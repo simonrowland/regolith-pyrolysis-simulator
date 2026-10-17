@@ -252,7 +252,9 @@ def test_path_value_keys_match_the_extract_tree() -> None:
     how ``table_transcription`` came to refuse ``/K``; its one relative path
     (bencze-yazhenskikh-2016.yaml:198) sits beside four printed tables.
     ``url`` values (http/https) and dot-paths (``path``, ``metadata_path``)
-    are not path-shaped here.
+    are not path-shaped here. Keys ending in ``_as_printed`` hold verbatim
+    source text (including filenames), so their values are excluded by key
+    name from this path-metadata heuristic.
     """
     acc: dict[str, list[str]] = {}
     for path in vle.discover_extracts():
@@ -265,6 +267,7 @@ def test_path_value_keys_match_the_extract_tree() -> None:
         for key, values in acc.items()
         if any(_PATH_SHAPED_RE.match(v) for v in values)
         and not any(is_prose(v) for v in values)
+        and not key.endswith("_as_printed")
     }
     missing = carries_paths - vle.PATH_VALUE_KEYS
     assert not missing, f"path-carrying keys outside PATH_VALUE_KEYS: {sorted(missing)}"

@@ -1,0 +1,702 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2024-cai-silica-evaporation.yaml
+observations:
+- observation_id: shornikov-2024-cai-silica-evaporation::shornikov_2024_fig1a_al_pressure
+  experiment_id: 59954d004a175edad250294260d31088bc9270bba581587ce382b9e8040050d3::experiment::shornikov_2024_cai_type_a_kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_figure_only'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'CAI type A residual melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only does not name a reference_state
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: 'Experimental CAI melt evaporation data are attributed to Shornikov and Yakovlev (2023), LPS LIV, Abstract
+      #1983, reference [2].'
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2024-cai-silica-evaporation
+  locator:
+    page: 2
+    published_page: 6197
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel A; line 3 is Al, per the caption.
+  read_from: pdf:shornikov-2024-cai-silica-evaporation
+- observation_id: shornikov-2024-cai-silica-evaporation::shornikov_2024_fig1a_ca_pressure
+  experiment_id: 59954d004a175edad250294260d31088bc9270bba581587ce382b9e8040050d3::experiment::shornikov_2024_cai_type_a_kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_figure_only'
+    species:
+      formula: Ca
+      phase:
+        tag: unknown
+        reason: phase string 'CAI type A residual melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only does not name a reference_state
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: 'Experimental CAI melt evaporation data are attributed to Shornikov and Yakovlev (2023), LPS LIV, Abstract
+      #1983, reference [2].'
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2024-cai-silica-evaporation
+  locator:
+    page: 2
+    published_page: 6197
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel A; line 1 is Ca, per the caption.
+  read_from: pdf:shornikov-2024-cai-silica-evaporation
+- observation_id: shornikov-2024-cai-silica-evaporation::shornikov_2024_fig1a_mg_pressure
+  experiment_id: 59954d004a175edad250294260d31088bc9270bba581587ce382b9e8040050d3::experiment::shornikov_2024_cai_type_a_kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_figure_only'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'CAI type A residual melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only does not name a reference_state
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: 'Experimental CAI melt evaporation data are attributed to Shornikov and Yakovlev (2023), LPS LIV, Abstract
+      #1983, reference [2].'
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2024-cai-silica-evaporation
+  locator:
+    page: 2
+    published_page: 6197
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel A; line 2 is Mg, per the caption.
+  read_from: pdf:shornikov-2024-cai-silica-evaporation
+- observation_id: shornikov-2024-cai-silica-evaporation::shornikov_2024_fig1a_sio_pressure
+  experiment_id: 59954d004a175edad250294260d31088bc9270bba581587ce382b9e8040050d3::experiment::shornikov_2024_cai_type_a_kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_figure_only'
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'CAI type A residual melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only does not name a reference_state
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: 'Experimental CAI melt evaporation data are attributed to Shornikov and Yakovlev (2023), LPS LIV, Abstract
+      #1983, reference [2].'
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2024-cai-silica-evaporation
+  locator:
+    page: 2
+    published_page: 6197
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel A; line 4 is SiO, per the caption.
+  read_from: pdf:shornikov-2024-cai-silica-evaporation
+- observation_id: shornikov-2024-cai-silica-evaporation::shornikov_2024_fig1b_al_pressure
+  experiment_id: 59954d004a175edad250294260d31088bc9270bba581587ce382b9e8040050d3::experiment::shornikov_2024_cai_type_b_kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_figure_only'
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: phase string 'CAI type B residual melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only does not name a reference_state
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: 'Experimental CAI melt evaporation data are attributed to Shornikov and Yakovlev (2023), LPS LIV, Abstract
+      #1983, reference [2].'
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2024-cai-silica-evaporation
+  locator:
+    page: 2
+    published_page: 6197
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel B; line 3 is Al, per the caption.
+  read_from: pdf:shornikov-2024-cai-silica-evaporation
+- observation_id: shornikov-2024-cai-silica-evaporation::shornikov_2024_fig1b_ca_pressure
+  experiment_id: 59954d004a175edad250294260d31088bc9270bba581587ce382b9e8040050d3::experiment::shornikov_2024_cai_type_b_kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_figure_only'
+    species:
+      formula: Ca
+      phase:
+        tag: unknown
+        reason: phase string 'CAI type B residual melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only does not name a reference_state
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: 'Experimental CAI melt evaporation data are attributed to Shornikov and Yakovlev (2023), LPS LIV, Abstract
+      #1983, reference [2].'
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2024-cai-silica-evaporation
+  locator:
+    page: 2
+    published_page: 6197
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel B; line 1 is Ca, per the caption.
+  read_from: pdf:shornikov-2024-cai-silica-evaporation
+- observation_id: shornikov-2024-cai-silica-evaporation::shornikov_2024_fig1b_mg_pressure
+  experiment_id: 59954d004a175edad250294260d31088bc9270bba581587ce382b9e8040050d3::experiment::shornikov_2024_cai_type_b_kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_figure_only'
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'CAI type B residual melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only does not name a reference_state
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: 'Experimental CAI melt evaporation data are attributed to Shornikov and Yakovlev (2023), LPS LIV, Abstract
+      #1983, reference [2].'
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2024-cai-silica-evaporation
+  locator:
+    page: 2
+    published_page: 6197
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel B; line 2 is Mg, per the caption.
+  read_from: pdf:shornikov-2024-cai-silica-evaporation
+- observation_id: shornikov-2024-cai-silica-evaporation::shornikov_2024_fig1b_sio_pressure
+  experiment_id: 59954d004a175edad250294260d31088bc9270bba581587ce382b9e8040050d3::experiment::shornikov_2024_cai_type_b_kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'partial_pressure_figure_only'
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'CAI type B residual melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    reference_state:
+      tag: unknown
+      reason: qualifier figure_only does not name a reference_state
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: 'Experimental CAI melt evaporation data are attributed to Shornikov and Yakovlev (2023), LPS LIV, Abstract
+      #1983, reference [2].'
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2024-cai-silica-evaporation
+  locator:
+    page: 2
+    published_page: 6197
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel B; line 4 is SiO, per the caption.
+  read_from: pdf:shornikov-2024-cai-silica-evaporation
+- observation_id: shornikov-2024-cai-silica-evaporation::shornikov_2024_fig1c_al2o3_activity
+  experiment_id: 59954d004a175edad250294260d31088bc9270bba581587ce382b9e8040050d3::experiment::shornikov_2024_cai_type_a_kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'component_activity_figure_only'
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'CAI type A residual melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2024-cai-silica-evaporation
+  locator:
+    page: 2
+    published_page: 6197
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel C; line 2 is Al2O3, per the caption.
+  read_from: pdf:shornikov-2024-cai-silica-evaporation
+- observation_id: shornikov-2024-cai-silica-evaporation::shornikov_2024_fig1c_ca2al2sio7_activity
+  experiment_id: 59954d004a175edad250294260d31088bc9270bba581587ce382b9e8040050d3::experiment::shornikov_2024_cai_type_a_kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'compound_activity_figure_only'
+    species:
+      formula: Ca2Al2SiO7
+      phase:
+        tag: unknown
+        reason: phase string 'CAI type A residual melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: Shornikov (2007), Experiment in Geosciences 14:35-37, cited as reference [3].
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2024-cai-silica-evaporation
+  locator:
+    page: 2
+    published_page: 6197
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel C; line 4 is Ca2Al2SiO7, per the caption.
+  read_from: pdf:shornikov-2024-cai-silica-evaporation
+- observation_id: shornikov-2024-cai-silica-evaporation::shornikov_2024_fig1c_cao_activity
+  experiment_id: 59954d004a175edad250294260d31088bc9270bba581587ce382b9e8040050d3::experiment::shornikov_2024_cai_type_a_kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'component_activity_figure_only'
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CAI type A residual melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2024-cai-silica-evaporation
+  locator:
+    page: 2
+    published_page: 6197
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel C; line 1 is CaO, per the caption.
+  read_from: pdf:shornikov-2024-cai-silica-evaporation
+- observation_id: shornikov-2024-cai-silica-evaporation::shornikov_2024_fig1c_sio2_activity
+  experiment_id: 59954d004a175edad250294260d31088bc9270bba581587ce382b9e8040050d3::experiment::shornikov_2024_cai_type_a_kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'component_activity_figure_only'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CAI type A residual melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2024-cai-silica-evaporation
+  locator:
+    page: 2
+    published_page: 6197
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel C; line 3 is SiO2, per the caption.
+  read_from: pdf:shornikov-2024-cai-silica-evaporation
+- observation_id: shornikov-2024-cai-silica-evaporation::shornikov_2024_fig1d_al2o3_activity
+  experiment_id: 59954d004a175edad250294260d31088bc9270bba581587ce382b9e8040050d3::experiment::shornikov_2024_cai_type_b_kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'component_activity_figure_only'
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'CAI type B residual melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2024-cai-silica-evaporation
+  locator:
+    page: 2
+    published_page: 6197
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel D; line 2 is Al2O3, per the caption.
+  read_from: pdf:shornikov-2024-cai-silica-evaporation
+- observation_id: shornikov-2024-cai-silica-evaporation::shornikov_2024_fig1d_ca2al2sio7_activity
+  experiment_id: 59954d004a175edad250294260d31088bc9270bba581587ce382b9e8040050d3::experiment::shornikov_2024_cai_type_b_kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'compound_activity_figure_only'
+    species:
+      formula: Ca2Al2SiO7
+      phase:
+        tag: unknown
+        reason: phase string 'CAI type B residual melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: Shornikov (2007), Experiment in Geosciences 14:35-37, cited as reference [3].
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2024-cai-silica-evaporation
+  locator:
+    page: 2
+    published_page: 6197
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel D; line 4 is Ca2Al2SiO7, per the caption.
+  read_from: pdf:shornikov-2024-cai-silica-evaporation
+- observation_id: shornikov-2024-cai-silica-evaporation::shornikov_2024_fig1d_cao_activity
+  experiment_id: 59954d004a175edad250294260d31088bc9270bba581587ce382b9e8040050d3::experiment::shornikov_2024_cai_type_b_kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'component_activity_figure_only'
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CAI type B residual melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2024-cai-silica-evaporation
+  locator:
+    page: 2
+    published_page: 6197
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel D; line 1 is CaO, per the caption.
+  read_from: pdf:shornikov-2024-cai-silica-evaporation
+- observation_id: shornikov-2024-cai-silica-evaporation::shornikov_2024_fig1d_sio2_activity
+  experiment_id: 59954d004a175edad250294260d31088bc9270bba581587ce382b9e8040050d3::experiment::shornikov_2024_cai_type_b_kems
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'component_activity_figure_only'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CAI type B residual melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2024-cai-silica-evaporation
+  locator:
+    page: 2
+    published_page: 6197
+    pdf_page_index: 1
+    figure: '1'
+    note: Panel D; line 3 is SiO2, per the caption.
+  read_from: pdf:shornikov-2024-cai-silica-evaporation

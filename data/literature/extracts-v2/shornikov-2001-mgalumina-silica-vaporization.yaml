@@ -1,0 +1,1134 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2001-mgalumina-silica-vaporization.yaml
+observations:
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_al2o3_ca_s_1933k
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::shornikov-2001-mgalumina-silica-vaporization
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Not stated in this article; curve reproduced from cited prior work.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, activity_component, composition_component,
+      composition_basis, composition_axis_range_mole_percent, curve_as_printed, system_as_printed, temperature_as_printed_K,
+      source_attribution_as_printed, data_scope'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 5; CA-S comparative activity attributed by the caption to prior work.
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 5; CA-S comparative activity attributed by the caption to prior work.
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_al2o3_ma_s_2050k
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'MgAl2O4-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2050'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, activity_component, composition_component,
+      composition_basis, composition_axis_range_mole_percent, curve_as_printed, system_as_printed, temperature_as_printed_K,
+      source_attribution_as_printed, data_scope'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 4; MA-S activity in this study.
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2050'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 4; MA-S activity in this study.
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_cao_ca_s_1933k
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::shornikov-2001-mgalumina-silica-vaporization
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Not stated in this article; curve reproduced from cited prior work.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, activity_component, composition_component,
+      composition_basis, composition_axis_range_mole_percent, curve_as_printed, system_as_printed, temperature_as_printed_K,
+      source_attribution_as_printed, data_scope'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 2; CA-S comparative activity attributed by the caption to prior work.
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 2; CA-S comparative activity attributed by the caption to prior work.
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_cao_ct_s_2100k
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::shornikov-2001-mgalumina-silica-vaporization
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-TiO2-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Not stated in this article; curve reproduced from cited prior work.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, activity_component, composition_component,
+      composition_basis, composition_axis_range_mole_percent, curve_as_printed, system_as_printed, temperature_as_printed_K,
+      source_attribution_as_printed, data_scope'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 3; CT-S comparative activity attributed by the caption to prior work.
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 3; CT-S comparative activity attributed by the caption to prior work.
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_mgo_ma_s_2050k
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: unknown
+        reason: phase string 'MgAl2O4-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2050'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, activity_component, composition_component,
+      composition_basis, composition_axis_range_mole_percent, curve_as_printed, system_as_printed, temperature_as_printed_K,
+      source_attribution_as_printed, data_scope'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 1; MA-S activity in this study.
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2050'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 1; MA-S activity in this study.
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_sio2_ca_s_1933k
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::shornikov-2001-mgalumina-silica-vaporization
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Not stated in this article; curve reproduced from cited prior work.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, activity_component, composition_component,
+      composition_basis, composition_axis_range_mole_percent, curve_as_printed, system_as_printed, temperature_as_printed_K,
+      source_attribution_as_printed, data_scope'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 8; CA-S comparative activity attributed by the caption to prior work.
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 8; CA-S comparative activity attributed by the caption to prior work.
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_sio2_ct_s_2100k
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::shornikov-2001-mgalumina-silica-vaporization
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-TiO2-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Not stated in this article; curve reproduced from cited prior work.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, activity_component, composition_component,
+      composition_basis, composition_axis_range_mole_percent, curve_as_printed, system_as_printed, temperature_as_printed_K,
+      source_attribution_as_printed, data_scope'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 9; CT-S comparative activity attributed by the caption to prior work.
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 9; CT-S comparative activity attributed by the caption to prior work.
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_sio2_ma_s_2050k
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'MgAl2O4-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2050'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Equation (12) integrates SiO2 activity from x(SiO2)=1; the equation does
+        not explicitly state a solid or liquid phase for that pure-composition endpoint.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, activity_component, composition_component,
+      composition_basis, composition_axis_range_mole_percent, curve_as_printed, system_as_printed, temperature_as_printed_K,
+      source_attribution_as_printed, data_scope'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 7; MA-S activity in this study.
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2050'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 7; MA-S activity in this study.
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_tio2_ct_s_2100k
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::shornikov-2001-mgalumina-silica-vaporization
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: TiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-TiO2-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2100'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source reference state not printed: Not stated in this article; curve reproduced from cited prior work.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, activity_component, composition_component,
+      composition_basis, composition_axis_range_mole_percent, curve_as_printed, system_as_printed, temperature_as_printed_K,
+      source_attribution_as_printed, data_scope'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 6; CT-S comparative activity attributed by the caption to prior work.
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 6; CT-S comparative activity attributed by the caption to prior work.
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f3_ca_s_ref14_1933k
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::shornikov-2001-mgalumina-silica-vaporization
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Gibbs energy of melt formation'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1933'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Gibbs energy of melt formation'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 328
+    pdf_page_index: 6
+    figure: '3'
+    note: Curve 3; CA-S melt formation Gibbs energy.
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 328
+        pdf_page_index: 6
+        figure: '3'
+        note: Curve 3; CA-S melt formation Gibbs energy.
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f3_ct_s_ref17_2100k
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::shornikov-2001-mgalumina-silica-vaporization
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Gibbs energy of melt formation'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-TiO2-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2100'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Gibbs energy of melt formation'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 328
+    pdf_page_index: 6
+    figure: '3'
+    note: Curve 4; CT-S melt formation Gibbs energy.
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        published_page: 328
+        pdf_page_index: 6
+        figure: '3'
+        note: Curve 4; CT-S melt formation Gibbs energy.
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f3_ideal_melt_reference
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::shornikov-2001-mgalumina-silica-vaporization
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Gibbs energy of ideal melt formation reference'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Gibbs energy of ideal melt formation reference';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 328
+    pdf_page_index: 6
+    figure: '3'
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f3_ma_s_2050k
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Gibbs energy of melt formation'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'MgAl2O4-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2050'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Gibbs energy of melt formation'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 328
+    pdf_page_index: 6
+    figure: '3'
+    note: Curve 1; MA-S melt formation Gibbs energy from this study.
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2050'
+      locator:
+        published_page: 328
+        pdf_page_index: 6
+        figure: '3'
+        note: Curve 1; MA-S melt formation Gibbs energy from this study.
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f3_ma_s_ref11_1873k
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::shornikov-2001-mgalumina-silica-vaporization
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Gibbs energy of melt formation'
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'MgAl2O4-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Gibbs energy of melt formation'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 328
+    pdf_page_index: 6
+    figure: '3'
+    note: Curve 2; comparative MA-S melt formation Gibbs energy.
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 328
+        pdf_page_index: 6
+        figure: '3'
+        note: Curve 2; comparative MA-S melt formation Gibbs energy.

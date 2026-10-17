@@ -1,0 +1,5095 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  citation: Mathieu, R. (2009). Solubilité du sodium dans les silicates fondus. Thesis, INPL Nancy.
+  source_ids:
+  - mathieu-2009-sodium-solubility-thesis
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: unknown:mathieu-2009-sodium-solubility-thesis
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+experiments:
+- experiment_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8::experiment::sealed_ampoule_glass_equilibration
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    container:
+      state:
+        tag: value
+        value: Pt wire loop hung under the Pt lid of a Pt crucible reactor inside a sealed silica ampoule
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+    pretreatment:
+      state:
+        tag: value
+        value: 15–20 mg glass beads suspended on Pt loops inside sealed silica ampoule; Na2O–xSiO2 source coexists with sample.
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: runs_span_multiple_temperatures_from_1250_to_1400_C
+      locator:
+        published_page: 41
+        section: II.4.1
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: closed_ampoule_equilibration; no run chamber background pressure reported
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: sealed_ampoule_no_sweep_gas
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+    regime:
+      regime_class:
+        tag: unknown
+        reason: sealed_ampoule_equilibration_not_a_gas_flow_regime
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value: '0.1'
+        locator:
+          published_page: 38
+          section: II.2 Description du système expérimental
+          note: 10^-3 mbar evacuation before sealing; preparation pressure only.
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  locator:
+    published_page: 38
+    section: II.2 Description du système expérimental
+    note: pdf_page=61
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_applicable_to_sealed_ampoule_method
+        locator:
+          published_page: 38
+          section: II.2 Description du système expérimental
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_applicable_to_sealed_ampoule_method
+        locator:
+          published_page: 38
+          section: II.2 Description du système expérimental
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.21379575'
+          approximate: false
+      locator:
+        table: III.1
+        note: table caption; pdf_page=145
+      inference:
+        relation: Ni/NiO solid buffer fO2 printed in the table caption ("fO2 = 2.11*10-06 atm"); the author does not state
+          how it was computed
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=2.11E-6 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000211'
+            locator:
+              table: III.1
+              note: table caption; pdf_page=145
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              table: III.1
+              note: table caption; pdf_page=145
+        output_unit: Pa
+  bench_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8::bench::mathieu_2009_sealed_silica_ampoule_cell
+  thermal_schedule:
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Ampoule removed from the furnace and quenched in water; cooling rate estimated at 50 °C/s over the first 10
+          s
+      locator:
+        published_page: 39
+        section: II.2 Description du système expérimental
+benches:
+- id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8::bench::mathieu_2009_sealed_silica_ampoule_cell
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Sealed silica-ampoule thermochemical cell (closed system) heated in a muffle furnace
+    locator:
+      published_page: 38
+      section: II.2 Description du système expérimental
+  method:
+    state:
+      tag: value
+      value: Wire-loop glass beads suspended under the lid of a Pt crucible reactor above a Na2O-xSiO2 source of known aNa2O;
+        fO2 set by a Me/MeO solid buffer; ampoule sealed under vacuum; quench in water
+    locator:
+      published_page: 38
+      section: II.2 Description du système expérimental
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Sealed silica tube of 25-30 cm3 (22 mm external diameter, 120 mm high); reactor is a Pt crucible (16 mm diameter,
+        20 mm high) with a Pt lid; samples on Pt wire loops hung from Pt holders; Me/MeO buffer in a silica or alumina crucible
+        under the Pt crucible; ampoule held upright in an alumina crucible in the furnace
+    locator:
+      published_page: 38
+      section: II.2 Description du système expérimental
+  cell_materials:
+  - state:
+      tag: value
+      value: SiO2
+    locator:
+      published_page: 38
+      section: II.2 Description du système expérimental
+  - state:
+      tag: value
+      value: Pt
+    locator:
+      published_page: 38
+      section: II.2 Description du système expérimental
+  - state:
+      tag: value
+      value: Al2O3
+    locator:
+      published_page: 39
+      section: II.2 Description du système expérimental
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+        note: Sealed ampoule; no effusion orifice.
+  ionization:
+    ionization_energy_eV:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+  temperature_measurement:
+    control_thermocouple:
+      state:
+        tag: value
+        value: Furnace temperature controlled by a Pt/PtRh thermocouple
+      locator:
+        published_page: 39
+        section: II.2 Description du système expérimental
+  temperature_calibration:
+    calibration_procedure:
+      state:
+        tag: value
+        value: Calibration of the furnace and the ampoules gives a gradient of 3 °C/cm
+      locator:
+        published_page: 39
+        section: II.2 Description du système expérimental
+    stated_uncertainty:
+      state:
+        tag: value
+        value: Temperature uncertainty does not exceed ±5 °C; gradient on the cell about 3 °C/cm, small inside the 20 mm reactor
+          (2008 J. Non-Cryst. Solids letter reprinted in chapter II)
+      locator:
+        published_page: 54
+        section: reprinted 2008 letter, section 2
+  heating_method:
+    state:
+      tag: value
+      value: GERO HTK 8.4 muffle furnace at the working temperature; quench in water, cooling rate estimated at 50 °C/s over
+        the first 10 s
+    locator:
+      published_page: 39
+      section: II.2 Description du système expérimental
+  other_facts:
+  - name: ampoule_volume
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: 25-30
+          approximate: false
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+    unit: cm3
+  - name: ampoule_external_diameter
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '22'
+          approximate: false
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+    unit: mm
+  - name: ampoule_height
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+          approximate: false
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+    unit: mm
+  - name: reactor_crucible_diameter
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '16'
+          approximate: false
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+    unit: mm
+  - name: reactor_crucible_height
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20'
+          approximate: false
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+    unit: mm
+  - name: sodium_source_mass
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2'
+          approximate: false
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+    unit: g
+  - name: sodium_source_composition
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Na2O-xSiO2 with 1 <= x <= 9
+          approximate: false
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+    unit: instrument
+  - name: sample_bead_mass
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: 15-20
+          approximate: false
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+    unit: mg
+  - name: max_samples_per_run
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '9'
+          approximate: false
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+    unit: count
+  - name: bead_premelt_temperature
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1650'
+          approximate: false
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+    unit: °C
+  - name: oxygen_buffer
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Me/MeO solid buffer (Me = Ni, Co, Fe); 5 g of stoichiometric mixture Me/MeO = 4
+          approximate: false
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+    unit: instrument
+  - name: evacuation_pressure_before_sealing
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.001'
+          approximate: false
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+        note: Pmini = 10-3 mbar, measured with an MKS baratron; preparation pressure, not a run background pressure
+    unit: mbar
+  - name: degassing_temperature_before_sealing
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '150'
+          approximate: false
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+    unit: °C
+  - name: quench_cooling_rate
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '50'
+          approximate: false
+      locator:
+        published_page: 39
+        section: II.2 Description du système expérimental
+    unit: °C/s
+  - name: thermal_gradient
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3'
+          approximate: false
+      locator:
+        published_page: 39
+        section: II.2 Description du système expérimental
+    unit: °C/cm
+  - name: temperature_uncertainty
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5'
+          approximate: false
+      locator:
+        published_page: 54
+        section: reprinted 2008 letter, section 2
+        note: printed as ±5 °C
+    unit: °C
+  - name: maximum_usable_temperature
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1450'
+          approximate: false
+      locator:
+        published_page: 41
+        section: II.4.1
+        note: above this the silica ampoule becomes ductile
+    unit: °C
+  - name: run_temperature_range
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: 1250-1400
+          approximate: false
+      locator:
+        published_page: 41
+        section: II.4.1
+    unit: °C
+  - name: background_pressure_Pa
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 38
+        section: II.2 Description du système expérimental
+        note: Closed ampoule; no run background pressure is reported.
+    unit: Pa
+context:
+- observation_id: mathieu_2009_activity_definition_context
+  type: source_metadata_context
+  locator:
+    pdf_page_index: 42
+    section: experimental methods
+  units: printed equation and prose
+  values:
+    quantity: activity_definition_and_standard_state
+    method_class: quoted_unattributed
+    reaction: Na2O(l) = 2 Na(g) + 1/2 O2(g)
+    activity_relation_as_printed: K_eq = P_Na^2 P_O2^(1/2) / a_Na2O(l); source glass and sample activities equated at equilibrium.
+    activity_standard_state: pure liquid Na2O, as explicitly denoted Na2O(l).
+    defining_species: Na(g) partial pressure together with oxygen fugacity; no ion-current measurement.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_activity_definition_context
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_apparatus_context
+  type: source_metadata_context
+  locator:
+    pdf_page_index: 39
+    section: experimental methods
+  units: printed prose
+  values:
+    quantity: apparatus_and_sample
+    method_class: quoted_unattributed
+    ampoule: sealed silica ampoule; internal volume 25–30 cm³; outside diameter 22 mm; height 120 mm
+    crucible: Pt crucible, 16 mm diameter × 20 mm height, with Pt lid
+    sample: 15–20 mg glass beads suspended from Pt loops; up to 9 beads on a lid; source glass and sample coexist in the sealed
+      capsule
+    preparation: Powders mixed with PVA binder, formed into beads, melted in a 1650 °C muffle furnace and air-quenched.
+    starting_source: Na2O–xSiO2 with 1 ≤ x ≤ 9; named buffers include NS1, NS2, NS3.5 and NS8.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_apparatus_context
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_buffer_context
+  type: source_metadata_context
+  locator:
+    pdf_page_index: 40
+    section: experimental methods
+  units: printed prose
+  values:
+    quantity: buffer_and_ampoule_pressure
+    method_class: quoted_unattributed
+    oxygen_buffers: Ni/NiO, Co/CoO and Fe/FeO solid metal/metal-oxide buffers; 5 g stoichiometric metal/oxide mixture.
+    evacuation: Ampoule evacuated to 10^-3 mbar before sealing; preparation residual pressure only, not a run chamber pressure.
+    oxygen_fugacity_range_as_printed: 10^-5 to 10^-12 atm overall; at 1400 °C, 10^-6 to 10^-10 atm.
+    oxygen_fugacity_uncertainty: residual O2 uncertainty <0.2 log unit; calculated using HSC Chemistry, Fig. II.2.
+    water_note: Water is discussed as residual contaminant; preheating with activated charcoal and liquid-nitrogen trapping
+      are described.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_buffer_context
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_01_cell_design
+  type: source_metadata_context
+  locator:
+    pdf_page: 60
+    published_page: 37
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    topic: cell design
+    statement_as_printed: Tout d'abord le volume limité de ce dispositif, en diminuant l'évaporation de la source, permet
+      de fixer la pression partielle en Na sur des temps longs (plusieurs jours) et d’atteindre plus facilement les conditions
+      d'équilibre.
+    checked_against: embedded PDF text layer and the rendered page image
+    transcription_note: sentence runs across the page break PDF p60-61
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_01_cell_design
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_02_glass_synthesis
+  type: source_metadata_context
+  locator:
+    pdf_page: 63
+    published_page: 40
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    topic: glass synthesis
+    statement_as_printed: Ensuite le creuset est porté à 1650°C pendant 1h, ou a 100°C au dessus du liquidus pour les compositions
+      sodiques, afin de diminuer la perte d’oxyde de sodium par volatilisation, tout en permettant l’homogénéisation.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_02_glass_synthesis
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_03_glass_synthesis
+  type: source_metadata_context
+  locator:
+    pdf_page: 63
+    published_page: 40
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    topic: glass synthesis
+    statement_as_printed: Ensuite le creuset est porté à 100°C au dessus du liquidus pendant 15 minutes, afin de limiter la
+      perte d’oxyde de sodium par volatilisation, tout en permettant l’homogénéisation du verre.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_03_glass_synthesis
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_04_fo2_uncertainty
+  type: source_metadata_context
+  locator:
+    pdf_page: 65
+    published_page: 42
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    topic: fO2 uncertainty
+    statement_as_printed: La PO2 dans l'ampoule peut être évaluée grâce à la figure II.2, avec une barre d'erreur inférieure
+      à 0.2 unité log.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_04_fo2_uncertainty
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_05_source_activity_model
+  type: source_metadata_context
+  locator:
+    pdf_page: 67
+    published_page: 44
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    topic: source activity model
+    statement_as_printed: A chaque température, l’écart entre les données expérimentales et le modèle est inférieur à 0.5
+      unité log.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_05_source_activity_model
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_06_source_activity_model
+  type: source_metadata_context
+  locator:
+    pdf_page: 67
+    published_page: 44
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    topic: source activity model
+    statement_as_printed: Néanmoins nos modèles ne sont valables que pour xNa2O supérieur a 20 mol%. Pour des valeurs plus
+      faibles, l’activité tend vers une valeur constante, et s'écarte du domaine linéaire. Ainsi pour des valeurs de xNa2O,
+      inferieures à 20 mol%, les valeurs d’activités considérées seront celle obtenues avec FactSage@.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_06_source_activity_model
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_07_source_state
+  type: source_metadata_context
+  locator:
+    pdf_page: 67
+    published_page: 44
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    topic: source state
+    statement_as_printed: Pour les tampons avec une concentration en SiO2 inférieur à 88 wt%, à 1400°C, la source est liquide.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_07_source_state
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_08_temperature
+  type: source_metadata_context
+  locator:
+    pdf_page: 77
+    published_page: 54
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    topic: temperature
+    statement_as_printed: Preliminary temperature measurements in the device near the reactor reveals that despite the existence
+      of a thermal gradient on the cell (≈3 °C cm−1), gradients inside the reactor (20 mm high) are relatively small due to
+      the ability of the alumina of the support and the platinum of the crucible to homogenize the temperature, and that temperature
+      uncertainty do not exceed ±5 °C.
+    checked_against: embedded PDF text layer and the rendered page image
+    transcription_note: ≈, −1 and ± are symbol-font glyphs; read from the page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_08_temperature
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_09_equilibration_kinetics_vs_fo2
+  type: source_metadata_context
+  locator:
+    pdf_page: 79
+    published_page: 56
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: equilibration kinetics vs fO2
+    statement_as_printed: The fact that the attainment of equilibrium is faster in Co/CoO and Fe/FeO redox conditions than
+      at Ni/NiO, is consistent with an increase in the rate of Na evaporation with decreasing fO2 [2,17,22,23].
+    checked_against: embedded PDF text layer and the rendered page image
+    transcription_note: two-column page; sentence order read from the page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_09_equilibration_kinetics_vs_fo2
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_10_equilibration_kinetics
+  type: source_metadata_context
+  locator:
+    pdf_page: 100
+    published_page: 77
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: equilibration kinetics
+    statement_as_printed: Results show that Na2O contents of the EDiAn melt increase rapidly with the exposure time and reached
+      a steady state at a value of Na2O ≈ 13 wt% (Fig. 3).
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_10_equilibration_kinetics
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_11_composition_conservation
+  type: source_metadata_context
+  locator:
+    pdf_page: 100
+    published_page: 77
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    topic: composition conservation
+    statement_as_printed: After experiments, Si/Mg and Ca/Al ratio (Table 2) remain constant in the studied glass samples
+      indicating that i) Na entering the melt from the gas phase simply dilutes the Na-free primordial composition (Table
+      1), ii) SiO(gas) entering from the gas phase, if any, is negligible
+    checked_against: embedded PDF text layer and the rendered page image
+    transcription_note: sentence continues with citations (Rego et al, 1988; ...)
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_11_composition_conservation
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_12_composition_conservation
+  type: source_metadata_context
+  locator:
+    pdf_page: 103
+    published_page: 80
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    topic: composition conservation
+    statement_as_printed: As observed for EDiAn, Si/Mg and Ca/Al ratio remain constant in the studied glass samples indicating
+      that partial pressures of SiO(g) in the cell are negligible, and that no sample contamination occurs from the source.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_12_composition_conservation
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_13_cms_solubility_range
+  type: source_metadata_context
+  locator:
+    pdf_page: 103
+    published_page: 80
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: CMS solubility range
+    statement_as_printed: The normalized values Na2O (wt%) or Na2O (mol%) are presented in Table 6, showing a very large range
+      of variation, from 4.28 up to 30 mol%, of the sodium solubility in CMS melts.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_13_cms_solubility_range
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_14_solubility_vs_sio2_nbo_t
+  type: source_metadata_context
+  locator:
+    pdf_page: 104
+    published_page: 81
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: solubility vs SiO2/NBO/T
+    statement_as_printed: The increase of the SiO2 content of the melt causes a drastic increase of the Na2O-solubility in
+      the CMS melt, by almost an order of magnitude, form 4.28 mol% for silica-poor melts up to a maximum value of ≈ 30 mol%
+      for a pure SiO2 melt, suggestive of the significant influence of the melt bulk polymerization (NBO/T) on the Na2O solubility.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_14_solubility_vs_sio2_nbo_t
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_15_gamma_vs_sio2_ca_mg
+  type: source_metadata_context
+  locator:
+    pdf_page: 104
+    published_page: 81
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: gamma vs SiO2, Ca-Mg
+    statement_as_printed: Iso-activity coefficient curves drawn in the CMS system follows (Fig. 7) the same trend depicted
+      for Na2O solubility curves with a significant decrease of γNa2Osample as function of SiO2 content and NBO/T. γNa2Osample
+      curves are also sensitive to Ca-Mg exchange in the melt with a decrease of a γNa2Osample values as Mg is substituted
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_15_gamma_vs_sio2_ca_mg
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_16_solubility_vs_polymerization
+  type: source_metadata_context
+  locator:
+    pdf_page: 105
+    published_page: 82
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: solubility vs polymerization
+    statement_as_printed: At first, the strong positive correlation between the Na2O-solubility and the silica content of
+      the melt (Fig. 6 and 7) suggest that the degree of polymerization of melts is one of the key parameters controlling
+      the Na-solubility in CMS melt, with increasing solubility with increasing melt polymerization.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_16_solubility_vs_polymerization
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_17_solubility_vs_mgo_cao
+  type: source_metadata_context
+  locator:
+    pdf_page: 106
+    published_page: 83
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: solubility vs MgO, CaO
+    statement_as_printed: For Na, this assumption is confirmed by the influence of MgO or CaO contents, showing that when
+      MgO or CaO contents increase, Na-solubility decreases.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_17_solubility_vs_mgo_cao
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_18_solubility_vs_ca_mg_substitution
+  type: source_metadata_context
+  locator:
+    pdf_page: 106
+    published_page: 83
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: solubility vs Ca-Mg substitution
+    statement_as_printed: At constant bulk NBO/T, we have seen indeed that the substitution of CaO by MgO causes a significant
+      increases in the Na2O solubility in CMS melt (Fig. 6 and 7).
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_18_solubility_vs_ca_mg_substitution
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_19_phase_relations_vs_na
+  type: source_metadata_context
+  locator:
+    pdf_page: 107
+    published_page: 84
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: phase relations vs Na
+    statement_as_printed: the molten domain increase strongly (until a 150-200°C decrease of liquidus for MgO-rich compositions),
+      confirming the melting effect of sodium, ii) more polymerized minerals (enstatite, wollastonite and quartz) are destabilized,
+      iii) less polymerized minerals (forsterite and rankinite) are stabilized, e.g. for high Na-content.
+    checked_against: embedded PDF text layer and the rendered page image
+    transcription_note: '"Na- content" is hyphenated across a line end on the page'
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_19_phase_relations_vs_na
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_20_gamma_ordering
+  type: source_metadata_context
+  locator:
+    pdf_page: 111
+    published_page: 88
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: gamma ordering
+    statement_as_printed: Indeed, for an equivalent optical basicity and equivalent temperature modeling, ln(γMgO) is 4-5
+      order of magnitude higher than ln(γCaO); and ln(γCaO) is 5-6 order of magnitude higher than ln(γNa2O) (this study and
+      Beckett, 2002).
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_20_gamma_ordering
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_21_solubility_vs_polymerization
+  type: source_metadata_context
+  locator:
+    pdf_page: 111
+    published_page: 88
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: solubility vs polymerization
+    statement_as_printed: the higher the BO or Si-O-Si fraction in the CMS melt, the higher the Na-solubility.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_21_solubility_vs_polymerization
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_22_source_activity_ns3_5
+  type: source_metadata_context
+  locator:
+    pdf_page: 144
+    published_page: 121
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: source activity NS3.5
+    statement_as_printed: Ce tampon sodique va imposer une activité d’un ordre de grandeur plus faible dans le réacteur.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_22_source_activity_ns3_5
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_23_cms_ns3_5_solubility
+  type: source_metadata_context
+  locator:
+    pdf_page: 146
+    published_page: 123
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: CMS NS3.5 solubility
+    statement_as_printed: La solubilité du Na augmente en direction du pole siliceux (NBO/T la pus faible) pour atteindre
+      une valeur d’environ 22mol%, suggérant toujours un effet important de la teneur en SiO2 et donc du degré de polymérisation
+      du liquide.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_23_cms_ns3_5_solubility
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_24_phase_relations_vs_pna
+  type: source_metadata_context
+  locator:
+    pdf_page: 148
+    published_page: 125
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: phase relations vs PNa
+    statement_as_printed: On peut noter que sous une PNa plus faible, le domaine liquide est plus petit, avec apparition dans
+      ce cas de la Wo.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_24_phase_relations_vs_pna
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_25_source_activity_ns2_1250_c
+  type: source_metadata_context
+  locator:
+    pdf_page: 149
+    published_page: 126
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: source activity NS2 1250 C
+    statement_as_printed: Ce tampon sodique, à température plus basse, va imposer une activité plus faible.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_25_source_activity_ns2_1250_c
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_26_non_equilibrium_crystallised_starts
+  type: source_metadata_context
+  locator:
+    pdf_page: 150
+    published_page: 127
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    topic: non-equilibrium crystallised starts
+    statement_as_printed: En effet la cinétique de condensation va avoir un rôle d’autant plus important que les compositions
+      de départ sont cristallisées.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_26_non_equilibrium_crystallised_starts
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_27_cms_1250_c_iso_solubility
+  type: source_metadata_context
+  locator:
+    pdf_page: 151
+    published_page: 128
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: CMS 1250 C iso-solubility
+    statement_as_printed: Les courbes obtenues présentent toujours un aspect linéaire, subparallèle, dont la valeur augmente
+      en direction du pole siliceux pour atteindre une valeur d’environ 22mol%.
+    checked_against: embedded PDF text layer and the rendered page image
+    transcription_note: sentence runs across the page break PDF p151-152 (printed page number 128 omitted); printed "sub-parallèle"
+      hyphenated at line end
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_27_cms_1250_c_iso_solubility
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_28_generalisation_to_t_and_pna
+  type: source_metadata_context
+  locator:
+    pdf_page: 154
+    published_page: 131
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: generalisation to T and PNa
+    statement_as_printed: Des expériences avec le même tampon à plus basse température, ou avec un tampon plus pauvre en sodium
+      à la même température, montrent que ces résultats sont généralisables à toute température et toute pression partielle
+      en sodium, avec une solubilité plus faible.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_28_generalisation_to_t_and_pna
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_29_solubility_vs_optical_basicity
+  type: source_metadata_context
+  locator:
+    pdf_page: 154
+    published_page: 131
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: solubility vs optical basicity
+    statement_as_printed: Les résultats obtenus dans l’article montrent une très bonne corrélation entre la solubilité et
+      la basicité optique.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_29_solubility_vs_optical_basicity
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_30_run_durations_iv_1
+  type: source_metadata_context
+  locator:
+    pdf_page: 159
+    published_page: 136
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    topic: run durations IV.1
+    statement_as_printed: pour des temps variant de 48h à 116h.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_30_run_durations_iv_1
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_31_analysis_location
+  type: source_metadata_context
+  locator:
+    pdf_page: 161
+    published_page: 138
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    topic: analysis location
+    statement_as_printed: Pour ces compositions, les analyses ont été effectuées dans la partie de la charge la plus riche
+      en verre.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_31_analysis_location
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_32_cas_solubility_range
+  type: source_metadata_context
+  locator:
+    pdf_page: 162
+    published_page: 139
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: CAS solubility range
+    statement_as_printed: Les résultats sur la solubilité du sodium montrent une très grande variabilité, avec des concentrations
+      en oxyde de sodium variant entre 0.9 pour les compositions pauvres en SiO2 et en Al2O3 et jusqu’à 30 mol% pour la composition
+      la plus riche en SiO2.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_32_cas_solubility_range
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_33_cas_iso_solubility
+  type: source_metadata_context
+  locator:
+    pdf_page: 162
+    published_page: 139
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: CAS iso-solubility
+    statement_as_printed: Les courbes obtenues présentent un aspect linéaire, sub-parallèle, avec une augmentation de la solubilité
+      en direction du pôle siliceux jusqu'à environ 30 mol%.
+    checked_against: embedded PDF text layer and the rendered page image
+    transcription_note: sentence runs across the page break PDF p162-163
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_33_cas_iso_solubility
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_34_mas_vs_cas_variability
+  type: source_metadata_context
+  locator:
+    pdf_page: 168
+    published_page: 145
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: MAS vs CAS variability
+    statement_as_printed: La solubilité du sodium dans ces compositions de liquide MAS varie entre 17 et 30 mol% de Na2O.
+      Pour une même gamme de composition, on doit noter que cette variabilité est significativement plus faible que celle
+      observée pour le système CAS.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_34_mas_vs_cas_variability
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_35_mas_iso_solubility
+  type: source_metadata_context
+  locator:
+    pdf_page: 169
+    published_page: 146
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: MAS iso-solubility
+    statement_as_printed: Les courbes obtenues présentent un aspect linéaire, sub-parallèle et la valeur de solubilité augmente
+      en direction du pole siliceux pour atteindre une valeur d’environ 30 mol%.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_35_mas_iso_solubility
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_36_glassy_run_products
+  type: source_metadata_context
+  locator:
+    pdf_page: 172
+    published_page: 149
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    topic: glassy run products
+    statement_as_printed: Toutes ces compositions ont un liquidus inférieur à 1400°C, et donc, sont vitreuses après expériences.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_36_glassy_run_products
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_37_cmas5_solubility_range
+  type: source_metadata_context
+  locator:
+    pdf_page: 173
+    published_page: 150
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: CMAS5 solubility range
+    statement_as_printed: La solubilité du sodium varie entre 3.3 et 17.2 mol% pour les compositions les plus siliceuses.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_37_cmas5_solubility_range
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_38_iso_solubility_iv_3
+  type: source_metadata_context
+  locator:
+    pdf_page: 174
+    published_page: 151
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: iso-solubility IV.3
+    statement_as_printed: Les courbes d’iso-solubilité présentent un aspect linéaire, sub-parallèle et dont la valeur augmente
+      en direction du pole SiO2 pour atteindre une valeur d’environ 28 mol%.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_38_iso_solubility_iv_3
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_39_iso_solubility_iv_3
+  type: source_metadata_context
+  locator:
+    pdf_page: 174
+    published_page: 151
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: iso-solubility IV.3
+    statement_as_printed: L’évolution de la solubilité de Na vers le pôle SiO2 n’est pas linéaire, avec une augmentation plus
+      lente en se rapprochant de ce pôle.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_39_iso_solubility_iv_3
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_40_ns3_5_vs_ns2
+  type: source_metadata_context
+  locator:
+    pdf_page: 176
+    published_page: 153
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: NS3.5 vs NS2
+    statement_as_printed: Les résultats montrent une grande variation de la solubilité du sodium, avec des valeurs de solubilité
+      plus faible qu’avec le tampon Na2O-2SiO2, la concentration en oxyde de sodium variant entre 2 et 11 mol%.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_40_ns3_5_vs_ns2
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_41_iso_solubility_iv_4
+  type: source_metadata_context
+  locator:
+    pdf_page: 177
+    published_page: 154
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: iso-solubility IV.4
+    statement_as_printed: Les courbes d’iso-solubilité en Na2O en mol% (figure IV.15a) présentent un aspect linéaire, sub-parallèle
+      avec une solubilité qui augmente en direction du pole 5mol%Al2O3-95mol%SiO2 et augmente avec la teneur en silice.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_41_iso_solubility_iv_4
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_42_ns1_vs_ns2
+  type: source_metadata_context
+  locator:
+    pdf_page: 179
+    published_page: 156
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: NS1 vs NS2
+    statement_as_printed: Ils montrent une grande variation, et des valeurs de solubilité plus forte qu’avec le tampon Na2O-2SiO2
+      . En effet la concentration en oxyde de sodium sont toutes supérieures à 14 mol% jusqu’à des valeurs de 45 mol% pour
+      la composition la plus siliceuse.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_42_ns1_vs_ns2
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_43_iv_6_complementary
+  type: source_metadata_context
+  locator:
+    pdf_page: 180
+    published_page: 157
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    topic: IV.6 complementary
+    statement_as_printed: Ces données sont complémentaires de celles présentées dans le chapitre précédent. Il est intéressant
+      de noter l’équilibre melilite+liquide pour la composition CMA16S2.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_43_iv_6_complementary
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_44_iv_7_range
+  type: source_metadata_context
+  locator:
+    pdf_page: 180
+    published_page: 157
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: IV.7 range
+    statement_as_printed: La large gamme des compositions présentées dans ce paragraphe entraîne une large gamme de solubilité
+      en sodium mesuré, avec des concentrations en oxyde de sodium variant entre 0.5 et 27 mol%.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_44_iv_7_range
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_45_ns8_vs_other_sources
+  type: source_metadata_context
+  locator:
+    pdf_page: 183
+    published_page: 160
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: NS8 vs other sources
+    statement_as_printed: Les résultats montrent une grande variation, avec des valeurs de solubilité plus faible qu’avec
+      les autres sources, variant de 0.18 mol% à environ 12 mol%.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_45_ns8_vs_other_sources
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_46_al2o3_effect_cas
+  type: source_metadata_context
+  locator:
+    pdf_page: 184
+    published_page: 161
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: Al2O3 effect CAS
+    statement_as_printed: Dans le système CaO-Al2O3-SiO2, pour des compositions avec un rapport Ca/Si inférieur à 0.43, l’ajout
+      d’Al2O3 semble provoquer une baisse de la solubilité en sodium et une hausse du coefficient d’activité (figure IV.16).
+      Par exemple, pour l’ajout de 30 mol% d’Al2O3, la solubilité diminue de l’ordre de 3 mol%.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_46_al2o3_effect_cas
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_47_al2o3_effect_cas
+  type: source_metadata_context
+  locator:
+    pdf_page: 184
+    published_page: 161
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: Al2O3 effect CAS
+    statement_as_printed: Pour des compositions de rapport molaire CaO/SiO2 compris entre 0.43 et 0.66, l’ajout d’Al2O3 ne
+      semble pas provoquer de variation de solubilité ou de coefficient d’activité.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_47_al2o3_effect_cas
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_48_al2o3_effect_cas
+  type: source_metadata_context
+  locator:
+    pdf_page: 184
+    published_page: 161
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: Al2O3 effect CAS
+    statement_as_printed: Enfin pour des compositions avec un rapport Ca/Si supérieur à 0.66, l’ajout d’Al2O3 semble entraîner
+      une hausse de la solubilité en sodium et une baisse du coefficient d’activité. Par exemple, pour l’ajout de 30 mol%
+      d’Al2O3, la solubilité augmente de 5-6 mol%.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_48_al2o3_effect_cas
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_49_al2o3_effect_mas
+  type: source_metadata_context
+  locator:
+    pdf_page: 186
+    published_page: 163
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: Al2O3 effect MAS
+    statement_as_printed: Pour le système MgO-Al2O3-SiO2, l’effet de la dilution semble être négligeable pour des compositions
+      avec des rapports Mg/Si supérieurs à 0.10 (figure IV.17). Pour des compositions avec des rapports inférieurs à 0.10,
+      l’ajout d’Al2O3 semble impliquer une baisse de la solubilité.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_49_al2o3_effect_mas
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_50_al2o3_series
+  type: source_metadata_context
+  locator:
+    pdf_page: 188
+    published_page: 165
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: Al2O3 series
+    statement_as_printed: Pour la série CMS35+Al2O3, l’influence de l’addition d’Al2O3 sur la solubilité du Na est quasi nulle,
+      même à des teneurs d’Al2O3 de 25mol%.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_50_al2o3_series
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_51_al2o3_series
+  type: source_metadata_context
+  locator:
+    pdf_page: 188
+    published_page: 165
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: Al2O3 series
+    statement_as_printed: Pour les séries, CMS36+Al2O3, source NS1 et source NS2, l’influence de l’addition d’Al2O3 est aussi
+      négligeable jusqu’à 18mol% d’Al2O. Au delà, une légère augmentation de la solubilité et une légère diminution du coefficient
+      d’activité sont observées. Cependant, malgré l’ajout de 25 mol% d’Al2O3, notons que l’augmentation de la solubilité
+      reste inférieure à 2 mol%. Enfin, pour la série CMS34+Al2O3, source NS2, 1400°C ; l’influence est quasi-nulle jusqu’à
+      une valeur de 12-13 mol% d’Al2O3, puis nous pouvons observer une hausse de la solubilité de sodium ou une diminution
+      du coefficient d’activité. Par exemple pour un ajout de 25 mol% d’Al2O3, l’augmentation de la solubilité est supérieure
+      à 4 mol%.
+    checked_against: embedded PDF text layer and the rendered page image
+    transcription_note: runs across the page break PDF p188-189; "d’Al2O." is printed so (typo for Al2O3)
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_51_al2o3_series
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_52_al2o3_summary
+  type: source_metadata_context
+  locator:
+    pdf_page: 191
+    published_page: 168
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: Al2O3 summary
+    statement_as_printed: Néanmoins nous pouvons suggérer que la solubilité augmente avec la polymérisation en direction du
+      pôle Al2O3. Pour le système CaO-Al2O3-SiO2, l’influence de l’ajout d’Al2O3 sur la solubilité du sodium est variable.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_52_al2o3_summary
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_53_al2o3_summary
+  type: source_metadata_context
+  locator:
+    pdf_page: 192
+    published_page: 169
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: Al2O3 summary
+    statement_as_printed: D’après ces résultats, pour une composition du système CaO-SiO2 avec un rapport Ca/Si jusqu’à 1.08,
+      l’ajout d’Al2O3 ne modifie pas la valeur de solubilité en Na ; mais ces résultats sont limités à des concentrations
+      maximales de 12 mol% d'Al2O3. En revanche, pour des rapports Ca/Si inférieurs à 0.43, l’ajout d’Al2O3 entraîne une baisse
+      de la valeur de solubilité et une hausse des coefficients d’activité. Pour des rapports Ca/Si supérieurs à 0.66, cet
+      ajout va entraîner inversement une hausse de la solubilité et une baisse des coefficients d’activité.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_53_al2o3_summary
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_54_solubility_vs_nbo_t
+  type: source_metadata_context
+  locator:
+    pdf_page: 196
+    published_page: 173
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: solubility vs NBO/T
+    statement_as_printed: Nos résultats montrent que la solubilité diminue globalement avec le nombre NBO/T.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_54_solubility_vs_nbo_t
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_55_nbo_t_scatter
+  type: source_metadata_context
+  locator:
+    pdf_page: 197
+    published_page: 174
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    topic: NBO/T scatter
+    statement_as_printed: la solubilité peut varier de façon importante ; par exemple pour NBO/T=1,5, la solubilité varie
+      entre 0 et 18mol%.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_55_nbo_t_scatter
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_56_solubility_vs_basicity
+  type: source_metadata_context
+  locator:
+    pdf_page: 198
+    published_page: 175
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: solubility vs basicity
+    statement_as_printed: Une bonne corrélation existe entre la concentration en Na2O et la basicité, avec une relation linéaire
+      pour des valeurs de basicité entre 12 et 58.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_56_solubility_vs_basicity
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_57_solubility_vs_sun_basicity
+  type: source_metadata_context
+  locator:
+    pdf_page: 199
+    published_page: 176
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: solubility vs Sun basicity
+    statement_as_printed: 'Deux zones sont observables: i) pour une basicité comprise entre 2,80 et 3,30; la solubilité est
+      constante; ii) pour une basicité supérieure à 3,30; l''augmentation est linéaire, mais avec une dispertion des valeurs,
+      notamment pour les compositions du système CaO-Al2O3-SiO2.'
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_57_solubility_vs_sun_basicity
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_58_basicity_scale_comparison
+  type: source_metadata_context
+  locator:
+    pdf_page: 199
+    published_page: 176
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: basicity scale comparison
+    statement_as_printed: La corrélation observée entre la basicité de Sanderson et la solubilité du sodium dans les liquides
+      silicatés est moins bonne que celle obtenue avce la basicité de Sun.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_58_basicity_scale_comparison
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_59_optical_basicity_linear_range
+  type: source_metadata_context
+  locator:
+    pdf_page: 206
+    published_page: 183
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: optical basicity linear range
+    statement_as_printed: Le domaine linéaire se situe pour des valeurs de basicité inférieures à 0.68.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_59_optical_basicity_linear_range
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_60_solubility_vs_pna
+  type: source_metadata_context
+  locator:
+    pdf_page: 209
+    published_page: 186
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: solubility vs PNa
+    statement_as_printed: Pour les séries à 1400°C, pour une basicité optique donnée, la solubilité augmente avec la PNa ou
+      l’aNa2O de la source.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_60_solubility_vs_pna
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_61_solubility_vs_basicity
+  type: source_metadata_context
+  locator:
+    pdf_page: 209
+    published_page: 186
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: solubility vs basicity
+    statement_as_printed: Pour les compositions les plus dépolymérisées, qui correspondent aux basicités les plus élevées,
+      la solubilité est faible à très faible.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_61_solubility_vs_basicity
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_62_al_coordination
+  type: source_metadata_context
+  locator:
+    pdf_page: 215
+    published_page: 192
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: Al coordination
+    statement_as_printed: Plus cette proportion est importante, plus elle semble favoriser la solubilité.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_62_al_coordination
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_63_al_coordination
+  type: source_metadata_context
+  locator:
+    pdf_page: 215
+    published_page: 192
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    topic: Al coordination
+    statement_as_printed: Néanmoins, ces proportions restent faible au regard de l’Al total, il est difficile de dire si l’augmentation
+      de la solubilité du sodium est directement proportionnelle à ces teneurs en VAl.
+    checked_against: embedded PDF text layer and the rendered page image
+    transcription_note: '"VAl" is printed with a superscript V (five-fold Al); read from the page image'
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_63_al_coordination
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_64_mg_vs_ca_aluminosilicates
+  type: source_metadata_context
+  locator:
+    pdf_page: 217
+    published_page: 194
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: Mg vs Ca aluminosilicates
+    statement_as_printed: A composition équivalente dans ces deux systèmes, la solubilité est plus importante dans le liquide
+      magnésien. Par ailleurs, l’étude des courbes d’isosolubilité dans le système CMAS, à isoteneur en Al2O3 (par exemple
+      5mol%, paragraphe 3.2, chapitre IV) illustre également la différence Ca/Mg ; ce système se comporte comme le système
+      CMS pour la solubilité en sodium. En revanche, la différence de pente NBO/T-courbe d’isosolubilité est plus faible que
+      pour le système CMS.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_64_mg_vs_ca_aluminosilicates
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_65_solubility_vs_pna
+  type: source_metadata_context
+  locator:
+    pdf_page: 219
+    published_page: 196
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: solubility vs PNa
+    statement_as_printed: Pour une augmentation de PNa équivalente, l’augmentation de la teneur en Na2O est beaucoup plus
+      importante pour le pôle SiO2 que pour la composition SPM.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_65_solubility_vs_pna
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_66_solubility_vs_pna
+  type: source_metadata_context
+  locator:
+    pdf_page: 219
+    published_page: 196
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: solubility vs PNa
+    statement_as_printed: 'Par ailleurs, l’évolution de la solubilité en Na en fonction de la PNa semble suivre deux types
+      d’augmentation : i) une augmentation linéaire et rapide de la solubilité pour des pressions partielles en sodium basses
+      ; ii) une augmentation linéaire et lente pour les pressions partielles en sodium les plus élevées.'
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_66_solubility_vs_pna
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_67_solubility_vs_pna_henry
+  type: source_metadata_context
+  locator:
+    pdf_page: 219
+    published_page: 196
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: solubility vs PNa, Henry
+    statement_as_printed: Par exemple pour les compositions ; pôle SiO2, CMA16S1, et EDiAn, le domaine de Henry se situe pour
+      une PNa inférieur à 1*10-6 atm. Pour la composition CMA16S2, la limite est de 10-5 atm. Et pour la composition SPM,
+      le domaine de Henry est jusqu’à une PNa de 1.5*10-4 atm. Il semble donc exister une dépendance du comportement en loi
+      de Henry à la composition du liquide.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_67_solubility_vs_pna_henry
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_68_henry_regressions
+  type: source_metadata_context
+  locator:
+    pdf_page: 220
+    published_page: 197
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    topic: Henry regressions
+    statement_as_printed: Nous avons effectué des régressions linéaires, pour les PNa les plus faibles.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_68_henry_regressions
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_69_mixing_line
+  type: source_metadata_context
+  locator:
+    pdf_page: 221
+    published_page: 198
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: mixing line
+    statement_as_printed: Le très bon coefficient de corrélation obtenu sur une très grande gamme de composition suggère en
+      effet que la solubilité du sodium pourrait se résumer à un mélange entre ces deux pôles, les compositions intermédiaires
+      se répartissant sur cette droite de mélange.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_69_mixing_line
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_70_chondrule_mesostasis_vs_basicity
+  type: source_metadata_context
+  locator:
+    pdf_page: 238
+    published_page: 215
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: chondrule mesostasis vs basicity
+    statement_as_printed: on observe que la teneur en sodium diminue lorsque la basicité optique du liquide augmente, comme
+      pour nos expériences, avec une relation de type linéaire.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_70_chondrule_mesostasis_vs_basicity
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_71_natural_samples_vs_basicity
+  type: source_metadata_context
+  locator:
+    pdf_page: 240
+    published_page: 217
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: natural samples vs basicity
+    statement_as_printed: Dans cette figure, on observe que globalement la teneur en sodium diminue lorsque la basicité optique
+      du liquide augmente.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_71_natural_samples_vs_basicity
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_72_capacity_vs_lambda
+  type: source_metadata_context
+  locator:
+    pdf_page: 244
+    published_page: 221
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: capacity vs Lambda
+    statement_as_printed: À travers cette étude, nous avons vu que la solubilité (ou la capacité) du liquide en Na2O diminue
+      avec l'augmentation de Λ (figure VI.7).
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_72_capacity_vs_lambda
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_73_capacity_vs_lambda
+  type: source_metadata_context
+  locator:
+    pdf_page: 245
+    published_page: 222
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: capacity vs Lambda
+    statement_as_printed: La capacité en Na2O du liquide est donc d'autant plus forte que celui-ci est polymérisé (faible
+      valeur de Λ).
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_73_capacity_vs_lambda
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_74_phase_relations_vs_pna
+  type: source_metadata_context
+  locator:
+    pdf_page: 246
+    published_page: 223
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: phase relations vs PNa
+    statement_as_printed: D’autre part, le domaine liquide est moins étendu pour des PNa plus faibles.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_74_phase_relations_vs_pna
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_75_sio2_effect
+  type: source_metadata_context
+  locator:
+    pdf_page: 248
+    published_page: 225
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: SiO2 effect
+    statement_as_printed: L’ajout de SiO2 dans le système CMS va augmenter le liquidus et la viscosité en même tant que sa
+      capacité en Na.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_75_sio2_effect
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_76_modifier_effect
+  type: source_metadata_context
+  locator:
+    pdf_page: 248
+    published_page: 225
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: modifier effect
+    statement_as_printed: D’autre part, l'augmentation de la quantité de cations modificateurs de réseau diminue la solubilité
+      de Na dans un liquide.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_76_modifier_effect
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_77_cas_phase_relations
+  type: source_metadata_context
+  locator:
+    pdf_page: 249
+    published_page: 226
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: CAS phase relations
+    statement_as_printed: L’ajout de sodium va impliquer des changements encore plus importants que pour le système CMS (figure
+      VI.12). Les deux domaines liquides se rejoignent, et s’étendent dans le domaine peralumineux. L’extension plus importante
+      s’explique tout simplement par l’effet polymérisant de l’Al2O3.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_77_cas_phase_relations
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_78_olivine_na_vs_melt_na
+  type: source_metadata_context
+  locator:
+    pdf_page: 255
+    published_page: 232
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: olivine Na vs melt Na
+    statement_as_printed: Les valeurs présentent une certaine hétérogénéité, néanmoins globalement la teneur en sodium dans
+      l'olivine augmente avec la concentration en oxyde de sodium du liquide
+    checked_against: embedded PDF text layer and the rendered page image
+    transcription_note: sentence ends without a full stop in the text layer before the next sentence
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_78_olivine_na_vs_melt_na
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_79_na_incompatibility
+  type: source_metadata_context
+  locator:
+    pdf_page: 257
+    published_page: 234
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: Na incompatibility
+    statement_as_printed: Notre étude montre que le Na semble avoir un comportement encore plus incompatible qu'ils ne le
+      suggèrent; ce qui implique, en supposant leur modèle vrai, que l'enrichissement autour des chondres doit être encore
+      plus important qu'ils le supposent.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_79_na_incompatibility
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_claim_80_conclusion
+  type: source_metadata_context
+  locator:
+    pdf_page: 266
+    published_page: 243
+    note: thesis prose
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    topic: conclusion
+    statement_as_printed: Cette étude a montré que la solubilité du sodium augmente avec la teneur en SiO2. Par ailleurs,
+      la substitution du calcium par le magnésium favorise la solubilité du sodium. Enfin, l’ajout d’Al2O3 peut favoriser
+      ou non la solubilité du sodium.
+    checked_against: embedded PDF text layer and the rendered page image
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_claim_80_conclusion
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_directional_claim_vi4
+  type: source_metadata_context
+  locator:
+    pdf_page_index: 255
+    published_page: 233
+    note: paragraph immediately below Tableau VI.4
+  units: printed prose
+  values:
+    quantity: directional_comparison
+    method_class: quoted_unattributed
+    statement_as_printed: Les coefficients de partage du sodium ont été reportés en fonction de la quantité de FeO dans l'olivine
+      dans la figure VI.16, mettant en évidence une corrélation entre le DNa et la teneur en FeO, en effet plus l'olivine
+      est riche en FeO, plus la teneur en Na est élevée.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_directional_claim_vi4
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_figures_context
+  type: source_metadata_context
+  locator:
+    pdf_page_index: 0
+    section: figures
+    note: Curves not digitized in this partial extraction.
+  units: figure references
+  values:
+    quantity: figure_only_inventory
+    method_class: figure_only
+    reason: Figures are present throughout Chapters III–VI and Annexes; curve coordinates were not digitized.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_figures_context
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_materials_context
+  type: source_metadata_context
+  locator:
+    pdf_page_index: 39
+    section: experimental methods
+  units: printed prose
+  values:
+    quantity: starting_materials_and_analysis
+    method_class: quoted_unattributed
+    source_glass_reagents: metallurgical-grade SiO2 and Na2CO3; numeric purity values are not reported in the reviewed passage.
+    other_glasses: SiO2, CaCO3, MgO, Al2O3 and Na2CO3 reagents; ground in agate; staged drying/decarbonation then treatment
+      to 1650 °C or 100 °C above liquidus.
+    analysis: Compositions checked by electron microprobe; post-run analyses occur in tables.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_materials_context
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_method_context
+  type: source_metadata_context
+  locator:
+    pdf_page_index: 38
+    section: experimental methods
+  units: printed prose
+  values:
+    quantity: experimental_method_and_scope
+    method_class: quoted_unattributed
+    method_as_printed: gas–melt equilibration in sealed silica ampoules; quenched charges analyzed by electron microprobe
+    method_token: quench_equilibration
+    temperature_range_as_printed: 1250–1400 °C
+    maximum_temperature_note: 1450 °C is described as a practical upper limit because silica ampoules soften and deform.
+    source_note: This is not a Knudsen effusion or mass-spectrometric vapor-pressure study.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_method_context
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_prose_p148_fig_iii5_pna_caption
+  type: source_metadata_context
+  locator:
+    pdf_page: 148
+    published_page: 125
+    section: III.1.2
+    figure: III.5
+    note: PNa value in figure caption; differs from paragraph and liquidus label
+  units: atm
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    value_as_printed: 2.35*10-05
+    statement_as_printed: Figure III. 5 Section isotherme à 1400°C, P=1atm, Iso-PNa, PNa=2.35*10-05 (atm), et iso-aNa2O, aNa2O=1.19*10-08,
+      sous une fO2 de 2.11*10-06 atm (Ni/NiO).
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_prose_p148_fig_iii5_pna_caption
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_prose_p148_gamma_cms15
+  type: source_metadata_context
+  locator:
+    pdf_page: 148
+    published_page: 125
+    section: III.1.2
+    note: first listed endpoint in prose summary of iso-activity-coefficient curves; CMS15
+  units: dimensionless activity coefficient
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    gamma_as_printed: 5.8*10-07
+    reported_range_as_printed: 5.8*10-07 to 5.5*10-08
+    statement_as_printed: Les courbes présentent la même évolution que pour la solubilité avec des valeurs de γNa2O variant
+      entre 5.8*10-07 pour la composition CMS15, et 5.5*10-08 pour le pôle SiO2.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_prose_p148_gamma_cms15
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_prose_p148_gamma_sio2
+  type: source_metadata_context
+  locator:
+    pdf_page: 148
+    published_page: 125
+    section: III.1.2
+    note: second listed endpoint in prose summary of iso-activity-coefficient curves; SiO2 pole
+  units: dimensionless activity coefficient
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    gamma_as_printed: 5.5*10-08
+    reported_range_as_printed: 5.8*10-07 to 5.5*10-08
+    statement_as_printed: Les courbes présentent la même évolution que pour la solubilité avec des valeurs de γNa2O variant
+      entre 5.8*10-07 pour la composition CMS15, et 5.5*10-08 pour le pôle SiO2.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_prose_p148_gamma_sio2
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_prose_p152_gamma_cms8
+  type: source_metadata_context
+  locator:
+    pdf_page: 152
+    published_page: 129
+    section: III.2
+    note: first listed endpoint in prose summary of iso-activity-coefficient curves; CMS8
+  units: dimensionless activity coefficient
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    gamma_as_printed: 5.21*10-07
+    reported_range_as_printed: 5.21*10-07 to 1.22*10-07
+    statement_as_printed: Les courbes présentent la même évolution que pour la solubilité avec des valeurs de γNa2O variant
+      entre 5.21*10-07 pour la composition CMS8, et 1.22*10-07 pour le pôle SiO2.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_prose_p152_gamma_cms8
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_prose_p152_gamma_sio2
+  type: source_metadata_context
+  locator:
+    pdf_page: 152
+    published_page: 129
+    section: III.2
+    note: second listed endpoint in prose summary of iso-activity-coefficient curves; SiO2 pole
+  units: dimensionless activity coefficient
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    gamma_as_printed: 1.22*10-07
+    reported_range_as_printed: 5.21*10-07 to 1.22*10-07
+    statement_as_printed: Les courbes présentent la même évolution que pour la solubilité avec des valeurs de γNa2O variant
+      entre 5.21*10-07 pour la composition CMS8, et 1.22*10-07 pour le pôle SiO2.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_prose_p152_gamma_sio2
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_prose_p163_gamma_cas_lower
+  type: source_metadata_context
+  locator:
+    pdf_page: 163
+    published_page: 140
+    section: IV.1.3
+    note: first listed endpoint in prose summary of iso-activity-coefficient curves
+  units: dimensionless activity coefficient
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    gamma_as_printed: 7*10-07
+    reported_range_as_printed: 7*10-07 to 10-05
+    statement_as_printed: Les courbes présentent la même disposition que celles d'iso-solubilité avec des valeurs de γNa2O
+      variant entre 7*10-07 et 10-05.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_prose_p163_gamma_cas_lower
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_prose_p163_gamma_cas_upper
+  type: source_metadata_context
+  locator:
+    pdf_page: 163
+    published_page: 140
+    section: IV.1.3
+    note: second listed endpoint in prose summary of iso-activity-coefficient curves
+  units: dimensionless activity coefficient
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    gamma_as_printed: 10-05
+    reported_range_as_printed: 7*10-07 to 10-05
+    statement_as_printed: Les courbes présentent la même disposition que celles d'iso-solubilité avec des valeurs de γNa2O
+      variant entre 7*10-07 et 10-05.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_prose_p163_gamma_cas_upper
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_prose_p169_gamma_mas_lower
+  type: source_metadata_context
+  locator:
+    pdf_page: 169
+    published_page: 146
+    section: IV.2.3
+    note: first listed endpoint in prose summary of iso-activity-coefficient curves
+  units: dimensionless activity coefficient
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    gamma_as_printed: 10-06
+    reported_range_as_printed: 10-06 to 7*10-07
+    statement_as_printed: Les courbes d’iso-coefficient d’activité en Na2O présentent la même évolution avec des valeurs de
+      γNa2O variant entre 10-06 et 7*10-07.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_prose_p169_gamma_mas_lower
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_prose_p169_gamma_mas_upper
+  type: source_metadata_context
+  locator:
+    pdf_page: 169
+    published_page: 146
+    section: IV.2.3
+    note: second listed endpoint in prose summary of iso-activity-coefficient curves
+  units: dimensionless activity coefficient
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    gamma_as_printed: 7*10-07
+    reported_range_as_printed: 10-06 to 7*10-07
+    statement_as_printed: Les courbes d’iso-coefficient d’activité en Na2O présentent la même évolution avec des valeurs de
+      γNa2O variant entre 10-06 et 7*10-07.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_prose_p169_gamma_mas_upper
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_prose_p174_gamma_cmas_lower
+  type: source_metadata_context
+  locator:
+    pdf_page: 174
+    published_page: 151
+    section: IV.3.1.2.2
+    note: first listed endpoint in prose summary of iso-activity-coefficient curves
+  units: dimensionless activity coefficient
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    gamma_as_printed: 3*10-06
+    reported_range_as_printed: 3*10-06 to 7*10-07
+    statement_as_printed: Les courbes d’iso-coefficient d’activité en Na2O présentent la même évolution que pour la solubilité
+      avec des valeurs de γNa2O variant entre 3*10-06 et 7*10-07.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_prose_p174_gamma_cmas_lower
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_prose_p174_gamma_cmas_upper
+  type: source_metadata_context
+  locator:
+    pdf_page: 174
+    published_page: 151
+    section: IV.3.1.2.2
+    note: second listed endpoint in prose summary of iso-activity-coefficient curves
+  units: dimensionless activity coefficient
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    gamma_as_printed: 7*10-07
+    reported_range_as_printed: 3*10-06 to 7*10-07
+    statement_as_printed: Les courbes d’iso-coefficient d’activité en Na2O présentent la même évolution que pour la solubilité
+      avec des valeurs de γNa2O variant entre 3*10-06 et 7*10-07.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_prose_p174_gamma_cmas_upper
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_prose_p177_gamma_cmas_lower
+  type: source_metadata_context
+  locator:
+    pdf_page: 177
+    published_page: 154
+    section: IV.3.1.3.2
+    note: first listed endpoint in prose summary of iso-activity-coefficient curves
+  units: dimensionless activity coefficient
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    gamma_as_printed: 1*10-07
+    reported_range_as_printed: 1*10-07 to 4*10-07
+    statement_as_printed: Les courbes d’iso-coefficient d’activité en Na2O présentent la même évolution que pour la solubilité
+      avec des valeurs de γNa2O variant entre 1*10-07 et 4*10-07.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_prose_p177_gamma_cmas_lower
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_prose_p177_gamma_cmas_upper
+  type: source_metadata_context
+  locator:
+    pdf_page: 177
+    published_page: 154
+    section: IV.3.1.3.2
+    note: second listed endpoint in prose summary of iso-activity-coefficient curves
+  units: dimensionless activity coefficient
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    gamma_as_printed: 4*10-07
+    reported_range_as_printed: 1*10-07 to 4*10-07
+    statement_as_printed: Les courbes d’iso-coefficient d’activité en Na2O présentent la même évolution que pour la solubilité
+      avec des valeurs de γNa2O variant entre 1*10-07 et 4*10-07.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_prose_p177_gamma_cmas_upper
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_prose_p200_basicity_lower
+  type: source_metadata_context
+  locator:
+    pdf_page: 200
+    published_page: 177
+    note: V.1 prose; lower endpoint of reported optical-basicity interval
+  units: dimensionless optical basicity
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    value_as_printed: 0,48
+    range_as_printed: 0,48 to 0,68
+    statement_as_printed: mettant en évidence une bonne relation linéaire pour des valeurs de basicité entre 0,48 et 0,68
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_prose_p200_basicity_lower
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_prose_p200_basicity_upper
+  type: source_metadata_context
+  locator:
+    pdf_page: 200
+    published_page: 177
+    note: V.1 prose; upper endpoint of reported optical-basicity interval
+  units: dimensionless optical basicity
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    value_as_printed: 0,68
+    range_as_printed: 0,48 to 0,68
+    statement_as_printed: mettant en évidence une bonne relation linéaire pour des valeurs de basicité entre 0,48 et 0,68
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_prose_p200_basicity_upper
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_prose_p212_v_al_peralkaline
+  type: source_metadata_context
+  locator:
+    pdf_page: 212
+    published_page: 189
+    note: V.3 prose; coordination proportion in peralkaline liquids
+  units: percent of Al
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    value_as_printed: 14%
+    statement_as_printed: ou 14% dans les liquides péralcalins
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_prose_p212_v_al_peralkaline
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_prose_p212_v_al_peraluminous
+  type: source_metadata_context
+  locator:
+    pdf_page: 212
+    published_page: 189
+    note: V.3 prose; coordination proportion in peraluminous liquids
+  units: percent of Al
+  values:
+    quantity: data_qualification
+    method_class: quoted_unattributed
+    value_as_printed: 40%
+    statement_as_printed: la proportion d’VAl peut atteindre des valeurs supérieurs à 40% dans les liquides péralumineux
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_prose_p212_v_al_peraluminous
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_t1_run_conditions
+  type: experiment_series
+  experiment: sealed_ampoule_glass_equilibration
+  locator:
+    pdf_page: 145
+    table: III.1
+    note: table caption
+  units: as printed
+  values:
+    quantity: table_run_conditions_and_reference_rows
+    method_class: quoted_unattributed
+    table: III.1
+    system: CaO-MgO-SiO2
+    T_C_caption: 1400
+    sodium_source: Na2O-3.5SiO2 (NS3.5)
+    oxygen_buffer: Ni/NiO
+    source_a_Na2O_as_printed: 1.19*10-08
+    source_a_Na2O: '0.0000000119'
+    P_Na_caption_as_printed: 2.97*10-05 atm
+    P_Na_atm_caption: '0.0000297'
+    fO2_atm_caption: '0.00000211'
+    analysis_uncertainty_as_printed: ecart-type sur n (5<=n<=10) analyses a la sonde electronique; corrected values with propagated
+      errors
+    pressure_heading_scale: x10^-5 atm
+    gamma_heading_scale: x10^-7
+    table_file: tables/mathieu-2009-sodium-solubility-thesis/t1.csv
+    reference_rows_as_printed:
+    - composition: pole
+      Na2O_wt_pct_corrected_as_printed: 22.22 (0.50)
+      Na2O_mol_pct_corrected_as_printed: 21.69 (0.50)
+      gamma_Na2O_as_printed: 0.55 (0.02)
+      gamma_scale_as_printed: x10^-7
+    - composition: EDiAn
+      Na2O_wt_pct_corrected_as_printed: 8.07 (0.61)
+      Na2O_mol_pct_corrected_as_printed: 8.05 (0.59)
+      gamma_Na2O_as_printed: 1.53 (0.08)
+      gamma_scale_as_printed: x10^-7
+    rows_without_Na2O_values:
+    - run: ACMS20
+      composition: CMS27
+      associated_phases: Wo+Rk+liq
+      status_as_transcribed: N.A.
+    - run: ACMS22
+      composition: CMSP1
+      associated_phases: Wo+liq
+      status_as_transcribed: N.A.
+    - run: ACMS22
+      composition: CMSP5
+      associated_phases: Wo
+      status_as_transcribed: no liquid
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_t1_run_conditions
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_t2_run_conditions
+  type: experiment_series
+  experiment: sealed_ampoule_glass_equilibration
+  locator:
+    pdf_page: 150
+    table: III.2 (caption; III.3 in text)
+    note: table caption
+  units: as printed
+  values:
+    quantity: table_run_conditions_and_reference_rows
+    method_class: quoted_unattributed
+    table: III.2 (caption; III.3 in text)
+    system: CaO-MgO-SiO2
+    T_C_caption: 1400
+    sodium_source: Na2O-2SiO2 (NS2)
+    oxygen_buffer: Ni/NiO
+    source_a_Na2O_as_printed: 4.07*10-08
+    source_a_Na2O: '0.0000000407'
+    P_Na_caption_as_printed: 5.50*10-06 atm
+    P_Na_atm_caption: '0.0000055'
+    fO2_atm_caption: '0.00000211'
+    analysis_uncertainty_as_printed: ecart-type sur n (5<=n<=10) analyses a la sonde electronique; corrected values with propagated
+      errors
+    pressure_heading_scale: x10^-6 atm
+    gamma_heading_scale: x10^-7
+    table_file: tables/mathieu-2009-sodium-solubility-thesis/t2.csv
+    reference_rows_as_printed:
+    - composition: pole
+      Na2O_wt_pct_corrected_as_printed: 32.65 (0.50)
+      Na2O_mol_pct_corrected_as_printed: 33.33 (0.51)
+      gamma_Na2O_as_printed: 1.22 (0.02)
+      gamma_scale_as_printed: x10^-7
+    - composition: EDiAn
+      Na2O_wt_pct_corrected_as_printed: 11.64 (0.19)
+      Na2O_mol_pct_corrected_as_printed: 11.31 (0.18)
+      gamma_Na2O_as_printed: 3.60 (0.08)
+      gamma_scale_as_printed: x10^-7
+    rows_without_Na2O_values:
+    - run: ACMS29
+      composition: CMS5
+      associated_phases: Mo
+      status_as_transcribed: no_liquid
+    - run: ACMS33
+      composition: CMS27
+      associated_phases: Wo
+      status_as_transcribed: no_liquid
+    - run: ACMS33
+      composition: CMS30
+      associated_phases: Ak
+      status_as_transcribed: no_liquid
+    temperature_conflict: 'source_internally_inconsistent: the Tableau III.2 caption (printed p.127) says 1400 °C, but the
+      paragraph introducing the table (printed p.126) describes this Na2O-2SiO2 series at 1250 °C, and the caption source
+      condition PNa=5.50*10-6 atm, aNa2O=4.07*10-8 is the 1250 °C NS2 condition (Annexe 8, Tableau A.8.3; Tableau IV.6). The
+      caption temperature is carried as printed; the row is not admitted.'
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_t2_run_conditions
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_t38_run_conditions
+  type: experiment_series
+  experiment: sealed_ampoule_glass_equilibration
+  locator:
+    pdf_page: 161
+    table: IV.1
+    note: table caption
+  units: as printed
+  values:
+    quantity: table_run_conditions_and_reference_rows
+    method_class: quoted_unattributed
+    table: IV.1
+    system: CaO-Al2O3-SiO2
+    T_C_caption: 1400
+    sodium_source: Na2O-2SiO2 (NS2)
+    oxygen_buffer: Ni/NiO
+    source_a_Na2O_as_printed: 2.11*10-07
+    source_a_Na2O: '0.000000211'
+    P_Na_caption_as_printed: 1.25*10-04 atm
+    P_Na_atm_caption: '0.000125'
+    fO2_atm_caption: '0.00000211'
+    analysis_uncertainty_as_printed: ecart-type sur n (5<=n<=10) analyses a la sonde electronique; corrected values with propagated
+      errors
+    pressure_heading_scale: x10^-4 atm
+    gamma_heading_scale: x10^-6
+    table_file: tables/mathieu-2009-sodium-solubility-thesis/t38.csv
+    rows_without_Na2O_values:
+    - run: ACMAS18
+      composition: CMA25S6
+      associated_phases: La+Ge+liq
+      status_as_transcribed: not_analysed
+    - run: ACMAS20
+      composition: NAS1
+      associated_phases: N.A.
+      status_as_transcribed: no_liquid
+    - run: ACMAS34
+      composition: CA
+      associated_phases: CA
+      status_as_transcribed: no_liquid
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_t38_run_conditions
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_t39_run_conditions
+  type: experiment_series
+  experiment: sealed_ampoule_glass_equilibration
+  locator:
+    pdf_page: 168
+    table: IV.2
+    note: table caption
+  units: as printed
+  values:
+    quantity: table_run_conditions_and_reference_rows
+    method_class: quoted_unattributed
+    table: IV.2
+    system: MgO-Al2O3-SiO2
+    T_C_caption: 1400
+    sodium_source: Na2O-2SiO2 (NS2)
+    oxygen_buffer: Ni/NiO
+    source_a_Na2O_as_printed: 2.11*10-07
+    source_a_Na2O: '0.000000211'
+    P_Na_caption_as_printed: 1.25*10-04 atm
+    P_Na_atm_caption: '0.000125'
+    fO2_atm_caption: '0.00000211'
+    analysis_uncertainty_as_printed: ecart-type sur n (5<=n<=10) analyses a la sonde electronique; corrected values with propagated
+      errors
+    pressure_heading_scale: x10^-4 atm
+    gamma_heading_scale: x10^-6
+    table_file: tables/mathieu-2009-sodium-solubility-thesis/t39.csv
+    rows_without_Na2O_values:
+    - run: ACMAS20
+      composition: NAS1
+      associated_phases: N.A.
+      status_as_transcribed: not_analyzed
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_t39_run_conditions
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_t40_run_conditions
+  type: experiment_series
+  experiment: sealed_ampoule_glass_equilibration
+  locator:
+    pdf_page: 173
+    table: IV.3
+    note: table caption
+  units: as printed
+  values:
+    quantity: table_run_conditions_and_reference_rows
+    method_class: quoted_unattributed
+    table: IV.3
+    system: CaO-MgO-5mol%Al2O3-SiO2
+    T_C_caption: 1400
+    sodium_source: Na2O-2SiO2 (NS2)
+    oxygen_buffer: Ni/NiO
+    source_a_Na2O_as_printed: 2.11*10-07
+    source_a_Na2O: '0.000000211'
+    P_Na_caption_as_printed: 1.25*10-04 atm
+    P_Na_atm_caption: '0.000125'
+    fO2_atm_caption: '0.00000211'
+    analysis_uncertainty_as_printed: ecart-type sur n (5<=n<=10) analyses a la sonde electronique; corrected values with propagated
+      errors
+    pressure_heading_scale: x10^-4 atm
+    gamma_heading_scale: x10^-6
+    table_file: tables/mathieu-2009-sodium-solubility-thesis/t40.csv
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_t40_run_conditions
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_t41_run_conditions
+  type: experiment_series
+  experiment: sealed_ampoule_glass_equilibration
+  locator:
+    pdf_page: 176
+    table: IV.4
+    note: table caption
+  units: as printed
+  values:
+    quantity: table_run_conditions_and_reference_rows
+    method_class: quoted_unattributed
+    table: IV.4
+    system: CaO-MgO-5mol%Al2O3-SiO2 (caption)
+    T_C_caption: 1400
+    sodium_source: Na2O-3.5SiO2 (NS3.5)
+    oxygen_buffer: Ni/NiO
+    source_a_Na2O_as_printed: 1.19*10-08
+    source_a_Na2O: '0.0000000119'
+    P_Na_caption_as_printed: 2.97*10-05 atm
+    P_Na_atm_caption: '0.0000297'
+    fO2_atm_caption: '0.00000211'
+    analysis_uncertainty_as_printed: ecart-type sur n (5<=n<=10) analyses a la sonde electronique; corrected values with propagated
+      errors
+    pressure_heading_scale: x10^-5 atm
+    gamma_heading_scale: x10^-7
+    table_file: tables/mathieu-2009-sodium-solubility-thesis/t41.csv
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_t41_run_conditions
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_t42_run_conditions
+  type: experiment_series
+  experiment: sealed_ampoule_glass_equilibration
+  locator:
+    pdf_page: 180
+    table: IV.5
+    note: table caption
+  units: as printed
+  values:
+    quantity: table_run_conditions_and_reference_rows
+    method_class: quoted_unattributed
+    table: IV.5
+    system: CaO-MgO-Al2O3-SiO2
+    T_C_caption: 1400
+    sodium_source: Na2O-SiO2 (NS1)
+    oxygen_buffer: Ni/NiO
+    source_a_Na2O_as_printed: 4.83*10-06
+    source_a_Na2O: '0.00000483'
+    P_Na_caption_as_printed: 5.99*10-04 atm
+    P_Na_atm_caption: '0.000599'
+    fO2_atm_caption: '0.00000211'
+    analysis_uncertainty_as_printed: ecart-type sur n (5<=n<=10) analyses a la sonde electronique; corrected values with propagated
+      errors
+    pressure_heading_scale: x10^-4 atm
+    gamma_heading_scale: x10^-5
+    table_file: tables/mathieu-2009-sodium-solubility-thesis/t42.csv
+    reference_rows_as_printed:
+    - composition: Pôle
+      Na2O_wt_pct_corrected_as_printed: 45.45 (0.50)
+      Na2O_mol_pct_corrected_as_printed: 44.23 (1.18)
+      gamma_Na2O_as_printed: 10.80 (0.44)
+      gamma_scale_as_printed: x10^-5
+    - composition: EDiAn
+      Na2O_wt_pct_corrected_as_printed: 22.1 (1.2)
+      Na2O_mol_pct_corrected_as_printed: 22.61 (0.78)
+      gamma_Na2O_as_printed: 21.20 (1.02)
+      gamma_scale_as_printed: x10^-5
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_t42_run_conditions
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_t43_run_conditions
+  type: experiment_series
+  experiment: sealed_ampoule_glass_equilibration
+  locator:
+    pdf_page: 180
+    table: IV.6
+    note: table caption
+  units: as printed
+  values:
+    quantity: table_run_conditions_and_reference_rows
+    method_class: quoted_unattributed
+    table: IV.6
+    system: CaO-MgO-Al2O3-SiO2
+    T_C_caption: 1250
+    sodium_source: Na2O-2SiO2 (NS2)
+    oxygen_buffer: Ni/NiO
+    source_a_Na2O_as_printed: 4.07*10-08
+    source_a_Na2O: '0.0000000407'
+    P_Na_caption_as_printed: 5.50*10-06 atm
+    P_Na_atm_caption: '0.0000055'
+    fO2_atm_caption: '0.00000211'
+    analysis_uncertainty_as_printed: ecart-type sur n (5<=n<=10) analyses a la sonde electronique; corrected values with propagated
+      errors
+    pressure_heading_scale: x10^-6 atm
+    gamma_heading_scale: x10^-5
+    table_file: tables/mathieu-2009-sodium-solubility-thesis/t43.csv
+    reference_rows_as_printed:
+    - composition: EDiAn
+      Na2O_wt_pct_corrected_as_printed: 11.64 (0.19)
+      Na2O_mol_pct_corrected_as_printed: 11.31 (0.18)
+      gamma_Na2O_as_printed: 3.60 (0.08)
+      gamma_scale_as_printed: x10^-5
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_t43_run_conditions
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_t44_run_conditions
+  type: experiment_series
+  experiment: sealed_ampoule_glass_equilibration
+  locator:
+    pdf_page: 182
+    table: IV.7
+    note: table caption
+  units: as printed
+  values:
+    quantity: table_run_conditions_and_reference_rows
+    method_class: quoted_unattributed
+    table: IV.7
+    system: CaO-MgO-Al2O3-SiO2
+    T_C_caption: 1400
+    sodium_source: Na2O-2SiO2 (NS2)
+    oxygen_buffer: Ni/NiO
+    source_a_Na2O_as_printed: 2.11*10-07
+    source_a_Na2O: '0.000000211'
+    P_Na_caption_as_printed: 1.25*10-04 atm
+    P_Na_atm_caption: '0.000125'
+    fO2_atm_caption: '0.00000211'
+    analysis_uncertainty_as_printed: ecart-type sur n (5<=n<=10) analyses a la sonde electronique; corrected values with propagated
+      errors
+    pressure_heading_scale: x10^-4 atm
+    gamma_heading_scale: x10^-7
+    table_file: tables/mathieu-2009-sodium-solubility-thesis/t44.csv
+    reference_rows_as_printed:
+    - composition: EDiAn
+      Na2O_wt_pct_corrected_as_printed: 12.35 (0.32)
+      Na2O_mol_pct_corrected_as_printed: 12 (0.31)
+      gamma_Na2O_as_printed: 1.76 (0.06)
+      gamma_scale_as_printed: x10^-7
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_t44_run_conditions
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_t45_run_conditions
+  type: experiment_series
+  experiment: sealed_ampoule_glass_equilibration
+  locator:
+    pdf_page: 183
+    table: IV.8
+    note: table caption
+  units: as printed
+  values:
+    quantity: table_run_conditions_and_reference_rows
+    method_class: quoted_unattributed
+    table: IV.8
+    system: CaO-MgO-Al2O3-SiO2
+    T_C_caption: 1400
+    sodium_source: Na2O-3.5SiO2 (NS3.5)
+    oxygen_buffer: Ni/NiO
+    source_a_Na2O_as_printed: 1.19*10-08
+    source_a_Na2O: '0.0000000119'
+    P_Na_caption_as_printed: 2.97*10-05 atm
+    P_Na_atm_caption: '0.0000297'
+    fO2_atm_caption: '0.00000211'
+    analysis_uncertainty_as_printed: ecart-type sur n (5<=n<=10) analyses a la sonde electronique; corrected values with propagated
+      errors
+    pressure_heading_scale: x10^-5 atm
+    gamma_heading_scale: x10^-7
+    table_file: tables/mathieu-2009-sodium-solubility-thesis/t45.csv
+    reference_rows_as_printed:
+    - composition: EDiAn
+      Na2O_wt_pct_corrected_as_printed: 7.95 (0.61)
+      Na2O_mol_pct_corrected_as_printed: 7.71 (0.59)
+      gamma_Na2O_as_printed: 0.15 (0.01)
+      gamma_scale_as_printed: x10^-7
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_t45_run_conditions
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_t46_run_conditions
+  type: experiment_series
+  experiment: sealed_ampoule_glass_equilibration
+  locator:
+    pdf_page: 184
+    table: IV.9 (caption IV.19)
+    note: table caption
+  units: as printed
+  values:
+    quantity: table_run_conditions_and_reference_rows
+    method_class: quoted_unattributed
+    table: IV.9 (caption IV.19)
+    system: CaO-MgO-Al2O3-SiO2
+    T_C_caption: 1400
+    sodium_source: Na2O-8SiO2 (NS8)
+    oxygen_buffer: Ni/NiO
+    source_a_Na2O_as_printed: 2.34*10-09
+    source_a_Na2O: '0.00000000234'
+    P_Na_caption_as_printed: 1.32*10-05 atm
+    P_Na_atm_caption: '0.0000132'
+    fO2_atm_caption: '0.00000211'
+    analysis_uncertainty_as_printed: ecart-type sur n (5<=n<=10) analyses a la sonde electronique; corrected values with propagated
+      errors
+    pressure_heading_scale: no PNa column printed
+    gamma_heading_scale: x10^-6
+    table_file: tables/mathieu-2009-sodium-solubility-thesis/t46.csv
+    reference_rows_as_printed:
+    - composition: pôle
+      Na2O_wt_pct_corrected_as_printed: 12.00 (0.27)
+      Na2O_mol_pct_corrected_as_printed: 11.68 (0.26)
+      gamma_Na2O_as_printed: 0.05 (0.01)
+      gamma_scale_as_printed: x10^-6
+    - composition: EDiAn
+      Na2O_wt_pct_corrected_as_printed: 6.24 (0.54)
+      Na2O_mol_pct_corrected_as_printed: 5.56 (0.48)
+      gamma_Na2O_as_printed: 0.13 (0.01)
+      gamma_scale_as_printed: x10^-6
+    rows_without_Na2O_values:
+    - run: ACMAS51
+      composition: KHC1
+      associated_phases: Sp+Ma+liq
+      status_as_transcribed: values_not_printed
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_t46_run_conditions
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_table_inventory
+  type: source_metadata_context
+  locator:
+    pdf_page_index: 303
+    section: Tables I–VI and Annexes I–XII
+    note: CSV inventory; source-internal caption conflicts noted in provenance files.
+  units: table records
+  values:
+    quantity: transcription_inventory
+    method_class: quoted_unattributed
+    tables:
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t1.csv
+      table_as_labeled: III.1
+      transcribed_records: 23
+      locator:
+        published_page: 122
+        pdf_page: 145
+        pdf_page_index: 144
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t1.provenance.yaml
+      sample_row:
+        record:
+          experiment: ''
+          composition: pole
+          associated_phases: ''
+          PNa_x1e-5_atm: ''
+          PNa_sd_x1e-5_atm: ''
+          Na2O_analyzed_wt_pct: ''
+          analyzed_sd_wt_pct: ''
+          Na2O_corrected_wt_pct: '22.22'
+          corrected_sd_wt_pct: '0.50'
+          Na2O_corrected_mol_pct: '21.69'
+          corrected_sd_mol_pct: '0.50'
+          gamma_Na2O_x1e-7: '0.55'
+          gamma_sd_x1e-7: '0.02'
+          liquid_status: ''
+        numeric_cells:
+        - '22.22'
+        - '0.5'
+        - '21.69'
+        - '0.5'
+        - '0.55'
+        - '0.02'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t2.csv
+      table_as_labeled: III.3 (introduced in text); III.2 (caption)
+      transcribed_records: 30
+      locator:
+        published_page: 126
+        pdf_page: 149
+        pdf_page_index: 148
+        table: III.3 in paragraph on p.126; caption says III.2 on p.127
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t2.provenance.yaml
+      sample_row:
+        record:
+          experiment: ''
+          composition: pole
+          associated_phases: ''
+          PNa_x1e-6_atm: ''
+          PNa_sd_x1e-6_atm: ''
+          Na2O_analyzed_wt_pct: ''
+          analyzed_sd_wt_pct: ''
+          Na2O_corrected_wt_pct: '32.65'
+          corrected_sd_wt_pct: '0.50'
+          Na2O_corrected_mol_pct: '33.33'
+          corrected_sd_mol_pct: '0.51'
+          gamma_Na2O_x1e-7: '1.22'
+          gamma_sd_x1e-7: '0.02'
+          liquid_status: ''
+        numeric_cells:
+        - '32.65'
+        - '0.5'
+        - '33.33'
+        - '0.51'
+        - '1.22'
+        - '0.02'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t3.csv
+      table_as_labeled: A.I.1
+      transcribed_records: 6
+      locator:
+        pdf_page_index: 297
+        published_page: 275
+        record: 'Tableau A.I.1 : Valeurs de ASun permettant le calcul de l’acidobasicité suivant le modèle de Sun'
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t3.provenance.yaml
+      sample_row:
+        record:
+          oxide: Na2O
+          ASun: '20'
+        numeric_cells:
+        - '20'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t4.csv
+      table_as_labeled: A.I.2
+      transcribed_records: 4
+      locator:
+        pdf_page_index: 298
+        published_page: 276
+        record: 'Tableau A.I.2 : Exemple de composition pour le calcul de l’électronégativité de Sanderson'
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t4.provenance.yaml
+      sample_row:
+        record:
+          oxide: SiO2
+          mol_percent: '37.88'
+        numeric_cells:
+        - '37.88'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t5.csv
+      table_as_labeled: A.I.3
+      transcribed_records: 7
+      locator:
+        pdf_page_index: 299
+        published_page: 277
+        record: 'Tableau A.I.3 : Valeurs de xi permettant le calcul de l’acidobasicité suivant le modèle de Sanderson'
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t5.provenance.yaml
+      sample_row:
+        record:
+          element: Si
+          oxide: SiO2
+          xi: '2.62'
+        numeric_cells:
+        - '2.62'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t6.csv
+      table_as_labeled: A.I.4
+      transcribed_records: 10
+      locator:
+        pdf_page_index: 300
+        published_page: 278
+        record: 'Tableau A.I.4 : Valeur de la basicité optique selon Duffy ( 2004)'
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t6.provenance.yaml
+      sample_row:
+        record:
+          oxide: SiO2
+          lambda_oxide_printed: '0.48'
+        numeric_cells:
+        - '0.48'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t7.csv
+      table_as_labeled: A.2.1
+      transcribed_records: 94
+      locator:
+        pdf_page_index:
+        - 303
+        - 304
+        - 305
+        record: Tableau A.2.1 Récapitulatifs des données de Rego et al (1988), T=1400°C
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t7.provenance.yaml
+      sample_row:
+        record:
+          row_id: t7_r001
+          pdf_page_index: '303'
+        numeric_cells:
+        - '303'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t8.csv
+      table_as_labeled: A.2.2
+      transcribed_records: 22
+      locator:
+        pdf_page_index: 305
+        printed_page: 283
+        record: Tableau A.2.2 Récapitulatifs des données de Pak et al (1989), T=1400°C
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t8.provenance.yaml
+      sample_row:
+        record:
+          row_id: t8_r001
+          pdf_page_index: '305'
+          Na2O_mol_pct: '60.0'
+          CaO_mol_pct: '0.0'
+          SiO2_mol_pct: '40.0'
+          NBO_T_composition_without_Na: '0.0'
+          Lambda_composition_without_Na: '0.48'
+          T_C: '1400.0'
+          a_Na2O_times_1e_minus_5: '57.4'
+          gamma_Na2O_times_1e_minus_5: '95.7'
+          log_a_Na2O: '-3.24'
+          log_gamma_Na2O: '-3.02'
+        numeric_cells:
+        - '305'
+        - '60'
+        - '0'
+        - '40'
+        - '0'
+        - '0.48'
+        - '1400'
+        - '57.4'
+        - '95.7'
+        - '-3.24'
+        - '-3.02'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t9.csv
+      table_as_labeled: A.2.3
+      transcribed_records: 3
+      locator:
+        pdf_page: 307
+        printed_page: 283
+        record: Tableau A.2.3 Récapitulatifs des données de Witthohn (1999), à ≈ 1400°C
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t9.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '306'
+          composition_name: MS1
+          Na2O_mol_pct: 7,79
+          SiO2_mol_pct: 65,13
+          Al2O3_mol_pct: 27,08
+          CaO_mol_pct: ''
+          Fe2O3_mol_pct: ''
+          NBO_T_composition_without_Na: -0,454
+          Lambda_composition_without_Na: 0,526
+          T_C: '1441'
+          a_Na2O_times_1e_minus_13: 47,30
+          gamma_Na2O_times_1e_minus_11: 6,07
+          log_a_Na2O: -11,33
+          log_gamma_Na2O: -10,22
+        numeric_cells:
+        - '306'
+        - '1441'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t10.csv
+      table_as_labeled: A.2.4
+      transcribed_records: 17
+      locator:
+        pdf_page_index:
+        - 306
+        - 307
+        printed_page:
+        - 283
+        - 284
+        record: Tableau A.2.4 Récapitulatifs des compositions
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t10.provenance.yaml
+      sample_row:
+        record:
+          row_id: t10_r001
+          pdf_page_index: '306'
+          source_sample_name: 18Ca10Na0.3
+          numeric_cells_left_to_right: '[18.0,3.0,0.37,8.55,75.23,15.82,-0.169,0.53]'
+        numeric_cells:
+        - '306'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t11.csv
+      table_as_labeled: A.2.5
+      transcribed_records: 51
+      locator:
+        pdf_page_index:
+        - 306
+        - 307
+        printed_page:
+        - 283
+        - 284
+        record: Tableau A.2.5 Récapitulatifs des données de Willenborg (2003), T ≈ 1400°C
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t11.provenance.yaml
+      sample_row:
+        record:
+          row_id: t11_r001
+          pdf_page_index: '307'
+          composition_name: 18Ca10Na0,3
+          Na2O_mol_pct: '0.37'
+          T_C: '1398.8'
+          a_Na2O_times_1e_minus_13: '3.01'
+          gamma_Na2O_times_1e_minus_11: '8.14'
+          P_Na_atm_times_1e_minus_7: '3.35'
+          log_a_Na2O: '-12.52'
+          log_gamma_Na2O: '-10.09'
+        numeric_cells:
+        - '307'
+        - '0.37'
+        - '1398.8'
+        - '3.01'
+        - '8.14'
+        - '3.35'
+        - '-12.52'
+        - '-10.09'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t12.csv
+      table_as_labeled: A.4.1
+      transcribed_records: 48
+      locator:
+        pdf_page_index:
+        - 321
+        - 322
+        printed_page:
+        - 299
+        - 300
+        record: Résultats expérimentaux sur la composition EDiAn, 1350°C
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t12.provenance.yaml
+      sample_row:
+        record:
+          row_id: t12_r001
+          pdf_page_index: '321'
+          sample_id: AEDiAn12
+          bead: a
+          record_kind: result
+          numeric_cells_left_to_right: '[15.0,1350.0,33.98,10.61,9.61,46.08,13.78,19.91,1.31,0.31]'
+        numeric_cells:
+        - '321'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t13.csv
+      table_as_labeled: A.4.2
+      transcribed_records: 30
+      locator:
+        pdf_page_index:
+        - 322
+        - 323
+        printed_page:
+        - 300
+        - 301
+        record: Résultats expérimentaux sur la composition EDiAn, 1350°C
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t13.provenance.yaml
+      sample_row:
+        record:
+          row_id: t13_r001
+          pdf_page_index: '322'
+          sample_id: AEDiAn26
+          bead: a
+          record_kind: result
+          numeric_cells_left_to_right: '[1.0,1350.0,33.4,19.16,9.1,40.91,12.68,18.15,1.3,0.33]'
+        numeric_cells:
+        - '322'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t14.csv
+      table_as_labeled: A.4.3
+      transcribed_records: 28
+      locator:
+        pdf_page_index:
+        - 323
+        - 324
+        printed_page:
+        - 301
+        - 302
+        record: Résultats expérimentaux sur la composition EDiAn, 1350°C
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t14.provenance.yaml
+      sample_row:
+        record:
+          row_id: t14_r001
+          pdf_page_index: '323'
+          sample_id: AEDiAn40
+          bead: a
+          record_kind: result
+          numeric_cells_left_to_right: '[23.0,1350.0,33.57,12.35,9.76,13.98,43.72,20.18]'
+        numeric_cells:
+        - '323'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t15.csv
+      table_as_labeled: A.6.1
+      transcribed_records: 43
+      locator:
+        pdf_page_indices:
+        - 332
+        - 333
+        published_pages:
+        - 309
+        - 310
+        table_system: EDiAn reference composition, experimental run and final source Na2O compositions
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t15.provenance.yaml
+      sample_row:
+        record:
+          experiment: AEDiAn45
+          duration_h: '67'
+          T_C: '1400'
+          EDiAn_Na2O_wt_pct: '13.23'
+          EDiAn_Na2O_sd_wt_pct: '0.21'
+          EDiAn_MgO_wt_pct: '8.95'
+          EDiAn_MgO_sd_wt_pct: '0.16'
+          EDiAn_SiO2_wt_pct: '44.17'
+          EDiAn_SiO2_sd_wt_pct: '0.25'
+          EDiAn_Al2O3_wt_pct: '14.26'
+          EDiAn_Al2O3_sd_wt_pct: '0.13'
+          EDiAn_CaO_wt_pct: '19.39'
+          EDiAn_CaO_sd_wt_pct: '0.1'
+          source_final_Na2O_wt_pct: '33.33'
+          source_final_Na2O_sd_wt_pct: '0.5'
+          source_final_status: analysed
+        numeric_cells:
+        - '67'
+        - '1400'
+        - '13.23'
+        - '0.21'
+        - '8.95'
+        - '0.16'
+        - '44.17'
+        - '0.25'
+        - '14.26'
+        - '0.13'
+        - '19.39'
+        - '0.1'
+        - '33.33'
+        - '0.5'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t16.csv
+      table_as_labeled: A.6.2
+      transcribed_records: 325
+      locator:
+        pdf_page_index:
+        - 333
+        - 341
+        printed_page:
+        - 311
+        - 318
+        record: Tableau A.6.2 Résultats expérimentaux sur les autres compositions, 1400°C
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t16.provenance.yaml
+      sample_row:
+        record:
+          row_id: t16_r001
+          pdf_page_index: '333'
+          record_kind: context
+          sample_id: ''
+          composition_id: ''
+          numeric_cells_left_to_right: '[2.0]'
+        numeric_cells:
+        - '333'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t17.csv
+      table_as_labeled: A.6.3
+      transcribed_records: 325
+      locator:
+        pdf_page_index:
+        - 341
+        - 348
+        printed_page:
+        - 319
+        - 326
+        record: Tableau A.6.3 Données corrigées à PNa=1.25*10-4 atm, 1400°C
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t17.provenance.yaml
+      sample_row:
+        record:
+          row_id: t17_r001
+          pdf_page_index: '341'
+          record_kind: context
+          sample_id: ''
+          composition_id: ''
+          numeric_cells_left_to_right: '[2.0]'
+        numeric_cells:
+        - '341'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t18.csv
+      table_as_labeled: A.7.1
+      transcribed_records: 8
+      locator:
+        pdf_page_index: 361
+        printed_page: 339
+        record: Tableau A.7.1 Résultats expérimentaux sur la composition EDiAn, 1400°C
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t18.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '361'
+          experiment: ACMS13
+          duration_h: '100.0'
+          T_C: '1400.0'
+          Na2O_wt_pct: '8.07'
+          Na2O_sd_wt_pct: '0.16'
+          MgO_wt_pct: '10.11'
+          MgO_sd_wt_pct: '0.23'
+          SiO2_wt_pct: '45.68'
+          SiO2_sd_wt_pct: '0.27'
+          Al2O3_wt_pct: '14.96'
+          Al2O3_sd_wt_pct: '0.12'
+          CaO_wt_pct: '21.16'
+          CaO_sd_wt_pct: '0.12'
+          source_final_Na2O_wt_pct: '23.37'
+          source_final_Na2O_sd_wt_pct: '0.33'
+        numeric_cells:
+        - '361'
+        - '100'
+        - '1400'
+        - '8.07'
+        - '0.16'
+        - '10.11'
+        - '0.23'
+        - '45.68'
+        - '0.27'
+        - '14.96'
+        - '0.12'
+        - '21.16'
+        - '0.12'
+        - '23.37'
+        - '0.33'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t19.csv
+      table_as_labeled: A.7.2
+      transcribed_records: 27
+      locator:
+        pdf_page_index:
+        - 361
+        - 362
+        printed_page:
+        - 339
+        - 340
+        record: Tableau A.7.2 Résultats expérimentaux sur les autres compositions, 1400°C
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t19.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '361'
+          experiment: ACMS13
+          composition: CMS8
+          associated_phase: ''
+          Na2O_wt_pct: '4.5'
+          Na2O_sd_wt_pct: '0.05'
+          MgO_wt_pct: '5.06'
+          MgO_sd_wt_pct: '0.21'
+          SiO2_wt_pct: '49.1'
+          SiO2_sd_wt_pct: '1.21'
+          Al2O3_wt_pct: '0.05'
+          Al2O3_sd_wt_pct: '0.03'
+          CaO_wt_pct: '41.29'
+          CaO_sd_wt_pct: '0.51'
+        numeric_cells:
+        - '361'
+        - '4.5'
+        - '0.05'
+        - '5.06'
+        - '0.21'
+        - '49.1'
+        - '1.21'
+        - '0.05'
+        - '0.03'
+        - '41.29'
+        - '0.51'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t20.csv
+      table_as_labeled: A.7.3
+      transcribed_records: 76
+      locator:
+        pdf_page_index:
+        - 363
+        - 364
+        printed_page:
+        - 341
+        - 342
+        record: Tableau A.7.3 Données corrigées à PNa=2.97*10-5 atm, 1400°C
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t20.provenance.yaml
+      sample_row:
+        record:
+          row_id: t20_r001
+          pdf_page_index: '363'
+          record_kind: context
+          sample_id: ''
+          composition_id: ''
+          numeric_cells_left_to_right: '[3.5]'
+        numeric_cells:
+        - '363'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t21.csv
+      table_as_labeled: A.8.1
+      transcribed_records: 9
+      locator:
+        pdf_page_index: 371
+        printed_page: 349
+        record: Tableau A.8.1 Résultats expérimentaux sur la composition EDiAn, 1250°C
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t21.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '371'
+          experiment: AEDiAn58
+          duration_h: '72.0'
+          T_C: '1250.0'
+          Na2O_wt_pct: '11.4'
+          Na2O_sd_wt_pct: '0.2'
+          MgO_wt_pct: '10.06'
+          MgO_sd_wt_pct: '0.17'
+          SiO2_wt_pct: '14.45'
+          SiO2_sd_wt_pct: '0.17'
+          Al2O3_wt_pct: '44.86'
+          Al2O3_sd_wt_pct: '0.42'
+          CaO_wt_pct: '19.23'
+          CaO_sd_wt_pct: '0.14'
+          source_final_Na2O_wt_pct: '30.93'
+          source_final_Na2O_sd_wt_pct: '0.25'
+        numeric_cells:
+        - '371'
+        - '72'
+        - '1250'
+        - '11.4'
+        - '0.2'
+        - '10.06'
+        - '0.17'
+        - '14.45'
+        - '0.17'
+        - '44.86'
+        - '0.42'
+        - '19.23'
+        - '0.14'
+        - '30.93'
+        - '0.25'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t22.csv
+      table_as_labeled: A.8.2
+      transcribed_records: 27
+      locator:
+        pdf_page_index:
+        - 371
+        - 372
+        printed_page:
+        - 349
+        - 350
+        record: Tableau A.8.2 Résultats expérimentaux sur les autres compositions, 1250°C
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t22.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '371'
+          experiment: ACMS29
+          composition: CMS1
+          associated_phase: Wo + liq
+          Na2O_wt_pct: '6.01'
+          Na2O_sd_wt_pct: '0.14'
+          MgO_wt_pct: '1.46'
+          MgO_sd_wt_pct: '0.01'
+          SiO2_wt_pct: '75.56'
+          SiO2_sd_wt_pct: '0.93'
+          Al2O3_wt_pct: '0.35'
+          Al2O3_sd_wt_pct: '0.03'
+          CaO_wt_pct: '16.62'
+          CaO_sd_wt_pct: '1.16'
+        numeric_cells:
+        - '371'
+        - '6.01'
+        - '0.14'
+        - '1.46'
+        - '0.01'
+        - '75.56'
+        - '0.93'
+        - '0.35'
+        - '0.03'
+        - '16.62'
+        - '1.16'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t23.csv
+      table_as_labeled: A.8.3
+      transcribed_records: 70
+      locator:
+        pdf_page_index:
+        - 373
+        - 374
+        printed_page:
+        - 351
+        - 352
+        record: Tableau A.8.3 Données corrigées à PNa=5.50*10-6 atm, 1250°C
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t23.provenance.yaml
+      sample_row:
+        record:
+          row_id: t23_r001
+          pdf_page_index: '373'
+          record_kind: context
+          sample_id: ''
+          composition_id: ''
+          numeric_cells_left_to_right: '[2.0]'
+        numeric_cells:
+        - '373'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t24.csv
+      table_as_labeled: A.9.1
+      transcribed_records: 5
+      locator:
+        pdf_page_index: 385
+        pdf_page: 386
+        printed_page: 363
+        record: Tableau A.9.1 Résultats expérimentaux sur la composition EDiAn, 1400°C, avec le tampon Na2O-1SiO2, Tampon
+          Ni/NiO
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t24.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '385'
+          experiment: APEDiAn14
+          duration_h: '12.0'
+          T_C: '1400.0'
+          Na2O_wt_pct: '22.83'
+          Na2O_sd_wt_pct: '0.37'
+          MgO_wt_pct: '39.39'
+          MgO_sd_wt_pct: '0.24'
+          SiO2_wt_pct: '8.01'
+          SiO2_sd_wt_pct: '0.17'
+          Al2O3_wt_pct: '12.41'
+          Al2O3_sd_wt_pct: '0.15'
+          CaO_wt_pct: '17.35'
+          CaO_sd_wt_pct: '0.19'
+          source_final_Na2O_wt_pct: '43.25'
+          source_final_Na2O_sd_wt_pct: '0.2'
+        numeric_cells:
+        - '385'
+        - '12'
+        - '1400'
+        - '22.83'
+        - '0.37'
+        - '39.39'
+        - '0.24'
+        - '8.01'
+        - '0.17'
+        - '12.41'
+        - '0.15'
+        - '17.35'
+        - '0.19'
+        - '43.25'
+        - '0.2'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t25.csv
+      table_as_labeled: A.9.2
+      transcribed_records: 8
+      locator:
+        pdf_page_index: 385
+        pdf_page: 386
+        printed_page: 363
+        record: Tableau A.9.2 Résultats expérimentaux sur les autres compositions, 1400°C, avec le tampon Na2O-1SiO2, Tampon
+          Ni/NiO
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t25.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '385'
+          experiment: APEDiAn14
+          composition: CMS36
+          Na2O_wt_pct: '25.5'
+          Na2O_sd_wt_pct: '1.03'
+          MgO_wt_pct: '46.04'
+          MgO_sd_wt_pct: '0.41'
+          SiO2_wt_pct: '8.81'
+          SiO2_sd_wt_pct: '0.25'
+          Al2O3_wt_pct: '0.06'
+          Al2O3_sd_wt_pct: '0.03'
+          CaO_wt_pct: '19.59'
+          CaO_sd_wt_pct: '0.73'
+        numeric_cells:
+        - '385'
+        - '25.5'
+        - '1.03'
+        - '46.04'
+        - '0.41'
+        - '8.81'
+        - '0.25'
+        - '0.06'
+        - '0.03'
+        - '19.59'
+        - '0.73'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t26.csv
+      table_as_labeled: A.9.3
+      transcribed_records: 26
+      locator:
+        pdf_page_index:
+        - 385
+        - 386
+        pdf_page:
+        - 386
+        - 387
+        printed_page:
+        - 363
+        - 364
+        record: Tableau A.9.3 Données corrigées à PNa=5.99*10-4 atm, 1400°C, avec le tampon Na2O-1SiO2, Tampon Ni/NiO
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t26.provenance.yaml
+      sample_row:
+        record:
+          row_id: t26_r001
+          pdf_page_index: '385'
+          record_kind: context
+          experiment: ''
+          composition: ''
+          numeric_cells_left_to_right: '[1.0]'
+        numeric_cells:
+        - '385'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t27.csv
+      table_as_labeled: A.10.1
+      transcribed_records: 6
+      locator:
+        pdf_page_index: 389
+        pdf_page: 390
+        printed_page: 367
+        record: Tableau A.10.1 Résultats expérimentaux sur la composition EDiAn, 1400°C, avec le tampon Na2O-8SiO2, Tampon
+          Ni/NiO
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t27.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '389'
+          experiment: ACMAS21
+          duration_h: '96.0'
+          T_C: '1400'
+          Na2O_wt_pct: '6.14'
+          Na2O_sd_wt_pct: '0.15'
+          MgO_wt_pct: '9.7'
+          MgO_sd_wt_pct: '0.08'
+          SiO2_wt_pct: '47.45'
+          SiO2_sd_wt_pct: '0.43'
+          Al2O3_wt_pct: '15.0'
+          Al2O3_sd_wt_pct: '0.21'
+          CaO_wt_pct: '21.7'
+          CaO_sd_wt_pct: '0.15'
+          source_final_Na2O_wt_pct: '10.31'
+          source_final_Na2O_sd_wt_pct: '0.3'
+        numeric_cells:
+        - '389'
+        - '96'
+        - '1400'
+        - '6.14'
+        - '0.15'
+        - '9.7'
+        - '0.08'
+        - '47.45'
+        - '0.43'
+        - '15'
+        - '0.21'
+        - '21.7'
+        - '0.15'
+        - '10.31'
+        - '0.3'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t28.csv
+      table_as_labeled: A.10.2
+      transcribed_records: 8
+      locator:
+        pdf_page_index: 389
+        pdf_page: 390
+        printed_page: 367
+        record: Tableau A.10.2 Résultats expérimentaux sur les autres compositions, 1400°C, avec le tampon Na2O-8SiO2, Tampon
+          Ni/NiO
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t28.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '389'
+          experiment: ACMAS21
+          composition: CMA16S1
+          associated_phase: ''
+          Na2O_wt_pct: '11.66'
+          Na2O_sd_wt_pct: '0.31'
+          MgO_wt_pct: '11.72'
+          MgO_sd_wt_pct: '0.09'
+          SiO2_wt_pct: '56.42'
+          SiO2_sd_wt_pct: '0.57'
+          Al2O3_wt_pct: '14.55'
+          Al2O3_sd_wt_pct: '0.21'
+          CaO_wt_pct: '5.64'
+          CaO_sd_wt_pct: '0.09'
+        numeric_cells:
+        - '389'
+        - '11.66'
+        - '0.31'
+        - '11.72'
+        - '0.09'
+        - '56.42'
+        - '0.57'
+        - '14.55'
+        - '0.21'
+        - '5.64'
+        - '0.09'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t29.csv
+      table_as_labeled: A.10.3
+      transcribed_records: 23
+      locator:
+        pdf_page_index: 390
+        pdf_page: 391
+        printed_page: 368
+        record: Tableau A.10.3 Données corrigées à PNa=1.32*10-5 atm, 1400°C, avec le tampon Na2O-8SiO2, Tampons Ni/NiO
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t29.provenance.yaml
+      sample_row:
+        record:
+          row_id: t29_r001
+          pdf_page_index: '390'
+          record_kind: context
+          experiment: ''
+          composition: ''
+          numeric_cells_left_to_right: '[8.0]'
+        numeric_cells:
+        - '390'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t30.csv
+      table_as_labeled: A.11.1
+      transcribed_records: 13
+      locator:
+        pdf_page_index: 397
+        pdf_page: 398
+        printed_page: 375
+        record: Tableau A.11.1 Récapitulatifs des analyses effectuées de la composition de la mésostase du chondre CH7, météorite
+          Semarkona
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t30.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '397'
+          sample: SEM#7
+          Na2O: '5.44'
+          MgO: '3.51'
+          SiO2: '56.81'
+          Al2O3: '22.08'
+          CaO: '10.91'
+          TiO2: '0.32'
+          FeO: '0.39'
+          MnO: '0.26'
+          Cr2O3: '0.18'
+          K2O: '0.27'
+          total_wt_pct: '100.16'
+          Lambda: '0.55'
+        numeric_cells:
+        - '397'
+        - '5.44'
+        - '3.51'
+        - '56.81'
+        - '22.08'
+        - '10.91'
+        - '0.32'
+        - '0.39'
+        - '0.26'
+        - '0.18'
+        - '0.27'
+        - '100.16'
+        - '0.55'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t31.csv
+      table_as_labeled: A.11.2
+      transcribed_records: 19
+      locator:
+        pdf_page_index: 397
+        pdf_page: 398
+        printed_page: 375
+        record: Tableau A.11.2 Récapitulatifs des analyses effectuées de la composition de la mésostase de divers chondres
+          de Semarkona
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t31.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '397'
+          sample: SEM-CH4
+          phase: PO
+          Na2O: '0.3'
+          MgO: '5.9'
+          SiO2: '47.42'
+          Al2O3: '24.19'
+          CaO: '18.72'
+          TiO2: '1.02'
+          FeO: '0.2'
+          MnO: '0.07'
+          Cr2O3: '0.16'
+          K2O: '0.01'
+          total_wt_pct: '97.98'
+          Lambda: '0.59'
+        numeric_cells:
+        - '397'
+        - '0.3'
+        - '5.9'
+        - '47.42'
+        - '24.19'
+        - '18.72'
+        - '1.02'
+        - '0.2'
+        - '0.07'
+        - '0.16'
+        - '0.01'
+        - '97.98'
+        - '0.59'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t32.csv
+      table_as_labeled: A.11.3
+      transcribed_records: 12
+      locator:
+        pdf_page_index: 398
+        pdf_page: 399
+        printed_page: 376
+        record: Tableau A.11.3 Récapitulatifs des analyses effectuées de la composition de la mésostase de divers chondres
+          de Semarkona
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t32.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '398'
+          sample: 3-3a
+          phase: PO
+          replicate: '1'
+          Na2O: '3.81'
+          MgO: '5.47'
+          SiO2: '60.27'
+          Al2O3: '15.37'
+          CaO: '12.23'
+          TiO2: '0.73'
+          FeO: '0.6'
+          MnO: '0.21'
+          total_wt_pct: '98.69'
+          Lambda: '0.55'
+        numeric_cells:
+        - '398'
+        - '1'
+        - '3.81'
+        - '5.47'
+        - '60.27'
+        - '15.37'
+        - '12.23'
+        - '0.73'
+        - '0.6'
+        - '0.21'
+        - '98.69'
+        - '0.55'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t33.csv
+      table_as_labeled: A.11.4
+      transcribed_records: 20
+      locator:
+        pdf_page_index: 398
+        pdf_page: 399
+        printed_page: 376
+        record: Tableau A.11.4 Récapitulatifs des analyses effectuées de la composition de la mésostase de divers chondres
+          de Semarkona
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t33.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '398'
+          sample: CH5
+          analysis_within_sample: '1'
+          Na2O: '0.51'
+          MgO: '6.39'
+          SiO2: '54.6'
+          Al2O3: '19.09'
+          CaO: '17.49'
+          TiO2: '0.93'
+          FeO: '0.49'
+          MnO: '0.09'
+          K2O: '0.02'
+          total_wt_pct: '99.61'
+          Lambda: '0.5827'
+        numeric_cells:
+        - '398'
+        - '1'
+        - '0.51'
+        - '6.39'
+        - '54.6'
+        - '19.09'
+        - '17.49'
+        - '0.93'
+        - '0.49'
+        - '0.09'
+        - '0.02'
+        - '99.61'
+        - '0.5827'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t34.csv
+      table_as_labeled: A.11.5
+      transcribed_records: 26
+      locator:
+        pdf_page_index: 399
+        pdf_page: 400
+        printed_page: 377
+        record: Tableau A.11.5 Analyses de mésostase de chondres des météorites SAH97096 et SAH97123, type EH3
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t34.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '399'
+          meteorite: SAH97096
+          label: 97096-1-2
+          'No': '2'
+          Na2O: '4.0'
+          MgO: '0.9'
+          Al2O3: '18.62'
+          SiO2: '67.42'
+          S: '0.8'
+          Cl: '0.06'
+          K2O: '0.1'
+          CaO: '6.58'
+          TiO2: '0.09'
+          Cr2O3: '0.11'
+          MnO: '0.2'
+          FeO: '0.87'
+          NiO: '0.14'
+          total_wt_pct: '99.9'
+          Lambda: '0.5937'
+        numeric_cells:
+        - '399'
+        - '2'
+        - '4'
+        - '0.9'
+        - '18.62'
+        - '67.42'
+        - '0.8'
+        - '0.06'
+        - '0.1'
+        - '6.58'
+        - '0.09'
+        - '0.11'
+        - '0.2'
+        - '0.87'
+        - '0.14'
+        - '99.9'
+        - '0.5937'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t35.csv
+      table_as_labeled: A.11.6
+      transcribed_records: 50
+      locator:
+        pdf_page_index:
+        - 399
+        - 400
+        pdf_page:
+        - 400
+        - 401
+        printed_page:
+        - 377
+        - 378
+        record: Tableau A.11.6 Analyses de la composition de mésostase de chondres de Gra95229, QUE99177, PCA91082 et El Djouf
+          001
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t35.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '399'
+          sample: gra95229-21-chd1
+          'No': '98'
+          SiO2: '69.85'
+          TiO2: '0.27'
+          Al2O3: '15.43'
+          Cr2O3: '0.18'
+          FeO: '0.76'
+          MnO: '1.09'
+          MgO: '1.37'
+          CaO: '4.46'
+          Na2O: '4.69'
+          K2O: '1.17'
+          total_wt_pct: '99.27'
+          Lambda: '0.5212'
+        numeric_cells:
+        - '399'
+        - '98'
+        - '69.85'
+        - '0.27'
+        - '15.43'
+        - '0.18'
+        - '0.76'
+        - '1.09'
+        - '1.37'
+        - '4.46'
+        - '4.69'
+        - '1.17'
+        - '99.27'
+        - '0.5212'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t36.csv
+      table_as_labeled: A.12.1
+      transcribed_records: 104
+      locator:
+        pdf_page_index:
+        - 403
+        - 404
+        - 405
+        pdf_page:
+        - 404
+        - 405
+        - 406
+        printed_page:
+        - 381
+        - 382
+        - 383
+        record: Tableau A.12.1 Analyses sur les charges expérimentales pour la détermination des DNa
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t36.provenance.yaml
+      sample_row:
+        record:
+          row_id: t36_r001
+          pdf_page_index: '403'
+          record_kind: measurement
+          sample: ACMAS52-PO
+          material: VERRE
+          point_label: POINT
+          numeric_cells_left_to_right: '[9.645,54.589,13.202,10.13,10.977,98.542]'
+        numeric_cells:
+        - '403'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t37.csv
+      table_as_labeled: A.12.2
+      transcribed_records: 128
+      locator:
+        pdf_page_index:
+        - 405
+        - 406
+        - 407
+        - 408
+        pdf_page:
+        - 406
+        - 407
+        - 408
+        - 409
+        printed_page:
+        - 383
+        - 384
+        - 385
+        - 386
+        record: Tableau A.12.2 Analyses de chondres PO types I et II de Semarkona, boninites et océanites
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t37.provenance.yaml
+      sample_row:
+        record:
+          row_id: t37_r001
+          pdf_page_index: '405'
+          record_kind: measurement
+          sample_group: CH2
+          chondrule_type: ''
+          phase: MESOSTASE
+          numeric_cells_left_to_right: '[55.52,0.52,21.29,0.28,0.35,0.05,4.11,15.44,1.41,0.07,0.0,99.04,0.57]'
+        numeric_cells:
+        - '405'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t38.csv
+      table_as_labeled: IV.1
+      transcribed_records: 50
+      locator:
+        pdf_page:
+        - 159
+        - 160
+        - 161
+        pdf_page_index:
+        - 158
+        - 159
+        - 160
+        published_pages: 136-138
+        system: CaO-Al2O3-SiO2
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t38.provenance.yaml
+      sample_row:
+        record:
+          experiment: ACMAS5
+          composition: AS1
+          associated_phases: ''
+          T_C: '1400'
+          p_Na_10_minus_4_atm: '1.01'
+          p_Na_sd_10_minus_4_atm: '0.04'
+          Na2O_wt_pct_assayed: '21.07'
+          Na2O_wt_pct_assayed_sd: '0.57'
+          Na2O_wt_pct_corrected: '23.18'
+          Na2O_wt_pct_corrected_sd: '0.75'
+          Na2O_mol_pct_corrected: '24.89'
+          Na2O_mol_pct_corrected_sd: '0.81'
+          gamma_Na2O_10_minus_6: '0.85'
+          gamma_Na2O_sd_10_minus_6: '0.03'
+          analysis_status: analysed
+        numeric_cells:
+        - '1400'
+        - '1.01'
+        - '0.04'
+        - '21.07'
+        - '0.57'
+        - '23.18'
+        - '0.75'
+        - '24.89'
+        - '0.81'
+        - '0.85'
+        - '0.03'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t39.csv
+      table_as_labeled: IV.2
+      transcribed_records: 25
+      locator:
+        pdf_page_index: 167
+        published_page: 144
+        system: MgO-Al2O3-SiO2
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t39.provenance.yaml
+      sample_row:
+        record:
+          experiment: ACMAS5
+          composition: AS1
+          associated_phases: ''
+          T_C: '1400'
+          p_Na_10_minus_4_atm: '1.01'
+          p_Na_sd_10_minus_4_atm: '0.04'
+          Na2O_wt_pct_assayed: '21.07'
+          Na2O_wt_pct_assayed_sd: '0.57'
+          Na2O_wt_pct_corrected: '23.18'
+          Na2O_wt_pct_corrected_sd: '0.75'
+          Na2O_mol_pct_corrected: '24.89'
+          Na2O_mol_pct_corrected_sd: '0.81'
+          gamma_Na2O_10_minus_6: '0.85'
+          gamma_Na2O_sd_10_minus_6: '0.03'
+          analysis_status: analysed
+        numeric_cells:
+        - '1400'
+        - '1.01'
+        - '0.04'
+        - '21.07'
+        - '0.57'
+        - '23.18'
+        - '0.75'
+        - '24.89'
+        - '0.81'
+        - '0.85'
+        - '0.03'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t40.csv
+      table_as_labeled: IV.3
+      transcribed_records: 17
+      locator:
+        pdf_page_index: 173
+        published_page: 150
+        system: CaO-MgO-5mol%Al2O3-SiO2
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t40.provenance.yaml
+      sample_row:
+        record:
+          experiment: ACMAS40
+          composition: CMAS19
+          associated_phases: ''
+          T_C: '1400'
+          p_Na_10_minus_4_atm: '1.09'
+          p_Na_sd_10_minus_4_atm: '0.04'
+          Na2O_wt_pct_assayed: '15.82'
+          Na2O_wt_pct_assayed_sd: '0.23'
+          Na2O_wt_pct_corrected: '16.70'
+          Na2O_wt_pct_corrected_sd: '0.39'
+          Na2O_mol_pct_corrected: '16.44'
+          Na2O_mol_pct_corrected_sd: '0.68'
+          gamma_Na2O_10_minus_6: '1.28'
+          gamma_Na2O_sd_10_minus_6: '0.06'
+        numeric_cells:
+        - '1400'
+        - '1.09'
+        - '0.04'
+        - '15.82'
+        - '0.23'
+        - '16.7'
+        - '0.39'
+        - '16.44'
+        - '0.68'
+        - '1.28'
+        - '0.06'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t41.csv
+      table_as_labeled: IV.4
+      transcribed_records: 10
+      locator:
+        pdf_page_index: 176
+        published_page: 153
+        system: CaO-MgO-5mol%Al2O3-SiO2
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t41.provenance.yaml
+      sample_row:
+        record:
+          experiment: ACMAS31
+          composition: CMA9S15
+          T_C: '1400'
+          p_Na_10_minus_5_atm: '4.07'
+          p_Na_sd_10_minus_5_atm: '0.02'
+          Na2O_wt_pct_assayed: '2.06'
+          Na2O_wt_pct_assayed_sd: '0.10'
+          Na2O_wt_pct_corrected: '1.82'
+          Na2O_wt_pct_corrected_sd: '0.08'
+          Na2O_mol_pct_corrected: '1.65'
+          Na2O_mol_pct_corrected_sd: '0.07'
+          gamma_Na2O_10_minus_7: '7.28'
+          gamma_Na2O_sd_10_minus_7: '0.36'
+        numeric_cells:
+        - '1400'
+        - '4.07'
+        - '0.02'
+        - '2.06'
+        - '0.1'
+        - '1.82'
+        - '0.08'
+        - '1.65'
+        - '0.07'
+        - '7.28'
+        - '0.36'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t42.csv
+      table_as_labeled: IV.5
+      transcribed_records: 10
+      locator:
+        pdf_page_index: 179
+        published_page: 156
+        system: CaO-MgO-Al2O3-SiO2
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t42.provenance.yaml
+      sample_row:
+        record:
+          record_type: source_pole
+          experiment: ''
+          composition: Pôle
+          T_C: '1400'
+          p_Na_10_minus_4_atm: ''
+          p_Na_sd_10_minus_4_atm: ''
+          Na2O_wt_pct_assayed: ''
+          Na2O_wt_pct_assayed_sd: ''
+          Na2O_wt_pct_corrected: '45.45'
+          Na2O_wt_pct_corrected_sd: '0.50'
+          Na2O_mol_pct_corrected: '44.23'
+          Na2O_mol_pct_corrected_sd: '1.18'
+          gamma_Na2O_10_minus_5: '10.80'
+          gamma_Na2O_sd_10_minus_5: '0.44'
+        numeric_cells:
+        - '1400'
+        - '45.45'
+        - '0.5'
+        - '44.23'
+        - '1.18'
+        - '10.8'
+        - '0.44'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t43.csv
+      table_as_labeled: IV.6
+      transcribed_records: 3
+      locator:
+        pdf_page_index: 180
+        published_page: 157
+        system: CaO-MgO-Al2O3-SiO2
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t43.provenance.yaml
+      sample_row:
+        record:
+          record_type: reference_composition
+          experiment: ''
+          composition: EDiAn
+          associated_phases: ''
+          T_C: '1250'
+          p_Na_10_minus_6_atm: ''
+          p_Na_sd_10_minus_6_atm: ''
+          Na2O_wt_pct_assayed: ''
+          Na2O_wt_pct_assayed_sd: ''
+          Na2O_wt_pct_corrected: '11.64'
+          Na2O_wt_pct_corrected_sd: '0.19'
+          Na2O_mol_pct_corrected: '11.31'
+          Na2O_mol_pct_corrected_sd: '0.18'
+          gamma_Na2O_10_minus_5: '3.60'
+          gamma_Na2O_sd_10_minus_5: '0.08'
+          analysis_note: ''
+        numeric_cells:
+        - '1250'
+        - '11.64'
+        - '0.19'
+        - '11.31'
+        - '0.18'
+        - '3.6'
+        - '0.08'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t44.csv
+      table_as_labeled: IV.7
+      transcribed_records: 53
+      locator:
+        pdf_page_indices:
+        - 181
+        - 182
+        published_pages:
+        - 158
+        - 159
+        system: CaO-MgO-Al2O3-SiO2
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t44.provenance.yaml
+      sample_row:
+        record:
+          record_type: reference
+          experiment: ''
+          composition: EDiAn
+          associated_phases: ''
+          T_C: '1400'
+          p_Na_10_minus_4_atm: ''
+          p_Na_sd_10_minus_4_atm: ''
+          Na2O_wt_pct_assayed: ''
+          Na2O_wt_pct_assayed_sd: ''
+          Na2O_wt_pct_corrected: '12.35'
+          Na2O_wt_pct_corrected_sd: '0.32'
+          Na2O_mol_pct_corrected: '12'
+          Na2O_mol_pct_corrected_sd: '0.31'
+          gamma_Na2O_10_minus_7: '1.76'
+          gamma_Na2O_sd_10_minus_7: '0.06'
+        numeric_cells:
+        - '1400'
+        - '12.35'
+        - '0.32'
+        - '12'
+        - '0.31'
+        - '1.76'
+        - '0.06'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t45.csv
+      table_as_labeled: IV.8
+      transcribed_records: 3
+      locator:
+        pdf_page_index: 183
+        published_page: 160
+        system: CaO-MgO-Al2O3-SiO2
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t45.provenance.yaml
+      sample_row:
+        record:
+          record_type: reference
+          experiment: ''
+          composition: EDiAn
+          associated_phases: ''
+          T_C: '1400'
+          p_Na_10_minus_5_atm: ''
+          p_Na_sd_10_minus_5_atm: ''
+          Na2O_wt_pct_assayed: ''
+          Na2O_wt_pct_assayed_sd: ''
+          Na2O_wt_pct_corrected: '7.95'
+          Na2O_wt_pct_corrected_sd: '0.61'
+          Na2O_mol_pct_corrected: '7.71'
+          Na2O_mol_pct_corrected_sd: '0.59'
+          gamma_Na2O_10_minus_7: '0.15'
+          gamma_Na2O_sd_10_minus_7: '0.01'
+        numeric_cells:
+        - '1400'
+        - '7.95'
+        - '0.61'
+        - '7.71'
+        - '0.59'
+        - '0.15'
+        - '0.01'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t46.csv
+      table_as_labeled: IV.9 (caption IV.19)
+      transcribed_records: 10
+      locator:
+        pdf_page_indices:
+        - 183
+        - 184
+        published_pages:
+        - 160
+        - 161
+        system: CaO-MgO-Al2O3-SiO2
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t46.provenance.yaml
+      sample_row:
+        record:
+          record_type: source_pole
+          experiment: ''
+          composition: pôle
+          associated_phases: ''
+          T_C: '1400'
+          Na2O_wt_pct_assayed: ''
+          Na2O_wt_pct_assayed_sd: ''
+          Na2O_wt_pct_corrected: '12.00'
+          Na2O_wt_pct_corrected_sd: '0.27'
+          Na2O_mol_pct_corrected: '11.68'
+          Na2O_mol_pct_corrected_sd: '0.26'
+          gamma_Na2O_10_minus_6: '0.05'
+          gamma_Na2O_sd_10_minus_6: '0.01'
+          analysis_status: reported
+        numeric_cells:
+        - '1400'
+        - '12'
+        - '0.27'
+        - '11.68'
+        - '0.26'
+        - '0.05'
+        - '0.01'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t47.csv
+      table_as_labeled: I.1
+      transcribed_records: 1
+      locator:
+        pdf_page_index: 34
+        pdf_page: 35
+        printed_page: 12
+        record: Tableau I.1 Valeur de la basicité optique selon Duffy (2004)
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t47.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '34'
+          locator: printed p. 12; Tableau I.1
+          method: Duffy (2004) as attributed in caption
+          SiO2_Lambda_oxide: '0.48'
+          Al2O3_Lambda_oxide: '0.6'
+          CaO_Lambda_oxide: '1.0'
+          MgO_Lambda_oxide: '0.78'
+          K2O_Lambda_oxide: '1.4'
+          Na2O_Lambda_oxide: '1.15'
+        numeric_cells:
+        - '34'
+        - '0.48'
+        - '0.6'
+        - '1'
+        - '0.78'
+        - '1.4'
+        - '1.15'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t48.csv
+      table_as_labeled: II.1
+      transcribed_records: 11
+      locator:
+        pdf_page_index: 69
+        pdf_page: 70
+        printed_page: 47
+        record: Tableau II.1 Standards utilisés à la sonde électronique en fonction des éléments étudiés
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t48.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '69'
+          locator: printed p. 47; Tableau II.1
+          element: Na
+          standard: Albite (NaAlSi3O8)
+        numeric_cells:
+        - '69'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t49.csv
+      table_as_labeled: II.2
+      transcribed_records: 9
+      locator:
+        pdf_page_index: 82
+        pdf_page: 83
+        printed_page: 60
+        record: Tableau II.2 Valeur de la constante de la réaction (III.1) suivant différents logiciels thermodynamiques
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t49.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '82'
+          locator: printed p. 60; Tableau II.2
+          temperature_C: '1100'
+          K_FactSage: '2.66E-08'
+          K_HSC_Chemistry: '2.45E-08'
+          K_Thermodata: ''
+        numeric_cells:
+        - '82'
+        - '1100'
+        - '0.0000000266'
+        - '0.0000000245'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t50.csv
+      table_as_labeled: II.3
+      transcribed_records: 7
+      locator:
+        pdf_page_index: 83
+        pdf_page: 84
+        printed_page: 61
+        record: Tableau II.3 Récapitulatif des tampons sodiques utilisés, des températures étudiées, et des gammes d’activités
+          en Na2O et des pressions partielles étudiées
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t50.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '83'
+          table: II.3
+          source: Na2O-SiO2
+          temperature_C: '1400'
+          x_Na2O: '45.45'
+          log_aNa2O: '-5.32'
+          log_a_2sigma: '0.38'
+          aNa2O: '4.83E-06'
+          a_2sigma: '6.02E-08'
+          buffer: Ni/NiO
+          PO2_atm: '2.11E-06'
+          PO2_2sigma: '2.00E-06'
+          PNa_atm: '5.99E-04'
+          PNa_2sigma: '5.37E-06'
+        numeric_cells:
+        - '83'
+        - '1400'
+        - '45.45'
+        - '-5.32'
+        - '0.38'
+        - '0.00000483'
+        - '0.0000000602'
+        - '0.00000211'
+        - '0.000002'
+        - '0.000599'
+        - '0.00000537'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t51.csv
+      table_as_labeled: II.4
+      transcribed_records: 5
+      locator:
+        pdf_page_index: 84
+        pdf_page: 85
+        printed_page: 62
+        record: Tableau II.4 Concentrations en Na2O dans la composition EDiAn sous différents sources Na2O-xSiO2
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t51.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '84'
+          table: II.4
+          source: Na2O-3.5SiO2
+          experiment_count: '8'
+          temperature_C: '1400'
+          EDiAn_Na2O_wt_percent: '8.07'
+          EDiAn_Na2O_parenthetical: '0.37'
+        numeric_cells:
+        - '84'
+        - '8'
+        - '1400'
+        - '8.07'
+        - '0.37'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t52.csv
+      table_as_labeled: V.1
+      transcribed_records: 6
+      locator:
+        pdf_page_index: 197
+        pdf_page: 198
+        printed_page: 175
+        record: Tableau V.1 Valeurs de ASun permettant le calcul de l’acidobasicité suivant le modèle de Sun
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t52.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '197'
+          table: V.1
+          oxide: Na2O
+          A_Sun: '20'
+        numeric_cells:
+        - '197'
+        - '20'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t53.csv
+      table_as_labeled: V.2
+      transcribed_records: 7
+      locator:
+        pdf_page_index: 198
+        pdf_page: 199
+        printed_page: 176
+        record: Tableau V.2 Valeurs de xi permettant le calcul de l’acidobasicité suivant le modèle de Sanderson
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t53.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '198'
+          table: V.2
+          element: Si
+          oxide: SiO2
+          xi: '2.62'
+        numeric_cells:
+        - '198'
+        - '2.62'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t54.csv
+      table_as_labeled: V.3
+      transcribed_records: 10
+      locator:
+        pdf_page_index: 199
+        pdf_page: 200
+        printed_page: 177
+        record: Tableau V.3 Valeur de la basicité optique selon Duffy (2004)
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t54.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '199'
+          table: V.3
+          oxide: SiO2
+          optical_basicity_value: '0.48'
+        numeric_cells:
+        - '199'
+        - '0.48'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t55.csv
+      table_as_labeled: V.4
+      transcribed_records: 12
+      locator:
+        pdf_page_index: 210
+        pdf_page: 211
+        printed_page: 188
+        record: Tableau V.4 Récapitulatif des modèles de solubilité suivant les équations Na2O(mol ou wt%) = a*Lambda + b
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t55.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '210'
+          table: V.4
+          row: '1'
+          activity_exponent: '-3'
+          a_coefficient: '-171.8'
+          a_parenthetical: '69'
+          b_coefficient: '144.3'
+          b_parenthetical: '37'
+        numeric_cells:
+        - '210'
+        - '1'
+        - '-3'
+        - '-171.8'
+        - '69'
+        - '144.3'
+        - '37'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t56.csv
+      table_as_labeled: V.5
+      transcribed_records: 8
+      locator:
+        pdf_page_index: 220
+        pdf_page: 221
+        printed_page: 198
+        record: Tableau V.5 Coefficients (a, b, c, d, e) des équations Na2O=f(PNa) pour les pôles de composition étudiés
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t56.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '220'
+          table: V.5
+          parameter: a
+          Pole: '4640379'
+          CMA16S1: '2220185'
+          EDiAn: '1183329'
+          CMA16S2: '88571'
+          SPM: '8581'
+        numeric_cells:
+        - '220'
+        - '4640379'
+        - '2220185'
+        - '1183329'
+        - '88571'
+        - '8581'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t57.csv
+      table_as_labeled: VI.1
+      transcribed_records: 6
+      locator:
+        pdf_page_index: 232
+        pdf_page: 233
+        printed_page: 210
+        record: Tableau VI.1 classification type des chondres
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t57.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '232'
+          table: VI.1
+          type: I
+          type_description: pauvre en FeO, olivine Fa<10
+          subtype: IA
+          subtype_description: olivine>80%
+        numeric_cells:
+        - '232'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t58.csv
+      table_as_labeled: VI.2
+      transcribed_records: 11
+      locator:
+        pdf_page_index: 233
+        pdf_page: 234
+        printed_page: 211
+        record: Tableau VI.2 Compositions moyennes des différents types de chondres dans la météorite de Semarkona
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t58.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '233'
+          table: VI.2
+          oxide: SiO2
+          I_PO_pds_percent: '44.81'
+          I_PO_sigma: '3.21'
+          I_POP_pds_percent: '56.4'
+          I_POP_sigma: '1.56'
+          I_PP_pds_percent: '57.87'
+          I_PP_sigma: '1.07'
+          II_PO_pds_percent: '45.08'
+          II_PO_sigma: '2.13'
+          II_PP_pds_percent: '54.37'
+          II_PP_sigma: '4.27'
+        numeric_cells:
+        - '233'
+        - '44.81'
+        - '3.21'
+        - '56.4'
+        - '1.56'
+        - '57.87'
+        - '1.07'
+        - '45.08'
+        - '2.13'
+        - '54.37'
+        - '4.27'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t59.csv
+      table_as_labeled: VI.3
+      transcribed_records: 7
+      locator:
+        pdf_page_index: 253
+        pdf_page: 254
+        printed_page: 231
+        record: Tableau VI.3 Moyenne des concentrations en Na2O déterminée dans les olivines et le liquide des charges expérimentales
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t59.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '253'
+          table: VI.3
+          charge: ACMAS13-PO
+          Na2O_ol_wt_percent: '0.0174'
+          Na2O_ol_parenthetical: '14'
+          Na2O_ol_error_1sigma: '0.0005'
+          Na2O_glass_wt_percent: '17.50'
+          Na2O_glass_parenthetical: '2'
+          Na2O_glass_error_1sigma: '0.15'
+          DNa_times_1e3: '0.99'
+          DNa_error_times_1e5: '3.67'
+        numeric_cells:
+        - '253'
+        - '0.0174'
+        - '14'
+        - '0.0005'
+        - '17.5'
+        - '2'
+        - '0.15'
+        - '0.99'
+        - '3.67'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t60.csv
+      table_as_labeled: Annexe 3 composition table
+      transcribed_records: 171
+      locator:
+        pdf_page_index: 311
+        pdf_page: 312
+        printed_page: 289
+        record: Annexe 3; composition rows continue through printed page 295
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t60.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '311'
+          system: Na2O-CaO-SiO2
+          composition: NCS3
+          analysis_method_and_source: S.E. Abdelouhab (2005)
+          Na2O_wt_percent: '20.23'
+          MgO_wt_percent: '0.00'
+          SiO2_wt_percent: '60.81'
+          Al2O3_wt_percent: '0.00'
+          CaO_wt_percent: '18.96'
+          Na2O_secondary_value: '0.43'
+          MgO_secondary_value: ''
+          SiO2_secondary_value: '0.24'
+          Al2O3_secondary_value: ''
+          CaO_secondary_value: '0.44'
+        numeric_cells:
+        - '311'
+        - '20.23'
+        - '0'
+        - '60.81'
+        - '0'
+        - '18.96'
+        - '0.43'
+        - '0.24'
+        - '0.44'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t61.csv
+      table_as_labeled: VI.4
+      transcribed_records: 7
+      locator:
+        pdf_page_index: 255
+        pdf_page: 256
+        printed_page: 233
+        record: Tableau VI.4 Moyenne des concentrations en Na2O déterminée dans les olivines des chondres de type II de Semarkona,
+          des boninites, des océanites et le liquide, et DNa calculé
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t61.provenance.yaml
+      sample_row:
+        record:
+          pdf_page_index: '255'
+          table: VI.4
+          sample: CH83
+          FeO_ol_wt_percent: '12'
+          FeO_ol_parenthetical: '4'
+          FeO_error_1sigma: '0.34'
+          DNa_times_1e3: '1.04'
+          DNa_error_times_1e4: '2.00'
+        numeric_cells:
+        - '255'
+        - '12'
+        - '4'
+        - '0.34'
+        - '1.04'
+        - '2'
+      rows:
+      - sample: CH83
+        FeO_ol_wt_percent: '12'
+        FeO_ol_parenthetical: '4'
+        FeO_error_1sigma: '0.34'
+        DNa_times_1e3: '1.04'
+        DNa_error_times_1e4: '2.00'
+      - sample: CH62
+        FeO_ol_wt_percent: '14.8'
+        FeO_ol_parenthetical: '4'
+        FeO_error_1sigma: '0.37'
+        DNa_times_1e3: '3.32'
+        DNa_error_times_1e4: '1.10'
+      - sample: CH19
+        FeO_ol_wt_percent: '13.18'
+        FeO_ol_parenthetical: '4'
+        FeO_error_1sigma: '0.45'
+        DNa_times_1e3: '1.78'
+        DNa_error_times_1e4: '2.65'
+      - sample: CH92
+        FeO_ol_wt_percent: '11.41'
+        FeO_ol_parenthetical: '3'
+        FeO_error_1sigma: '1.41'
+        DNa_times_1e3: '1.88'
+        DNa_error_times_1e4: '1.60'
+      - sample: CH121
+        FeO_ol_wt_percent: '4.9'
+        FeO_ol_parenthetical: '6'
+        FeO_error_1sigma: '0.17'
+        DNa_times_1e3: '2.62'
+        DNa_error_times_1e4: '0.94'
+      - sample: Boninite
+        FeO_ol_wt_percent: '10.14'
+        FeO_ol_parenthetical: '4'
+        FeO_error_1sigma: '0.34'
+        DNa_times_1e3: '1.43'
+        DNa_error_times_1e4: '2.13'
+      - sample: Océanite
+        FeO_ol_wt_percent: '16.2'
+        FeO_ol_parenthetical: '9'
+        FeO_error_1sigma: '0.57'
+        DNa_times_1e3: '2.19'
+        DNa_error_times_1e4: '6.45'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t62.csv
+      table_as_labeled: Table 1 of the reprinted letter R. Mathieu et al., J. Non-Cryst. Solids 354 (2008) 5079-5083 (page
+        5081)
+      transcribed_records: 12
+      locator:
+        pdf_page: 78
+        pdf_page_index: 77
+        journal_page: 5081
+        section: 'Chapitre II reprint: Letter to the editor, Table 1'
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t62.provenance.yaml
+      sample_row:
+        record:
+          run: EDiAn
+          time_h: '0'
+          T_C: '1400'
+          Na2O_wt_pct: '0.09'
+          Na2O_sd_1sigma: '0.01'
+          MgO_wt_pct: '10.84'
+          MgO_sd_1sigma: '0.24'
+          Al2O3_wt_pct: '16.25'
+          Al2O3_sd_1sigma: '0.28'
+          SiO2_wt_pct: '53.12'
+          SiO2_sd_1sigma: '0.95'
+          CaO_wt_pct: '21.10'
+          CaO_sd_1sigma: '0.66'
+          Ca_Al: '1.32'
+          Mg_Si: '0.33'
+        numeric_cells:
+        - '0'
+        - '1400'
+        - '0.09'
+        - '0.01'
+        - '10.84'
+        - '0.24'
+        - '16.25'
+        - '0.28'
+        - '53.12'
+        - '0.95'
+        - '21.1'
+        - '0.66'
+        - '1.32'
+        - '0.33'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t63.csv
+      table_as_labeled: Table 1 of the chapter III English article draft (Starting compositions, wt%)
+      transcribed_records: 38
+      locator:
+        published_pages:
+        - 98
+        - 99
+        pdf_page:
+        - 121
+        - 122
+        pdf_page_index:
+        - 120
+        - 121
+        section: Chapitre III article, Table 1
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t63.provenance.yaml
+      sample_row:
+        record:
+          composition: EDiAn
+          analysis_footnote: ''
+          Na2O_wt_pct: '0.09'
+          Na2O_sd_2sigma: '0.01'
+          MgO_wt_pct: '10.84'
+          MgO_sd_2sigma: '0.24'
+          SiO2_wt_pct: '53.12'
+          SiO2_sd_2sigma: '0.95'
+          Al2O3_wt_pct: '16.25'
+          Al2O3_sd_2sigma: '0.28'
+          CaO_wt_pct: '21.10'
+          CaO_sd_2sigma: '0.66'
+        numeric_cells:
+        - '0.09'
+        - '0.01'
+        - '10.84'
+        - '0.24'
+        - '53.12'
+        - '0.95'
+        - '16.25'
+        - '0.28'
+        - '21.1'
+        - '0.66'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t64.csv
+      table_as_labeled: Table 2 of the chapter III English article draft (test for attainment of equilibrium)
+      transcribed_records: 8
+      locator:
+        published_page: 100
+        pdf_page: 123
+        pdf_page_index: 122
+        section: Chapitre III article, Table 2
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t64.provenance.yaml
+      sample_row:
+        record:
+          run: ACMA16S-19
+          duration_h: '1'
+          T_C: '1400'
+          EDiAn_Na2O_wt_pct: '1.88'
+          EDiAn_Na2O_sd_2sigma: '0.09'
+          MgO_wt_pct: '10.33'
+          MgO_sd_2sigma: '0.14'
+          SiO2_wt_pct: '49.95'
+          SiO2_sd_2sigma: '0.50'
+          Al2O3_wt_pct: '15.75'
+          Al2O3_sd_2sigma: '0.21'
+          CaO_wt_pct: '22.08'
+          CaO_sd_2sigma: '0.05'
+          Ca_Al: '1.27'
+          Mg_Si: '0.30'
+          source_final_Na2O_wt_pct: '31.86'
+          source_final_Na2O_sd_2sigma: '0.29'
+        numeric_cells:
+        - '1'
+        - '1400'
+        - '1.88'
+        - '0.09'
+        - '10.33'
+        - '0.14'
+        - '49.95'
+        - '0.5'
+        - '15.75'
+        - '0.21'
+        - '22.08'
+        - '0.05'
+        - '1.27'
+        - '0.3'
+        - '31.86'
+        - '0.29'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t65.csv
+      table_as_labeled: Table 3 of the chapter III English article draft (EDiAn glass compositions after equilibration, 1400
+        °C, Ni/NiO, NS2 source)
+      transcribed_records: 14
+      locator:
+        published_page: 101
+        pdf_page: 124
+        pdf_page_index: 123
+        section: Chapitre III article, Table 3
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t65.provenance.yaml
+      sample_row:
+        record:
+          run: ACMS9
+          duration_h: '96'
+          T_C: '1400'
+          EDiAn_Na2O_wt_pct: '11.22'
+          EDiAn_Na2O_sd_2sigma: '0.22'
+          EDiAn_MgO_wt_pct: '9.49'
+          EDiAn_MgO_sd_2sigma: '0.14'
+          EDiAn_SiO2_wt_pct: '45.94'
+          EDiAn_SiO2_sd_2sigma: '0.14'
+          EDiAn_Al2O3_wt_pct: '13.52'
+          EDiAn_Al2O3_sd_2sigma: '0.20'
+          EDiAn_CaO_wt_pct: '19.82'
+          EDiAn_CaO_sd_2sigma: '0.08'
+          source_final_Na2O_wt_pct: '32.75'
+          source_final_Na2O_sd_2sigma: '0.63'
+        numeric_cells:
+        - '96'
+        - '1400'
+        - '11.22'
+        - '0.22'
+        - '9.49'
+        - '0.14'
+        - '45.94'
+        - '0.14'
+        - '13.52'
+        - '0.2'
+        - '19.82'
+        - '0.08'
+        - '32.75'
+        - '0.63'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t66.csv
+      table_as_labeled: Table 4 of the chapter III English article draft (EDiAn Na2O with different Na2O-xSiO2 sources and
+        the corresponding PNa)
+      transcribed_records: 3
+      locator:
+        published_page: 102
+        pdf_page: 125
+        pdf_page_index: 124
+        section: Chapitre III article, Table 4
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t66.provenance.yaml
+      sample_row:
+        record:
+          source_type: Na2O-3.5SiO2
+          number_of_runs: '6'
+          T_C: '1400'
+          EDiAn_final_Na2O_wt_pct: '8.07'
+          EDiAn_final_Na2O_sd_2sigma: '0.37'
+          source_final_Na2O_wt_pct: '22.22'
+          source_final_Na2O_sd_2sigma: '0.30'
+          PNa_atm: '2.97e-05'
+          PNa_sd_2sigma_atm: '1.62e-07'
+          PNa_as_printed: 2.97*10-05 (1.62*10-07)
+        numeric_cells:
+        - '6'
+        - '1400'
+        - '8.07'
+        - '0.37'
+        - '22.22'
+        - '0.3'
+        - '0.0000297'
+        - '0.000000162'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t67.csv
+      table_as_labeled: Table 5 of the chapter III English article draft (CaO-MgO-SiO2 glass compositions after equilibration,
+        1400 °C, Ni/NiO, NS2 source)
+      transcribed_records: 33
+      locator:
+        published_pages:
+        - 103
+        - 104
+        pdf_page:
+        - 126
+        - 127
+        pdf_page_index:
+        - 125
+        - 126
+        section: Chapitre III article, Table 5
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t67.provenance.yaml
+      sample_row:
+        record:
+          run: ACMS9
+          composition: CMS8
+          footnote: ''
+          Na2O_wt_pct: '7.25'
+          Na2O_sd_2sigma: '0.14'
+          MgO_wt_pct: '4.67'
+          MgO_sd_2sigma: '0.08'
+          SiO2_wt_pct: '49.44'
+          SiO2_sd_2sigma: '0.30'
+          CaO_wt_pct: '38.58'
+          CaO_sd_2sigma: '0.20'
+        numeric_cells:
+        - '7.25'
+        - '0.14'
+        - '4.67'
+        - '0.08'
+        - '49.44'
+        - '0.3'
+        - '38.58'
+        - '0.2'
+    - table_file: tables/mathieu-2009-sodium-solubility-thesis/t68.csv
+      table_as_labeled: Table 6 of the chapter III English article draft (normalized Na2O solubility, γNa2O, NBO/T and optical
+        basicity)
+      transcribed_records: 33
+      locator:
+        published_pages:
+        - 105
+        - 106
+        pdf_page:
+        - 128
+        - 129
+        pdf_page_index:
+        - 127
+        - 128
+        section: Chapitre III article, Table 6
+      status: structured_image_checked
+      provenance_file: tables/mathieu-2009-sodium-solubility-thesis/t68.provenance.yaml
+      sample_row:
+        record:
+          composition: End-Member-NS2
+          Na2O_wt_pct_normalized: '30.09'
+          Na2O_wt_sd_2sigma: '0.5'
+          Na2O_mol_pct_normalized: '29.80'
+          Na2O_mol_sd_2sigma: '0.45'
+          gamma_Na2O_x1e-6: '0.72'
+          gamma_sd_2sigma_x1e-6: '0.02'
+          NBO_T_Na_free: '0'
+          optical_basicity_Na_free: '0.48'
+        numeric_cells:
+        - '30.09'
+        - '0.5'
+        - '29.8'
+        - '0.45'
+        - '0.72'
+        - '0.02'
+        - '0'
+        - '0.48'
+    limitation: CSV table transcriptions are structured and image-checked. Numeric table rows are not yet normalized into
+      species observations.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_table_inventory
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt
+- observation_id: mathieu_2009_temperature_context
+  type: source_metadata_context
+  locator:
+    pdf_page_index: 41
+    section: experimental methods
+  units: printed prose
+  values:
+    quantity: temperature_measurement_and_quench
+    method_class: quoted_unattributed
+    furnace: vertical GERO HTK 8.4 muffle furnace; ampoules on an alumina support crucible.
+    sensor: Pt/PtRh thermocouple; furnace and capsules calibrated; gradient 3 °C/cm.
+    stated_temperature_uncertainty: not stated in the reviewed passage.
+    quench: ampoules extracted and water-quenched; first 10 s cooling estimated at 50 °C/s.
+  context_id: mathieu-2009-sodium-solubility-thesis::context::mathieu_2009_temperature_context
+  work_id: 10.70675/39024f29z943dz4cc7zb2f6za74b9f3e1fd8
+  source_id: mathieu-2009-sodium-solubility-thesis
+  species: Na2O_melt

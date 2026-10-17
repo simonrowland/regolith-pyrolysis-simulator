@@ -18527,9 +18527,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: derived
-    model: derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Stolyarova et al. (1991), Table Ib, Eq. [1]
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -18602,13 +18602,10 @@ observations:
         table: Ib
         note: Printed X(SiO2)=0.49; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived
           as T_K−273.15 from the table caption; not printed.
-  derived_from:
-  - kems-053-stolyarova-1991::stolyarova_1991_printed_equilibrium_1
   derivation:
-    relation: P_O is calculated from measured WO2 and WO3 partial pressures and the equilibrium constant for the printed gas
-      reaction (WO3) = (WO2) + (O), Eq. [1]; numerical WO2/WO3 input pressures are not tabulated.
+    relation: atm_to_Pa
     inputs:
-    - kems-053-stolyarova-1991::stolyarova_1991_printed_equilibrium_1
+    - pdf:kems-053-stolyarova-1991
     parameters:
     - - original
       - state:
@@ -18619,31 +18616,6 @@ observations:
           published_page: 3711
           pdf_page_index: 2
           table: Ib
-        inference:
-          relation: atm_to_Pa
-          inputs:
-          - P_Pa = P_atm × 101325
-          - original_unit=atm
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.000000001'
-              locator:
-                page: 3711
-                published_page: 3711
-                pdf_page_index: 2
-                table: Ib
-          - - factor
-            - state:
-                tag: value
-                value: '101325'
-              locator:
-                page: 3711
-                published_page: 3711
-                pdf_page_index: 2
-                table: Ib
-          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -18774,9 +18746,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: derived
-    model: derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Stolyarova et al. (1991), Table Ib, Eq. [1]
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -18849,13 +18821,10 @@ observations:
         table: Ib
         note: Printed X(SiO2)=0.41; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived
           as T_K−273.15 from the table caption; not printed.
-  derived_from:
-  - kems-053-stolyarova-1991::stolyarova_1991_printed_equilibrium_1
   derivation:
-    relation: P_O is calculated from measured WO2 and WO3 partial pressures and the equilibrium constant for the printed gas
-      reaction (WO3) = (WO2) + (O), Eq. [1]; numerical WO2/WO3 input pressures are not tabulated.
+    relation: atm_to_Pa
     inputs:
-    - kems-053-stolyarova-1991::stolyarova_1991_printed_equilibrium_1
+    - pdf:kems-053-stolyarova-1991
     parameters:
     - - original
       - state:
@@ -18866,31 +18835,6 @@ observations:
           published_page: 3711
           pdf_page_index: 2
           table: Ib
-        inference:
-          relation: atm_to_Pa
-          inputs:
-          - P_Pa = P_atm × 101325
-          - original_unit=atm
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.000000001'
-              locator:
-                page: 3711
-                published_page: 3711
-                pdf_page_index: 2
-                table: Ib
-          - - factor
-            - state:
-                tag: value
-                value: '101325'
-              locator:
-                page: 3711
-                published_page: 3711
-                pdf_page_index: 2
-                table: Ib
-          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -19021,9 +18965,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: derived
-    model: derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Stolyarova et al. (1991), Table Ib, Eq. [1]
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -19103,13 +19047,10 @@ observations:
         table: Ib
         note: Printed X(SiO2)=0.25; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived
           as T_K−273.15 from the table caption; not printed.
-  derived_from:
-  - kems-053-stolyarova-1991::stolyarova_1991_printed_equilibrium_1
   derivation:
-    relation: P_O is calculated from measured WO2 and WO3 partial pressures and the equilibrium constant for the printed gas
-      reaction (WO3) = (WO2) + (O), Eq. [1]; numerical WO2/WO3 input pressures are not tabulated.
+    relation: atm_to_Pa
     inputs:
-    - kems-053-stolyarova-1991::stolyarova_1991_printed_equilibrium_1
+    - pdf:kems-053-stolyarova-1991
     parameters:
     - - original
       - state:
@@ -19120,31 +19061,6 @@ observations:
           published_page: 3711
           pdf_page_index: 2
           table: Ib
-        inference:
-          relation: atm_to_Pa
-          inputs:
-          - P_Pa = P_atm × 101325
-          - original_unit=atm
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.00000000068'
-              locator:
-                page: 3711
-                published_page: 3711
-                pdf_page_index: 2
-                table: Ib
-          - - factor
-            - state:
-                tag: value
-                value: '101325'
-              locator:
-                page: 3711
-                published_page: 3711
-                pdf_page_index: 2
-                table: Ib
-          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -19275,9 +19191,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: derived
-    model: derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Stolyarova et al. (1991), Table Ib, Eq. [1]
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -19357,13 +19273,10 @@ observations:
         table: Ib
         note: Printed X(SiO2)=0.39; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived
           as T_K−273.15 from the table caption; not printed.
-  derived_from:
-  - kems-053-stolyarova-1991::stolyarova_1991_printed_equilibrium_1
   derivation:
-    relation: P_O is calculated from measured WO2 and WO3 partial pressures and the equilibrium constant for the printed gas
-      reaction (WO3) = (WO2) + (O), Eq. [1]; numerical WO2/WO3 input pressures are not tabulated.
+    relation: atm_to_Pa
     inputs:
-    - kems-053-stolyarova-1991::stolyarova_1991_printed_equilibrium_1
+    - pdf:kems-053-stolyarova-1991
     parameters:
     - - original
       - state:
@@ -19374,31 +19287,6 @@ observations:
           published_page: 3711
           pdf_page_index: 2
           table: Ib
-        inference:
-          relation: atm_to_Pa
-          inputs:
-          - P_Pa = P_atm × 101325
-          - original_unit=atm
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.000000001'
-              locator:
-                page: 3711
-                published_page: 3711
-                pdf_page_index: 2
-                table: Ib
-          - - factor
-            - state:
-                tag: value
-                value: '101325'
-              locator:
-                page: 3711
-                published_page: 3711
-                pdf_page_index: 2
-                table: Ib
-          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -19529,9 +19417,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: derived
-    model: derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Stolyarova et al. (1991), Table Ib, Eq. [1]
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -19611,13 +19499,10 @@ observations:
         table: Ib
         note: Printed X(SiO2)=0.38; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived
           as T_K−273.15 from the table caption; not printed.
-  derived_from:
-  - kems-053-stolyarova-1991::stolyarova_1991_printed_equilibrium_1
   derivation:
-    relation: P_O is calculated from measured WO2 and WO3 partial pressures and the equilibrium constant for the printed gas
-      reaction (WO3) = (WO2) + (O), Eq. [1]; numerical WO2/WO3 input pressures are not tabulated.
+    relation: atm_to_Pa
     inputs:
-    - kems-053-stolyarova-1991::stolyarova_1991_printed_equilibrium_1
+    - pdf:kems-053-stolyarova-1991
     parameters:
     - - original
       - state:
@@ -19628,31 +19513,6 @@ observations:
           published_page: 3711
           pdf_page_index: 2
           table: Ib
-        inference:
-          relation: atm_to_Pa
-          inputs:
-          - P_Pa = P_atm × 101325
-          - original_unit=atm
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.00000000074'
-              locator:
-                page: 3711
-                published_page: 3711
-                pdf_page_index: 2
-                table: Ib
-          - - factor
-            - state:
-                tag: value
-                value: '101325'
-              locator:
-                page: 3711
-                published_page: 3711
-                pdf_page_index: 2
-                table: Ib
-          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -19783,9 +19643,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: derived
-    model: derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Stolyarova et al. (1991), Table Ib, Eq. [1]
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -19858,13 +19718,10 @@ observations:
         table: Ib
         note: Printed X(SiO2)=0.50; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived
           as T_K−273.15 from the table caption; not printed.
-  derived_from:
-  - kems-053-stolyarova-1991::stolyarova_1991_printed_equilibrium_1
   derivation:
-    relation: P_O is calculated from measured WO2 and WO3 partial pressures and the equilibrium constant for the printed gas
-      reaction (WO3) = (WO2) + (O), Eq. [1]; numerical WO2/WO3 input pressures are not tabulated.
+    relation: atm_to_Pa
     inputs:
-    - kems-053-stolyarova-1991::stolyarova_1991_printed_equilibrium_1
+    - pdf:kems-053-stolyarova-1991
     parameters:
     - - original
       - state:
@@ -19875,31 +19732,6 @@ observations:
           published_page: 3711
           pdf_page_index: 2
           table: Ib
-        inference:
-          relation: atm_to_Pa
-          inputs:
-          - P_Pa = P_atm × 101325
-          - original_unit=atm
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.000000001'
-              locator:
-                page: 3711
-                published_page: 3711
-                pdf_page_index: 2
-                table: Ib
-          - - factor
-            - state:
-                tag: value
-                value: '101325'
-              locator:
-                page: 3711
-                published_page: 3711
-                pdf_page_index: 2
-                table: Ib
-          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -20030,9 +19862,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: derived
-    model: derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Stolyarova et al. (1991), Table Ib, Eq. [1]
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -20112,13 +19944,10 @@ observations:
         table: Ib
         note: Printed X(SiO2)=0.40; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived
           as T_K−273.15 from the table caption; not printed.
-  derived_from:
-  - kems-053-stolyarova-1991::stolyarova_1991_printed_equilibrium_1
   derivation:
-    relation: P_O is calculated from measured WO2 and WO3 partial pressures and the equilibrium constant for the printed gas
-      reaction (WO3) = (WO2) + (O), Eq. [1]; numerical WO2/WO3 input pressures are not tabulated.
+    relation: atm_to_Pa
     inputs:
-    - kems-053-stolyarova-1991::stolyarova_1991_printed_equilibrium_1
+    - pdf:kems-053-stolyarova-1991
     parameters:
     - - original
       - state:
@@ -20129,31 +19958,6 @@ observations:
           published_page: 3711
           pdf_page_index: 2
           table: Ib
-        inference:
-          relation: atm_to_Pa
-          inputs:
-          - P_Pa = P_atm × 101325
-          - original_unit=atm
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.00000000068'
-              locator:
-                page: 3711
-                published_page: 3711
-                pdf_page_index: 2
-                table: Ib
-          - - factor
-            - state:
-                tag: value
-                value: '101325'
-              locator:
-                page: 3711
-                published_page: 3711
-                pdf_page_index: 2
-                table: Ib
-          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -20284,9 +20088,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: derived
-    model: derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Stolyarova et al. (1991), Table Ib, Eq. [1]
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -20359,13 +20163,10 @@ observations:
         table: Ib
         note: Printed X(SiO2)=0.44; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived
           as T_K−273.15 from the table caption; not printed.
-  derived_from:
-  - kems-053-stolyarova-1991::stolyarova_1991_printed_equilibrium_1
   derivation:
-    relation: P_O is calculated from measured WO2 and WO3 partial pressures and the equilibrium constant for the printed gas
-      reaction (WO3) = (WO2) + (O), Eq. [1]; numerical WO2/WO3 input pressures are not tabulated.
+    relation: atm_to_Pa
     inputs:
-    - kems-053-stolyarova-1991::stolyarova_1991_printed_equilibrium_1
+    - pdf:kems-053-stolyarova-1991
     parameters:
     - - original
       - state:
@@ -20376,31 +20177,6 @@ observations:
           published_page: 3711
           pdf_page_index: 2
           table: Ib
-        inference:
-          relation: atm_to_Pa
-          inputs:
-          - P_Pa = P_atm × 101325
-          - original_unit=atm
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.000000001'
-              locator:
-                page: 3711
-                published_page: 3711
-                pdf_page_index: 2
-                table: Ib
-          - - factor
-            - state:
-                tag: value
-                value: '101325'
-              locator:
-                page: 3711
-                published_page: 3711
-                pdf_page_index: 2
-                table: Ib
-          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -20531,9 +20307,9 @@ observations:
   evidence:
     class:
       tag: value
-      value: model_derived
-    original_method_class: derived
-    model: derived
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Stolyarova et al. (1991), Table Ib, Eq. [1]
   admission:
     status: admitted
     reason: source admission_status=admitted
@@ -20613,13 +20389,10 @@ observations:
         table: Ib
         note: Printed X(SiO2)=0.33; CaO=1-X(SiO2) is the documented complement for the binary CaO-SiO2 system; T_C is derived
           as T_K−273.15 from the table caption; not printed.
-  derived_from:
-  - kems-053-stolyarova-1991::stolyarova_1991_printed_equilibrium_1
   derivation:
-    relation: P_O is calculated from measured WO2 and WO3 partial pressures and the equilibrium constant for the printed gas
-      reaction (WO3) = (WO2) + (O), Eq. [1]; numerical WO2/WO3 input pressures are not tabulated.
+    relation: atm_to_Pa
     inputs:
-    - kems-053-stolyarova-1991::stolyarova_1991_printed_equilibrium_1
+    - pdf:kems-053-stolyarova-1991
     parameters:
     - - original
       - state:
@@ -20630,31 +20403,6 @@ observations:
           published_page: 3711
           pdf_page_index: 2
           table: Ib
-        inference:
-          relation: atm_to_Pa
-          inputs:
-          - P_Pa = P_atm × 101325
-          - original_unit=atm
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.0000000006700000000000001'
-              locator:
-                page: 3711
-                published_page: 3711
-                pdf_page_index: 2
-                table: Ib
-          - - factor
-            - state:
-                tag: value
-                value: '101325'
-              locator:
-                page: 3711
-                published_page: 3711
-                pdf_page_index: 2
-                table: Ib
-          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -20665,47 +20413,6 @@ observations:
           pdf_page_index: 2
           table: Ib
     output_unit: Pa
-- observation_id: kems-053-stolyarova-1991::stolyarova_1991_printed_equilibrium_1
-  experiment_id: 10.1149/1.2085485::kems-053-stolyarova-1991
-  identity:
-    quantity:
-      tag: unknown
-      reason: unsupported quantity 'printed_equilibrium'
-    species:
-      formula: O
-      phase:
-        tag: unknown
-        reason: source does not state phase
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
-      charge:
-        tag: value
-        value: 0
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'printed_equilibrium'; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: unknown
-      reason: 'page_grounded: method_class method_only'
-    original_method_class: method_only
-  admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
-  source_id: kems-053-stolyarova-1991
-  locator:
-    page: 3711
-    published_page: 3711
-    pdf_page_index: 2
-    table: Ib
-    equation: '[1]'
-  read_from: pdf:kems-053-stolyarova-1991
 - observation_id: kems-053-stolyarova-1991::stolyarova_1991_sio2_activity_eq3_1933k::T=1933.00:h=209a6ff7118a
   experiment_id: 10.1149/1.2085485::experiment::stolyarova-1991-w-cell
   identity:

@@ -15121,15 +15121,33 @@ class Migrator:
     ) -> None:
         raw_item = item.get("item")
         index = item.get("index", 0)
+        row_method_class = (
+            raw_item.get("method_class") if isinstance(raw_item, Mapping) else None
+        )
+        # Other extracts use inner method labels to describe transcribed rows;
+        # only author_estimate refines a compilation assessment here.
         if (
-            source_id == "kems-041-sossi-fegley-2018"
-            and isinstance(raw_item, Mapping)
-            and isinstance(raw_item.get("method_class"), str)
+            isinstance(raw_item, Mapping)
+            and isinstance(row_method_class, str)
+            and (
+                source_id == "kems-041-sossi-fegley-2018"
+                or (
+                    METHOD_CLASS_MAP.get(row_method_class)
+                    is EvidenceClass.AUTHOR_ESTIMATE
+                    and evidence.class_.is_value
+                    and evidence.class_.value is EvidenceClass.COMPILATION_ASSESSED
+                )
+            )
         ):
             row_attribution = raw_item.get("references_as_published")
             row_model = raw_item.get("evidence_model")
+            if source_id != "kems-041-sossi-fegley-2018":
+                if not isinstance(row_attribution, str):
+                    row_attribution = evidence.attribution
+                if not isinstance(row_model, str):
+                    row_model = evidence.model
             evidence, _ = self._evidence_for(
-                raw_item["method_class"],
+                row_method_class,
                 attribution=(row_attribution if isinstance(row_attribution, str) else None),
                 model=(row_model if isinstance(row_model, str) else None),
             )

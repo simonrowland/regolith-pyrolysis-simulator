@@ -1,0 +1,3824 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/adamkovicova-1980-casio3-heat-of-fusion.yaml
+observations:
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_heat_of_fusion_at_1817K
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'pseudowollastonite_to_CaSiO3_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1817'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '57.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_kJ_mol-1: '2.9'
+      note: Authors combine the errors of both relative-enthalpy functions by the Gauss error-distribution law.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_heat_of_fusion_at_1817K
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 197
+    pdf_page_index: 5
+    figure: '1'
+    equation: '8'
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1817'
+      locator:
+        page: 197
+        pdf_page_index: 5
+        figure: '1'
+        equation: '8'
+  derived_from:
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_relative_enthalpy_fit_eq6
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_melt_relative_enthalpy_fit_eq7
+  derivation:
+    relation: ΔHfus(1817 K) = Hrel,melt(1817 K) − Hrel,pseudowollastonite(1817 K), from Eqs. (6) and (7).
+    inputs:
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_relative_enthalpy_fit_eq6
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_melt_relative_enthalpy_fit_eq7
+    parameters: []
+    output_unit: as_published
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_melt_heat_capacity_stated
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'molar_heat_capacity'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1829, 1961]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'molar_heat_capacity'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 198
+    pdf_page_index: 6
+    section: Discussion
+    equation: '7'
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  derived_from:
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_melt_relative_enthalpy_fit_eq7
+  derivation:
+    relation: The authors identify the Eq. (7) linear relative-enthalpy slope as the melt molar heat capacity; this is their
+      stated value, not a new calculation.
+    inputs:
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_melt_relative_enthalpy_fit_eq7
+    parameters: []
+    output_unit: as_published
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_melt_relative_enthalpy_fit_eq7
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_relative_enthalpy'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1829, 1961]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'fitted_relative_enthalpy'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_kJ_mol-1: '2'
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 197
+    pdf_page_index: 5
+    table: III
+    equation: '7'
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  derived_from:
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1829:h=cf370c06c383
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1848:h=0841596d01f9
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1859:h=ec5d85f803d1
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1915:h=3d0ce135d3d3
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1961:h=32621aaaf097
+  derivation:
+    relation: Least-squares regression of the measured melt relative enthalpy values in Table III, Eq. (7).
+    inputs:
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1829:h=cf370c06c383
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1848:h=0841596d01f9
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1859:h=ec5d85f803d1
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1915:h=3d0ce135d3d3
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1961:h=32621aaaf097
+    parameters: []
+    output_unit: as_published
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_27_6_quote
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_heat_of_fusion_prior_value' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: unsupported printed unit for delta_H_fus_kJ_mol-1
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Bottinga and Richet (1978), one of the two CaSiO3 heat-of-fusion values reported in their survey.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 199
+    pdf_page_index: 7
+    section: Discussion
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_50_1_quote
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_heat_of_fusion_prior_value' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: unsupported printed unit for delta_H_fus_kJ_mol-1
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Adams and Cohen (1966), derived from the decrease of the CaSiO3 solidification point in the CaSiO3–BaSiO3
+      system.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 199
+    pdf_page_index: 7
+    section: Discussion
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_56_1_quote
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_heat_of_fusion_prior_value' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: unsupported printed unit for delta_H_fus_kJ_mol-1
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Tables [3]–[6]; the authors say table [6] reports Kelley’s calculation from Allen and White data for the
+      CaSiO3–MgSiO3 system.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 199
+    pdf_page_index: 7
+    section: Discussion
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_59_0_quote
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_heat_of_fusion_prior_value' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: unsupported printed unit for delta_H_fus_kJ_mol-1
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Bottinga and Richet (1978), calculated from the CaSiO3 heat of devitrification at 298 K and heat-capacity
+      data.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 199
+    pdf_page_index: 7
+    section: Discussion
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_68_2_quote
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_heat_of_fusion_prior_value' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: unsupported printed unit for delta_H_fus_kJ_mol-1
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Bottinga and Richet (1978), calculated using the Clapeyron equation.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 199
+    pdf_page_index: 7
+    section: Discussion
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_82_9_quote
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_heat_of_fusion_prior_value' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: unsupported printed unit for delta_H_fus_kJ_mol-1
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Bottinga and Richet (1978), the other CaSiO3 heat-of-fusion value reported in their survey.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 199
+    pdf_page_index: 7
+    section: Discussion
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_melt_heat_capacity_0_14654_quote
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'molar_heat_capacity'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'molar_heat_capacity'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Barin, Knacke and Kubaschewski (1977), Thermochemical Properties of Inorganic Substances, Supplement, pp.
+      116–117, cited as [4].
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 198
+    pdf_page_index: 6
+    section: Discussion
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_melt_heat_capacity_0_15073_quote
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'molar_heat_capacity'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'molar_heat_capacity'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Barin, Knacke and Kubaschewski (1977), Thermochemical Properties of Inorganic Substances, Supplement, pp.
+      116–117, cited as [4].
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 198
+    pdf_page_index: 6
+    section: Discussion
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_cooling_fit_eq3
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_enthalpy_of_cooling'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1506, 1780]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'fitted_enthalpy_of_cooling'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_kJ_mol-1: '1.1'
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 195
+    pdf_page_index: 3
+    table: I
+    equation: '3'
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  derived_from:
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1576:h=b53aea1560f8
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1630:h=406a82a894f5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
+  derivation:
+    relation: Least-squares regression of measured pseudowollastonite cooling enthalpies, with ΔHcool = 0 at 298 K, Eq. (3).
+    inputs:
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1576:h=b53aea1560f8
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1630:h=406a82a894f5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
+    parameters: []
+    output_unit: as_published
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_heat_capacity_eq4
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'molar_heat_capacity'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1506, 1780]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'molar_heat_capacity'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    equation: '4'
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  derived_from:
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_cooling_fit_eq3
+  derivation:
+    relation: Authors obtain Eq. (4) from the temperature derivative of the Eq. (3) fitted cooling enthalpy.
+    inputs:
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_cooling_fit_eq3
+    parameters: []
+    output_unit: as_published
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_relative_enthalpy_fit_eq6
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_relative_enthalpy'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1506, 1780]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'fitted_relative_enthalpy'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_kJ_mol-1: '2.1'
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: I
+    equation: '6'
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  derived_from:
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_cooling_fit_eq3
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+  derivation:
+    relation: Add the Eq. (3) fitted cooling enthalpy and mean solution enthalpy from Eq. (5) under the Eq. (1) reference-state
+      definition.
+    inputs:
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_cooling_fit_eq3
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+    parameters: []
+    output_unit: as_published
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1506'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '139.6'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The paper reports 1.1 kJ mol−1 as the regression error for Eq. (3), not as a per-point uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 195
+    pdf_page_index: 3
+    table: I
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1506'
+      locator:
+        page: 195
+        pdf_page_index: 3
+        table: I
+  derivation:
+    relation: negative_cooling_enthalpy_to_H_minus_H298
+    inputs:
+    - unknown:adamkovicova-1980-casio3-heat-of-fusion
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '139.6'
+        locator:
+          page: 195
+          pdf_page_index: 3
+          table: I
+    - - factor
+      - state:
+          tag: value
+          value: '1'
+        locator:
+          page: 195
+          pdf_page_index: 3
+          table: I
+    output_unit: kJ/mol
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1576:h=b53aea1560f8
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1576'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '150.6'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The paper reports 1.1 kJ mol−1 as the regression error for Eq. (3), not as a per-point uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 195
+    pdf_page_index: 3
+    table: I
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1576'
+      locator:
+        page: 195
+        pdf_page_index: 3
+        table: I
+  derivation:
+    relation: negative_cooling_enthalpy_to_H_minus_H298
+    inputs:
+    - unknown:adamkovicova-1980-casio3-heat-of-fusion
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '150.6'
+        locator:
+          page: 195
+          pdf_page_index: 3
+          table: I
+    - - factor
+      - state:
+          tag: value
+          value: '1'
+        locator:
+          page: 195
+          pdf_page_index: 3
+          table: I
+    output_unit: kJ/mol
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1630:h=406a82a894f5
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1630'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '157.1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The paper reports 1.1 kJ mol−1 as the regression error for Eq. (3), not as a per-point uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 195
+    pdf_page_index: 3
+    table: I
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1630'
+      locator:
+        page: 195
+        pdf_page_index: 3
+        table: I
+  derivation:
+    relation: negative_cooling_enthalpy_to_H_minus_H298
+    inputs:
+    - unknown:adamkovicova-1980-casio3-heat-of-fusion
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '157.1'
+        locator:
+          page: 195
+          pdf_page_index: 3
+          table: I
+    - - factor
+      - state:
+          tag: value
+          value: '1'
+        locator:
+          page: 195
+          pdf_page_index: 3
+          table: I
+    output_unit: kJ/mol
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1678'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '165'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The paper reports 1.1 kJ mol−1 as the regression error for Eq. (3), not as a per-point uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 195
+    pdf_page_index: 3
+    table: I
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1678'
+      locator:
+        page: 195
+        pdf_page_index: 3
+        table: I
+  derivation:
+    relation: negative_cooling_enthalpy_to_H_minus_H298
+    inputs:
+    - unknown:adamkovicova-1980-casio3-heat-of-fusion
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '165'
+        locator:
+          page: 195
+          pdf_page_index: 3
+          table: I
+    - - factor
+      - state:
+          tag: value
+          value: '1'
+        locator:
+          page: 195
+          pdf_page_index: 3
+          table: I
+    output_unit: kJ/mol
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1730'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '173.9'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The paper reports 1.1 kJ mol−1 as the regression error for Eq. (3), not as a per-point uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 195
+    pdf_page_index: 3
+    table: I
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1730'
+      locator:
+        page: 195
+        pdf_page_index: 3
+        table: I
+  derivation:
+    relation: negative_cooling_enthalpy_to_H_minus_H298
+    inputs:
+    - unknown:adamkovicova-1980-casio3-heat-of-fusion
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '173.9'
+        locator:
+          page: 195
+          pdf_page_index: 3
+          table: I
+    - - factor
+      - state:
+          tag: value
+          value: '1'
+        locator:
+          page: 195
+          pdf_page_index: 3
+          table: I
+    output_unit: kJ/mol
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1780'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '183.3'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The paper reports 1.1 kJ mol−1 as the regression error for Eq. (3), not as a per-point uncertainty.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 195
+    pdf_page_index: 3
+    table: I
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1780'
+      locator:
+        page: 195
+        pdf_page_index: 3
+        table: I
+  derivation:
+    relation: negative_cooling_enthalpy_to_H_minus_H298
+    inputs:
+    - unknown:adamkovicova-1980-casio3-heat-of-fusion
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '183.3'
+        locator:
+          page: 195
+          pdf_page_index: 3
+          table: I
+    - - factor
+      - state:
+          tag: value
+          value: '1'
+        locator:
+          page: 195
+          pdf_page_index: 3
+          table: I
+    output_unit: kJ/mol
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1506:h=13c0520666a4
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'relative_enthalpy'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1506'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The fitted relative-enthalpy function in Eq. (6) has a stated error of 2.1 kJ mol−1.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 195
+    pdf_page_index: 3
+    table: I
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1506'
+      locator:
+        page: 195
+        pdf_page_index: 3
+        table: I
+  derived_from:
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1576:h=b53aea1560f8
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1630:h=406a82a894f5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+  derivation:
+    relation: Hrel = −(ΔHcool + ΔHsol), Eq. (1); use the Table I cooling values and the Table II arithmetic mean solution
+      heat.
+    inputs:
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1576:h=b53aea1560f8
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1630:h=406a82a894f5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+    parameters: []
+    output_unit: as_published
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1576:h=70272ed69634
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'relative_enthalpy'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1576'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The fitted relative-enthalpy function in Eq. (6) has a stated error of 2.1 kJ mol−1.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 195
+    pdf_page_index: 3
+    table: I
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1576'
+      locator:
+        page: 195
+        pdf_page_index: 3
+        table: I
+  derived_from:
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1576:h=b53aea1560f8
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1630:h=406a82a894f5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+  derivation:
+    relation: Hrel = −(ΔHcool + ΔHsol), Eq. (1); use the Table I cooling values and the Table II arithmetic mean solution
+      heat.
+    inputs:
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1576:h=b53aea1560f8
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1630:h=406a82a894f5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+    parameters: []
+    output_unit: as_published
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1630:h=1cdd7210e586
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'relative_enthalpy'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1630'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The fitted relative-enthalpy function in Eq. (6) has a stated error of 2.1 kJ mol−1.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 195
+    pdf_page_index: 3
+    table: I
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1630'
+      locator:
+        page: 195
+        pdf_page_index: 3
+        table: I
+  derived_from:
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1576:h=b53aea1560f8
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1630:h=406a82a894f5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+  derivation:
+    relation: Hrel = −(ΔHcool + ΔHsol), Eq. (1); use the Table I cooling values and the Table II arithmetic mean solution
+      heat.
+    inputs:
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1576:h=b53aea1560f8
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1630:h=406a82a894f5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+    parameters: []
+    output_unit: as_published
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1678:h=7f5dd9b90129
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'relative_enthalpy'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1678'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The fitted relative-enthalpy function in Eq. (6) has a stated error of 2.1 kJ mol−1.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 195
+    pdf_page_index: 3
+    table: I
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1678'
+      locator:
+        page: 195
+        pdf_page_index: 3
+        table: I
+  derived_from:
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1576:h=b53aea1560f8
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1630:h=406a82a894f5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+  derivation:
+    relation: Hrel = −(ΔHcool + ΔHsol), Eq. (1); use the Table I cooling values and the Table II arithmetic mean solution
+      heat.
+    inputs:
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1576:h=b53aea1560f8
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1630:h=406a82a894f5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+    parameters: []
+    output_unit: as_published
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1730:h=de2a9db8efd6
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'relative_enthalpy'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1730'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The fitted relative-enthalpy function in Eq. (6) has a stated error of 2.1 kJ mol−1.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 195
+    pdf_page_index: 3
+    table: I
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1730'
+      locator:
+        page: 195
+        pdf_page_index: 3
+        table: I
+  derived_from:
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1576:h=b53aea1560f8
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1630:h=406a82a894f5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+  derivation:
+    relation: Hrel = −(ΔHcool + ΔHsol), Eq. (1); use the Table I cooling values and the Table II arithmetic mean solution
+      heat.
+    inputs:
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1576:h=b53aea1560f8
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1630:h=406a82a894f5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+    parameters: []
+    output_unit: as_published
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1780:h=0f90032e6c86
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'relative_enthalpy'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1780'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The fitted relative-enthalpy function in Eq. (6) has a stated error of 2.1 kJ mol−1.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 195
+    pdf_page_index: 3
+    table: I
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1780'
+      locator:
+        page: 195
+        pdf_page_index: 3
+        table: I
+  derived_from:
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1576:h=b53aea1560f8
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1630:h=406a82a894f5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+  derivation:
+    relation: Hrel = −(ΔHcool + ΔHsol), Eq. (1); use the Table I cooling values and the Table II arithmetic mean solution
+      heat.
+    inputs:
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1576:h=b53aea1560f8
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1630:h=406a82a894f5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+    parameters: []
+    output_unit: as_published
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=110dc5ab88c5
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      individual_points: not_reported
+      mean_kJ_mol-1: '1.8'
+      confidence: reliability coefficient (1−α) = 0.95
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: II
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: II
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=3c425a0b5c95
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      individual_points: not_reported
+      mean_kJ_mol-1: '1.8'
+      confidence: reliability coefficient (1−α) = 0.95
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: II
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: II
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=4ed9d5ece6d5
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      individual_points: not_reported
+      mean_kJ_mol-1: '1.8'
+      confidence: reliability coefficient (1−α) = 0.95
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: II
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: II
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=5d640b1f1f5d
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      individual_points: not_reported
+      mean_kJ_mol-1: '1.8'
+      confidence: reliability coefficient (1−α) = 0.95
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: II
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: II
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=95cdca894010
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      individual_points: not_reported
+      mean_kJ_mol-1: '1.8'
+      confidence: reliability coefficient (1−α) = 0.95
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: II
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: II
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured::T=298:h=f96204ad61af
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_solution'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: alpha
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      individual_points: not_reported
+      mean_kJ_mol-1: '1.8'
+      confidence: reliability coefficient (1−α) = 0.95
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: II
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: II
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1829'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '217.1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The authors state that individual ΔHcool errors for melt cannot be determined separately.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: III
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1829'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: III
+  derivation:
+    relation: negative_cooling_enthalpy_to_H_minus_H298
+    inputs:
+    - unknown:adamkovicova-1980-casio3-heat-of-fusion
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '217.1'
+        locator:
+          page: 196
+          pdf_page_index: 4
+          table: III
+    - - factor
+      - state:
+          tag: value
+          value: '1'
+        locator:
+          page: 196
+          pdf_page_index: 4
+          table: III
+    output_unit: kJ/mol
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1848:h=7c4f837720a4
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1848'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '219.9'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The authors state that individual ΔHcool errors for melt cannot be determined separately.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: III
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1848'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: III
+  derivation:
+    relation: negative_cooling_enthalpy_to_H_minus_H298
+    inputs:
+    - unknown:adamkovicova-1980-casio3-heat-of-fusion
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '219.9'
+        locator:
+          page: 196
+          pdf_page_index: 4
+          table: III
+    - - factor
+      - state:
+          tag: value
+          value: '1'
+        locator:
+          page: 196
+          pdf_page_index: 4
+          table: III
+    output_unit: kJ/mol
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1859:h=4d038eb2bc00
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1859'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '222.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The authors state that individual ΔHcool errors for melt cannot be determined separately.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: III
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1859'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: III
+  derivation:
+    relation: negative_cooling_enthalpy_to_H_minus_H298
+    inputs:
+    - unknown:adamkovicova-1980-casio3-heat-of-fusion
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '222.2'
+        locator:
+          page: 196
+          pdf_page_index: 4
+          table: III
+    - - factor
+      - state:
+          tag: value
+          value: '1'
+        locator:
+          page: 196
+          pdf_page_index: 4
+          table: III
+    output_unit: kJ/mol
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1915:h=650213d91f74
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1915'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '230.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The authors state that individual ΔHcool errors for melt cannot be determined separately.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: III
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1915'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: III
+  derivation:
+    relation: negative_cooling_enthalpy_to_H_minus_H298
+    inputs:
+    - unknown:adamkovicova-1980-casio3-heat-of-fusion
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '230.5'
+        locator:
+          page: 196
+          pdf_page_index: 4
+          table: III
+    - - factor
+      - state:
+          tag: value
+          value: '1'
+        locator:
+          page: 196
+          pdf_page_index: 4
+          table: III
+    output_unit: kJ/mol
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1961:h=7aae6dcb0477
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
+  identity:
+    quantity:
+      tag: value
+      value: H_minus_H298
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1961'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile H_minus_H298 does not use wall
+  value:
+    kind: point
+    point: '238.9'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The authors state that individual ΔHcool errors for melt cannot be determined separately.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: III
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1961'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: III
+  derivation:
+    relation: negative_cooling_enthalpy_to_H_minus_H298
+    inputs:
+    - unknown:adamkovicova-1980-casio3-heat-of-fusion
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '238.9'
+        locator:
+          page: 196
+          pdf_page_index: 4
+          table: III
+    - - factor
+      - state:
+          tag: value
+          value: '1'
+        locator:
+          page: 196
+          pdf_page_index: 4
+          table: III
+    output_unit: kJ/mol
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1829:h=cf370c06c383
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'relative_enthalpy'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1829'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The fitted relative-enthalpy function in Eq. (7) has a stated error of 2.0 kJ mol−1.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: III
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1829'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: III
+  derived_from:
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1848:h=7c4f837720a4
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1859:h=4d038eb2bc00
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1915:h=650213d91f74
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1961:h=7aae6dcb0477
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1829:h=22f3731c16bd
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1848:h=a662473fe545
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1859:h=9d06b38c7c61
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1915:h=ecc019604d45
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
+  derivation:
+    relation: Hrel = −(ΔHcool + ΔHsol), Eq. (1); Table III reports the sums of its cooling and mean solution-heat columns.
+    inputs:
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1848:h=7c4f837720a4
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1859:h=4d038eb2bc00
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1915:h=650213d91f74
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1961:h=7aae6dcb0477
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1829:h=22f3731c16bd
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1848:h=a662473fe545
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1859:h=9d06b38c7c61
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1915:h=ecc019604d45
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
+    parameters: []
+    output_unit: as_published
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1848:h=0841596d01f9
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'relative_enthalpy'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1848'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The fitted relative-enthalpy function in Eq. (7) has a stated error of 2.0 kJ mol−1.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: III
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1848'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: III
+  derived_from:
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1848:h=7c4f837720a4
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1859:h=4d038eb2bc00
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1915:h=650213d91f74
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1961:h=7aae6dcb0477
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1829:h=22f3731c16bd
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1848:h=a662473fe545
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1859:h=9d06b38c7c61
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1915:h=ecc019604d45
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
+  derivation:
+    relation: Hrel = −(ΔHcool + ΔHsol), Eq. (1); Table III reports the sums of its cooling and mean solution-heat columns.
+    inputs:
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1848:h=7c4f837720a4
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1859:h=4d038eb2bc00
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1915:h=650213d91f74
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1961:h=7aae6dcb0477
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1829:h=22f3731c16bd
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1848:h=a662473fe545
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1859:h=9d06b38c7c61
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1915:h=ecc019604d45
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
+    parameters: []
+    output_unit: as_published
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1859:h=ec5d85f803d1
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'relative_enthalpy'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1859'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The fitted relative-enthalpy function in Eq. (7) has a stated error of 2.0 kJ mol−1.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: III
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1859'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: III
+  derived_from:
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1848:h=7c4f837720a4
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1859:h=4d038eb2bc00
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1915:h=650213d91f74
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1961:h=7aae6dcb0477
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1829:h=22f3731c16bd
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1848:h=a662473fe545
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1859:h=9d06b38c7c61
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1915:h=ecc019604d45
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
+  derivation:
+    relation: Hrel = −(ΔHcool + ΔHsol), Eq. (1); Table III reports the sums of its cooling and mean solution-heat columns.
+    inputs:
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1848:h=7c4f837720a4
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1859:h=4d038eb2bc00
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1915:h=650213d91f74
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1961:h=7aae6dcb0477
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1829:h=22f3731c16bd
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1848:h=a662473fe545
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1859:h=9d06b38c7c61
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1915:h=ecc019604d45
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
+    parameters: []
+    output_unit: as_published
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1915:h=3d0ce135d3d3
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'relative_enthalpy'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1915'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The fitted relative-enthalpy function in Eq. (7) has a stated error of 2.0 kJ mol−1.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: III
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1915'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: III
+  derived_from:
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1848:h=7c4f837720a4
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1859:h=4d038eb2bc00
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1915:h=650213d91f74
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1961:h=7aae6dcb0477
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1829:h=22f3731c16bd
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1848:h=a662473fe545
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1859:h=9d06b38c7c61
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1915:h=ecc019604d45
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
+  derivation:
+    relation: Hrel = −(ΔHcool + ΔHsol), Eq. (1); Table III reports the sums of its cooling and mean solution-heat columns.
+    inputs:
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1848:h=7c4f837720a4
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1859:h=4d038eb2bc00
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1915:h=650213d91f74
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1961:h=7aae6dcb0477
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1829:h=22f3731c16bd
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1848:h=a662473fe545
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1859:h=9d06b38c7c61
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1915:h=ecc019604d45
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
+    parameters: []
+    output_unit: as_published
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1961:h=32621aaaf097
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'relative_enthalpy'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1961'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The fitted relative-enthalpy function in Eq. (7) has a stated error of 2.0 kJ mol−1.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: III
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1961'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: III
+  derived_from:
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1848:h=7c4f837720a4
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1859:h=4d038eb2bc00
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1915:h=650213d91f74
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1961:h=7aae6dcb0477
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1829:h=22f3731c16bd
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1848:h=a662473fe545
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1859:h=9d06b38c7c61
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1915:h=ecc019604d45
+  - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
+  derivation:
+    relation: Hrel = −(ΔHcool + ΔHsol), Eq. (1); Table III reports the sums of its cooling and mean solution-heat columns.
+    inputs:
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1848:h=7c4f837720a4
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1859:h=4d038eb2bc00
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1915:h=650213d91f74
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1961:h=7aae6dcb0477
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1829:h=22f3731c16bd
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1848:h=a662473fe545
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1859:h=9d06b38c7c61
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1915:h=ecc019604d45
+    - adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
+    parameters: []
+    output_unit: as_published
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1829:h=22f3731c16bd
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'mean_negative_heat_of_solution'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_melt_sample_solution_heat' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1829'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The authors state that individual ΔHsol errors for melt cannot be determined separately.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: III
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1829'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: III
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1848:h=a662473fe545
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'mean_negative_heat_of_solution'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_melt_sample_solution_heat' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1848'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The authors state that individual ΔHsol errors for melt cannot be determined separately.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: III
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1848'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: III
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1859:h=9d06b38c7c61
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'mean_negative_heat_of_solution'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_melt_sample_solution_heat' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1859'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The authors state that individual ΔHsol errors for melt cannot be determined separately.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: III
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1859'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: III
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1915:h=ecc019604d45
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'mean_negative_heat_of_solution'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_melt_sample_solution_heat' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1915'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The authors state that individual ΔHsol errors for melt cannot be determined separately.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: III
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1915'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: III
+- observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'mean_negative_heat_of_solution'
+    species:
+      formula: CaSiO3
+      phase:
+        tag: unknown
+        reason: phase string 'CaSiO3_melt_sample_solution_heat' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1961'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: The authors state that individual ΔHsol errors for melt cannot be determined separately.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: adamkovicova-1980-casio3-heat-of-fusion
+  locator:
+    page: 196
+    pdf_page_index: 4
+    table: III
+  read_from: unknown:adamkovicova-1980-casio3-heat-of-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1961'
+      locator:
+        page: 196
+        pdf_page_index: 4
+        table: III

@@ -474,7 +474,8 @@ _EVIDENCE_VOCABULARY = {
         "proxy", "qualitative_comparison", "second_law_kems", "third_law_kems",
     })},
     "admission_status": {**_MARKER_REFUSALS, **dict.fromkeys({
-        "bound_not_point", "equipment_metadata", "note_parent_unaltered", "true_absence",
+        "admitted", "bound_not_point", "equipment_metadata", "note_parent_unaltered",
+        "true_absence",
     })},
     "status": {**_MARKER_REFUSALS, **dict.fromkeys({
         "CONTESTED", "not_observed", "pointer_or_anchor_without_numeric_points",
@@ -600,7 +601,8 @@ def load_adopted_observations(
     raw_observations = {
         (str(entry.get("source_id") or ""), str(species), str(row.get("observation_id") or "")): row
         for entry in extracts
-        for species, block in (entry.get("species") or {}).items()
+        if isinstance(entry.get("species"), Mapping)
+        for species, block in entry["species"].items()
         for row in block.get("observations") or []
     }
     # IDs are source-wide: replacement edges can cross species. Removing
@@ -4952,7 +4954,20 @@ def coverage_summary(
                 evaluation.skip_reason
                 or "typed-refusal:missing_capability:comparison_not_produced"
             ]
-        primary_reason = None if comparable else reasons[0]
+        if comparable:
+            primary_reason = None
+        else:
+            typed_refusal = evaluation.skip_reason
+            if not (typed_refusal or "").startswith(_TYPED_SKIP_PREFIX):
+                typed_refusal = next(
+                    (
+                        reason
+                        for reason in reasons
+                        if reason.startswith(_TYPED_SKIP_PREFIX)
+                    ),
+                    None,
+                )
+            primary_reason = typed_refusal or reasons[0]
         entries.append(
             {
                 "source": evaluation.observation.source_id,

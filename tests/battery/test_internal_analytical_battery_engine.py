@@ -11,14 +11,19 @@ import pytest
 
 from simulator.battery.enums import (
     AmountBasis,
+    Authority,
     Engine,
     EvidenceClass,
+    ExecutionState,
+    NoticeKind,
     Phase,
     Quantity,
     AdmissionStatus,
+    RefusalReason,
 )
 from simulator.battery.identity import Identity
-from simulator.battery.records import Composition, Species, State
+from simulator.battery.records import Composition, Species, State, Value
+from simulator.battery import score as battery_score
 from simulator.battery.score import predict_with_engine
 from simulator.diagnostic_helpers.binary_pot_battery import (
     BinaryPot,
@@ -149,6 +154,241 @@ def test_internal_analytical_scores_multi_cation_parent_activity(monkeypatch) ->
     )
 
 
+def _assert_internal_activity_residual_matches_production(
+    *,
+    source_id: str,
+    observation_id: str,
+) -> None:
+    from simulator.battery.generators.bench import activity_request_for_engine
+
+    root = Path(__file__).resolve().parents[2]
+    context = battery_score.load_score_context(root, sources=(source_id,))
+    observation = context.observations[observation_id]
+    residual, _ = battery_score.compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={observation_id},
+    )
+    assert residual.execution.state is ExecutionState.PRODUCED
+    assert residual.numeric is not None
+
+    converted = battery_score.fusion_comparison_reference(
+        observation,
+        engine=Engine.INTERNAL_ANALYTICAL,
+    )
+    identity = converted.identity
+    temperature = battery_score.temperature_of(identity)
+    assert temperature is not None and converted.value.point is not None
+    experiment = context.experiments[converted.experiment_id]
+    request = activity_request_for_engine(
+        experiment, converted, Engine.INTERNAL_ANALYTICAL.value
+    )
+    assert request is not None and request.payload is not None
+
+    expected = melt_oxide_activity(
+        identity.species.formula,
+        request.payload["composition_mol"],
+        temperature_K=float(temperature),
+    )
+    assert expected is not None
+    expected_residual, _, _ = battery_score.populate_numeric(
+        quantity=Quantity.ACTIVITY,
+        candidate=Decimal(str(expected.thermodynamic_parent_activity())),
+        reference=converted.value.point,
+        source_relation=residual.source_relation,
+        operation_override=residual.numeric.operation,
+    )
+    assert expected_residual is not None
+    assert residual.numeric.value == pytest.approx(expected_residual.value, rel=1e-9)
+    fallback = next(
+        notice for notice in residual.notices if notice.kind is NoticeKind.FALLBACK
+    )
+    assert fallback.authority is Authority.BRIDGE
+    assert fallback.reason == "melt_oxide_activity has no certified evidence tier"
+
+
+def test_internal_analytical_scores_guo_2021_mgo_row() -> None:
+    _assert_internal_activity_residual_matches_production(
+        source_id="guo-2021-mgo-activity-cmas-slag",
+        observation_id=(
+            "guo-2021-mgo-activity-cmas-slag::"
+            "guo_2021_table5_mgo_activities_1873k::T=1873:h=32bc4d012e2d"
+        ),
+    )
+
+
+def test_internal_analytical_scores_cho_suito_1994_sio2_row() -> None:
+    _assert_internal_activity_residual_matches_production(
+        source_id="cho-suito-1994-cas-slag-activities",
+        observation_id=(
+            "cho-suito-1994-cas-slag-activities::"
+            "cho_suito_1994_t5_acs2_sio2_cn"
+        ),
+    )
+
+
+def test_internal_analytical_scores_feo_with_ideal_fallback_notice() -> None:
+    from simulator.battery.generators.bench import activity_request_for_engine
+
+    temperature = Decimal("1873")
+    experiment, bench, observation = _case(
+        composition=_composition(
+            ("CaO", "0.4"), ("SiO2", "0.4"), ("FeO", "0.2")
+        ),
+        temperature=Value.point_of(temperature),
+        formula="FeO",
+    )
+    observation = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            temperature_K=State.of(temperature),
+        ),
+    )
+    request = activity_request_for_engine(
+        experiment, observation, Engine.INTERNAL_ANALYTICAL.value
+    )
+    assert request is not None and request.payload is not None
+    expected = melt_oxide_activity(
+        "FeO",
+        request.payload["composition_mol"],
+        temperature_K=float(temperature),
+    )
+    assert expected is not None
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        handles={},
+        isolated=False,
+    )
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert float(prediction.value) == pytest.approx(
+        expected.thermodynamic_parent_activity(), rel=1e-9
+    )
+    notice = next(
+        notice for notice in prediction.notices if notice.kind is NoticeKind.FALLBACK
+    )
+    assert notice.authority is Authority.BRIDGE
+    assert notice.reason == expected.warning
+
+
+def test_internal_analytical_types_unsupported_activity_species() -> None:
+    experiment, bench, observation = _case(
+        composition=_composition(("ZrO2", "0.5"), ("SiO2", "0.5")),
+        formula="ZrO2",
+    )
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        handles={},
+        isolated=False,
+    )
+
+    assert prediction.execution.state is ExecutionState.UNSUPPORTED
+    assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert prediction.refusal_detail["formula"] == "ZrO2"
+
+
+def test_internal_analytical_types_unsupported_activity_composition() -> None:
+    experiment, bench, observation = _case(
+        composition=_composition(("MgO", "0.5"), ("ZrO2", "0.5")),
+        formula="MgO",
+    )
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        handles={},
+        isolated=False,
+    )
+
+    assert prediction.execution.state is ExecutionState.UNSUPPORTED
+    assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert prediction.refusal_detail["unsupported_composition_components"] == ["ZrO2"]
+
+
+def test_internal_analytical_predicts_below_gamma_band_with_notice() -> None:
+    from simulator.battery.generators.bench import activity_request_for_engine
+
+    temperature = Decimal("1600")
+    experiment, bench, observation = _case(
+        composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
+        temperature=Value.point_of(temperature),
+        formula="Na2O",
+    )
+    observation = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            temperature_K=State.of(temperature),
+        ),
+    )
+    request = activity_request_for_engine(
+        experiment, observation, Engine.INTERNAL_ANALYTICAL.value
+    )
+    assert request is not None and request.payload is not None
+    expected = melt_oxide_activity(
+        "Na2O",
+        request.payload["composition_mol"],
+        temperature_K=float(temperature),
+    )
+    assert expected is not None
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        handles={},
+        isolated=False,
+    )
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert float(prediction.value) == pytest.approx(
+        expected.thermodynamic_parent_activity(), rel=1e-9
+    )
+    assert prediction.authority is Authority.EXTRAPOLATED
+    notice = next(
+        notice
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    )
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert "constant_gamma_extrapolated_out_of_domain" in notice.reason
+    assert notice.band == "[1673, 1673] K"
+
+
+def test_internal_analytical_keeps_missing_activity_composition_typed() -> None:
+    experiment, bench, observation = _case(
+        composition=None,
+        formula="MgO",
+    )
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        handles={},
+        isolated=False,
+    )
+
+    assert prediction.value is None
+    assert prediction.execution.state is ExecutionState.NOT_PROBED
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail["reason"] == "missing_evidence"
+
+
 def test_internal_analytical_request_forwards_point_oxygen_without_redox() -> None:
     from simulator.battery.generators.bench import activity_request_for_engine
 
@@ -220,7 +460,7 @@ def test_internal_analytical_uses_identity_oxygen_without_redox(monkeypatch) -> 
     assert prediction.refusal_reason is None
 
 
-def test_internal_analytical_without_oxygen_is_typed_refusal() -> None:
+def test_internal_analytical_activity_does_not_require_oxygen() -> None:
     experiment, bench, observation = _case(
         composition=_composition(("SiO2", "0.6"), ("Na2O", "0.4")),
         formula="SiO2",
@@ -234,11 +474,9 @@ def test_internal_analytical_without_oxygen_is_typed_refusal() -> None:
         isolated=False,
     )
 
-    assert prediction.value is None
-    assert prediction.refusal_reason is not None
-    assert prediction.refusal_detail["engine_reason"] == (
-        "internal_analytical_missing_oxygen_condition"
-    )
+    assert prediction.value is not None
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.refusal_reason is None
 
 
 def _hand_built_observation() -> tuple[object, Identity]:

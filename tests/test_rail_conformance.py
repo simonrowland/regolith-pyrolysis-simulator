@@ -1842,8 +1842,10 @@ def test_t3_unfixed_expected_set_names_na_without_mass_spec_record(
 ) -> None:
     """Red-by-revert: every PINS mass_spec key vs mass-spec-type records.
 
-    The assertion must name pins_without_records=['Na'] — Na has a T3
-    mass_spec declaration but no live mass-spec-type store record.
+    Zhang's admitted Table 4 row contains alpha-times-gamma evidence but no
+    per-point alpha, so the evaluator typed-refuses it without Motzfeldt
+    geometry. Plante's 1979 K2O entry is partial pressure, not an activity.
+    K and Na therefore lack live mass-spec-type store records.
     """
 
     unfixed_expected = {
@@ -1852,7 +1854,7 @@ def test_t3_unfixed_expected_set_names_na_without_mass_spec_record(
         if species_id in LIVE_SPECIES and "mass_spec" in row["validations"]
     }
     covered = _mass_spec_covered_species(mass_spec_rollup, set(LIVE_SPECIES))
-    with pytest.raises(AssertionError, match=r"pins_without_records=\['Na'\]"):
+    with pytest.raises(AssertionError, match=r"pins_without_records=\['K', 'Na'\]"):
         _assert_mass_spec_pin_record_parity(unfixed_expected, covered)
 
 

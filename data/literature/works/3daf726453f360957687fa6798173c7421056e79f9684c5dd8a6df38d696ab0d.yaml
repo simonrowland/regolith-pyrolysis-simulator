@@ -1,0 +1,1263 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  citation: Shornikov, S. I., Archakov, I. Yu., and Chemekova, T. Yu. (2000). A Mass-Spectrometric Study of Vaporization and
+    Phase Equilibria in the Al2O3–SiO2 System. Russian Journal of Physical Chemistry, 74(5), 677–683.
+  source_ids:
+  - shornikov-2000-aluminosilicate-vaporization
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:shornikov-2000-aluminosilicate-vaporization
+      role: pdf
+      path: raw/shornikov-2000-aluminosilicate-vaporization/shornikov-2000-aluminosilicate-vaporization.pdf
+      sha256:
+        tag: value
+        value: dbd1fcb5d9d98b5b56a5b5c09651514d105c69a0a392bd5b684c7ed131766437
+    - asset_id: unknown:shornikov-2000-aluminosilicate-vaporization
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::kems-vaporization-series
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+        note: No vaporization charge mass stated
+    initial_composition:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+        note: Per-sample compositions are retained in source-context and observation rows
+    printed_composition:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+        note: Eight distinct sample compositions are listed; no single composition applies to this series
+    form:
+      state:
+        tag: value
+        value: Al2O3-SiO2 samples vaporized as melts
+      locator:
+        published_page: 677
+        pdf_page_index: 0
+        section: Experimental
+    characterization:
+      state:
+        tag: value
+        value: Samples synthesized by solid-state reaction and analyzed by X-ray and chemical analysis; alumina prepared from
+          ammonium alum of os. ch. special-purity grade with only traces of impurities detected spectroscopically; rock-crystal
+          powder contained 99.90 wt% SiO2. No numerical post-vaporization assay is stated; text reports partial SiO2 volatilization
+          on unprotected surfaces.
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+    pretreatment:
+      state:
+        tag: value
+        value: Starting oxides mixed in a jasper ball mill in acetone; solid-state synthesis in air in Silit furnaces up to
+          1600 K for 24 h; high-frequency annealing in argon on a Donets-1 unit at 1800-2000 K for 1 h, stated to prevent
+          transition to liquid.
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1720'
+          interval_high: '2520'
+          approximate: false
+      locator:
+        published_page: 677
+        pdf_page_index: 0
+        section: Abstract and Experimental
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 677
+        pdf_page_index: 0
+        section: Introduction
+        note: The <=1e-10 atm upper bound applies to source heating capability, not an assigned sample-run background
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 677
+        pdf_page_index: 0
+        section: Experimental
+        note: No sweep gas stated for vaporization runs
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  locator:
+    published_page: 677
+    pdf_page_index: 0
+    section: Experimental
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 677
+          pdf_page_index: 0
+          section: Experimental
+          note: The source does not state a diameter
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 677
+          pdf_page_index: 0
+          section: Experimental
+          note: The source does not state a channel length
+    calibration:
+      method:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 678
+          pdf_page_index: 1
+          section: Results and Discussion
+          note: No intensity-to-partial-pressure conversion is reported
+      reference_substance:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 678
+          pdf_page_index: 1
+          section: Results and Discussion
+          note: No pressure-calibration reference substance is reported
+  bench_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::bench::shornikov-2000-mi1201-mo-cell
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+        note: No duration is stated for the vaporization run series
+- experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::quench-phase-diagram-study
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+    initial_composition:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+        note: No single quenching charge composition assigned
+    form:
+      state:
+        tag: value
+        value: Al2O3-SiO2 samples suspended on tungsten wire
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+        note: Heated to complete melting; no temperature values stated for quench runs
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  locator:
+    published_page: 678
+    pdf_page_index: 1
+    section: Experimental
+    note: Additional phase-diagram study by quenching; apparatus and run assignments are only partly described
+  apparatus:
+    calibration:
+      method:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 678
+          pdf_page_index: 1
+          section: Experimental
+          note: Quench runs have no intensity-to-pressure measurement
+      reference_substance:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 678
+          pdf_page_index: 1
+          section: Experimental
+          note: Quench runs have no intensity-to-pressure measurement
+  bench_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::bench::quench-furnace-described
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Heated to complete melting, held molten for some time, then rapidly crystallized by quenching
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+        note: Only qualitative duration, held molten for some time
+- experiment_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::experiment::table-1-literature-comparison
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    section: Nonvariant points table
+benches:
+- id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::bench::quench-furnace-described
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Furnace used for quenching experiments; type not stated
+    locator:
+      published_page: 678
+      pdf_page_index: 1
+      section: Experimental
+  cell_material_and_liner:
+    state:
+      tag: not_applicable
+      reason: not_applicable
+    locator:
+      published_page: 678
+      pdf_page_index: 1
+      section: Experimental
+      note: No effusion cell or liner described for the quench furnace
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+        note: No effusion orifice in the quench furnace method
+    orifice_channel_length_m:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+        note: No effusion channel in the quench furnace method
+  ionization:
+    energy_eV:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+        note: Quench phase-diagram work is described without mass spectrometric ionization
+  temperature_measurement:
+    sensor:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+        note: No temperature sensor or calibration is stated for quench runs
+  temperature_calibration:
+    method:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+        note: No temperature sensor or calibration is stated for quench runs
+  other_facts:
+  - name: sample_support
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: tungsten wire
+          approximate: false
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+    unit: as printed
+  - name: ionization_cross_sections_and_source
+    value:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+        note: Quench phase-diagram work is described without mass spectrometry
+    unit: as printed
+  - name: multiplier_correction
+    value:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+        note: Quench phase-diagram work is described without mass spectrometry
+    unit: as printed
+  - name: isotope_correction
+    value:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+        note: Quench phase-diagram work is described without mass spectrometry
+    unit: as printed
+- id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d::bench::shornikov-2000-mi1201-mo-cell
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: MI-1201 high-temperature mass spectrometer
+    locator:
+      published_page: 677
+      pdf_page_index: 0
+      section: Experimental
+  method:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometry
+    locator:
+      published_page: 677
+      pdf_page_index: 0
+      section: Experimental
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Molybdenum effusion cells; liner material not stated
+    locator:
+      published_page: 677
+      pdf_page_index: 0
+      section: Experimental
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      published_page: 677
+      pdf_page_index: 0
+      section: Experimental
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 677
+        pdf_page_index: 0
+        section: Experimental
+        note: Orifice stated; diameter not printed
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 677
+        pdf_page_index: 0
+        section: Experimental
+        note: No channel length printed
+  detector:
+    state:
+      tag: value
+      value: MI-1201 commercial mass spectrometer
+    locator:
+      published_page: 677
+      pdf_page_index: 0
+      section: Experimental
+  ionization:
+    energy_eV:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20'
+          approximate: false
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Results and Discussion
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: EOP-66 optical pyrometer
+      locator:
+        published_page: 677
+        pdf_page_index: 0
+        section: Experimental
+  temperature_calibration:
+    method:
+      state:
+        tag: value
+        value: Calibrated against reference temperature points
+      locator:
+        published_page: 677
+        pdf_page_index: 0
+        section: Experimental
+    blackbody_simulation:
+      state:
+        tag: value
+        value: Blackbody radiation imitated with a channel from the effusion chamber body
+      locator:
+        published_page: 677
+        pdf_page_index: 0
+        section: Experimental
+  heating_method:
+    state:
+      tag: value
+      value: Alternating current through a tantalum holder of the effusion cell
+    locator:
+      published_page: 677
+      pdf_page_index: 0
+      section: Experimental
+  other_facts:
+  - name: liner_material
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 677
+        pdf_page_index: 0
+        section: Experimental
+        note: Liner material is not stated
+    unit: as printed
+  - name: stated_temperature_measurement_accuracy
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+          approximate: false
+      locator:
+        published_page: 677
+        pdf_page_index: 0
+        section: Experimental
+        note: EOP-66 accuracy includes light absorption by pyrometric window
+    unit: K
+  - name: ion_optical_system_copper_lead_diameter
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+          approximate: false
+      locator:
+        published_page: 677
+        pdf_page_index: 0
+        section: Introduction
+    unit: mm
+  - name: orifice_laser_cut_weld_width
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <=
+          bound_value: '0.02'
+          approximate: false
+      locator:
+        published_page: 677
+        pdf_page_index: 0
+        section: Experimental
+        note: Weld width is not orifice diameter
+    unit: mm
+  - name: sample_vaporization_surface_area_to_effusion_orifice_area_ratio
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: '>='
+          bound_value: '250'
+          approximate: false
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Experimental
+    unit: dimensionless
+  - name: ion_source_residual_gas_pressure_upper_bound_at_3000_K
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <=
+          bound_value: '0.0000000001'
+          approximate: false
+      locator:
+        published_page: 677
+        pdf_page_index: 0
+        section: Introduction
+        note: Ion source high-rate heating capability; not a sample-run chamber background
+    unit: atm
+  - name: ionizing_energy_uncertainty
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.1'
+          approximate: false
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Results and Discussion
+    unit: eV
+  - name: ionization_cross_sections_and_source
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Results and Discussion
+        note: No cross-sections or their source reported
+    unit: as printed
+  - name: multiplier_correction
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Results and Discussion
+        note: No multiplier correction reported
+    unit: as printed
+  - name: isotope_correction
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Results and Discussion
+        note: No isotope correction reported
+    unit: as printed
+context:
+- observation_id: shornikov_2000_conclusion_page682
+  type: thermodynamic_example
+  locator:
+    published_page: 682
+    pdf_page_index: 5
+    section: Conclusion
+  units: as printed
+  values:
+    quantity: author_conclusion
+    method_class: quoted_unattributed
+    statements_as_printed:
+    - The data of one of the earliest works [40] concerned with the phase diagram of the Al2O3-SiO2 system appear to be fairly
+      approximate.
+    - It follows from the table that the data obtained in this work provide unambiguous evidence of the existence of a eutectic
+      composition in the M + A + L region and are in agreement with the results of [11, 12, 37, 38, 42].
+    - This proves the congruent character of mullite melting observed in the same works in the temperature range 2123-2207
+      K.
+    - The conclusion that mullite melts incongruently [24-26, 28, 30, 35, 41, 43, 44] cannot be considered convincing for
+      the reasons given above; this conclusion is influenced by such factors as experimental procedure, the presence of impurities,
+      and changes in the initial concentration of samples during measurements.
+    - Our data do not confirm the occurrence of a peritectic compound in the concentration range 37-66 mol % Al2O3 [24-27,
+      44].
+    - The calculations of this peritectic composition performed in [45] are based on the thermodynamic data obtained in mass
+      spectrometric experiments with the use of the Knudsen effusion method for the Al6Si2O13-Al2O3 and CaAlSi2O8-Al6Si2O13-Al2O3
+      equilibria in the temperature range 1472-1761 K; these temperatures are too low for obtaining reliable data.
+    - In our view, the results of [45] cannot be considered sufficiently correct and require a detailed examination.
+    - The reliability of the results of this work is substantiated by thermodynamic data, which unambiguously favor the congruent
+      character of mullite melting.
+    - It should be noted that the point of view expressed and substantiated by Toropov and Galakhov in [11, 23, 47, 65-67]
+      is often (for instance, in [25, 52, 71-73]) unjustly ignored in considering the properties of the Al2O3-SiO2 system.
+    - To summarize, we performed a mass spectrometric study with the use of the Knudsen effusion method of vaporization of
+      Al2O3-SiO2 melts. The mass spectrometric data and the results obtained in studying the phase diagram of the Al2O3-SiO2
+      system in the mullite region by the method of quenching allowed us to refine the position of the liquidus line in this
+      system and prove the congruent character of mullite melting at 2180 K.
+    - Mainly, our data are in agreement with the phase diagram of the Al2O3-SiO2 system constructed by Toropov and Galakhov
+      and provide a basis for thermodynamic calculations of the properties of this system.
+  context_id: shornikov-2000-aluminosilicate-vaporization::context::shornikov_2000_conclusion_page682
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  species: Al2O3
+- observation_id: shornikov_2000_equation1_integrated_current_composition_method
+  type: method
+  locator:
+    published_page: 679
+    pdf_page_index: 2
+    equation: '1'
+  units: as printed
+  values:
+    quantity: composition_change_calculation
+    method_class: model_derived
+    relation_as_printed: m_t(j)=m_0(j) multiplied by the time integral of I_j(i)+ from 0 to t divided by the integral from
+      0 to t_0
+    definition_as_printed: t_0 is the time of complete vaporization of component j from an Al2O3-SiO2 melt
+  context_id: shornikov-2000-aluminosilicate-vaporization::context::shornikov_2000_equation1_integrated_current_composition_method
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  species: Al2O3
+- observation_id: shornikov_2000_fig3_current_and_composition_trajectories
+  type: experiment_series
+  locator:
+    figure: '3'
+    published_page: 680
+    pdf_page_index: 3
+  units: as printed in figure; curves not digitized
+  values:
+    quantity: ion_current_and_composition_time_series
+    method_class: figure_only
+    temperature_K: 2220
+    time_axis_tick_labels_min:
+    - 25
+    - 75
+    - 125
+    ion_current_log_axis_tick_labels:
+    - 0
+    - 1
+    - 2
+    - 3
+    composition_axis_tick_labels_mol_percent:
+    - 10
+    - 30
+    - 50
+    - 70
+    caption_as_printed: Fig. 3. Evolution of ion current intensities for (1) (SiO)+ and (2) (Al)+ and (3) changes in the content
+      of Al2O3 in the condensed phase during vaporization of an Al2O3-SiO2 melt at 2220 K.
+    note: Curve values not digitized.
+  context_id: shornikov-2000-aluminosilicate-vaporization::context::shornikov_2000_fig3_current_and_composition_trajectories
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  species: Al2O3
+- observation_id: shornikov_2000_fig4_liquidus_points
+  type: thermodynamic_example
+  locator:
+    figure: '4'
+    published_page: 680
+    pdf_page_index: 3
+  units: as printed in figure; curve values not digitized
+  values:
+    quantity: liquidus_diagram_and_sample_labels
+    method_class: figure_only
+    caption_sample_compositions_Al2O3_mol_percent:
+    - '1.19'
+    - '3.31'
+    - '4.38'
+    - '12.84'
+    - '18.32'
+    - '28.2'
+    - '60'
+    - '67.63'
+    - '70.21'
+    - '84.14'
+    temperature_axis_scale: T times 10^-3 K
+    temperature_axis_tick_labels_times_1e3_K:
+    - '1.9'
+    - '2.1'
+    - '2.3'
+    composition_axis_tick_labels_mol_percent:
+    - 20
+    - 40
+    - 60
+    - 80
+    - 100
+    phase_regions_as_printed: (I) SiO2 + liquid; (II, III) Al6Si2O13 + liquid; (IV) Al6Si2O13 + SiO2; (V) Al6Si2O13 solid
+      solutions; (VI) Al6Si2O13 + Al2O3; (VII) Al2O3 + liquid; (VIII) liquid.
+    note: The plotted liquidus curves and points were not digitized.
+  context_id: shornikov-2000-aluminosilicate-vaporization::context::shornikov_2000_fig4_liquidus_points
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  species: Al2O3
+- observation_id: shornikov_2000_impurity_drift_and_heating_qualifiers_page681
+  type: thermodynamic_example
+  locator:
+    published_page: 681
+    pdf_page_index: 4
+    section: Results and Discussion
+    note: The phase-characterization sentence continues on p. 682; the final polymorph sentence is printed on p. 682.
+  units: as printed
+  values:
+    quantity: factors_qualifying_mullite_melting_interpretation
+    method_class: quoted_unattributed
+    statements_as_printed:
+    - The question of the reliability of determining the phase relations in the region of mullite melting is complicated by
+      insignificance of the temperature difference between the melting point and the eutectic horizontal and by closeness
+      of the eutectic point to the stoichiometric composition of mullite.
+    - According to [50], the character of mullite melting is intermediate between congruent and incongruent.
+    - As a consequence, we come across opposite views on the matter in works of the same authors, for instance, melting of
+      mullite is claimed to be incongruent in [24] and congruent in [38].
+    - The presence of a third component such as manganese oxide [58] in the Al2O3-SiO2 system facilitates mullite formation,
+      whereas sodium oxide [43], silicon monoxide [29, 31, 32], and nickel and iron oxides [46] hinder the reaction, which
+      can create the impression that mullite melts incongruently.
+    - Similar conclusions can be drawn when stoichiometric mullite samples are held for a long time in open containers and
+      heated in vacuum, because their initial composition then shifts to the side of aluminum oxide.
+    - This process is difficult to take into account because of different temperature dependences of the integral vaporization
+      coefficients of silicon dioxide and aluminum oxide.
+    - Note that when mullite is heated at a high rate in a microfurnace, samples can be overheated, which favors the congruent
+      interpretation [50].
+    - Special attention should be given to the determination of the phase composition of Al2O3-SiO2 samples, because X-ray
+      diffractograms or microscopic examination of separate probe regions may give a distorted idea of equilibrium phase relations
+      [11, 65-67].
+    - The effects of aluminum oxide polymorphs on the attainment of equilibria in the Al2O3-SiO2 system should also be taken
+      into account [68-70].
+  context_id: shornikov-2000-aluminosilicate-vaporization::context::shornikov_2000_impurity_drift_and_heating_qualifiers_page681
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  species: Al2O3
+- observation_id: shornikov_2000_introductory_phase_relations_background
+  type: thermodynamic_example
+  locator:
+    published_page: 677
+    pdf_page_index: 0
+    section: Introduction
+  units: K and as printed
+  values:
+    quantity: introductory_phase_relations_background
+    method_class: quoted_unattributed
+    mullite_stability_threshold_K: 1000
+    abstract_temperature_range_K:
+    - 1720
+    - 2520
+    abstract_mullite_congruent_melting_temperature_K: 2180
+    statements_as_printed:
+    - Vaporization of Al2O3–SiO2 melts from a Knudsen effusion cell was studied mass-spectrometrically in the temperature
+      range 1720–2520 K. The liquidus line in the aluminosilicate system was refined, and the Al6Si2O13 compound was shown
+      to melt congruently at 2180 K.
+    - Of special importance for the production of modern high-quality refractories are the properties of mullite Al6Si2O13,
+      which occurs in the Al2O3–SiO2 system and is stable at high (above 1000 K) temperatures; this is a highly refractory
+      and chemically stable component for firing refractories from kaolins and clays, high-alumina articles, porcelain, and
+      other aluminosilicate ceramic masses.
+    - These low-temperature (in comparison with mullite) compounds are stable only at certain temperatures and pressures.
+    - The data on the physicochemical properties of these compounds are, however, not unambiguous, and those on the phase
+      relations and the thermodynamic properties of the Al2O3–SiO2 system are even controversial.
+  context_id: shornikov-2000-aluminosilicate-vaporization::context::shornikov_2000_introductory_phase_relations_background
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  species: Al2O3
+- observation_id: shornikov_2000_ion_current_interference_limits
+  type: thermodynamic_example
+  locator:
+    published_page: 678
+    pdf_page_index: 1
+    section: Results and Discussion
+    note: The Mo+ limit begins on p. 678; the Si+ and AlSiO+ interference limits are printed on p. 679.
+  units: relative ion-current percent
+  values:
+    quantity: fragment_and_cell_reaction_interference_limits
+    method_class: measured_direct
+    cell_ion_Mo_plus_percent_of_SiO_plus: '0.1'
+    Si_plus_fragment_percent_of_SiO_plus: 3
+    AlSiO_plus_percent_of_SiO_plus: '0.01'
+    statements_as_printed:
+    - The ratio between the ion currents corresponding to the molecular ions formed in interaction between the gas phase over
+      Al2O3-SiO2 and the material of the effusion cell [(MoO)+, (MoO2)+, and (MoO3)+] was close to that observed for vaporization
+      of mullite [8, 15, 16] and melts in this system in the concentration range 0-20 mol % Al2O3 [17] and silicon dioxide
+      [13].
+    - The intensity of the ion current of the (Mo)+ molecular ion formed in the vaporization of the effusion cell itself did
+      not exceed 0.1% of the intensity of the (SiO)+ ion current.
+    - The intensity of the ion current corresponding to the (Si)+ fragment ion formed from the (SiO)+ and (SiO2)+ molecular
+      ions did not exceed 3% of the intensity of the (SiO)+ ion current, as with silicon dioxide [13].
+    - The relative content of the (AlSiO)+ molecular ion studied in detail in [8, 15, 16, 18, 19] was insignificant in the
+      mass spectra of vapor over Al2O3-SiO2 melts and did not exceed 0.01% of the (SiO)+ ion current intensity.
+  context_id: shornikov-2000-aluminosilicate-vaporization::context::shornikov_2000_ion_current_interference_limits
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  species: Al2O3
+- observation_id: shornikov_2000_melting_disagreement_qualifiers_page680
+  type: thermodynamic_example
+  locator:
+    published_page: 680
+    pdf_page_index: 3
+    section: Results and Discussion
+    note: The final comparison continues onto page 681
+  units: as printed
+  values:
+    quantity: melting_interpretation_comparisons
+    method_class: quoted_unattributed
+    numerical_comparisons_as_printed:
+      congruent_melting_composition_discrepancy_wt_percent: '7.5'
+      congruent_melting_temperature_discrepancy_K: 100
+      incongruent_melting_composition_discrepancy_wt_percent: 23
+      incongruent_melting_temperature_discrepancy_K: 60
+      pure_oxide_temperature_measurement_error_upper_bound_K: 20
+    statements_as_printed:
+    - A detailed analysis of the data on nonvariant points in the Al2O3-SiO2 system shows that melting of mullite is considered
+      congruent in some works and incongruent in others (table).
+    - Data on the concentrations and temperatures corresponding to the nonvariant points of the Al2O3-SiO2 system for the
+      M + S + L, M + L, and M + A + L phases (A = Al2O3, S = SiO2, M = mullite, and L = liquid) are discrepant.
+    - According to the table, these discrepancies equal 7.5 wt % and 100 K in the works in which mullite is assumed to melt
+      congruently and 23 wt % and 60 K in the works claiming incongruent melting of mullite.
+    - These deviations far exceed the deviations obtained in the same works for the temperatures of fusion of pure Al2O3 and
+      SiO2 oxides, which coincide within the errors of measurements not exceeding 20 K and correspond to the generally accepted
+      values [22, 39] (table).
+    - We believe that the difference in opinions concerning the character and temperature of fusion of mullite (table) is
+      to a great degree determined by different conditions of measurements, first and foremost temperature conditions (heating
+      and cooling rates) and the composition of the gas phase, and also other factors influencing melting of this compound
+      [12, 23, 46-50].
+    - The dual character of melting of mullite gives grounds to believe that mullite melts incongruently under equilibrium
+      conditions and congruently under metastable conditions [26, 29, 41, 51, 52].
+    - However, according to Galakhov [53], a detailed consideration of these works (in particular, [26]) does not allow an
+      equilibrium phase diagram to be constructed with incongruent melting of mullite.
+    - The point of view expressed in [26, 29, 41, 51, 52] is opposite to that [23, 42, 54-57], where the conclusion is drawn
+      that the stable variant of the Al2O3-SiO2 phase diagram is characterized by congruent melting of mullite, whereas the
+      metastable variant includes incongruent mullite melting.
+  context_id: shornikov-2000-aluminosilicate-vaporization::context::shornikov_2000_melting_disagreement_qualifiers_page680
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  species: Al2O3
+- observation_id: shornikov_2000_mullite_vapor_relative_ion_currents_2220k
+  experiment: kems-vaporization-series
+  type: thermodynamic_example
+  locator:
+    published_page: 678
+    pdf_page_index: 1
+    section: Results and Discussion
+  T_range_K:
+  - '2220'
+  - '2220'
+  phase: Al2O3-SiO2 vapor over melt of composition close to mullite
+  units: relative ion-current ratio, as printed
+  values:
+    quantity: relative_molecular_ion_currents
+    method_class: measured_direct
+    temperature_K: 2220
+    composition_Al2O3_mol_percent:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        published_page: 678
+        pdf_page_index: 1
+        section: Results and Discussion
+        note: The ratio passage says compositions close to that of mullite; no exact numerical composition is specified for
+          this measurement.
+    ions_in_order_as_printed:
+    - (SiO)+
+    - (SiO2)+
+    - (Al)+
+    - (AlO)+
+    - (Al2O)+
+    - (AlO2)+
+    - (Al2O2)+
+    - (O)+
+    - (O2)+
+    ion_current_ratio_as_printed: '600 : 0.5 : 1.0 : 0.05 : 0.2 : 0.001 : 0.002 : 0.005 : 0.001'
+    relative_ion_current_values:
+    - 600
+    - '0.5'
+    - '1'
+    - '0.05'
+    - '0.2'
+    - '0.001'
+    - '0.002'
+    - '0.005'
+    - '0.001'
+  context_id: shornikov-2000-aluminosilicate-vaporization::context::shornikov_2000_mullite_vapor_relative_ion_currents_2220k
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  species: Al2O3
+- observation_id: shornikov_2000_phase_diagram_comparisons_page680
+  type: thermodynamic_example
+  locator:
+    published_page: 679
+    pdf_page_index: 2
+    section: Results and Discussion
+    note: Comparisons printed on p. 679; the final preference sentence continues at the top left of p. 680.
+  units: as printed
+  values:
+    quantity: liquidus_and_phase_diagram_comparisons
+    method_class: quoted_attributed
+    point_at_2220_K_other_data_Al2O3_mol_percent:
+    - '69.4'
+    - '78.4'
+    Al2O3_plus_liquid_field_begins_mol_percent_as_reported_elsewhere: '60'
+    claimed_peritectic_composition_Al2O3_mol_percent: '36.9'
+    statements_as_printed:
+    - According to the other data [24, 25], the point at 2220 K occurs between 69.4 [24] and 78.4 mol% Al2O3 [25].
+    - It was found in [26, 27] that the Al2O3 + liquid field began at 60.0 mol% Al2O3. This result differs substantially from
+      those of this work and [11, 23-25].
+    - The position of the liquidus point at 2220 K determined in this work is also evidence against the occurrence of a peritectic
+      compound in the Al2O3-SiO2 system containing 36.9 mol % Al2O3; this compound was claimed to exist in [26, 27] and in
+      several other works [28-36].
+    - The positions of liquidus points were verified by studying the characteristic behavior of ion currents at the temperatures
+      of fusion of the aluminosilicate system compositions studied in this work.
+    - The positions of liquidus points determined in this work as described above substantiate the data on the Al2O3 + liquid
+      field in the Al2O3-SiO2 system obtained in [11, 23].
+    - It follows from Fig. 4 that the liquidus points in region II (Al6Si2O13 + liquid) obtained in this work almost coincide
+      with those reported in [11] at the end portions of crystallization curves and lie somewhat higher (by ~25 K) than the
+      latter in the concentration range 20-40 mol % Al2O3.
+    - These deviations are within the errors of this work and [11]. Note that they do not introduce fundamental differences
+      in the phase diagram of the Al2O3-SiO2 system.
+    - We nevertheless give preference to the crystallization line with a slope steeper than that obtained in [11].
+    attribution: References [11, 23-36] as cited by Shornikov et al. (2000)
+  context_id: shornikov-2000-aluminosilicate-vaporization::context::shornikov_2000_phase_diagram_comparisons_page680
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  species: Al2O3
+- observation_id: shornikov_2000_published_directional_claims_page679
+  type: thermodynamic_example
+  locator:
+    published_page: 679
+    pdf_page_index: 2
+    section: Results and Discussion
+  units: as printed
+  values:
+    quantity: vaporization_and_composition_qualifiers
+    method_class: quoted_unattributed
+    statements_as_printed:
+    - It follows that vaporization of aluminosilicate melts largely follows the heterogeneous reactions characteristic of
+      vaporization of pure oxides constituting the Al2O3-SiO2 system.
+    - As follows from the mass spectrum of vapor over Al2O3-SiO2 melts given above and the mass spectrum of vapor over mullite
+      [8, 15, 16], an increase in temperature decreases the amount of polyatomic molecules corresponding to the (AlO)+, (Al2O)+,
+      (AlO2)+, (Al2O2)+, (SiO2)+, and (AlSiO)+ ions in the gas phase over Al2O3-SiO2 melts in comparison with the simpler
+      molecular species corresponding to the (SiO)+ and (Al)+ molecular ions.
+    - Note that the polyatomic molecules mentioned above such as (AlO), (Al2O), (AlO2), and (Al2O2) detected in the gas phase
+      over aluminosilicate melts and over dialuminum trioxide [5, 8, 13-16] are formed as a result of vaporization of Al2O3
+      present in the Al2O3-SiO2 system rather than in reduction reactions between melts and the effusion cell material, as
+      was erroneously stated in [20].
+    - According to [21, 22], the compositions of the condensed phase and the gas phase over it are different.
+    - Vaporization of Al2O3-SiO2 melts causes substantial changes in the concentration ratio between the components in the
+      condensed phase.
+    - This makes it possible to obtain virtually the whole set of ion currents from the initial to the final composition,
+      which corresponds to the component with the higher melting point, under given temperature conditions.
+    - Such changes in the intensities of ion currents corresponding to molecular forms in the vapor phase over melts are evidence
+      of a rapid increase in the concentration of aluminum oxide x(Al2O3) in the condensed phase during vaporization (Fig.
+      3).
+    - The ratio between the (SiO)+ and (Al)+ ion current intensities remained constant starting with a 73.67 ± 0.15 mol% Al2O3
+      concentration.
+    - The observed changes in x(Al2O3) were determined from the ratio between the masses of condensed phase components calculated
+      from a decrease in mass mt(j) of the jth component during time t by the equation (1).
+    - This means that, during vaporization of an Al2O3-SiO2 melt, the ratio between the concentrations of the oxides constituting
+      this melt changed to that corresponding to a liquidus line point.
+    - These experiments enabled us to determine the positions of liquidus points by selecting different temperature conditions
+      of measurements. Some of these points are shown in Fig. 4.
+  context_id: shornikov-2000-aluminosilicate-vaporization::context::shornikov_2000_published_directional_claims_page679
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  species: Al2O3
+- observation_id: shornikov_2000_region_ii_and_mullite_fusion_comparisons
+  type: thermodynamic_example
+  locator:
+    published_page: 680
+    pdf_page_index: 3
+    section: Results and Discussion
+  units: as printed
+  values:
+    quantity: eutectic_and_congruent_melting_comparisons
+    method_class: quoted_unattributed
+    measured_sample_composition_Al2O3_mol_percent: '67.63'
+    sample_fusion_temperature_K: 2157
+    comparison_eutectic_temperature_K: 2123
+    comparison_eutectic_composition_Al2O3_mol_percent: '68.9'
+    mass_spectral_mullite_fusion_temperature_K: 2180
+    statements_as_printed:
+    - Interesting conclusions can be drawn from the data on vaporization of the Al2O3-SiO2 melt with a 67.63 mol % Al2O3 initial
+      composition.
+    - We studied this sample because of its closeness to the eutectic composition at 2123 K reported in [11] (68.9 mol % Al2O3,
+      table) and found that the temperature of its fusion equaled 2157 K.
+    - This temperature is closest to the values cited in [11, 12, 37, 38].
+    - The temperature of fusion of mullite found in this work from the mass spectral measurements, 2180 K, is fairly close
+      to the temperature of fusion of the sample specified above but somewhat exceeds the latter.
+    - This allows us to suggest the existence of a eutectic composition in the phase diagram of the aluminosilicate system
+      between the mullite and corundum fields and leads us to conclude that mullite undergoes congruent melting.
+    - Similar conclusions were drawn from the data obtained in quenching experiments.
+    - When a sample initially having the composition of mullite loses an insignificant amount of silicon dioxide, excess aluminum
+      oxide crystallizes as corundum, which is the reason why melting of mullite is thought to be accompanied by decomposition.
+    - In reality, the initial composition of the sample changes during heating.
+    - We detected corundum only in samples with free film surfaces unprotected by tungsten.
+    - Samples completely covered by tungsten metal films, which looked like black band edging samples in polished sections
+      for microscopic examination, only contained mullite.
+    - If silicon dioxide volatilized from the surface, samples contained well-defined layers of Al2O3 grains.
+    - The chemical analysis and microscopic examination data show that mullite melts congruently in vacuum at 2183 K.
+  context_id: shornikov-2000-aluminosilicate-vaporization::context::shornikov_2000_region_ii_and_mullite_fusion_comparisons
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  species: Al2O3
+- observation_id: shornikov_2000_sample_composition_series
+  type: characterization
+  locator:
+    published_page: 678
+    pdf_page_index: 1
+    section: Experimental
+  units: mol% Al2O3 and wt% Al2O3
+  values:
+    quantity: prepared_sample_composition_series
+    method_class: measured_direct
+    analysis_methods_as_printed: X-ray and chemical analysis
+    samples:
+    - sample_order: 1
+      Al2O3_mol_percent: '1.19'
+      Al2O3_wt_percent: '2'
+    - sample_order: 2
+      Al2O3_mol_percent: '3.31'
+      Al2O3_wt_percent: '5.5'
+    - sample_order: 3
+      Al2O3_mol_percent: '12.84'
+      Al2O3_wt_percent: '20'
+    - sample_order: 4
+      Al2O3_mol_percent: '28.2'
+      Al2O3_wt_percent: '40'
+    - sample_order: 5
+      Al2O3_mol_percent: '60'
+      Al2O3_wt_percent: '71.8'
+    - sample_order: 6
+      Al2O3_mol_percent: '67.63'
+      Al2O3_wt_percent: '78'
+    - sample_order: 7
+      Al2O3_mol_percent: '70.21'
+      Al2O3_wt_percent: '80'
+    - sample_order: 8
+      Al2O3_mol_percent: '84.14'
+      Al2O3_wt_percent: '90'
+  context_id: shornikov-2000-aluminosilicate-vaporization::context::shornikov_2000_sample_composition_series
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  species: Al2O3
+- observation_id: shornikov_2000_sample_preparation_numeric_facts
+  type: characterization
+  locator:
+    published_page: 678
+    pdf_page_index: 1
+    section: Experimental
+  units: K, h, wt%
+  values:
+    quantity: sample_preparation_protocol
+    method_class: measured_direct
+    starting_materials:
+      alumina_precursor: ammonium alum
+      alumina_grade_as_printed: os. ch. (special purity)
+      alumina_impurities_as_printed: only traces detected spectroscopically
+      silica_material: rock crystal powder
+      silica_SiO2_wt_percent: '99.9'
+    mixing:
+      mill: jasper ball mill
+      solvent: acetone
+    solid_state_synthesis:
+      furnace: Silit
+      atmosphere: air
+      maximum_temperature_K: 1600
+      duration_h: 24
+    high_temperature_annealing:
+      unit: Donets-1
+      heating: high-frequency
+      atmosphere: argon
+      temperature_range_K:
+      - 1800
+      - 2000
+      duration_h: 1
+      stated_purpose: prevent transition to liquid
+    post_run_composition_as_analyzed:
+      state:
+        tag: unknown
+        reason: not_published
+      note: No numerical post-vaporization composition is reported; unprotected surfaces showed partial SiO2 volatilization.
+  context_id: shornikov-2000-aluminosilicate-vaporization::context::shornikov_2000_sample_preparation_numeric_facts
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  species: Al2O3
+- observation_id: shornikov_2000_shutter_measurement_qualification
+  type: method
+  locator:
+    published_page: 677
+    pdf_page_index: 0
+    section: Experimental
+  units: as printed
+  values:
+    quantity: molecular_beam_shutter_qualification
+    method_class: quoted_unattributed
+    statement_as_printed: The flow of molecules from the effusion cell to the region of ionization of the ion source through
+      channel 5 could be rapidly stopped by the introduction of molybdenum shutter 6 with the use of electromagnetic armature.
+      Note that without a shutter, measurement results may be distorted, as, for instance, in work [9].
+  context_id: shornikov-2000-aluminosilicate-vaporization::context::shornikov_2000_shutter_measurement_qualification
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  species: Al2O3
+- observation_id: shornikov_2000_table1_row_t1_r14_temperature_absent
+  type: thermodynamic_example
+  locator:
+    table: Nonvariant points
+    published_page: 681
+    pdf_page_index: 4
+    note: Table row t1-r14; the temperature cell is blank
+  units: mol% Al2O3 and K
+  values:
+    quantity: table_row_without_temperature
+    method_class: quoted_attributed
+    source_row: t1-r14
+    phase_region_as_printed: M + L, congruent melting
+    Al2O3_mol_percent: '58.24'
+    Al2O3_mol_percent_as_printed: '58.24'
+    composition_mol:
+      Al2O3: '0.5824'
+      SiO2: '0.4176'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: Nonvariant points
+        published_page: 681
+        pdf_page_index: 4
+        note: Temperature cell is blank in this printed row
+    reference_as_printed: '[1]'
+    attribution: Reference [1] as cited by Shornikov et al. (2000)
+  context_id: shornikov-2000-aluminosilicate-vaporization::context::shornikov_2000_table1_row_t1_r14_temperature_absent
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  species: Al2O3
+- observation_id: shornikov_2000_vaporization_composition_drift_qualifier
+  type: experiment_series
+  locator:
+    published_page: 678
+    pdf_page_index: 1
+    section: Experimental
+  units: as printed
+  values:
+    quantity: composition_change_and_protection
+    method_class: quoted_unattributed
+    statement_as_printed: A characteristic feature of this method is the formation of tungsten metal films preventing vaporization
+      of aluminum and silicon oxides on the surface of samples, because partial volatilization of system components (largely
+      silicon dioxide) in vacuum at high temperatures and normal pressure changes the initial composition of samples during
+      measurements. If the surface remained unprotected, partial vaporization of silicon dioxide was indeed observed according
+      to chemical and mineralogical analyses.
+    additional_statements_as_printed:
+    - The very high rate of crystallization required short times for the formation of crystalline phases.
+    - The initial compositions were selected based on consideration of possible high-temperature heterogeneous reactions that
+      changed the composition of condensed phases during vaporization under given temperature conditions.
+  context_id: shornikov-2000-aluminosilicate-vaporization::context::shornikov_2000_vaporization_composition_drift_qualifier
+  work_id: 3daf726453f360957687fa6798173c7421056e79f9684c5dd8a6df38d696ab0d
+  source_id: shornikov-2000-aluminosilicate-vaporization
+  species: Al2O3

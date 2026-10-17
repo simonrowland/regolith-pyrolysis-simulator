@@ -1,0 +1,392 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2023-calcium-phosphate
+source:
+  citation: >-
+    Shornikov, S. I. and Demidova, S. I. (2023). Thermodynamic properties of the CaO–P4O10 melts.
+    Experiment in Geosciences, 29(1), 55–57.
+  year: 2023
+  corpus_asset: raw/shornikov-2023-calcium-phosphate/shornikov-2023-calcium-phosphate.pdf
+  corpus_sha256: 7d8732eaa4d7946d1d9bd99d8619626a4d015be8f5ce7d38a6132dc583112234
+extraction:
+  method: >-
+    Manual extraction checked against all five pages rendered at 240 dpi. The article is on published pages 55–57
+    (PDF pages 3–5); the separate SiO2–P4O10 article beginning on published page 57 is excluded. The article has
+    no numerical data tables. Figures 1–4 were inspected and retained as figure-only evidence without digitizing
+    plotted coordinates.
+  date: '2026-10-05'
+  worker: codex-resume-52720-1791214186
+review_status: draft
+fidelity_samples:
+  - species: P4O10
+    observable: activity_coefficient
+    observation_id: shornikov_2023_p4o10_activity_figure2
+    field: method_class
+    value: figure_only
+    locator:
+      page: 56
+      published_page: 56
+      pdf_page_index: 3
+      figure: '2B'
+      note: 'The cited P4O10 activity curves are retained as figure-only; plotted coordinates are not digitized.'
+  - species: P4O10
+    observation_id: shornikov_2023_p4o10_activity_estimate_cap3o8
+    field: activity
+    value: 2.21e-38
+    locator:
+      page: 56
+      published_page: 56
+      pdf_page_index: 3
+      figure: '2B'
+      note: 'Estimated P4O10 activity in Ca3P2O8 at 1900 K, stated in the prose and retained as located context.'
+experiments:
+  - experiment_id: shornikov_2023_cao_p4o10_model
+    method: engine_evaluation
+    locator:
+      page: 55
+      published_page: 55
+      pdf_page_index: 2
+      section: Abstract
+      note: 'The reported results are calculations from a semi-empirical thermodynamic model.'
+    conditions:
+      temperature_K:
+        state:
+          tag: unknown
+          reason: range_only_not_a_single_temperature
+        locator:
+          page: 55
+          published_page: 55
+          pdf_page_index: 2
+          section: Abstract
+          note: 'The model covers 700–2100 K; no single run temperature is stated.'
+species:
+  CaO:
+    observations:
+      - observation_id: shornikov_2023_cao_activity_figure2
+        type: activity_coefficient
+        experiment: shornikov_2023_cao_p4o10_model
+        locator:
+          page: 56
+          published_page: 56
+          pdf_page_index: 3
+          figure: '2A'
+          note: 'CaO activity curves at 1923 K: present study, Hudon and Jung (2015), and experimental Schwerdtfeger and Engell (1963); coordinates not digitized.'
+        phase: condensed_liquid
+        units: dimensionless activity as plotted
+        T_range_K: [1923, 1923]
+        values:
+          quantity: CaO activity
+          method_class: figure_only
+          admission_status: figure_only
+          semantics: bound_not_point_ordering
+          reason: 'Figure 2A contains curves and experimental markers; numeric coordinates were not digitized.'
+          standard_state:
+            state:
+              tag: unknown
+              reason: not_stated_in_this_source
+          defining_ion:
+            state:
+              tag: unknown
+              reason: not_applicable_to_thermodynamic_model
+    context:
+      - observation_id: shornikov_2023_minimum_mixing_energy
+        type: thermodynamic_example
+        locator:
+          page: 57
+          published_page: 57
+          pdf_page_index: 4
+          section: Results and Discussion
+          figure: '4'
+          note: 'The prose states the minimum and locates it near Ca2P2O7; Figure 4 curve coordinates were not digitized.'
+        units: kJ/mol
+        values:
+          quantity: minimum mixing energy
+          method_class: model_derived
+          attribution: 'Calculated in the present study using the semi-empirical model.'
+          system: CaO–P4O10 melt
+          temperature_K: 1923
+          composition: close to Ca2P2O7
+          mixing_energy_kJ_mol: -210
+      - observation_id: shornikov_2023_figure1_phase_diagram
+        type: thermodynamic_example
+        locator:
+          page: 55
+          published_page: 55
+          pdf_page_index: 2
+          figure: '1'
+          note: 'Phase diagram attributed to Hudon and Jung (2015); diagram boundaries were not digitized.'
+        units: figure-only
+        values:
+          quantity: CaO–P4O10 phase diagram
+          method_class: figure_only
+          attribution: 'Hudon and Jung (2015), as cited by this paper.'
+          reason: 'Figure-only phase diagram; no coordinates digitized.'
+      - observation_id: shornikov_2023_model_scope_and_qualifications
+        type: thermodynamic_example
+        locator:
+          page: 57
+          published_page: 57
+          pdf_page_index: 4
+          section: Results and Discussion
+        units: as reported
+        values:
+          quantity: model scope, numeric context, and qualifications
+          method_class: quoted_attributed
+          attribution: 'Shornikov and Demidova (2023), including the prior studies named in the located contextual groups.'
+          temperature_range_K: [700, 2100]
+          model: 'Semi-empirical thermodynamic model; equilibrium conditions were found from Gibbs energies of condensed phases and vapor species for a given melt composition and temperature.'
+          model_inputs: 'Formation Gibbs energies for CaO and P4O10 in crystalline and liquid states, eight calcium phosphates, and reference thermodynamic data for possible gas-phase species from Glushko et al. (1978–1982).'
+          gas_species_considered: [Ca, Ca2, CaO, P, P2, P3, P4, PO, PO2, P2O3, P2O4, P2O5, P3O6, P4O6, P4O7, P4O8, P4O9, P4O10, O, O2, O3, O4]
+          model_condensed_phases: [CaO, P4O10, CaP4O11, Ca2P6O17, CaP2O6, Ca4P6O19, Ca2P2O7, Ca3P2O8, Ca10P6O25, Ca4P2O9]
+          printed_thermodynamic_context:
+            locator: {page: 55, published_page: 55, pdf_page_index: 2, section: Introduction}
+            oxide_equivalent_compositions:
+              Ca3P2O8: '6CaO · P4O10'
+              Ca2P2O7: '4CaO · P4O10'
+              CaP2O6: '2CaO · P4O10'
+              CaP4O11: 'CaO · P4O10'
+              Ca4P2O9: '8CaO · P4O10'
+              Ca4P6O19: '8CaO · 3P4O10'
+              Ca2P6O17: '4CaO · 3P4O10'
+              Ca10P6O25: '20CaO · 3P4O10'
+            congruent_melting_K:
+              Ca3P2O8: 2076
+              Ca2P2O7: 1622
+              CaP2O6: 1251
+              CaP4O11: 1046
+            dissociation_K:
+              Ca4P2O9: 2021
+              Ca4P6O19: 1242
+              Ca2P6O17: 1040
+            Ca10P6O25_stability_range_K: [1126, 1323]
+            Ca10P6O25_decomposes_into: [α-Ca4P2O9, β-Ca3P2O8]
+          cited_measurement_context:
+            locator: {page: 56, published_page: 56, pdf_page_index: 3, section: Introduction}
+            CaO_activity_measurement:
+              temperature_K: 1923
+              composition_range_mol_percent_P4O10: [11, 22]
+              attribution: 'Schwerdtfeger and Engell (1963); described as a single experimental study.'
+            cited_knudsen_pressure_measurements_temperature_range_K: [800, 1900]
+            CaPO2_detected_over_Ca3P2O8_at_K: 2046
+            CaPO2_detection_attribution: 'Lopatin and Semenov (1986).'
+            estimated_P4O10_activity_in_Ca3P2O8_at_K: 1900
+          cited_literature_apparatus:
+            - cell_material_as_printed: platinum
+              locator: {page: 56, published_page: 56, pdf_page_index: 3, section: Introduction}
+              cell_material_enum: Pt
+              attribution: 'Ratkovsky et al. (1975).'
+            - cell_material_as_printed: molybdenum
+              locator: {page: 56, published_page: 56, pdf_page_index: 3, section: Introduction}
+              cell_material_enum: Mo
+              attribution: 'Lopatin and Semenov (1986; 1989) and Nagai et al. (2009).'
+            - cell_material_as_printed: alund
+              locator: {page: 56, published_page: 56, pdf_page_index: 3, section: Introduction}
+              cell_material_enum: alumina
+              attribution: 'Butylin et al. (1975) and Ratkovsky et al. (1975).'
+          prior_literature_experiment_sets:
+            - method: knudsen_effusion
+              locator: {page: 56, published_page: 56, pdf_page_index: 3, section: Introduction}
+              measurements: 'Partial pressures of PO, PO2, and P4O10 over congruently melting calcium phosphates and phosphate-alloy mixtures.'
+              temperature_range_K: [800, 1900]
+              cited_sources: 'Butylin et al. (1975); Ratkovsky et al. (1975); Lopatin and Semenov (1989); Lopatin (1997); Nagai et al. (2009).'
+              equipment_detail: 'Published p. 56 associates platinum cells with Ratkovsky et al. (1975), molybdenum cells with Lopatin and Semenov (1986; 1989) and Nagai et al. (2009), and alund cells with Butylin et al. (1975) and Ratkovsky et al. (1975); no individual source-to-species mapping beyond the article text is inferred.'
+              equipment_facts_not_reported_here:
+                locator: {page: 56, published_page: 56, pdf_page_index: 3, section: Introduction}
+                orifice_diameter_m: {state: {tag: unknown, reason: not_reported_for_cited_studies}}
+                orifice_channel_length_m: {state: {tag: unknown, reason: not_reported_for_cited_studies}}
+                calibration_substance_and_method: {state: {tag: unknown, reason: not_reported_for_cited_studies}}
+                ionization_cross_sections_and_source: {state: {tag: unknown, reason: not_reported_for_cited_studies}}
+                ionization_energy_eV: {state: {tag: unknown, reason: not_reported_for_cited_studies}}
+                multiplier_or_isotope_corrections: {state: {tag: unknown, reason: not_reported_for_cited_studies}}
+                temperature_measurement_and_calibration: {state: {tag: unknown, reason: not_reported_for_cited_studies}}
+                background_pressure_Pa: {state: {tag: unknown, reason: not_reported_for_cited_studies}}
+                sample_preparation_and_post_run_composition: {state: {tag: unknown, reason: not_reported_for_cited_studies}}
+            - measurements: 'CaO activity in CaO–P4O10 melts, 11–22 mol % P4O10 at 1923 K.'
+              locator: {page: 56, published_page: 56, pdf_page_index: 3, section: Introduction}
+              method: {state: unknown, reason: not_stated_in_this_article}
+              cited_sources: 'Schwerdtfeger and Engell (1963), the single study identified by the authors.'
+          model_experiment_facts:
+            locator:
+              page: 55
+              published_page: 55
+              pdf_page_index: 2
+              section: Abstract
+            cell_material_and_liner: {state: {tag: unknown, reason: not_applicable_to_theoretical_model}}
+            cell_materials: {state: {tag: unknown, reason: not_applicable_to_theoretical_model}}
+            orifice_diameter_m: {state: {tag: unknown, reason: not_applicable_to_theoretical_model}}
+            orifice_channel_length_m: {state: {tag: unknown, reason: not_applicable_to_theoretical_model}}
+            pressure_calibration_substance_and_method: {state: {tag: unknown, reason: not_applicable_to_theoretical_model}}
+            ionization_cross_sections_and_source: {state: {tag: unknown, reason: not_applicable_to_theoretical_model}}
+            ionization_energy_eV: {state: {tag: unknown, reason: not_applicable_to_theoretical_model}}
+            multiplier_or_isotope_corrections: {state: {tag: unknown, reason: not_applicable_to_theoretical_model}}
+            temperature_measurement_and_calibration: {state: {tag: unknown, reason: not_applicable_to_theoretical_model}}
+            background_pressure_Pa: {state: {tag: unknown, reason: not_applicable_to_theoretical_model}}
+            sample_preparation_and_initial_composition: {state: {tag: unknown, reason: no_physical_charge_in_model_calculation}}
+          activity_interpretation: 'The article identifies CaO and P4O10 thermodynamic activities but does not state the standard state of either; no experimental defining ion applies to the present model outputs.'
+          verbatim_comparative_statements:
+            - quote: 'A detailed review of the available physicochemical data and an assessment of thermodynamic properties in the CaO–P4O10 system was recently carried out in (Jantzen et al., 2019).'
+              locator: {page: 56, published_page: 56, pdf_page_index: 3, section: Introduction}
+            - quote: 'The theoretical calculations of thermodynamic properties of the CaO–P4O10 melts in the temperature range 700–2100 K were performed using a semi-empirical model (Shornikov, 2019) in order to clarify its parameters.'
+              locator: {page: 57, published_page: 57, pdf_page_index: 4, section: Results and Discussion}
+            - quote: 'Phosphorus is an important minor element of the lunar rocks. It has moderate volatility and is usually present as phosphates (merrilite, apatite).'
+              locator: {page: 55, published_page: 55, pdf_page_index: 2, section: Introduction}
+            - quote: 'Considerable interest in them is caused by the discovery of the OH–bearing apatites in a number of mare basalts, that contradicts the early statement about dryness of the lunar basaltic magmas.'
+              locator: {page: 55, published_page: 55, pdf_page_index: 2, section: Introduction}
+            - quote: 'The available thermodynamic data on calcium phosphates are quite contradictory: errors in determining the values of the enthalpy of compound formation exceed 10 kJ/mol, and in the values of the entropy of formation – at least 5 J/(mol×K).'
+              locator: {page: 56, published_page: 56, pdf_page_index: 3, section: Introduction}
+            - quote: 'The use of the latter can lead to chemical interaction with phosphate samples (Lopatin, 1997) and, thereby, distort the measurement results.'
+              locator: {page: 56, published_page: 56, pdf_page_index: 3, section: Introduction}
+            - quote: 'Measurements of CaO activity in the CaO–P4O10 melt were performed in a narrow concentration range (11–22 mol % P4O10) at 1923 K in a single experimental study (Schwerdtfeger, Engell, 1963) (Fig. 2).'
+              locator: {page: 56, published_page: 56, pdf_page_index: 3, section: Introduction, figure: '2'}
+            - quote: 'The partial pressures of (PO), (PO2) and (P4O10) vapor species over congruently melting calcium phosphates (Butylin et al., 1975; Ratkovsky et al., 1975; Lopatin, Semenov, 1989; Lopatin, 1997) and mixtures of calcium phosphates with alloys (Nagai et al.., 2009) were determined by the Knudsen effusion mass spectrometry method in a wide temperature range of 800–1900 K (Fig. 3).'
+              locator: {page: 56, published_page: 56, pdf_page_index: 3, section: Introduction, figure: '3'}
+            - quote: 'A comparison of the results of calculations of the oxide activities (ai) (Fig. 2) and the mixing energies (ΔGm) (Fig. 4) in the CaO–P4O10 melts at 1923 K obtained at the present study with those obtained by Hadon and Zhang (2015), as well as with experimental data obtained in (Schwerdtferger, Engell, 1963; Lopatin, Semenov, 1989), shows their satisfactory correspondence.'
+              locator: {page: 57, published_page: 57, pdf_page_index: 4, section: Results and Discussion}
+            - quote: 'The calculated oxide activities in the the CaO–P4O10 melt correspond to the position of the liquid phase in the phase diagram of the system (Fig. 1).'
+              locator: {page: 57, published_page: 57, pdf_page_index: 4, section: Results and Discussion}
+            - quote: 'The minimum value of the mixing energy in the CaO–P4O10 melts is in the composition region close to Ca2P2O7 and is equal to –210 kJ/mol.'
+              locator: {page: 57, published_page: 57, pdf_page_index: 4, section: Results and Discussion}
+            - quote: 'As follows from Fig. 3A, the calculated partial pressures of (P4O10) gaseous phosphorus oxide over CaP2O6 calcium phosphate correspond satisfactorily to the experimental data obtained by the Knudsen effusion mass spectrometric method in (Butylin et al., 1975; Ratkovsky et al., 1975; Lopatin, 1997).'
+              locator: {page: 57, published_page: 57, pdf_page_index: 4, section: Results and Discussion}
+            - quote: 'The higher partial pressure values of (PO2) gaseous oxide over Ca2P2O7 obtained by Lopatin (1997) are due to the presence of reducing conditions occurring in the case of a molybdenum effusion cell (Fig. 3B).'
+              locator: {page: 57, published_page: 57, pdf_page_index: 4, section: Results and Discussion}
+            - quote: 'The observed difference between the calculated values of (PO2) partial pressure and the results obtained by Butylin et al. (1975) illustrates the above-mentioned interaction of the phosphate melt with the alund effusion cell which they used in the experiments (Fig. 3B).'
+              locator: {page: 57, published_page: 57, pdf_page_index: 4, section: Results and Discussion}
+          source_data_limitation: 'The article reports a theoretical model and comparisons with prior studies, not new experiments. It gives no numerical uncertainty for the model results.'
+          printed_source_metadata:
+            cover:
+              locator: {page: 1, pdf_page_index: 0, section: Cover}
+              ISSN: '0869-2904'
+            front_matter:
+              locator: {page: 2, pdf_page_index: 1, section: Journal and institutional information}
+              founded_year: 1991
+              institutional_address: 'Russian Academy of Sciences, 142432 Chernogolovka, Academica Osip’yana str. 4, Moscow region, Russian Federation.'
+            references:
+              locator: {page: 57, published_page: 57, pdf_page_index: 4, section: References}
+              as_printed:
+                - 'Butylin B. A., Ratkovsky I. A., Ershov V. A., Novikov G. I. (1975) Thermodynamic study of the processes of thermal dissociation of calcium meta-, pyro- and orthophosphates // Doklady AN BSSR, vol. 19, no. 7, pp. 618–621.'
+                - 'Glushko V. P., Gurvich L. V., Bergman G. A., Veitz I. V., Medvedev V. A., Khakchikuruzov G. A., Yungman V. S. (1978–1982) Thermodynamic properties of individual substances. Moscow: Nauka.'
+                - 'Hudon P., Jung I.-H. (2015) Critical evaluation and thermodynamic optimization of the CaO–P2O5 system. Met. Mater. Trans. B, vol. 46, no. 1, pp. 494–522.'
+                - 'Jantzen T., Yazhenskikh E., Hack K., Muller M. (2019) Thermodynamic assessment of the CaO–P2O5–SiO2–ZnO system with special emphasis on the addition of ZnO to the Ca2SiO4–Ca3P2O8 phase. CALPHAD, vol. 67, no. 101668.'
+                - 'Lopatin S. I., Semenov G. A. (1986) Gaseous phosphates of calcium, strontium and barium. Doklady AN SSSR, vol. 287, no. 2, pp. 380–381.'
+                - 'Lopatin S. I., Semenov G. A. (1989) Mass spectrometric investigation of thermal dissociation of alkaline earth metal monophosphates. Izv. AN SSSR. Neorg. Mater., vol. 25, no. 4, pp. 645–650.'
+                - 'Lopatin S. I. (1997) Vaporization in phosphate systems. Russ. J. Gen. Chem., vol. 67, no. 2, pp. 208–227.'
+                - 'Nagai T., Miyake M., Maeda M. (2009) Thermodynamic measurement of calcium phosphates by double Knudsen cell mass spectrometry. Met. Mater. Trans. B, vol. 40, no. 4, pp. 544–549.'
+                - 'Ratkovsky I. A., Butylin B. A., Novikov G. I. (1975) Thermodynamic investigation of the processes of thermal dissociation of Ca(PO3)2. Doklady AN BSSR, vol. 19, no. 2, pp. 139–140.'
+                - 'Schwerdtfeger K., Engell H. J. Die aktivitaten im system kalziumoxyd–phosphorsaure bei 1650 °C // Arch. Eisenhuettenwes. 1963. V. 34. № 9. P. 647–652.'
+                - 'Shornikov S. I. (2019) Thermodynamic modelling of evaporation processes of lunar and meteoritic substance. Geochem. Int., vol. 57, no. 8, pp. 865–872.'
+      - observation_id: shornikov_2023_mixing_energy_figure4
+        type: thermodynamic_example
+        locator:
+          page: 57
+          published_page: 57
+          pdf_page_index: 4
+          figure: '4'
+          note: 'Mixing-energy curves at 1923 K, present study and Hudon and Jung (2015); no curve coordinates digitized.'
+        units: kJ/mol
+        values:
+          quantity: CaO–P4O10 melt mixing energy
+          method_class: figure_only
+          admission_status: figure_only
+          semantics: bound_not_point_ordering
+          reason: 'Figure 4 plotted coordinates were not digitized; the prose-reported minimum is recorded separately.'
+  P4O10:
+    context:
+      - observation_id: shornikov_2023_p4o10_activity_estimate_cap3o8
+        type: thermodynamic_example
+        locator:
+          page: 56
+          published_page: 56
+          pdf_page_index: 3
+          section: Introduction
+          figure: '2B'
+          note: 'The printed point estimate is retained; Figure 2B curve coordinates were not digitized.'
+        units: dimensionless activity
+        values:
+          quantity: P4O10 activity in Ca3P2O8
+          activity: 2.21e-38
+          temperature_K: 1900
+          method_class: author_estimate
+          attribution: 'Estimated by the present authors based on Lopatin and Semenov (1989).'
+          reduction_relation: 'The relation and numerical inputs used to obtain the estimate are not reported here.'
+          standard_state:
+            state:
+              tag: unknown
+              reason: not_stated_in_this_source
+    observations:
+      - observation_id: shornikov_2023_p4o10_activity_figure2
+        type: activity_coefficient
+        experiment: shornikov_2023_cao_p4o10_model
+        locator:
+          page: 56
+          published_page: 56
+          pdf_page_index: 3
+          figure: '2B'
+          note: 'P4O10 activity curves at 1923 K (present study and Hudon and Jung, 2015) and 1900 K (Lopatin and Semenov, 1989); coordinates not digitized.'
+        phase: condensed_liquid
+        units: dimensionless activity as plotted
+        T_range_K: [1900, 1923]
+        values:
+          quantity: P4O10 activity
+          method_class: figure_only
+          admission_status: figure_only
+          semantics: bound_not_point_ordering
+          reason: 'Figure 2B contains calculated and cited experimental curves; numeric coordinates were not digitized.'
+          standard_state:
+            state:
+              tag: unknown
+              reason: not_stated_in_this_source
+          defining_ion:
+            state:
+              tag: unknown
+              reason: not_applicable_to_thermodynamic_model
+      - observation_id: shornikov_2023_p4o10_pressure_figure3
+        type: partial_pressure
+        experiment: shornikov_2023_cao_p4o10_model
+        locator:
+          page: 56
+          published_page: 56
+          pdf_page_index: 3
+          figure: '3A'
+          note: 'P4O10 pressure over CaP2O6; model curve and cited KEMS measurements, without digitized coordinates.'
+        phase: CaP2O6
+        units: pressure as plotted
+        values:
+          quantity: P4O10 partial pressure
+          method_class: figure_only
+          admission_status: figure_only
+          semantics: bound_not_point_ordering
+          reason: 'Figure 3A plotted coordinates were not digitized.'
+  PO2:
+    observations:
+      - observation_id: shornikov_2023_po2_pressure_figure3
+        type: partial_pressure
+        experiment: shornikov_2023_cao_p4o10_model
+        locator:
+          page: 56
+          published_page: 56
+          pdf_page_index: 3
+          figure: '3B'
+          note: 'PO2 pressure over Ca2P2O7; model curve and cited KEMS measurements, without digitized coordinates.'
+        phase: Ca2P2O7
+        units: pressure as plotted
+        values:
+          quantity: PO2 partial pressure
+          method_class: figure_only
+          admission_status: figure_only
+          semantics: bound_not_point_ordering
+          reason: 'Figure 3B plotted coordinates were not digitized.'
+    context:
+      - observation_id: shornikov_2023_po2_literature_qualification
+        type: thermodynamic_example
+        locator:
+          page: 57
+          published_page: 57
+          pdf_page_index: 4
+          section: Results and Discussion
+          figure: '3B'
+        units: as reported
+        values:
+          quantity: PO2 pressure comparison qualification
+          method_class: quoted_attributed
+          attribution: 'Lopatin (1997), compared with the present study and Butylin et al. (1975).'
+          statement: 'The higher partial pressure values of (PO2) gaseous oxide over Ca2P2O7 obtained by Lopatin (1997) are due to the presence of reducing conditions occurring in the case of a molybdenum effusion cell.'

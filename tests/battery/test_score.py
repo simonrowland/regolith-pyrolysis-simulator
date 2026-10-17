@@ -3585,7 +3585,6 @@ def _assert_no_model_derived_e15_points(
 ) -> None:
     from simulator.battery import score as score_mod
 
-    oxygen_candidates_by_source: dict[str, int] = {}
     model_derived_oxygen_sources = {
         observation.source_id
         for observation in context.observations.values()
@@ -3595,6 +3594,7 @@ def _assert_no_model_derived_e15_points(
         and observation.evidence.class_.is_value
         and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
     }
+    assert model_derived_oxygen_sources
     for residual in residuals:
         observation = context.observations.get(residual.reference)
         if observation is None:
@@ -3603,35 +3603,9 @@ def _assert_no_model_derived_e15_points(
             observation.evidence.class_.is_value
             and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
         )
-        if (
-            is_model_derived
-            and isinstance(observation.identity, Identity)
-            and observation.identity.species.formula in {"O", "O2"}
-        ):
-            measured_observation = replace(
-                observation,
-                evidence=replace(
-                    observation.evidence,
-                    class_=State.of(EvidenceClass.MEASURED_DIRECT),
-                ),
-            )
-            oxygen_candidates_by_source[observation.source_id] = (
-                oxygen_candidates_by_source.get(observation.source_id, 0)
-                + int(
-                    score_mod._e15_residual_point(
-                        residual, measured_observation
-                    )
-                    is not None
-                )
-            )
         point = score_mod._e15_residual_point(residual, observation)
         if point is not None:
             assert not is_model_derived
-    assert model_derived_oxygen_sources
-    assert all(
-        oxygen_candidates_by_source.get(source_id, 0) >= 1
-        for source_id in model_derived_oxygen_sources
-    )
 
 
 def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
@@ -4012,7 +3986,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
             NoticeKind.DERIVATION_USES_COMPILATION,
             "reference_converted_via_fusion;probe",
         ),
-        (NoticeKind.FIGURE_ONLY, "figure_only:probe"),
+        (NoticeKind.FIGURE_ONLY, "figure_only"),
         (NoticeKind.REACTIVE_CELL_NOT_MODELLED, "reactive_cell_not_modelled:probe"),
         (
             NoticeKind.LIQUIDUS_POSITION_CONTESTED,
@@ -4048,6 +4022,26 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
 
     assert flagged_strata(notices) == expected
     assert _flagged_payload_strata(payload) == expected
+
+    evidence_class_notice = Notice(
+        kind=NoticeKind.FIGURE_ONLY,
+        affected_quantities=(Quantity.P_PARTIAL,),
+        reason="evidence_class:model_derived",
+        origin="evidence-class-pin",
+    )
+    assert FLAGGED_STRATUM_FIGURE_ONLY not in flagged_strata(
+        (evidence_class_notice,)
+    )
+    assert FLAGGED_STRATUM_FIGURE_ONLY not in _flagged_payload_strata(
+        {
+            "notices": [
+                {
+                    "kind": NoticeKind.FIGURE_ONLY.value,
+                    "reason": "evidence_class:model_derived",
+                }
+            ]
+        }
+    )
 
 
 def test_knudsen_absolute_flux_requires_orifice_area() -> None:
@@ -9439,8 +9433,11 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     ] == [(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION, 1)]
 
 
-def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
+def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
+    tmp_path: Path,
+) -> None:
     import simulator.battery.score as score_module
+    from tests.battery.test_migrate import _migrate_real_extract
 
     context = load_score_context(
         sources=(
@@ -9452,10 +9449,19 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     )
     observations = context.observations
     filtered = context
+    stolyarova_atomic_oxygen_pressures = {
+        key
+        for key in observations
+        if key.startswith(
+            "kems-053-stolyarova-1991::"
+            "stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium::T=1933.00:"
+        )
+    }
     admitted_model_derived = {
         key
         for key, obs in observations.items()
         if obs.admission.status is AdmissionStatus.ADMITTED
+        and key not in stolyarova_atomic_oxygen_pressures
         and obs.evidence.class_.is_value
         and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
     }
@@ -9478,16 +9484,6 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         if obs.source_id == "kems-053-stolyarova-1991"
         and isinstance(obs.identity, Identity)
         and quantity_token(obs.identity) is Quantity.ACTIVITY
-    }
-    stolyarova_derived_pressures = {
-        key
-        for key, obs in observations.items()
-        if obs.source_id == "kems-053-stolyarova-1991"
-        and isinstance(obs.identity, Identity)
-        and quantity_token(obs.identity) is Quantity.P_PARTIAL
-        and obs.admission.status is AdmissionStatus.ADMITTED
-        and obs.evidence.class_.is_value
-        and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
     }
     stolyarova_1995_derived_pressures = {
         key
@@ -9519,7 +9515,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     }
     headline_diagnostic_references = (
         (stolyarova_activities & admitted_model_derived)
-        | stolyarova_derived_pressures
+        | stolyarova_atomic_oxygen_pressures
         | stolyarova_1995_derived_pressures
         | stolyarova_1996_derived_pressures
         | kems_model_derived
@@ -9527,7 +9523,26 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     assert len(allibert_admitted) == 16
     assert len(allibert_rejected) == 55
     assert len(stolyarova_activities) == 54
-    assert len(stolyarova_derived_pressures) == 9
+    assert len(stolyarova_atomic_oxygen_pressures) == 9
+    assert all(
+        observations[key].admission.status is AdmissionStatus.ADMITTED
+        for key in stolyarova_atomic_oxygen_pressures
+    )
+    fresh_stolyarova = _migrate_real_extract(
+        tmp_path, "kems-053-stolyarova-1991.yaml"
+    )
+    fresh_stolyarova_pressures = {
+        key: observation
+        for key, observation in fresh_stolyarova.observations.items()
+        if key in stolyarova_atomic_oxygen_pressures
+    }
+    assert set(fresh_stolyarova_pressures) == stolyarova_atomic_oxygen_pressures
+    assert all(
+        observation.admission.status is AdmissionStatus.ADMITTED
+        and observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        for observation in fresh_stolyarova_pressures.values()
+    )
     # Eqn 1 p_O (9), Eqn 2 p_O (8), and calculated p_O2 (9) are model-derived,
     # not measured pressures (review, Derived O / O2).
     assert len(stolyarova_1995_derived_pressures) == 26
@@ -9555,11 +9570,13 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     ] == [30, 10, 15]
     assert len(kems_model_derived) == 28
     assert len(
-        stolyarova_activities | stolyarova_derived_pressures | kems_model_derived
+        stolyarova_activities | stolyarova_atomic_oxygen_pressures | kems_model_derived
     ) == 91
     assert len(headline_diagnostic_references) == 136
-    assert admitted_model_derived == headline_diagnostic_references
-    assert not admitted_model_derived & {
+    assert admitted_model_derived == (
+        headline_diagnostic_references - stolyarova_atomic_oxygen_pressures
+    )
+    assert admitted_model_derived <= {
         obs.observation_id for obs in score_module.comparison_candidates(filtered)
     }
 
@@ -9606,6 +9623,20 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         if residual.reference in headline_diagnostic_references
     ]
     assert len(headline_diagnostic_residuals) == len(headline_diagnostic_references)
+    model_derived_residuals = [
+        residual
+        for residual in headline_diagnostic_residuals
+        if residual.reference in admitted_model_derived
+    ]
+    assert len(model_derived_residuals) == len(admitted_model_derived)
+    assert all(
+        any(
+            notice.kind is NoticeKind.FIGURE_ONLY
+            and notice.reason == "evidence_class:model_derived"
+            for notice in residual.notices
+        )
+        for residual in model_derived_residuals
+    )
     assert all(
         "reference_measured_evidence" in residual.exclusions
         for residual in headline_diagnostic_residuals
@@ -9782,14 +9813,21 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         assert unavailable_stolyarova_refs <= {
             row.reference for row in stolyarova_rows
         }
-        assert len(stolyarova_rows) == 235 + len(unavailable_stolyarova_refs)
+        expected_stolyarova_refs = {
+            observation.observation_id
+            for observation in score_module.comparison_candidates(filtered)
+            if observation.source_id
+            in {"kems-053-stolyarova-1991", "stolyarova-1995-cao-alumina-kems"}
+        } | unavailable_stolyarova_refs | stolyarova_1996_derived_pressures
+        assert {row.reference for row in stolyarova_rows} == expected_stolyarova_refs
+        assert len(stolyarova_rows) == len(expected_stolyarova_refs)
         activity_rows = [
             row for row in stolyarova_rows if row.reference in stolyarova_activities
         ]
         derived_pressure_rows = [
             row
             for row in stolyarova_rows
-            if row.reference in stolyarova_derived_pressures
+            if row.reference in stolyarova_atomic_oxygen_pressures
         ]
         assert len(activity_rows) == 54
         assert len(derived_pressure_rows) == 9

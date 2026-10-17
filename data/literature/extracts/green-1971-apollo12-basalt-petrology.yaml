@@ -1,0 +1,639 @@
+schema_version: literature_extract.v1
+source_id: green-1971-apollo12-basalt-petrology
+source:
+  citation: >-
+    Green, D. H., Ringwood, A. E., Ware, N. G., Hibberson, W. O., Major, A. & Kiss, E. (1971),
+    "Experimental petrology and petrogenesis of Apollo 12 basalts", Proceedings of the Second
+    Lunar Science Conference, Vol. 1, pp. 601–615. The M.I.T. Press.
+  url: https://articles.adsabs.harvard.edu/pdf/1971LPSC....2..601G
+  year: 1971
+extraction:
+  method: Manual transcription checked against rendered page images; the scan has no text layer.
+  date: '2026-10-03'
+  worker: b681-green1971
+  provenance_path: raw/green-1971-apollo12-basalt-petrology/sidecar.yaml
+review_status: draft
+fidelity_samples:
+  - species: Apollo12_12065
+    observable: transition_point
+    observation_id: green1971_12065_liquidus
+    field: temperature_K
+    value: 1453.15
+    locator: {page: 5, published_page: 605, paragraph: 12065}
+  - species: Apollo12_12022
+    observable: transition_point
+    observation_id: green1971_12022_liquidus_figure_read
+    field: range
+    value: [1553.15, 1563.15]
+    locator: {page: 4, published_page: 604, figure: '2'}
+benches:
+  - id: green1971-metallic-fe-capsules
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: experimental melting and crystallization apparatus}
+      locator: {page: 2, published_page: 602, section: Experimental}
+    cell_material_and_liner:
+      state: {tag: value, value: metallic Fe capsules}
+      locator: {page: 2, published_page: 602, section: Experimental}
+    other_facts:
+      - name: run_assignment_of_capsule_to_reversal_and_melting_experiments
+        unit: as_printed
+        value:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, published_page: 602, section: Experimental, note: Capsules are stated for experiments generally; individual run assignment is absent}
+experiments:
+  - experiment_id: green1971-12009-olivine-1230-1bar
+    series: Apollo 12 12009, 1 bar
+    bench_id: green1971-metallic-fe-capsules
+    method: quench_equilibration
+    locator: {page: 9, published_page: 609, table: '1', note: "Olivine analysis from the 1230°C, 1 bar run"}
+    sample:
+      initial_composition:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, published_page: 602, section: Experimental, note: No starting whole-rock oxide composition is printed}
+      form:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, published_page: 602, section: Experimental, note: "Paper describes this precursor generally, but does not state this individual run's charge form"}
+    conditions:
+      temperature_K: {state: {tag: value, value: {kind: point, point: '1503.15'}}, locator: {page: 9, published_page: 609, table: '1', note: Printed 1230°C; K = °C + 273.15}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 9, published_page: 609, table: '1', note: Printed 1 bar; converted with 1 bar = 100000 Pa}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: No gas mixture is stated}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+    fO2_control:
+      channel: {tag: value, value: intrinsic}
+      buffer: {state: {tag: value, value: Metallic Fe capsule; authors state experimental redox conditions closely match natural-rock crystallization}, locator: {page: 2, published_page: 602, section: Experimental}}
+    thermal_schedule:
+      method: {state: {tag: value, value: Quench-equilibration experiment}, locator: {page: 2, published_page: 602, section: Experimental}}
+      total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {page: 8, published_page: 608, section: Experimental, note: Most runs at ≥1100°C used 1–6 h; the duration is not assigned to this run}}
+  - experiment_id: green1971-12021-pigeonite-1150-1bar
+    series: Apollo 12 12021, 1 bar
+    bench_id: green1971-metallic-fe-capsules
+    method: quench_equilibration
+    locator: {page: 9, published_page: 609, table: '1', note: Pigeonite with olivine}
+    sample:
+      initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: Whole-rock oxide composition is not printed}}
+      form: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: "Paper describes this precursor generally, but does not state this individual run's charge form"}}
+    conditions:
+      temperature_K: {state: {tag: value, value: {kind: point, point: '1423.15'}}, locator: {page: 9, published_page: 609, table: '1', note: Printed 1150°C; K = °C + 273.15}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 9, published_page: 609, table: '1', note: Printed 1 bar; converted with 1 bar = 100000 Pa}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+    fO2_control:
+      channel: {tag: value, value: intrinsic}
+      buffer: {state: {tag: value, value: Metallic Fe capsule; redox conditions reported to closely match natural-rock crystallization}, locator: {page: 2, published_page: 602, section: Experimental}}
+    thermal_schedule:
+      method: {state: {tag: value, value: Quench-equilibration experiment}, locator: {page: 2, published_page: 602, section: Experimental}}
+      total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {page: 8, published_page: 608, section: Experimental, note: Most runs at ≥1100°C used 1–6 h; no run-specific assignment}}
+  - experiment_id: green1971-12021-pigeonite-1140-1bar
+    series: Apollo 12 12021, 1 bar
+    bench_id: green1971-metallic-fe-capsules
+    method: quench_equilibration
+    locator: {page: 9, published_page: 609, table: '1', note: Pigeonite without olivine}
+    sample:
+      initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: Whole-rock oxide composition is not printed}}
+      form: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: "Paper describes this precursor generally, but does not state this individual run's charge form"}}
+    conditions:
+      temperature_K: {state: {tag: value, value: {kind: point, point: '1413.15'}}, locator: {page: 9, published_page: 609, table: '1', note: Printed 1140°C; K = °C + 273.15}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 9, published_page: 609, table: '1', note: Printed 1 bar; converted with 1 bar = 100000 Pa}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+    fO2_control:
+      channel: {tag: value, value: intrinsic}
+      buffer: {state: {tag: value, value: Metallic Fe capsule; redox conditions reported to closely match natural-rock crystallization}, locator: {page: 2, published_page: 602, section: Experimental}}
+    thermal_schedule:
+      method: {state: {tag: value, value: Quench-equilibration experiment}, locator: {page: 2, published_page: 602, section: Experimental}}
+      total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {page: 8, published_page: 608, section: Experimental, note: Most runs at ≥1100°C used 1–6 h; no run-specific assignment}}
+  - experiment_id: green1971-12022-first-pyroxene-1150-1atm
+    series: Apollo 12 12022, 1 atmosphere
+    bench_id: green1971-metallic-fe-capsules
+    method: quench_equilibration
+    locator: {page: 10, published_page: 610, paragraph: Results, note: First pyroxene result; with olivine}
+    sample:
+      initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: Whole-rock oxide composition is not printed}}
+      form: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: "Paper describes this precursor generally, but does not state this individual run's charge form"}}
+    conditions:
+      temperature_K: {state: {tag: value, value: {kind: point, point: '1423.15'}}, locator: {page: 10, published_page: 610, paragraph: Results, note: Printed 1150°C; K = °C + 273.15}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '101325'}}, locator: {page: 10, published_page: 610, paragraph: Results, note: Printed 1 atmosphere; converted with 1 atm = 101325 Pa}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+    fO2_control:
+      channel: {tag: value, value: intrinsic}
+      buffer: {state: {tag: value, value: Metallic Fe capsule; redox conditions reported to closely match natural-rock crystallization}, locator: {page: 2, published_page: 602, section: Experimental}}
+    thermal_schedule:
+      method: {state: {tag: value, value: Quench-equilibration experiment}, locator: {page: 2, published_page: 602, section: Experimental}}
+      total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {page: 8, published_page: 608, section: Experimental, note: Most runs at ≥1100°C used 1–6 h; no run-specific assignment}}
+  - experiment_id: green1971-12009-pyroxene-5kb-1280
+    series: Apollo 12 12009, high pressure
+    bench_id: green1971-metallic-fe-capsules
+    method: quench_equilibration
+    locator: {page: 9, published_page: 609, paragraph: Results}
+    sample:
+      initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: Whole-rock oxide composition is not printed}}
+      form: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: "Paper describes this precursor generally, but does not state this individual run's charge form"}}
+    conditions:
+      temperature_K: {state: {tag: value, value: {kind: point, point: '1553.15'}}, locator: {page: 9, published_page: 609, paragraph: Results, note: Printed 1280°C; K = °C + 273.15}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '500000000'}}, locator: {page: 9, published_page: 609, paragraph: Results, note: Printed 5 kb; converted with 1 kb = 100000000 Pa}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+    fO2_control:
+      channel: {tag: value, value: intrinsic}
+      buffer: {state: {tag: value, value: Metallic Fe capsule; redox conditions reported to closely match natural-rock crystallization}, locator: {page: 2, published_page: 602, section: Experimental}}
+    thermal_schedule:
+      method: {state: {tag: value, value: Quench-equilibration experiment}, locator: {page: 2, published_page: 602, section: Experimental}}
+      total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {page: 8, published_page: 608, section: Experimental, note: Most runs at ≥1100°C used 1–6 h; no run-specific assignment}}
+  - experiment_id: green1971-12009-pyroxene-10kb-1300
+    series: Apollo 12 12009, high pressure
+    bench_id: green1971-metallic-fe-capsules
+    method: quench_equilibration
+    locator: {page: 9, published_page: 609, paragraph: Results}
+    sample:
+      initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: Whole-rock oxide composition is not printed}}
+      form: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: "Paper describes this precursor generally, but does not state this individual run's charge form"}}
+    conditions:
+      temperature_K: {state: {tag: value, value: {kind: point, point: '1573.15'}}, locator: {page: 9, published_page: 609, paragraph: Results, note: Printed 1300°C; K = °C + 273.15}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '1000000000'}}, locator: {page: 9, published_page: 609, paragraph: Results, note: Printed 10 kb; converted with 1 kb = 100000000 Pa}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+    fO2_control:
+      channel: {tag: value, value: intrinsic}
+      buffer: {state: {tag: value, value: Metallic Fe capsule; redox conditions reported to closely match natural-rock crystallization}, locator: {page: 2, published_page: 602, section: Experimental}}
+    thermal_schedule:
+      method: {state: {tag: value, value: Quench-equilibration experiment}, locator: {page: 2, published_page: 602, section: Experimental}}
+      total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {page: 8, published_page: 608, section: Experimental, note: Most runs at ≥1100°C used 1–6 h; no run-specific assignment}}
+  - experiment_id: green1971-12009-pyroxene-15kb-1390
+    series: Apollo 12 12009, high pressure
+    bench_id: green1971-metallic-fe-capsules
+    method: quench_equilibration
+    locator: {page: 9, published_page: 609, table: '1', note: Near-liquidus clinopyroxene analysis}
+    sample:
+      initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: Whole-rock oxide composition is not printed}}
+      form: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: "Paper describes this precursor generally, but does not state this individual run's charge form"}}
+    conditions:
+      temperature_K: {state: {tag: value, value: {kind: point, point: '1663.15'}}, locator: {page: 9, published_page: 609, table: '1', note: Printed 1390°C; K = °C + 273.15}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '1500000000'}}, locator: {page: 9, published_page: 609, table: '1', note: Printed 15 kb; converted with 1 kb = 100000000 Pa}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+    fO2_control:
+      channel: {tag: value, value: intrinsic}
+      buffer: {state: {tag: value, value: Metallic Fe capsule; redox conditions reported to closely match natural-rock crystallization}, locator: {page: 2, published_page: 602, section: Experimental}}
+    thermal_schedule:
+      method: {state: {tag: value, value: Quench-equilibration experiment}, locator: {page: 2, published_page: 602, section: Experimental}}
+      total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {page: 8, published_page: 608, section: Experimental, note: Most runs at ≥1100°C used 1–6 h; no run-specific assignment}}
+  - experiment_id: green1971-12009-pyroxene-9kb-1310
+    series: Apollo 12 12009, high pressure
+    bench_id: green1971-metallic-fe-capsules
+    method: quench_equilibration
+    locator: {page: 12, published_page: 612, paragraph: Results}
+    sample:
+      initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: Whole-rock oxide composition is not printed}}
+      form: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: "Paper describes this precursor generally, but does not state this individual run's charge form"}}
+    conditions:
+      temperature_K: {state: {tag: value, value: {kind: point, point: '1583.15'}}, locator: {page: 12, published_page: 612, paragraph: Results, note: Printed 1310°C; K = °C + 273.15}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '900000000'}}, locator: {page: 12, published_page: 612, paragraph: Results, note: Printed 9 kb; converted with 1 kb = 100000000 Pa}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+    fO2_control:
+      channel: {tag: value, value: intrinsic}
+      buffer: {state: {tag: value, value: Metallic Fe capsule; redox conditions reported to closely match natural-rock crystallization}, locator: {page: 2, published_page: 602, section: Experimental}}
+    thermal_schedule:
+      method: {state: {tag: value, value: Quench-equilibration experiment}, locator: {page: 2, published_page: 602, section: Experimental}}
+      total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {page: 8, published_page: 608, section: Experimental, note: Most runs at ≥1100°C used 1–6 h; no run-specific assignment}}
+  - experiment_id: green1971-12022-pyroxene-5kb-1280
+    series: Apollo 12 12022, high pressure
+    bench_id: green1971-metallic-fe-capsules
+    method: quench_equilibration
+    locator: {page: 10, published_page: 610, paragraph: Results}
+    sample:
+      initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: Whole-rock oxide composition is not printed}}
+      form: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: "Paper describes this precursor generally, but does not state this individual run's charge form"}}
+    conditions:
+      temperature_K: {state: {tag: value, value: {kind: point, point: '1553.15'}}, locator: {page: 10, published_page: 610, paragraph: Results, note: Printed 1280°C; K = °C + 273.15}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '500000000'}}, locator: {page: 10, published_page: 610, paragraph: Results, note: Printed 5 kb; converted with 1 kb = 100000000 Pa}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+    fO2_control:
+      channel: {tag: value, value: intrinsic}
+      buffer: {state: {tag: value, value: Metallic Fe capsule; redox conditions reported to closely match natural-rock crystallization}, locator: {page: 2, published_page: 602, section: Experimental}}
+    thermal_schedule:
+      method: {state: {tag: value, value: Quench-equilibration experiment}, locator: {page: 2, published_page: 602, section: Experimental}}
+      total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {page: 8, published_page: 608, section: Experimental, note: Most runs at ≥1100°C used 1–6 h; no run-specific assignment}}
+  - experiment_id: green1971-12022-pyroxene-13kb-1360
+    series: Apollo 12 12022, high pressure
+    bench_id: green1971-metallic-fe-capsules
+    method: quench_equilibration
+    locator: {page: 10, published_page: 610, paragraph: Results}
+    sample:
+      initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: Whole-rock oxide composition is not printed}}
+      form: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: "Paper describes this precursor generally, but does not state this individual run's charge form"}}
+    conditions:
+      temperature_K: {state: {tag: value, value: {kind: point, point: '1633.15'}}, locator: {page: 10, published_page: 610, paragraph: Results, note: Printed 1360°C; K = °C + 273.15}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '1300000000'}}, locator: {page: 10, published_page: 610, paragraph: Results, note: Printed 13 kb; converted with 1 kb = 100000000 Pa}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+    fO2_control:
+      channel: {tag: value, value: intrinsic}
+      buffer: {state: {tag: value, value: Metallic Fe capsule; redox conditions reported to closely match natural-rock crystallization}, locator: {page: 2, published_page: 602, section: Experimental}}
+    thermal_schedule:
+      method: {state: {tag: value, value: Quench-equilibration experiment}, locator: {page: 2, published_page: 602, section: Experimental}}
+      total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {page: 8, published_page: 608, section: Experimental, note: Most runs at ≥1100°C used 1–6 h; no run-specific assignment}}
+  - experiment_id: green1971-12022-pyroxene-15kb-1370
+    series: Apollo 12 12022, high pressure
+    bench_id: green1971-metallic-fe-capsules
+    method: quench_equilibration
+    locator: {page: 10, published_page: 610, paragraph: Results, note: No olivine}
+    sample:
+      initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: Whole-rock oxide composition is not printed}}
+      form: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: "Paper describes this precursor generally, but does not state this individual run's charge form"}}
+    conditions:
+      temperature_K: {state: {tag: value, value: {kind: point, point: '1643.15'}}, locator: {page: 10, published_page: 610, paragraph: Results, note: Printed 1370°C; K = °C + 273.15}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '1500000000'}}, locator: {page: 10, published_page: 610, paragraph: Results, note: Printed 15 kb; converted with 1 kb = 100000000 Pa}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+    fO2_control:
+      channel: {tag: value, value: intrinsic}
+      buffer: {state: {tag: value, value: Metallic Fe capsule; redox conditions reported to closely match natural-rock crystallization}, locator: {page: 2, published_page: 602, section: Experimental}}
+    thermal_schedule:
+      method: {state: {tag: value, value: Quench-equilibration experiment}, locator: {page: 2, published_page: 602, section: Experimental}}
+      total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {page: 8, published_page: 608, section: Experimental, note: Most runs at ≥1100°C used 1–6 h; no run-specific assignment}}
+  - experiment_id: green1971-synthetic-12009-ol75-15kb-1440
+    series: Synthetic 90.9% basalt 12009 + 9.1% olivine Fo75, 15 kb
+    bench_id: green1971-metallic-fe-capsules
+    method: quench_equilibration
+    locator: {page: 10, published_page: 610, paragraph: Results}
+    sample:
+      initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 10, published_page: 610, paragraph: Results, note: Stated component percentages are transcribed in context; a chemical Composition cannot be formed because component basis and full oxide analyses are not printed}}
+      form: {state: {tag: value, value: 'Prepared mixture: 90.9% Apollo 12 basalt 12009 plus 9.1% olivine Fo75'}, locator: {page: 10, published_page: 610, paragraph: Results}}
+    conditions:
+      temperature_K: {state: {tag: value, value: {kind: point, point: '1713.15'}}, locator: {page: 10, published_page: 610, paragraph: Results, note: Printed 1440 ± 10°C; K = °C + 273.15}}
+      temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '10'}}, locator: {page: 10, published_page: 610, paragraph: Results, note: Printed ±10°C; temperature interval uncertainty is ±10 K}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '1500000000'}}, locator: {page: 10, published_page: 610, paragraph: Results, note: Printed 15 kb; converted with 1 kb = 100000000 Pa}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+    fO2_control:
+      channel: {tag: value, value: intrinsic}
+      buffer: {state: {tag: value, value: Metallic Fe capsule; redox conditions reported to closely match natural-rock crystallization}, locator: {page: 2, published_page: 602, section: Experimental}}
+    thermal_schedule:
+      method: {state: {tag: value, value: Quench-equilibration experiment}, locator: {page: 2, published_page: 602, section: Experimental}}
+      total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {page: 8, published_page: 608, section: Experimental, note: Most runs at ≥1100°C used 1–6 h; no run-specific assignment}}
+  - experiment_id: green1971-12040-opx-15kb-1460
+    series: Apollo 12 12040, high pressure
+    bench_id: green1971-metallic-fe-capsules
+    method: quench_equilibration
+    locator: {page: 9, published_page: 609, table: '1'}
+    sample:
+      initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: Whole-rock oxide composition is not printed}}
+      form: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: "Paper describes this precursor generally, but does not state this individual run's charge form"}}
+    conditions:
+      temperature_K: {state: {tag: value, value: {kind: point, point: '1733.15'}}, locator: {page: 9, published_page: 609, table: '1', note: Printed 1460°C; K = °C + 273.15}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '1500000000'}}, locator: {page: 9, published_page: 609, table: '1', note: Printed 15 kb; converted with 1 kb = 100000000 Pa}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+    fO2_control:
+      channel: {tag: value, value: intrinsic}
+      buffer: {state: {tag: value, value: Metallic Fe capsule; redox conditions reported to closely match natural-rock crystallization}, locator: {page: 2, published_page: 602, section: Experimental}}
+    thermal_schedule:
+      method: {state: {tag: value, value: Quench-equilibration experiment}, locator: {page: 2, published_page: 602, section: Experimental}}
+      total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {page: 8, published_page: 608, section: Experimental, note: Most runs at ≥1100°C used 1–6 h; no run-specific assignment}}
+  - experiment_id: green1971-12040-opx-20kb-1480
+    series: Apollo 12 12040, high pressure
+    bench_id: green1971-metallic-fe-capsules
+    method: quench_equilibration
+    locator: {page: 9, published_page: 609, table: '1'}
+    sample:
+      initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: Whole-rock oxide composition is not printed}}
+      form: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: "Paper describes this precursor generally, but does not state this individual run's charge form"}}
+    conditions:
+      temperature_K: {state: {tag: value, value: {kind: point, point: '1753.15'}}, locator: {page: 9, published_page: 609, table: '1', note: Printed 1480°C; K = °C + 273.15}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '2000000000'}}, locator: {page: 9, published_page: 609, table: '1', note: Printed 20 kb; converted with 1 kb = 100000000 Pa}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+    fO2_control:
+      channel: {tag: value, value: intrinsic}
+      buffer: {state: {tag: value, value: Metallic Fe capsule; redox conditions reported to closely match natural-rock crystallization}, locator: {page: 2, published_page: 602, section: Experimental}}
+    thermal_schedule:
+      method: {state: {tag: value, value: Quench-equilibration experiment}, locator: {page: 2, published_page: 602, section: Experimental}}
+      total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {page: 8, published_page: 608, section: Experimental, note: Most runs at ≥1100°C used 1–6 h; no run-specific assignment}}
+  - experiment_id: green1971-12009-spinel-1190-1bar
+    series: Apollo 12 12009, 1 bar
+    bench_id: green1971-metallic-fe-capsules
+    method: quench_equilibration
+    locator: {page: 9, published_page: 609, table: '1'}
+    sample:
+      initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: Whole-rock oxide composition is not printed}}
+      form: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: "Paper describes this precursor generally, but does not state this individual run's charge form"}}
+    conditions:
+      temperature_K: {state: {tag: value, value: {kind: point, point: '1463.15'}}, locator: {page: 9, published_page: 609, table: '1', note: Printed 1190°C; K = °C + 273.15}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 9, published_page: 609, table: '1', note: Printed 1 bar; converted with 1 bar = 100000 Pa}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+    thermal_schedule:
+      total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {page: 8, published_page: 608, section: Experimental, note: Most runs at ≥1100°C used 1–6 h; no run-specific assignment}}
+  - experiment_id: green1971-12009-spinel-1150-1bar
+    series: Apollo 12 12009, 1 bar
+    bench_id: green1971-metallic-fe-capsules
+    method: quench_equilibration
+    locator: {page: 9, published_page: 609, table: '1'}
+    sample:
+      initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: Whole-rock oxide composition is not printed}}
+      form: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: "Paper describes this precursor generally, but does not state this individual run's charge form"}}
+    conditions:
+      temperature_K: {state: {tag: value, value: {kind: point, point: '1423.15'}}, locator: {page: 9, published_page: 609, table: '1', note: Printed 1150°C; K = °C + 273.15}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 9, published_page: 609, table: '1', note: Printed 1 bar; converted with 1 bar = 100000 Pa}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+    thermal_schedule:
+      total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {page: 8, published_page: 608, section: Experimental, note: Most runs at ≥1100°C used 1–6 h; no run-specific assignment}}
+  - experiment_id: green1971-12065-one-atm-series
+    series: Apollo 12 rock 12065 one-atmosphere crystallization summary
+    bench_id: green1971-metallic-fe-capsules
+    method: quench_equilibration
+    locator: {page: 5, published_page: 605, paragraph: Results}
+    sample:
+      initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: Whole-rock oxide composition is not printed}}
+      form: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: "Paper describes this precursor generally, but does not state this individual run's charge form"}}
+    conditions:
+      temperature_K: {state: {tag: unknown, reason: not_published}, locator: {page: 5, published_page: 605, paragraph: Results, note: Registry represents a sequence across multiple temperatures}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '101325'}}, locator: {page: 5, published_page: 605, paragraph: Results, note: Printed 1 atmosphere; converted with 1 atm = 101325 Pa}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+    fO2_control:
+      channel: {tag: value, value: buffer}
+      buffer: {state: {tag: value, value: In equilibrium with metallic iron; metallic Fe capsules used}, locator: {page: 4, published_page: 604, figure: '2', note: Capsule description is on p. 2 / printed p. 602}}
+    thermal_schedule:
+      total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {page: 8, published_page: 608, section: Experimental, note: Most runs at ≥1100°C used 1–6 h; run assignments absent}}
+  - experiment_id: green1971-12022-one-atm-prose-series
+    series: Apollo 12 rock 12022 one-atmosphere prose results
+    bench_id: green1971-metallic-fe-capsules
+    method: quench_equilibration
+    locator: {page: 6, published_page: 606, paragraph: Results}
+    sample:
+      initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: Whole-rock oxide composition is not printed}}
+      form: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: "Paper describes this precursor generally, but does not state this individual run's charge form"}}
+    conditions:
+      temperature_K: {state: {tag: unknown, reason: not_published}, locator: {page: 6, published_page: 606, paragraph: Results, note: Registry represents a sequence across multiple temperatures}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '101325'}}, locator: {page: 6, published_page: 606, paragraph: Results, note: Section is explicitly for 1 atmosphere; converted with 1 atm = 101325 Pa}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+    fO2_control:
+      channel: {tag: value, value: buffer}
+      buffer: {state: {tag: value, value: Metallic Fe capsules; one-atmosphere Figure 2 caption states equilibrium with metallic iron}, locator: {page: 2, published_page: 602, section: Experimental}}
+    thermal_schedule:
+      total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {page: 8, published_page: 608, section: Experimental, note: Most runs at ≥1100°C used 1–6 h; run assignments absent}}
+  - experiment_id: green1971-12022-one-bar-figure-series
+    series: Apollo 12 rock 12022 Figure 2 one-bar crystallization diagram
+    bench_id: green1971-metallic-fe-capsules
+    method: quench_equilibration
+    locator: {page: 4, published_page: 604, figure: '2'}
+    sample:
+      initial_composition: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: Whole-rock oxide composition is not printed}}
+      form: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental, note: "Paper describes this precursor generally, but does not state this individual run's charge form"}}
+    conditions:
+      temperature_K: {state: {tag: unknown, reason: not_published}, locator: {page: 4, published_page: 604, figure: '2', note: Registry represents a sequence across multiple temperatures}}
+    pressure_environment:
+      total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '100000'}}, locator: {page: 4, published_page: 604, figure: '2', note: Figure title says 1 bar; converted with 1 bar = 100000 Pa}}
+      sweep_gas: {state: {tag: unknown, reason: not_published}, locator: {page: 2, published_page: 602, section: Experimental}}
+      regime: {regime_class: {tag: unknown, reason: not_published}}
+    fO2_control:
+      channel: {tag: value, value: buffer}
+      buffer: {state: {tag: value, value: In equilibrium with metallic iron}, locator: {page: 4, published_page: 604, figure: '2'}}
+species:
+  Apollo12_12065:
+    observations:
+      - observation_id: green1971_12065_liquidus
+        type: transition_point
+        experiment: green1971-12065-one-atm-series
+        locator: {page: 5, published_page: 605, paragraph: Results}
+        units: K
+        values: {method_class: measured_direct, property_kind: liquidus, temperature_K: 1453.15, temperature_C_as_printed: 1180, pressure_as_printed: 1 atmosphere, pressure_basis_Pa: 101325}
+      - observation_id: green1971_12065_plagioclase_in
+        type: transition_point
+        experiment: green1971-12065-one-atm-series
+        locator: {page: 5, published_page: 605, paragraph: Results}
+        units: K
+        values: {method_class: measured_direct, property_kind: phase_appearance, temperature_K: 1403.15, temperature_C_as_printed: 1130, pressure_as_printed: 1 atmosphere, pressure_basis_Pa: 101325}
+      - observation_id: green1971_12065_olivine_reacts_out
+        type: transition_point
+        experiment: green1971-12065-one-atm-series
+        locator: {page: 5, published_page: 605, paragraph: Results}
+        units: K
+        values: {method_class: measured_direct, property_kind: phase_disappearance, temperature_K: 1423.15, temperature_C_as_printed: 1150, pressure_as_printed: 1 atmosphere, pressure_basis_Pa: 101325}
+    context:
+      - observation_id: green1971_12065_liquidus_assemblage
+        type: experiment_series
+        locator: {page: 5, published_page: 605, paragraph: Results}
+        units: as printed
+        values:
+          run_products: olivine + pigeonite + spinel are reported together on the liquidus at 1180°C.
+          method_class: measured_direct
+          limitation: No bracketing runs or uncertainty are stated.
+      - observation_id: green1971_12065_starting_material_absence
+        type: composition
+        locator: {page: 2, published_page: 602, section: Experimental}
+        units: oxide wt% as a whole-rock analysis
+        values:
+          initial_composition: {state: {tag: unknown, reason: not_published}}
+          Na2O_as_printed: {state: {tag: unknown, reason: not_published}}
+          K2O_as_printed: {state: {tag: unknown, reason: not_published}}
+          solidus: {state: {tag: unknown, reason: not_published}}
+          alkali_or_iron_loss_statement: {state: {tag: unknown, reason: not_published}}
+  Apollo12_12022:
+    observations:
+      - observation_id: green1971_12022_liquidus_figure_read
+        type: transition_point
+        experiment: green1971-12022-one-bar-figure-series
+        locator: {page: 4, published_page: 604, figure: '2', note: "Visual reading from Figure 2; the 1280–1290°C interval reflects reading precision, not plotted grid spacing"}
+        units: K
+        uncertainty: No experimental uncertainty is stated; the 1280–1290°C visual reading interval expresses the Figure 2 reading precision.
+        values: {method_class: figure_only, quantity: transition_temperature, property_kind: liquidus, range: [1553.15, 1563.15], temperature_C_visual_read: [1280, 1290], pressure_as_printed: 1 bar, pressure_basis_Pa: 100000}
+      - observation_id: green1971_12022_pigeonite_in
+        type: transition_point
+        experiment: green1971-12022-one-atm-prose-series
+        locator: {page: 6, published_page: 606, paragraph: Results}
+        units: K
+        values: {method_class: measured_direct, property_kind: phase_appearance, temperature_K: 1423.15, temperature_C_as_printed: 1150, pressure_as_printed: 1 atmosphere, pressure_basis_Pa: 101325}
+      - observation_id: green1971_12022_ilmenite_plagioclase_in
+        type: transition_point
+        experiment: green1971-12022-one-atm-prose-series
+        locator: {page: 6, published_page: 606, paragraph: Results}
+        units: K
+        values: {method_class: measured_direct, property_kind: phase_appearance, temperature_K: 1403.15, temperature_C_as_printed: 1130, pressure_as_printed: 1 atmosphere, pressure_basis_Pa: 101325}
+    context:
+      - observation_id: green1971_12022_phase_sequence
+        type: experiment_series
+        locator: {page: 6, published_page: 606, paragraph: Results}
+        units: °C
+        values:
+          run_products: Olivine Fo77 is the stated liquidus phase; pigeonite appears at about 1150°C; ilmenite and plagioclase appear a little lower, at 1130°C.
+          method_class: measured_direct
+          caveat: Liquidus temperature is not stated in prose; Figure 2 visual read is stored separately as figure_only.
+      - observation_id: green1971_12022_starting_material_absence
+        type: composition
+        locator: {page: 2, published_page: 602, section: Experimental}
+        units: oxide wt% as a whole-rock analysis
+        values:
+          initial_composition: {state: {tag: unknown, reason: not_published}}
+          Na2O_as_printed: {state: {tag: unknown, reason: not_published}}
+          K2O_as_printed: {state: {tag: unknown, reason: not_published}}
+          solidus: {state: {tag: unknown, reason: not_published}}
+          alkali_or_iron_loss_statement: {state: {tag: unknown, reason: not_published}}
+  Apollo12_tables_and_runs:
+    observations: []
+    context:
+      - observation_id: green1971_table1_phase_analyses
+        type: composition
+        locator: {page: 9, published_page: 609, table: '1'}
+        units: oxide wt% as tabulated; basis is not stated
+        values:
+          method_class: measured_tabulated
+          note: These are natural mineral analyses and experimental phase analyses, not whole-rock starting-material compositions.
+          rows:
+            - {analysis: 12009_natural_most_Mg_rich_olivine, rock: '12009', phase: olivine, sample: natural rock, composition_wt_pct: {SiO2: '38.26', TiO2: '0.0', Al2O3: '0.0', FeO: '22.00', MnO: '0.18', MgO: '38.07', CaO: '0.21', Cr2O3: '0.57', V2O3: '—'}}
+            - {analysis: 12009_run_olivine_1230C_1bar, rock: '12009', phase: olivine, sample: experimental run, temperature_C: 1230, pressure: 1 bar, composition_wt_pct: {SiO2: '38.70', TiO2: '<0.03', Al2O3: '<0.03', FeO: '21.89', MnO: '0.20', MgO: '38.13', CaO: '0.31', Cr2O3: '0.54', V2O3: '—'}}
+            - {analysis: 12009_natural_most_magnesian_spinel, rock: '12009', phase: spinel, sample: natural rock, composition_wt_pct: {SiO2: '0.09', TiO2: '4.61', Al2O3: '12.14', FeO: '25.56', MnO: '0.40', MgO: '7.27', CaO: '0.13', Cr2O3: '48.88', V2O3: '1.02'}}
+            - {analysis: 12009_run_spinel_1190C_1bar, rock: '12009', phase: spinel, sample: experimental run, temperature_C: 1190, pressure: 1 bar, composition_wt_pct: {SiO2: '0.20', TiO2: '3.80', Al2O3: '12.24', FeO: '27.62', MnO: '0.40', MgO: '8.38', CaO: '0.27', Cr2O3: '45.46', V2O3: '1.02'}}
+            - {analysis: 12009_run_spinel_1150C_1bar, rock: '12009', phase: spinel, sample: experimental run, temperature_C: 1150, pressure: 1 bar, composition_wt_pct: {SiO2: '0.16', TiO2: '5.84', Al2O3: '12.32', FeO: '28.20', MnO: '0.40', MgO: '6.98', CaO: '0.23', Cr2O3: '44.26', V2O3: '0.93'}}
+            - {analysis: 12021_natural_most_Mg_rich_pigeonite_core, rock: '12021', phase: pigeonite, sample: natural rock, composition_wt_pct: {SiO2: '52.85', TiO2: '0.66', Al2O3: '1.59', FeO: '17.92', MnO: '0.31', MgO: '21.78', CaO: '4.45', Cr2O3: '0.84', Na2O: '0.0'}}
+            - {analysis: 12021_run_pigeonite_1150C_1bar_with_olivine, rock: '12021', phase: pigeonite, sample: experimental run, temperature_C: 1150, pressure: 1 bar, coexisting: olivine, composition_wt_pct: {SiO2: '52.32', TiO2: '0.79', Al2O3: '1.10', FeO: '17.10', MnO: '0.30', MgO: '22.62', CaO: '4.55', Cr2O3: '0.75', Na2O: '0.06'}}
+            - {analysis: 12021_run_pigeonite_1140C_1bar_without_olivine, rock: '12021', phase: pigeonite, sample: experimental run, temperature_C: 1140, pressure: 1 bar, coexisting: no olivine, composition_wt_pct: {SiO2: '52.39', TiO2: '0.96', Al2O3: '1.20', FeO: '20.00', MnO: '0.38', MgO: '19.56', CaO: '4.85', Cr2O3: '0.69', Na2O: '0.05'}}
+            - {analysis: 12009_run_clinopyroxene_15kb_1390C, rock: '12009', phase: clinopyroxene, sample: experimental near-liquidus run, temperature_C: 1390, pressure: 15 kb, composition_wt_pct: {SiO2: '51.70', TiO2: '0.84', Al2O3: '4.06', FeO: '15.83', MnO: '0.29', MgO: '19.69', CaO: '7.19', Cr2O3: '1.04', Na2O: '0.11'}}
+            - {analysis: 12009_plus_10pct_olivine_run_orthopyroxene_15kb_1440C, rock: 12009 + 10% olivine Fo75, phase: orthopyroxene, sample: experimental run, temperature_C: 1440, pressure: 15 kb, coexisting: olivine Fo75, composition_wt_pct: {SiO2: '54.03', TiO2: '0.34', Al2O3: '2.30', FeO: '12.96', MnO: '0.29', MgO: '27.69', CaO: '2.02', Cr2O3: '0.78', Na2O: '0.06'}}
+            - {analysis: 12040_run_orthopyroxene_15kb_1460C, rock: '12040', phase: orthopyroxene, sample: experimental run, temperature_C: 1460, pressure: 15 kb, coexisting: olivine Fo78, composition_wt_pct: {SiO2: '55.35', TiO2: '0.40', Al2O3: '2.14', FeO: '11.73', MnO: '0.13', MgO: '28.17', CaO: '1.76', Cr2O3: '0.66', Na2O: '0.00'}}
+            - {analysis: 12040_run_orthopyroxene_20kb_1480C, rock: '12040', phase: orthopyroxene, sample: experimental run, temperature_C: 1480, pressure: 20 kb, coexisting: clinopyroxene, composition_wt_pct: {SiO2: '55.12', TiO2: '0.48', Al2O3: '2.06', FeO: '13.14', MnO: '0.16', MgO: '26.22', CaO: '2.34', Cr2O3: '0.95', Na2O: '0.00'}}
+      - observation_id: green1971_table2_partition_coefficients
+        type: experiment_series
+        locator: {page: 14, published_page: 614, table: '2'}
+        units: dimensionless crystal/liquid partition coefficient
+        values:
+          note: Primarily Apollo 11 basalt and synthetic diopside-whitlockite runs; no Apollo 12 starting whole-rock analyses.
+          rows:
+            - {system: Apollo 11 basalt, element: Eu2+, phase: plagioclase, K_as_printed: '1.20 ± 0.10', method_class: measured_tabulated}
+            - {system: Apollo 11 basalt + 25% additional normative anorthite, element: Eu2+, phase: plagioclase, K_as_printed: '1.00 ± 0.10', method_class: quoted_attributed, attribution: Ringwood (1970)}
+            - {system: Apollo 11 basalt + 25% additional normative anorthite, element: Sr2+, phase: plagioclase, K_as_printed: '1.50 ± 0.10', method_class: quoted_attributed, attribution: Ringwood (1970)}
+            - {system: Apollo 11 basalt, element: Eu2+, phase: augite (16% CaO), K_as_printed: '0.10 ± 0.04', method_class: measured_tabulated, conditions: 'liquidus phase at 1250°C, 10 kb'}
+            - {system: Apollo 11 basalt, element: Gd3+, phase: augite (16% CaO), K_as_printed: '0.17 ± 0.05', method_class: measured_tabulated, conditions: 'liquidus phase at 1250°C, 10 kb'}
+            - {system: Apollo 11 basalt, element: Gd3+, phase: augite (19% CaO-liquid), K_as_printed: '0.35 ± 0.11', method_class: measured_tabulated, conditions: 'near-liquidus, atmospheric pressure'}
+            - {system: Apollo 11 basalt, element: 'Gd3+, Eu2+', phase: olivine, K_as_printed: '<0.02', method_class: measured_tabulated, conditions: 'near-liquidus, atmospheric pressure'}
+            - {system: Apollo 11 basalt, element: Eu2+, phase: armalcolite, K_as_printed: '0.11 ± 0.05', method_class: measured_tabulated, conditions: 'near-liquidus, atmospheric pressure'}
+            - {system: Apollo 11 basalt, element: Gd3+, phase: armalcolite, K_as_printed: '0.05 ± 0.03', method_class: measured_tabulated, conditions: 'near-liquidus, atmospheric pressure'}
+            - {system: D60 W40, element: Gd3+, phase: diopside, K_as_printed: '0.06 ± 0.04', method_class: measured_tabulated, conditions: 'near-eutectic, 1280°C, atmospheric pressure'}
+            - {system: D60 W40, element: Gd3+, phase: whitlockite, K_as_printed: '3.44 ± 0.18', method_class: measured_tabulated, conditions: 'near-eutectic, 1280°C, atmospheric pressure'}
+            - {system: D60 W40, element: Sr2+, phase: diopside, K_as_printed: '0.09 ± 0.05', method_class: measured_tabulated, conditions: 'near-eutectic, 1280°C, atmospheric pressure'}
+            - {system: D60 W40, element: Sr2+, phase: whitlockite, K_as_printed: '1.00 ± 0.10', method_class: measured_tabulated, conditions: 'near-eutectic, 1280°C, atmospheric pressure'}
+            - {system: D60 W40 + 2% Al2O3, element: Gd3+, phase: diopside, K_as_printed: '0.16 ± 0.05', method_class: measured_tabulated, conditions: '1260°C, atmospheric pressure'}
+            - {system: D60 W40 + 2% Al2O3, element: Gd3+, phase: whitlockite, K_as_printed: '3.67 ± 0.19', method_class: measured_tabulated, conditions: '1260°C, atmospheric pressure'}
+            - {system: D60 W40 + 2% Al2O3, element: Sr2+, phase: diopside, K_as_printed: '0.08 ± 0.05', method_class: measured_tabulated, conditions: '1260°C, atmospheric pressure'}
+            - {system: D60 W40 + 2% Al2O3, element: Sr2+, phase: whitlockite, K_as_printed: '1.00 ± 0.10', method_class: measured_tabulated, conditions: '1260°C, atmospheric pressure'}
+      - observation_id: green1971_other_rock_bulk_compositions_absent
+        type: composition
+        locator: {page: 2, published_page: 602, section: Experimental, note: "Table 1 reports mineral analyses, not starting whole-rock compositions"}
+        units: oxide wt% as a whole-rock starting analysis
+        values:
+          rows:
+            - {rock: '12009', initial_composition: {state: {tag: unknown, reason: not_published}}, Na2O: {state: {tag: unknown, reason: not_published}}, K2O: {state: {tag: unknown, reason: not_published}}}
+            - {rock: '12021', initial_composition: {state: {tag: unknown, reason: not_published}}, Na2O: {state: {tag: unknown, reason: not_published}}, K2O: {state: {tag: unknown, reason: not_published}}}
+            - {rock: '12040', initial_composition: {state: {tag: unknown, reason: not_published}}, Na2O: {state: {tag: unknown, reason: not_published}}, K2O: {state: {tag: unknown, reason: not_published}}}
+          alkali_or_iron_loss_statement: {state: {tag: unknown, reason: not_published}}
+      - observation_id: green1971_explicit_run_results_and_higher_pressure_summaries
+        type: experiment_series
+        locator: {page: 8, published_page: 608, section: Results}
+        units: K with printed °C retained; pressure and composition units as printed
+        values:
+          note: Partial transcription of selected run-result and pressure-summary rows from prose and Table 1, not a complete transcription of every stated result. Temperature conversion is K = °C + 273.15. Other stated results not separately registered include 12040 clinopyroxene at 5 kb and 1280°C and modified-basalt clinopyroxene at 1420°C (p. 610), experimental conditions in Table 2, and the 7–8 kb, 1200°C subsolidus reaction (p. 602). The source does not provide a complete run table; individual duration assignments and full run assemblages are absent.
+          run_products:
+            - {record_id: '12009_olivine_1230C_1bar', rock_or_system: '12009', record_kind: reported_run_result, temperature_C_as_printed: 1230, temperature_K: 1503.15, pressure_as_printed: '1 bar', phase_or_result: olivine, composition_as_printed: 'Table 1 phase analysis', coexisting_phases_or_note: 'run at 1230°C; Table 1 column 2', locator: 'PDF p. 9 / printed p. 609', method_class: measured_tabulated}
+            - {record_id: '12009_spinel_1190C_1bar', rock_or_system: '12009', record_kind: reported_run_result, temperature_C_as_printed: 1190, temperature_K: 1463.15, pressure_as_printed: '1 bar', phase_or_result: spinel, composition_as_printed: 'Table 1 phase analysis', coexisting_phases_or_note: 'spinel at 1190°C; Table 1 column 4', locator: 'PDF p. 9 / printed p. 609', method_class: measured_tabulated}
+            - {record_id: '12009_spinel_1150C_1bar', rock_or_system: '12009', record_kind: reported_run_result, temperature_C_as_printed: 1150, temperature_K: 1423.15, pressure_as_printed: '1 bar', phase_or_result: spinel, composition_as_printed: 'Table 1 phase analysis', coexisting_phases_or_note: 'spinel at 1150°C; Table 1 column 5', locator: 'PDF p. 9 / printed p. 609', method_class: measured_tabulated}
+            - {record_id: '12021_pigeonite_1150C_1bar', rock_or_system: '12021', record_kind: reported_run_result, temperature_C_as_printed: 1150, temperature_K: 1423.15, pressure_as_printed: '1 bar', phase_or_result: pigeonite, composition_as_printed: 'Table 1 phase analysis', coexisting_phases_or_note: 'accompanied by olivine; Table 1 column 2', locator: 'PDF p. 9 / printed p. 609', method_class: measured_tabulated}
+            - {record_id: '12021_pigeonite_1140C_1bar', rock_or_system: '12021', record_kind: reported_run_result, temperature_C_as_printed: 1140, temperature_K: 1413.15, pressure_as_printed: '1 bar', phase_or_result: pigeonite, composition_as_printed: 'Table 1 phase analysis', coexisting_phases_or_note: 'not accompanied by olivine; Table 1 column 3', locator: 'PDF p. 9 / printed p. 609', method_class: measured_tabulated}
+            - {record_id: '12009_pyroxene_5kb_1280C', rock_or_system: '12009', record_kind: reported_run_result, temperature_C_as_printed: 1280, temperature_K: 1553.15, pressure_as_printed: '5 kb', phase_or_result: near-liquidus pyroxene, composition_as_printed: '2.5% CaO; 1.8% Al2O3; Ca5.0Mg73.5Fe21.6', coexisting_phases_or_note: near-liquidus phase, locator: 'PDF p. 9 / printed p. 609', method_class: measured_direct}
+            - {record_id: '12009_pyroxene_10kb_1300C', rock_or_system: '12009', record_kind: reported_run_result, temperature_C_as_printed: 1300, temperature_K: 1573.15, pressure_as_printed: '10 kb', phase_or_result: liquidus pyroxene, composition_as_printed: '4.2% CaO; 2.3% Al2O3; Ca8.7Mg67.5Fe23.8', coexisting_phases_or_note: liquidus phase, locator: 'PDF p. 9 / printed p. 609', method_class: measured_direct}
+            - {record_id: '12009_pyroxene_15kb_1390C', rock_or_system: '12009', record_kind: reported_run_result, temperature_C_as_printed: 1390, temperature_K: 1663.15, pressure_as_printed: '15 kb', phase_or_result: liquidus pyroxene, composition_as_printed: '7.2% CaO; 4.1% Al2O3; Ca15.3Mg58.4Fe26.4', coexisting_phases_or_note: 'near-liquidus run; Table 1 clinopyroxene analysis', locator: 'PDF p. 9 / printed p. 609', method_class: measured_direct}
+            - {record_id: '12009_plus_10pct_olivine_15kb', rock_or_system: '12009 + olivine', record_kind: reported_run_result, temperature_C_as_printed: 1440, temperature_K: 1713.15, temperature_uncertainty_K: 10, pressure_as_printed: '15 kb', phase_or_result: 'olivine Fo74.5 + orthopyroxene on liquidus', composition_as_printed: '90.9% basalt 12009 + 9.1% olivine Fo75; orthopyroxene 2.0% CaO, 2.3% Al2O3, Ca4.0Mg76.0Fe20', coexisting_phases_or_note: 'clinopyroxene joined at 1420°C', locator: 'PDF p. 10 / printed p. 610', method_class: measured_direct}
+            - {record_id: '12040_orthopyroxene_15kb_1460C', rock_or_system: '12040', record_kind: reported_run_result, temperature_C_as_printed: 1460, temperature_K: 1733.15, pressure_as_printed: '15 kb', phase_or_result: orthopyroxene, composition_as_printed: 'Table 1 phase analysis', coexisting_phases_or_note: 'coexists with olivine Fo78; Table 1 column 3', locator: 'PDF p. 9 / printed p. 609', method_class: measured_tabulated}
+            - {record_id: '12040_orthopyroxene_20kb_1480C', rock_or_system: '12040', record_kind: reported_run_result, temperature_C_as_printed: 1480, temperature_K: 1753.15, pressure_as_printed: '20 kb', phase_or_result: orthopyroxene, composition_as_printed: 'Table 1 phase analysis', coexisting_phases_or_note: 'coexists with clinopyroxene; Table 1 column 4', locator: 'PDF p. 9 / printed p. 609', method_class: measured_tabulated}
+            - {record_id: '12022_first_pyroxene_1bar', rock_or_system: '12022', record_kind: reported_run_result, temperature_C_as_printed: 1150, temperature_K: 1423.15, pressure_as_printed: '1 atmosphere', phase_or_result: pigeonite, composition_as_printed: '3.7% CaO; 1.7% Al2O3; Ca7.8Mg72.3Fe19.9', coexisting_phases_or_note: with olivine, locator: 'PDF p. 10 / printed p. 610', method_class: measured_direct}
+            - {record_id: '12022_first_pyroxene_5kb', rock_or_system: '12022', record_kind: reported_run_result, temperature_C_as_printed: 1280, temperature_K: 1553.15, pressure_as_printed: '5 kb', phase_or_result: pigeonite, composition_as_printed: '2.9% CaO; 1.2% Al2O3; Ca6.0Mg73.1Fe20.9', coexisting_phases_or_note: with olivine, locator: 'PDF p. 10 / printed p. 610', method_class: measured_direct}
+            - {record_id: '12022_first_pyroxene_13kb', rock_or_system: '12022', record_kind: reported_run_result, temperature_C_as_printed: 1360, temperature_K: 1633.15, pressure_as_printed: '13 kb', phase_or_result: pigeonite, composition_as_printed: '4.5% CaO; 3.7% Al2O3; Ca9.1Mg69.1Fe21.8', coexisting_phases_or_note: with olivine, locator: 'PDF p. 10 / printed p. 610', method_class: measured_direct}
+            - {record_id: '12022_first_pyroxene_15kb', rock_or_system: '12022', record_kind: reported_run_result, temperature_C_as_printed: 1370, temperature_K: 1643.15, pressure_as_printed: '15 kb', phase_or_result: pigeonite, composition_as_printed: '6.5% CaO; 6.2% Al2O3; Ca13.7Mg63.4Fe22.9', coexisting_phases_or_note: no olivine, locator: 'PDF p. 10 / printed p. 610', method_class: measured_direct}
+            - {record_id: '12009_liquidus_pyroxene_9kb_1310C', rock_or_system: '12009', record_kind: reported_run_result, temperature_C_as_printed: 1310, temperature_K: 1583.15, pressure_as_printed: '9 kb', phase_or_result: pigeonitic pyroxene, composition_as_printed: '4.66% CaO; 2.61% Al2O3; 100Mg/(Mg + Fe) = 75', coexisting_phases_or_note: pyroxene alone on liquidus, locator: 'PDF p. 12 / printed p. 612', method_class: measured_direct}
+            - {record_id: '12065_olivine_liquidus_limit', rock_or_system: '12065', record_kind: pressure_boundary_summary, phase_or_result: olivine on liquidus only at pressures ≤2 kb, coexisting_phases_or_note: slightly greater than 2 kb is where olivine disappears, locator: 'PDF p. 8 / printed p. 608', method_class: measured_direct}
+            - {record_id: '12009_olivine_liquidus_limit', rock_or_system: '12009', record_kind: pressure_boundary_summary, pressure_as_printed: '7–9 kb', phase_or_result: olivine disappears from liquidus, coexisting_phases_or_note: boundary reported between 7 and 9 kb, locator: 'PDF p. 8 / printed p. 608', method_class: measured_direct}
+            - {record_id: '12022_olivine_liquidus_limit', rock_or_system: '12022', record_kind: pressure_boundary_summary, pressure_as_printed: '14–15 kb', phase_or_result: olivine disappears from liquidus, coexisting_phases_or_note: boundary reported between 14 and 15 kb, locator: 'PDF p. 8 / printed p. 608', method_class: measured_direct}
+            - {record_id: '12040_olivine_liquidus_limit', rock_or_system: '12040', record_kind: pressure_boundary_summary, pressure_as_printed: '20–25 kb', phase_or_result: olivine disappears from liquidus, coexisting_phases_or_note: boundary reported between 20 and 25 kb, locator: 'PDF p. 8 / printed p. 608', method_class: measured_direct}
+            - {record_id: '12040_liquidus_at_25kb', rock_or_system: '12040', record_kind: pressure_boundary_summary, pressure_as_printed: '25 kb', phase_or_result: 'orthopyroxene becomes liquidus; olivine absent; clinopyroxene is second phase', coexisting_phases_or_note: temperature not stated for this phase summary, locator: 'PDF p. 10 / printed p. 610', method_class: measured_direct}
+            - {record_id: '12065_high_pressure_liquidus', rock_or_system: '12065', record_kind: pressure_boundary_summary, pressure_as_printed: '>2 kb', phase_or_result: pigeonitic pyroxene becomes liquidus, composition_as_printed: '3–4% CaO; 1–2% Al2O3', coexisting_phases_or_note: temperature not stated for this phase summary, locator: 'PDF p. 12 / printed p. 612', method_class: measured_direct}
+            - {record_id: '12021_high_pressure_liquidus', rock_or_system: '12021', record_kind: pressure_boundary_summary, pressure_as_printed: '>2 kb', phase_or_result: pigeonitic pyroxene becomes liquidus, composition_as_printed: '5–6% CaO; 3% Al2O3', coexisting_phases_or_note: temperature not stated for this phase summary, locator: 'PDF p. 12 / printed p. 612', method_class: measured_direct}
+            - {record_id: '12040_opx_liquidus_interval', rock_or_system: '12040', record_kind: pressure_boundary_summary, pressure_as_printed: '12–20 kb', phase_or_result: 'orthopyroxene joins olivine on or near liquidus; clinopyroxene appears at lower temperatures', coexisting_phases_or_note: temperature not stated for this phase summary, locator: 'PDF p. 10 / printed p. 610', method_class: measured_direct}
+            - {record_id: '12065_liquidus_1atm', rock_or_system: '12065', record_kind: crystallization_sequence_summary, temperature_C_as_printed: 1180, temperature_K: 1453.15, pressure_as_printed: '1 atmosphere', phase_or_result: 'olivine + pigeonite + spinel', coexisting_phases_or_note: all three phases reported together on liquidus; no uncertainty or bracketing run pair stated, locator: 'PDF p. 5 / printed p. 605', method_class: measured_direct}
+            - {record_id: '12065_olivine_reacts_out_1atm', rock_or_system: '12065', record_kind: crystallization_sequence_summary, temperature_C_as_printed: 1150, temperature_K: 1423.15, pressure_as_printed: '1 atmosphere', phase_or_result: olivine disappears by reaction, coexisting_phases_or_note: equilibrium maintained, locator: 'PDF p. 5 / printed p. 605', method_class: measured_direct}
+            - {record_id: '12065_plagioclase_in_1atm', rock_or_system: '12065', record_kind: crystallization_sequence_summary, temperature_C_as_printed: 1130, temperature_K: 1403.15, pressure_as_printed: '1 atmosphere', phase_or_result: plagioclase appears, coexisting_phases_or_note: no uncertainty or bracketing run pair stated, locator: 'PDF p. 5 / printed p. 605', method_class: measured_direct}
+            - {record_id: '12022_pigeonite_in_1atm', rock_or_system: '12022', record_kind: crystallization_sequence_summary, temperature_C_as_printed: 1150, temperature_K: 1423.15, pressure_as_printed: '1 atmosphere', phase_or_result: pigeonite, coexisting_phases_or_note: 'about 1150°C; liquidus olivine Fo77 is only visually read from Figure 2 at 1280–1290°C', locator: 'PDF p. 6 / printed p. 606', method_class: measured_direct}
+            - {record_id: '12022_ilmenite_and_plagioclase_in_1atm', rock_or_system: '12022', record_kind: crystallization_sequence_summary, temperature_C_as_printed: 1130, temperature_K: 1403.15, pressure_as_printed: '1 atmosphere', phase_or_result: 'ilmenite + plagioclase', coexisting_phases_or_note: a little below pigeonite-in, locator: 'PDF p. 6 / printed p. 606', method_class: measured_direct}
+            - {record_id: '12021_liquidus_1atm', rock_or_system: '12021', record_kind: crystallization_sequence_summary, temperature_C_as_printed: 1155, temperature_K: 1428.15, pressure_as_printed: '1 atmosphere', phase_or_result: 'olivine + pigeonite + spinel', coexisting_phases_or_note: reported together on liquidus; olivine is consumed by about 1140°C, locator: 'PDF p. 6 / printed p. 606', method_class: measured_direct}
+            - {record_id: '12021_olivine_out_1atm', rock_or_system: '12021', record_kind: crystallization_sequence_summary, temperature_C_as_printed: 1140, temperature_K: 1413.15, temperature_approximate: true, pressure_as_printed: '1 atmosphere', phase_or_result: olivine consumed by reaction, coexisting_phases_or_note: about 1140°C, locator: 'PDF p. 6 / printed p. 606', method_class: measured_direct}
+            - {record_id: '12040_liquidus_1bar', rock_or_system: '12040', record_kind: crystallization_sequence_summary, temperature_C_as_printed: 1400, temperature_K: 1673.15, pressure_as_printed: '1 bar', phase_or_result: olivine Fo82, coexisting_phases_or_note: 'spinel second; pigeonite third at 1190°C; plagioclase near 1140°C; ilmenite about 1100°C', locator: 'PDF pp. 3–4 / printed pp. 603–604', method_class: measured_direct}
+            - {record_id: '12040_pigeonite_in_1bar', rock_or_system: '12040', record_kind: crystallization_sequence_summary, temperature_C_as_printed: 1190, temperature_K: 1463.15, pressure_as_printed: '1 bar', phase_or_result: pigeonite, coexisting_phases_or_note: third phase after olivine and spinel, locator: 'PDF pp. 3–4 / printed pp. 603–604', method_class: measured_direct}
+            - {record_id: '12040_plagioclase_in_1bar', rock_or_system: '12040', record_kind: crystallization_sequence_summary, temperature_C_as_printed: 1140, temperature_K: 1413.15, temperature_approximate: true, pressure_as_printed: '1 bar', phase_or_result: plagioclase, coexisting_phases_or_note: near 1140°C, locator: 'PDF pp. 3–4 / printed pp. 603–604', method_class: measured_direct}
+            - {record_id: '12040_ilmenite_in_1bar', rock_or_system: '12040', record_kind: crystallization_sequence_summary, temperature_C_as_printed: 1100, temperature_K: 1373.15, temperature_approximate: true, pressure_as_printed: '1 bar', phase_or_result: ilmenite, coexisting_phases_or_note: about 1100°C, locator: 'PDF pp. 3–4 / printed pp. 603–604', method_class: measured_direct}
+      - observation_id: green1971_table2_run_footnotes
+        type: method
+        locator: {page: 14, published_page: 614, table: '2', note: Table 2 footnote and adjacent methods description}
+        units: as printed
+        values:
+          dopants: 1% Eu2O3, Gd2O3 or SrO plus Gd2O3
+          container_and_redox: sealed Fe capsules, pre-reduced before melting
+          probe: electron probe microanalyzer
+          redox_note: Phosphate-present runs partly reduced phosphate; P dissolved in Fe and the redox conditions changed, oxidizing Eu2+ to Eu3+.
+          synthetic_system: D60 W40 denotes diopside CaMgSi2O6 and whitlockite Ca3(PO4)2.
+      - observation_id: green1971_figure1_transcribed_labels
+        type: experiment_series
+        locator: {page: 3, published_page: 603, figure: '1'}
+        units: as printed
+        values:
+          figure_title: Experimental crystallization of 12040 and 12009 under subsolidus conditions at high pressure; also high-pressure melting-interval crystallization data.
+          axes: {pressure: 0–35 kb, temperature: 1000–1600°C}
+          legend: {X: olivine, plus: orthopyroxene, open_circle: clinopyroxene, diamond: spinel, open_square: plagioclase}
+          phase_fields: [Px + Ol + Ilm ± Sp, Px + Ga + Ol + Ilm, Ol + Px + Pl + Ilm, Px + Rt ± Ilm, Px + Ga + Ilm + Rt]
+          caption_boundaries: Low-pressure plagioclase-bearing boundary partly determined by unpublished olivine solid-solution + anorthite reaction data; other subsolidus boundary marks first garnet appearance.
+          method_class: figure_only
+          digitization_limit: Individual plotted marker coordinates are not transcribed; overlapping symbols and unlabelled points prevent unambiguous run-by-run assignment.
+      - observation_id: green1971_figure2_caption_and_visual_estimates
+        type: experiment_series
+        locator: {page: 4, published_page: 604, figure: '2'}
+        units: as printed
+        values:
+          title: Experimental crystallization sequence at 1 bar pressure.
+          redox_condition: Figure caption says Apollo 12 rocks are at 1 atm in equilibrium with metallic iron.
+          shading: Width of shaded mineral fields visually estimates crystallized phase amount.
+          method_class: figure_only
+      - observation_id: green1971_duration_and_starting_material
+        type: method
+        locator: {page: 2, published_page: 602, section: Experimental, note: Duration qualification on PDF p. 8 / printed p. 608}
+        units: as printed
+        values:
+          melting_charge: Most runs above the solidus used glass prepared by melting 0.3–0.5 g powdered, homogenized lunar sample.
+          starting_material_alternatives: Oxide-mix glasses also used for some melting experiments on 12009, 12040 and 12021 and subsolidus work on 12040/12009; no differences from natural-rock glasses were detected.
+          reversal_material: Reversal experiments used glass and previously crystallized fine-grained glass containing olivine + pyroxene + plagioclase.
+          duration: Most runs at T ≥1100°C lasted 1–6 h; run-specific duration assignments are not stated.
+          container: Metallic Fe capsules.
+          fO2: Authors state redox conditions closely match Apollo 12 natural-rock crystallization, supported by matching Cr, V and Ni in olivine/spinel.
+          method: quench_equilibration
+          source_starting_material_composition: {state: {tag: unknown, reason: not_published}}

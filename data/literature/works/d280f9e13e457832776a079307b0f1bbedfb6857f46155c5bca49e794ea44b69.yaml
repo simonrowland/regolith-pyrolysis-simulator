@@ -1,0 +1,2695 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  citation: Zaitsev, A. I. (2000). "Knudsen Cell Mass Spectrometry of Slags and Silicates." Proc. VI International Conference
+    on Molten Slags, Fluxes and Salts (Stockholm-Helsinki, 2000), paper 045, 20 pp.
+  source_ids:
+  - zaitsev-2000-ms2000-045
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: unknown:zaitsev-2000-ms2000-045
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::alf-mass-spectrum-table2
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '2'
+    form:
+      state:
+        tag: value
+        value: CaF2-Al2O3-CaO samples and three-phase fields used for aluminium fluoride line assignment.
+      locator:
+        published_page: 13
+        pdf_page_index: 12
+        section: Assignment of the mass spectra lines
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '2'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '2'
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '2'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '2'
+    note: Experimentally reduced intensities across 1600, 1650, 1723, and 1773 K; composition and cell material are not mapped
+      to rows.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '2'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 20
+          pdf_page_index: 19
+          table: '2'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 20
+          pdf_page_index: 19
+          table: '2'
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Mass-spectrometer sensitivity calibrated from reference-substance vapour pressure; double-cell comparisons
+            use sample/reference ion-current ratios with ionisation cross-section correction.
+        locator:
+          published_page: 3
+          pdf_page_index: 2
+          section: Experimental arrangement
+      reference_substance:
+        state:
+          tag: value
+          value: Sample-dependent choice among Fe, Ag, Ni, Cu, SrF2; this run assignment is not stated.
+        locator:
+          published_page: 2
+          pdf_page_index: 1
+          section: Experimental arrangement
+  bench_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::bench::zaitsev-mi1201v
+- experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::figure2-x0349-ni
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 two-phase region; x(SiO2)=0.349
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  locator:
+    published_page: 17
+    pdf_page_index: 16
+    figure: '2'
+    note: Figure-only Na2O Gibbs-energy curve; x(SiO2)=0.349; Ni cell; orifice 2.12e-4 m.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Ni effusion cell; no separate liner stated.
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.000212'
+            approximate: false
+        locator:
+          published_page: 17
+          pdf_page_index: 16
+          figure: '2'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 17
+          pdf_page_index: 16
+          figure: '2'
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Mass-spectrometer sensitivity calibrated from reference-substance vapour pressure; double-cell comparisons
+            use sample/reference ion-current ratios with ionisation cross-section correction.
+        locator:
+          published_page: 3
+          pdf_page_index: 2
+          section: Experimental arrangement
+      reference_substance:
+        state:
+          tag: value
+          value: Sample-dependent choice among Fe, Ag, Ni, Cu, SrF2; this run assignment is not stated.
+        locator:
+          published_page: 2
+          pdf_page_index: 1
+          section: Experimental arrangement
+  bench_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::bench::zaitsev-mi1201v
+- experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::figure2-x0360-mo
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 two-phase region; x(SiO2)=0.360
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  locator:
+    published_page: 17
+    pdf_page_index: 16
+    figure: '2'
+    note: Figure-only Na2O Gibbs-energy curve; x(SiO2)=0.360; Mo cell; orifice 2.48e-4 m.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Mo effusion cell; no separate liner stated.
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.000248'
+            approximate: false
+        locator:
+          published_page: 17
+          pdf_page_index: 16
+          figure: '2'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 17
+          pdf_page_index: 16
+          figure: '2'
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Mass-spectrometer sensitivity calibrated from reference-substance vapour pressure; double-cell comparisons
+            use sample/reference ion-current ratios with ionisation cross-section correction.
+        locator:
+          published_page: 3
+          pdf_page_index: 2
+          section: Experimental arrangement
+      reference_substance:
+        state:
+          tag: value
+          value: Sample-dependent choice among Fe, Ag, Ni, Cu, SrF2; this run assignment is not stated.
+        locator:
+          published_page: 2
+          pdf_page_index: 1
+          section: Experimental arrangement
+  bench_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::bench::zaitsev-mi1201v
+- experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::figure2-x0382-nb
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 two-phase region; x(SiO2)=0.382
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  locator:
+    published_page: 17
+    pdf_page_index: 16
+    figure: '2'
+    note: Figure-only Na2O Gibbs-energy curve; x(SiO2)=0.382; Nb cell; orifice 2.09e-4 m.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Nb effusion cell; no separate liner stated.
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.000209'
+            approximate: false
+        locator:
+          published_page: 17
+          pdf_page_index: 16
+          figure: '2'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 17
+          pdf_page_index: 16
+          figure: '2'
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Mass-spectrometer sensitivity calibrated from reference-substance vapour pressure; double-cell comparisons
+            use sample/reference ion-current ratios with ionisation cross-section correction.
+        locator:
+          published_page: 3
+          pdf_page_index: 2
+          section: Experimental arrangement
+      reference_substance:
+        state:
+          tag: value
+          value: Sample-dependent choice among Fe, Ag, Ni, Cu, SrF2; this run assignment is not stated.
+        locator:
+          published_page: 2
+          pdf_page_index: 1
+          section: Experimental arrangement
+  bench_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::bench::zaitsev-mi1201v
+- experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::figure2-x0382-ta
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 two-phase region; x(SiO2)=0.382
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  locator:
+    published_page: 17
+    pdf_page_index: 16
+    figure: '2'
+    note: Figure-only Na2O Gibbs-energy curve; x(SiO2)=0.382; Ta cell; orifice 3.14e-4 m.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Ta effusion cell; no separate liner stated.
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.000314'
+            approximate: false
+        locator:
+          published_page: 17
+          pdf_page_index: 16
+          figure: '2'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 17
+          pdf_page_index: 16
+          figure: '2'
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Mass-spectrometer sensitivity calibrated from reference-substance vapour pressure; double-cell comparisons
+            use sample/reference ion-current ratios with ionisation cross-section correction.
+        locator:
+          published_page: 3
+          pdf_page_index: 2
+          section: Experimental arrangement
+      reference_substance:
+        state:
+          tag: value
+          value: Sample-dependent choice among Fe, Ag, Ni, Cu, SrF2; this run assignment is not stated.
+        locator:
+          published_page: 2
+          pdf_page_index: 1
+          section: Experimental arrangement
+  bench_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::bench::zaitsev-mi1201v
+- experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::figure2-x0405-mo
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 two-phase region; x(SiO2)=0.405
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  locator:
+    published_page: 17
+    pdf_page_index: 16
+    figure: '2'
+    note: Figure-only Na2O Gibbs-energy curve; x(SiO2)=0.405; Mo cell; orifice 3.51e-4 m.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Mo effusion cell; no separate liner stated.
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.000351'
+            approximate: false
+        locator:
+          published_page: 17
+          pdf_page_index: 16
+          figure: '2'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 17
+          pdf_page_index: 16
+          figure: '2'
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Mass-spectrometer sensitivity calibrated from reference-substance vapour pressure; double-cell comparisons
+            use sample/reference ion-current ratios with ionisation cross-section correction.
+        locator:
+          published_page: 3
+          pdf_page_index: 2
+          section: Experimental arrangement
+      reference_substance:
+        state:
+          tag: value
+          value: Sample-dependent choice among Fe, Ag, Ni, Cu, SrF2; this run assignment is not stated.
+        locator:
+          published_page: 2
+          pdf_page_index: 1
+          section: Experimental arrangement
+  bench_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::bench::zaitsev-mi1201v
+- experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::figure2-x0430-ta
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 two-phase region; x(SiO2)=0.430
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  locator:
+    published_page: 17
+    pdf_page_index: 16
+    figure: '2'
+    note: Figure-only Na2O Gibbs-energy curve; x(SiO2)=0.430; Ta cell; orifice 2.03e-4 m.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Ta effusion cell; no separate liner stated.
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.000203'
+            approximate: false
+        locator:
+          published_page: 17
+          pdf_page_index: 16
+          figure: '2'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 17
+          pdf_page_index: 16
+          figure: '2'
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Mass-spectrometer sensitivity calibrated from reference-substance vapour pressure; double-cell comparisons
+            use sample/reference ion-current ratios with ionisation cross-section correction.
+        locator:
+          published_page: 3
+          pdf_page_index: 2
+          section: Experimental arrangement
+      reference_substance:
+        state:
+          tag: value
+          value: Sample-dependent choice among Fe, Ag, Ni, Cu, SrF2; this run assignment is not stated.
+        locator:
+          published_page: 2
+          pdf_page_index: 1
+          section: Experimental arrangement
+  bench_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::bench::zaitsev-mi1201v
+- experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::figure2-x0450-mo
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 two-phase region; x(SiO2)=0,450 as printed
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  locator:
+    published_page: 17
+    pdf_page_index: 16
+    figure: '2'
+    note: Figure-only Na2O Gibbs-energy curve; x(SiO2)=0,450; Mo cell; orifice 2.07e-4 m.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Mo effusion cell; no separate liner stated.
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.000207'
+            approximate: false
+        locator:
+          published_page: 17
+          pdf_page_index: 16
+          figure: '2'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 17
+          pdf_page_index: 16
+          figure: '2'
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Mass-spectrometer sensitivity calibrated from reference-substance vapour pressure; double-cell comparisons
+            use sample/reference ion-current ratios with ionisation cross-section correction.
+        locator:
+          published_page: 3
+          pdf_page_index: 2
+          section: Experimental arrangement
+      reference_substance:
+        state:
+          tag: value
+          value: Sample-dependent choice among Fe, Ag, Ni, Cu, SrF2; this run assignment is not stated.
+        locator:
+          published_page: 2
+          pdf_page_index: 1
+          section: Experimental arrangement
+  bench_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::bench::zaitsev-mi1201v
+- experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::figure2-x0477-nb
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Na2O-SiO2 two-phase region; x(SiO2)=0.477
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  locator:
+    published_page: 17
+    pdf_page_index: 16
+    figure: '2'
+    note: Figure-only Na2O Gibbs-energy curve; x(SiO2)=0.477; Nb cell; orifice 3.11e-4 m.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Nb effusion cell; no separate liner stated.
+      locator:
+        published_page: 17
+        pdf_page_index: 16
+        figure: '2'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.000311'
+            approximate: false
+        locator:
+          published_page: 17
+          pdf_page_index: 16
+          figure: '2'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 17
+          pdf_page_index: 16
+          figure: '2'
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Mass-spectrometer sensitivity calibrated from reference-substance vapour pressure; double-cell comparisons
+            use sample/reference ion-current ratios with ionisation cross-section correction.
+        locator:
+          published_page: 3
+          pdf_page_index: 2
+          section: Experimental arrangement
+      reference_substance:
+        state:
+          tag: value
+          value: Sample-dependent choice among Fe, Ag, Ni, Cu, SrF2; this run assignment is not stated.
+        locator:
+          published_page: 2
+          pdf_page_index: 1
+          section: Experimental arrangement
+  bench_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::bench::zaitsev-mi1201v
+- experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::figure3-nb-1
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_initial_mole_fractions
+          components:
+          - - CaF2
+            - '0.303'
+          - - SiO2
+            - '0.242'
+          - - Al2O3
+            - '0.147'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 18
+        pdf_page_index: 17
+        figure: '3'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673'
+          approximate: false
+      locator:
+        published_page: 18
+        pdf_page_index: 17
+        figure: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 18
+        pdf_page_index: 17
+        figure: '3'
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 18
+        pdf_page_index: 17
+        figure: '3'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  locator:
+    published_page: 18
+    pdf_page_index: 17
+    figure: '3'
+    note: Figure-only isothermal curve at 1673 K; initial x(CaF2)=0.303, x(SiO2)=0.242, x(Al2O3)=0.147; Nb cell; orifice 2.08e-4
+      m.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Nb effusion cell; no separate liner stated.
+      locator:
+        published_page: 18
+        pdf_page_index: 17
+        figure: '3'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.000208'
+            approximate: false
+        locator:
+          published_page: 18
+          pdf_page_index: 17
+          figure: '3'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 18
+          pdf_page_index: 17
+          figure: '3'
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Mass-spectrometer sensitivity calibrated from reference-substance vapour pressure; double-cell comparisons
+            use sample/reference ion-current ratios with ionisation cross-section correction.
+        locator:
+          published_page: 3
+          pdf_page_index: 2
+          section: Experimental arrangement
+      reference_substance:
+        state:
+          tag: value
+          value: Sample-dependent choice among Fe, Ag, Ni, Cu, SrF2; this run assignment is not stated.
+        locator:
+          published_page: 2
+          pdf_page_index: 1
+          section: Experimental arrangement
+  bench_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::bench::zaitsev-mi1201v
+- experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::figure3-nb-2
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_initial_mole_fractions
+          components:
+          - - CaF2
+            - '0.303'
+          - - SiO2
+            - '0.242'
+          - - Al2O3
+            - '0.147'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 18
+        pdf_page_index: 17
+        figure: '3'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673'
+          approximate: false
+      locator:
+        published_page: 18
+        pdf_page_index: 17
+        figure: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 18
+        pdf_page_index: 17
+        figure: '3'
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 18
+        pdf_page_index: 17
+        figure: '3'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  locator:
+    published_page: 18
+    pdf_page_index: 17
+    figure: '3'
+    note: Figure-only isothermal curve at 1673 K; initial x(CaF2)=0.303, x(SiO2)=0.242, x(Al2O3)=0.147; Nb cell; orifice 3.32e-4
+      m.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Nb effusion cell; no separate liner stated.
+      locator:
+        published_page: 18
+        pdf_page_index: 17
+        figure: '3'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.000332'
+            approximate: false
+        locator:
+          published_page: 18
+          pdf_page_index: 17
+          figure: '3'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 18
+          pdf_page_index: 17
+          figure: '3'
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Mass-spectrometer sensitivity calibrated from reference-substance vapour pressure; double-cell comparisons
+            use sample/reference ion-current ratios with ionisation cross-section correction.
+        locator:
+          published_page: 3
+          pdf_page_index: 2
+          section: Experimental arrangement
+      reference_substance:
+        state:
+          tag: value
+          value: Sample-dependent choice among Fe, Ag, Ni, Cu, SrF2; this run assignment is not stated.
+        locator:
+          published_page: 2
+          pdf_page_index: 1
+          section: Experimental arrangement
+  bench_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::bench::zaitsev-mi1201v
+- experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::figure4-filled
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_initial_mole_fractions
+          components:
+          - - CaF2
+            - '0.171'
+          - - SiO2
+            - '0.391'
+          - - Al2O3
+            - '0.096'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 19
+        pdf_page_index: 18
+        figure: '4'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1473'
+          approximate: false
+      locator:
+        published_page: 19
+        pdf_page_index: 18
+        figure: '4'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 19
+        pdf_page_index: 18
+        figure: '4'
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 19
+        pdf_page_index: 18
+        figure: '4'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  locator:
+    published_page: 19
+    pdf_page_index: 18
+    figure: '4'
+    note: Figure-only isothermal curve at 1473 K; filled symbols; initial x(CaF2)=0.171, x(SiO2)=0.391, x(Al2O3)=0.096; Mo
+      cell; orifice 4.09e-4 m.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Mo effusion cell; no separate liner stated.
+      locator:
+        published_page: 19
+        pdf_page_index: 18
+        figure: '4'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.000409'
+            approximate: false
+        locator:
+          published_page: 19
+          pdf_page_index: 18
+          figure: '4'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 19
+          pdf_page_index: 18
+          figure: '4'
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Mass-spectrometer sensitivity calibrated from reference-substance vapour pressure; double-cell comparisons
+            use sample/reference ion-current ratios with ionisation cross-section correction.
+        locator:
+          published_page: 3
+          pdf_page_index: 2
+          section: Experimental arrangement
+      reference_substance:
+        state:
+          tag: value
+          value: Sample-dependent choice among Fe, Ag, Ni, Cu, SrF2; this run assignment is not stated.
+        locator:
+          published_page: 2
+          pdf_page_index: 1
+          section: Experimental arrangement
+  bench_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::bench::zaitsev-mi1201v
+- experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::figure4-open
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_initial_mole_fractions
+          components:
+          - - CaF2
+            - '0.201'
+          - - SiO2
+            - '0.4'
+          - - Al2O3
+            - '0.095'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 19
+        pdf_page_index: 18
+        figure: '4'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1473'
+          approximate: false
+      locator:
+        published_page: 19
+        pdf_page_index: 18
+        figure: '4'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 19
+        pdf_page_index: 18
+        figure: '4'
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 19
+        pdf_page_index: 18
+        figure: '4'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  locator:
+    published_page: 19
+    pdf_page_index: 18
+    figure: '4'
+    note: Figure-only isothermal curve at 1473 K; open symbols; initial x(CaF2)=0.201, x(SiO2)=0.400, x(Al2O3)=0.095; Mo cell;
+      orifice 2.54e-4 m.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Mo effusion cell; no separate liner stated.
+      locator:
+        published_page: 19
+        pdf_page_index: 18
+        figure: '4'
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.000254'
+            approximate: false
+        locator:
+          published_page: 19
+          pdf_page_index: 18
+          figure: '4'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 19
+          pdf_page_index: 18
+          figure: '4'
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Mass-spectrometer sensitivity calibrated from reference-substance vapour pressure; double-cell comparisons
+            use sample/reference ion-current ratios with ionisation cross-section correction.
+        locator:
+          published_page: 3
+          pdf_page_index: 2
+          section: Experimental arrangement
+      reference_substance:
+        state:
+          tag: value
+          value: Sample-dependent choice among Fe, Ag, Ni, Cu, SrF2; this run assignment is not stated.
+        locator:
+          published_page: 2
+          pdf_page_index: 1
+          section: Experimental arrangement
+  bench_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::bench::zaitsev-mi1201v
+- experiment_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::experiment::mnosi2-table1-1773k
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+        note: Eight varying x(SiO2) rows; no single charge composition.
+    form:
+      state:
+        tag: value
+        value: MnO-SiO2 melt
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1773'
+          approximate: false
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 20
+        pdf_page_index: 19
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  locator:
+    published_page: 20
+    pdf_page_index: 19
+    table: '1'
+    note: Table 1 series at 1773 K; Nb and Mo selected for MnO-SiO2, but per-row cell and orifice assignments are not given.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Nb or Mo cell; the paper says both were selected for MnO-SiO2 but does not assign Table 1 rows to a specific
+          cell.
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 20
+          pdf_page_index: 19
+          table: '1'
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 20
+          pdf_page_index: 19
+          table: '1'
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Mass-spectrometer sensitivity calibrated from reference-substance vapour pressure; double-cell comparisons
+            use sample/reference ion-current ratios with ionisation cross-section correction.
+        locator:
+          published_page: 3
+          pdf_page_index: 2
+          section: Experimental arrangement
+      reference_substance:
+        state:
+          tag: value
+          value: Sample-dependent choice among Fe, Ag, Ni, Cu, SrF2; this run assignment is not stated.
+        locator:
+          published_page: 2
+          pdf_page_index: 1
+          section: Experimental arrangement
+  bench_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::bench::zaitsev-mi1201v
+benches:
+- id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69::bench::zaitsev-mi1201v
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: MI-1201V mass spectrometer with Knudsen effusion block
+    locator:
+      published_page: 2
+      pdf_page_index: 1
+      section: Experimental arrangement
+  method:
+    state:
+      tag: value
+      value: Knudsen cell mass spectrometry
+    locator:
+      published_page: 2
+      pdf_page_index: 1
+      section: Experimental arrangement
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Double-compartment vacuum-melted high-purity Ta, Nb, Mo, or Ni cells; no separate liner is described.
+    locator:
+      published_page: 2
+      pdf_page_index: 1
+      section: Experimental arrangement
+  cell_materials:
+  - state:
+      tag: value
+      value: Ta
+    locator:
+      published_page: 2
+      pdf_page_index: 1
+      section: Experimental arrangement
+  - state:
+      tag: value
+      value: Nb
+    locator:
+      published_page: 2
+      pdf_page_index: 1
+      section: Experimental arrangement
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      published_page: 2
+      pdf_page_index: 1
+      section: Experimental arrangement
+  - state:
+      tag: value
+      value: Ni
+    locator:
+      published_page: 2
+      pdf_page_index: 1
+      section: Experimental arrangement
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00014'
+          interval_high: '0.00053'
+          approximate: true
+      locator:
+        published_page: 2
+        pdf_page_index: 1
+        section: Experimental arrangement
+        note: Approximate 0.14–0.53 mm range across experiments; no per-row assignment.
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 1
+        section: Experimental arrangement
+  detector:
+    state:
+      tag: value
+      value: Mass spectrometer; ion currents measured by electrometer amplifier.
+    locator:
+      published_page: 2
+      pdf_page_index: 1
+      section: Experimental arrangement
+  ionization:
+    ionizing_energy_eV:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '50'
+          interval_high: '70'
+          approximate: false
+      locator:
+        published_page: 2
+        pdf_page_index: 1
+        section: Experimental arrangement
+    acceleration_voltage_kV:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3.2'
+          approximate: false
+      locator:
+        published_page: 2
+        pdf_page_index: 1
+        section: Experimental arrangement
+    cross_section_method:
+      state:
+        tag: value
+        value: Molecular cross-section sigma(i) in Eq. (1).
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        section: Experimental arrangement
+    activity_ratio_cross_sections:
+      state:
+        tag: value
+        value: Eq. (11) requires neither ionisation cross-sections nor sensitivity constants.
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Theoretical basis
+    aluminium_fluoride_cross_sections:
+      state:
+        tag: value
+        value: Mann atomic cross-sections combined by the additivity rule for aluminium fluorides.
+      locator:
+        published_page: 12
+        pdf_page_index: 11
+        section: Assignment of the mass spectra lines
+    mann_reference:
+      state:
+        tag: value
+        value: J. B. Mann; reference 19, 1970, p. 814.
+      locator:
+        published_page: 14
+        pdf_page_index: 13
+        section: References
+    cross_section_source_for_all_species:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 1
+        section: Experimental arrangement
+    multiplier_isotope_corrections:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2
+        pdf_page_index: 1
+        section: Experimental arrangement
+  temperature_measurement:
+    sensor:
+      state:
+        tag: value
+        value: Pt-Pt/10% Rh thermocouple; hot junction in thermocouple block below the effusion cell.
+      locator:
+        published_page: 2
+        pdf_page_index: 1
+        section: Experimental arrangement
+  temperature_calibration:
+    calibration_points:
+      state:
+        tag: value
+        value: Melting points of silver, copper, terbium, and CaF2.
+      locator:
+        published_page: 2
+        pdf_page_index: 1
+        section: Experimental arrangement
+  heating_method:
+    state:
+      tag: value
+      value: Tungsten-filament heater wound around niobium furnace shell, insulated by alumina and surrounded by radiation
+        shields.
+    locator:
+      published_page: 2
+      pdf_page_index: 1
+      section: Experimental arrangement
+  other_facts:
+  - name: pressure_calculation
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: p(i)=k times summed ion-current intensities and temperature divided by ionisation cross-section; k
+            is determined from reference-substance vapour pressure. In double cells p(x)=p(s)[sigma(s)I(x)]/[sigma(x)I(s)].
+          approximate: false
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        section: Experimental arrangement
+    unit: as printed
+  - name: cell_diameter_unspecified
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '6'
+          approximate: false
+      locator:
+        published_page: 2
+        pdf_page_index: 1
+        section: Experimental arrangement
+        note: Source does not specify internal or external diameter.
+    unit: mm
+  - name: reference_substances
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Super-high-purity Fe (<10^-6% impurities), Ag (99.99%), Ni (99.98%), Cu (99,999%), or high-purity SrF2;
+            per-run assignment not given.
+          approximate: false
+      locator:
+        published_page: 2
+        pdf_page_index: 1
+        section: Experimental arrangement
+    unit: as printed
+  - name: nonideality_correction
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Correction for non-ideality of effusion holes introduced when necessary.
+          approximate: false
+      locator:
+        published_page: 2
+        pdf_page_index: 1
+        section: Experimental arrangement
+    unit: as printed
+  - name: maximum_temperature_correction
+    value:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: <=
+          bound_value: '8'
+          approximate: false
+      locator:
+        published_page: 2
+        pdf_page_index: 1
+        section: Experimental arrangement
+        note: Maximum correction did not exceed 8 K.
+    unit: K
+  - name: beam_background_separation
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Moving shutter of special configuration separated beam and background signals.
+          approximate: false
+      locator:
+        published_page: 2
+        pdf_page_index: 1
+        section: Experimental arrangement
+    unit: as printed
+context:
+- observation_id: zaitsev_2000_address_page_1
+  type: thermodynamic_example
+  locator:
+    published_page: 1
+    pdf_page_index: 0
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: address
+    address_as_printed: G.V.Kurdumov Institute for Metal Physics and Functional Materials, I.P.Bardin Central Research Institute
+      for Ferrous Metallurgy, 9/23 2nd Baumanskaya St., Moscow 100705, Russia.
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_address_page_1
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_apparatus_qualifiers_page_2
+  type: thermodynamic_example
+  locator:
+    published_page: 2
+    pdf_page_index: 1
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: apparatus_qualifiers
+    quotes:
+    - No creeping of the substance from the effusion hole was observed.
+    - The furnace shell is fastened to a special support by molybdenum screws. To decrease the heat loss, the effusion block
+      is supported on a ceramic pedestal (6).
+    - A slot in the cover of the water-cooled jacket is co-axial with the inlet slot of the ionising chamber through which
+      the molecular beam passes.
+    sweep_gas_status: Not-applicable status in experiment records is an inference from effusion arrangement; the paper does
+      not explicitly deny sweep gas.
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_apparatus_qualifiers_page_2
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_equations_page_10
+  type: thermodynamic_example
+  locator:
+    published_page: 10
+    pdf_page_index: 9
+    section: Printed equations
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: printed_equations_context
+    notation: Plain-text rendering; primes, superscript o, roots, integrals and chemical subscripts named explicitly; no evaluated
+      results.
+    relations:
+      '36': d ln{a(CaO)} = [2x(SiO2)+3x(Al2O3)+x(CaF2)]/y d ln{p(CaF2)} - x(SiO2)/y d ln{p(SiF4)} - 2x(Al2O3)/y d ln{p(AlF3)}
+      '37': d ln{a(Al2O3)} = -3[x(CaF2)+x(CaO)]/y d ln{p(CaF2)} - 3x(SiO2)/y d ln{p(SiF4)} + 2[x(CaO)+2x(SiO2)]/y d ln{p(AlF3)}
+      '38': d ln{a(SiO2)} = -2[x(CaF2)+x(CaO)]/y d ln{p(CaF2)} + [x(CaO)+3x(Al2O3)]/y d ln{p(SiF4)} - 4x(Al2O3)/y d ln{p(AlF3)}
+      unnumbered: y=x(CaO)+2x(SiO2)+3x(Al2O3). Similar equations can use partial pressures of any three vapour species; integrate
+        along isothermal composition-change lines with initial activities from the first method. Assignment handles double/triple
+        lines even without two non-overlapping lines.
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_equations_page_10
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_equations_page_11
+  type: thermodynamic_example
+  locator:
+    published_page: 11
+    pdf_page_index: 10
+    section: Printed equations
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: printed_equations_context
+    notation: Plain-text rendering; primes, superscript o, roots, integrals and chemical subscripts named explicitly; no evaluated
+      results.
+    relations:
+      '39': 2 AlF2(g) = AlF3(g) + AlF(g)
+      40_first: r1=I(AlF2+,AlF3)/I(AlF3+,AlF3); Eq. (40) continues on p. 12.
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_equations_page_11
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_equations_page_12
+  type: thermodynamic_example
+  locator:
+    published_page: 12
+    pdf_page_index: 11
+    section: Printed equations
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: printed_equations_context
+    notation: Plain-text rendering; primes, superscript o, roots, integrals and chemical subscripts named explicitly; no evaluated
+      results.
+    relations:
+      '41':
+      - n=I(AlF+,AlF2)/I(AlF2+,AlF2)
+      - l=I(Al+,AlF2)/I(AlF2+,AlF2)
+      '42':
+      - I(AlF2+,AlF2)=I(AlF2+)-I(AlF2+,AlF3)
+      - I(AlF+,AlF2)=n*[I(AlF2+)-I(AlF2+,AlF3)]
+      - I(Al+,AlF2)=l*[I(AlF2+)-I(AlF2+,AlF3)]
+      '43':
+      - I(AlF+,AlF)=I(AlF+)-n*[I(AlF2+)-I(AlF2+,AlF3)]-I(AlF+,AlF3)
+      - I(Al+,AlF)=I(Al+)-l*[I(AlF2+)-I(AlF2+,AlF3)]-I(Al+,AlF3)
+      '44': p(AlF3)=[kT/sigma(AlF3)]*[I(AlF3+,AlF3)+I(AlF2+,AlF3)+I(AlF+,AlF3)+I(Al+,AlF3)]
+      '45': p(AlF2)=[kT/sigma(AlF2)]*(1+n+l)*[I(AlF2+)-I(AlF2+,AlF3)]
+      '46': p(AlF)=[kT/sigma(AlF)]*{I(AlF+)+I(Al+)-(n+l)*[I(AlF2+)-I(AlF2+,AlF3)]-I(AlF+,AlF3)-I(Al+,AlF3)}
+      '47': K_P(39)=[sigma(AlF2)^2/sigma(AlF3)/sigma(AlF)]*{I(AlF3+,AlF3)+I(AlF2+,AlF3)+I(AlF+,AlF3)+I(Al+,AlF3)}*{I(AlF+)+I(Al+)-(n+l)*[I(AlF2+)-I(AlF2+,AlF3)]-I(AlF+,AlF3)-I(Al,AlF3)}/{(1+n+l)*[I(AlF2+)-I(AlF2+,AlF3)]}^2
+      40_continuation:
+      - r2=I(AlF+,AlF3)/I(AlF3+,AlF3)
+      - r3=I(Al+,AlF3)/I(AlF3+,AlF3)
+      print_note: The last Al current in the numerator of Eq. (47) prints I(Al,AlF3) without a plus. Retained without repair.
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_equations_page_12
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_equations_page_13
+  type: thermodynamic_example
+  locator:
+    published_page: 13
+    pdf_page_index: 12
+    section: Printed equations
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: printed_equations_context
+    notation: Plain-text rendering; primes, superscript o, roots, integrals and chemical subscripts named explicitly; no evaluated
+      results.
+    relations:
+      '48': m=I(AlF+,AlF)/I(Al+,AlF)
+      '49': m = {I(AlF+) - n[I(AlF2+) - I(AlF2+,AlF3)] - I(AlF+,AlF3)}/{I(Al+) - l[I(AlF2+) - I(AlF2+,AlF3)] - I(Al+,AlF3)}
+      print_note: Linear Eq. (49) groups the numerator/denominator as a fraction. The page's square brackets after n and l
+        are not visibly closed; their grouping is interpreted via Eqs. (43)/(48), not a new numerical result. Five unknowns
+        are I(AlF2+,AlF3), I(AlF+,AlF3), I(Al+,AlF3), n, l. Source says five cell materials despite naming only four; no fifth
+        material inferred.
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_equations_page_13
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_equations_page_3
+  type: thermodynamic_example
+  locator:
+    published_page: 3
+    pdf_page_index: 2
+    section: Printed equations
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: printed_equations_context
+    notation: Plain-text rendering; primes, superscript o, roots, integrals and chemical subscripts named explicitly; no evaluated
+      results.
+    relations:
+      '1': p(i) = k (sum_j I(i,j) T)/sigma(i)
+      '2': n MnO(s,l) + Me(s) = MeO_n(g) + n Mn(g)
+      '3': n SiO2(s,l) + Me(s) = MeO_n(g) + n SiO(g)
+      '4':
+      - K_P(2) = p(MeO_n)[p(Mn)]^n/{[a(MnO)]^n a(Me)} = p^o(MeO_n)[p^o(Mn)]^n/a(Me)
+      - K_P(3) = p(MeO_n)[p(SiO)]^n/{[a(SiO2)]^n a(Me)} = p^o(MeO_n)[p^o(SiO)]^n/a(Me)
+      1prime: p(x) = p(s) {sigma(s) I(x)/[sigma(x) I(s)]}
+      unnumbered: Superscript o refers to mixtures with activities of MnO and SiO2 equal to unity; a(Me)=1.
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_equations_page_3
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_equations_page_4
+  type: thermodynamic_example
+  locator:
+    published_page: 4
+    pdf_page_index: 3
+    section: Printed equations
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: printed_equations_context
+    notation: Plain-text rendering; primes, superscript o, roots, integrals and chemical subscripts named explicitly; no evaluated
+      results.
+    relations:
+      '5':
+      - '[a(MnO)]^n = p(MeO_n)[p(Mn)]^n/{p^o(MeO_n)[p^o(Mn)]^n} = I(MeO_n+)[I(Mn+)]^n/{I^o(MeO_n+)[I^o(Mn+)]^n}'
+      - '[a(SiO2)]^n = p(MeO_n)[p(SiO)]^n/{p^o(MeO_n)[p^o(SiO)]^n} = I(MeO_n+)[I(SiO+)]^n/{I^o(MeO_n+)[I^o(SiO+)]^n}'
+      '6': '[a(MnO)/a(SiO2)]^n = [p^o(MeO_n)]prime/p^o(MeO_n) * {p(Mn)p^o(SiO)/[p^o(Mn)p(SiO)]}^n'
+      '7': a(MnO)/a(SiO2) = p(Mn)/p(SiO) * [K_P(3)/K_P(2)]^(1/n) = sigma(SiO)I(Mn+)/[sigma(Mn)I(SiO+)] * [K_P(3)/K_P(2)]^(1/n)
+      '8': See qualifying claim 6 on this page for SiO2(s,l)+Mn(g)=MnO(s,l)+SiO(g).
+      '9': Gprime(MnO) = RT ln[aprime(MnO)/aprime(SiO2)] = RT ln{K_P(8)sigma(SiO)Iprime(Mn+)/[sigma(Mn)Iprime(SiO+)]}
+      '10': Gdoubleprime(MnO) = RT/2 * [2 ln{K_P(8)sigma(SiO)/sigma(Mn)} + ln{Idoubleprime(Mn+)/Idoubleprime(SiO+)} + ln{Iprime(Mn+)/Iprime(SiO+)}]
+      unnumbered:
+      - p^o(MeO_n)=K_P(2)/[p^o(Mn)]^n; [p^o(MeO_n)]prime=K_P(3)/[p^o(SiO)]^n
+      - Primed reductant pressure is over a SiO2-saturated mixture; unprimed over MnO-saturated mixture. For G/I/activity
+        primes and double primes the fields are MnO.SiO2+SiO2 and MnO.SiO2+MnO.2SiO2, respectively.
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_equations_page_4
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_equations_page_5
+  type: thermodynamic_example
+  locator:
+    published_page: 5
+    pdf_page_index: 4
+    section: Printed equations
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: printed_equations_context
+    notation: Plain-text rendering; primes, superscript o, roots, integrals and chemical subscripts named explicitly; no evaluated
+      results.
+    relations:
+      '11': ln a(MnO) = -integral_{x(MnO)=1}^{x(MnO)} x(SiO2) d ln[a(SiO2)/a(MnO)] = -integral_{x(MnO)=1}^{x(MnO)} x(SiO2)
+        d ln{K_P(8)sigma(SiO)I(Mn+)/[sigma(Mn)I(SiO+)]} = -integral_{x(MnO)=1}^{x(MnO)} x(SiO2) d ln[I(Mn+)/I(SiO+)]
+      print_note: The first displayed activity ratio is SiO2/MnO, while the later current ratio is Mn/SiO; retained as printed,
+        without repairing their apparent inconsistency. A similar SiO2 equation is stated but not displayed.
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_equations_page_5
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_equations_page_6
+  type: thermodynamic_example
+  locator:
+    published_page: 6
+    pdf_page_index: 5
+    section: Printed equations
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: printed_equations_context
+    notation: Plain-text rendering; primes, superscript o, roots, integrals and chemical subscripts named explicitly; no evaluated
+      results.
+    relations:
+      '12': 2 Na(K)2O(s,l) = 4 Na(K)(g) + O2(g)
+      '13': 2 Na(K)2O(s,l) = 3 Na(K)(g) + Na(K)O2(g)
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_equations_page_6
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_equations_page_7
+  type: thermodynamic_example
+  locator:
+    published_page: 7
+    pdf_page_index: 6
+    section: Printed equations
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: printed_equations_context
+    notation: Plain-text rendering; primes, superscript o, roots, integrals and chemical subscripts named explicitly; no evaluated
+      results.
+    relations:
+      '14': I[Na(K)+,Na(K)O2] = b I[O2+,Na(K)O2] = b I(O2+)
+      '15': I[Na(K)+,Na(K)] = I[Na(K)+] - I[Na(K)+,Na(K)O2] = I[Na(K)+] - b I(O2+)
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_equations_page_7
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_equations_page_8
+  type: thermodynamic_example
+  locator:
+    published_page: 8
+    pdf_page_index: 7
+    section: Printed equations
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: printed_equations_context
+    notation: Plain-text rendering; primes, superscript o, roots, integrals and chemical subscripts named explicitly; no evaluated
+      results.
+    relations:
+      '16': 2 CaF2(s,l) + SiO2(s) <-> 2 CaO(s) + SiF4(g)
+      '17': 3 CaF2(s,l) + Al2O3(s) <-> 3 CaO(s) + 2 AlF3(g)
+      '18': CaF2(s,l) + Al2O3(s) <-> CaO(s) + 2 AlOF(g)
+      '19': 2 SiO2(s) + Me(s) <-> MeO2(g) + 2 SiO(g)
+      '20': Al2O3(s) + Me(s) <-> MeO2(g) + Al2O(g)
+      '21': 2 Al2O3(s) + Me(s) <-> MeO2(g) + 2 Al2O2(g)
+      '22': CaF2(s,l) + Al2O(g) <-> CaO(s) + 2 AlF(g)
+      '23': 2 CaF2(s,l) + Al2O2(g) <-> 2 CaO(s) + 2 AlF2(g)
+      '24': CaF2(s,l) + SiO(g) <-> CaO(s) + SiF2(g)
+      '25': 2 CaO(s) + Me(s) <-> MeO2(g) + 2 Ca(g)
+      '26': CaF2(s,l) + Ca(g) <-> 2 CaF(g)
+      '27': 3 CaF2(s,l) + Al2O3(s) <-> 3 CaO(s) + Al2F6(g)
+      '28': CaF2(s,l) <-> CaF2(g)
+      '29': n(i) = S_eff(2 pi R T M(i))^(-1/2) integral p(i) dt = (k/sigma_i) alpha S_eff(2 pi R T M(i))^(-1/2) integral T^(1/2)
+        sum_j I(i,j) dt
+      '30': n(CaF2) = n^o(CaF2)-n^ev(CaF2)-2n(SiF4)-n(SiF2)-(3/2)n(AlF3)-n(AlF2)-(1/2)n(AlF)-(1/2)n(AlOF)-(1/2)n(CaF)-3n(Al2F6)
+      '31': n(SiO2) = n^o(SiO2)-n(SiF4)-n(SiO)-n(SiF2)
+      unnumbered: 'S_eff = pi D_eff h/4; h is Klausing''s coefficient. The printed D_eff has no square exponent. The second
+        Eq. (29) line prints alpha before S_eff and T both in the prefactor and integral; no physical correction made. Effusing
+        components: SiF4, SiF2, CaF2, CaF, Ca, Al2F6, AlF3, AlF2, AlOF, SiO, MeO2; M(i) is molar mass.'
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_equations_page_8
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_equations_page_9
+  type: thermodynamic_example
+  locator:
+    published_page: 9
+    pdf_page_index: 8
+    section: Printed equations
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: printed_equations_context
+    notation: Plain-text rendering; primes, superscript o, roots, integrals and chemical subscripts named explicitly; no evaluated
+      results.
+    relations:
+      '32': n(Al2O3) = n^o(Al2O3)-n(Al2F6)-(1/2)[n(AlF3)+n(AlF2)+n(AlF)+n(AlOF)]
+      '33': n(CaO) = n^o(CaO)+2n(SiF4)+n(SiF2)+(3/2)n(AlF3)+n(AlF2)+(1/2)n(AlF)+(1/2)n(AlOF)+3n(Al2F6)-n(Ca)-(1/2)n(CaF)
+      '34':
+      - ln{K_P(16)/Pa^2} = 2 ln{a(CaO)}+ln{p(SiF4)}-2 ln{a(CaF2)}-ln{a(SiO2)}
+      - ln{K_P(17)/Pa^3} = 2 ln{p(AlF3)}+3 ln{a(CaO)}-3 ln{a(CaF2)}-ln{a(Al2O3)}
+      - ln{K_P(18)/Pa^2} = ln{a(CaO)}+2 ln{p(AlOF)}-ln{a(CaF2)}-ln{a(Al2O3)}
+      '35': ln{K_P(19)/Pa^3} = 2 ln{p(SiO)}+ln{p(MO2)}-2 ln{a(SiO2)}
+      print_note: 'Eq. (35) prints MO2, not MeO2. n^o(i) is initial amount; n^ev(CaF2) evaporated calcium fluoride. Two activity
+        methods for three other components: equilibrium constants from IVTANTERMO/reactions (16)-(27), and Gibbs-Duhem differentials.
+        Eq. (5) may also determine SiO2 activity from saturated/unsaturated data.'
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_equations_page_9
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_equilibrium_protocols_page_13
+  type: thermodynamic_example
+  locator:
+    published_page: 13
+    pdf_page_index: 12
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: equilibrium_protocols
+    first: Same initial composition evaporated from cells of different orifice areas; sentence continues p. 14.
+    second: Different initial compositions selected on the same distillation line; same or different orifice diameters. Positions
+      and partial pressures agree; major species CaF2, AlF3, SiF4 in Nb/Mo cells plotted against x(CaF2).
+    second_locator:
+      published_page: 14
+      pdf_page_index: 13
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_equilibrium_protocols_page_13
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_figure1_effusion_block_schematic
+  type: method
+  locator:
+    published_page: 16
+    pdf_page_index: 15
+    figure: '1'
+  units: as printed
+  values:
+    quantity: effusion_block_schematic
+    method_class: quoted_unattributed
+    components: 1 double effusion cell; 2 Pt/Pt-10%Rh thermocouple; 3 tungsten heating element; 4 thermocouple block; 5 high-temperature
+      furnace; 6 alumina holder; 7 radiation shields; 8 water-cooled jacket; 9 reference substance; 10 substance under investigation;
+      11 water-cooled jacket cover; 12 effusion holes.
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_figure1_effusion_block_schematic
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_figure2_na2o_gibbs_curves
+  type: thermodynamic_example
+  locator:
+    published_page: 17
+    figure: '2'
+    pdf_page_index: 16
+  units: kJ/mol as plotted
+  values:
+    quantity: partial_Gibbs_energy_temperature_curves
+    ordinate_as_printed: -Delta G(Na2O), kJ mol^-1; positive ticks 115-145 display negative partial Gibbs energy.
+    method_class: figure_only
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    reason: Plotted curves have no numeric table values; no digitization performed.
+    two_phase_regions:
+    - N3S2+NS
+    - N3S2+N2S
+    - N2S+NS
+    series: figure2-* experiments
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_figure2_na2o_gibbs_curves
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: Na2O
+- observation_id: zaitsev_2000_figures3_4_vapor_pressure_curves
+  type: thermodynamic_example
+  locator:
+    published_page: 18
+    figure: '3'
+    pdf_page_index: 17
+  units: Pa as plotted
+  values:
+    quantity: CaF2_AlF3_SiF4 vapor-pressure curves
+    method_class: figure_only
+    admission_status: figure_only
+    semantics: bound_not_point_ordering
+    reason: Figures 3 and 4 are not tabulated and are not digitized. Printed run conditions are retained as experiments figure3-*
+      and figure4-*.
+    figure4_locator:
+      published_page: 19
+      pdf_page_index: 18
+      figure: '4'
+    figure3_axes: p/Pa; x(CaF2).
+    figure4_axes: Left p(SiF4)/Pa; right p(CaF2),p(AlF3)/(10^-1 Pa); x(CaF2).
+    aperture_unit_note: Captions 3 and 4 omit aperture units; metre representation in experiments is inferred from Fig. 2
+      and apparatus scale, not printed in these captions.
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_figures3_4_vapor_pressure_curves
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: CaF2
+- observation_id: zaitsev_2000_ion_assignments_page_10
+  type: thermodynamic_example
+  locator:
+    published_page: 10
+    pdf_page_index: 9
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: ion_assignments
+    quaternary_detected_ions:
+    - SiF3+
+    - SiF2+
+    - SiF+
+    - CaF2+
+    - CaF+
+    - Ca+
+    - Al2F5+
+    - AlF3+
+    - AlF2+
+    - AlF+
+    - Al+
+    - AlOF+
+    - SiO+
+    - MeO+
+    - MeO2+
+    - MoO3+
+    Me: Nb, Ta, Mo; cell materials
+    ternary_detected_ions:
+    - Al2F5+
+    - AlF3+
+    - AlF2+
+    - AlF+
+    - Al+
+    - AlOF+
+    - CaF2+
+    - CaF+
+    - Ca+
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_ion_assignments_page_10
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_phase_assignment_page_13
+  type: thermodynamic_example
+  locator:
+    published_page: 13
+    pdf_page_index: 12
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: phase_assignment
+    temperatures_K:
+    - 1773
+    - 1723
+    - 1650
+    fields_for_these_temperatures:
+    - 3CaO.3Al2O3.CaF2+CaO.2Al2O3+CaO.Al2O3
+    - L+3CaO.3Al2O3.CaF2+CaO.2Al2O3
+    - CaO.Al2O3+3CaO.3Al2O3.CaF2+11CaO.7Al2O3.CaF2
+    temperature_other_K: 1600
+    fields_at_1600_K:
+    - 3CaO.3Al2O3.CaF2+CaO.2Al2O3+CaF2
+    - 3CaO.3Al2O3.CaF2+CaO.2Al2O3+CaO.Al2O3
+    m_fields:
+    - L+3CaO.Al2O3+CaO
+    - L+CaO
+    - L+3CaO.Al2O3+11CaO.7Al2O3.CaF2
+    m_validation: m independent of cell materials and agrees with equilibrium investigations refs. 20,21. Similar assignment
+      for CaF2+, CaF+, Ca+.
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_phase_assignment_page_13
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_phase_fields_page_11
+  type: thermodynamic_example
+  locator:
+    published_page: 11
+    pdf_page_index: 10
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: phase_fields
+    assemblages:
+    - 3CaO.3Al2O3.CaF2+CaO.2Al2O3+CaF2
+    - 3CaO.3Al2O3.CaF2+CaO.2Al2O3+CaO.Al2O3
+    - L+3CaO.Al2O3+CaO
+    - L+CaO.6Al2O3+CaF2
+    - L+3CaO.3Al2O3.CaF2+CaO.2Al2O3
+    - L+CaO.6Al2O3+CaO.2Al2O3
+    - L+3CaO.Al2O3+11CaO.7Al2O3.CaF2
+    - CaO.Al2O3+3CaO.3Al2O3.CaF2+11CaO.7Al2O3.CaF2
+    normalization: 'Two methods: reference-substance ion currents, or non-overlapping AlF3+ line and r1/r2/r3. Over each three-phase
+      region p(AlF3) independent of cell material; fixed-sensitivity AlF3-origin currents constant.'
+    precursors: 'AlF+ has three precursors: AlF3, AlF2 fragment ions and AlF molecular ions; all three can source Al+ fragments.
+      Al2F5+ fragments from dimer AlF3, AlF3+ molecular, AlOF+ molecular. The text says molecular AlF2+ originates from AlF3;
+      apparent source typo retained here, not silently changed.'
+    quote: The calculation revealed that aluminium monofluoride and difluoride can be produced by reactions between aluminium
+      suboxide and calcium fluoride as the equilibrium constants of these reactions are greater than unity.
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_phase_fields_page_11
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_qualifying_statements
+  type: thermodynamic_example
+  locator:
+    published_page: 2
+    pdf_page_index: 1
+    section: Experimental arrangement
+  units: as printed
+  values:
+    quantity: directional_comparative_and_qualifying_claims
+    method_class: quoted_unattributed
+    claims:
+    - quote: In this way representative files of experimental data, containing several hundred to several thousand values
+        of activity of all components in wide temperature and concentration ranges, were obtained for molten slags and silicates
+        of various nature and complexities.
+      locator:
+        published_page: 2
+        pdf_page_index: 1
+        section: Introduction
+    - quote: Knudsen effusion technique is free from these disadvantages and in combination with mass spectrometric analysis
+        of evaporated products allows one to determine activities of all, or at least majority of the components of multicomponent
+        mixtures. However, its application to liquid slags is often limited by extremely low partial vapour pressure of these
+        substances in the temperature range most suitable for the technique.
+      locator:
+        published_page: 1
+        pdf_page_index: 0
+        section: Introduction
+    - quote: The partial pressure of the vapour species were calculated according to the equation p(i)=k[(sum_j I(i,j)T)/sigma(i)],
+        where k is the mass-spectrometer sensitivity constant determined from the vapour pressure of a reference substance;
+        sigma(i) is the cross-section of ionisation of an i-type; sum_j I(i,j) is the sum of intensities of ion currents resulting
+        from ionisation of molecules i.
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        section: Experimental arrangement
+    - quote: The temperature dependencies of the ion currents (vapour pressures) of the reference substances were reproducible
+        in all cases and in good agreement with the databank of thermodynamic values IVTANTERMO [15].
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        section: Experimental arrangement
+    - quote: The complete ion currents that originated from Mn and SiO were used for the determination of a(MnO)/a(SiO2),
+        as ionisation of each of these molecules produces ions of a single type only.
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        section: Experimental realisation and assignment of mass spectra
+    - quote: The ratios a(MnO)/a(SiO2), obtained in this way depend neither on the value of n nor on the choice of reductant
+        because (K_P(3)/K_P(2))^(1/n) is equal to the equilibrium constant of the reaction SiO2(s,l)+Mn(g)=MnO(s,l)+SiO(g).
+      locator:
+        published_page: 4
+        pdf_page_index: 3
+        section: Theoretical basis
+        note: Eq. (8); nth root and division rendered in plain-text mathematical notation.
+    - quote: Owing to the two mechanisms of evaporation, the ion currents Na+ or K+ could originate from two sources, namely
+        from ionisation of Na and NaO2 or K and KO2. O2+ could also have two precursors, O2 and NaO2 or KO2, though the major
+        source should be NaO2 or KO2. Formation of NaO+, or KO+ ions through dissociative ionisation of NaO2, or KO2 seems
+        very unlikely.
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        section: Experimental realisation and assignment of mass spectra
+    - quote: Therefore, appearance of O2+ lines in the mass spectra, like in the experiments with Mo or Ni cells, could be
+        considered as indication that Na+, or K+ ions originated from both above sources. On the contrary, the absence of
+        the O2+ in the mass spectra in experiments with Ta or Nb cells showed that the concentration of Na(K)O2 in the vapour
+        was very low and Na(K)+ ions originated from a single source, reaction (12).
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        section: Experimental realisation and assignment of mass spectra
+    - quote: These experiments revealed that, if Nb, or Ta cells were used, the measured vapour pressures of Na or K differed
+        by the factor of 1.6 to 1.7, but a(Na2O) or a(K2O) calculated by means of equation (2) agreed within the experimental
+        errors (1-3%).
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        section: Experimental realisation and assignment of mass spectra
+    - quote: However, the vapour pressures measured, using Mo and Ni cells, resulted in significantly higher values of the
+        alkali metals activity evidently because of activation of the second mechanism of Na(K)2O vaporisation and a substantial
+        contribution into the Na(K)+ current of Na(K)+ ions formed by the dissociative ionisation Na(K)O2.
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        section: Experimental realisation and assignment of mass spectra
+    - quote: At the ionising energy of 50 eV the constant b was found to be equal to 1.72 and 2.90 for Na2O and K2O, correspondingly,
+        depending on neither sample composition nor temperature.
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        section: Experimental realisation and assignment of mass spectra
+    - quote: In the cases, when I(O2+) were reliably established, the application of this b value to corrections of the Na(K)+
+        currents measured with the help of Mo and Ni effusion cells resulted in a(Na2O) and a(K2O) coinciding, within the
+        experimental uncertainties, with those found using Nb and Ta cells.
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        section: Experimental realisation and assignment of mass spectra
+    - quote: The results of the experiments with Mo and Ni effusion cells were used for a(Na2O) and a(K2O) determinations
+        only when it was possible to obtain reliable values of I(O2+), that is when is was possible to divide I(Na+) and I(K+)
+        into the two constituents discussed.
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        section: Experimental realisation and assignment of mass spectra
+    - quote: Fig. 2 illustrates that the thermodynamic values, found as describe above in experiments with effusion cells
+        of different materials and various orifice areas and in experiments with samples of different composition in the same
+        heterogeneous region, were in good agreement. This result confirms the existence of equilibrium in the effusion cell
+        during experiments and proves the reliability of the thermodynamic information acquired.
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        section: Experimental realisation and assignment of mass spectra
+    - quote: Random chemical analysis showed that the concentration of the reductant oxides in the test substances after the
+        experiments was insignificant (<0.05%).
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: Experimental realisation and assignment of mass spectra
+    - quote: Al2O, Al2O2 and AlO are the products of reduction of Al2O3 by the effusion-cell materials, the reducing capability
+        increasing in the series Mo < Ni < Ta < Nb.
+      locator:
+        published_page: 11
+        pdf_page_index: 10
+        section: Assignment of the mass spectra lines
+    - quote: Depending on the activity of the components of the CaF2-Al2O3-CaO system, the above reactions can result in p(AlF)
+        several orders of magnitude higher than the partial pressure of AlF3 attained owing to reaction (17).
+      locator:
+        published_page: 11
+        pdf_page_index: 10
+        section: Assignment of the mass spectra lines
+    - quote: The concentration of Al atoms produced in the vapour by the reactions between Al2O3 and the cell materials is
+        several orders of magnitude lower than that of AlF and AlF2.
+      locator:
+        published_page: 11
+        pdf_page_index: 10
+        section: Assignment of the mass spectra lines
+    - quote: It should be noted that direct reduction of aluminium fluorides by the cell-materials is almost negligible and
+        should lead to the pressure of the reduced species (AlF2, AlF, Al) several orders of magnitude lower than those observed
+        in reality.
+      locator:
+        published_page: 11
+        pdf_page_index: 10
+        section: Assignment of the mass spectra lines
+    - quote: However it should be noted that the results of the calculation of the ratio sigma2(AlF2)/sigma(AlF3)/sigma(AlF)
+        happened to be is practically equivalent to the commonly used assumption that this ratio is equal unity for isomolecular
+        reactions.
+      locator:
+        published_page: 12
+        pdf_page_index: 11
+        section: Assignment of the mass spectra lines
+    - quote: Both methods gave coinciding results, but the first was preferred because of the low intensity of the AlF3+ ion
+        current.
+      locator:
+        published_page: 12
+        pdf_page_index: 11
+        section: Assignment of the mass spectra lines
+    - quote: The partial pressure of AIF over CaF2-Al2O3-CaO samples of the composition, belonging to the region of equilibrium
+        with pure CaO, was almost three orders of magnitude higher than that of aluminium di- and trifluoride, thus meaning
+        that the AlF+ and Al+ ion currents originated almost exclusively from AIF molecules.
+      locator:
+        published_page: 13
+        pdf_page_index: 12
+        section: Assignment of the mass spectra lines
+    - quote: The result of assignment given in Table 2 are in good agreement with information obtained in the studies of AlF3
+        sublimation and equilibria involving aluminium mono-, di- and trifluorides [20-28].
+      locator:
+        published_page: 13
+        pdf_page_index: 12
+        section: Assignment of the mass spectra lines
+    - quote: In all cases, both the position of distillation lines on the phase diagram and the values of partial pressures
+        of the vapour species were in good agreement.
+      locator:
+        published_page: 14
+        pdf_page_index: 13
+        section: Consideration of equilibrium conditions in effusion cells
+    - quote: In the experiments with the CaO-Al2O3-SiO2 melt only SiO+, MeO2+, MeO+ (Me=Ta, Nb, Mo) and MoO3+ were detected
+        in the mass spectra of the saturated vapour. This means that only silicon dioxide was reducted according to equation
+        (3) [8]. On the contrary, no peaks connected with the products of reduction of silicon dioxide were detected in the
+        mass spectra in the experiments with Na2O-SiO2 (Me=Ta, Nb, Mo,Ni) and K2O-SiO2 (Me=Ta, Nb, Mo,Ni,Al) mixtures [10,11].
+        Thus, only alkali oxides reacted with Me in the effusion cell.
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        section: Experimental realisation and assignment of mass spectra
+    - quote: Very high intensity of some of the reactions (16)-(28) allowed us to use the isothermal-evaporation method along
+        with determination of the component vapour pressures as functions of temperature.
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        section: Theoretical basis
+    - quote: This allowed calculation of the component’s mole fractions in samples at the beginning of any experiment with
+        an accuracy of ±0.0001 to ±0.0002 unattainable by conventional preliminary melting of samples and their subsequent
+        chemical analysis.
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        section: Theoretical basis
+    - quote: Of all components of the CaF2-CaO-Al2O3-SiO2 melts only the activities of CaF2 could be calculated straightforwardly
+        as the ratios of the vapour pressures over the liquid solution and pure calcium difluoride.
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        section: Theoretical basis
+    - quote: If one of the pressures listed happened to be immeasurable, then the corresponding equation could be replaced
+        by another relationship, for example by equation following from reaction (19).
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        section: Theoretical basis
+    - quote: If in some experiments the isothermal exposure leads to a shift of the configuration point of melt composition
+        from the region of the liquid phase stability into a heterogeneous field, the initial values of the components’ activities
+        can be calculated from the conditions of equilibrium between the liquid solution and solid compounds.
+      locator:
+        published_page: 10
+        pdf_page_index: 9
+        section: Theoretical basis
+    - quote: The last equation reduced the number of experiments with effusion cells made of different materials to three.
+        We now have a system of six equations containing five unknowns, which can be solved, for example, by the least squares
+        method.
+      locator:
+        published_page: 13
+        pdf_page_index: 12
+        section: Assignment of the mass spectra lines
+    - quote: The results of experiments, where the smallest differences between the intensities of AlF2+, AlF+ and Al+ ion
+        currents were observed, were used in equation (47).
+      locator:
+        published_page: 13
+        pdf_page_index: 12
+        section: Assignment of the mass spectra lines
+    - quote: Thus in order to interpret the mass spectra under discussion completely, it was necessary to measure the AlF3+,
+        AlF2+, AlF+ and Al+ ion currents over a slag mixture of the same composition, using effusion cells made from five
+        different materials.
+      locator:
+        published_page: 13
+        pdf_page_index: 12
+        section: Assignment of the mass spectra lines
+      note: The earlier methods description says Nb, Ta, Mo, and Ni were cell materials, while aluminium was powder only;
+        the fifth cell material is not identified.
+    numeric_context:
+      several_hundred_to_several_thousand: activity values in wide temperature/concentration ranges in the introduction
+      cell_diameter_mm: 6
+      orifice_diameter_mm_range:
+      - '0.14'
+      - '0.53'
+      temperature_correction_max_K: 8
+      ionizing_energy_eV:
+      - 50
+      - 70
+      acceleration_voltage_kV: '3.2'
+      reductant_oxide_after_run_wt_percent: <0.05
+      Fe_impurity_wt_percent: <10^-6
+      Ag_purity_percent: '99.99'
+      Ni_purity_percent: '99.98'
+      Cu_purity_as_printed: 99,999%
+      sample_mole_fraction_accuracy:
+      - '0.0001'
+      - '0.0002'
+      figure3:
+        temperature_K: 1673
+        initial_x_CaF2: '0.303'
+        initial_x_SiO2: '0.242'
+        initial_x_Al2O3: '0.147'
+        orifice_diameters_m:
+        - '0.000208'
+        - '0.000332'
+      figure4:
+        temperature_K: 1473
+        initial_compositions:
+        - - '0.201'
+          - '0.4'
+          - '0.095'
+        - - '0.171'
+          - '0.391'
+          - '0.096'
+        orifice_diameters_m:
+        - '0.000254'
+        - '0.000409'
+      figure2_temperature_axis_K:
+      - 900
+      - 1300
+    figure_captions: 'Figure 2: eight x(SiO2)/cell/orifice assignments are recorded as figure2-* experiments. Figure 3 and
+      4 captions are recorded as figure-only experiments. No curve points were digitized.'
+    sample_context:
+    - value: CaF2 inserted with slag components or preliminary-smelted samples.
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        note: Sentence continues on p. 8 / PDF index 7.
+    - value: Reductants Nb, Ta, Mo, Ni or Al; first four used as cells and sometimes powder; Al powder only. Full Table 1
+        starting purity and post-run charge composition not reported; reductant oxides <0.05% after experiments.
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+    activity_standard_states: Table 1 gives solid MnO and beta-cristobalite reference states. CaF2 activity in quaternary
+      melts is defined as solution vapor pressure divided by pure calcium-difluoride vapor pressure; the source does not otherwise
+      state standard states for CaO, Al2O3, and SiO2 activities.
+    known_missing: No chamber background pressure, channel length, per-run calibration substance, global cross-section source,
+      isotope/multiplier correction, numerical Table 1 input currents, or post-run Table 1 charge analysis is reported.
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_qualifying_statements
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: MnO
+- observation_id: zaitsev_2000_references_page_14
+  type: thermodynamic_example
+  locator:
+    published_page: 14
+    pdf_page_index: 13
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: references
+    references:
+    - 1. Zaitsev, Korolyov, Mogutnov; Russ. J. Phys. Chem., 1990, 64, 1494.
+    - 2. Zaitsev, Korolyov, Mogutnov; High Temp. Science, 1990, 28, 351.
+    - 3. Zaitsev, Korolyov, Mogutnov; J. Chem. Thermodynamics, 1990, 22, 513.
+    - 4. Zaitsev, Korolyov, Mogutnov; Sixth International Iron and Steel Congress, Iron and Steel Inst. Japan, Nagoya, Vol.1,
+      1990, p.287.
+    - 5. Zaitsev, Litvina, Mogutnov; J. Chem. Thermodynamics, 1992, 24, 1039.
+    - 6. Zaitsev, Mogutnov; J. Mater. Chem., 1995, 5, 1063.
+    - 7. Zaitsev, Mogutnov; High Temp. Mater. Science, 1995, 34, 155.
+    - 8. Zaitsev, Litvina, Lyakishev, Mogutnov; J. Chem. Soc. Faraday Trans., 1997, 93, 3089.
+    - 9. Zaitsev, Litvina, Mogutnov; Russ. Inorg. Mater., 1997, 33, 76.
+    - 10. Zaitsev, Shelkova, Lyakishev, Mogutnov; Phys.Chem.Chem.Phys., 1999, 1, 1899.
+    - 11. Zaitsev, Shelkova, Lyakishev, Mogutnov; Russ. J. Phys. Chem. (in press).
+    - 12. Tovmachenko; Ph. Dr. Thesis, Moscow, 1980.
+    - 13. Mogutnov, Zaitsev, Shelkova, Litvina; Sixth Intern. Conf. On Molten Slags, Fluxes and Salts.
+    - 14. Zaitsev, Korolyov, Mogutnov; Russ. High Temp. Phys., 1989, 27, 465.
+    - 15. Gurvitch; Vestnik Akad. Nauk SSSR., 1983, 3, 54.
+    - 16. Belton, Fruehan; Metal. Trans., 1971, 2, 291.
+    - 17. Steinberg, Schofield; J. Chem. Phys., 1991, 94, 3901.
+    - 18. Zaitsev, Litvina, Mogutnov; J. Chem. Thermodynamics, 1992, 24, 737.
+    - 19. Mann; Proc. Int. Conf. Mass Spectroscopy, ed. Ogata, Hayakama, Univ. Park Press, Tokyo, 1970, p.814.
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_references_page_14
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_references_page_15
+  type: thermodynamic_example
+  locator:
+    published_page: 15
+    pdf_page_index: 14
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: references
+    references:
+    - 20. Porter; J. Chem. Phys., 1960, 33, 951.
+    - 21. Hildenbrand, Theard; J. Chem. Phys., 1965, 42, 3230.
+    - 22. Buchlec, Marram, Stauffer; J. Phys. Chem., 1967, 71, 4139.
+    - 23. Ehlert, Margrave; J. Amer. Ceram. Soc., 1964, 86, 3901.
+    - 24. Farber, Harris; High Temp. Sci., 1971, 3, 231.
+    - 25. Manual, Srivastana, Farber; High Temp. Sci., 1972, 4, 227.
+    - 26. Srivastana, Farber; J. Phys. Chem., 1971, 75, 1760.
+    - 27. Porter, Zeller; J. Chem. Phys., 1960, 33, 858.
+    - 28. Erokhin, Shegul'skaya, Sidorov, Akishin; Izvestiya AN SSSR, Neorgan. Materialy, 1977, 3, 873.
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_references_page_15
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_residual_oxygen_page_7
+  type: thermodynamic_example
+  locator:
+    published_page: 7
+    pdf_page_index: 6
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    quantity: residual_oxygen
+    quote: To estimate the values of this contribution, the residual oxygen in the mass spectrometer was frozen out by liquid
+      nitrogen, using a trap placed near the ion source and cooling the Knudsen block jacket. Then measurements of the O2+
+      signal connected with reaction (13) were carried out.
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_residual_oxygen_page_7
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3
+- observation_id: zaitsev_2000_table2_calculated_intensities
+  type: thermodynamic_example
+  locator:
+    published_page: 20
+    table: '2'
+    pdf_page_index: 19
+  units: arbitrary units
+  values:
+    quantity: calculated mass-spectral line intensities from AlF3, AlF2, and AlF molecules
+    method_class: measured_reduced
+    attribution: Calculated intensity of mass spectra lines, as captioned; derived during mass-spectral assignment.
+    ionizing_energy_eV: 50
+    composition_and_cell_assignment: No unique charge composition or cell per row; published temperature-group phase fields
+      are retained in phase_assignment context on p. 13.
+    printed_origin_headings:
+    - AlF3
+    - AlF3
+    - AlF
+    heading_discrepancy: Middle heading is AlF3 as printed; caption and Eqs. (41)-(46) imply AlF2. Middle columns preserve
+      the printed heading rather than silently correcting it.
+    derivation:
+      relation: Experimental assignment using observed AlF3+, AlF2+, AlF+, Al+ currents normalized to reference sensitivity;
+        Eqs. (40)-(49), pp. 11-13; Mann/additivity cross-sections and IVTANTERMO K_P(39). Smallest-difference runs selected
+        for Eq. (47); m determined in CaO-equilibrium fields.
+      inputs: Measured currents and reference-normalization signals described but not numerically tabulated; no invented raw
+        currents or resolving observation lineage is asserted for this unscored context.
+    columns:
+    - T_K
+    - I(AlF3+,AlF3)
+    - I(AlF2+,AlF3)
+    - I(AlF+,AlF3)
+    - I(Al+,AlF3)
+    - I(AlF2+,AlF3 middle group as printed)
+    - I(AlF+,AlF3 middle group as printed)
+    - I(Al+,AlF3 middle group as printed)
+    - I(AlF+,AlF)
+    - I(Al+,AlF)
+    rows:
+    - temperature_K: 1600
+      I(AlF3+,AlF3): '1.3'
+      I(AlF2+,AlF3): 100
+      I(AlF+,AlF3): '2.1'
+      I(Al+,AlF3): '2.2'
+      I(AlF2+,AlF3 middle group as printed): 100
+      I(AlF+,AlF3 middle group as printed): '3.6'
+      I(Al+,AlF3 middle group as printed): '4.7'
+      I(AlF+,AlF): 100
+      I(Al+,AlF): '16.8'
+      method_class: measured_reduced
+      attribution: Calculated intensity, as stated in the Table 2 caption.
+    - temperature_K: 1650
+      I(AlF3+,AlF3): '1.6'
+      I(AlF2+,AlF3): 100
+      I(AlF+,AlF3): '1.9'
+      I(Al+,AlF3): '1.9'
+      I(AlF2+,AlF3 middle group as printed): 100
+      I(AlF+,AlF3 middle group as printed): '4.1'
+      I(Al+,AlF3 middle group as printed): '4.7'
+      I(AlF+,AlF): 100
+      I(Al+,AlF): '16.2'
+      method_class: measured_reduced
+      attribution: Calculated intensity, as stated in the Table 2 caption.
+    - temperature_K: 1723
+      I(AlF3+,AlF3): '1.4'
+      I(AlF2+,AlF3): 100
+      I(AlF+,AlF3): '2.2'
+      I(Al+,AlF3): '2.4'
+      I(AlF2+,AlF3 middle group as printed): 100
+      I(AlF+,AlF3 middle group as printed): '3.9'
+      I(Al+,AlF3 middle group as printed): '4.5'
+      I(AlF+,AlF): 100
+      I(Al+,AlF): '16.4'
+      method_class: measured_reduced
+      attribution: Calculated intensity, as stated in the Table 2 caption.
+    - temperature_K: 1773
+      I(AlF3+,AlF3): '1.4'
+      I(AlF2+,AlF3): 100
+      I(AlF+,AlF3): '2.1'
+      I(Al+,AlF3): '2.3'
+      I(AlF2+,AlF3 middle group as printed): 100
+      I(AlF+,AlF3 middle group as printed): '3.9'
+      I(Al+,AlF3 middle group as printed): '4.9'
+      I(AlF+,AlF): 100
+      I(Al+,AlF): '17.1'
+      method_class: measured_reduced
+      attribution: Calculated intensity, as stated in the Table 2 caption.
+  context_id: zaitsev-2000-ms2000-045::context::zaitsev_2000_table2_calculated_intensities
+  work_id: d280f9e13e457832776a079307b0f1bbedfb6857f46155c5bca49e794ea44b69
+  source_id: zaitsev-2000-ms2000-045
+  species: AlF3

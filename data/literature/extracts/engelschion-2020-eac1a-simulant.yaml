@@ -18,6 +18,10 @@ extraction:
   worker: w1-engelschion-2020-eac1a-simulant
   provenance_path: corpus/raw/engelschion-2020-eac1a-simulant/
 review_status: draft
+fidelity_samples:
+- path: species.EAC-1A.observations[engelschion_2020_eac1a_water_release].values.water_released_wt_pct_as_printed
+  value: '~0.8'
+  locator: {page: 2, section: Density, note: 'The procedure released ~0.8 wt% water from the simulant.'}
 corrections: []
 benches:
 - id: pegasus-dsc-404c

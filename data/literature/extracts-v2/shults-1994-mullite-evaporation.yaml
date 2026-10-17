@@ -1,0 +1,5570 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shults-1994-mullite-evaporation.yaml
+observations:
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_al2o_partial_pressure_1933k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0002127825'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.15 under scale ×10^9 atm
+      value: '0.000015198749999999999'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al2O row at 1933 K; scale p_Al2O × 10^9 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_Al2O row at 1933 K; scale p_Al2O × 10^9 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al2O row at 1933 K; scale p_Al2O × 10^9 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_al2o_partial_pressure_1983k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00045292275'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.25 under scale ×10^9 atm
+      value: '0.000025331250000000002'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al2O row at 1983 K; scale p_Al2O × 10^9 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_Al2O row at 1983 K; scale p_Al2O × 10^9 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al2O row at 1983 K; scale p_Al2O × 10^9 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_al2o_partial_pressure_2033k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al2O
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0014692125'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.8 under scale ×10^9 atm
+      value: '0.00008106000000000001'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al2O row at 2033 K; scale p_Al2O × 10^9 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_Al2O row at 2033 K; scale p_Al2O × 10^9 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al2O row at 2033 K; scale p_Al2O × 10^9 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_al_partial_pressure_1833k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00036477'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.02 under scale ×10^8 atm
+      value: '0.000020265'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al row at 1833 K; scale p_Al × 10^8 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_Al row at 1833 K; scale p_Al × 10^8 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al row at 1833 K; scale p_Al × 10^8 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_al_partial_pressure_1933k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.003333592500000000303975'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.15 under scale ×10^8 atm
+      value: '0.0001519875'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al row at 1933 K; scale p_Al × 10^8 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_Al row at 1933 K; scale p_Al × 10^8 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al row at 1933 K; scale p_Al × 10^8 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_al_partial_pressure_1983k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.007599375'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.30 under scale ×10^8 atm
+      value: '0.000303975'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al row at 1983 K; scale p_Al × 10^8 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_Al row at 1983 K; scale p_Al × 10^8 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al row at 1983 K; scale p_Al × 10^8 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_al_partial_pressure_2033k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Al
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0213795750000000020265'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.8 under scale ×10^8 atm
+      value: '0.0008106000000000001'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al row at 2033 K; scale p_Al × 10^8 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_Al row at 2033 K; scale p_Al × 10^8 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_Al row at 2033 K; scale p_Al × 10^8 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_alo_partial_pressure_1933k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0005603272500000000506625'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.040 under scale ×10^8 atm
+      value: '0.00004053'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_AlO row at 1933 K; scale p_AlO × 10^8 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_AlO row at 1933 K; scale p_AlO × 10^8 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_AlO row at 1933 K; scale p_AlO × 10^8 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_alo_partial_pressure_1983k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.001600935000000000303975'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.09 under scale ×10^8 atm
+      value: '0.0000911925'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_AlO row at 1983 K; scale p_AlO × 10^8 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_AlO row at 1983 K; scale p_AlO × 10^8 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_AlO row at 1983 K; scale p_AlO × 10^8 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_alo_partial_pressure_2033k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0042657825'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.18 under scale ×10^8 atm
+      value: '0.000182385'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_AlO row at 2033 K; scale p_AlO × 10^8 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_AlO row at 2033 K; scale p_AlO × 10^8 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_AlO row at 2033 K; scale p_AlO × 10^8 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_alsio_partial_pressure_1933k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlSiO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000034551825000000004053'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.030 under scale ×10^10 atm
+      value: '0.000000303975'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_AlSiO row at 1933 K; scale p_AlSiO × 10^10 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_AlSiO row at 1933 K; scale p_AlSiO × 10^10 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_AlSiO row at 1933 K; scale p_AlSiO × 10^10 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_alsio_partial_pressure_1983k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlSiO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000014286825'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.11 under scale ×10^10 atm
+      value: '0.000001114575'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_AlSiO row at 1983 K; scale p_AlSiO × 10^10 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_AlSiO row at 1983 K; scale p_AlSiO × 10^10 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_AlSiO row at 1983 K; scale p_AlSiO × 10^10 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_alsio_partial_pressure_2033k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: AlSiO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00005410755'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.40 under scale ×10^10 atm
+      value: '0.000004053'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_AlSiO row at 2033 K; scale p_AlSiO × 10^10 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_AlSiO row at 2033 K; scale p_AlSiO × 10^10 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_AlSiO row at 2033 K; scale p_AlSiO × 10^10 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_moo2_partial_pressure_1833k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: MoO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0005370225'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.05 under scale ×10^8 atm
+      value: '0.000050662500000000005'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO2 row at 1833 K; scale p_MoO2 × 10^8 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_MoO2 row at 1833 K; scale p_MoO2 × 10^8 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO2 row at 1833 K; scale p_MoO2 × 10^8 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_moo2_partial_pressure_1933k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: MoO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0019353075'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.15 under scale ×10^8 atm
+      value: '0.0001519875'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO2 row at 1933 K; scale p_MoO2 × 10^8 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_MoO2 row at 1933 K; scale p_MoO2 × 10^8 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO2 row at 1933 K; scale p_MoO2 × 10^8 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_moo2_partial_pressure_1983k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: MoO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00344505'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.25 under scale ×10^8 atm
+      value: '0.0002533125'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO2 row at 1983 K; scale p_MoO2 × 10^8 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_MoO2 row at 1983 K; scale p_MoO2 × 10^8 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO2 row at 1983 K; scale p_MoO2 × 10^8 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_moo2_partial_pressure_2033k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: MoO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.005856585'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.30 under scale ×10^8 atm
+      value: '0.000303975'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO2 row at 2033 K; scale p_MoO2 × 10^8 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_MoO2 row at 2033 K; scale p_MoO2 × 10^8 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO2 row at 2033 K; scale p_MoO2 × 10^8 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_moo3_partial_pressure_1833k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: MoO3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000125643'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.08 under scale ×10^9 atm
+      value: '0.000008106'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO3 row at 1833 K; scale p_MoO3 × 10^9 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_MoO3 row at 1833 K; scale p_MoO3 × 10^9 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO3 row at 1833 K; scale p_MoO3 × 10^9 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_moo3_partial_pressure_1933k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: MoO3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0004275915'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.25 under scale ×10^9 atm
+      value: '0.000025331250000000002'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO3 row at 1933 K; scale p_MoO3 × 10^9 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_MoO3 row at 1933 K; scale p_MoO3 × 10^9 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO3 row at 1933 K; scale p_MoO3 × 10^9 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_moo3_partial_pressure_1983k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: MoO3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000774123000000000101325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.40 under scale ×10^9 atm
+      value: '0.00004053000000000001'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO3 row at 1983 K; scale p_MoO3 × 10^9 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_MoO3 row at 1983 K; scale p_MoO3 × 10^9 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO3 row at 1983 K; scale p_MoO3 × 10^9 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_moo3_partial_pressure_2033k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: MoO3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00125643000000000020265'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.6 under scale ×10^9 atm
+      value: '0.000060794999999999996'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO3 row at 2033 K; scale p_MoO3 × 10^9 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_MoO3 row at 2033 K; scale p_MoO3 × 10^9 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_MoO3 row at 2033 K; scale p_MoO3 × 10^9 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_o2_partial_pressure_1833k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00000052689'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.05 under scale ×10^11 atm
+      value: '0.0000000506625'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated in this work from gas-phase equilibria using reference data [11].
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O2 row at 1833 K; scale p_O2 × 10^11 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_O2 row at 1833 K; scale p_O2 × 10^11 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O2 row at 1833 K; scale p_O2 × 10^11 atm.
+  derived_from:
+  - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1833k
+  derivation:
+    relation: p(O2) calculated using equilibrium (2), (O2)=2(O); equilibrium constant from [11].; species.phase=gas derived
+      from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1833k
+    parameters: []
+    output_unit: as_published
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_o2_partial_pressure_1933k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0000046508175'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.26 under scale ×10^11 atm
+      value: '0.00000026344499999999996'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated in this work from gas-phase equilibria using reference data [11].
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O2 row at 1933 K; scale p_O2 × 10^11 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_O2 row at 1933 K; scale p_O2 × 10^11 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O2 row at 1933 K; scale p_O2 × 10^11 atm.
+  derived_from:
+  - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1933k
+  derivation:
+    relation: p(O2) calculated using equilibrium (2), (O2)=2(O); equilibrium constant from [11].; species.phase=gas derived
+      from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1933k
+    parameters: []
+    output_unit: as_published
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_o2_partial_pressure_1983k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000013881525'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.6 under scale ×10^11 atm
+      value: '0.0000006079499999999999'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated in this work from gas-phase equilibria using reference data [11].
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O2 row at 1983 K; scale p_O2 × 10^11 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_O2 row at 1983 K; scale p_O2 × 10^11 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O2 row at 1983 K; scale p_O2 × 10^11 atm.
+  derived_from:
+  - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1983k
+  derivation:
+    relation: p(O2) calculated using equilibrium (2), (O2)=2(O); equilibrium constant from [11].; species.phase=gas derived
+      from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1983k
+    parameters: []
+    output_unit: as_published
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_o2_partial_pressure_2033k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00003475447499999999493375'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 1.7 under scale ×10^11 atm
+      value: '0.0000017225249999999999'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated in this work from gas-phase equilibria using reference data [11].
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O2 row at 2033 K; scale p_O2 × 10^11 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_O2 row at 2033 K; scale p_O2 × 10^11 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O2 row at 2033 K; scale p_O2 × 10^11 atm.
+  derived_from:
+  - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_2033k
+  derivation:
+    relation: p(O2) calculated using equilibrium (2), (O2)=2(O); equilibrium constant from [11].; species.phase=gas derived
+      from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_2033k
+    parameters: []
+    output_unit: as_published
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1833k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00003850350000000000303975'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.04 under scale ×10^9 atm
+      value: '0.000004053'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated in this work from gas-phase equilibria using reference data [11].
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O row at 1833 K; scale p_O × 10^9 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_O row at 1833 K; scale p_O × 10^9 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O row at 1833 K; scale p_O × 10^9 atm.
+  derived_from:
+  - shults-1994-mullite-evaporation::shults_1994_t2_moo3_partial_pressure_1833k
+  - shults-1994-mullite-evaporation::shults_1994_t2_moo2_partial_pressure_1833k
+  derivation:
+    relation: p(O) calculated using equilibrium (1), (MoO3)=(MoO2)+(O); equilibrium constant from [11].; species.phase=gas
+      derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - shults-1994-mullite-evaporation::shults_1994_t2_moo3_partial_pressure_1833k
+    - shults-1994-mullite-evaporation::shults_1994_t2_moo2_partial_pressure_1833k
+    parameters: []
+    output_unit: as_published
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1933k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00026851125'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.15 under scale ×10^9 atm
+      value: '0.000015198749999999999'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated in this work from gas-phase equilibria using reference data [11].
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O row at 1933 K; scale p_O × 10^9 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_O row at 1933 K; scale p_O × 10^9 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O row at 1933 K; scale p_O × 10^9 atm.
+  derived_from:
+  - shults-1994-mullite-evaporation::shults_1994_t2_moo3_partial_pressure_1933k
+  - shults-1994-mullite-evaporation::shults_1994_t2_moo2_partial_pressure_1933k
+  derivation:
+    relation: p(O) calculated using equilibrium (1), (MoO3)=(MoO2)+(O); equilibrium constant from [11].; species.phase=gas
+      derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - shults-1994-mullite-evaporation::shults_1994_t2_moo3_partial_pressure_1933k
+    - shults-1994-mullite-evaporation::shults_1994_t2_moo2_partial_pressure_1933k
+    parameters: []
+    output_unit: as_published
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1983k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.000692049750000000101325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.30 under scale ×10^9 atm
+      value: '0.000030397499999999998'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated in this work from gas-phase equilibria using reference data [11].
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O row at 1983 K; scale p_O × 10^9 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_O row at 1983 K; scale p_O × 10^9 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O row at 1983 K; scale p_O × 10^9 atm.
+  derived_from:
+  - shults-1994-mullite-evaporation::shults_1994_t2_moo3_partial_pressure_1983k
+  - shults-1994-mullite-evaporation::shults_1994_t2_moo2_partial_pressure_1983k
+  derivation:
+    relation: p(O) calculated using equilibrium (1), (MoO3)=(MoO2)+(O); equilibrium constant from [11].; species.phase=gas
+      derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - shults-1994-mullite-evaporation::shults_1994_t2_moo3_partial_pressure_1983k
+    - shults-1994-mullite-evaporation::shults_1994_t2_moo2_partial_pressure_1983k
+    parameters: []
+    output_unit: as_published
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_2033k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.001600935000000000303975'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.8 under scale ×10^9 atm
+      value: '0.00008106000000000001'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    attribution: Calculated in this work from gas-phase equilibria using reference data [11].
+    model: model_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O row at 2033 K; scale p_O × 10^9 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_O row at 2033 K; scale p_O × 10^9 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_O row at 2033 K; scale p_O × 10^9 atm.
+  derived_from:
+  - shults-1994-mullite-evaporation::shults_1994_t2_moo3_partial_pressure_2033k
+  - shults-1994-mullite-evaporation::shults_1994_t2_moo2_partial_pressure_2033k
+  derivation:
+    relation: p(O) calculated using equilibrium (1), (MoO3)=(MoO2)+(O); equilibrium constant from [11].; species.phase=gas
+      derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - shults-1994-mullite-evaporation::shults_1994_t2_moo3_partial_pressure_2033k
+    - shults-1994-mullite-evaporation::shults_1994_t2_moo2_partial_pressure_2033k
+    parameters: []
+    output_unit: as_published
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_sio2_partial_pressure_1833k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00020265'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.05 under scale ×10^8 atm
+      value: '0.000050662500000000005'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO2 row at 1833 K; scale p_SiO2 × 10^8 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_SiO2 row at 1833 K; scale p_SiO2 × 10^8 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO2 row at 1833 K; scale p_SiO2 × 10^8 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_sio2_partial_pressure_1933k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0006403740000000000506625'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.060 under scale ×10^8 atm
+      value: '0.000060794999999999996'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO2 row at 1933 K; scale p_SiO2 × 10^8 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_SiO2 row at 1933 K; scale p_SiO2 × 10^8 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO2 row at 1933 K; scale p_SiO2 × 10^8 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_sio2_partial_pressure_1983k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0019353075'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.22 under scale ×10^8 atm
+      value: '0.00022291500000000002'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO2 row at 1983 K; scale p_SiO2 × 10^8 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_SiO2 row at 1983 K; scale p_SiO2 × 10^8 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO2 row at 1983 K; scale p_SiO2 × 10^8 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_sio2_partial_pressure_2033k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00471161250000000060795'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.80 under scale ×10^8 atm
+      value: '0.0008106000000000001'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO2 row at 2033 K; scale p_SiO2 × 10^8 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_SiO2 row at 2033 K; scale p_SiO2 × 10^8 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO2 row at 2033 K; scale p_SiO2 × 10^8 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_sio_partial_pressure_1833k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '4.002337500000000506625'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.80 under scale ×10^5 atm
+      value: '0.8106000000000001'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO row at 1833 K; scale p_SiO × 10^5 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_SiO row at 1833 K; scale p_SiO × 10^5 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO row at 1833 K; scale p_SiO × 10^5 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_sio_partial_pressure_1933k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '4.13406'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.15 under scale ×10^5 atm
+      value: '0.1519875'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO row at 1933 K; scale p_SiO × 10^5 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_SiO row at 1933 K; scale p_SiO × 10^5 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO row at 1933 K; scale p_SiO × 10^5 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_sio_partial_pressure_1983k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '8.69368500000000101325'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.25 under scale ×10^5 atm
+      value: '0.2533125'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO row at 1983 K; scale p_SiO × 10^5 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_SiO row at 1983 K; scale p_SiO × 10^5 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO row at 1983 K; scale p_SiO × 10^5 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t2_sio_partial_pressure_2033k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '23.5074'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.7 under scale ×10^5 atm
+      value: '0.709275'
+      basis: absolute pressure uncertainty in Pa; converted from the printed scaled atm coefficient
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO row at 2033 K; scale p_SiO × 10^5 atm.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 96
+    published_page: 96
+    pdf_page_index: 1
+    table: '2'
+    note: Table 2, p_SiO row at 2033 K; scale p_SiO × 10^5 atm.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 96
+        published_page: 96
+        pdf_page_index: 1
+        table: '2'
+        note: Table 2, p_SiO row at 2033 K; scale p_SiO × 10^5 atm.
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t6_al2o3_activity_1833k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O3
+          phase:
+            tag: unknown
+            reason: not_published
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O3
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1.05'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.07
+      value: '0.07'
+      basis: absolute dimensionless activity
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 Al2O3 row at 1833 K.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 97
+    published_page: 97
+    pdf_page_index: 2
+    table: '6'
+    note: Table 6 Al2O3 row at 1833 K.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 Al2O3 row at 1833 K.
+  derived_from:
+  - shults-1994-mullite-evaporation::shults_1994_t2_al_partial_pressure_1833k
+  - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1833k
+  derivation:
+    relation: alpha_Al2O3 = (p_Al^2 p_O^3)/((p_Al^0)^2 (p_O^0)^3), equation (7); pure oxide reference vapor pressures are
+      not tabulated in this paper.
+    inputs:
+    - shults-1994-mullite-evaporation::shults_1994_t2_al_partial_pressure_1833k
+    - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1833k
+    parameters: []
+    output_unit: as_published
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t6_al2o3_activity_1933k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O3
+          phase:
+            tag: unknown
+            reason: not_published
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O3
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1.04'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.06
+      value: '0.06'
+      basis: absolute dimensionless activity
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 Al2O3 row at 1933 K.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 97
+    published_page: 97
+    pdf_page_index: 2
+    table: '6'
+    note: Table 6 Al2O3 row at 1933 K.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 Al2O3 row at 1933 K.
+  derived_from:
+  - shults-1994-mullite-evaporation::shults_1994_t2_al_partial_pressure_1933k
+  - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1933k
+  derivation:
+    relation: alpha_Al2O3 = (p_Al^2 p_O^3)/((p_Al^0)^2 (p_O^0)^3), equation (7); pure oxide reference vapor pressures are
+      not tabulated in this paper.
+    inputs:
+    - shults-1994-mullite-evaporation::shults_1994_t2_al_partial_pressure_1933k
+    - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1933k
+    parameters: []
+    output_unit: as_published
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t6_al2o3_activity_1983k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O3
+          phase:
+            tag: unknown
+            reason: not_published
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O3
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1.01'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.05
+      value: '0.05'
+      basis: absolute dimensionless activity
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 Al2O3 row at 1983 K.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 97
+    published_page: 97
+    pdf_page_index: 2
+    table: '6'
+    note: Table 6 Al2O3 row at 1983 K.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 Al2O3 row at 1983 K.
+  derived_from:
+  - shults-1994-mullite-evaporation::shults_1994_t2_al_partial_pressure_1983k
+  - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1983k
+  derivation:
+    relation: alpha_Al2O3 = (p_Al^2 p_O^3)/((p_Al^0)^2 (p_O^0)^3), equation (7); pure oxide reference vapor pressures are
+      not tabulated in this paper.
+    inputs:
+    - shults-1994-mullite-evaporation::shults_1994_t2_al_partial_pressure_1983k
+    - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1983k
+    parameters: []
+    output_unit: as_published
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t6_al2o3_activity_2033k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O3
+          phase:
+            tag: unknown
+            reason: not_published
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O3
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1.01'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.03
+      value: '0.03'
+      basis: absolute dimensionless activity
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 Al2O3 row at 2033 K.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 97
+    published_page: 97
+    pdf_page_index: 2
+    table: '6'
+    note: Table 6 Al2O3 row at 2033 K.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 Al2O3 row at 2033 K.
+  derived_from:
+  - shults-1994-mullite-evaporation::shults_1994_t2_al_partial_pressure_2033k
+  - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_2033k
+  derivation:
+    relation: alpha_Al2O3 = (p_Al^2 p_O^3)/((p_Al^0)^2 (p_O^0)^3), equation (7); pure oxide reference vapor pressures are
+      not tabulated in this paper.
+    inputs:
+    - shults-1994-mullite-evaporation::shults_1994_t2_al_partial_pressure_2033k
+    - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_2033k
+    parameters: []
+    output_unit: as_published
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t6_sio2_activity_1833k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1833'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: unknown
+            reason: not_published
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.37'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.09
+      value: '0.09'
+      basis: absolute dimensionless activity
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 SiO2 row at 1833 K.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 97
+    published_page: 97
+    pdf_page_index: 2
+    table: '6'
+    note: Table 6 SiO2 row at 1833 K.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1833'
+      locator:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 SiO2 row at 1833 K.
+  derived_from:
+  - shults-1994-mullite-evaporation::shults_1994_t2_sio_partial_pressure_1833k
+  - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1833k
+  derivation:
+    relation: alpha_SiO2 = (p_SiO p_O)/(p_SiO^0 p_O^0), equation (8); pure oxide reference vapor pressures are not tabulated
+      in this paper.
+    inputs:
+    - shults-1994-mullite-evaporation::shults_1994_t2_sio_partial_pressure_1833k
+    - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1833k
+    parameters: []
+    output_unit: as_published
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t6_sio2_activity_1933k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: unknown
+            reason: not_published
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.19'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.02
+      value: '0.02'
+      basis: absolute dimensionless activity
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 SiO2 row at 1933 K.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 97
+    published_page: 97
+    pdf_page_index: 2
+    table: '6'
+    note: Table 6 SiO2 row at 1933 K.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 SiO2 row at 1933 K.
+  derived_from:
+  - shults-1994-mullite-evaporation::shults_1994_t2_sio_partial_pressure_1933k
+  - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1933k
+  derivation:
+    relation: alpha_SiO2 = (p_SiO p_O)/(p_SiO^0 p_O^0), equation (8); pure oxide reference vapor pressures are not tabulated
+      in this paper.
+    inputs:
+    - shults-1994-mullite-evaporation::shults_1994_t2_sio_partial_pressure_1933k
+    - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1933k
+    parameters: []
+    output_unit: as_published
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t6_sio2_activity_1983k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1983'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: unknown
+            reason: not_published
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.18'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.02
+      value: '0.02'
+      basis: absolute dimensionless activity
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 SiO2 row at 1983 K.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 97
+    published_page: 97
+    pdf_page_index: 2
+    table: '6'
+    note: Table 6 SiO2 row at 1983 K.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1983'
+      locator:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 SiO2 row at 1983 K.
+  derived_from:
+  - shults-1994-mullite-evaporation::shults_1994_t2_sio_partial_pressure_1983k
+  - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1983k
+  derivation:
+    relation: alpha_SiO2 = (p_SiO p_O)/(p_SiO^0 p_O^0), equation (8); pure oxide reference vapor pressures are not tabulated
+      in this paper.
+    inputs:
+    - shults-1994-mullite-evaporation::shults_1994_t2_sio_partial_pressure_1983k
+    - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_1983k
+    parameters: []
+    output_unit: as_published
+- observation_id: shults-1994-mullite-evaporation::shults_1994_t6_sio2_activity_2033k
+  experiment_id: 531269b85bf4cd799cf25149a3f52fc460ef0c6475514d426e4803e836210625::experiment::shults-1994-mullite-knudsen-series
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: unknown
+            reason: not_published
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Al2O3
+          - '0.6'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.17'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      verbatim: ± 0.01
+      value: '0.01'
+      basis: absolute dimensionless activity
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex-resume-28539-1791216756
+      date: '2026-10-05'
+      evidence:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 SiO2 row at 2033 K.
+  notices: []
+  source_id: shults-1994-mullite-evaporation
+  locator:
+    page: 97
+    published_page: 97
+    pdf_page_index: 2
+    table: '6'
+    note: Table 6 SiO2 row at 2033 K.
+  read_from: pdf:shults-1994-mullite-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 97
+        published_page: 97
+        pdf_page_index: 2
+        table: '6'
+        note: Table 6 SiO2 row at 2033 K.
+  derived_from:
+  - shults-1994-mullite-evaporation::shults_1994_t2_sio_partial_pressure_2033k
+  - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_2033k
+  derivation:
+    relation: alpha_SiO2 = (p_SiO p_O)/(p_SiO^0 p_O^0), equation (8); pure oxide reference vapor pressures are not tabulated
+      in this paper.
+    inputs:
+    - shults-1994-mullite-evaporation::shults_1994_t2_sio_partial_pressure_2033k
+    - shults-1994-mullite-evaporation::shults_1994_t2_o_partial_pressure_2033k
+    parameters: []
+    output_unit: as_published

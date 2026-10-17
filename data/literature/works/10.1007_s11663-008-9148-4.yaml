@@ -1,0 +1,2208 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1007/s11663-008-9148-4
+  citation: Basu, S., Lahiri, A. K. & Seetharaman, S. (2008), "Activity of Iron Oxide in Steelmaking Slag", Metallurgical
+    and Materials Transactions B 39B (June 2008), pp. 447-456.
+  source_ids:
+  - basu-2008-feo-steelmaking
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: unknown:basu-2008-feo-steelmaking
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1007/s11663-008-9148-4
+experiments:
+- experiment_id: 10.1007/s11663-008-9148-4::experiment::basu_1873k_equilibration
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 448
+        pdf_page_index: 1
+        section: III. Experimentation
+        note: Experiments began with MgO-free slags, but exact initial oxide composition is not given in this paper.
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        note: Table II reports sample compositions after equilibration; the exact starting compositions are not given here.
+    form:
+      state:
+        tag: value
+        value: liquid iron with synthetic slag
+      locator:
+        page: 447
+        pdf_page_index: 0
+        section: III. Experimentation
+    characterization:
+      state:
+        tag: value
+        value: Microscopic examination of selected slag samples quenched from the equilibration temperature confirmed solid
+          fractions; examination using a scanning electron microscope with energy dispersive X-ray spectroscopy and an electron
+          probe microanalyzer revealed the solid phases to consist primarily of silicates of calcium, with traces of phosphorus
+          and magnesium.
+      locator:
+        page: 448-449
+        pdf_page_index: 1-2
+        section: III. Experimentation
+        note: 'Techniques as printed: SEM with EDS, and EPMA.'
+    pretreatment:
+      state:
+        tag: value
+        value: Experiments began with MgO-free slags; MgO saturation was attained by dissolution from the magnesia crucibles.
+      locator:
+        page: 448
+        pdf_page_index: 1
+        section: III. Experimentation
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        section: IV. Results and Discussion
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 447
+        pdf_page_index: 0
+        section: III. Experimentation
+        note: Ar flow is reported but furnace total pressure is not.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: would_invent
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 447
+        pdf_page_index: 0
+        section: III. Experimentation
+        note: Printed 0.15 to 0.20 mNm3 min-1 (numeric). Converting to sccm would require assuming the normal reference state,
+          so flow_sccm is typed would_invent; the printed interval is retained in bench.other_facts.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1007/s11663-008-9148-4
+  locator:
+    page: 447
+    pdf_page_index: 0
+    section: III. Experimentation
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          page: 447
+          pdf_page_index: 0
+          section: III. Experimentation
+          note: This equilibration furnace is not an effusion apparatus.
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          page: 447
+          pdf_page_index: 0
+          section: III. Experimentation
+          note: This equilibration furnace is not an effusion apparatus.
+  bench_id: 10.1007/s11663-008-9148-4::bench::basu_mos2_horizontal_tube_furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Equilibrated at the desired temperature under a gentle argon stream; samples withdrawn through one end of the
+          horizontal tube.
+      locator:
+        page: 447
+        pdf_page_index: 0
+        section: III. Experimentation
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '28800'
+          approximate: false
+      locator:
+        page: 447
+        pdf_page_index: 0
+        section: III. Experimentation
+        note: Printed 8 hours at desired temperature; conversion to seconds only.
+- experiment_id: 10.1007/s11663-008-9148-4::experiment::basu_1923k_equilibration
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 448
+        pdf_page_index: 1
+        section: III. Experimentation
+        note: Experiments began with MgO-free slags, but exact initial oxide composition is not given in this paper.
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        note: Table III reports sample compositions after equilibration; the exact starting compositions are not given here.
+    form:
+      state:
+        tag: value
+        value: liquid iron with synthetic slag
+      locator:
+        page: 447
+        pdf_page_index: 0
+        section: III. Experimentation
+    pretreatment:
+      state:
+        tag: value
+        value: Experiments began with MgO-free slags; MgO saturation was attained by dissolution from the magnesia crucibles.
+      locator:
+        page: 448
+        pdf_page_index: 1
+        section: III. Experimentation
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1923'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        section: IV. Results and Discussion
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 447
+        pdf_page_index: 0
+        section: III. Experimentation
+        note: Ar flow is reported but furnace total pressure is not.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: unknown
+            reason: would_invent
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 447
+        pdf_page_index: 0
+        section: III. Experimentation
+        note: Printed 0.15 to 0.20 mNm3 min-1 (numeric). Converting to sccm would require assuming the normal reference state,
+          so flow_sccm is typed would_invent; the printed interval is retained in bench.other_facts.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1007/s11663-008-9148-4
+  locator:
+    page: 447
+    pdf_page_index: 0
+    section: III. Experimentation
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          page: 447
+          pdf_page_index: 0
+          section: III. Experimentation
+          note: This equilibration furnace is not an effusion apparatus.
+      orifice_channel_length_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          page: 447
+          pdf_page_index: 0
+          section: III. Experimentation
+          note: This equilibration furnace is not an effusion apparatus.
+  bench_id: 10.1007/s11663-008-9148-4::bench::basu_mos2_horizontal_tube_furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Equilibrated at the desired temperature under a gentle argon stream; samples withdrawn through one end of the
+          horizontal tube.
+      locator:
+        page: 447
+        pdf_page_index: 0
+        section: III. Experimentation
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '28800'
+          approximate: false
+      locator:
+        page: 447
+        pdf_page_index: 0
+        section: III. Experimentation
+        note: Printed 8 hours at desired temperature; conversion to seconds only.
+benches:
+- id: 10.1007/s11663-008-9148-4::bench::basu_mos2_horizontal_tube_furnace
+  work_id: 10.1007/s11663-008-9148-4
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: MoS2-heated horizontal tube furnace
+    locator:
+      page: 447
+      pdf_page_index: 0
+      section: III. Experimentation
+  cell_materials:
+  - state:
+      tag: value
+      value: MgO
+    locator:
+      page: 447
+      pdf_page_index: 0
+      section: III. Experimentation
+      note: The authors describe sintered dense magnesia crucibles.
+  temperature_measurement:
+    thermocouples:
+      state:
+        tag: value
+        value: Two B-type thermocouples; one located inside the furnace tube and the other just outside
+      locator:
+        page: 447
+        pdf_page_index: 0
+        section: III. Experimentation
+    temperature_uniformity:
+      state:
+        tag: value
+        value: maintained within ±1 K
+      locator:
+        page: 447
+        pdf_page_index: 0
+        section: III. Experimentation
+        note: Temperature control bound also carried numerically as a bench fact.
+    control:
+      state:
+        tag: value
+        value: PID controller
+      locator:
+        page: 447
+        pdf_page_index: 0
+        section: III. Experimentation
+  temperature_calibration:
+    calibration_procedure:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 447
+        pdf_page_index: 0
+        section: III. Experimentation
+        note: B-type thermocouples and PID are stated; no calibration procedure is described in this paper.
+  heating_method:
+    state:
+      tag: value
+      value: MoS2-heated horizontal tube furnace
+    locator:
+      page: 447
+      pdf_page_index: 0
+      section: III. Experimentation
+  other_facts:
+  - name: argon_flow_as_printed
+    value:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.15'
+          interval_high: '0.2'
+          approximate: false
+      locator:
+        page: 447
+        pdf_page_index: 0
+        section: III. Experimentation
+        note: Printed mNm3 min-1; retained without conversion.
+    unit: mNm3 min-1
+  - name: temperature_control_tolerance
+    value:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-1'
+          interval_high: '1'
+          approximate: false
+      locator:
+        page: 447
+        pdf_page_index: 0
+        section: III. Experimentation
+        note: Printed temperature maintained within ±1 K.
+    unit: K
+context:
+- observation_id: basu_2008_attributed_literature_statements
+  type: quoted_comparator
+  locator:
+    page: 447-453
+    pdf_page_index: 0-6
+    section: II. Stoichiometry; III. Experimentation; IV. Results and Discussion
+    note: Statements the paper attributes to other workers or to cited sources; each carries its attribution and reference
+      numbers as printed.
+  units: verbatim statements
+  values:
+    quantity: attributed_literature_statements
+    method_class: quoted_attributed
+    attribution: Basu et al. (2008) quoting or summarising the cited workers named in each claim (reference numbers as printed).
+    claims:
+    - page: 447
+      quotation: “Deo and Boom observed that this nonstoichiometry is of negligible significance in steelmaking operations.[25]
+        They suggested that the free energy of formation of “FeO” and that of FexO may be considered as the same. This convention
+        has been followed up on in the present work.”
+      attribution: Deo and Boom [25]; the convention defines what "FeO" means in Tables II-III
+    - page: 448
+      quotation: “Similar results were obtained from the commercial thermodynamic packages THERMOCALC* and FACTSAGE.**”
+      attribution: commercial packages THERMOCALC and FACTSAGE (footnotes, p. 448); refers to the probable solid fractions
+        at 1873 K
+    - page: 448-449
+      quotation: “Previous investigations have already confirmed the presence of two-phase slag in some of the samples, particularly
+        those with higher basicity.[26,27]”
+      attribution: present authors earlier work [26,27]
+    - page: 450
+      quotation: “Similar behavior of FeO activity was observed by several others as well.[18,22,31–34]”
+      attribution: refs. [18,22,31-34]
+    - page: 450
+      quotation: “Turkdogan and Pearson had reported negative deviation of a(FeO) in CaO-MgO-MnO-FeO-SiO2 slags at all FeO
+        concentrations, but only when SiO2 concentration was less than 0.8 molar pct (X(SiO2) < 0.008).[9] At higher concentrations
+        of SiO2, the activity of FeO exhibited positive deviation.”
+      attribution: Turkdogan and Pearson [9]; the second sentence continues their finding
+    - page: 450
+      quotation: “A similar trend was reported by Kishimoto and co-workers, who concluded that the increase in basicity over
+        the range X(CaO)/X(SiO2) = 2.0 to 6.0, at any level of FeO concentration, caused only a marginal decrease in the activity
+        coefficient of FeO.[22]”
+      attribution: Kishimoto and co-workers [22]
+    - page: 450
+      quotation: “A similar trend was reported by Bodsworth,[13] Kishimoto et al.,[22] and by Fetters and Chipman[5] as well
+        as Turkdogan and Pearson,[9] whose findings are shown in Figure 7.”
+      attribution: Bodsworth [13], Kishimoto et al. [22], Fetters and Chipman [5], Turkdogan and Pearson [9]
+    - page: 450
+      quotation: “The results of Chipman[1] are an exception and show negative deviation over the entire range of FeO concentration.”
+      attribution: Chipman [1]
+    - page: 453
+      quotation: “Turkdogan and Pearson observed that the activity of FeO showed a marginally negative deviation in silica-free
+        steelmaking slags, which changed to positive deviation as the SiO2 content was increased.[9] A similar trend has been
+        reported by others as well.”
+      attribution: Turkdogan and Pearson [9]; others unnamed
+  context_id: basu-2008-feo-steelmaking::context::basu_2008_attributed_literature_statements
+  work_id: 10.1007/s11663-008-9148-4
+  source_id: basu-2008-feo-steelmaking
+  species: FeO
+- observation_id: basu_2008_figures_1_13_figure_only
+  type: figure_only
+  locator:
+    page: 449-455
+    pdf_page_index: 2-8
+    figure: 1-13
+    note: Curves and plotted markers were not digitized. Figs. 1-2 p. 449; Figs. 3-6 p. 453; Figs. 7-10 p. 454; Figs. 11-13
+      p. 455.
+  units: as plotted
+  values:
+    quantity: figure_data_not_digitized
+    method_class: figure_only
+    figures:
+    - figure: '1'
+      page: 449
+      subject: oxygen in liquid metal, MgO in slag, and phosphorus partition ratio vs equilibration time; no values digitized
+    - figure: '2'
+      page: 449
+      subject: slag compositions at 1873 K and 1923 K on the (CaO + MgO)-(FeO + Fe2O3)-(SiO2 + P2O5) pseudo-ternary, with
+        1873 K liquidus curves [28]; no values digitized
+    - figure: '3'
+      page: 453
+      subject: FeO activity vs concentration
+    - figure: '4'
+      page: 453
+      subject: prior workers’ FeO activity vs concentration
+    - figure: '5'
+      page: 453
+      subject: FeO activity coefficient vs basicity
+    - figure: '6'
+      page: 453
+      subject: FeO activity coefficient vs FeO concentration
+    - figure: '7'
+      page: 454
+      subject: prior workers’ gamma(FeO) vs concentration
+    - figure: '8'
+      page: 454
+      subject: gamma(FeO) vs SiO2 concentration
+    - figure: '9'
+      page: 454
+      subject: gamma(FeO) vs CaO concentration
+    - figure: '10'
+      page: 454
+      subject: prior workers’ gamma(FeO) vs SiO2 concentration
+    - figure: '11'
+      page: 455
+      subject: interdependence of FeO and SiO2 mole fractions
+    - figure: '12'
+      page: 455
+      subject: measured vs Eq. [2] calculated gamma(FeO)
+    - figure: '13'
+      page: 455
+      subject: measured vs Eq. [3] calculated gamma(FeO)
+  context_id: basu-2008-feo-steelmaking::context::basu_2008_figures_1_13_figure_only
+  work_id: 10.1007/s11663-008-9148-4
+  source_id: basu-2008-feo-steelmaking
+  species: FeO
+- observation_id: basu_2008_numeric_correlations_and_conditions
+  type: thermodynamic_example
+  locator:
+    page: 447-455
+    pdf_page_index: 0-8
+    section: Experimentation; Results and Discussion
+  units: as printed
+  values:
+    quantity: numeric_context_and_author_correlations
+    method_class: model_derived
+    numeric_context:
+      solid_wustite_stoichiometry_x_range:
+      - '0.95'
+      - '0.98'
+      prior_pure_ferrous_oxide_melt_mass_pct_FeO: '94'
+      prior_pure_ferrous_oxide_melt_mass_pct_Fe2O3: '6'
+      prior_corresponding_FeO_stoichiometry: FeO1.03
+      interaction_parameter_compilation_year: 1974
+      experiment_temperature_K:
+      - '1873'
+      - '1923'
+      FeO_concentration_range_mass_pct:
+      - '10'
+      - '30'
+      basicity_range_mass_pct_CaO_over_SiO2:
+      - '1.2'
+      - '3.5'
+      equilibration_time_hours: '8'
+      temperature_control_uncertainty_K: ±1
+      source_claim_temperature_interval_K: '50'
+      eq2: log10 gamma(FeO) = -0.7335 log10 X(FeO) - 0.2889; r2 = 0.93
+      eq3: log10 gamma(FeO) = 1262/T - 1.1302 X(FeO) + 0.96 X(SiO2) + 0.123 X(CaO) - 0.4198; r2 = 89 pct
+      eq2_eq3_correlation_coefficients_as_discussed_pct:
+      - '92'
+      - '93'
+    formula_note: Activities in Tables II-III are calculated by the authors from their equilibrated steel analyses (h[O] =
+      [mass pct O] x fO; a(FeO) from h[O] by Eq. [1]); the paper does not print the oxygen analysis or metal composition underlying
+      each h[O] number. The a(FeO) and h_O values are carried as activity_coefficient observations.
+    source_internal_inconsistencies:
+    - 'source_internally_inconsistent: Eq. [2] prints r2 = 0.93 (p. 454) and Eq. [3] prints r2 = 89 pct (p. 455), but p. 455
+      states "The correlation coefficients of Eqs. [2] and [3] are practically the same (92 and 93 pct)." Both printed forms
+      are carried; not reconciled.'
+    - 'source_internally_inconsistent: p. 450 states "the oxygen concentration in steel is expressed in parts per million
+      (by mass)", yet Tables II-III (pp. 451-452) print no ppm oxygen column, only h_O. This is why the h[O] reduction inputs
+      are typed absent (not_published).'
+  context_id: basu-2008-feo-steelmaking::context::basu_2008_numeric_correlations_and_conditions
+  work_id: 10.1007/s11663-008-9148-4
+  source_id: basu-2008-feo-steelmaking
+  species: FeO
+- observation_id: basu_2008_qualifying_and_directional_statements
+  type: method
+  locator:
+    page: 447-456
+    pdf_page_index: 0-9
+    section: Experimentation; Results and Discussion; Conclusions
+    note: Present authors statements. Statements attributed to other workers are in basu_2008_attributed_literature_statements.
+  units: verbatim statements
+  values:
+    quantity: qualifiers_and_directional_claims_rechecked_against_page_images
+    method_class: quoted_unattributed
+    claims:
+    - page: 447
+      quotation: “The desired temperature was maintained within ±1K in the furnace tube through the use of two B-type thermocouples,
+        one located inside the furnace tube and the other just outside the same, together with a PID controller.”
+    - page: 448
+      quotation: “none of these three parameters show any perceptible change beyond 8 hours of soaking.”
+    - page: 448
+      quotation: “All the experiments were started with MgO-free slags, and the saturation concentration was attained by dissolution
+        of MgO from magnesia crucibles into the slag.”
+    - page: 448
+      quotation: “Therefore, the possibility of the presence of solid/undissolved MgO in the slag was neglected.”
+    - page: 448
+      quotation: “It is seen that some of the slag samples probably contained solid fractions at 1873 K.”
+    - page: 448
+      quotation: “Microscopic examination of some selected slag samples, quenched from the equilibration temperature, confirmed
+        the presence of solid fractions.”
+    - page: 449
+      quotation: “the solid phases to consist primarily of silicates of calcium, with traces of phosphorus and magnesium.”
+    - page: 449
+      quotation: “the constituents in the slag were present partly in the silicate phase and partly in the liquid fraction
+        of the slag.”
+    - page: 449
+      quotation: “because the samples were at thermodynamic equilibrium, the activity of any species in both the phases would
+        still be the same.”
+    - page: 450
+      quotation: “FeO exhibits positive deviation from ideality for most chemical compositions investigated, except at high
+        FeO concentrations, i.e., exceeding 0.4 mole fraction.”
+    - page: 450
+      quotation: “positive deviation of the activity of FeO was observed by these workers, with the exception of Chipman.”
+    - page: 450
+      quotation: “The results of Ichise and Iwase show negative deviation in a few cases at low iron oxide concentrations
+        (X(FeO) < 0.1), whereas Wrampelmeyer et al. observed some incidences of negative deviation of FeO at intermediate
+        concentrations (X(FeO) = 0.25 to 0.4).”
+    - page: 450
+      quotation: “the results of Chipman exhibit no positive deviation at all, but a small negative deviation of a(FeO) at
+        X(FeO) exceeding 0.4 is seen in Figure 4.”
+    - page: 450
+      quotation: “the change in basicity as well as temperature has only a negligible influence on the activity coefficient
+        of FeO, for any given range of FeO concentration.”
+    - page: 450
+      quotation: “A marginal decrease of γ(FeO) with the increase of basicity can be noticed upon careful analysis of Figure
+        5.”
+    - page: 450
+      quotation: “Bishop et al. reported a gentle decrease in a(FeO) when the basicity, defined as the ratio mole pct (CaO
+        + MgO + MnO)/mole pct (SiO2 + PO2.5 + Al2O3), increased beyond 2, for FetO concentration within the range of 10 to
+        60 mole pct.”
+    - page: 450
+      quotation: “Fetters and Chipman, and also Turkdogan and Pearson, reported that the activity of FeO reached a distinct
+        local maximum corresponding to a basicity of approximately 2.”
+    - page: 450
+      quotation: “no such local maximum was observed by the present authors.”
+    - page: 450
+      quotation: “no definite correlation could be obtained between γ(FeO) and optical basicity of the slags.”
+    - page: 450
+      quotation: “The changes in γ(FeO), seen in Figure 5, are due primarily to changes in FeO concentration.”
+    - page: 450
+      quotation: “The activity coefficient of FeO depends very strongly on its concentration, irrespective of basicity and
+        temperature, within the range investigated.”
+    - page: 450
+      quotation: “The figure shows a nearly linear decrease of the activity coefficient with increasing FeO concentration”
+    - page: 450
+      quotation: “the activity of FeO exhibits positive deviation at lower FeO concentrations but moves closer to ideality
+        as the FeO concentration increases.”
+    - page: 450
+      quotation: “The activity coefficient of FeO appears to be independent of temperature, at least over the interval investigated.”
+    - page: 450
+      quotation: “negative deviation is exhibited when the concentration of FeO exceeds 40 molar pct (X(FeO) > 0.4).”
+    - page: 453
+      quotation: “all the workers, except Bodsworth, reported an increase in the activity coefficient of FeO with increasing
+        SiO2 concentration.”
+    - page: 450
+      quotation: “no definite correlation of γ(FeO) with CaO concentration can be observed.”
+    - page: 452
+      quotation: “At low concentrations of FeO, i.e., X(FeO) < 0.1, γ(FeO) tends to decrease gradually with increasing CaO
+        concentration. However, no such trend is visible at X(FeO) exceeding 0.1.”
+    - page: 452-453
+      quotation: “a change of temperature within the range investigated appears to cause insignificant change in the activity
+        coefficient of FeO.”
+    - page: 454
+      quotation: “the trend shown in Figure 8 should be treated with caution.”
+    - page: 453-454
+      quotation: “Increase in FeO concentration, at any given level of basicity, caused a proportionate decrease in the concentrations
+        of both CaO and SiO2.”
+    - page: 454
+      quotation: “This resulted in a negative correlation between X(FeO) and X(SiO2).”
+    - page: 453
+      quotation: “Also, the nature of the plot remains the same if the concentration of SiO2 (and CaO) is expressed in terms
+        of mass percent instead of molar fraction.”
+    - page: 454
+      quotation: “It is likely that a similar situation might have existed with some of the results shown in Figure 10, but
+        that could not be verified due to the nonavailability of complete information for many of the sources.”
+    - page: 454-455
+      quotation: “Basicity of the slag was found to be statistically insignificant as an independent variable and, hence,
+        was excluded from the correlation.”
+    - page: 455
+      quotation: “The correlation coefficients of Eqs. [2] and [3] are practically the same (92 and 93 pct).”
+    - page: 455
+      quotation: “it can be concluded that γ(FeO) can be adequately estimated using Eq. [2], and incorporation of additional
+        compositional variables does not yield any significant improvement.”
+    - page: 455
+      quotation: “The activity of FeO ... shows pronounced positive deviation from ideality, at least up to X(FeO) = 0.4.”
+    - page: 455
+      quotation: “Change in basicity over the range (pct CaO)/(pct SiO2) = 1 to 4 had a negligible effect on γ(FeO).”
+    - page: 455
+      quotation: “γ(FeO) shows a strong tendency to decrease with increasing mole fraction of FeO, irrespective of temperature
+        and basicity.”
+    - page: 455
+      quotation: “Increase of SiO2 mole fraction tends to have a positive effect on γ(FeO), but the trends cannot be confirmed,
+        because X(SiO2) was strongly dependent on X(FeO).”
+    - page: 456
+      quotation: “The proposed correlation is capable of fairly accurate estimation of the activity coefficient of FeO.”
+    - page: 450
+      quotation: “The concentrations of CaO, SiO2, FeO, P2O5, and MgO are considered in mass percent, and the oxygen concentration
+        in steel is expressed in parts per million (by mass).”
+    - page: 450
+      quotation: “Change in CaO concentration has a likewise minimal influence, but γ(FeO) is affected more significantly
+        by the concentration of SiO2.”
+    - page: 450
+      quotation: “It is seen that γ(FeO) increases with the increase in the molar concentration of SiO2.”
+    - page: 450-452
+      quotation: “the results appear segregated into different ranges based on FeO concentration only.”
+    - page: 453
+      quotation: “The scatter in the value of γ(FeO), for any particular level of SiO2 (or CaO) concentration, may have resulted
+        from variations in iron oxide concentration.”
+    - page: 453
+      quotation: “However, very little description of the effect of CaO concentration on γ(FeO) has been reported. It can
+        be assumed that the earlier findings were probably similar to the absence of definite correlation with CaO concentration,
+        as has been observed by the present authors.”
+    - page: 453
+      quotation: “It should be noted that the concentrations of SiO2 and FeO were not strictly independent variables in the
+        samples investigated in the present work.”
+    - page: 454
+      quotation: “Figure 6 illustrates that the activity coefficient of FeO is practically a function of FeO concentration
+        only, with a negligible influence of temperature. The relatively small temperature interval of only 50 K could have
+        been partly responsible for this.”
+    - page: 455
+      quotation: “This conforms to the trend seen in Figure 5, which shows no definitive influence of basicity on γ(FeO).”
+    - page: 455
+      quotation: “It can be seen in Figures 8 and 9 that the concentration of SiO2 has an effect on the activity coefficient
+        of FeO, while CaO concentration has a much weaker influence.”
+    - page: 455
+      quotation: “Equation [3] shows that the activity coefficient of FeO is influenced by the concentrations of both CaO
+        and SiO2, even though it is unaffected by basicity. In fact, the coefficients of X(CaO) and X(SiO2) have the same
+        sign, which may explain why no perceptible dependence of γ(FeO) on basicity could be observed.”
+  context_id: basu-2008-feo-steelmaking::context::basu_2008_qualifying_and_directional_statements
+  work_id: 10.1007/s11663-008-9148-4
+  source_id: basu-2008-feo-steelmaking
+  species: FeO
+- observation_id: basu_2008_table_i_prior_investigations
+  type: quoted_comparator
+  locator:
+    page: 448
+    pdf_page_index: 1
+    table: I
+    note: Prior literature summary; secondary findings are retained as attributed context.
+  units: as printed
+  values:
+    quantity: earlier_investigations_activity_feo_summary
+    method_class: quoted_attributed
+    attribution: Authors' summary of references [1]-[24] and [32].
+    table_transcription: 'worker,system_studied,observations_findings
+
+      "Chipman [1]","vacuum decarburized liquid electrolytic iron in equilibrium with H2/H2O gas mixture; Fe(l) + H2O(g) =
+      FeO(l) + H2(g)","Fe(l) + 1/2 O2(g) = (FeO); ΔG° = -31,200 - 1.0 T (cal mol-1)"
+
+      "Vacher and Hamilton [2]","liquid Fe containing carbon and oxygen in equilibrium with CO/CO2 gas mixture","free energy
+      of formation of FeO similar to that reported by Chipman [1]"
+
+      "Chipman and Marshall [4]","solid wüstite, and liquid “FeO” (separately), in equilibrium with solid Fe and H2/H2O gas
+      mixture","FeO(l) + H2(g) = Fe(s) + H2O(g); ΔG° = -7240 + 4.67 T (cal mol-1)"
+
+      "Fetters and Chipman [5,6]","nearly pure liquid iron in equilibrium with CaO-SiO2-FeO-MgO slag rich in iron oxide","log[mass
+      pct O]saturation = -4860/T + 1.935; local maximum of [O] solubility at mass pct ratio (CaO + MgO)/SiO2 = 1.8-2.0, for
+      all FeO levels"
+
+      "Darken and Gurry [10]","iron and wüstite equilibrated with CO/CO2 mixture","effect of p(O2) on iron-wüstite equilibrium"
+
+      "Richardson and Jeffes [11]","2 Fe(l) + O2(g) = 2 FeO(l)","ΔG° (1808-2000 K) = -111,250 + 21.67 T (cal mol-1)"
+
+      "Bodsworth [13]","liquid FeO-Fe2O3-SiO2 slag in equilibrium with CO/CO2 and H2/H2O gas mixtures","FeO(l) + H2(g) = γ-Fe(s)
+      + H2O(g); ΔG° = -23842 + 15.26 T (cal mol-1)"
+
+      "Bishop et al. [17,18]","experimentally determined γ(FeO) in CaO-MgO-SiO2-FeOx slag","estimation of γ(FeO) and γ(MnO)
+      in basic open hearth slag"
+
+      "Morales and Fruehan [15]","Fe(l) + [O] = FetO(l)","ΔG° = -27,740 + 11.66 T (cal mol-1)"
+
+      "Suito and Inoue [14]","equilibrium of CaO-SiO2-FetO-MgOsatd.-P2O5-MnO slag and liquid iron over 1823 to 1923 K","γ(FetO)
+      increases with increase in X(SiO2) and X(P2O5) as well as increase in temperature"
+
+      "Lee and Suito [21]","experimentally determined γ(FetO) in CaO-Al2O3-FetO and CaO-Al2O3-SiO2-FetO slag at 1873 K","γ(FetO)
+      independent of X(FetO) for X(FetO) < 0.1; strong negative deviation of a(SiO2) upto X(SiO2) = 0.4"
+
+      "Liu et al. [32]","Measurement of a(FeO) in CaO-SiO2-Al2O3-MgOsatd.-FeO slag using EMF technique at 1823 K","γ(FeO)
+      ranges from 2.2 to 4.7 for X(FeO) upto 0.08; γ(FeO) decreases marginally with increase in FeO concentration within 0
+      to 5 mole pct; marginal increase in γ(FeO) when basicity increases from 1.6 to 2.2"
+
+      "Ogura et al. [23]","electrochemical measurement of a(FeO) in CaO-SiO2-FeO slag at 1673 K using zirconia electrolyte","positive
+      deviation of a(FeO); γ(FeO) decreases with increasing X(CaO)/X(SiO2) for X(CaO)/X(SiO2) > 1"
+
+      "Haneo and Itagaki [24]","equilibration of FeO-Fe2O3-CaO-SiO2 slag with CO/CO2 gas mixture at 1573 and 1673 K","γ(FeO)
+      increases with increasing basicity but no appreciable effect of temperature within 1573 to 1673 K"'
+  context_id: basu-2008-feo-steelmaking::context::basu_2008_table_i_prior_investigations
+  work_id: 10.1007/s11663-008-9148-4
+  source_id: basu-2008-feo-steelmaking
+  species: FeO
+- observation_id: basu_2008_table_ii_measured_compositions_1873k
+  type: composition
+  experiment: basu_1873k_equilibration
+  locator:
+    page: 451-452
+    pdf_page_index: 4-5
+    table: II
+    note: Measured sample compositions; solutions 1-63 on p. 451, solutions 64-65 on p. 452 (Table II continued); all solution
+      rows also have row locators. Each row is repeated in its a(FeO) and h_O observations.
+  units: mass percent
+  values:
+    quantity: measured_slag_oxide_composition
+    method_class: measured_tabulated
+    series:
+    - solution: 1
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '51.63'
+        SiO2: '16.88'
+        FeO: '17.53'
+        MgO: '4.49'
+        P2O5: '3.65'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 1
+    - solution: 2
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '39.82'
+        SiO2: '29.5'
+        FeO: '10.03'
+        MgO: '13.9'
+        P2O5: '6.33'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 2
+    - solution: 3
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '35.8'
+        SiO2: '19.95'
+        FeO: '23.15'
+        MgO: '11.57'
+        P2O5: '4.32'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 3
+    - solution: 4
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '51.91'
+        SiO2: '17.6'
+        FeO: '17.76'
+        MgO: '3.55'
+        P2O5: '3.74'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 4
+    - solution: 5
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '53.14'
+        SiO2: '17.96'
+        FeO: '18.19'
+        MgO: '3.58'
+        P2O5: '3.73'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 5
+    - solution: 6
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '51.67'
+        SiO2: '16.75'
+        FeO: '17.94'
+        MgO: '4.82'
+        P2O5: '3.66'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 6
+    - solution: 7
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '49.22'
+        SiO2: '20.39'
+        FeO: '18.05'
+        MgO: '3.71'
+        P2O5: '5.09'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 7
+    - solution: 8
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '50.71'
+        SiO2: '16.8'
+        FeO: '18.83'
+        MgO: '6.19'
+        P2O5: '4.53'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 8
+    - solution: 9
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '53.42'
+        SiO2: '17.69'
+        FeO: '19'
+        MgO: '4.65'
+        P2O5: '4.03'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 9
+    - solution: 10
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '35.84'
+        SiO2: '20.07'
+        FeO: '23.03'
+        MgO: '11.8'
+        P2O5: '4.31'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 10
+    - solution: 11
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '38.22'
+        SiO2: '17.83'
+        FeO: '22.92'
+        MgO: '7.25'
+        P2O5: '7.75'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 11
+    - solution: 12
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '50.67'
+        SiO2: '26.73'
+        FeO: '10.37'
+        MgO: '5.05'
+        P2O5: '6.88'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 12
+    - solution: 13
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '37.12'
+        SiO2: '17.41'
+        FeO: '22.74'
+        MgO: '7.92'
+        P2O5: '7.37'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 13
+    - solution: 14
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '41.71'
+        SiO2: '19.8'
+        FeO: '22.56'
+        MgO: '8.22'
+        P2O5: '4.93'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 14
+    - solution: 15
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '50.16'
+        SiO2: '16.67'
+        FeO: '19.6'
+        MgO: '6.05'
+        P2O5: '4.38'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 15
+    - solution: 16
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '51.24'
+        SiO2: '26.84'
+        FeO: '10.27'
+        MgO: '4.81'
+        P2O5: '6.68'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 16
+    - solution: 17
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '39.49'
+        SiO2: '29.42'
+        FeO: '8.93'
+        MgO: '15.45'
+        P2O5: '6.31'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 17
+    - solution: 18
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '51.57'
+        SiO2: '23.14'
+        FeO: '12.28'
+        MgO: '4.08'
+        P2O5: '3.32'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 18
+    - solution: 19
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '27.56'
+        SiO2: '12.53'
+        FeO: '34.99'
+        MgO: '7.88'
+        P2O5: '4.26'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 19
+    - solution: 20
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '41.83'
+        SiO2: '19.82'
+        FeO: '22.09'
+        MgO: '8.06'
+        P2O5: '4.94'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 20
+    - solution: 21
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '40.83'
+        SiO2: '19.42'
+        FeO: '23.91'
+        MgO: '7.63'
+        P2O5: '3.2'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 21
+    - solution: 22
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '28.99'
+        SiO2: '15.43'
+        FeO: '31.08'
+        MgO: '13.19'
+        P2O5: '4.36'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 22
+    - solution: 23
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '43.01'
+        SiO2: '20.31'
+        FeO: '20.04'
+        MgO: '7.87'
+        P2O5: '5.07'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 23
+    - solution: 24
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '39.37'
+        SiO2: '29.2'
+        FeO: '9.19'
+        MgO: '15.58'
+        P2O5: '6.27'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 24
+    - solution: 25
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '53.35'
+        SiO2: '18.09'
+        FeO: '18.15'
+        MgO: '3.45'
+        P2O5: '3.61'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 25
+    - solution: 26
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '37.22'
+        SiO2: '14.71'
+        FeO: '31.96'
+        MgO: '8.25'
+        P2O5: '4.37'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 26
+    - solution: 27
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '42.8'
+        SiO2: '20.19'
+        FeO: '21.14'
+        MgO: '7.91'
+        P2O5: '5.14'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 27
+    - solution: 28
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '30.85'
+        SiO2: '22.75'
+        FeO: '21.57'
+        MgO: '15.16'
+        P2O5: '6.09'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 28
+    - solution: 29
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '36.2'
+        SiO2: '14.35'
+        FeO: '32.21'
+        MgO: '8.45'
+        P2O5: '4.27'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 29
+    - solution: 30
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '35.06'
+        SiO2: '19.75'
+        FeO: '23.11'
+        MgO: '12.15'
+        P2O5: '4.16'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 30
+    - solution: 31
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '35.77'
+        SiO2: '20.21'
+        FeO: '22.97'
+        MgO: '11.78'
+        P2O5: '4.16'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 31
+    - solution: 32
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '30.65'
+        SiO2: '22.57'
+        FeO: '21.12'
+        MgO: '15.09'
+        P2O5: '6.04'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 32
+    - solution: 33
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '40.19'
+        SiO2: '19.37'
+        FeO: '24.48'
+        MgO: '7.75'
+        P2O5: '3.18'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 33
+    - solution: 34
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '27.54'
+        SiO2: '14.64'
+        FeO: '31.44'
+        MgO: '12.43'
+        P2O5: '4.18'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 34
+    - solution: 35
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '48.81'
+        SiO2: '16.13'
+        FeO: '19.45'
+        MgO: '7.16'
+        P2O5: '4.25'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 35
+    - solution: 36
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '49.65'
+        SiO2: '20.64'
+        FeO: '18.06'
+        MgO: '3.7'
+        P2O5: '5.01'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 36
+    - solution: 37
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '27.98'
+        SiO2: '14.98'
+        FeO: '30.87'
+        MgO: '12.41'
+        P2O5: '4.36'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 37
+    - solution: 38
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '30.37'
+        SiO2: '22.56'
+        FeO: '20.93'
+        MgO: '16.66'
+        P2O5: '5.87'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 38
+    - solution: 39
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '53'
+        SiO2: '17.83'
+        FeO: '19.66'
+        MgO: '3.77'
+        P2O5: '3.86'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 39
+    - solution: 40
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '28.99'
+        SiO2: '15.33'
+        FeO: '28'
+        MgO: '13.74'
+        P2O5: '3.51'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 40
+    - solution: 41
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '36.39'
+        SiO2: '14.06'
+        FeO: '34.46'
+        MgO: '8.34'
+        P2O5: '4.44'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 41
+    - solution: 42
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '46.68'
+        SiO2: '24.23'
+        FeO: '11.96'
+        MgO: '3.39'
+        P2O5: '3.37'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 42
+    - solution: 43
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '54.63'
+        SiO2: '20.26'
+        FeO: '12.43'
+        MgO: '3.42'
+        P2O5: '4.99'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 43
+    - solution: 44
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '24.89'
+        SiO2: '11.22'
+        FeO: '44.92'
+        MgO: '7.89'
+        P2O5: '1.14'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 44
+    - solution: 45
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '34.95'
+        SiO2: '13.64'
+        FeO: '34.26'
+        MgO: '8'
+        P2O5: '4.27'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 45
+    - solution: 46
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '30.4'
+        SiO2: '22.56'
+        FeO: '19.85'
+        MgO: '16.77'
+        P2O5: '5.99'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 46
+    - solution: 47
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '54.56'
+        SiO2: '20.16'
+        FeO: '12.39'
+        MgO: '3.18'
+        P2O5: '5.17'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 47
+    - solution: 48
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '48.23'
+        SiO2: '15.98'
+        FeO: '22.61'
+        MgO: '6.49'
+        P2O5: '3.71'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 48
+    - solution: 49
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '49.71'
+        SiO2: '20.17'
+        FeO: '19.55'
+        MgO: '3.3'
+        P2O5: '5.12'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 49
+    - solution: 50
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '24.42'
+        SiO2: '10.93'
+        FeO: '46.89'
+        MgO: '8.42'
+        P2O5: '1.28'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 50
+    - solution: 51
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '54.99'
+        SiO2: '20.31'
+        FeO: '11.65'
+        MgO: '3.15'
+        P2O5: '4.93'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 51
+    - solution: 52
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '48.77'
+        SiO2: '16.23'
+        FeO: '20.92'
+        MgO: '7.05'
+        P2O5: '4.28'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 52
+    - solution: 53
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '54.31'
+        SiO2: '21.49'
+        FeO: '13.12'
+        MgO: '3.12'
+        P2O5: '4.59'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 53
+    - solution: 54
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '54.4'
+        SiO2: '21.59'
+        FeO: '13.39'
+        MgO: '2.69'
+        P2O5: '4.58'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 54
+    - solution: 55
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '34.98'
+        SiO2: '24.38'
+        FeO: '16.79'
+        MgO: '13.93'
+        P2O5: '7.53'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 55
+    - solution: 56
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '34.82'
+        SiO2: '24.92'
+        FeO: '16.94'
+        MgO: '13.86'
+        P2O5: '7.08'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 56
+    - solution: 57
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '40.35'
+        SiO2: '29.71'
+        FeO: '6.65'
+        MgO: '15.41'
+        P2O5: '6.06'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 57
+    - solution: 58
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '34.55'
+        SiO2: '24.94'
+        FeO: '17.23'
+        MgO: '13.41'
+        P2O5: '6.5'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 58
+    - solution: 59
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '41.22'
+        SiO2: '30.52'
+        FeO: '6.44'
+        MgO: '15.54'
+        P2O5: '6.22'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 59
+    - solution: 60
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '50.68'
+        SiO2: '26.83'
+        FeO: '10.04'
+        MgO: '5.32'
+        P2O5: '6.79'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 60
+    - solution: 61
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '49.71'
+        SiO2: '22.61'
+        FeO: '14.58'
+        MgO: '7.33'
+        P2O5: '3.31'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 61
+    - solution: 62
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '40.3'
+        SiO2: '29.74'
+        FeO: '6.94'
+        MgO: '15.41'
+        P2O5: '6.21'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 62
+    - solution: 63
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '49.07'
+        SiO2: '22.06'
+        FeO: '16.52'
+        MgO: '7.25'
+        P2O5: '3.33'
+      locator:
+        page: 451
+        pdf_page_index: 4
+        table: II
+        row: Solution 63
+    - solution: 64
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '29.49'
+        SiO2: '12.42'
+        FeO: '40.97'
+        MgO: '8.76'
+        P2O5: '3.83'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: II (continued)
+        row: Solution 64
+    - solution: 65
+      T_K: 1873
+      composition_wt_pct:
+        CaO: '52.41'
+        SiO2: '21.2'
+        FeO: '14.76'
+        MgO: '5.05'
+        P2O5: '4.76'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: II (continued)
+        row: Solution 65
+  context_id: basu-2008-feo-steelmaking::context::basu_2008_table_ii_measured_compositions_1873k
+  work_id: 10.1007/s11663-008-9148-4
+  source_id: basu-2008-feo-steelmaking
+  species: FeO
+- observation_id: basu_2008_table_iii_measured_compositions_1923k
+  type: composition
+  experiment: basu_1923k_equilibration
+  locator:
+    page: 452
+    pdf_page_index: 5
+    table: III
+    note: Measured sample compositions; all solution rows also have row locators. Each row is repeated in its a(FeO) and h_O
+      observations.
+  units: mass percent
+  values:
+    quantity: measured_slag_oxide_composition
+    method_class: measured_tabulated
+    series:
+    - solution: 1
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '38.99'
+        SiO2: '24.42'
+        FeO: '17.33'
+        MgO: '11.68'
+        P2O5: '3.35'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 1
+    - solution: 2
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '47.91'
+        SiO2: '22.69'
+        FeO: '12.8'
+        MgO: '8.59'
+        P2O5: '7.34'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 2
+    - solution: 3
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '43.11'
+        SiO2: '20.15'
+        FeO: '18.67'
+        MgO: '8.57'
+        P2O5: '4.83'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 3
+    - solution: 4
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '33.68'
+        SiO2: '18.26'
+        FeO: '24.64'
+        MgO: '7.19'
+        P2O5: '7.99'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 4
+    - solution: 5
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '44.74'
+        SiO2: '13.72'
+        FeO: '25.07'
+        MgO: '6.03'
+        P2O5: '3.17'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 5
+    - solution: 6
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '39.88'
+        SiO2: '24.81'
+        FeO: '18.52'
+        MgO: '10.78'
+        P2O5: '3.73'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 6
+    - solution: 7
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '48.54'
+        SiO2: '18.01'
+        FeO: '19.54'
+        MgO: '6.15'
+        P2O5: '3.54'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 7
+    - solution: 8
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '38.52'
+        SiO2: '28.48'
+        FeO: '10.62'
+        MgO: '16'
+        P2O5: '6.14'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 8
+    - solution: 9
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '40.04'
+        SiO2: '24.69'
+        FeO: '18.84'
+        MgO: '10.89'
+        P2O5: '3.61'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 9
+    - solution: 10
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '35.52'
+        SiO2: '14.26'
+        FeO: '29.44'
+        MgO: '8.11'
+        P2O5: '4.5'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 10
+    - solution: 11
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '48.95'
+        SiO2: '18.29'
+        FeO: '19.15'
+        MgO: '6.16'
+        P2O5: '3.62'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 11
+    - solution: 12
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '49.08'
+        SiO2: '18.35'
+        FeO: '21.09'
+        MgO: '6.47'
+        P2O5: '3.69'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 12
+    - solution: 13
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '38.79'
+        SiO2: '28.83'
+        FeO: '9.98'
+        MgO: '15.08'
+        P2O5: '6.22'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 13
+    - solution: 14
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '36.97'
+        SiO2: '12.9'
+        FeO: '33.87'
+        MgO: '7.89'
+        P2O5: '3.93'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 14
+    - solution: 15
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '39.49'
+        SiO2: '17.34'
+        FeO: '24.17'
+        MgO: '10.81'
+        P2O5: '3.49'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 15
+    - solution: 16
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '42.64'
+        SiO2: '13.05'
+        FeO: '27.87'
+        MgO: '5.68'
+        P2O5: '2.94'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 16
+    - solution: 17
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '38.58'
+        SiO2: '28.89'
+        FeO: '10.17'
+        MgO: '15.04'
+        P2O5: '6.23'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 17
+    - solution: 18
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '36.3'
+        SiO2: '15.99'
+        FeO: '26.62'
+        MgO: '10.64'
+        P2O5: '3.54'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 18
+    - solution: 19
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '47.51'
+        SiO2: '22.4'
+        FeO: '13.09'
+        MgO: '8.26'
+        P2O5: '7.51'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 19
+    - solution: 20
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '37.6'
+        SiO2: '18.84'
+        FeO: '24.37'
+        MgO: '9.24'
+        P2O5: '7.08'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 20
+    - solution: 21
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '36.13'
+        SiO2: '15.93'
+        FeO: '26.29'
+        MgO: '11.25'
+        P2O5: '3.59'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 21
+    - solution: 22
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '49.61'
+        SiO2: '18.48'
+        FeO: '20.03'
+        MgO: '6.42'
+        P2O5: '3.88'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 22
+    - solution: 23
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '47.06'
+        SiO2: '22.4'
+        FeO: '12.53'
+        MgO: '8.53'
+        P2O5: '7.4'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 23
+    - solution: 24
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '39.74'
+        SiO2: '17.39'
+        FeO: '22.2'
+        MgO: '10.48'
+        P2O5: '3.6'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 24
+    - solution: 25
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '36.63'
+        SiO2: '12.84'
+        FeO: '30.95'
+        MgO: '8.4'
+        P2O5: '4'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 25
+    - solution: 26
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '34.91'
+        SiO2: '13.95'
+        FeO: '30.8'
+        MgO: '7.97'
+        P2O5: '4.74'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 26
+    - solution: 27
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '43.95'
+        SiO2: '23.25'
+        FeO: '13.72'
+        MgO: '11.98'
+        P2O5: '6.32'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 27
+    - solution: 28
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '35'
+        SiO2: '13.98'
+        FeO: '31.21'
+        MgO: '8.03'
+        P2O5: '4.55'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 28
+    - solution: 29
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '38.36'
+        SiO2: '13.45'
+        FeO: '29.81'
+        MgO: '7.83'
+        P2O5: '4.22'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 29
+    - solution: 30
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '41.3'
+        SiO2: '15.36'
+        FeO: '29.68'
+        MgO: '7.59'
+        P2O5: '4.01'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 30
+    - solution: 31
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '37.5'
+        SiO2: '13.16'
+        FeO: '29'
+        MgO: '8.38'
+        P2O5: '3.85'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 31
+    - solution: 32
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '40.69'
+        SiO2: '15'
+        FeO: '29.65'
+        MgO: '7.21'
+        P2O5: '4'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 32
+    - solution: 33
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '44.04'
+        SiO2: '23.16'
+        FeO: '13.45'
+        MgO: '12.18'
+        P2O5: '6.29'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 33
+    - solution: 34
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '40.68'
+        SiO2: '15.14'
+        FeO: '32.25'
+        MgO: '7.16'
+        P2O5: '4.02'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 34
+    - solution: 35
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '25.82'
+        SiO2: '8.55'
+        FeO: '48.6'
+        MgO: '10.08'
+        P2O5: '1.74'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 35
+    - solution: 36
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '43.25'
+        SiO2: '20.17'
+        FeO: '17.77'
+        MgO: '8.84'
+        P2O5: '4.8'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 36
+    - solution: 37
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '43.52'
+        SiO2: '20.54'
+        FeO: '17.81'
+        MgO: '8.85'
+        P2O5: '4.55'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 37
+    - solution: 38
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '43.23'
+        SiO2: '20.27'
+        FeO: '18.73'
+        MgO: '8.94'
+        P2O5: '4.82'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 38
+    - solution: 39
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '52.25'
+        SiO2: '20.86'
+        FeO: '14.59'
+        MgO: '3.53'
+        P2O5: '4.75'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 39
+    - solution: 40
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '25.28'
+        SiO2: '8.34'
+        FeO: '48.91'
+        MgO: '10.15'
+        P2O5: '1.41'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 40
+    - solution: 41
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '17.74'
+        SiO2: '12.46'
+        FeO: '35.75'
+        MgO: '21.48'
+        P2O5: '2.47'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 41
+    - solution: 42
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '17.52'
+        SiO2: '11.62'
+        FeO: '36.27'
+        MgO: '21.29'
+        P2O5: '2.37'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 42
+    - solution: 43
+      T_K: 1923
+      composition_wt_pct:
+        CaO: '17.39'
+        SiO2: '12'
+        FeO: '36.85'
+        MgO: '20.46'
+        P2O5: '1.08'
+      locator:
+        page: 452
+        pdf_page_index: 5
+        table: III
+        row: Solution 43
+  context_id: basu-2008-feo-steelmaking::context::basu_2008_table_iii_measured_compositions_1923k
+  work_id: 10.1007/s11663-008-9148-4
+  source_id: basu-2008-feo-steelmaking
+  species: FeO

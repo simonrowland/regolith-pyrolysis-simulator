@@ -1,0 +1,314 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/greig-1927-ajs-immiscibility-silicate-melts-part1.yaml
+observations:
+- observation_id: greig-1927-ajs-immiscibility-silicate-melts-part1::greig1927_cristobalite_melting_point
+  experiment_id: 10.2475/ajs.s5-13.73.1::experiment::cristobalite-melting-t2a
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'cristobalite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1986.15'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed ± 5° (°C); temperature held constant to better than ± 0.4° during each run (Table II A note).
+      T_C_plus_minus_as_printed: 5
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: greig-1927-ajs-immiscibility-silicate-melts-part1::greig1927_cristobalite_melting_point
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  locator:
+    page: 9
+    published_page: 9
+    table: II A
+    note: Summary line "Melting point 1713° ± 5°." printed under Table II A (p. 9) and again under Table II B (p. 10)
+  read_from: unknown:greig-1927-ajs-immiscibility-silicate-melts-part1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1986.15'
+      locator:
+        page: 9
+        published_page: 9
+        table: II A
+        note: Summary line "Melting point 1713° ± 5°." printed under Table II A (p. 9) and again under Table II B (p. 10)
+- observation_id: greig-1927-ajs-immiscibility-silicate-melts-part1::greig1927_t3_cao_sio2_cristobalite_two_liquids_T
+  experiment_id: 10.2475/ajs.s5-13.73.1::experiment::cristobalite-two-liquids-t3
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'cristobalite + two liquids' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: three_phase_equilibrium_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1971.15'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No ± printed for this temperature in Table III; the working element was compared with the two standard elements
+        after runs 6, 11 and 15.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: greig-1927-ajs-immiscibility-silicate-melts-part1::greig1927_t3_cao_sio2_cristobalite_two_liquids_T
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Row "Temperature of the equilibrium", CaO-SiO2 column(s) 15CaO, 85SiO2 / 5CaO, 95SiO2; restated in prose p. 30
+  read_from: unknown:greig-1927-ajs-immiscibility-silicate-melts-part1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1971.15'
+      locator:
+        page: 14
+        published_page: 14
+        table: III
+        note: Row "Temperature of the equilibrium", CaO-SiO2 column(s) 15CaO, 85SiO2 / 5CaO, 95SiO2; restated in prose p.
+          30
+- observation_id: greig-1927-ajs-immiscibility-silicate-melts-part1::greig1927_t3_mgo_sio2_cristobalite_two_liquids_T
+  experiment_id: 10.2475/ajs.s5-13.73.1::experiment::cristobalite-two-liquids-t3
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'cristobalite + two liquids' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: three_phase_equilibrium_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1968.15'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No ± printed for this temperature in Table III; the working element was compared with the two standard elements
+        after runs 6, 11 and 15.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: greig-1927-ajs-immiscibility-silicate-melts-part1::greig1927_t3_mgo_sio2_cristobalite_two_liquids_T
+  source_id: greig-1927-ajs-immiscibility-silicate-melts-part1
+  locator:
+    page: 14
+    published_page: 14
+    table: III
+    note: Row "Temperature of the equilibrium", MgO-SiO2 column(s) 15MgO, 85SiO2; restated in prose p. 30
+  read_from: unknown:greig-1927-ajs-immiscibility-silicate-melts-part1
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1968.15'
+      locator:
+        page: 14
+        published_page: 14
+        table: III
+        note: Row "Temperature of the equilibrium", MgO-SiO2 column(s) 15MgO, 85SiO2; restated in prose p. 30

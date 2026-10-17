@@ -1,0 +1,2824 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/tsuchiyama-1998-forsterite-mg2sio4-h2.yaml
+observations:
+- observation_id: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_a_10::T=1523.15:row=a-10:h=5e34847d1c48
+  experiment_id: 10.2465/minerj.20.113::experiment::forsterite-h2-run-a-10
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_areal_density
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1523.15'
+  value:
+    kind: point
+    point: '0.0708'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      mass_loss_g_as_printed: ±0.01 mg
+      initial_dimensions_as_printed: about ±0.05 mm
+      temperature_precision_as_printed: better than ±10°C
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_a_10::T=1523.15:row=a-10:h=5e34847d1c48
+  source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+  locator:
+    published_page: 116
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Table 1 row for run A-10.
+  read_from: pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run A-10.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-10.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-10.
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0002353'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run A-10.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.2353 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2353'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-10.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-10.
+        output_unit: kg
+  derivation:
+    relation: g_per_cm2_to_kg_per_m2
+    inputs:
+    - pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00708'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run A-10.
+    - - factor
+      - state:
+          tag: value
+          value: '10'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run A-10.
+    output_unit: kg_per_m2
+- observation_id: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_a_1::T=1723.15:row=a-1:h=b47c89b47524
+  experiment_id: 10.2465/minerj.20.113::experiment::forsterite-h2-run-a-1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_areal_density
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1723.15'
+  value:
+    kind: point
+    point: '0.1016'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      mass_loss_g_as_printed: ±0.01 mg
+      initial_dimensions_as_printed: about ±0.05 mm
+      temperature_precision_as_printed: better than ±10°C
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'source_internally_inconsistent: the text on p. 114 says “durations ranging from 3 to 66 hours”; Table 1 (p. 116)
+      prints run A-1 at 1450 °C for 2 h. The Table 1 value is carried; not corrected.'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_a_1::T=1723.15:row=a-1:h=b47c89b47524
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_a_1::T=1723.15:row=a-1:h=b47c89b47524
+  source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+  locator:
+    published_page: 116
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Table 1 row for run A-1.
+  read_from: pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run A-1.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-1.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-1.
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.00027608'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run A-1.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.27608 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.27608'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-1.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-1.
+        output_unit: kg
+  derivation:
+    relation: g_per_cm2_to_kg_per_m2
+    inputs:
+    - pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.01016'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run A-1.
+    - - factor
+      - state:
+          tag: value
+          value: '10'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run A-1.
+    output_unit: kg_per_m2
+- observation_id: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_a_2::T=1623.15:row=a-2:h=65da5d7689f5
+  experiment_id: 10.2465/minerj.20.113::experiment::forsterite-h2-run-a-2
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_areal_density
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1623.15'
+  value:
+    kind: point
+    point: '0.0535'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      mass_loss_g_as_printed: ±0.01 mg
+      initial_dimensions_as_printed: about ±0.05 mm
+      temperature_precision_as_printed: better than ±10°C
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_a_2::T=1623.15:row=a-2:h=65da5d7689f5
+  source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+  locator:
+    published_page: 116
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Table 1 row for run A-2.
+  read_from: pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1623.15'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run A-2.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1350'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-2.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-2.
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.00026392'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run A-2.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.26392 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.26392'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-2.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-2.
+        output_unit: kg
+  derivation:
+    relation: g_per_cm2_to_kg_per_m2
+    inputs:
+    - pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00535'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run A-2.
+    - - factor
+      - state:
+          tag: value
+          value: '10'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run A-2.
+    output_unit: kg_per_m2
+- observation_id: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_a_4::T=1573.15:row=a-4:h=5cca0ec34f84
+  experiment_id: 10.2465/minerj.20.113::experiment::forsterite-h2-run-a-4
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_areal_density
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+  value:
+    kind: point
+    point: '0.1311'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      mass_loss_g_as_printed: ±0.01 mg
+      initial_dimensions_as_printed: about ±0.05 mm
+      temperature_precision_as_printed: better than ±10°C
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_a_4::T=1573.15:row=a-4:h=5cca0ec34f84
+  source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+  locator:
+    published_page: 116
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Table 1 row for run A-4.
+  read_from: pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run A-4.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-4.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-4.
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.00028208'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run A-4.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.28208 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.28208'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-4.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-4.
+        output_unit: kg
+  derivation:
+    relation: g_per_cm2_to_kg_per_m2
+    inputs:
+    - pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.01311'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run A-4.
+    - - factor
+      - state:
+          tag: value
+          value: '10'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run A-4.
+    output_unit: kg_per_m2
+- observation_id: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_a_5::T=1623.15:row=a-5:h=7bb1e37a684b
+  experiment_id: 10.2465/minerj.20.113::experiment::forsterite-h2-run-a-5
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_areal_density
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1623.15'
+  value:
+    kind: point
+    point: '0.1634'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      mass_loss_g_as_printed: ±0.01 mg
+      initial_dimensions_as_printed: about ±0.05 mm
+      temperature_precision_as_printed: better than ±10°C
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_a_5::T=1623.15:row=a-5:h=7bb1e37a684b
+  source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+  locator:
+    published_page: 116
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Table 1 row for run A-5.
+  read_from: pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1623.15'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run A-5.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1350'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-5.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-5.
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.00019937'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run A-5.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.19937 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.19937'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-5.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-5.
+        output_unit: kg
+  derivation:
+    relation: g_per_cm2_to_kg_per_m2
+    inputs:
+    - pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.01634'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run A-5.
+    - - factor
+      - state:
+          tag: value
+          value: '10'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run A-5.
+    output_unit: kg_per_m2
+- observation_id: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_a_6::T=1573.15:row=a-6:h=eacac0620a06
+  experiment_id: 10.2465/minerj.20.113::experiment::forsterite-h2-run-a-6
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_areal_density
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+  value:
+    kind: point
+    point: '0.1091'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      mass_loss_g_as_printed: ±0.01 mg
+      initial_dimensions_as_printed: about ±0.05 mm
+      temperature_precision_as_printed: better than ±10°C
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_a_6::T=1573.15:row=a-6:h=eacac0620a06
+  source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+  locator:
+    published_page: 116
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Table 1 row for run A-6.
+  read_from: pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run A-6.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-6.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-6.
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.000253'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run A-6.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.253 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.253'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-6.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-6.
+        output_unit: kg
+  derivation:
+    relation: g_per_cm2_to_kg_per_m2
+    inputs:
+    - pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.01091'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run A-6.
+    - - factor
+      - state:
+          tag: value
+          value: '10'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run A-6.
+    output_unit: kg_per_m2
+- observation_id: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_a_7::T=1573.15:row=a-7:h=342e0d77dba1
+  experiment_id: 10.2465/minerj.20.113::experiment::forsterite-h2-run-a-7
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_areal_density
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+  value:
+    kind: point
+    point: '0.0674'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      mass_loss_g_as_printed: ±0.01 mg
+      initial_dimensions_as_printed: about ±0.05 mm
+      temperature_precision_as_printed: better than ±10°C
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_a_7::T=1573.15:row=a-7:h=342e0d77dba1
+  source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+  locator:
+    published_page: 116
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Table 1 row for run A-7.
+  read_from: pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run A-7.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-7.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-7.
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.00024089'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run A-7.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.24089 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.24089'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-7.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-7.
+        output_unit: kg
+  derivation:
+    relation: g_per_cm2_to_kg_per_m2
+    inputs:
+    - pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00674'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run A-7.
+    - - factor
+      - state:
+          tag: value
+          value: '10'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run A-7.
+    output_unit: kg_per_m2
+- observation_id: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_a_9::T=1623.15:row=a-9:h=b4b3c017d202
+  experiment_id: 10.2465/minerj.20.113::experiment::forsterite-h2-run-a-9
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_areal_density
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1623.15'
+  value:
+    kind: point
+    point: '0.1041'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      mass_loss_g_as_printed: ±0.01 mg
+      initial_dimensions_as_printed: about ±0.05 mm
+      temperature_precision_as_printed: better than ±10°C
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_a_9::T=1623.15:row=a-9:h=b4b3c017d202
+  source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+  locator:
+    published_page: 116
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Table 1 row for run A-9.
+  read_from: pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1623.15'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run A-9.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1350'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-9.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-9.
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.00024339'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run A-9.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.24339 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.24339'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-9.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run A-9.
+        output_unit: kg
+  derivation:
+    relation: g_per_cm2_to_kg_per_m2
+    inputs:
+    - pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.01041'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run A-9.
+    - - factor
+      - state:
+          tag: value
+          value: '10'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run A-9.
+    output_unit: kg_per_m2
+- observation_id: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_11::T=1523.15:row=foh-11:h=c639ea3024a2
+  experiment_id: 10.2465/minerj.20.113::experiment::forsterite-h2-run-foh-11
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_areal_density
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1523.15'
+  value:
+    kind: point
+    point: '0.0491'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      mass_loss_g_as_printed: ±0.01 mg
+      initial_dimensions_as_printed: about ±0.05 mm
+      temperature_precision_as_printed: better than ±10°C
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_11::T=1523.15:row=foh-11:h=c639ea3024a2
+  source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+  locator:
+    published_page: 116
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Table 1 row for run FoH-11.
+  read_from: pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-11.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-11.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-11.
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.00028954'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-11.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.28954 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.28954'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-11.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-11.
+        output_unit: kg
+  derivation:
+    relation: g_per_cm2_to_kg_per_m2
+    inputs:
+    - pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00491'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-11.
+    - - factor
+      - state:
+          tag: value
+          value: '10'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-11.
+    output_unit: kg_per_m2
+- observation_id: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_12::T=1523.15:row=foh-12:h=5e43c6e39a69
+  experiment_id: 10.2465/minerj.20.113::experiment::forsterite-h2-run-foh-12
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_areal_density
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1523.15'
+  value:
+    kind: point
+    point: '0.1166'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      mass_loss_g_as_printed: ±0.01 mg
+      initial_dimensions_as_printed: about ±0.05 mm
+      temperature_precision_as_printed: better than ±10°C
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'source_internally_inconsistent: Table 1 (p. 116) prints FoH-12 at 1250 °C for 48 h; the Fig. 4 caption (p. 118)
+      gives Run FoH-12 as “1250°C, 24 hrs”. The Table 1 value is carried; not corrected.'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_12::T=1523.15:row=foh-12:h=5e43c6e39a69
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_12::T=1523.15:row=foh-12:h=5e43c6e39a69
+  source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+  locator:
+    published_page: 116
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Table 1 row for run FoH-12.
+  read_from: pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-12.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-12.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-12.
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0003162'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-12.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.3162 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.3162'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-12.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-12.
+        output_unit: kg
+  derivation:
+    relation: g_per_cm2_to_kg_per_m2
+    inputs:
+    - pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.01166'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-12.
+    - - factor
+      - state:
+          tag: value
+          value: '10'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-12.
+    output_unit: kg_per_m2
+- observation_id: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_14::T=1473.15:row=foh-14:h=b40a943b9fbf
+  experiment_id: 10.2465/minerj.20.113::experiment::forsterite-h2-run-foh-14
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_areal_density
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: point
+    point: '0.0409'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      mass_loss_g_as_printed: ±0.01 mg
+      initial_dimensions_as_printed: about ±0.05 mm
+      temperature_precision_as_printed: better than ±10°C
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_14::T=1473.15:row=foh-14:h=b40a943b9fbf
+  source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+  locator:
+    published_page: 116
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Table 1 row for run FoH-14.
+  read_from: pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-14.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-14.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-14.
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0002201'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-14.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.2201 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2201'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-14.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-14.
+        output_unit: kg
+  derivation:
+    relation: g_per_cm2_to_kg_per_m2
+    inputs:
+    - pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00409'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-14.
+    - - factor
+      - state:
+          tag: value
+          value: '10'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-14.
+    output_unit: kg_per_m2
+- observation_id: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_15::T=1673.15:row=foh-15:h=73fad6c3a56e
+  experiment_id: 10.2465/minerj.20.113::experiment::forsterite-h2-run-foh-15
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_areal_density
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: point
+    point: '0.9689'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      mass_loss_g_as_printed: ±0.01 mg
+      initial_dimensions_as_printed: about ±0.05 mm
+      temperature_precision_as_printed: better than ±10°C
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_15::T=1673.15:row=foh-15:h=73fad6c3a56e
+  source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+  locator:
+    published_page: 116
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Table 1 row for run FoH-15.
+  read_from: pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-15.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-15.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-15.
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.00021697'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-15.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.21697 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.21697'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-15.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-15.
+        output_unit: kg
+  derivation:
+    relation: g_per_cm2_to_kg_per_m2
+    inputs:
+    - pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.09689'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-15.
+    - - factor
+      - state:
+          tag: value
+          value: '10'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-15.
+    output_unit: kg_per_m2
+- observation_id: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_16::T=1673.15:row=foh-16:h=ec43def7be49
+  experiment_id: 10.2465/minerj.20.113::experiment::forsterite-h2-run-foh-16
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_areal_density
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: point
+    point: '0.1975'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      mass_loss_g_as_printed: ±0.01 mg
+      initial_dimensions_as_printed: about ±0.05 mm
+      temperature_precision_as_printed: better than ±10°C
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_16::T=1673.15:row=foh-16:h=ec43def7be49
+  source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+  locator:
+    published_page: 116
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Table 1 row for run FoH-16.
+  read_from: pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-16.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-16.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-16.
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0002153'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-16.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.2153 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2153'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-16.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-16.
+        output_unit: kg
+  derivation:
+    relation: g_per_cm2_to_kg_per_m2
+    inputs:
+    - pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.01975'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-16.
+    - - factor
+      - state:
+          tag: value
+          value: '10'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-16.
+    output_unit: kg_per_m2
+- observation_id: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_17::T=1723.15:row=foh-17:h=7742d5bdb8f6
+  experiment_id: 10.2465/minerj.20.113::experiment::forsterite-h2-run-foh-17
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_areal_density
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1723.15'
+  value:
+    kind: point
+    point: '0.3246'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      mass_loss_g_as_printed: ±0.01 mg
+      initial_dimensions_as_printed: about ±0.05 mm
+      temperature_precision_as_printed: better than ±10°C
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_17::T=1723.15:row=foh-17:h=7742d5bdb8f6
+  source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+  locator:
+    published_page: 116
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Table 1 row for run FoH-17.
+  read_from: pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-17.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-17.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-17.
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.00023935'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-17.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.23935 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.23935'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-17.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-17.
+        output_unit: kg
+  derivation:
+    relation: g_per_cm2_to_kg_per_m2
+    inputs:
+    - pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.03246'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-17.
+    - - factor
+      - state:
+          tag: value
+          value: '10'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-17.
+    output_unit: kg_per_m2
+- observation_id: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_18::T=1473.15:row=foh-18:h=c2dd34f75031
+  experiment_id: 10.2465/minerj.20.113::experiment::forsterite-h2-run-foh-18
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_areal_density
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: point
+    point: '0.0459'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      mass_loss_g_as_printed: ±0.01 mg
+      initial_dimensions_as_printed: about ±0.05 mm
+      temperature_precision_as_printed: better than ±10°C
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_18::T=1473.15:row=foh-18:h=c2dd34f75031
+  source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+  locator:
+    published_page: 116
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Table 1 row for run FoH-18.
+  read_from: pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-18.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-18.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-18.
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.00032673'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-18.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.32673 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.32673'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-18.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-18.
+        output_unit: kg
+  derivation:
+    relation: g_per_cm2_to_kg_per_m2
+    inputs:
+    - pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00459'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-18.
+    - - factor
+      - state:
+          tag: value
+          value: '10'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-18.
+    output_unit: kg_per_m2
+- observation_id: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_19::T=1673.15:row=foh-19:h=bf2e01fb7cfb
+  experiment_id: 10.2465/minerj.20.113::experiment::forsterite-h2-run-foh-19
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_areal_density
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+  value:
+    kind: point
+    point: '0.0895'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      mass_loss_g_as_printed: ±0.01 mg
+      initial_dimensions_as_printed: about ±0.05 mm
+      temperature_precision_as_printed: better than ±10°C
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_19::T=1673.15:row=foh-19:h=bf2e01fb7cfb
+  source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+  locator:
+    published_page: 116
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Table 1 row for run FoH-19.
+  read_from: pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-19.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-19.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-19.
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.00031822'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-19.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.31822 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.31822'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-19.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-19.
+        output_unit: kg
+  derivation:
+    relation: g_per_cm2_to_kg_per_m2
+    inputs:
+    - pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00895'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-19.
+    - - factor
+      - state:
+          tag: value
+          value: '10'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-19.
+    output_unit: kg_per_m2
+- observation_id: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_1::T=1473.15:row=foh-1:h=91d4654a78c4
+  experiment_id: 10.2465/minerj.20.113::experiment::forsterite-h2-run-foh-1
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_areal_density
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473.15'
+  value:
+    kind: point
+    point: '0.0174'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      mass_loss_g_as_printed: ±0.01 mg
+      initial_dimensions_as_printed: about ±0.05 mm
+      temperature_precision_as_printed: better than ±10°C
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_1::T=1473.15:row=foh-1:h=91d4654a78c4
+  source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+  locator:
+    published_page: 116
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Table 1 row for run FoH-1.
+  read_from: pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-1.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1200'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-1.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-1.
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.00032694'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-1.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.32694 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.32694'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-1.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-1.
+        output_unit: kg
+  derivation:
+    relation: g_per_cm2_to_kg_per_m2
+    inputs:
+    - pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00174'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-1.
+    - - factor
+      - state:
+          tag: value
+          value: '10'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-1.
+    output_unit: kg_per_m2
+- observation_id: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_20::T=1723.15:row=foh-20:h=0b942713ac50
+  experiment_id: 10.2465/minerj.20.113::experiment::forsterite-h2-run-foh-20
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_areal_density
+    species:
+      formula: forsterite
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1723.15'
+  value:
+    kind: point
+    point: '0.137'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      mass_loss_g_as_printed: ±0.01 mg
+      initial_dimensions_as_printed: about ±0.05 mm
+      temperature_precision_as_printed: better than ±10°C
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_areal_density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tsuchiyama-1998-forsterite-mg2sio4-h2::tsuchiyama_1998_table1_run_foh_20::T=1723.15:row=foh-20:h=0b942713ac50
+  source_id: tsuchiyama-1998-forsterite-mg2sio4-h2
+  locator:
+    published_page: 116
+    pdf_page_index: 3
+    table: '1'
+    section: Table 1
+    note: Table 1 row for run FoH-20.
+  read_from: pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-20.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-20.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-20.
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.00027443'
+      locator:
+        published_page: 116
+        pdf_page_index: 3
+        table: '1'
+        section: Table 1
+        note: Table 1 row for run FoH-20.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.27443 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.27443'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-20.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 116
+              pdf_page_index: 3
+              table: '1'
+              section: Table 1
+              note: Table 1 row for run FoH-20.
+        output_unit: kg
+  derivation:
+    relation: g_per_cm2_to_kg_per_m2
+    inputs:
+    - pdf:tsuchiyama-1998-forsterite-mg2sio4-h2
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0137'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-20.
+    - - factor
+      - state:
+          tag: value
+          value: '10'
+        locator:
+          published_page: 116
+          pdf_page_index: 3
+          table: '1'
+          section: Table 1
+          note: Table 1 row for run FoH-20.
+    output_unit: kg_per_m2

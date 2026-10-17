@@ -624,11 +624,13 @@ species:
         evidence_refs:
           - validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml
       mass_spec:
-        # form589 2026-08-09: Costa Fo93Fa7 crystalline olivine α + Wetzel
-        # unresolved amorphous/provenance row excluded. Residual TIGHTENS
-        # 1.297484933 -> 0.409862769 (Schaefer-Fegley liquid silica/forsterite
-        # survey). SIGN: old max was a solid-olivine point, not a melt residual.
-        pinned_residual_dex: 0.40986276901889873
+        # form589 2026-08-09 excluded Costa's crystalline olivine and Wetzel's
+        # unresolved row; the prior 1.297484933 max was not a melt residual.
+        # d2e761e77 (2026-09-13) superseded the broad Schaefer-Fegley SiO
+        # survey row with its Table 10 row-specific successor. The old max
+        # 0.409862769 was that superseded survey; the live comparable maximum
+        # is Richter 2007 SiO-CaI at 2173 K, 0.212143461 dex.
+        pinned_residual_dex: 0.21214346131136663
         evidence_refs:
           - tests/chemistry/extract_store_reproduction_residual_baselines.yaml
           - docs/model-limitations.md#extract-store-reproduction-battery
