@@ -93,20 +93,20 @@ As `xb` approaches 1, the interval shrinks and the integrand contains `(x - 1)`,
 
 The NASA Glenn labels at `thermo.inp` lines 12239 and 12244 say `Fe.947O(cr)` and `Fe.947O(L)`, but the corresponding composition fields encode **Fe0.95O** (`n_Fe = 0.95`, molecular weight 69.05215), while JANAF Fe-001 is **Fe0.947O**. The reproduced NASA columns below use the NASA composition field, `n_Fe = 0.95`. NASA’s source is the [NASA Glenn coefficient database](https://github.com/nasa/cea/blob/main/data/thermo.inp) (documented in [NASA TP 2002-211556](https://ntrs.nasa.gov/citations/20020085330)); JANAF sources are [Fe-001](https://janaf.nist.gov/tables/Fe-001.html) and [Fe-019](https://janaf.nist.gov/tables/Fe-019.html). The published NASA label and its composition field therefore identify different stoichiometries.
 
-The table reports residuals `NASA − JANAF`, in kJ mol`^-1`, for the `G` function and `ΔfG`. NASA’s solid segment covers 298.15–1652 K. JANAF Fe-001 is tabulated at 100 K intervals, so the 1650 K comparison linearly interpolates JANAF between 1600 and 1700 K. The corrected polynomial `G` residual is +0.00088 kJ mol`^-1` at 1000 K and +0.09934 kJ mol`^-1` at 1600 K. The physics ruling d-164 treats `f_GD` and `f_J` as different standard states; the residuals below are a thermochemical cross-check and do not equate those routes.
+The table reports residuals `NASA − JANAF`, in kJ mol`^-1`, for the `G` function and `ΔfG`. NASA’s solid segment covers 298.15–1652 K. The reproducible operation for the solid `G` residual is: take the Fe.947O(cr) NASA-9 polynomial (whose composition field is Fe0.95O), calculate `G_NASA = R T [(H/RT)_NASA − (S/R)_NASA]`, and subtract `G_JANAF = ΔfH°(298.15 K) + [H−H°(298.15 K)] − T S` from Fe-001. NASA CEA coefficients are in J-based units, JANAF `S` is J mol`^-1` K`^-1`, enthalpy terms are kJ mol`^-1`, and the residual is converted to kJ mol`^-1`. For 1650 K, interpolate the JANAF `S` and `H−H°(298.15 K)` rows linearly between 1600 and 1700 K; the NASA polynomial itself is evaluated at 1650 K. The stored coefficients, JANAF rows, sources and calculation are in [`darken_gurry_wustite_g_residual.py`](darken_gurry_wustite_g_residual.py). One sanity value: at 1000 K this gives `G_NASA − G_JANAF = +0.00088 kJ mol`^-1`. JANAF data are Chase, NIST-JANAF 4th ed. (1998), Fe-001, p. 1172; NASA data are NASA Glenn/CEA `thermo.inp` lines 12239–12243, documented in NASA TP-2002-211556. The `ΔfG` column is unchanged; it remains the separately reproduced NASA-minus-JANAF formation-Gibbs residual. The physics ruling d-164 treats `f_GD` and `f_J` as different standard states; the residuals below are a thermochemical cross-check and do not equate those routes.
 
 | T (K) | `G` residual | `ΔfG` residual |
 | ---: | ---: | ---: |
 | 1000 | +0.00088 | +0.12746 |
-| 1100 | +0.00813 | +0.17523 |
-| 1200 | +0.02334 | +0.25358 |
-| 1300 | +0.04208 | +0.32543 |
-| 1400 | +0.06361 | +0.39860 |
-| 1500 | +0.08277 | +0.47002 |
+| 1100 | +0.00817 | +0.17523 |
+| 1200 | +0.02278 | +0.25358 |
+| 1300 | +0.04272 | +0.32543 |
+| 1400 | +0.06385 | +0.39860 |
+| 1500 | +0.08301 | +0.47002 |
 | 1600 | +0.09934 | +0.53884 |
-| 1650 | +0.08427 | +0.56942 |
+| 1650 | +0.05971 | +0.56942 |
 
-The maximum absolute residuals in the overlap are 0.09934 kJ mol`^-1` in `G` and 0.56942 kJ mol`^-1` in `ΔfG`. The JANAF-anchored liquid candidate is
+The maximum absolute residuals in the overlap are 0.09934 kJ mol`^-1` in `G` and 0.56942 kJ mol`^-1` in `ΔfG`. The Table V `derived_from` slope remains an open caveat: the stored Table VI gas-ratio slope does not reproduce every printed heat within the paper's figure-versus-table gap; see the review note. The JANAF-anchored liquid candidate is
 
 \[
 \ln f_J=\frac{\Delta_fG(\mathrm{Fe}_{0.95}\mathrm O,L;NASA)-\Delta_fG(\mathrm{FeO},l;JANAF)}{RT},
