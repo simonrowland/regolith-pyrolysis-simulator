@@ -26,6 +26,7 @@ from simulator.battery.enums import (
     Quantity,
     ReferenceStateConvention,
     RefusalReason,
+    ResidualStatus,
 )
 from simulator.battery.generators.janaf import (
     JANAF_R_J_PER_MOL_K,
@@ -44,8 +45,10 @@ from simulator.battery.records import (
 from simulator.battery.score import (
     EnginePrediction,
     Execution,
+    FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
     ScoreContext,
     compile_residual,
+    flagged_strata,
     fusion_comparison_reference,
     score_store,
     temperature_of,
@@ -206,7 +209,7 @@ def _conversion_notice(notices: tuple[Notice, ...]) -> Notice:
         for notice in notices
         if notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
         and notice.reason.startswith(
-            "iron-saturated Fe(1-x)O(l) reference converted to stoichiometric FeO(l);"
+            "source_flagged_less_reliable: basis=Darken & Gurry 1946"
         )
     ]
     assert len(found) == 1
@@ -222,13 +225,33 @@ def test_anchors_match_the_derivation_and_an_independent_recompute() -> None:
         notice = _conversion_notice(converted.notices)
         assert notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
         assert (
-            "source_flagged_less_reliable: D&G 1945 direct Fe/wustite "
-            "pCO2/pCO ratios, flagged by D&G as less reliable on p. 811; "
-            "uncertainty ±0.035 dex in log f (credible-route spread: 1.792 "
-            "vs Holzheid/Barin quoted 1.94 at 1400 C, 0.069 dex "
-            "end-to-end); Masson 1965 Temkin estimate 0.936 is EXCLUDED "
-            "from the band (stated validity N_Fe2+ 0.7-0.9; this case lies "
-            "outside it)"
+            "Table III B, p. 803 direct Fe/wustite pCO2/pCO ratios"
+            in notice.reason
+        )
+        assert "Darken & Gurry 1946 (JACS 68:798-816)" in notice.reason
+        assert "which the authors flag as less reliable on p. 811" in notice.reason
+        log_f_spread_dex = (Decimal("1.94") / Decimal("1.792")).log10()
+        log_f_spread_text = format(
+            log_f_spread_dex.quantize(Decimal("0.0001")), "f"
+        )
+        iw_shift_text = format(
+            (2 * log_f_spread_dex).quantize(Decimal("0.001")), "f"
+        )
+        assert (
+            "uncertainty ±0.035 dex in log f centred on 1.792, reaching "
+            "Holzheid/Barin 1.94 at 1400 C"
+        ) in notice.reason
+        assert (
+            f"log-f spread log10(1.94/1.792) = {log_f_spread_text} dex"
+            in notice.reason
+        )
+        assert (
+            "IW shift Δlog10(fO2) = 2 Δlog10(f) = "
+            f"{iw_shift_text} dex"
+        ) in notice.reason
+        assert (
+            "Masson 1965 Temkin estimate 0.936 is EXCLUDED from the band "
+            "(stated validity N_Fe2+ 0.7-0.9; this case lies outside it)"
         ) in notice.reason
         assert f"factor={factor}" in notice.reason
         jackknife_low, jackknife_high = _independent_jackknife(temperature)
@@ -277,6 +300,64 @@ def test_anchors_match_the_derivation_and_an_independent_recompute() -> None:
         Decimal("1.2"),
     )
     assert fusion_comparison_reference(other, engine=Engine.INTERNAL_ANALYTICAL) is other
+
+
+def test_complete_measured_direct_feo_probe_is_excluded_from_headline() -> None:
+    temperature = Decimal("1673.15")
+    work = F.work()
+    experiment = F.tabulation_experiment(
+        experiment_id="t1243-eligibility-probe",
+        work_id=work.work_id,
+        T_K=temperature,
+    )
+    reference = replace(
+        _wustite_row(temperature),
+        experiment_id=experiment.experiment_id,
+        source_id=work.work_id,
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={reference.observation_id: reference},
+        extract_review={work.work_id: "reviewed"},
+        hostname="test",
+    )
+
+    def predict(engine, observation, **_kwargs):
+        assert observation.value.point is not None
+        return EnginePrediction(
+            engine=engine,
+            channel=engine.value,
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence="t1243-complete-probe",
+            ),
+            value=observation.value.point,
+            unit="dimensionless",
+            authority=Authority.CERTIFIED,
+            coefficient_sources=("nasa-cea-thermo",),
+            lineage_complete=True,
+            identity=observation.identity,
+        )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={reference.observation_id},
+        predict=predict,
+    )
+
+    assert reference.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.numeric.value == Decimal(0)
+    assert residual.numeric.decision_band is None
+    assert residual.score_eligible is False
+    assert "not_flagged_stratum" in residual.exclusions
+    assert flagged_strata(residual.notices) == (
+        FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
+    )
 
 
 def _feo_rows(result):

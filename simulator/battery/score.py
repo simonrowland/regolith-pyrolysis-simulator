@@ -394,6 +394,7 @@ FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED = "calibration-not-grounded"
 FLAGGED_STRATUM_CELL_MATERIAL_INFERRED = "cell-material-inferred"
 FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
 FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT = "source-internally-inconsistent"
+FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE = "source_flagged_less_reliable"
 FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
 FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion"
 FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
@@ -1205,6 +1206,14 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
     if any(_is_fusion_conversion_reason(reason) for _kind, reason in notices):
         strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
+    if any(
+        isinstance(reason, str)
+        and reason.startswith(
+            f"{FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE}:"
+        )
+        for _kind, reason in notices
+    ):
+        strata.append(FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE)
     if NoticeKind.FIGURE_ONLY.value in kinds:
         strata.append(FLAGGED_STRATUM_FIGURE_ONLY)
     if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
@@ -1815,6 +1824,9 @@ def _iron_saturated_feo_comparison(
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
     converted = reference.value.point * factor
+    log_f_spread_dex = (
+        Decimal(_HOLZHEID_PRINTED_FACTOR_1400_C) / Decimal("1.792")
+    ).log10()
     stoichiometric = replace(
         standard_state,
         endmember=replace(
@@ -1827,14 +1839,19 @@ def _iron_saturated_feo_comparison(
         kind=NoticeKind.DERIVATION_USES_COMPILATION,
         affected_quantities=(quantity,),
         reason=(
+            "source_flagged_less_reliable: basis=Darken & Gurry 1946 "
+            "(JACS 68:798-816), Table III B, p. 803 direct Fe/wustite "
+            "pCO2/pCO ratios, which the authors flag as less reliable on "
+            "p. 811; uncertainty ±0.035 dex in log f centred on 1.792, "
+            "reaching Holzheid/Barin 1.94 at 1400 C; credible-route "
+            "log-f spread log10(1.94/1.792) = "
+            f"{_display_decimal(log_f_spread_dex, '0.0001')} dex; "
+            "IW shift Δlog10(fO2) = 2 Δlog10(f) = "
+            f"{_display_decimal(2 * log_f_spread_dex, '0.001')} dex; "
+            "Masson 1965 Temkin estimate 0.936 is EXCLUDED from the band "
+            "(stated validity N_Fe2+ 0.7-0.9; this case lies outside it); "
             "iron-saturated Fe(1-x)O(l) reference converted to stoichiometric "
-            "FeO(l); source_flagged_less_reliable: D&G 1945 direct "
-            "Fe/wustite pCO2/pCO ratios, flagged by D&G as less reliable on "
-            "p. 811; uncertainty ±0.035 dex in log f (credible-route spread: "
-            "1.792 vs Holzheid/Barin quoted 1.94 at 1400 C, 0.069 dex "
-            "end-to-end); Masson 1965 Temkin estimate 0.936 is EXCLUDED "
-            "from the band (stated validity N_Fe2+ 0.7-0.9; this case lies "
-            f"outside it); source_value={reference.value.point}; "
+            f"FeO(l); source_value={reference.value.point}; "
             f"converted_value={converted}; "
             f"factor={_display_decimal(factor, '0.001')}; "
             "jackknife sensitivity factor "
