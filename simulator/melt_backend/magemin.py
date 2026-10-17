@@ -2814,7 +2814,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 continue  # buffer control row, not a phase
             if fraction <= 0.0:
                 continue
-            phases[name] = {'mass_kg': fraction}
+            # MAGEMin can emit multiple phase instances with one name; retain
+            # their combined system mass fraction instead of the last row.
+            phases.setdefault(name, {'mass_kg': 0.0})['mass_kg'] += fraction
         return phases
 
     # ------------------------------------------------------------------
