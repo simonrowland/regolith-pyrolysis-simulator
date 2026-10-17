@@ -817,6 +817,52 @@ def test_provider_matches_safarian_engh_pure_si_hkl_mass_flux():
 
 
 @pytest.mark.xdist_group("serial")
+def test_provider_traces_subthreshold_flux_without_adding_it_to_flux_map():
+    species = "K2O_gas"
+    request = IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_FLUX,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"K2O": 10.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        fO2_log=None,
+        control_inputs={
+            "vapour_batch_flux_pressures_Pa": {
+                species: 2.341423426915613e-14,
+            },
+            "overhead_partials_Pa": {},
+            "overhead_pressure_pa": 0.0,
+            "molar_mass_kg_mol": {species: 0.094196},
+            "stoich_by_species": {
+                species: {
+                    "parent_oxide": "K2O",
+                    "oxide_per_product_kg": 1.0,
+                    "O2_per_product_kg": 0.0,
+                },
+            },
+            "available_oxide_kg": {species: 10.0},
+            "melt_surface_area_m2": 1.0,
+            "stir_factor": 1.0,
+            "alpha": {species: 1.0},
+            "evaporation_series_resistance": {
+                "gas_resistance_enabled": False,
+                "melt_resistance_enabled": False,
+            },
+        },
+    )
+
+    result = BuiltinEvaporationFluxProvider().dispatch(request)
+
+    assert result.status == "ok"
+    assert result.diagnostic["evaporation_flux_kg_hr"] == {}
+    trace = result.diagnostic["below_threshold_evaporation_flux"]
+    assert trace["threshold_kg_hr"] == 1e-12
+    assert trace["fluxes_kg_hr"][species] == pytest.approx(8.5e-14, rel=1e-12)
+
+
+@pytest.mark.xdist_group("serial")
 def test_provider_skips_species_without_grounded_molar_mass():
     provider = BuiltinEvaporationFluxProvider()
     view = ProviderAccountView(
