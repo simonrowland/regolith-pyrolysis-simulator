@@ -3602,9 +3602,17 @@ def _high_t_melt_activity_fallback_sentence(notice: Mapping[str, Any]) -> str:
         campaign_text = f"campaigns `{', '.join(map(str, campaigns))}`"
     else:
         campaign_text = "campaign `unspecified`"
+    prediction = (
+        "held effective-gamma/table extrapolated predictions"
+        if any(
+            item.get("code") == "hold_last_certified_effective_gamma"
+            for item in notice.get("notices", ())
+        )
+        else "a constant-gamma extrapolated prediction"
+    )
     return (
         f"**High-temperature melt activity**: OpenIMCC refusal `{reason}` "
-        "used a constant-gamma extrapolated prediction for "
+        f"used {prediction} for "
         f"{notice.get('affected_tick_count', 0)} tick(s) and "
         f"{notice.get('affected_parent_count', 0)} parent oxide(s), "
         f"{campaign_text}, hours {notice.get('first_hour')}-"

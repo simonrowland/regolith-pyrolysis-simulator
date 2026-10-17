@@ -656,6 +656,10 @@ def _build_high_t_melt_activity_authority(
         "seam": {},
         "authority_exclusions": {},
     }
+    previous = controls.get("high_t_melt_activity_previous") or {}
+    certificates = dict(previous.get("certified_effective_gamma_by_parent") or {})
+    base["certified_effective_gamma_by_parent"] = certificates
+    hour = controls.get("simulation_hour")
     from simulator.melt_backend.openimcc_bridge import (
         _IMCC_REFUSAL_ERROR_TYPE,
         OpenImccCompositionPolicyRefusal,
@@ -725,6 +729,30 @@ def _build_high_t_melt_activity_authority(
         )
         if isinstance(relaxed_projection, Mapping):
             base["openimcc_projection_crmn_relaxed"] = dict(relaxed_projection)
+        held = {}
+        if hour is not None:
+            for parent, certificate in certificates.items():
+                temperature_gap = abs(temperature_K - certificate["temperature_K"])
+                hour_gap = float(hour) - certificate["hour"]
+                if (
+                    parent not in composition_mol
+                    or temperature_gap > certificate["window_K"]
+                ):
+                    continue
+                notice = {
+                    "code": "hold_last_certified_effective_gamma",
+                    "type": "typed_notice",
+                    "authority": "extrapolated",
+                    "parent": parent,
+                    **certificate,
+                    "temperature_gap_K": temperature_gap,
+                    "hour_gap": hour_gap,
+                    "original_refusal": dict(fallback_reason),
+                    "message": "Holding the last certified effective single-cation gamma",
+                }
+                held[parent] = notice
+                base["notices"].append(notice)
+        base["held_effective_gamma_by_parent"] = held
         return base
 
     bridge = cleaned.bridge
@@ -884,6 +912,45 @@ def _build_high_t_melt_activity_authority(
             }
         )
     base["seam_max_abs_ratio_dex"] = max_abs_dex
+    if hour is not None and not bridge.extrapolated:
+        previous_temperature = controls.get("high_t_melt_activity_previous_temperature_K")
+        # The local thermal continuation is limited to two observed steps;
+        # it does not certify a distant temperature. K differences equal C
+        # differences, so 2*|T-T_previous| is a window in K. Isothermal
+        # certification or no previous T gives a zero-K window (same-T only).
+        window_K = (
+            2.0 * abs(temperature_K - float(previous_temperature))
+            if previous_temperature is not None else 0.0
+        )
+        for parent in cleaned.single_cation_activities:
+            if parent in base["authority_exclusions"]:
+                continue
+            selected = _high_t_activity_for_parent(
+                parent, composition_mol, temperature_K=temperature_K, authority=base,
+            )
+            if selected is None or selected.x_single_cation <= 0.0:
+                continue
+            # Premise: the bridge has already converted parent activities
+            # to single-cation a; a = gamma_eff * X_bulk_single. Thus
+            # gamma_eff,last = a_last / X_last, then on refusal use
+            # a_current = gamma_eff,last * X_current in the helper below.
+            # This is NOT OpenIMCC's internal gamma against unbound-parent
+            # X on a total-species basis: that current X needs the failed
+            # solve. Both this effective coefficient and the table use the
+            # same available bulk single-cation basis. All factors are
+            # dimensionless; X->0 gives a->0 for finite gamma. With smooth
+            # T/composition, gamma_eff,last tends to the true current value
+            # as step size->0. Over one step it retains the solved local
+            # non-ideality; the table is a different model (SiO2 gamma=1
+            # was 43x too high in the diagnosed refusal). Numerical
+            # certification of the last solve is not empirical validation.
+            certificates[parent] = {
+                "gamma_last": selected.effective_gamma,
+                "temperature_K": float(temperature_K),
+                "hour": float(hour),
+                "window_K": window_K,
+                "coefficient_basis": "bulk_single_cation",
+            }
     return base
 
 
@@ -894,7 +961,7 @@ def _high_t_activity_for_parent(
     temperature_K: float,
     authority: Mapping[str, Any] | None,
 ) -> Any:
-    """Return legacy activity or the successful C3 openimcc replacement."""
+    """Select the table, solved OpenIMCC, or local effective-gamma hold."""
 
     legacy = melt_oxide_activity(
         parent_oxide,
@@ -909,6 +976,22 @@ def _high_t_activity_for_parent(
         return legacy
     if authority.get("fallback"):
         fallback_reason = dict(authority.get("fallback_reason") or {})
+        held = authority.get("held_effective_gamma_by_parent", {}).get(parent_oxide)
+        if held is not None:
+            gamma = float(held["gamma_last"])
+            return replace(
+                legacy,
+                gamma=gamma,
+                effective_gamma=gamma,
+                activity=gamma * legacy.x_single_cation,
+                activity_model="hold_last_certified_effective_gamma",
+                citation="Last numerically certified OpenIMCC activity on the bulk single-cation basis",
+                warning=(
+                    "hold_last_certified_effective_gamma:"
+                    f"{fallback_reason.get('code', 'openimcc_evaluation_refused')}"
+                ),
+                evidence_tier="PREDICT_AND_FLAG",
+            )
         fallback_warning = (
             "openimcc_refused_constant_gamma_fallback:"
             f"{fallback_reason.get('code', 'openimcc_evaluation_refused')}"
@@ -1064,10 +1147,18 @@ def _attach_high_t_activity_provenance(
             )
             token = "openimcc"
         else:
-            provenance["melt_activity_authority"] = provider
+            held = authority.get("held_effective_gamma_by_parent", {}).get(parent_oxide)
+            provenance["melt_activity_authority"] = (
+                "hold_last_certified_effective_gamma" if held else provider
+            )
             provenance["melt_activity_fallback"] = True
             provenance["openimcc_refusal"] = fallback_reason
-            token = "openimcc_refused_constant_gamma_fallback"
+            token = (
+                "hold_last_certified_effective_gamma"
+                if held else "openimcc_refused_constant_gamma_fallback"
+            )
+            if held:
+                provenance["hold_last_certified_effective_gamma"] = dict(held)
             if fallback_reason.get("code"):
                 token += f"_{fallback_reason['code']}"
         classification = authority.get("composition_projection_classification")
@@ -2022,7 +2113,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         # output floor; preserve the carrier so predict-and-flag never drops it.
         retain_high_t_openimcc_carriers = bool(
             high_t_activity_authority
-            and high_t_activity_authority.get("provider") == "openimcc"
+            and (
+                high_t_activity_authority.get("provider") == "openimcc"
+                or high_t_activity_authority.get("held_effective_gamma_by_parent")
+            )
         )
         if high_t_activity_authority:
             for notice in high_t_activity_authority.get("notices", ()):
@@ -2636,12 +2730,19 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 )
                 if (
                     high_t_activity_authority
-                    and high_t_activity_authority.get("provider") == "openimcc"
+                    and (
+                        high_t_activity_authority.get("provider") == "openimcc"
+                        or "FeO" in high_t_activity_authority.get("held_effective_gamma_by_parent", {})
+                    )
                     and candidate_activity is not None
                 ):
                     oxide_activity = candidate_activity
                     a_oxide = oxide_activity.activity
-                    fe_activity_basis = "openimcc_single_cation"
+                    fe_activity_basis = (
+                        "hold_last_certified_effective_gamma"
+                        if candidate_activity.activity_model == "hold_last_certified_effective_gamma"
+                        else "openimcc_single_cation"
+                    )
                 elif intrinsic_fO2_log is not None:
                     oxide_activity = None
                     a_oxide = below_cap_fe_activity

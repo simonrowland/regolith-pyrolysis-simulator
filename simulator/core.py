@@ -9281,6 +9281,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'campaign': campaign_name,
             'parent_oxides': parent_oxides,
             'reason': dict(authority.get('fallback_reason') or {}),
+            'held_effective_gamma_notices': list(
+                authority.get('held_effective_gamma_by_parent', {}).values()
+            ),
         }
         steps = getattr(self, '_high_t_melt_activity_fallback_steps', None)
         if not isinstance(steps, list):
@@ -9329,6 +9332,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
         )
         reason_codes = sorted({str(item['reason']) for item in notices})
+        for step in valid_steps:
+            notices.extend(step.get('held_effective_gamma_notices', ()))
         notice: Dict[str, Any] = {
             'kind': 'high_t_melt_activity_fallback',
             'authority': 'extrapolated',
@@ -9928,6 +9933,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'high_t_melt_activity_previous_temperature_K': getattr(
                     self, '_last_high_t_melt_activity_temperature_K', None
                 ),
+                'high_t_melt_activity_previous': getattr(
+                    self, '_last_high_t_melt_activity', {}
+                ),
+                'simulation_hour': int(self.melt.hour) + 1,
                 'high_t_melt_activity_crossing': (
                     getattr(
                         self,

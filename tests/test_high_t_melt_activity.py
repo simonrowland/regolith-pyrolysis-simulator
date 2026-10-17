@@ -260,7 +260,7 @@ def _history_request(composition, temperature_K, hour, previous=None):
 
 
 def test_successful_openimcc_physics_is_bit_identical() -> None:
-    result = _provider().dispatch(_request(BASE_MELT_MOL, 2400.65))
+    result = _provider().dispatch(_history_request(BASE_MELT_MOL, 2400.65, 61))
     # Pin captured on green e912e472f with the requested e975edd export,
     # before adding continuation. JSON round-trips preserve float bits.
     assert hashlib.sha256(
@@ -269,7 +269,7 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
 
 
 @pytest.mark.parametrize("gap_K, hour_gap, held", [
-    (7.5, 1, True), (15.0, 2, True), (15.01, 1, False), (7.5, 3, False),
+    (7.5, 1, True), (15.0, 2, True), (15.01, 1, False), (0.0, 3, True),
 ])
 def test_refused_activity_holds_only_local_certified_gamma(
     monkeypatch, gap_K, hour_gap, held,
@@ -291,7 +291,7 @@ def test_refused_activity_holds_only_local_certified_gamma(
     activity = vapor_pressure_module._high_t_activity_for_parent(
         "SiO2", _LUNAR_CALL_62, temperature_K=2400.65 + gap_K, authority=authority,
     )
-    notices = [n for n in authority["notices"] if n["code"] == "hold_last_certified_gamma"]
+    notices = [n for n in authority["notices"] if n["code"] == "hold_last_certified_effective_gamma"]
     assert authority["authority"] == "extrapolated"
     assert authority["fallback_reason"]["code"] == "imcc_nonconvergence"
     if not held:
@@ -306,9 +306,9 @@ def test_refused_activity_holds_only_local_certified_gamma(
     assert silica_notice["hour_gap"] == hour_gap
     assert silica_notice["window_K"] == 15.0
     assert silica_notice["original_refusal"]["code"] == "imcc_nonconvergence"
-    assert "hold_last_certified_gamma" in activity.warning
+    assert "hold_last_certified_effective_gamma" in activity.warning
     provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["SiO"]
-    assert provenance["melt_activity_authority"] == "hold_last_certified_gamma"
+    assert provenance["melt_activity_authority"] == "hold_last_certified_effective_gamma"
     assert provenance["openimcc_refusal"]["code"] == "imcc_nonconvergence"
     if gap_K == 7.5:
         # Independent call-62 transport observation: at frozen geometry and
@@ -320,8 +320,8 @@ def test_refused_activity_holds_only_local_certified_gamma(
             / (561.522380 - 106.0723021)
         )
         sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
-        with (DATA_DIR / "vapor_pressures.yaml").open() as handle:
-            sim.vapor_pressures = yaml.safe_load(handle)
+        sim.species_formula_registry = {}
+        sim.vapor_pressures = provider._vapor_pressure_data
         parent_mass = (
             _LUNAR_CALL_62["SiO2"]
             * resolve_species_formula("SiO2").molar_mass_kg_per_mol()
@@ -334,13 +334,48 @@ def test_refused_activity_holds_only_local_certified_gamma(
         # Logged solved draw is 5.0014%; the local hold is about 5.83%,
         # rather than the refused table leg's measured 93.2713%.
         assert 0.05 < removed_mol / _LUNAR_CALL_62["SiO2"] < 0.065
+        sim.melt = SimpleNamespace(hour=61, campaign=CampaignPhase.C2A)
+        sim._note_high_t_melt_activity_fallback(
+            authority, result.diagnostic["vapor_pressure_numerator_provenance"],
+        )
+        run_notice = sim.high_t_melt_activity_run_notice()
+        assert silica_notice in run_notice["notices"]
+        assert run_notice["reason"] == "imcc_nonconvergence"
+        assert "held effective-gamma" in _high_t_melt_activity_fallback_sentence(run_notice)
     # A refused prediction must never refresh the certificate or its clock.
-    again = provider.dispatch(replace(request, control_inputs={
+    assert authority["certified_effective_gamma_by_parent"] == (
+        certified.diagnostic["high_t_melt_activity"]["certified_effective_gamma_by_parent"]
+    )
+    again = provider.dispatch(replace(request, temperature_C=2415.66 - 273.15, control_inputs={
         **request.control_inputs, "high_t_melt_activity_previous": authority,
         "simulation_hour": 64,
     }))
-    assert not any(n["code"] == "hold_last_certified_gamma"
+    assert not any(n["code"] == "hold_last_certified_effective_gamma"
                    for n in again.diagnostic["high_t_melt_activity"]["notices"])
+
+
+def test_first_high_t_certificate_without_previous_temperature_can_hold(monkeypatch) -> None:
+    request = _request(BASE_MELT_MOL, 2400.65)
+    provider = _provider()
+    certified = provider.dispatch(replace(
+        request, control_inputs={**request.control_inputs, "simulation_hour": 1},
+    )).diagnostic["high_t_melt_activity"]
+
+    def nonconverge(**kwargs):
+        raise ImccNonconvergenceError("next same-T call refused", {})
+
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", nonconverge)
+    result = provider.dispatch(replace(request, control_inputs={
+        **request.control_inputs, "simulation_hour": 2,
+        "high_t_melt_activity_previous": certified,
+    }))
+    authority = result.diagnostic["high_t_melt_activity"]
+    held = authority["held_effective_gamma_by_parent"]["SiO2"]
+    assert held["window_K"] == 0.0
+    activity = vapor_pressure_module._high_t_activity_for_parent(
+        "SiO2", BASE_MELT_MOL, temperature_K=2400.65, authority=authority,
+    )
+    assert activity.activity == pytest.approx(certified["activities_by_oxide"]["SiO2"])
 
 
 def test_below_cap_is_activity_source_parity_with_pre_c3_path() -> None:
