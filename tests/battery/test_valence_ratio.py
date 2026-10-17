@@ -63,6 +63,7 @@ from simulator.battery.score import (
     render_score_report,
     residual_to_plain,
     render_score_report_from_payloads,
+    selected_lineage_level,
     score_store,
 )
 
@@ -70,6 +71,7 @@ from simulator.battery.score import (
 ROOT = Path(__file__).resolve().parents[2]
 SOSSI_CR = ROOT / "data/literature/extracts/kems-045-sossi-2018-pnas-cr.yaml"
 TRANELL_TI = ROOT / "data/literature/extracts/tranell-2002-titanium-valence.yaml"
+BERRY_CR = ROOT / "data/literature/extracts/berry-oneill-2004-chromium-xanes.yaml"
 
 
 def _identity(basis: ValenceBasis) -> Identity:
@@ -299,6 +301,193 @@ def _migrate_sossi_cr():
     return migrator.result
 
 
+def _migrate_berry_cr():
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(BERRY_CR)
+    migrator.finalize()
+    return migrator.result
+
+
+def test_berry_oneill_2004_table3_valence_fractions_and_render_pins():
+    result = _migrate_berry_cr()
+    rows = list(result.observations.values())
+    fractions = [
+        row
+        for row in rows
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.VALENCE_RATIO
+        and row.identity.valence_basis.is_value
+        and row.identity.valence_basis.value.value_form is ValenceValueForm.FRACTION
+    ]
+    log_ratios = [
+        row
+        for row in rows
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.VALENCE_RATIO
+        and row.identity.valence_basis.is_value
+        and row.identity.valence_basis.value.value_form is ValenceValueForm.LOG10_RATIO
+    ]
+
+    # Table 3 has 133 numeric Cr2+/SumCr cells; these values were checked on
+    # the 400 dpi render of printed p. 794 (PDF page 5).
+    assert len(rows) == 145
+    assert len(fractions) == 133
+    assert len(log_ratios) == 7
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+
+    by_local_id = {
+        row.observation_id.split("::", 1)[1].split("::", 1)[0]: row
+        for row in rows
+    }
+    render_pins = {
+        "berry_2004_table3_ad_r01": Decimal("0.050"),
+        "berry_2004_table3_ad_wo_r13": Decimal("0.453"),
+        "berry_2004_table3_ad_rt20_r24": Decimal("0.951"),
+        "berry_2004_table3_ad_r21": Decimal("0.936"),
+        "berry_2004_table3_ad_fo_r21": Decimal("0.919"),
+    }
+    for local_id, expected in render_pins.items():
+        row = by_local_id[local_id]
+        assert row.value.kind is ValueKind.POINT
+        assert row.value.point == expected
+        assert row.locator.published_page == 794
+
+    duplicate_author_row = {
+        local_id: by_local_id[local_id]
+        for local_id in (
+            "berry_2004_table3_ad_r21",
+            "berry_2004_table3_ad_fo_r21",
+        )
+    }
+    assert {
+        local_id: row.value.point for local_id, row in duplicate_author_row.items()
+    } == {
+        "berry_2004_table3_ad_r21": Decimal("0.936"),
+        "berry_2004_table3_ad_fo_r21": Decimal("0.919"),
+    }
+    assert duplicate_author_row["berry_2004_table3_ad_r21"].locator.record.endswith(
+        "AD column; Cr2+/SumCr cell"
+    )
+    assert duplicate_author_row[
+        "berry_2004_table3_ad_fo_r21"
+    ].locator.record.endswith("AD + Fo column; Cr2+/SumCr cell")
+
+    assert all(row.identity.species.formula == "Cr" for row in fractions)
+    assert all(row.identity.species.phase.value is Phase.L for row in fractions)
+    assert all(row.evidence.class_.value is EvidenceClass.MEASURED_REDUCED for row in fractions)
+    assert all(
+        row.identity.valence_basis.value.numerator_oxidation_states == (2,)
+        and row.identity.valence_basis.value.denominator_kind
+        is ValenceDenominatorKind.TOTAL_ELEMENT
+        for row in fractions
+    )
+    required_conditions = (
+        "temperature_K",
+        "fO2_log",
+        "fO2_control",
+        "total_pressure_Pa",
+        "composition",
+    )
+    assert all(row.identity.temperature_K.is_value for row in rows)
+    assert all(
+        all(
+            key in row.point_conditions
+            and row.point_conditions[key].state is not None
+            and row.point_conditions[key].locator is not None
+            for key in required_conditions
+        )
+        for row in rows
+    )
+
+    pressure_cells = {
+        "berry_2004_table3_ad_r25",
+        "berry_2004_table3_ad_fo_r25",
+        "berry_2004_table3_ad_wo_r25",
+        "berry_2004_table3_ad_en_r25",
+        "berry_2004_table3_ad_qz_r25",
+    }
+    assert {
+        local_id
+        for local_id, row in by_local_id.items()
+        if row.identity.total_pressure_Pa is not None
+        and row.identity.total_pressure_Pa.is_value
+    } == pressure_cells
+    for local_id in pressure_cells:
+        row = by_local_id[local_id]
+        pressure = row.identity.total_pressure_Pa
+        point_pressure = row.point_conditions["total_pressure_Pa"]
+        assert pressure is not None and pressure.is_value
+        assert pressure.value == Decimal("100000")
+        assert point_pressure.state.is_value
+        assert point_pressure.state.value == Decimal("100000")
+
+    for row in fractions:
+        assert row.derivation is not None
+        assert len(row.derivation.parameters) == 1
+        name, area = row.derivation.parameters[0]
+        assert name == "A(1s/4s)"
+        assert area.state.is_value
+        assert area.locator is not None
+        assert area.locator.published_page == 794
+        assert "A(1s/4s)" in area.locator.record
+        assert not row.derived_from
+        assert not row.derivation.inputs
+        assert row.derivation.raw_inputs is not None
+        assert row.derivation.raw_inputs.state.value == "not_printed"
+        assert row.derivation.raw_inputs.locator is not None
+        assert row.derivation.raw_inputs.locator.table is None
+        assert row.derivation.raw_inputs.locator.section == "Experimental methods"
+        assert "Raw XANES spectra" in row.derivation.raw_inputs.locator.record
+        assert selected_lineage_level(row, set(result.observations))
+
+    area_pins = {
+        "berry_2004_table3_ad_r01": Decimal("0.005"),
+        "berry_2004_table3_ad_wo_r13": Decimal("0.174"),
+        "berry_2004_table3_ad_rt20_r24": Decimal("0.382"),
+    }
+    for local_id, expected in area_pins.items():
+        assert by_local_id[local_id].derivation.parameters[0][1].state.value == expected
+
+    slope_rows = [row for row in rows if "slope" in row.observation_id]
+    assert len(slope_rows) == 5
+    table4_rows = [*log_ratios, *slope_rows]
+    assert len(table4_rows) == 12
+    for row in table4_rows:
+        assert row.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        assert row.evidence.attribution == "Berry and O'Neill (2004), Table 4"
+        assert not row.derived_from
+        pressure = row.identity.total_pressure_Pa
+        point_pressure = row.point_conditions["total_pressure_Pa"]
+        if row in log_ratios:
+            assert pressure is not None and pressure.is_unknown
+        else:
+            assert pressure is None or pressure.is_unknown
+        assert point_pressure.state.is_unknown
+    for row in slope_rows:
+        control = row.point_conditions["fO2_control"]
+        assert control.state.is_unknown
+        assert control.locator == row.locator
+        assert row.point_conditions["fO2_log"].locator == row.locator
+        assert row.point_conditions["total_pressure_Pa"].locator == row.locator
+    assert {
+        row.value.point for row in log_ratios
+    } == {
+        Decimal("1.871"),
+        Decimal("1.921"),
+        Decimal("2.056"),
+        Decimal("1.844"),
+        Decimal("1.650"),
+        Decimal("2.274"),
+        Decimal("2.371"),
+    }
+    unavailable = [row for row in rows if row.value.kind is ValueKind.UNAVAILABLE]
+    assert len(unavailable) == 5
+    assert {row.observation_id for row in unavailable} == {
+        row.observation_id for row in slope_rows
+    }
+
+
 def test_refused_printed_valence_forms_do_not_select_scalar(tmp_path: Path):
     doc = yaml.safe_load(SOSSI_CR.read_text(encoding="utf-8"))
     template = doc["species"]["Cr"]["observations"][0]
@@ -342,7 +531,6 @@ def test_refused_printed_valence_forms_do_not_select_scalar(tmp_path: Path):
         "fixture_refused_valence_1",
     }
     assert all(row.value.kind is ValueKind.UNAVAILABLE for row in rows.values())
-
 
 def test_sossi_2018_quoted_cr_rows_migrate_as_numeric_valence_fractions():
     result = _migrate_sossi_cr()
