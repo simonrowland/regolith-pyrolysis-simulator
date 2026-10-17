@@ -1,11 +1,18 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
 import yaml
 
-from simulator.battery.migrate import Migrator, to_plain
+import simulator.battery.migrate as battery_migrate
+from simulator.battery.enums import AdmissionStatus, ValencePrintedForm, ValueKind
+from simulator.battery.migrate import (
+    Migrator,
+    mass_fraction_pair_to_valence_ratio,
+    to_plain,
+)
 
 
 REPO = Path(__file__).resolve().parents[1]
@@ -122,13 +129,31 @@ def test_johnston_isolated_migration_preserves_point_conditions() -> None:
         if row.source_id == "johnston-1965-sodium-disilicate-redox"
     ]
 
-    assert len(observations) == 101
+    assert len(observations) == 148
     assert len(result.validation.hard_issues) == 0
     assert sum(row["value"]["kind"] == "unavailable" for row in observations) == 101
     table_i = [row for row in observations if row["locator"]["table"] == "I"]
     table_ii = [row for row in observations if row["locator"]["table"] == "II"]
-    assert len(table_i) == 94
+    ratios = [
+        row
+        for row in observations
+        if row["identity"]["quantity"] == {"tag": "value", "value": "valence_ratio"}
+    ]
+    table_i_cells = [row for row in table_i if row not in ratios]
+    assert len(table_i) == 141
+    assert len(table_i_cells) == 94
     assert len(table_ii) == 7
+    assert len(ratios) == 47
+    assert all(row["admission"]["status"] == "admitted" for row in ratios)
+    assert all(row["value"]["kind"] == "point" for row in ratios)
+    assert sum(
+        row["evidence"]["class"]["value"] == "measured_reduced"
+        for row in ratios
+    ) == 32
+    assert sum(
+        row["evidence"]["class"]["value"] == "author_estimate"
+        for row in ratios
+    ) == 15
     expected_i = {
         "T_C",
         "atmosphere",
@@ -158,9 +183,126 @@ def test_johnston_isolated_migration_preserves_point_conditions() -> None:
         "johnston_1965_t1_ce_r02",
     )
     for sample_id in sample_ids:
-        row = next(row for row in table_i if sample_id in row["observation_id"])
+        row = next(
+            row for row in table_i_cells if sample_id in row["observation_id"]
+        )
         identity = row["identity"]
         assert identity["composition"]["tag"] == "value"
         assert identity["temperature_K"]["tag"] == "value"
         assert identity.get("total_pressure_Pa") is None
         assert identity.get("fO2_Pa") is None
+
+    # Independent hand pins: Ti row 1 is 0.021/1.50 = 0.014; Sn row 8 is
+    # 0.011/1.68 = 0.006547619...; V row 41 is 0.033/1.16 = 0.028448275... .
+    ratio_by_source_row = {
+        row["observation_id"].split("::")[-2]: row for row in ratios
+    }
+    ti = ratio_by_source_row["johnston_1965_t1_ti_r01"]
+    sn = ratio_by_source_row["johnston_1965_t1_sn_r01"]
+    vanadium = ratio_by_source_row["johnston_1965_t1_v_r01"]
+    assert Decimal(ti["value"]["point"]) == Decimal("0.014")
+    assert Decimal(sn["value"]["point"]).quantize(
+        Decimal("0.000000000001")
+    ) == Decimal("0.006547619048")
+    assert Decimal(vanadium["value"]["point"]).quantize(
+        Decimal("0.000000000001")
+    ) == Decimal("0.028448275862")
+    assert ti["evidence"]["class"]["value"] == "author_estimate"
+    assert sn["evidence"]["class"]["value"] == "measured_reduced"
+    assert ti["identity"]["valence_basis"]["value"]["printed_form"] == (
+        ValencePrintedForm.MASS_FRACTION_PAIR.value
+    )
+    assert vanadium["identity"]["valence_basis"]["value"][
+        "denominator_oxidation_state"
+    ] == 5
+    assert "V results are expressed in terms of V4+ (p. 186)" in vanadium[
+        "derivation"
+    ]["relation"]
+    round_tripped_identity = battery_migrate._identity_from_plain(ti["identity"])
+    assert round_tripped_identity.valence_basis.value.mass_fraction_basis == (
+        "element",
+        "element",
+    )
+    for row in (ti, sn, vanadium):
+        assert row["identity"]["composition"]["tag"] == "value"
+        assert row["identity"]["fO2_Pa"] == {
+            "tag": "unknown",
+            "reason": "no_row_level_numeric_pO2_printed",
+        }
+        assert row["identity"]["temperature_K"]["tag"] == "value"
+        assert len(row["derived_from"]) == 2
+        assert row["derivation"]["inputs"] == row["derived_from"]
+        assert row["uncertainty"]["kind"] == "none"
+
+
+def test_mass_fraction_pair_uses_cation_stoichiometry() -> None:
+    # Hand computation: Fe2O3 contributes 2 Fe, FeO contributes 1 Fe, so
+    # (1 g / 159.687 g mol-1 * 2) / (2 g / 71.844 g mol-1 * 1)
+    # = 71.844/159.687 = 0.449905... . Swapping factors changes the result.
+    value = mass_fraction_pair_to_valence_ratio(
+        Decimal("1"),
+        Decimal("2"),
+        element="Fe",
+        mass_fraction_basis=("Fe2O3", "FeO"),
+    )
+    assert value.quantize(Decimal("0.000001")) == Decimal("0.449905")
+
+
+def test_element_basis_cancels_without_molar_mass_lookup(monkeypatch) -> None:
+    monkeypatch.setattr(
+        battery_migrate,
+        "oxide_molar_mass",
+        lambda _formula: pytest.fail("element-equivalent cells cancel M directly"),
+    )
+    assert mass_fraction_pair_to_valence_ratio(
+        Decimal("0.021"),
+        Decimal("1.50"),
+        element="Ti",
+        mass_fraction_basis=("element", "element"),
+    ) == Decimal("0.014")
+
+
+def test_missing_mass_fraction_cell_is_typed_refusal_not_zero() -> None:
+    with pytest.raises(battery_migrate.IdentityRefusal, match="missing input") as caught:
+        mass_fraction_pair_to_valence_ratio(
+            Decimal("0.021"),
+            None,
+            element="Ti",
+            mass_fraction_basis=("element", "element"),
+        )
+    assert caught.value.reason.value == "invalid_source"
+
+    doc = _load_extract()
+    row = _observations(doc)["johnston_1965_t1_ti_r01"]
+    row["values"]["points"].pop()
+    migrator = Migrator(root=REPO)
+    original_loader = battery_migrate.load_yaml
+
+    def load_mutated_extract(path: Path) -> dict:
+        if Path(path) == EXTRACT:
+            return doc
+        return original_loader(path)
+
+    battery_migrate.load_yaml = load_mutated_extract
+    try:
+        migrator._migrate_extract(EXTRACT)
+        migrator.finalize()
+    finally:
+        battery_migrate.load_yaml = original_loader
+    refused = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == "johnston-1965-sodium-disilicate-redox"
+        and observation.observation_id.endswith(
+            "johnston_1965_t1_ti_r01::valence_ratio"
+        )
+    )
+    assert refused.value.kind is ValueKind.UNAVAILABLE
+    assert "missing input" in refused.value.unavailable_reason
+    assert refused.value.point is None
+    assert refused.admission.status is AdmissionStatus.REJECTED
+    assert any(
+        entry.observation_id == refused.observation_id
+        and "missing input" in entry.why
+        for entry in migrator.result.queue
+    )

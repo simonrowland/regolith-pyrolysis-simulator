@@ -123,6 +123,35 @@ A parameterized checked-in test
 resolves every sample against the extract and asserts equality. Mutating a
 pinned extract value in memory must go RED.
 
+### Valence ratios from printed mass-fraction pairs
+
+Keep both source cells as printed in `values.points`, including their printed
+column labels and units. The migrator may emit a separate `valence_ratio`
+observation whose `identity.valence_basis` records the ratio and its printed
+input form:
+
+```yaml
+valence_basis:
+  numerator_oxidation_states: [3]
+  denominator_kind: total_element
+  denominator_oxidation_state: null
+  value_form: fraction
+  printed_form: mass_fraction_pair
+  mass_fraction_basis: [element, element]
+```
+
+`mass_fraction_basis` names the numerator and denominator bases in order. Use
+`element` when the printed values are element-equivalent, or the explicit
+printed formula (such as `Fe2O3`) when the source gives an oxide basis. The
+migrator reduces each cell to moles of the named element using its molar mass
+and cation count per formula unit, then forms the identity's valence ratio.
+The two stored source-cell observations must both appear in `derived_from` and
+the derivation's `inputs`; retain both printed values with their locators in
+the derivation parameters. A stoichiometric re-expression of measured cells is
+`measured_reduced`; if either input is estimated, use the weaker input's class.
+Propagate uncertainty only when the source prints per-cell uncertainty;
+otherwise leave the uncertainty band absent.
+
 **YAML alias note:** sample `value:` must be an **independent literal**, never a
 YAML alias (`*id`) into the observation body at the root or any nested depth.
 The validator recursively refuses shared mutable mapping/sequence identity — a

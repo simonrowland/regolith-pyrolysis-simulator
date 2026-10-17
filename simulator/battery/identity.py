@@ -98,6 +98,7 @@ from simulator.battery.enums import (
     RefusalReason,
     StateTag,
     ValenceDenominatorKind,
+    ValencePrintedForm,
     ValenceValueForm,
 )
 from simulator.battery.records import (
@@ -392,6 +393,8 @@ class ValenceBasis:
     denominator_kind: ValenceDenominatorKind
     denominator_oxidation_state: int | None
     value_form: ValenceValueForm
+    printed_form: ValencePrintedForm | None = None
+    mass_fraction_basis: tuple[str, str] | None = None
 
     def _validate_value(self, value: Decimal) -> None:
         if self.value_form is ValenceValueForm.RATIO and value < 0:
@@ -441,6 +444,34 @@ class ValenceBasis:
                 RefusalReason.INVALID_IDENTITY,
                 "valence_basis.value_form",
                 "must be a closed printed value form",
+            )
+        if self.printed_form is not None and not isinstance(
+            self.printed_form, ValencePrintedForm
+        ):
+            raise IdentityRefusal(
+                RefusalReason.INVALID_IDENTITY,
+                "valence_basis.printed_form",
+                "must be a closed printed input form",
+            )
+        if self.printed_form is ValencePrintedForm.MASS_FRACTION_PAIR:
+            if (
+                not isinstance(self.mass_fraction_basis, tuple)
+                or len(self.mass_fraction_basis) != 2
+                or any(
+                    not isinstance(item, str) or not item.strip()
+                    for item in self.mass_fraction_basis
+                )
+            ):
+                raise IdentityRefusal(
+                    RefusalReason.INVALID_IDENTITY,
+                    "valence_basis.mass_fraction_basis",
+                    "must name the basis of both printed mass-fraction cells",
+                )
+        elif self.mass_fraction_basis is not None:
+            raise IdentityRefusal(
+                RefusalReason.INVALID_IDENTITY,
+                "valence_basis.mass_fraction_basis",
+                "is only permitted for mass_fraction_pair",
             )
         if (
             not self.numerator_oxidation_states

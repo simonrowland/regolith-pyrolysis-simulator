@@ -6,7 +6,7 @@ Source: *Oxidation-reduction equilibria in molten Na2O.2SiO2 glass*, published p
 
 - Table I has 47 printed data rows. The MinerU table block has 55 body rows: 47 data rows and 8 element-column subheaders. The extract has exactly 47 Table I observations, with two printed wt% cells per row.
 - The rendered row-block counts are Ti 7, Sn 6, Ce 7, Sb 5, Mn 7, Co 6, Ni 2, V4+/V5+ 4, and V3+/Total V 3. These total 47. There is no Fe data block in Table I; Fe occurs only in the apparent-enthalpy list.
-- The paper prints reduced-species and total-element wt% pairs in the non-V4+/V5+ blocks; the first V block instead prints V4+ and V5+ as two valence-species columns. All values are stored as printed; no ratios were calculated.
+- The paper prints reduced-species and total-element wt% pairs in the non-V4+/V5+ blocks; the first V block instead prints V4+ and V5+ as two valence-species columns. All 94 cells remain stored as printed in the extract; the migrator emits separate ratio observations.
 - Asterisks on Total Ti*, Total Co*, and Total Ni* are retained; the page footer says “* Nominal.” Ditto marks in the Colour column are retained in `color_as_published`, with the resolved colour held separately.
 - All Table I rows represent quenched glass from the Na2O.2SiO2 melt; each has T_C and point_conditions with state and locator on the parent and both values.points entries. The source prints no row-level numeric pO2 or total pressure, so those remain explicit unknowns in point_conditions. Composition is encoded as component pairs for the migrator's point-condition reader. A migrated study-context record carries the alkali_shuttle context for this alkali-rich melt; observations remain on the redox rail, and the paper does not measure an alkali-metal shuttle reaction.
 - The source says opaque samples became somewhat devitrified during quenching (p. 186); the Ce O2 row is marked on this basis because its Table I colour is opaque yellow. It separately reports NaSbO3 X-ray patterns only for the Sb O2 and air samples at 1085 C (p. 187), and notes possible glass separation on cooling for Ti CO-C at 1200 and 1300 C (p. 187). Those five rows are marked asserted_altered; remaining Table I rows are not_stated. No row is marked asserted_preserved.
@@ -85,8 +85,18 @@ Both machine reads agree on the seven printed values on p. 189. Table I fits sto
 
 ## Migrator and scope
 
-The isolated real-migrator run emitted 101 observations: 94 children from the 47 two-cell Table I rows and 7 apparent-enthalpy values. All 101 are unavailable because neither stored quantity has a schema token; hard issues: 0; migration queue: 216. Every Table I child carries point_conditions keys T_C, temperature_K, atmosphere, fO2_Pa, total_pressure_Pa, and composition (94/94); every Table II child carries T_C, atmosphere, fO2_Pa, total_pressure_Pa, and composition (7/7). No ratio or apparent enthalpy was computed.
+Before the pair conversion, isolated migration emitted 101 observations: 94 children from the 47 two-cell Table I rows and 7 apparent-enthalpy values. The converted migration emits 148 observations: those same 94 retained cell children, 47 separate Table I valence ratios, and the 7 unchanged Table II points. All 47 ratios are admitted; 32 have `measured_reduced` evidence because both cells are analysed, and 15 have `author_estimate` evidence because the denominator is a nominal total marked by the p. 186 footnote. The 94 cell children and 7 Table II values remain unavailable. Hard issues: 0. The expected battery store delta is +47 observations; no store output is committed.
 
-For Ti row 1, Sn row 13, and Ce row 15, Identity composition and temperature_K map from the extract (mole fractions Na2O 1/3, SiO2 2/3; temperatures 1358.15 K, 1573.15 K, 1358.15 K). The source prints gas mixtures as atmosphere controls but no numeric total pressure or absolute fO2; point_conditions retains the atmosphere and unknown pressure/fO2 states. The migrator therefore leaves total_pressure_Pa and fO2_Pa unset in Identity; no printed numeric value is lost, and the schema or migrator was not changed.
+The pair basis follows the element-equivalent reading of the printed ion/total-element labels and the titrated-ion method (pp. 185–186). The paper states that V results are expressed in terms of V4+ (p. 186), consistent with the V4+/V5+ column labels. For one element, `n(X^k+)/n(X_total) = w(X^k+)/w(X_total)`: both wt% values are grams per 100 g, the same atomic molar mass and one-cation factor cancel, and the output is dimensionless. If the Ti cells instead meant Ti2O3/TiO2-equivalent wt%, the ratio would be multiplied by `2*M(TiO2)/M(Ti2O3) ≈ 1.11`. The paper gives no per-cell uncertainty for the Table I values. Its general ±0.1 mL titration statement is not a per-cell ratio uncertainty, so these observations have no uncertainty band.
+
+The three migrated identity-axis examples are:
+
+| Source row | Composition | fO2 | T | `valence_basis` |
+|---|---|---|---:|---|
+| Ti row 1 | Na2O 1/3, SiO2 2/3 | unknown: no row-level numeric pO2 printed | 1358.15 K | Ti3+ / total Ti; `mass_fraction_pair`, element / element |
+| Sn row 1 | Na2O 1/3, SiO2 2/3 | unknown: no row-level numeric pO2 printed | 1358.15 K | Sn2+ / total Sn; `mass_fraction_pair`, element / element |
+| V row 41 | Na2O 1/3, SiO2 2/3 | unknown: no row-level numeric pO2 printed | 1358.15 K | V4+ / V5+; `mass_fraction_pair`, element / element |
+
+Every ratio carries identity `fO2_Pa` and `total_pressure_Pa` states from the row conditions, which remain unknown because neither value is printed. The derived-from lineage names both stored cell observations and retains both printed wt% inputs with the p. 186 cell locator. Table II remains unchanged and no apparent enthalpy is computed.
 
 Figure-read candidates not extracted: log pO2 axes/curves in Figs. 2–3 and temperature-dependent equilibrium-constant curves in Fig. 5.

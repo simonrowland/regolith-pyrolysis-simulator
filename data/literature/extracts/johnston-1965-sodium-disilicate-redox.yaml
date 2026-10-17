@@ -14,10 +14,6 @@ extraction:
   apparent_delta_h_printed_entries: 7
   schema_gaps:
   - >-
-    No quantity token represents the printed reduced-species and total-element wt% pair in the Table I blocks other than V4+/V5+. Those pairs are retained as printed under concentration_series with quantity multivalent_element_wt_percent_pair; the real migrator must leave them unavailable rather than compute a valence ratio.
-  - >-
-    No quantity token represents the printed V4+ and V5+ wt% pair as two valence-species columns. Those four rows are retained as printed under concentration_series with quantity multivalent_element_wt_percent_pair and reason no_quantity_token_for_printed_v4_and_v5_wt_percent_pair.
-  - >-
     No quantity token represents apparent enthalpy of reduction. The seven printed values are retained under gibbs_table with quantity apparent_enthalpy_of_reduction; the real migrator must leave them unavailable.
   - >-
     Table I contains no Fe row. Fe appears only in the apparent-Delta-H list; the paper attributes that fit to prior iron-equilibrium work (ref. 1), whose input rows are not in this extract.

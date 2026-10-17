@@ -87,6 +87,7 @@ from simulator.battery.enums import (
     UncertaintyKind,
     ValueKind,
     ValenceDenominatorKind,
+    ValencePrintedForm,
     ValenceValueForm,
 )
 from simulator.yaml_cache import YAML12SafeLoader
@@ -1563,6 +1564,17 @@ def _valence_basis_from_plain(payload: object) -> ValenceBasis:
             "valence_basis.numerator_oxidation_states",
             "must be a list of integer oxidation states",
         )
+    mass_fraction_basis = payload.get("mass_fraction_basis")
+    if mass_fraction_basis is not None and (
+        not isinstance(mass_fraction_basis, (list, tuple))
+        or len(mass_fraction_basis) != 2
+        or any(not isinstance(item, str) for item in mass_fraction_basis)
+    ):
+        raise IdentityRefusal(
+            RefusalReason.INVALID_SOURCE,
+            "valence_basis.mass_fraction_basis",
+            "must be a two-item list of basis names",
+        )
     try:
         denominator = payload.get("denominator_oxidation_state")
         if denominator is not None and type(denominator) is not int:
@@ -1580,6 +1592,14 @@ def _valence_basis_from_plain(payload: object) -> ValenceBasis:
                 denominator
             ),
             value_form=ValenceValueForm(str(payload["value_form"])),
+            printed_form=(
+                None
+                if payload.get("printed_form") is None
+                else ValencePrintedForm(str(payload["printed_form"]))
+            ),
+            mass_fraction_basis=(
+                None if mass_fraction_basis is None else tuple(mass_fraction_basis)
+            ),
         )
     except (KeyError, TypeError, ValueError) as exc:
         if isinstance(exc, IdentityRefusal):
@@ -8879,6 +8899,161 @@ def fe3_fe2_ratio_parent_lineage(
     return derived_from
 
 
+_VALENCE_ION_LABEL = re.compile(r"(?P<element>[A-Z][a-z]?)(?P<state>\d+)(?P<sign>[+-])")
+_VALENCE_TOTAL_LABEL = re.compile(r"Total\s+(?P<element>[A-Z][a-z]?)\*?")
+
+
+def _valence_state_token(label: str, *, species_formula: str) -> tuple[str, int, str]:
+    match = _VALENCE_ION_LABEL.fullmatch(label.strip())
+    if match is None or match.group("element") != species_formula:
+        raise IdentityRefusal(
+            RefusalReason.INVALID_SOURCE,
+            "values.points.column_as_printed",
+            f"cannot read valence ion label {label!r} for {species_formula}",
+        )
+    sign = "plus" if match.group("sign") == "+" else "minus"
+    state = int(match.group("state")) * (1 if sign == "plus" else -1)
+    return match.group("element"), state, sign
+
+
+def _mass_fraction_pair_valence_basis(
+    printed_header: object, *, species_formula: str
+) -> ValenceBasis:
+    """Build the identity basis named by a printed ion / total or ion pair."""
+
+    if not isinstance(printed_header, str):
+        raise IdentityRefusal(
+            RefusalReason.INVALID_SOURCE,
+            "values.printed_element_subheader",
+            "mass_fraction_pair requires its printed valence header",
+        )
+    parts = [part.strip() for part in printed_header.split("/")]
+    if len(parts) == 1:
+        numerator_label = parts[0]
+        denominator_label = f"Total {species_formula}"
+    elif len(parts) == 2:
+        numerator_label, denominator_label = parts
+    else:
+        raise IdentityRefusal(
+            RefusalReason.INVALID_SOURCE,
+            "values.printed_element_subheader",
+            f"malformed valence-pair header {printed_header!r}",
+        )
+    element, numerator_state, numerator_sign = _valence_state_token(
+        numerator_label, species_formula=species_formula
+    )
+    total_match = _VALENCE_TOTAL_LABEL.fullmatch(denominator_label)
+    if total_match is not None:
+        if total_match.group("element") != element:
+            raise IdentityRefusal(
+                RefusalReason.INVALID_SOURCE,
+                "values.printed_element_subheader",
+                "numerator and total-element labels name different elements",
+            )
+        denominator_token = f"total_{element}"
+    else:
+        denominator_element, denominator_state, denominator_sign = _valence_state_token(
+            denominator_label, species_formula=species_formula
+        )
+        if denominator_element != element:
+            raise IdentityRefusal(
+                RefusalReason.INVALID_SOURCE,
+                "values.printed_element_subheader",
+                "numerator and denominator labels name different elements",
+            )
+        denominator_token = (
+            f"{denominator_element}{abs(denominator_state)}{denominator_sign}"
+        )
+    parsed = parse_valence_basis(
+        f"{element}{abs(numerator_state)}{numerator_sign}_over_{denominator_token}",
+        species_formula=species_formula,
+    )
+    return replace(
+        parsed,
+        printed_form=ValencePrintedForm.MASS_FRACTION_PAIR,
+        mass_fraction_basis=("element", "element"),
+    )
+
+
+def mass_fraction_pair_to_valence_ratio(
+    numerator_wt_pct: Decimal | None,
+    denominator_wt_pct: Decimal | None,
+    *,
+    element: str,
+    mass_fraction_basis: tuple[str, str],
+) -> Decimal:
+    """Convert printed wt% cells to the named cation ratio."""
+
+    if numerator_wt_pct is None or denominator_wt_pct is None:
+        missing = "numerator" if numerator_wt_pct is None else "denominator"
+        raise IdentityRefusal(
+            RefusalReason.INVALID_SOURCE,
+            "values.points",
+            f"missing input: {missing} mass-fraction cell",
+        )
+    if (
+        not element
+        or not isinstance(mass_fraction_basis, tuple)
+        or len(mass_fraction_basis) != 2
+        or any(
+            not isinstance(item, str) or not item.strip()
+            for item in mass_fraction_basis
+        )
+    ):
+        raise IdentityRefusal(
+            RefusalReason.INVALID_SOURCE,
+            "valence_basis.mass_fraction_basis",
+            "must name the element and both printed bases",
+        )
+    if not numerator_wt_pct.is_finite() or not denominator_wt_pct.is_finite():
+        raise IdentityRefusal(
+            RefusalReason.INVALID_SOURCE,
+            "values.points",
+            "mass-fraction cells must be finite numbers",
+        )
+    if numerator_wt_pct < 0 or denominator_wt_pct <= 0:
+        raise IdentityRefusal(
+            RefusalReason.INVALID_SOURCE,
+            "values.points",
+            "numerator must be non-negative and denominator must be positive",
+        )
+    if mass_fraction_basis == ("element", "element"):
+        # Premise: Johnston's printed ion/total-element labels and titrated-ion
+        # method give same-element mass fractions. Algebra: n_num/n_den =
+        # (w_num/M_X * 1)/(w_den/M_X * 1) = w_num/w_den. Units: wt% is g per
+        # 100 g, so g/(g mol-1) is mol per 100 g and the ratio is dimensionless.
+        # Hand check from Johnston row 1: 0.021/1.50 = 0.014.
+        return numerator_wt_pct / denominator_wt_pct
+
+    from simulator.accounting.formulas import parse_formula
+
+    def cation_moles(wt_pct: Decimal, basis: str) -> Decimal:
+        formula = element if basis == "element" else basis
+        try:
+            parsed = parse_formula(formula, species=formula)
+            cations = as_decimal(str(parsed.elements.get(element, 0)))
+            molar_mass = oxide_molar_mass(formula)
+        except (TypeError, ValueError, KeyError) as exc:
+            raise IdentityRefusal(
+                RefusalReason.INVALID_SOURCE,
+                "valence_basis.mass_fraction_basis",
+                f"cannot resolve printed formula {formula!r}: {exc}",
+            ) from exc
+        if cations <= 0 or molar_mass <= 0:
+            raise IdentityRefusal(
+                RefusalReason.INVALID_SOURCE,
+                "valence_basis.mass_fraction_basis",
+                f"printed basis {formula!r} contains no {element} cations",
+            )
+        # wt% gives g of formula per 100 g; divide by g/mol and multiply by
+        # cations per formula to obtain mol of the named cation per 100 g.
+        return (wt_pct / molar_mass) * cations
+
+    numerator_moles = cation_moles(numerator_wt_pct, mass_fraction_basis[0])
+    denominator_moles = cation_moles(denominator_wt_pct, mass_fraction_basis[1])
+    return numerator_moles / denominator_moles
+
+
 def _selection_from_named_field(
     payload: Mapping[str, Any],
     q_token: Quantity,
@@ -15136,6 +15311,19 @@ class Migrator:
                         content_stable_id=True,
                         use_printed_point_species=non_yield_points,
                     )
+            if (
+                source_id == "johnston-1965-sodium-disilicate-redox"
+                and values.get("quantity") == "multivalent_element_wt_percent_pair"
+                and any(name == "points" for name, _container in row_point_containers)
+            ):
+                self._emit_mass_fraction_pair_ratio(
+                    formula=formula,
+                    values=values,
+                    parent_id=obs_id,
+                    work=work,
+                    source_key=source_key,
+                    source_id=source_id,
+                )
             if self._count(source_key).observations_out > before:
                 return
         elif not value_sel.available:
@@ -15299,6 +15487,228 @@ class Migrator:
             derived_from,
             value_derivation,
         )
+        self._add_observation(observation, source_key)
+
+    def _emit_mass_fraction_pair_ratio(
+        self,
+        *,
+        formula: str,
+        values: Mapping[str, Any],
+        parent_id: str,
+        work: Work,
+        source_key: str,
+        source_id: str,
+    ) -> None:
+        """Add Johnston's ratio alongside its unchanged printed cell children."""
+
+        points = values.get("points")
+        points = points if isinstance(points, list) else []
+        try:
+            basis = _mass_fraction_pair_valence_basis(
+                values.get("printed_element_subheader"), species_formula=formula
+            )
+        except IdentityRefusal as refusal:
+            self.result.add_queue(
+                work.work_id,
+                None,
+                ["valence_basis"],
+                f"{refusal.reason.value}: {refusal.detail}",
+                source=source_key,
+                observation_id=f"{parent_id}::valence_ratio",
+            )
+            return
+
+        cell_ids = tuple(self._exploded_children.get(parent_id, ()))
+        cells = [
+            self.result.observations[cell_id]
+            for cell_id in cell_ids
+            if cell_id in self.result.observations
+        ]
+        if not cells:
+            self.result.add_queue(
+                work.work_id,
+                None,
+                ["values.points"],
+                "missing input: mass_fraction_pair has no stored cell observations",
+                source=source_key,
+                observation_id=f"{parent_id}::valence_ratio",
+            )
+            return
+        reference = cells[0]
+        ratio_id = f"{parent_id}::valence_ratio"
+        refusal_reason: str | None = None
+        if len(points) != 2 or len(cell_ids) != 2:
+            refusal_reason = (
+                "missing input: mass_fraction_pair requires both printed cells; "
+                f"found {len(points)} cells and {len(cell_ids)} stored observations"
+            )
+        else:
+            amounts = tuple(
+                _as_dec_or_none(
+                    point.get("value_as_published", point.get("value"))
+                    if isinstance(point, Mapping)
+                    else None
+                )
+                for point in points
+            )
+            if any(amount is None for amount in amounts):
+                refusal_reason = "missing input: a printed mass-fraction cell has no numeric value"
+            else:
+                numerator_wt_pct, denominator_wt_pct = amounts
+
+        condition_fields = {}
+        for axis in ("fO2_Pa", "total_pressure_Pa"):
+            located = (reference.point_conditions or {}).get(axis)
+            condition_fields[axis] = (
+                located.state
+                if isinstance(located, Located)
+                else State.unknown(f"source does not state {axis}")
+            )
+        identity = replace(
+            reference.identity,
+            quantity=State.of(Quantity.VALENCE_RATIO),
+            valence_basis=State.of(basis),
+            **condition_fields,
+        )
+
+        if refusal_reason is None:
+            try:
+                ratio = mass_fraction_pair_to_valence_ratio(
+                    numerator_wt_pct,
+                    denominator_wt_pct,
+                    element=formula,
+                    mass_fraction_basis=basis.mass_fraction_basis or (),
+                )
+            except IdentityRefusal as refusal:
+                refusal_reason = f"{refusal.reason.value}: {refusal.detail}"
+
+        method_classes = tuple(
+            str(point.get("method_class") or "").strip().casefold()
+            for point in points
+            if isinstance(point, Mapping)
+        )
+        if refusal_reason is None and (
+            len(method_classes) != 2
+            or any(
+                method_class not in {"measured_direct", "author_estimate"}
+                for method_class in method_classes
+            )
+        ):
+            refusal_reason = "unsupported evidence class on mass-fraction pair cells"
+
+        if refusal_reason is None:
+            assert ratio is not None
+            nominal = "author_estimate" in method_classes or any(
+                bool(point.get("total_nominal"))
+                for point in points
+                if isinstance(point, Mapping)
+            )
+            if nominal:
+                evidence, _ = evidence_for(
+                    "author_estimate",
+                    model="Johnston 1965 nominal total (p. 186 footnote)",
+                )
+            else:
+                evidence = Evidence(
+                    class_=State.of(EvidenceClass.MEASURED_REDUCED),
+                    original_method_class="measured_direct",
+                )
+            value = Value.point_of(ratio)
+            derived_from = cell_ids
+            first_state = basis.numerator_oxidation_states[0]
+            numerator_label = f"{formula}{abs(first_state)}{'+' if first_state > 0 else '-'}"
+            if basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT:
+                denominator_label = f"{formula}_total"
+            else:
+                assert basis.denominator_oxidation_state is not None
+                state = basis.denominator_oxidation_state
+                denominator_label = f"{formula}{abs(state)}{'+' if state > 0 else '-'}"
+            relation = (
+                f"n({numerator_label})/n({denominator_label}) = "
+                "(w_num/M_num*c_num)/(w_den/M_den*c_den); element-equivalent wt% "
+                "is interpreted from the printed ion/total-element labels and "
+                "titrated-ion method (Johnston 1965 pp. 185-186). For these same-"
+                "element cells M cancels and each element basis has one cation; "
+                "an oxide-equivalent Ti2O3/TiO2 reading would multiply Ti ratios "
+                "by about 1.11."
+            )
+            if formula == "V":
+                relation += (
+                    " Johnston states that V results are expressed in terms of V4+ "
+                    "(p. 186)."
+                )
+            if nominal:
+                relation += (
+                    " Denominator is the paper's nominal total (p. 186 footnote), "
+                    "not an analysed value."
+                )
+            amounts = (numerator_wt_pct, denominator_wt_pct)
+            derivation = Derivation(
+                relation=relation,
+                inputs=cell_ids,
+                parameters=(
+                    (
+                        "printed_numerator_wt_pct",
+                        Located(State.of(amounts[0]), locator=cells[0].locator),
+                    ),
+                    (
+                        "printed_denominator_wt_pct",
+                        Located(State.of(amounts[1]), locator=cells[1].locator),
+                    ),
+                ),
+                output_unit="dimensionless",
+            )
+            admission = Admission(
+                status=AdmissionStatus.ADMITTED,
+                reason="ratio reduced from the two retained printed mass-fraction cells",
+                decided_by=reference.admission.decided_by,
+            )
+        else:
+            evidence = Evidence(class_=State.unknown(refusal_reason))
+            value = Value(ValueKind.UNAVAILABLE, unavailable_reason=refusal_reason)
+            admission = Admission(
+                status=AdmissionStatus.REJECTED,
+                reason=refusal_reason,
+                decided_by=reference.admission.decided_by,
+            )
+            derived_from = None
+            derivation = None
+            self.result.add_queue(
+                work.work_id,
+                reference.locator,
+                ["values.points"],
+                refusal_reason,
+                source=source_key,
+                observation_id=ratio_id,
+            )
+
+        observation = Observation(
+            observation_id=ratio_id,
+            experiment_id=reference.experiment_id,
+            identity=identity,
+            value=value,
+            uncertainty=Uncertainty(kind=UncertaintyKind.NONE),
+            evidence=evidence,
+            admission=admission,
+            notices=(),
+            source_id=source_id,
+            locator=reference.locator,
+            read_from=reference.read_from,
+            point_conditions=reference.point_conditions,
+            derived_from=derived_from,
+            derivation=derivation,
+            provenance=reference.provenance,
+        )
+        if refusal_reason is None:
+            self._queue_unstated_derived_lineage(
+                work.work_id,
+                reference.locator,
+                source_key,
+                ratio_id,
+                evidence,
+                derived_from,
+                derivation,
+            )
         self._add_observation(observation, source_key)
 
     def _emit_exploded_point(
