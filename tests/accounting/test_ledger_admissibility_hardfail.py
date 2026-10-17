@@ -156,6 +156,18 @@ def test_positive_sub_tolerance_lot_retains_consistent_kg_and_mol(oxygen_kg) -> 
         assert retained.meta["species_mol"]["O2"] == oxygen_mol
 
 
+@pytest.mark.xfail(
+    reason="t-1238 kg-basis conservation behavior awaits physics approval",
+    strict=False,
+)
+def test_kg_basis_lot_preserves_nonzero_sub_tolerance_si_mass() -> None:
+    si_kg = 3.226e-13
+    lot = MaterialLot("process.cleaned_melt", {"Si": si_kg})
+
+    assert lot.species_kg == {"Si": si_kg}
+    assert lot.without_empty().species_kg == {"Si": si_kg}
+
+
 def test_h190_fe_reduction_retains_tiny_oxygen_credit_and_closes() -> None:
     ledger = AtomLedger()
     # Hero h190: Fe2O3 -> 2 FeO + 1/2 O2. The measured O2 parcel
