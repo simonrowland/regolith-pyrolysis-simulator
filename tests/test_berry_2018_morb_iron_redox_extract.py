@@ -6,7 +6,15 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.migrate import Migrator
+from simulator.battery.enums import (
+    AdmissionStatus,
+    Phase,
+    Quantity,
+    ValenceDenominatorKind,
+    ValenceValueForm,
+)
+from simulator.battery.identity import ValenceBasis, profile_for
+from simulator.battery.migrate import Migrator, _log_fO2_to_pa
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
 
@@ -61,8 +69,7 @@ def test_berry_table_rows_and_render_pins_are_preserved():
     assert check_all_fidelity_samples_match(mutated, label=EXTRACT.stem)
 
 
-def test_berry_typed_refusal_migration_keeps_row_conditions():
-    source = _document()
+def test_berry_valence_migration_stamps_identity_conditions_and_quench():
     result = _migrate_extract()
     migrated = [
         obs
@@ -73,15 +80,46 @@ def test_berry_typed_refusal_migration_keeps_row_conditions():
     assert len(migrated) == 52
     assert result.registry_issues == []
     assert result.validation.hard_issues == ()
-    assert all(obs.value.kind.value == "unavailable" for obs in migrated)
-    assert all(obs.identity.quantity.is_unknown for obs in migrated)
+    assert sum(obs.value.kind.value == "point" for obs in migrated) == 46
+    assert sum(obs.value.kind.value == "unavailable" for obs in migrated) == 6
+    assert all(obs.admission.status is AdmissionStatus.ADMITTED for obs in migrated)
+    assert all(
+        obs.identity.quantity.is_value
+        and obs.identity.quantity.value is Quantity.VALENCE_RATIO
+        for obs in migrated
+    )
+    expected_basis = ValenceBasis(
+        numerator_oxidation_states=(3,),
+        denominator_kind=ValenceDenominatorKind.TOTAL_ELEMENT,
+        denominator_oxidation_state=None,
+        value_form=ValenceValueForm.FRACTION,
+    )
+    assert all(
+        obs.identity.valence_basis is not None
+        and obs.identity.valence_basis.value == expected_basis
+        for obs in migrated
+    )
+    required_axes = frozenset(
+        {"composition", "fO2_Pa", "temperature_K", "total_pressure_Pa", "valence_basis"}
+    )
 
     for obs in migrated:
         assert obs.identity.temperature_K is not None
         assert obs.identity.temperature_K.value == Decimal("1673.15")
+        assert obs.identity.species.phase.value is Phase.GLASS
+        assert obs.identity.fO2_Pa is not None and obs.identity.fO2_Pa.is_value
+        assert obs.identity.total_pressure_Pa is not None
+        assert obs.identity.total_pressure_Pa.is_value
         conditions = obs.point_conditions
         assert conditions is not None
-        for name in ("T_C", "fO2_log", "delta_QFM", "total_pressure_Pa", "composition"):
+        for name in (
+            "T_C",
+            "fO2_log",
+            "delta_QFM",
+            "total_pressure_Pa",
+            "composition",
+            "quench_state",
+        ):
             assert name in conditions
             assert conditions[name].locator is not None
         assert conditions["T_C"].state.value == Decimal("1400")
@@ -89,8 +127,11 @@ def test_berry_typed_refusal_migration_keeps_row_conditions():
         assert conditions["delta_QFM"].state.is_value
         assert conditions["total_pressure_Pa"].state.is_value
         assert conditions["composition"].state.is_value
+        assert conditions["quench_state"].state.value == "not_stated"
+        assert conditions["quench_state"].locator.page == 2
         assert obs.identity.composition is not None
         assert obs.identity.composition.is_value
+        assert profile_for(obs.identity).required == required_axes
 
     row_1 = next(
         obs
@@ -104,5 +145,15 @@ def test_berry_typed_refusal_migration_keeps_row_conditions():
     )
     assert row_1.point_conditions["total_pressure_Pa"].state.value == Decimal("1000000000")
     assert row_2.point_conditions["total_pressure_Pa"].state.value == Decimal("101325")
-    assert row_1.identity.fO2_Pa is None
-    assert row_2.identity.fO2_Pa is None
+    row_3 = next(
+        obs
+        for obs in migrated
+        if obs.point_conditions["fO2_log"].state.value == Decimal("-1.00")
+    )
+    for obs in (row_1, row_2, row_3):
+        assert obs.identity.fO2_Pa.value == _log_fO2_to_pa(
+            obs.point_conditions["fO2_log"].state.value
+        )
+        assert obs.identity.total_pressure_Pa.value == obs.point_conditions[
+            "total_pressure_Pa"
+        ].state.value
