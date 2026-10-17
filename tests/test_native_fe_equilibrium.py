@@ -175,9 +175,15 @@ def test_saturation_notice_exposes_unbounded_edges_without_nonfinite_json(monkey
     json.dumps(result, allow_nan=False)
 
 
+# Band at q=.039, 90/10 SiO2/FeO, 1750 C: L=1.1415 (downward), U=1.0589 dex.
+# BELOW needs margin+U<0 (margin<-1.0589); ABOVE needs margin-L>0
+# (margin>1.1415). 1.1 sits between U and L, so it is INDETERMINATE under the
+# corrected comparator (b-899 r12c); before it, the swapped widths called it
+# ABOVE. 1.2 keeps the ABOVE case covered.
 @pytest.mark.parametrize('margin, status', [
     (-1.2, 'BELOW'), (-0.8, 'INDETERMINATE'), (-0.031, 'INDETERMINATE'),
-    (0.2, 'INDETERMINATE'), (0.6, 'INDETERMINATE'), (1.1, 'ABOVE'),
+    (0.2, 'INDETERMINATE'), (0.6, 'INDETERMINATE'), (1.1, 'INDETERMINATE'),
+    (1.2, 'ABOVE'),
 ])
 def test_three_way_saturation_uses_propagated_band(monkeypatch, margin, status):
     monkeypatch.setattr(fe_redox, 'calphad_ferrous_feo_activity_diagnostic',
