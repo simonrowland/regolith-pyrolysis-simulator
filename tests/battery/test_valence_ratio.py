@@ -423,6 +423,47 @@ def test_valence_ratio_scores_redox_and_counts_each_engine_refusal():
         assert residual.refusal.reason is RefusalReason.UNSUPPORTED
 
 
+def test_glass_valence_rows_keep_quench_labels_on_counted_refusals():
+    result = _migrate_sossi_cr()
+    template = _valence_template(result)
+    rows = tuple(
+        _quench_row(
+            template,
+            observation_id=f"glass-refused-{index}",
+            phase=Phase.GLASS,
+            value=value,
+            quench_state=QuenchState.ASSERTED_PRESERVED,
+        )
+        for index, value in enumerate(("0.32", "0.91"))
+    )
+    context = _quench_context(result, rows)
+    residuals, _candidates = score_store(
+        context,
+        engines=SCORE_ENGINE_SET,
+        rail=Rail.REDOX,
+    )
+
+    assert len(residuals) == len(rows) * len(SCORE_ENGINE_SET)
+    for residual in residuals:
+        assert residual.numeric is None
+        assert residual.refusal is not None
+        assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+        assert residual.quench_state is QuenchState.ASSERTED_PRESERVED
+        assert residual_to_plain(residual)["quench_state"] == "asserted_preserved"
+
+    redox_headline = [
+        row
+        for row in headline_rows(
+            residuals,
+            context=context,
+            engines=SCORE_ENGINE_SET,
+        )
+        if row["rail"] == Rail.REDOX.value
+    ]
+    assert sum(row["n_candidates"] for row in redox_headline) == len(residuals)
+    assert sum(row["n_refused"] for row in redox_headline) == len(residuals)
+
+
 def _valence_template(result):
     return next(
         row
@@ -727,13 +768,13 @@ def test_paired_quench_report_has_log10_difference_and_identical_ratio_zero():
         ),
     )
     context = _quench_context(result, rows)
+    diagnostics = paired_quench_diagnostics(context)
     residuals, _candidates = score_store(
         context,
         engines=(Engine.INTERNAL_ANALYTICAL,),
         rail=Rail.REDOX,
         predict=_numeric_quench_predictor([]),
     )
-    diagnostics = paired_quench_diagnostics(context)
     by_glass_id = {row["glass_observation"]: row for row in diagnostics}
 
     assert {row.reference for row in residuals} == {row.observation_id for row in rows}
