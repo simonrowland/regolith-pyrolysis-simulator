@@ -5122,6 +5122,24 @@ def test_backend_health_timeout_config_reaches_transport(monkeypatch):
     assert backend._thermoengine_transport.equilibrate_timeout_s == 7.0
 
 
+def test_thermoengine_backend_forwards_per_call_timeout():
+    backend = ThermoEngineBackend()
+    backend._composition_kg_to_wt_pct = lambda _composition: {'SiO2': 100.0}
+    backend._domain_gate = lambda *_args, **_kwargs: None
+    backend._apply_engine_commissioning = lambda *_args, **_kwargs: {}
+    backend._normalize_composition_to_melts_basis = lambda composition: composition
+    backend._last_normalization_warnings = []
+    backend._equilibrate_prepared = lambda **kwargs: kwargs
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg={'SiO2': 1.0},
+        call_timeout_s=17.0,
+    )
+
+    assert result['call_timeout_s'] == 17.0
+
+
 def test_thermoengine_transport_rejects_unknown_model_name():
     with pytest.raises(ValueError, match='unknown ThermoEngine MELTS model'):
         ThermoEngineTransport(
@@ -6550,6 +6568,30 @@ def test_thermoengine_transport_remaps_nonfinite_field_remote_error():
             pressure_bar=1.0,
             comp_wt=_melts_domain_composition(),
         )
+
+
+def test_thermoengine_transport_forwards_per_call_timeout():
+    transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._worker.start_count = 1
+    seen = {}
+
+    def _record_worker_call(_request, *, timeout_s=None):
+        seen['timeout_s'] = timeout_s
+        return object()
+
+    transport._worker.call = _record_worker_call
+    result = transport.equilibrate(
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+        comp_wt=_melts_domain_composition(),
+        call_timeout_s=27.0,
+    )
+
+    assert seen['timeout_s'] == 27.0
+    assert result is not None
 
 
 def test_thermoengine_transport_remaps_fo2_undefined_remote_error():
@@ -10701,6 +10743,81 @@ def test_gibbs_energy_library_failure_is_typed():
             temperature_C=1400.0,
             pressure_bar=1.0,
             component_mole_fraction={'SiO2': 1.0},
+            comp_wt={'SiO2': 100.0},
+        )
+
+
+def test_thermoengine_activity_matches_native_morita_and_pure_limits():
+    import numpy as np
+
+    transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._initialize_in_process()
+    phase = transport._liq_phase
+    names = tuple(str(name) for name in phase.endmember_names)
+    temperature_K = 1823.0
+    pressure_bar = 1.0
+    # The oxide-to-MELTS component composition of Morita's 1823 K SiO2 row.
+    composition = {
+        'SiO2': 0.9112683723462167,
+        'CaSiO3': 0.042460533478497556,
+        'Al2O3': 0.04627109417528579,
+    }
+    mol = [composition.get(name, 0.0) for name in names]
+    observed = transport._activities_from_chemical_potentials(
+        temperature_C=temperature_K - 273.15,
+        pressure_bar=pressure_bar,
+        component_mole_fraction=composition,
+        comp_wt={},
+    )['SiO2']
+    mu = np.asarray(
+        phase.chem_potential(temperature_K, pressure_bar, mol=[mol]), dtype=float
+    ).reshape(-1)[names.index('SiO2')]
+    pure = [0.0 for _ in names]
+    pure[names.index('SiO2')] = 1.0
+    mu0 = np.asarray(
+        phase.gibbs_energy(temperature_K, pressure_bar, mol=[pure]), dtype=float
+    ).reshape(-1)[0]
+    direct = activity_from_chem_potential(float(mu), float(mu0), temperature_K)
+    assert observed == pytest.approx(direct, rel=1e-9)
+    assert observed == pytest.approx(0.908291549557732, rel=1e-9)
+
+    pure_activity = transport._activities_from_chemical_potentials(
+        temperature_C=temperature_K - 273.15,
+        pressure_bar=pressure_bar,
+        component_mole_fraction={'SiO2': 1.0},
+        comp_wt={'SiO2': 100.0},
+    )['SiO2']
+    # MELTS v1 returns 1.00003004 (1.3e-5 dex) at the pure limit; VapoRock's
+    # independent MELTS-v1 path gives 1.0000301. This is engine numerics, so
+    # do not normalize through a second reference path. A 1e-4 dex tolerance
+    # is negligible beside the 0.1-0.8 dex residuals measured on this rail.
+    assert pure_activity == pytest.approx(1.00003004283758, rel=1e-8)
+    assert abs(math.log10(pure_activity)) <= 1e-4
+
+
+@pytest.mark.parametrize(
+    ('fraction', 'error_type', 'message'),
+    (
+        (float('nan'), ThermoEngineNonFiniteField, 'fractions are not finite'),
+        (-0.01, thermoengine_module.ThermoEngineNotConvergedError, 'negative value'),
+    ),
+)
+def test_thermoengine_activity_rejects_invalid_endmember_fractions(
+    fraction, error_type, message
+):
+    transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
+        activity_converter=activity_from_chem_potential,
+    )
+    transport._liq_phase = types.SimpleNamespace(endmember_names=('SiO2',))
+    with pytest.raises(error_type, match=message):
+        transport._activities_from_chemical_potentials(
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            component_mole_fraction={'SiO2': fraction},
             comp_wt={'SiO2': 100.0},
         )
 

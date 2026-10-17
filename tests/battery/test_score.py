@@ -2615,6 +2615,84 @@ def test_qualification_notice_carried() -> None:
     assert candidate.authority is Authority.EXTRAPOLATED
 
 
+def test_thermoengine_numeric_activity_outside_band_is_gamma_extrapolated(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        EquilibrateCell,
+    )
+
+    experiment = F.tabulation_experiment(T_K=Decimal("1703"))
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("SiO2", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    reference = F.observation(
+        "thermoengine-outside-gamma-band",
+        experiment.experiment_id,
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1703"),
+            component_basis="SiO2",
+            composition=composition,
+        ),
+        Decimal("0.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    handle = EngineHandle(
+        name=Engine.THERMOENGINE.value,
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=True,
+    )
+    monkeypatch.setattr(battery, "open_battery_engine", lambda _name: handle)
+
+    def successful_cell(engine_handle, pot, **kwargs):
+        return EquilibrateCell(
+            pot_id=pot.pot_id,
+            engine=engine_handle.name,
+            temperature_K=kwargs["temperature_K"],
+            po2=kwargs["po2"],
+            status="ok",
+            refusal_reason=None,
+            engine_status="ok",
+            engine_reason=None,
+            melt_activities={"SiO2_Liq": 0.9},
+            gas_partial_pressures_Pa={},
+            liquid_fraction=1.0,
+            wall_s=0.0,
+            cpu_s=0.0,
+            hostname="test",
+        )
+
+    monkeypatch.setattr(battery, "equilibrate_cell", successful_cell)
+    prediction = predict_with_engine(
+        Engine.THERMOENGINE,
+        reference,
+        experiment=experiment,
+        handles={Engine.THERMOENGINE.value: handle},
+        isolated=False,
+    )
+
+    assert prediction.value == Decimal("0.9"), prediction.refusal_detail
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+        and notice.authority is Authority.EXTRAPOLATED
+        for notice in prediction.notices
+    )
+    assert not any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.origin == "engine:thermoengine"
+        for notice in prediction.notices
+    )
+
+
 def test_metric_domain_refuses_zero_and_negative_dex() -> None:
     # Premise: dex = log10(C/R) requires C>0 and R>0. Zero is not a priceable dex.
     assert compute_metric(MetricOperation.DEX, Decimal("0"), Decimal("1")) is None
@@ -7969,6 +8047,31 @@ def test_periclase_fusion_conversion_uses_restored_janaf_rows() -> None:
     )
     converted = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
     assert converted.value.point != reference.value.point
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert any(
+        notice.reason.startswith("reference_converted_via_fusion;")
+        for notice in converted.notices
+    )
+
+
+def test_guo_periclase_measurement_uses_thermoengine_fusion_reference_owner() -> None:
+    from simulator.battery.score import fusion_comparison_reference
+
+    context = _migrated_extract_context("guo-2021-mgo-activity-cmas-slag.yaml")
+    reference = next(
+        observation
+        for observation in context.observations.values()
+        if observation.source_id == "guo-2021-mgo-activity-cmas-slag"
+        and observation.value.point == Decimal("0.6376")
+        and observation.identity.reference_state.is_value
+        and observation.identity.reference_state.value.endmember.polymorph.value
+        == "periclase"
+    )
+    converted = fusion_comparison_reference(
+        reference, engine=Engine.THERMOENGINE
+    )
+    assert converted.value.point != reference.value.point
+    assert abs(converted.value.point - Decimal("0.1024623")) < Decimal("0.00001")
     assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
     assert any(
         notice.reason.startswith("reference_converted_via_fusion;")

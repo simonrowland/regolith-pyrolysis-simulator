@@ -5,8 +5,12 @@ from __future__ import annotations
 import json
 import math
 import os
+import signal
 import resource
+import subprocess
+import sys
 import time
+from functools import partial
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -292,6 +296,24 @@ def test_classify_out_of_domain_and_no_liquid() -> None:
     )
     assert status == "refusal"
     assert reason == "no_liquid"
+
+
+def test_classify_thermoengine_nonfinite_keeps_field_detail() -> None:
+    class NonFiniteField(ValueError):
+        backend_status_reason = "thermoengine_nonfinite_field"
+
+    status, reason, engine_reason = classify_equilibrate_outcome(
+        error=NonFiniteField(
+            "ThermoEngine Liquid GibbsFreeEnergy is not finite: nan"
+        )
+    )
+
+    assert status == "refusal"
+    assert reason == REFUSAL_UNAVAILABLE
+    assert engine_reason == (
+        "thermoengine_nonfinite_field: "
+        "ThermoEngine Liquid GibbsFreeEnergy is not finite: nan"
+    )
 
 
 @pytest.mark.parametrize(
@@ -1748,38 +1770,31 @@ def test_simulated_crash_yields_engine_crash() -> None:
     assert any(notice.get("kind") == "melts_domain_gate" for notice in cell.notices)
 
 
-_TEST_ISOLATED_CELL_BOOTSTRAP = r"""
-import json
-import os
-import subprocess
-import sys
-import time
-from pathlib import Path
+def _fake_isolated_cell_bootstrap(
+    _engine: str, *, initialization_delay_s: float = 0.0
+):
+    time.sleep(initialization_delay_s)
+    return None, "fake-ready"
 
-from simulator.diagnostic_helpers.binary_pot_battery import EquilibrateCell, Po2Request
 
-# Give the worker its own tight descriptor ceiling. It inherits the parent's
-# soft limit, which the fd test raises above 256 when the parent is busy, so
-# without this a one-fd-per-cell leak inside the worker could go unnoticed.
-import resource
-_fd_now = len(os.listdir("/dev/fd"))
-_soft, _hard = resource.getrlimit(resource.RLIMIT_NOFILE)
-_cap = _fd_now + 64
-if _hard != resource.RLIM_INFINITY:
-    _cap = min(_cap, _hard)
-if _soft == resource.RLIM_INFINITY or _cap < _soft:
-    resource.setrlimit(resource.RLIMIT_NOFILE, (_cap, _hard))
-
-for line in sys.stdin:
-    request = json.loads(line)
+def _fake_isolated_cell_handler(_resource, request, _diagnostic_log):
     mode = request.get("simulate_crash")
     if mode == "exit":
         os._exit(73)
     if mode == "grandchild":
         marker = Path(request["why"])
-        child_code = (
-            "import time; from pathlib import Path; "
-            f"time.sleep(2.5); Path({str(marker)!r}).write_text('survived')"
+        release_file = marker.with_suffix(".release")
+        child_code = "\n".join(
+            (
+                "import time",
+                "from pathlib import Path",
+                f"release = Path({str(release_file)!r})",
+                f"marker = Path({str(marker)!r})",
+                "while not release.exists():",
+                "    time.sleep(0.01)",
+                "time.sleep(2.5)",
+                "marker.write_text('survived')",
+            )
         )
         child = subprocess.Popen([sys.executable, "-c", child_code])
         marker.with_suffix(".pid").write_text(str(child.pid))
@@ -1807,35 +1822,115 @@ for line in sys.stdin:
         hostname="worker-test",
         arm=request["arm"],
     )
-    sys.stdout.write(chr(30) + json.dumps(cell.as_payload()) + chr(10))
-    sys.stdout.flush()
-"""
+    return cell.as_payload()
+
+
+def _nested_warm_hang_handler(_resource, _request, _diagnostic_log):
+    time.sleep(30.0)
+
+
+def _nested_warm_worker_bootstrap():
+    return None, "nested-warm-ready"
+
+
+class _NestedWarmHangBackend:
+    def __init__(
+        self,
+        budget_path: str,
+        pid_path: str,
+        call_started_path: str,
+    ) -> None:
+        from simulator.engine_pool import WarmEngineWorker
+
+        self.budget_path = Path(budget_path)
+        self.worker = WarmEngineWorker(
+            name="nested test warm engine",
+            bootstrap=_nested_warm_worker_bootstrap,
+            handler=_nested_warm_hang_handler,
+            # Match the 30 s startup floor used by ThermoEngine's warm worker;
+            # startup must not masquerade as the per-cell call timeout below.
+            startup_timeout_s=30.0,
+            call_timeout_s=5.0,
+            diagnostic_signal=signal.SIGCONT,
+            watchdog_grace_s=0.05,
+            daemon=False,
+        )
+        self.worker.start()
+        Path(pid_path).write_text(str(self.worker.process.pid), encoding="utf-8")
+        self.call_started_path = Path(call_started_path)
+
+    def equilibrate(self, *, call_timeout_s: float, **_kwargs):
+        call_started = time.monotonic()
+        self.call_started_path.write_text(repr(call_started), encoding="utf-8")
+        original_call = self.worker.call
+
+        def record_call_budget(request, *, timeout_s=None):
+            self.budget_path.write_text(repr(timeout_s), encoding="utf-8")
+            return original_call(request, timeout_s=timeout_s)
+
+        self.worker.call = record_call_budget
+        return self.worker.call({}, timeout_s=call_timeout_s)
+
+    def close(self) -> None:
+        self.worker.close()
+
+
+def _nested_warm_hang_bootstrap(
+    engine: str,
+    *,
+    budget_path: str,
+    pid_path: str,
+    call_started_path: str,
+):
+    import simulator.diagnostic_helpers.binary_pot_battery as binary_pot_battery
+
+    backend = _NestedWarmHangBackend(budget_path, pid_path, call_started_path)
+    handle = EngineHandle(
+        name=engine,
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    return binary_pot_battery._IsolatedCellEngine(handle), "nested-warm-ready"
 
 
 def _install_fake_isolated_cell_worker(
     monkeypatch: pytest.MonkeyPatch,
+    *,
+    initialization_delay_s: float = 0.0,
 ):
-    import simulator.diagnostic_helpers.binary_pot_battery as battery
+    import simulator.diagnostic_helpers.binary_pot_battery as binary_pot_battery
 
-    battery._close_isolated_cell_workers()
+    binary_pot_battery._close_isolated_cell_workers()
     monkeypatch.setattr(
-        battery,
-        "_ISOLATED_CELL_BOOTSTRAP",
-        _TEST_ISOLATED_CELL_BOOTSTRAP,
+        binary_pot_battery,
+        "_bootstrap_isolated_cell_engine",
+        partial(
+            _fake_isolated_cell_bootstrap,
+            initialization_delay_s=float(initialization_delay_s),
+        ),
     )
-    return battery
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "_handle_isolated_cell_request",
+        _fake_isolated_cell_handler,
+    )
+    return binary_pot_battery
 
 
 def _run_fake_isolated_cell(
     battery,
     *,
     pot_id: str,
+    engine: str = "alphamelts",
     simulate_crash: str | None = None,
     why: str = "worker-test",
     timeout_s: float = 10.0,
 ) -> EquilibrateCell:
     handle = EngineHandle(
-        name="alphamelts",
+        name=engine,
         backend=object(),
         available=True,
         unavailable_reason=None,
@@ -1879,15 +1974,38 @@ def test_isolated_cell_worker_reuses_one_process_and_keeps_fds_bounded(
         capped_soft = min(capped_soft, hard)
     try:
         resource.setrlimit(resource.RLIMIT_NOFILE, (capped_soft, hard))
-        for index in range(300):
+        first = _run_fake_isolated_cell(battery, pot_id="worker-0")
+        assert first.status == "ok"
+        fd_after_start = len(os.listdir("/dev/fd"))
+        for index in range(1, 300):
             cell = _run_fake_isolated_cell(battery, pot_id=f"worker-{index}")
             assert cell.status == "ok"
         worker = battery._ISOLATED_CELL_WORKERS["alphamelts"]
         assert worker.start_count == 1
-        assert len(os.listdir("/dev/fd")) <= fd_before + 2
+        assert len(os.listdir("/dev/fd")) <= fd_after_start + 2
     finally:
         battery._close_isolated_cell_workers()
         resource.setrlimit(resource.RLIMIT_NOFILE, (soft, hard))
+
+
+def test_isolated_cell_startup_has_a_separate_budget_from_the_call_timeout(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    battery = _install_fake_isolated_cell_worker(
+        monkeypatch,
+        initialization_delay_s=2.2,
+    )
+    try:
+        cell = _run_fake_isolated_cell(
+            battery,
+            pot_id="worker-slow-initialization",
+            engine="thermoengine",
+            timeout_s=0.001,
+        )
+        assert cell.status == "ok"
+        assert battery._ISOLATED_CELL_WORKERS["thermoengine"].start_count == 1
+    finally:
+        battery._close_isolated_cell_workers()
 
 
 def test_isolated_cell_worker_crash_refuses_one_cell_then_restarts(
@@ -1914,7 +2032,20 @@ def test_isolated_cell_worker_timeout_kills_sleeping_grandchild(
     tmp_path: Path,
 ) -> None:
     battery = _install_fake_isolated_cell_worker(monkeypatch)
+    original_worker = battery.WarmEngineWorker
+
+    def fatal_diagnostic_signal_worker(**kwargs):
+        kwargs["diagnostic_signal"] = signal.SIGUSR1
+        return original_worker(**kwargs)
+
+    # Exercise the shared reaper against the fatal signal that exposed the
+    # leak, even though isolated cells now use a non-fatal diagnostic signal.
+    monkeypatch.setattr(
+        battery, "WarmEngineWorker", fatal_diagnostic_signal_worker
+    )
     marker = tmp_path / "grandchild.sentinel"
+    pid_file = marker.with_suffix(".pid")
+    release_file = marker.with_suffix(".release")
     try:
         started = _run_fake_isolated_cell(
             battery,
@@ -1923,7 +2054,9 @@ def test_isolated_cell_worker_timeout_kills_sleeping_grandchild(
             why=str(marker),
         )
         assert started.status == "ok"
-        assert marker.with_suffix(".pid").is_file()
+        assert pid_file.is_file()
+        grandchild_pid = int(pid_file.read_text(encoding="utf-8"))
+        release_file.touch()
 
         timed_out = _run_fake_isolated_cell(
             battery,
@@ -1933,11 +2066,77 @@ def test_isolated_cell_worker_timeout_kills_sleeping_grandchild(
             timeout_s=0.001,
         )
         assert timed_out.refusal_reason == REFUSAL_TIMEOUT
-        time.sleep(1.0)
+        deadline = time.monotonic() + 0.1
+        while True:
+            try:
+                os.kill(grandchild_pid, 0)
+            except ProcessLookupError:
+                break
+            if time.monotonic() >= deadline:
+                pytest.fail(
+                    f"worker timeout left grandchild pid {grandchild_pid} alive"
+                )
+            time.sleep(0.05)
+        time.sleep(0.5)
         assert not marker.exists(), "worker timeout left its sleeping grandchild alive"
         recovered = _run_fake_isolated_cell(battery, pot_id="worker-after-timeout")
         assert recovered.status == "ok"
         assert battery._ISOLATED_CELL_WORKERS["alphamelts"].start_count == 2
+    finally:
+        battery._close_isolated_cell_workers()
+
+
+def test_thermoengine_nested_warm_hang_uses_cell_budget_and_times_out(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    battery._close_isolated_cell_workers()
+    budget_path = tmp_path / "nested-budget.txt"
+    pid_path = tmp_path / "nested-worker.pid"
+    call_started_path = tmp_path / "nested-call-started.txt"
+    monkeypatch.setattr(
+        battery,
+        "_bootstrap_isolated_cell_engine",
+        partial(
+            _nested_warm_hang_bootstrap,
+            budget_path=str(budget_path),
+            pid_path=str(pid_path),
+            call_started_path=str(call_started_path),
+        ),
+    )
+    timeout_s = 0.8
+    try:
+        cell = _run_fake_isolated_cell(
+            battery,
+            pot_id="nested-warm-timeout",
+            engine="thermoengine",
+            why="nested-warm-timeout",
+            timeout_s=timeout_s,
+        )
+
+        assert cell.refusal_reason == REFUSAL_TIMEOUT
+        assert cell.engine_reason == (
+            f"equilibrate exceeded hard timeout of {timeout_s:g}s"
+        )
+        assert budget_path.is_file(), "nested worker reached equilibrate after startup"
+        assert call_started_path.is_file(), "nested worker call began after startup"
+        assert float(budget_path.read_text(encoding="utf-8")) == pytest.approx(
+            timeout_s
+        )
+        nested_pid = int(pid_path.read_text(encoding="utf-8"))
+        deadline = time.monotonic() + 1.0
+        while True:
+            try:
+                os.kill(nested_pid, 0)
+            except ProcessLookupError:
+                break
+            if time.monotonic() >= deadline:
+                pytest.fail(
+                    f"nested warm timeout left engine pid {nested_pid} alive"
+                )
+            time.sleep(0.05)
     finally:
         battery._close_isolated_cell_workers()
 
