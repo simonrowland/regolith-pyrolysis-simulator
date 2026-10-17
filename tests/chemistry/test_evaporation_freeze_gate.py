@@ -2819,6 +2819,8 @@ def test_freeze_gate_cache_quantization_holds_super_liquidus_ticks(
     feedstocks_data,
     setpoints_data,
 ):
+    feedstocks_data = deepcopy(feedstocks_data)
+    feedstocks_data['lunar_mare_low_ti'].pop('iron_speciation')
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
         feedstocks_data,
