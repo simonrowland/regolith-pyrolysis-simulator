@@ -417,6 +417,23 @@ def test_required_record_alpha_s_refuses_unparseable_marked_record():
         )
 
 
+def test_area_less_stage_keeps_causal_alpha_refusal(monkeypatch):
+    model = _configured_model()
+    model.stage_area_m2_by_stage = {}
+    record = condensation._alpha_record(
+        species="Fe", entry={"status": "CITED", "source": "missing measurement"},
+        source="test",
+    )
+    monkeypatch.setattr(condensation, '_stage_alpha_record', lambda *args: dict(record))
+    with pytest.raises(condensation.DepositionInputRefusal,
+                       match="unparseable sticking coefficient spec"):
+        model._resolve_wall_deposit_candidates_by_species_segment_kg(
+            evap_flux=EvaporationFlux(species_kg_hr={'Fe': 1.0}, total_kg_hr=1.0),
+            melt=MeltState(),
+            stage_route_by_species={'Fe': {'T_cond_C': 1250.0, 'capture_budget_kg': 0.1}},
+        )
+
+
 def test_required_record_alpha_s_passes_explicit_zero_and_measured_values():
     """An explicitly configured 0.0 is the category-3 real limit and must
     NOT refuse; declared values in [0, 1] pass through unchanged."""

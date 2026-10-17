@@ -3980,10 +3980,10 @@ class CondensationModel:
 
         # Geometry, temperatures, residence, material coefficients and total
         # stream pressure are fixed for this solve. Only available mass and
-        # local species pressure vary between Picard passes. Reuse a stage's
-        # last exact inputs; keep this bounded to one entry per stage/species
-        # and recompute the final telemetry pass so no notices are suppressed.
-        stage_efficiencies: dict[tuple[int, str], tuple] = {}
+        # local species pressure vary between Picard passes. Retain every
+        # exact state until this solve returns, including A -> B -> A visits;
+        # recompute the final telemetry pass so no notices are suppressed.
+        stage_efficiencies: dict[tuple[int, str, float, float | None], tuple] = {}
 
         def stage_candidates(stage_capture, wall_capture, *, record_telemetry=False, seed=False):
             self.stage_species_partial_pressures_pa = {}
@@ -4005,11 +4005,10 @@ class CondensationModel:
                     available = rates[species]
                     if available <= 1e-15 or _cr_stage_isolation_blocks(stage, species):
                         continue
-                    key = (stage.stage_number, species)
-                    inputs = (available, partials.get(species))
+                    key = (stage.stage_number, species, available, partials.get(species))
                     cached = stage_efficiencies.get(key)
-                    if not record_telemetry and cached is not None and cached[:2] == inputs:
-                        eta, alpha = cached[2:]
+                    if not record_telemetry and cached is not None:
+                        eta, alpha = cached
                         route['stage_alpha_records_by_stage'][stage.stage_number] = dict(alpha)
                     else:
                         alpha = _stage_alpha_record(stage, species, self.materials)
@@ -4023,13 +4022,14 @@ class CondensationModel:
                             available_kg=available,
                             alpha_s_value=_required_record_alpha_s(alpha, species=species, site='stage_deposition'),
                             alpha_record=alpha,
+                            record_telemetry=record_telemetry,
                             antoine_extrapolations=antoine_extrapolations if record_telemetry else None,
                             antoine_extrapolation_warnings=antoine_extrapolation_warnings if record_telemetry else None,
                             efficiency_outcomes=(efficiency_outcomes_by_species.setdefault(species, [])
                                                  if record_telemetry and efficiency_outcomes_by_species is not None else None),
                         )
                         stage_efficiencies[key] = (
-                            *inputs, eta, route['stage_alpha_records_by_stage'][stage.stage_number],
+                            eta, route['stage_alpha_records_by_stage'][stage.stage_number],
                         )
                     capture = available * eta
                     if capture > 1e-15:
@@ -4337,6 +4337,7 @@ class CondensationModel:
         alpha_s_value: float,
         flowing_pressure_pa: float | None = None,
         alpha_record: MutableMapping[str, Any] | None = None,
+        record_telemetry: bool = True,
         antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None = None,
         antoine_extrapolation_warnings: list[str] | None = None,
         efficiency_outcomes: list[dict[str, Any]] | None = None,
@@ -4530,7 +4531,12 @@ class CondensationModel:
             else None
         )
         sample_extrapolated = False
-        for sample in range(HKL_BAND_SAMPLES):
+        stage_area_m2 = self._stage_area_m2_for_stage_number(stage.stage_number)
+        # Preserve all input/refusal checks above. With no capture area the
+        # band cannot affect eta; final telemetry still samples it to retain
+        # the same notices and alpha metadata, including zero-capture stages.
+        samples = 0 if stage_area_m2 is None and not record_telemetry else HKL_BAND_SAMPLES
+        for sample in range(samples):
             if width_C <= 0.0:
                 T_surface_C = lo_C
             else:
@@ -4616,7 +4622,6 @@ class CondensationModel:
             ]
             alpha_record['alpha_s_sample_extrapolated'] = sample_extrapolated
 
-        stage_area_m2 = self._stage_area_m2_for_stage_number(stage.stage_number)
         if stage_area_m2 is not None:
             molar_mass_kg_mol = (
                 _molecular_mass_kg_per_molecule(
