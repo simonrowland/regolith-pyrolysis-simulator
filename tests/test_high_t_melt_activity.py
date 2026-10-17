@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import copy
+from dataclasses import replace
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -229,6 +231,116 @@ def _run_fe2o3_lookup_only_case(mode: str) -> dict[str, object]:
         "provider": sim._last_high_t_melt_activity.get("provider"),
         "high_t": sim._last_high_t_melt_activity,
     }
+
+
+# Captured calls 61/62, c2b7b4e/oimcc-calls-c2b7b4e-56179.jsonl.
+# These are the projected OpenIMCC inputs (eight parents), not a reconstruction
+# of the full trace-bearing ledger. Activities are independently logged solves.
+_LUNAR_CALL_61 = {
+    "Al2O3": 1360.009115728947, "CaO": 2014.8643551874766,
+    "K2O": 8.304955772557909, "MgO": 2291.4382038535123,
+    "Na2O": 1.9086093358233833e-07, "SiO2": 1340.4539744251974,
+    "TiO2": 192.89812056906857, "FeO": 0.02787490262712387,
+}
+_LUNAR_CALL_62 = {
+    "Al2O3": 1360.0091153170988, "CaO": 2014.8639120984496,
+    "K2O": 8.287690522177616, "MgO": 2290.998855181701,
+    "Na2O": 1.9086093358233833e-07, "SiO2": 1273.040628414757,
+    "TiO2": 192.8976539872457, "FeO": 0.02787490262712387,
+}
+
+
+def _history_request(composition, temperature_K, hour, previous=None):
+    request = _request(composition, temperature_K, previous_temperature_K=2393.15)
+    return replace(request, control_inputs={
+        **request.control_inputs,
+        "simulation_hour": hour,
+        "high_t_melt_activity_previous": previous or {},
+    })
+
+
+def test_successful_openimcc_physics_is_bit_identical() -> None:
+    result = _provider().dispatch(_request(BASE_MELT_MOL, 2400.65))
+    # Pin captured on green e912e472f with the requested e975edd export,
+    # before adding continuation. JSON round-trips preserve float bits.
+    assert hashlib.sha256(
+        json.dumps(_physics(result), sort_keys=True).encode()
+    ).hexdigest() == "7a8024a3a3235a06fbf1dd3bd20385c804a3098ac1d1b0b717cdd93b7cf57ad0"
+
+
+@pytest.mark.parametrize("gap_K, hour_gap, held", [
+    (7.5, 1, True), (15.0, 2, True), (15.01, 1, False), (7.5, 3, False),
+])
+def test_refused_activity_holds_only_local_certified_gamma(
+    monkeypatch, gap_K, hour_gap, held,
+) -> None:
+    provider = _provider()
+    certified = provider.dispatch(_history_request(_LUNAR_CALL_61, 2400.65, 61))
+    assert certified.diagnostic["high_t_melt_activity"]["provider"] == "openimcc"
+
+    def nonconverge(**kwargs):
+        raise ImccNonconvergenceError("logged call-62 refusal", {"residual_inf": 0.3222946427})
+
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", nonconverge)
+    request = _history_request(
+        _LUNAR_CALL_62, 2400.65 + gap_K, 61 + hour_gap,
+        certified.diagnostic["high_t_melt_activity"],
+    )
+    result = provider.dispatch(request)
+    authority = result.diagnostic["high_t_melt_activity"]
+    activity = vapor_pressure_module._high_t_activity_for_parent(
+        "SiO2", _LUNAR_CALL_62, temperature_K=2400.65 + gap_K, authority=authority,
+    )
+    notices = [n for n in authority["notices"] if n["code"] == "hold_last_certified_gamma"]
+    assert authority["authority"] == "extrapolated"
+    assert authority["fallback_reason"]["code"] == "imcc_nonconvergence"
+    if not held:
+        assert not notices
+        assert activity.activity == melt_oxide_activity("SiO2", _LUNAR_CALL_62).activity
+        assert "openimcc_refused_constant_gamma_fallback" in activity.warning
+        return
+    assert 0.0038 < activity.activity < 0.0041
+    silica_notice = next(n for n in notices if n["parent"] == "SiO2")
+    assert silica_notice["temperature_K"] == 2400.65
+    assert silica_notice["temperature_gap_K"] == gap_K
+    assert silica_notice["hour_gap"] == hour_gap
+    assert silica_notice["window_K"] == 15.0
+    assert silica_notice["original_refusal"]["code"] == "imcc_nonconvergence"
+    assert "hold_last_certified_gamma" in activity.warning
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["SiO"]
+    assert provenance["melt_activity_authority"] == "hold_last_certified_gamma"
+    assert provenance["openimcc_refusal"]["code"] == "imcc_nonconvergence"
+    if gap_K == 7.5:
+        # Independent call-62 transport observation: at frozen geometry and
+        # resistances J is linear in (p_eq-p_bulk). Scale the measured solved
+        # SiO rate, then exercise the production parent-depletion owner.
+        # kg/h * Pa/Pa stays kg/h; zero driving pressure gives zero draw.
+        raw_sio = 2.87908559 * (
+            (result.diagnostic["vapor_pressures_Pa"]["SiO"] - 106.0723021)
+            / (561.522380 - 106.0723021)
+        )
+        sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+        with (DATA_DIR / "vapor_pressures.yaml").open() as handle:
+            sim.vapor_pressures = yaml.safe_load(handle)
+        parent_mass = (
+            _LUNAR_CALL_62["SiO2"]
+            * resolve_species_formula("SiO2").molar_mass_kg_per_mol()
+        )
+        rates = sim._analytic_evaporation_depletion_rates(
+            {"SiO": raw_sio}, dt_hr=1.0, phase_scalar=1.0,
+            cleaned_melt_kg={"SiO2": parent_mass}, available_o2_kg=0.0,
+        )
+        removed_mol = rates["SiO"] / resolve_species_formula("SiO").molar_mass_kg_per_mol()
+        # Logged solved draw is 5.0014%; the local hold is about 5.83%,
+        # rather than the refused table leg's measured 93.2713%.
+        assert 0.05 < removed_mol / _LUNAR_CALL_62["SiO2"] < 0.065
+    # A refused prediction must never refresh the certificate or its clock.
+    again = provider.dispatch(replace(request, control_inputs={
+        **request.control_inputs, "high_t_melt_activity_previous": authority,
+        "simulation_hour": 64,
+    }))
+    assert not any(n["code"] == "hold_last_certified_gamma"
+                   for n in again.diagnostic["high_t_melt_activity"]["notices"])
 
 
 def test_below_cap_is_activity_source_parity_with_pre_c3_path() -> None:
