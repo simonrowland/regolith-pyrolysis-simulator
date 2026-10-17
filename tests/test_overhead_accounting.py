@@ -2020,7 +2020,9 @@ def test_controlled_stream_retains_source_and_supplies_feasible_o2(atmosphere, e
         flux, melt, CondensationTrain.create_default(),
         overhead_holdup_mol={"Fe": 1.0e-9}, p_downstream_bar=0.0,
     )
-    assert gas.composition["O2"] == pytest.approx(2.0)
+    assert gas.composition["O2"] == pytest.approx(2.0 if enabled else gas.pressure_mbar * 0.2)
+    if not enabled:
+        _assert_flowing_pipe_pressure(model, melt)
     assert gas.composition["Fe"] > 0.0
     assert model.last_stream_mol_hr["Fe"] > 0.0
     assert sum(gas.composition.values()) == pytest.approx(gas.pressure_mbar)
@@ -2062,9 +2064,11 @@ def test_mixed_commanded_supply_preserves_positive_source_partials(atmosphere, e
         flux, model.last_stream_boundary["pressure_mbar"],
         molar_flow_by_species=model.last_stream_mol_hr,
     )
-    assert partials["O2"] == pytest.approx(2.0)
-    assert partials["Ar"] == pytest.approx(4.0)
-    assert partials["Fe"] == pytest.approx(4.0)
+    pressure = model.last_stream_boundary['pressure_mbar']
+    assert partials["O2"] == pytest.approx(0.2 * pressure)
+    assert partials["Ar"] == pytest.approx(0.4 * pressure)
+    assert partials["Fe"] == pytest.approx(0.4 * pressure)
+    _assert_flowing_pipe_pressure(model, melt)
 
 
 @pytest.mark.parametrize("atmosphere", _O2_FLOORED)
@@ -2090,33 +2094,91 @@ def test_mixed_commanded_supply_known_n2_balance(atmosphere, pipe_length_m, sour
     # Independent Dalton balance: 1 mol/h N2 occupies the remaining 40%.
     assert flows == pytest.approx({"N2": 1.0, "O2": 0.5, "Ar": 1.0})
     assert sum(flows.values()) == pytest.approx(2.5)
-    assert not any(n["reason"] in {
-        "stream_throughput_out_of_domain", "stream_pressure_command_unmet",
-    } for n in model.stream_physics_notices)
+    assert any(n["reason"] == "stream_pressure_command_unmet"
+               for n in model.stream_physics_notices)
+    _assert_flowing_pipe_pressure(model, melt)
 
 
-@pytest.mark.parametrize("primed,expected_pressure", [(False, 10.0), (True, 0.15848778676312958)])
-def test_commanded_n2_stream_before_outlet_consolidation(primed, expected_pressure):
-    """Historical numeric pin for the subsequent outlet-law consolidation."""
+def _assert_flowing_pipe_pressure(model, melt, p_downstream_bar=0.0):
+    """Forward PIPE-1 independently closes the achieved molar throughput."""
+    capacity = model._pipe_conductance(
+        model.last_stream_boundary['pressure_mbar'] * 100.0, melt.temperature_C,
+        p_downstream_Pa=p_downstream_bar * 1.0e5, species_kg_for_M_avg={'N2': 1.0},
+    )
+    assert capacity * 3600.0 / (MOLAR_MASS['N2'] / 1000.0) == pytest.approx(
+        sum(model.last_stream_mol_hr.values()))
+
+
+@pytest.mark.parametrize("primed", [False, True])
+@pytest.mark.parametrize("source_n2,expected_pressure", [(1.0, 0.15848778676312958),
+                                                        (0.01, 0.01584877867631296)])
+def test_commanded_n2_stream_achieves_outlet_pressure(primed, source_n2, expected_pressure):
+    """Review reproduction and underfill: same pipe, same flow, same pressure."""
     from simulator.overhead import OverheadGasModel
     from simulator.state import CondensationTrain, MeltState
 
     melt = MeltState(atmosphere=Atmosphere.CONTROLLED_O2, temperature_C=1500.0,
                      p_total_mbar=10.0, pO2_mbar=2.0,
                      background_gas_species="Ar", background_gas_mole_fraction=0.5)
-    flux = EvaporationFlux(species_kg_hr={"N2": 0.028014})
+    flux = EvaporationFlux(species_kg_hr={"N2": 0.028014 * source_n2})
     flux.update_totals()
     model = OverheadGasModel({"enabled": False})
     if primed:
         model.flowing_stream_mol_hr(
-            {"N2": 1.0}, melt,
+            {"N2": source_n2}, melt,
             model.estimate_transport_state(flux, melt, p_downstream_bar=0.0),
         )
     gas = model.update(flux, melt, CondensationTrain.create_default(), p_downstream_bar=0.0)
-    assert model.last_stream_mol_hr == pytest.approx({"N2": 1.0, "O2": 0.5, "Ar": 1.0})
+    assert model.last_stream_mol_hr == pytest.approx(
+        {"N2": source_n2, "O2": 0.5 * source_n2, "Ar": source_n2})
     assert gas.pressure_mbar == pytest.approx(expected_pressure)
     assert gas.composition == pytest.approx({s: y * expected_pressure for s, y in
                                             {"N2": 0.4, "O2": 0.2, "Ar": 0.4}.items()})
+    miss = next(n for n in model.stream_physics_notices
+                if n['reason'] == 'stream_pressure_command_unmet')
+    assert miss['achieved_total_pressure_mbar'] == pytest.approx(expected_pressure)
+    assert miss['achieved_partial_pressures_mbar']['O2'] == pytest.approx(gas.composition['O2'])
+
+
+def test_commanded_n2_upstream_install_uses_achieved_pressure():
+    sim = _gas_train_sim()
+    sim.overhead_model._finite_headspace_enabled = False
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.temperature_C = 1500.0
+    sim.melt.p_total_mbar = 10.0
+    sim.melt.pO2_mbar = 2.0
+    sim.melt.background_gas_species = 'Ar'
+    sim.melt.background_gas_mole_fraction = 0.5
+    flux = EvaporationFlux(species_kg_hr={'N2': 0.028014})
+    flux.update_totals()
+    transport = sim.overhead_model.estimate_transport_state(flux, sim.melt, p_downstream_bar=0.0)
+    sim._install_upstream_projection(sim._flowing_stream_partial_pressures(
+        flux, transport, source_mol_hr={'N2': 1.0}, holdup_mol={},
+    ))
+    assert sim._melt_headspace_total_pressure_bar() * 1000.0 == pytest.approx(0.15848778676312958)
+    assert sim._melt_headspace_composition_mbar == pytest.approx(
+        {'N2': 0.06339511470525183, 'O2': 0.03169755735262592, 'Ar': 0.06339511470525183})
+
+
+@pytest.mark.parametrize('primed', [False, True])
+def test_flowing_pressure_above_downstream_even_when_command_is_lower(primed):
+    from simulator.overhead import OverheadGasModel
+    from simulator.state import CondensationTrain, MeltState
+
+    model = OverheadGasModel({'enabled': False})
+    melt = MeltState(atmosphere=Atmosphere.CONTROLLED_O2, temperature_C=1500.0,
+                     p_total_mbar=10.0, pO2_mbar=2.0,
+                     background_gas_species='Ar', background_gas_mole_fraction=0.5)
+    flux = EvaporationFlux(species_kg_hr={'N2': 0.028014})
+    flux.update_totals()
+    if primed:
+        model.flowing_stream_mol_hr({'N2': 1.0}, melt,
+            model.estimate_transport_state(flux, melt, p_downstream_bar=0.02))
+    gas = model.update(flux, melt, CondensationTrain.create_default(), p_downstream_bar=0.02)
+    assert model.last_stream_mol_hr['N2'] == pytest.approx(1.0)
+    assert gas.pressure_mbar > 20.0
+    assert gas.pressure_mbar == pytest.approx(model.last_stream_boundary['pressure_mbar'])
+    _assert_flowing_pipe_pressure(model, melt, p_downstream_bar=0.02)
 
 
 @pytest.mark.parametrize("oxygen_target,source", [

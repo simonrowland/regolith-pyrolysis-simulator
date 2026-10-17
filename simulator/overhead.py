@@ -1378,7 +1378,8 @@ class OverheadGasModel:
                 # (mol/h)/dimensionless=mol/h. For q_N2=1 and y_O2/Ar=.2/.4,
                 # Q=2.5, q_O2=.5, q_Ar=1 mol/h; as source -> 0, Q -> 0.
                 # With no nonsupplied gas, use the declared supply mixture at
-                # the open-duct limit. Otherwise the regulator throttles to Q.
+                # the open-duct limit. Otherwise supply is sized to Q; the
+                # achieved pressure still follows the unchanged open outlet.
                 fractions = {s: p / pressure_mbar for s, p in supplied_partials.items()}
                 other_flow = sum(q for s, q in flows.items() if s not in fractions)
                 remainder = 1.0 - sum(fractions.values())
@@ -1407,29 +1408,6 @@ class OverheadGasModel:
                     'required_carrier_out_mol_hr': required_carrier,
                     'authority_level': 'extrapolated', 'output_status': 'status_bearing',
                 })
-            actual_throughput = sum(flows.values())
-            if pressure_mbar > 0.0 and actual_throughput > 0.0:
-                # Diagnostic only, not a new choking/transport law. Continuity
-                # gives u=(Q/3600)RT/(P A) [m/s]. For ideal diatomic N2 use
-                # gamma=1.4 as an explicitly approximate property: a=sqrt(gamma RT/M).
-                # Molar sonic ceiling follows isentropic continuity at Mach=1;
-                # A P sqrt(gamma/(MRT))*[2/(gamma+1)]^((gamma+1)/(2(gamma-1)))
-                # has mol/s units, tends to zero with P, and only flags PIPE-1.
-                area = math.pi * self.pipe_diameter_m**2 / 4.0
-                mass = _species_molar_mass_g_mol(carrier, self.species_formula_registry) / 1000.0
-                gamma = 1.4
-                speed = actual_throughput / 3600.0 * GAS_CONSTANT * temperature_K / (pressure_mbar * 100.0 * area)
-                sound = math.sqrt(gamma * GAS_CONSTANT * temperature_K / mass)
-                sonic = (area * pressure_mbar * 100.0 * math.sqrt(gamma / (mass * GAS_CONSTANT * temperature_K))
-                         * (2.0 / (gamma + 1.0))**((gamma + 1.0) / (2.0 * (gamma - 1.0))) * 3600.0)
-                if speed > sound or actual_throughput > sonic:
-                    self.stream_physics_notices.append({
-                        'reason': 'stream_throughput_out_of_domain', 'status': 'extrapolated',
-                        'authority_level': 'extrapolated', 'output_status': 'status_bearing',
-                        'provenance': 'ideal_regulator_open_duct',
-                        'throughput_mol_hr': actual_throughput, 'sonic_ceiling_mol_hr': sonic,
-                        'mach': speed / sound, 'gamma_approximation': gamma, 'property_basis': carrier,
-                    })
             # Finite-vessel makeup differs from outlet flow: n=pV/(RT),
             # q_in=q_out+(n_now-n_prev)/1hr [mol/hr]. This is an internal
             # regulator inventory, not a second AtomLedger material account.
@@ -1447,17 +1425,37 @@ class OverheadGasModel:
                 self._update_stream_carrier_inventory(
                     carrier, n_now, flows[carrier], melt, holdup_mol or {},
                 )
-        if not carrier and atmosphere not in {'CONTROLLED_O2', 'CONTROLLED_O2_FLOW', 'O2_BACKPRESSURE'}:
-            # With no supplied carrier, a pressure command is a ceiling rather
-            # than extra gas. Invert the existing outlet law using the complete
-            # gas load: q_i*M_i is kg/hr, sum/3600 is kg/s. This determines
-            # pressure for the given source; it does not recompute evaporation.
-            pressure_mbar = self._flowing_pressure_mbar(
-                flows,
-                temperature_K - CELSIUS_TO_KELVIN_OFFSET,
-                p_downstream_bar=transport['p_downstream_bar'],
-            )
-            self.last_stream_boundary['pressure_mbar'] = pressure_mbar
+        # Commands above size supplied gas and finite regulator inventory.
+        # Every flowing boundary instead uses achieved complete throughput,
+        # including underfilled commanded mixtures and downstream capture.
+        pressure_mbar = self._flowing_pressure_mbar(
+            flows, temperature_K - CELSIUS_TO_KELVIN_OFFSET,
+            p_downstream_bar=transport['p_downstream_bar'],
+        )
+        self.last_stream_boundary['pressure_mbar'] = pressure_mbar
+        actual_throughput = sum(flows.values())
+        if carrier and pressure_mbar > 0.0 and actual_throughput > 0.0:
+            # Diagnostic only, not a new choking/transport law. Continuity
+            # gives u=(Q/3600)RT/(P A) [m/s]. For ideal diatomic N2 use
+            # gamma=1.4 as an explicitly approximate property: a=sqrt(gamma RT/M).
+            # Molar sonic ceiling follows isentropic continuity at Mach=1;
+            # A P sqrt(gamma/(MRT))*[2/(gamma+1)]^((gamma+1)/(2(gamma-1)))
+            # has mol/s units, tends to zero with P, and only flags PIPE-1.
+            area = math.pi * self.pipe_diameter_m**2 / 4.0
+            mass = _species_molar_mass_g_mol(carrier, self.species_formula_registry) / 1000.0
+            gamma = 1.4
+            speed = actual_throughput / 3600.0 * GAS_CONSTANT * temperature_K / (pressure_mbar * 100.0 * area)
+            sound = math.sqrt(gamma * GAS_CONSTANT * temperature_K / mass)
+            sonic = (area * pressure_mbar * 100.0 * math.sqrt(gamma / (mass * GAS_CONSTANT * temperature_K))
+                     * (2.0 / (gamma + 1.0))**((gamma + 1.0) / (2.0 * (gamma - 1.0))) * 3600.0)
+            if speed > sound or actual_throughput > sonic:
+                self.stream_physics_notices.append({
+                    'reason': 'stream_throughput_out_of_domain', 'status': 'extrapolated',
+                    'authority_level': 'extrapolated', 'output_status': 'status_bearing',
+                    'provenance': 'ideal_regulator_open_duct',
+                    'throughput_mol_hr': actual_throughput, 'sonic_ceiling_mol_hr': sonic,
+                    'mach': speed / sound, 'gamma_approximation': gamma, 'property_basis': carrier,
+                })
         self.last_stream_mol_hr = dict(flows)
         if sum(flows.values()) == 0.0:
             self.last_stream_boundary['pressure_mbar'] = 0.0
