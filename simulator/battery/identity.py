@@ -75,6 +75,7 @@ Ambiguity resolutions:
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import dataclass
 from decimal import Decimal
 from fractions import Fraction
@@ -94,7 +95,10 @@ from simulator.battery.enums import (
     PerBasis,
     Phase,
     Quantity,
+    RefusalReason,
     StateTag,
+    ValenceDenominatorKind,
+    ValenceValueForm,
 )
 from simulator.battery.records import (
     Composition,
@@ -318,6 +322,7 @@ def rescale_energy_per_basis(
 # ---------------------------------------------------------------------------
 
 _AXIS_NAMES = (
+    "valence_basis",
     "subtype",
     "per",
     "temperature_K",
@@ -371,6 +376,219 @@ class QuantityProfile:
     exposure_area_required: bool = False
 
 
+class IdentityRefusal(ValueError):
+    """A typed refusal raised while building a closed identity."""
+
+    def __init__(self, reason: RefusalReason, field: str, detail: str) -> None:
+        self.reason = reason
+        self.field = field
+        self.detail = detail
+        super().__init__(f"{reason.value}: {field}: {detail}")
+
+
+@dataclass(frozen=True)
+class ValenceBasis:
+    numerator_oxidation_states: tuple[int, ...]
+    denominator_kind: ValenceDenominatorKind
+    denominator_oxidation_state: int | None
+    value_form: ValenceValueForm
+
+    def _validate_value(self, value: Decimal) -> None:
+        if self.value_form is ValenceValueForm.FRACTION and not (
+            Decimal("0") <= value <= Decimal("1")
+        ):
+            raise IdentityRefusal(
+                RefusalReason.INVALID_SOURCE,
+                "value",
+                f"fraction valence value {value} must lie in [0, 1]",
+            )
+        if self.value_form is ValenceValueForm.RATIO and value < 0:
+            raise IdentityRefusal(
+                RefusalReason.INVALID_SOURCE,
+                "value",
+                f"ratio valence value {value} must be non-negative",
+            )
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.numerator_oxidation_states, tuple) or any(
+            type(state) is not int for state in self.numerator_oxidation_states
+        ) or len(set(self.numerator_oxidation_states)) != len(
+            self.numerator_oxidation_states
+        ):
+            raise IdentityRefusal(
+                RefusalReason.INVALID_IDENTITY,
+                "valence_basis.numerator_oxidation_states",
+                "must contain distinct integer oxidation states",
+            )
+        if not isinstance(self.denominator_kind, ValenceDenominatorKind):
+            raise IdentityRefusal(
+                RefusalReason.INVALID_IDENTITY,
+                "valence_basis.denominator_kind",
+                "must be a closed denominator kind",
+            )
+        if not isinstance(self.value_form, ValenceValueForm):
+            raise IdentityRefusal(
+                RefusalReason.INVALID_IDENTITY,
+                "valence_basis.value_form",
+                "must be a closed printed value form",
+            )
+        if (
+            not self.numerator_oxidation_states
+            and self.value_form is not ValenceValueForm.AVERAGE_OXIDATION_STATE
+        ):
+            raise IdentityRefusal(
+                RefusalReason.INVALID_IDENTITY,
+                "valence_basis.numerator_oxidation_states",
+                "must name oxidation states unless the value is an average oxidation state",
+            )
+        if (
+            self.value_form is ValenceValueForm.FRACTION
+            and len(self.numerator_oxidation_states) > 1
+        ):
+            raise IdentityRefusal(
+                RefusalReason.INVALID_IDENTITY,
+                "valence_basis.numerator_oxidation_states",
+                "a fraction must name exactly one numerator oxidation state",
+            )
+        if self.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT:
+            if self.denominator_oxidation_state is not None:
+                raise IdentityRefusal(
+                    RefusalReason.INVALID_IDENTITY,
+                    "valence_basis.denominator_oxidation_state",
+                    "must be absent for a total-element denominator",
+                )
+            if self.value_form not in {
+                ValenceValueForm.FRACTION,
+                ValenceValueForm.AVERAGE_OXIDATION_STATE,
+            }:
+                raise IdentityRefusal(
+                    RefusalReason.INVALID_IDENTITY,
+                    "valence_basis.value_form",
+                    "a total-element denominator must use the fraction or average "
+                    "oxidation-state form",
+                )
+            if (
+                self.value_form is ValenceValueForm.AVERAGE_OXIDATION_STATE
+                and self.numerator_oxidation_states
+            ):
+                raise IdentityRefusal(
+                    RefusalReason.INVALID_IDENTITY,
+                    "valence_basis.numerator_oxidation_states",
+                    "an average oxidation state has no numerator oxidation states",
+                )
+        elif type(self.denominator_oxidation_state) is not int:
+            raise IdentityRefusal(
+                RefusalReason.INVALID_IDENTITY,
+                "valence_basis.denominator_oxidation_state",
+                "must name the denominator oxidation state",
+            )
+        elif self.value_form is ValenceValueForm.FRACTION:
+            raise IdentityRefusal(
+                RefusalReason.INVALID_IDENTITY,
+                "valence_basis.value_form",
+                "a fraction must use a total-element denominator",
+            )
+        elif self.value_form is ValenceValueForm.AVERAGE_OXIDATION_STATE:
+            raise IdentityRefusal(
+                RefusalReason.INVALID_IDENTITY,
+                "valence_basis.denominator_kind",
+                "an average oxidation state must use a total-element denominator",
+            )
+        if (
+            self.denominator_kind is ValenceDenominatorKind.OXIDATION_STATE
+            and self.denominator_oxidation_state in self.numerator_oxidation_states
+        ):
+            raise IdentityRefusal(
+                RefusalReason.INVALID_IDENTITY,
+                "valence_basis.denominator_oxidation_state",
+                "must differ from numerator oxidation states",
+            )
+
+
+_PRINTED_VALENCE_QUANTITY = re.compile(
+    r"(?P<log10>log10_)?(?P<element>[A-Z][a-z]?)(?P<numerator>\d+)"
+    r"(?P<numerator_sign>plus|minus)_over_"
+    r"(?:(?P<total_kind>total|sum)_(?P<total_element>[A-Z][a-z]?)|"
+    r"(?P<denominator_element>[A-Z][a-z]?)(?P<denominator>\d+)"
+    r"(?P<denominator_sign>plus|minus))"
+)
+
+
+def _signed_oxidation_state(magnitude: str, sign: str) -> int:
+    value = int(magnitude)
+    return -value if sign == "minus" else value
+
+
+def parse_valence_basis(
+    raw: str, *, species_formula: str | None = None
+) -> ValenceBasis:
+    """Parse printed oxidation-state forms without changing their value basis."""
+
+    if raw == ValenceValueForm.AVERAGE_OXIDATION_STATE.value:
+        if not species_formula:
+            raise IdentityRefusal(
+                RefusalReason.INVALID_SOURCE,
+                "quantity",
+                "average oxidation state requires the identity species formula",
+            )
+        return ValenceBasis(
+            numerator_oxidation_states=(),
+            denominator_kind=ValenceDenominatorKind.TOTAL_ELEMENT,
+            denominator_oxidation_state=None,
+            value_form=ValenceValueForm.AVERAGE_OXIDATION_STATE,
+        )
+    match = _PRINTED_VALENCE_QUANTITY.fullmatch(raw)
+    if match is None:
+        raise IdentityRefusal(
+            RefusalReason.INVALID_SOURCE,
+            "quantity",
+            f"malformed valence ratio quantity {raw!r}",
+        )
+    element = match.group("element")
+    denominator_element = (
+        match.group("total_element") or match.group("denominator_element")
+    )
+    if element != denominator_element or (
+        species_formula is not None and element != species_formula
+    ):
+        raise IdentityRefusal(
+            RefusalReason.INVALID_SOURCE,
+            "quantity",
+            f"valence quantity element {element!r} does not match identity species "
+            f"{species_formula or denominator_element!r}",
+        )
+    total_element = match.group("total_kind") is not None
+    if total_element and match.group("log10"):
+        raise IdentityRefusal(
+            RefusalReason.INVALID_SOURCE,
+            "quantity",
+            "log10 valence quantities must name an oxidation-state denominator",
+        )
+    if total_element:
+        denominator_kind = ValenceDenominatorKind.TOTAL_ELEMENT
+        denominator_state = None
+        value_form = ValenceValueForm.FRACTION
+    else:
+        denominator_kind = ValenceDenominatorKind.OXIDATION_STATE
+        denominator_state = _signed_oxidation_state(
+            match.group("denominator"), match.group("denominator_sign")
+        )
+        value_form = (
+            ValenceValueForm.LOG10_RATIO
+            if match.group("log10")
+            else ValenceValueForm.RATIO
+        )
+    numerator_state = _signed_oxidation_state(
+        match.group("numerator"), match.group("numerator_sign")
+    )
+    return ValenceBasis(
+        numerator_oxidation_states=(numerator_state,),
+        denominator_kind=denominator_kind,
+        denominator_oxidation_state=denominator_state,
+        value_form=value_form,
+    )
+
+
 @dataclass(frozen=True)
 class Identity:
     quantity: State[Quantity] | Quantity
@@ -390,6 +608,7 @@ class Identity:
     exposure: State[Exposure] | None = None
     sample_mass_kg: State[Decimal] | None = None
     wall: State[WallIdentity] | None = None
+    valence_basis: State[ValenceBasis] | None = None
 
     def __post_init__(self) -> None:
         if isinstance(self.quantity, Quantity):
@@ -401,6 +620,24 @@ class Identity:
         elif self.quantity.is_value and self.quantity.value not in Quantity:
             raise ValueError(
                 f"Identity.quantity must be a closed Quantity token, not {self.quantity.value!r}"
+            )
+        quantity = self.quantity.value if self.quantity.is_value else None
+        if quantity is Quantity.VALENCE_RATIO:
+            if (
+                not isinstance(self.valence_basis, State)
+                or not self.valence_basis.is_value
+                or not isinstance(self.valence_basis.value, ValenceBasis)
+            ):
+                raise IdentityRefusal(
+                    RefusalReason.INVALID_IDENTITY,
+                    "valence_basis",
+                    "is required as a value for valence_ratio",
+                )
+        elif self.valence_basis is not None:
+            raise IdentityRefusal(
+                RefusalReason.INVALID_IDENTITY,
+                "valence_basis",
+                "is only permitted for valence_ratio",
             )
         if self.temperature_K is not None and self.temperature_K.is_value:
             object.__setattr__(
@@ -733,12 +970,15 @@ def profile_for(identity: Identity) -> QuantityProfile:
         Quantity.ELECTRICAL_CONDUCTIVITY,
         Quantity.LIQUIDUS_COMPOSITION,
         Quantity.FE3_FE2_RATIO,
+        Quantity.VALENCE_RATIO,
     }:
         req("temperature_K", "total_pressure_Pa", "composition")
-        if q is Quantity.FE3_FE2_RATIO:
+        if q in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
             req("fO2_Pa")
         else:
             na("fO2_Pa")
+        if q is Quantity.VALENCE_RATIO:
+            req("valence_basis")
         na(
             "per",
             "standard_pressure_Pa",
@@ -1454,11 +1694,11 @@ def identity_equal(left: Identity, right: Identity) -> IdentityEqualOutcome:
 def _same_row_redox_identity_equal(
     left: Identity, right: Identity
 ) -> IdentityEqualOutcome:
-    """Compare same-row Fe redox identities, where unknown phase is unused."""
+    """Compare same-row redox identities, where unknown phase is unused."""
 
     if (
-        quantity_token(left) is not Quantity.FE3_FE2_RATIO
-        or quantity_token(right) is not Quantity.FE3_FE2_RATIO
+        quantity_token(left) not in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}
+        or quantity_token(right) not in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}
     ):
         return identity_equal(left, right)
     return _identity_equal(left, right, allow_unknown_species_phase=True)
