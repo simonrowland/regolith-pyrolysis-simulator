@@ -1312,8 +1312,7 @@ def test_darken_gurry_equilibrium_compositions_migrate_with_conditions() -> None
         for observation in migrator.result.observations.values()
         if observation.source_id == "darken-gurry-1946-iron-oxygen-ii"
     ]
-    # dg46e supersedes dg46d's 89-row extract; these counts come from an
-    # isolated migration of the reviewed extract.
+    # dg46e supersedes dg46d's 89-row extract; counts were proven by isolated migration.
     assert len(observations) == 181
     assert Counter(observation.locator.table for observation in observations) == {
         "I": 76,
@@ -1329,27 +1328,141 @@ def test_darken_gurry_equilibrium_compositions_migrate_with_conditions() -> None
         "X": 6,
     }
     assert not migrator.result.validation.hard_issues
-    assert not any(
-        observation.admission.status is AdmissionStatus.ADMITTED
-        for observation in observations
-    )
     assert all(observation.point_conditions for observation in observations)
-    composition_rows = [
-        observation
+    table_rows = {
+        (observation.locator.table, observation.locator.note): observation
         for observation in observations
-        if observation.locator.table in {"I", "III A"}
-    ]
+    }
+    def experiment_for(experiment_id: str):
+        return next(
+            experiment
+            for key, experiment in migrator.result.experiments.items()
+            if key.endswith("::experiment::" + experiment_id)
+        )
+
+    table_i_a1 = table_rows[("I", "row=A1")]
+    assert table_i_a1.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    assert table_i_a1.identity.subtype.value == "r=(Fe++ + Fe+++)/Fe++ as printed"
+    assert table_i_a1.value.point == Decimal("1.096")
+    assert table_i_a1.identity.temperature_K.value == Decimal("1656.15")
+    assert table_i_a1.point_conditions["starting_material"].state.value == "Wüstite"
+
+    table_iii_a1 = table_rows[("III A", "row=1")]
+    assert table_iii_a1.value.point == Decimal("1.081")
+    assert all(
+        "equilibrium_boundary" in row.point_conditions
+        for row in observations
+        if row.locator.table == "III A"
+    )
+    assert table_rows[("III A", "row=12")].value.point == Decimal("1.067")
+    assert [
+        table_rows[("I", "row=" + row)].value.point for row in ("J1a", "J1b")
+    ] == [Decimal("2.824"), Decimal("2.850")]
+
+    series_a = experiment_for("dg46_t1_a").fO2_control
+    assert series_a is not None and series_a.gas_ratio is not None
+    assert series_a.gas_ratio.numerator_species == "CO2"
+    assert series_a.gas_ratio.denominator_species == "CO"
+    assert series_a.gas_ratio.basis == "partial_pressure"
+    assert series_a.gas_ratio.value.state.value.point == Decimal("0.376")
+    for letter, numerator, denominator, ratio in (
+        ("b", "CO2", "CO", "1.00"),
+        ("c", "CO2", "H2", "2.23"),
+        ("d", "H2O", "H2", "7.10"),
+        ("f", "CO2", "H2", "7.13"),
+        ("g", "CO2", "H2", "28.3"),
+    ):
+        experiment = experiment_for("dg46_t1_" + letter)
+        gas_ratio = experiment.fO2_control.gas_ratio
+        assert (gas_ratio.numerator_species, gas_ratio.denominator_species) == (
+            numerator,
+            denominator,
+        )
+        assert gas_ratio.value.state.value.point == Decimal(ratio)
+
+    for table, row, value, material in (
+        ("I", "row=L3", "4.067", "Fe2O3"),
+        ("I", "row=L7", "3.881", "Fe2O3"),
+        ("I", "row=L8", "4.033", "Fe2O3"),
+        ("I", "row=L9", "3.958", "Wüstite"),
+        ("I", "row=L10", "3.998", "Fe2O3"),
+    ):
+        row_observation = table_rows[(table, row)]
+        assert row_observation.value.point == Decimal(value)
+        assert row_observation.point_conditions["starting_material"].state.value == material
+    for row, temperature in (
+        ("row=L3", "1596"),
+        ("row=L7", "1615"),
+        ("row=L8", "1632"),
+        ("row=L9", "1632"),
+        ("row=L10", "1636"),
+    ):
+        assert table_rows[("I", row)].identity.temperature_K.value == (
+            Decimal(temperature) + Decimal("273.15")
+        )
+    oxygen_control = experiment_for("dg46_t1_l").fO2_control
+    assert oxygen_control is not None
+    assert (
+        oxygen_control.oxygen_partial_pressure_Pa.state.value.point
+        == Decimal("101325")
+    )
+    extract_yaml = yaml.safe_load(extract.read_text(encoding="utf-8"))
+    table_i_series_l = next(
+        observation
+        for observation in extract_yaml["species"]["FeO"]["observations"]
+        if observation["locator"]["table"] == "I"
+        and observation["experiment"] == "dg46_t1_l"
+    )
+    assert len(table_i_series_l["values"]["points"]) == 10
+    assert all(
+        experiment_for(
+            "dg46_t1_" + letter
+        ).fO2_control.oxygen_partial_pressure_Pa
+        is None
+        for letter in "abcdefghijk"
+    )
+    assert all(
+        experiment_for("dg46_t1_l")
+        .fO2_control.oxygen_partial_pressure_Pa.state.value.point
+        == Decimal("101325")
+        for observation in observations
+        if observation.locator.table == "I" and observation.locator.note.startswith("row=L")
+    )
+
+    table_iii_b = table_rows[("III B", "row=1")]
+    assert table_iii_b.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    assert table_iii_b.identity.species.phase.value is Phase.G
+    assert table_iii_b.identity.subtype.value == "pCO2/pCO"
+    assert [
+        table_rows[("III B", "row=" + row)].value.point for row in ("1", "2", "3")
+    ] == [Decimal("0.268"), Decimal("0.233"), Decimal("0.199")]
+    assert all(
+        "equilibrium_boundary" in table_rows[("III B", "row=" + row)].point_conditions
+        for row in ("1", "2", "3")
+    )
+    assert all(
+        row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and row.identity.subtype.value == "pCO2/pCO"
+        and row.identity.species.formula == "CO2"
+        and row.identity.species.phase.value is Phase.G
+        for row in observations
+        if row.locator.table == "III B"
+    )
+    composition_rows = [row for row in observations if row.locator.table in {"I", "III A"}]
     assert len(composition_rows) == 89
     assert all(
-        observation.point_conditions["composition"].state.is_value
-        for observation in composition_rows
+        row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        for row in composition_rows
     )
     assert all(
-        observation.identity.composition is None for observation in composition_rows
+        row.identity.subtype.value == "r=(Fe++ + Fe+++)/Fe++ as printed"
+        for row in composition_rows
     )
-    # Schema gap: migration still refuses source-specific quantity payloads
-    # outside existing d-154 contracts, including log-table tokens and the
-    # printed valence_basis_as_printed field. Preserve them without new tokens.
+    assert all(
+        row.identity.species.formula == "FeO"
+        and row.identity.species.phase.value is Phase.L
+        for row in composition_rows
+    )
 
 
 def test_malformed_registry_inference_records_issue_without_dropping_value() -> None:

@@ -11,9 +11,10 @@ EXTRACT = Path(
     "data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml"
 )
 PINNED_CELLS = (
-    ("dg46_1946_table_i_liquid_composition", "A1", "r", "1.096", 3),
-    ("dg46_1946_table_i_liquid_composition", "L3", "T_C", "1596", 3),
-    ("dg46_1946_table_iii_a_iron_boundary", "1", "r", "1.081", 6),
+    ("dg46_1946_table_i_liquid_composition_series_a", "A1", "r_as_printed", "1.096", 3),
+    ("dg46_1946_table_i_liquid_composition_series_l", "L3", "T_C", "1596", 3),
+    ("dg46_1946_table_iii_a_iron_boundary", "1", "r_as_printed", "1.081", 6),
+    ("dg46_1946_table_iii_b_gas_ratios", "2", "pCO2_over_pCO_as_printed", "0.233", 6),
     ("dg46_1946_table_iv_a_wustite_liquid", "6", "log_pO2_atm", "-6.14", 8),
     ("dg46_1946_table_vi_oxygen_potential", "1500-1", "N2_over_N1", "1.0225", 11),
     ("dg46_1946_table_vi_activities", "1400-1", "neg_log_a_FeO", "-0.0255", 11),
@@ -40,8 +41,11 @@ def test_darken_gurry_1946_render_pins_and_migration_conditions():
     extract = yaml.safe_load(EXTRACT.read_text())
     _assert_render_pins(extract)
 
-    table_i_points = extract["species"]["FeO"]["observations"][0]["values"][
-        "points"
+    table_i_points = [
+        point
+        for observation in extract["species"]["FeO"]["observations"]
+        if observation["locator"]["table"] == "I"
+        for point in observation["values"]["points"]
     ]
     assert [
         point["time_at_temperature_as_printed"]
@@ -61,12 +65,17 @@ def test_darken_gurry_1946_render_pins_and_migration_conditions():
     ]
     assert len(observations) == 181
     assert all(observation.point_conditions for observation in observations)
-    assert all(
+    assert sum(
+        observation.identity.species.phase.value is Phase.G
+        for observation in observations
+    ) == 3
+    assert sum(
         observation.identity.species.phase.value is Phase.L
         for observation in observations
-    )
+    ) == 178
     assert {observation.identity.species.formula for observation in observations} == {
-        "FeO"
+        "FeO",
+        "CO2",
     }
     assert all(
         condition.locator.published_page == observation.locator.published_page
@@ -91,15 +100,12 @@ def test_darken_gurry_1946_render_pins_and_migration_conditions():
     ]
     assert len(composition_rows) == 89
     assert all(
-        observation.point_conditions["composition"].state.is_value
-        and observation.point_conditions["composition"].locator.page
+        observation.point_conditions["starting_material"].state.is_value
+        and observation.point_conditions["starting_material"].locator.page
         == observation.locator.page
-        and observation.point_conditions["composition"].locator.table
+        and observation.point_conditions["starting_material"].locator.table
         == observation.locator.table
         for observation in composition_rows
-    )
-    assert all(
-        observation.identity.composition is None for observation in composition_rows
     )
     for table in ("V", "VI"):
         derived = [
@@ -117,10 +123,11 @@ def test_darken_gurry_1946_render_pins_and_migration_conditions():
     ("original_cell", "mutated_cell"),
     [
         (
-            "T_C: '1596', starting_material: Fe2O3, time_at_temperature_h: '1', r: '4.067'",
-            "T_C: '1590', starting_material: Fe2O3, time_at_temperature_h: '1', r: '4.067'",
+            "T_C: '1596', time_at_temperature_h: '1', r_as_printed: '4.067'",
+            "T_C: '1590', time_at_temperature_h: '1', r_as_printed: '4.067'",
         ),
         ("neg_log_a_FeO: '-0.0255'", "neg_log_a_FeO: '-0.0256'"),
+        ("pCO2_over_pCO_as_printed: '0.233'", "pCO2_over_pCO_as_printed: '0.234'"),
     ],
 )
 def test_darken_gurry_1946_render_pin_detects_cell_mutation(

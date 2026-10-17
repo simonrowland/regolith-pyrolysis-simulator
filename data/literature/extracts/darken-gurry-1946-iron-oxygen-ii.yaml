@@ -13,10 +13,10 @@ extraction:
   provenance_path: data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml
 review_status: draft
 fidelity_samples:
-- path: species.FeO.observations[dg46_1946_table_i_liquid_composition].values.points[0].r
+- path: species.FeO.observations[dg46_1946_table_i_liquid_composition_series_a].values.points[0].r_as_printed
   value: '1.096'
   locator: {page: 3, published_page: 800, table: 'I', row: A1}
-- path: species.FeO.observations[dg46_1946_table_iii_a_iron_boundary].values.points[0].r
+- path: species.FeO.observations[dg46_1946_table_iii_a_iron_boundary].values.points[0].r_as_printed
   value: '1.081'
   locator: {page: 6, published_page: 803, table: 'III A', row: 1}
 - path: species.FeO.observations[dg46_1946_table_iv_a_wustite_liquid].values.points[5].log_pO2_atm
@@ -43,98 +43,355 @@ experiments:
     form:
       state: {tag: value, value: 'Liquid iron oxide; starting materials and coexisting phases are recorded per printed row'}
       locator: {page: 3, published_page: 800, table: 'I'}
+- experiment_id: dg46_t1_a
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    gas_ratio:
+      numerator_species: CO2
+      denominator_species: CO
+      value: {state: {tag: value, value: 0.376}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'A'}}
+      basis: partial_pressure
+    buffer:
+      state: {tag: value, value: 'CO2-CO, pCO2/pCO=0.376'}
+      locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'A'}
+- experiment_id: dg46_t1_b
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    gas_ratio:
+      numerator_species: CO2
+      denominator_species: CO
+      value: {state: {tag: value, value: 1.00}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'B'}}
+      basis: partial_pressure
+    buffer:
+      state: {tag: value, value: 'CO2-CO, pCO2/pCO=1.00'}
+      locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'B'}
+- experiment_id: dg46_t1_c
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    gas_ratio:
+      numerator_species: CO2
+      denominator_species: H2
+      value: {state: {tag: value, value: 2.23}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'C'}}
+      basis: partial_pressure
+    buffer:
+      state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=2.23'}
+      locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'C'}
+- experiment_id: dg46_t1_d
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    gas_ratio:
+      numerator_species: H2O
+      denominator_species: H2
+      value: {state: {tag: value, value: 7.10}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'D'}}
+      basis: partial_pressure
+    buffer:
+      state: {tag: value, value: 'H2O-H2, pH2O/pH2=7.10'}
+      locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'D'}
+- experiment_id: dg46_t1_e
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: value, value: 'CO2-CO-H2O, initial pCO2/pCO/pH2O = 1:1:14.1'}
+      locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'E'}
+- experiment_id: dg46_t1_f
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    gas_ratio:
+      numerator_species: CO2
+      denominator_species: H2
+      value: {state: {tag: value, value: 7.13}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'F'}}
+      basis: partial_pressure
+    buffer:
+      state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=7.13'}
+      locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'F'}
+- experiment_id: dg46_t1_g
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    gas_ratio:
+      numerator_species: CO2
+      denominator_species: H2
+      value: {state: {tag: value, value: 28.3}, locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'G'}}
+      basis: partial_pressure
+    buffer:
+      state: {tag: value, value: 'CO2-H2, initial pCO2/pH2=28.3'}
+      locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'G'}
+- experiment_id: dg46_t1_h
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: value, value: 'Steam, 1 atmosphere'}
+      locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'H'}
+- experiment_id: dg46_t1_i
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: value, value: 'CO2, 1 atmosphere'}
+      locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'I'}
+- experiment_id: dg46_t1_j
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: value, value: 'CO2-O2, 3.91% oxygen'}
+      locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'J'}
+- experiment_id: dg46_t1_k
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: value, value: 'Air, 1 atmosphere'}
+      locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'K'}
+- experiment_id: dg46_t1_l
+  fO2_control:
+    channel: {tag: value, value: gas_mix}
+    buffer:
+      state: {tag: value, value: 'Oxygen, 1 atmosphere'}
+      locator: {published_page: 800, pdf_page: 3, table: 'I', heading: 'L'}
 species:
   FeO:
     observations:
-    - observation_id: dg46_1946_table_i_liquid_composition
-      experiment_id: dg46_1946_liquid_iron_oxide_equilibria
+    - observation_id: dg46_1946_table_i_liquid_composition_series_a
+      experiment: dg46_t1_a
       phase: l
       type: equilibrium_phase_composition
       locator: {page: 3, published_page: 800, table: 'I'}
       units: 'r dimensionless; temperature °C; time at temperature hours'
       values:
-        quantity: valence_ratio
-        valence_basis_as_printed: '(Fe++ + Fe+++)/Fe++; numerator includes Fe2+ and Fe3+, denominator Fe2+'
+        quantity: equilibrium_phase_composition
+        basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed'
         method_class: measured_tabulated
         admission_status: pending
         table_title_as_printed: 'Composition of liquid iron oxide in equilibrium with several atmospheres at various temperatures'
         points:
-        - {T_C: '1383', starting_material: Wüstite, time_at_temperature_h: '41', r: '1.096', point_conditions: {composition: {state: {tag: value, value: '1.096'}, locator: {page: 3, published_page: 800, table: 'I', row: A1}}, atmosphere: &gas_a {state: {tag: value, value: 'CO2-CO; pCO2/pCO = 0.376'}, locator: {page: 3, published_page: 800, table: 'I', row: A}}, total_pressure: &pressure_unstated {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 3, published_page: 800, table: 'I'}}}, locator: {page: 3, published_page: 800, table: 'I', row: A1}}
-        - {T_C: '1395', starting_material: Fe2O3, time_at_temperature_h: '48', r: '1.097', point_conditions: {composition: {state: {tag: value, value: '1.097'}, locator: {page: 3, published_page: 800, table: 'I', row: A2}}, atmosphere: *gas_a, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: A2}}
-        - {T_C: '1445', starting_material: Wüstite, time_at_temperature_h: '75', r: '1.091', point_conditions: {composition: {state: {tag: value, value: '1.091'}, locator: {page: 3, published_page: 800, table: 'I', row: A3}}, atmosphere: *gas_a, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: A3}}
-        - {T_C: '1479', starting_material: Wüstite, time_at_temperature_h: '72', r: '1.088', point_conditions: {composition: {state: {tag: value, value: '1.088'}, locator: {page: 3, published_page: 800, table: 'I', row: A4}}, atmosphere: *gas_a, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: A4}}
-        - {T_C: '1500', starting_material: Fe2O3, time_at_temperature_h: '23', r: '1.086', point_conditions: {composition: {state: {tag: value, value: '1.086'}, locator: {page: 3, published_page: 800, table: 'I', row: A5}}, atmosphere: *gas_a, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: A5}}
-        - {T_C: '1403', starting_material: Fe2O3, time_at_temperature_h: '5', r: '1.183', point_conditions: {composition: {state: {tag: value, value: '1.183'}, locator: {page: 3, published_page: 800, table: 'I', row: B1}}, atmosphere: &gas_b {state: {tag: value, value: 'CO2-CO; pCO2/pCO = 1.00'}, locator: {page: 3, published_page: 800, table: 'I', row: B}}, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: B1}}
-        - {T_C: '1450', starting_material: Fe2O3, time_at_temperature_h: '6', r: '1.178', point_conditions: {composition: {state: {tag: value, value: '1.178'}, locator: {page: 3, published_page: 800, table: 'I', row: B2}}, atmosphere: *gas_b, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: B2}}
-        - {T_C: '1575', starting_material: Fe2O3, time_at_temperature_h: '4', r: '1.169', point_conditions: {composition: {state: {tag: value, value: '1.169'}, locator: {page: 3, published_page: 800, table: 'I', row: B3}}, atmosphere: *gas_b, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: B3}}
-        - {T_C: '1575', starting_material: Wüstite, time_at_temperature_h: '6', r: '1.169', point_conditions: {composition: {state: {tag: value, value: '1.169'}, locator: {page: 3, published_page: 800, table: 'I', row: B4}}, atmosphere: *gas_b, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: B4}}
-        - {T_C: '1395', starting_material: Fe2O3, time_at_temperature_as_printed: '5½', time_at_temperature_h: '5.5', r: '1.241', point_conditions: {composition: {state: {tag: value, value: '1.241'}, locator: {page: 3, published_page: 800, table: 'I', row: C1}}, atmosphere: &gas_c {state: {tag: value, value: 'CO2-H2; initial pCO2/pH2 = 2.23'}, locator: {page: 3, published_page: 800, table: 'I', row: C}}, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: C1}}
-        - {T_C: '1395', starting_material: Wüstite, time_at_temperature_as_printed: '5½', time_at_temperature_h: '5.5', r: '1.238', point_conditions: {composition: {state: {tag: value, value: '1.238'}, locator: {page: 3, published_page: 800, table: 'I', row: C2}}, atmosphere: *gas_c, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: C2}}
-        - {T_C: '1500', starting_material: Fe2O3, time_at_temperature_h: '18', r: '1.230', point_conditions: {composition: {state: {tag: value, value: '1.230'}, locator: {page: 3, published_page: 800, table: 'I', row: C3}}, atmosphere: *gas_c, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: C3}}
-        - {T_C: '1500', starting_material: Wüstite, time_at_temperature_h: '18', r: '1.227', point_conditions: {composition: {state: {tag: value, value: '1.227'}, locator: {page: 3, published_page: 800, table: 'I', row: C4}}, atmosphere: *gas_c, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: C4}}
-        - {T_C: '1600', starting_material: Fe2O3, time_at_temperature_as_printed: '3¼', time_at_temperature_h: '3.25', r: '1.227', point_conditions: {composition: {state: {tag: value, value: '1.227'}, locator: {page: 3, published_page: 800, table: 'I', row: C5}}, atmosphere: *gas_c, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: C5}}
-        - {T_C: '1600', starting_material: Wüstite, time_at_temperature_as_printed: '3¼', time_at_temperature_h: '3.25', r: '1.227', point_conditions: {composition: {state: {tag: value, value: '1.227'}, locator: {page: 3, published_page: 800, table: 'I', row: C6}}, atmosphere: *gas_c, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: C6}}
-        - {T_C: '1428', starting_material: Fe2O3, time_at_temperature_h: '18', r: '1.273', point_conditions: {composition: {state: {tag: value, value: '1.273'}, locator: {page: 3, published_page: 800, table: 'I', row: D1}}, atmosphere: &gas_d {state: {tag: value, value: 'H2O-H2; pH2O/pH2 = 7.10'}, locator: {page: 3, published_page: 800, table: 'I', row: D}}, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: D1}}
-        - {T_C: '1428', starting_material: Wüstite, time_at_temperature_h: '18', r: '1.267', point_conditions: {composition: {state: {tag: value, value: '1.267'}, locator: {page: 3, published_page: 800, table: 'I', row: D2}}, atmosphere: *gas_d, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: D2}}
-        - {T_C: '1605', starting_material: Fe2O3, time_at_temperature_h: '4', r: '1.250', point_conditions: {composition: {state: {tag: value, value: '1.250'}, locator: {page: 3, published_page: 800, table: 'I', row: D3}}, atmosphere: *gas_d, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: D3}}
-        - {T_C: '1605', starting_material: Wüstite, time_at_temperature_h: '4', r: '1.245', point_conditions: {composition: {state: {tag: value, value: '1.245'}, locator: {page: 3, published_page: 800, table: 'I', row: D4}}, atmosphere: *gas_d, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: D4}}
-        - {T_C: '1598', starting_material: Fe2O3, time_at_temperature_h: '4', r: '1.386', point_conditions: {composition: {state: {tag: value, value: '1.386'}, locator: {page: 3, published_page: 800, table: 'I', row: E1}}, atmosphere: &gas_e {state: {tag: value, value: 'CO2-CO-H2O; initial pCO2/pCO/pH2O = 1:1:14.1'}, locator: {page: 3, published_page: 800, table: 'I', row: E}}, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: E1}}
-        - {T_C: '1598', starting_material: Wüstite, time_at_temperature_h: '4', r: '1.382', point_conditions: {composition: {state: {tag: value, value: '1.382'}, locator: {page: 3, published_page: 800, table: 'I', row: E2}}, atmosphere: *gas_e, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: E2}}
-        - {T_C: '1633', starting_material: Fe2O3, time_at_temperature_h: '4', r: '1.392', point_conditions: {composition: {state: {tag: value, value: '1.392'}, locator: {page: 3, published_page: 800, table: 'I', row: E3}}, atmosphere: *gas_e, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: E3}}
-        - {T_C: '1633', starting_material: Wüstite, time_at_temperature_h: '4', r: '1.392', point_conditions: {composition: {state: {tag: value, value: '1.392'}, locator: {page: 3, published_page: 800, table: 'I', row: E4}}, atmosphere: *gas_e, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: E4}}
-        - {T_C: '1444', starting_material: Fe2O3, time_at_temperature_h: '5', r: '1.428', point_conditions: {composition: {state: {tag: value, value: '1.428'}, locator: {page: 3, published_page: 800, table: 'I', row: F1}}, atmosphere: &gas_f {state: {tag: value, value: 'CO2-H2; initial pCO2/pH2 = 7.13'}, locator: {page: 3, published_page: 800, table: 'I', row: F}}, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F1}}
-        - {T_C: '1444', starting_material: Wüstite, time_at_temperature_h: '5', r: '1.427', point_conditions: {composition: {state: {tag: value, value: '1.427'}, locator: {page: 3, published_page: 800, table: 'I', row: F2}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F2}}
-        - {T_C: '1469', starting_material: Fe2O3, time_at_temperature_h: '5', r: '1.426', point_conditions: {composition: {state: {tag: value, value: '1.426'}, locator: {page: 3, published_page: 800, table: 'I', row: F3}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F3}}
-        - {T_C: '1469', starting_material: Wüstite, time_at_temperature_h: '5', r: '1.425', point_conditions: {composition: {state: {tag: value, value: '1.425'}, locator: {page: 3, published_page: 800, table: 'I', row: F4}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F4}}
-        - {T_C: '1472', starting_material: Fe2O3, time_at_temperature_h: '5', r: '1.426', point_conditions: {composition: {state: {tag: value, value: '1.426'}, locator: {page: 3, published_page: 800, table: 'I', row: F5}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F5}}
-        - {T_C: '1535', starting_material: Fe2O3, time_at_temperature_h: '3', r: '1.430', point_conditions: {composition: {state: {tag: value, value: '1.430'}, locator: {page: 3, published_page: 800, table: 'I', row: F6}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F6}}
-        - {T_C: '1535', starting_material: Wüstite, time_at_temperature_h: '3', r: '1.427', point_conditions: {composition: {state: {tag: value, value: '1.427'}, locator: {page: 3, published_page: 800, table: 'I', row: F7}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F7}}
-        - {T_C: '1601', starting_material: Fe2O3, time_at_temperature_as_printed: '4½', time_at_temperature_h: '4.5', r: '1.429', point_conditions: {composition: {state: {tag: value, value: '1.429'}, locator: {page: 3, published_page: 800, table: 'I', row: F8}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F8}}
-        - {T_C: '1601', starting_material: Wüstite, time_at_temperature_as_printed: '4½', time_at_temperature_h: '4.5', r: '1.427', point_conditions: {composition: {state: {tag: value, value: '1.427'}, locator: {page: 3, published_page: 800, table: 'I', row: F9}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F9}}
-        - {T_C: '1610', starting_material: Fe2O3, time_at_temperature_h: '2', r: '1.431', point_conditions: {composition: {state: {tag: value, value: '1.431'}, locator: {page: 3, published_page: 800, table: 'I', row: F10}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F10}}
-        - {T_C: '1610', starting_material: Wüstite, time_at_temperature_h: '2', r: '1.427', point_conditions: {composition: {state: {tag: value, value: '1.427'}, locator: {page: 3, published_page: 800, table: 'I', row: F11}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F11}}
-        - {T_C: '1485', starting_material: Wüstite, time_at_temperature_h: '4', r: '1.698', point_conditions: {composition: {state: {tag: value, value: '1.698'}, locator: {page: 3, published_page: 800, table: 'I', row: G1}}, atmosphere: &gas_g {state: {tag: value, value: 'CO2-H2; initial pCO2/pH2 = 28.3'}, locator: {page: 3, published_page: 800, table: 'I', row: G}}, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G1}}
-        - {T_C: '1491', starting_material: Wüstite, time_at_temperature_h: '3', r: '1.710', point_conditions: {composition: {state: {tag: value, value: '1.710'}, locator: {page: 3, published_page: 800, table: 'I', row: G2}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G2}}
-        - {T_C: '1496', starting_material: Fe2O3, time_at_temperature_h: '6', r: '1.708', point_conditions: {composition: {state: {tag: value, value: '1.708'}, locator: {page: 3, published_page: 800, table: 'I', row: G3}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G3}}
-        - {T_C: '1496', starting_material: Wüstite, time_at_temperature_h: '6', r: '1.719', point_conditions: {composition: {state: {tag: value, value: '1.719'}, locator: {page: 3, published_page: 800, table: 'I', row: G4}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G4}}
-        - {T_C: '1535', starting_material: Fe2O3, time_at_temperature_h: '18', r: '1.720', point_conditions: {composition: {state: {tag: value, value: '1.720'}, locator: {page: 3, published_page: 800, table: 'I', row: G5}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G5}}
-        - {T_C: '1535', starting_material: Wüstite, time_at_temperature_h: '18', r: '1.710', point_conditions: {composition: {state: {tag: value, value: '1.710'}, locator: {page: 3, published_page: 800, table: 'I', row: G6}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G6}}
-        - {T_C: '1594', starting_material: Fe2O3, time_at_temperature_h: '2', r: '1.732', point_conditions: {composition: {state: {tag: value, value: '1.732'}, locator: {page: 3, published_page: 800, table: 'I', row: G7}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G7}}
-        - {T_C: '1594', starting_material: Wüstite, time_at_temperature_h: '2', r: '1.707', point_conditions: {composition: {state: {tag: value, value: '1.707'}, locator: {page: 3, published_page: 800, table: 'I', row: G8}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G8}}
-        - {T_C: '1598', starting_material: Fe2O3, time_at_temperature_h: '5', r: '1.752', point_conditions: {composition: {state: {tag: value, value: '1.752'}, locator: {page: 3, published_page: 800, table: 'I', row: G9}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G9}}
-        - {T_C: '1598', starting_material: Wüstite, time_at_temperature_h: '5', r: '1.758', point_conditions: {composition: {state: {tag: value, value: '1.758'}, locator: {page: 3, published_page: 800, table: 'I', row: G10}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G10}}
-        - {T_C: '1603', starting_material: Fe2O3, time_at_temperature_h: '2', r: '1.766', point_conditions: {composition: {state: {tag: value, value: '1.766'}, locator: {page: 3, published_page: 800, table: 'I', row: G11}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G11}}
-        - {T_C: '1603', starting_material: Wüstite, time_at_temperature_h: '2', r: '1.777', point_conditions: {composition: {state: {tag: value, value: '1.777'}, locator: {page: 3, published_page: 800, table: 'I', row: G12}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G12}}
-        - {T_C: '1594', starting_material: Fe2O3, time_at_temperature_h: '12', r: '2.074', point_conditions: {composition: {state: {tag: value, value: '2.074'}, locator: {page: 3, published_page: 800, table: 'I', row: H1}}, atmosphere: &gas_h {state: {tag: value, value: 'Steam; 1 atmosphere'}, locator: {page: 3, published_page: 800, table: 'I', row: H}}}, locator: {page: 3, published_page: 800, table: 'I', row: H1}}
-        - {T_C: '1594', starting_material: Wüstite, time_at_temperature_h: '12', r: '2.080', point_conditions: {composition: {state: {tag: value, value: '2.080'}, locator: {page: 3, published_page: 800, table: 'I', row: H2}}, atmosphere: *gas_h}, locator: {page: 3, published_page: 800, table: 'I', row: H2}}
-        - {T_C: '1601', starting_material: Fe2O3, time_at_temperature_h: '18', r: '2.045', point_conditions: {composition: {state: {tag: value, value: '2.045'}, locator: {page: 3, published_page: 800, table: 'I', row: H3}}, atmosphere: *gas_h}, locator: {page: 3, published_page: 800, table: 'I', row: H3}}
-        - {T_C: '1601', starting_material: Wüstite, time_at_temperature_h: '18', r: '2.055', point_conditions: {composition: {state: {tag: value, value: '2.055'}, locator: {page: 3, published_page: 800, table: 'I', row: H4}}, atmosphere: *gas_h}, locator: {page: 3, published_page: 800, table: 'I', row: H4}}
-        - {T_C: '1577', starting_material: Fe2O3, time_at_temperature_h: '5', r: '2.304', point_conditions: {composition: {state: {tag: value, value: '2.304'}, locator: {page: 3, published_page: 800, table: 'I', row: I1}}, atmosphere: &gas_i {state: {tag: value, value: 'CO2; 1 atmosphere'}, locator: {page: 3, published_page: 800, table: 'I', row: I}}}, locator: {page: 3, published_page: 800, table: 'I', row: I1}}
-        - {T_C: '1578', starting_material: Fe2O3, time_at_temperature_h: '2', r: '2.309', point_conditions: {composition: {state: {tag: value, value: '2.309'}, locator: {page: 3, published_page: 800, table: 'I', row: I2}}, atmosphere: *gas_i}, locator: {page: 3, published_page: 800, table: 'I', row: I2}}
-        - {T_C: '1590', starting_material: Fe2O3, time_at_temperature_h: '3', r: '2.302', point_conditions: {composition: {state: {tag: value, value: '2.302'}, locator: {page: 3, published_page: 800, table: 'I', row: I3}}, atmosphere: *gas_i}, locator: {page: 3, published_page: 800, table: 'I', row: I3}}
-        - {T_C: '1591', starting_material: Wüstite, time_at_temperature_h: '5', r: '2.291', point_conditions: {composition: {state: {tag: value, value: '2.291'}, locator: {page: 3, published_page: 800, table: 'I', row: I4}}, atmosphere: *gas_i}, locator: {page: 3, published_page: 800, table: 'I', row: I4}}
-        - {T_C: '1592', starting_material: Fe2O3, time_at_temperature_h: '5', r: '2.286', point_conditions: {composition: {state: {tag: value, value: '2.286'}, locator: {page: 3, published_page: 800, table: 'I', row: I5}}, atmosphere: *gas_i}, locator: {page: 3, published_page: 800, table: 'I', row: I5}}
-        - {T_C: '1634', starting_material: Fe2O3, time_at_temperature_h: '4', r: '2.256', point_conditions: {composition: {state: {tag: value, value: '2.256'}, locator: {page: 3, published_page: 800, table: 'I', row: I6}}, atmosphere: *gas_i}, locator: {page: 3, published_page: 800, table: 'I', row: I6}}
-        - {T_C: '1605', starting_material: Fe2O3, time_at_temperature_h: '7', r: '2.824', point_conditions: {composition: {state: {tag: value, value: '2.824'}, locator: {page: 3, published_page: 800, table: 'I', row: J1a}}, atmosphere: &gas_j {state: {tag: value, value: 'CO2-O2; 3.91% oxygen'}, locator: {page: 3, published_page: 800, table: 'I', row: J}}, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: J1a}}
-        - {T_C: '1605', starting_material: Fe2O3, time_at_temperature_h: '7', r: '2.850', point_conditions: {composition: {state: {tag: value, value: '2.850'}, locator: {page: 3, published_page: 800, table: 'I', row: J1b}}, atmosphere: *gas_j, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: J1b}}
-        - {T_C: '1606', starting_material: Fe2O3, time_at_temperature_h: '3', r: '2.838', point_conditions: {composition: {state: {tag: value, value: '2.838'}, locator: {page: 3, published_page: 800, table: 'I', row: J2}}, atmosphere: *gas_j, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: J2}}
-        - {T_C: '1595', starting_material: Fe2O3, time_at_temperature_h: '2', r: '3.529', point_conditions: {composition: {state: {tag: value, value: '3.529'}, locator: {page: 3, published_page: 800, table: 'I', row: K1}}, atmosphere: &gas_k {state: {tag: value, value: 'Air; 1 atmosphere'}, locator: {page: 3, published_page: 800, table: 'I', row: K}}}, locator: {page: 3, published_page: 800, table: 'I', row: K1}}
-        - {T_C: '1602', starting_material: Fe2O3, time_at_temperature_h: '2', r: '3.492', point_conditions: {composition: {state: {tag: value, value: '3.492'}, locator: {page: 3, published_page: 800, table: 'I', row: K2}}, atmosphere: *gas_k}, locator: {page: 3, published_page: 800, table: 'I', row: K2}}
-        - {T_C: '1619', starting_material: Fe2O3, time_at_temperature_h: '3', r: '3.439', point_conditions: {composition: {state: {tag: value, value: '3.439'}, locator: {page: 3, published_page: 800, table: 'I', row: K3}}, atmosphere: *gas_k}, locator: {page: 3, published_page: 800, table: 'I', row: K3}}
-        - {T_C: '1630', starting_material: Fe2O3, time_at_temperature_h: '1', r: '3.348', point_conditions: {composition: {state: {tag: value, value: '3.348'}, locator: {page: 3, published_page: 800, table: 'I', row: K4}}, atmosphere: *gas_k}, locator: {page: 3, published_page: 800, table: 'I', row: K4}}
-        - {T_C: '1630', starting_material: Fe2O3, time_at_temperature_h: '6', r: '3.308', point_conditions: {composition: {state: {tag: value, value: '3.308'}, locator: {page: 3, published_page: 800, table: 'I', row: K5}}, atmosphere: *gas_k}, locator: {page: 3, published_page: 800, table: 'I', row: K5}}
-        - {T_C: '1635', starting_material: Fe2O3, time_at_temperature_h: '4', r: '3.301', point_conditions: {composition: {state: {tag: value, value: '3.301'}, locator: {page: 3, published_page: 800, table: 'I', row: K6}}, atmosphere: *gas_k}, locator: {page: 3, published_page: 800, table: 'I', row: K6}}
-        - {T_C: '1635', starting_material: Wüstite, time_at_temperature_h: '4', r: '3.281', point_conditions: {composition: {state: {tag: value, value: '3.281'}, locator: {page: 3, published_page: 800, table: 'I', row: K7}}, atmosphere: *gas_k}, locator: {page: 3, published_page: 800, table: 'I', row: K7}}
-        - {T_C: '1589', starting_material: Fe2O3, time_at_temperature_h: '6', r: '4.237', point_conditions: {composition: {state: {tag: value, value: '4.237'}, locator: {page: 3, published_page: 800, table: 'I', row: L1}}, atmosphere: &gas_l {state: {tag: value, value: 'Oxygen; 1 atmosphere'}, locator: {page: 3, published_page: 800, table: 'I', row: L}}}, locator: {page: 3, published_page: 800, table: 'I', row: L1}}
-        - {T_C: '1589', starting_material: Fe3O4, time_at_temperature_h: '6', r: '4.216', point_conditions: {composition: {state: {tag: value, value: '4.216'}, locator: {page: 3, published_page: 800, table: 'I', row: L2}}, atmosphere: *gas_l}, locator: {page: 3, published_page: 800, table: 'I', row: L2}}
-        - {T_C: '1596', starting_material: Fe2O3, time_at_temperature_h: '1', r: '4.067', point_conditions: {composition: {state: {tag: value, value: '4.067'}, locator: {page: 3, published_page: 800, table: 'I', row: L3}}, atmosphere: *gas_l}, locator: {page: 3, published_page: 800, table: 'I', row: L3}}
-        - {T_C: '1603', starting_material: Fe2O3, time_at_temperature_h: '1', r: '4.053', point_conditions: {composition: {state: {tag: value, value: '4.053'}, locator: {page: 3, published_page: 800, table: 'I', row: L4}}, atmosphere: *gas_l}, locator: {page: 3, published_page: 800, table: 'I', row: L4}}
-        - {T_C: '1607', starting_material: Fe2O3, time_at_temperature_h: '4', r: '4.023', point_conditions: {composition: {state: {tag: value, value: '4.023'}, locator: {page: 3, published_page: 800, table: 'I', row: L5}}, atmosphere: *gas_l}, locator: {page: 3, published_page: 800, table: 'I', row: L5}}
-        - {T_C: '1607', starting_material: Wüstite, time_at_temperature_h: '4', r: '4.007', point_conditions: {composition: {state: {tag: value, value: '4.007'}, locator: {page: 3, published_page: 800, table: 'I', row: L6}}, atmosphere: *gas_l}, locator: {page: 3, published_page: 800, table: 'I', row: L6}}
-        - {T_C: '1615', starting_material: Fe2O3, time_at_temperature_h: '1', r: '3.881', point_conditions: {composition: {state: {tag: value, value: '3.881'}, locator: {page: 3, published_page: 800, table: 'I', row: L7}}, atmosphere: *gas_l}, locator: {page: 3, published_page: 800, table: 'I', row: L7}}
-        - {T_C: '1632', starting_material: Fe2O3, time_at_temperature_h: '5', r: '4.033', point_conditions: {composition: {state: {tag: value, value: '4.033'}, locator: {page: 3, published_page: 800, table: 'I', row: L8}}, atmosphere: *gas_l}, locator: {page: 3, published_page: 800, table: 'I', row: L8}}
-        - {T_C: '1632', starting_material: Wüstite, time_at_temperature_h: '5', r: '3.958', point_conditions: {composition: {state: {tag: value, value: '3.958'}, locator: {page: 3, published_page: 800, table: 'I', row: L9}}, atmosphere: *gas_l}, locator: {page: 3, published_page: 800, table: 'I', row: L9}}
-        - {T_C: '1636', starting_material: Fe2O3, time_at_temperature_h: '1', r: '3.998', point_conditions: {composition: {state: {tag: value, value: '3.998'}, locator: {page: 3, published_page: 800, table: 'I', row: L10}}, atmosphere: *gas_l}, locator: {page: 3, published_page: 800, table: 'I', row: L10}}
+        - {T_C: '1383', time_at_temperature_h: '41', r_as_printed: '1.096', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: A1}}, atmosphere: &gas_a {state: {tag: value, value: 'CO2-CO; pCO2/pCO = 0.376'}, locator: {page: 3, published_page: 800, table: 'I', row: A}}, total_pressure: &pressure_unstated {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 3, published_page: 800, table: 'I'}}}, locator: {page: 3, published_page: 800, table: 'I', row: A1}}
+        - {T_C: '1395', time_at_temperature_h: '48', r_as_printed: '1.097', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: A2}}, atmosphere: *gas_a, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: A2}}
+        - {T_C: '1445', time_at_temperature_h: '75', r_as_printed: '1.091', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: A3}}, atmosphere: *gas_a, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: A3}}
+        - {T_C: '1479', time_at_temperature_h: '72', r_as_printed: '1.088', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: A4}}, atmosphere: *gas_a, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: A4}}
+        - {T_C: '1500', time_at_temperature_h: '23', r_as_printed: '1.086', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: A5}}, atmosphere: *gas_a, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: A5}}
+
+    - observation_id: dg46_1946_table_i_liquid_composition_series_b
+      experiment: dg46_t1_b
+      phase: l
+      type: equilibrium_phase_composition
+      locator: {page: 3, published_page: 800, table: 'I'}
+      units: 'r dimensionless; temperature °C; time at temperature hours'
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed'
+        method_class: measured_tabulated
+        admission_status: pending
+        table_title_as_printed: 'Composition of liquid iron oxide in equilibrium with several atmospheres at various temperatures'
+        points:
+        - {T_C: '1403', time_at_temperature_h: '5', r_as_printed: '1.183', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: B1}}, atmosphere: &gas_b {state: {tag: value, value: 'CO2-CO; pCO2/pCO = 1.00'}, locator: {page: 3, published_page: 800, table: 'I', row: B}}, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: B1}}
+        - {T_C: '1450', time_at_temperature_h: '6', r_as_printed: '1.178', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: B2}}, atmosphere: *gas_b, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: B2}}
+        - {T_C: '1575', time_at_temperature_h: '4', r_as_printed: '1.169', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: B3}}, atmosphere: *gas_b, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: B3}}
+        - {T_C: '1575', time_at_temperature_h: '6', r_as_printed: '1.169', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: B4}}, atmosphere: *gas_b, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: B4}}
+
+    - observation_id: dg46_1946_table_i_liquid_composition_series_c
+      experiment: dg46_t1_c
+      phase: l
+      type: equilibrium_phase_composition
+      locator: {page: 3, published_page: 800, table: 'I'}
+      units: 'r dimensionless; temperature °C; time at temperature hours'
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed'
+        method_class: measured_tabulated
+        admission_status: pending
+        table_title_as_printed: 'Composition of liquid iron oxide in equilibrium with several atmospheres at various temperatures'
+        points:
+        - {T_C: '1395', time_at_temperature_as_printed: '5½', time_at_temperature_h: '5.5', r_as_printed: '1.241', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: C1}}, atmosphere: &gas_c {state: {tag: value, value: 'CO2-H2; initial pCO2/pH2 = 2.23'}, locator: {page: 3, published_page: 800, table: 'I', row: C}}, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: C1}}
+        - {T_C: '1395', time_at_temperature_as_printed: '5½', time_at_temperature_h: '5.5', r_as_printed: '1.238', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: C2}}, atmosphere: *gas_c, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: C2}}
+        - {T_C: '1500', time_at_temperature_h: '18', r_as_printed: '1.230', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: C3}}, atmosphere: *gas_c, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: C3}}
+        - {T_C: '1500', time_at_temperature_h: '18', r_as_printed: '1.227', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: C4}}, atmosphere: *gas_c, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: C4}}
+        - {T_C: '1600', time_at_temperature_as_printed: '3¼', time_at_temperature_h: '3.25', r_as_printed: '1.227', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: C5}}, atmosphere: *gas_c, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: C5}}
+        - {T_C: '1600', time_at_temperature_as_printed: '3¼', time_at_temperature_h: '3.25', r_as_printed: '1.227', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: C6}}, atmosphere: *gas_c, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: C6}}
+
+    - observation_id: dg46_1946_table_i_liquid_composition_series_d
+      experiment: dg46_t1_d
+      phase: l
+      type: equilibrium_phase_composition
+      locator: {page: 3, published_page: 800, table: 'I'}
+      units: 'r dimensionless; temperature °C; time at temperature hours'
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed'
+        method_class: measured_tabulated
+        admission_status: pending
+        table_title_as_printed: 'Composition of liquid iron oxide in equilibrium with several atmospheres at various temperatures'
+        points:
+        - {T_C: '1428', time_at_temperature_h: '18', r_as_printed: '1.273', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: D1}}, atmosphere: &gas_d {state: {tag: value, value: 'H2O-H2; pH2O/pH2 = 7.10'}, locator: {page: 3, published_page: 800, table: 'I', row: D}}, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: D1}}
+        - {T_C: '1428', time_at_temperature_h: '18', r_as_printed: '1.267', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: D2}}, atmosphere: *gas_d, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: D2}}
+        - {T_C: '1605', time_at_temperature_h: '4', r_as_printed: '1.250', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: D3}}, atmosphere: *gas_d, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: D3}}
+        - {T_C: '1605', time_at_temperature_h: '4', r_as_printed: '1.245', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: D4}}, atmosphere: *gas_d, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: D4}}
+
+    - observation_id: dg46_1946_table_i_liquid_composition_series_e
+      experiment: dg46_t1_e
+      phase: l
+      type: equilibrium_phase_composition
+      locator: {page: 3, published_page: 800, table: 'I'}
+      units: 'r dimensionless; temperature °C; time at temperature hours'
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed'
+        method_class: measured_tabulated
+        admission_status: pending
+        table_title_as_printed: 'Composition of liquid iron oxide in equilibrium with several atmospheres at various temperatures'
+        points:
+        - {T_C: '1598', time_at_temperature_h: '4', r_as_printed: '1.386', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: E1}}, atmosphere: &gas_e {state: {tag: value, value: 'CO2-CO-H2O; initial pCO2/pCO/pH2O = 1:1:14.1'}, locator: {page: 3, published_page: 800, table: 'I', row: E}}, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: E1}}
+        - {T_C: '1598', time_at_temperature_h: '4', r_as_printed: '1.382', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: E2}}, atmosphere: *gas_e, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: E2}}
+        - {T_C: '1633', time_at_temperature_h: '4', r_as_printed: '1.392', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: E3}}, atmosphere: *gas_e, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: E3}}
+        - {T_C: '1633', time_at_temperature_h: '4', r_as_printed: '1.392', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: E4}}, atmosphere: *gas_e, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: E4}}
+
+    - observation_id: dg46_1946_table_i_liquid_composition_series_f
+      experiment: dg46_t1_f
+      phase: l
+      type: equilibrium_phase_composition
+      locator: {page: 3, published_page: 800, table: 'I'}
+      units: 'r dimensionless; temperature °C; time at temperature hours'
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed'
+        method_class: measured_tabulated
+        admission_status: pending
+        table_title_as_printed: 'Composition of liquid iron oxide in equilibrium with several atmospheres at various temperatures'
+        points:
+        - {T_C: '1444', time_at_temperature_h: '5', r_as_printed: '1.428', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: F1}}, atmosphere: &gas_f {state: {tag: value, value: 'CO2-H2; initial pCO2/pH2 = 7.13'}, locator: {page: 3, published_page: 800, table: 'I', row: F}}, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F1}}
+        - {T_C: '1444', time_at_temperature_h: '5', r_as_printed: '1.427', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: F2}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F2}}
+        - {T_C: '1469', time_at_temperature_h: '5', r_as_printed: '1.426', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: F3}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F3}}
+        - {T_C: '1469', time_at_temperature_h: '5', r_as_printed: '1.425', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: F4}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F4}}
+        - {T_C: '1472', time_at_temperature_h: '5', r_as_printed: '1.426', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: F5}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F5}}
+        - {T_C: '1535', time_at_temperature_h: '3', r_as_printed: '1.430', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: F6}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F6}}
+        - {T_C: '1535', time_at_temperature_h: '3', r_as_printed: '1.427', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: F7}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F7}}
+        - {T_C: '1601', time_at_temperature_as_printed: '4½', time_at_temperature_h: '4.5', r_as_printed: '1.429', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: F8}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F8}}
+        - {T_C: '1601', time_at_temperature_as_printed: '4½', time_at_temperature_h: '4.5', r_as_printed: '1.427', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: F9}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F9}}
+        - {T_C: '1610', time_at_temperature_h: '2', r_as_printed: '1.431', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: F10}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F10}}
+        - {T_C: '1610', time_at_temperature_h: '2', r_as_printed: '1.427', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: F11}}, atmosphere: *gas_f, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: F11}}
+
+    - observation_id: dg46_1946_table_i_liquid_composition_series_g
+      experiment: dg46_t1_g
+      phase: l
+      type: equilibrium_phase_composition
+      locator: {page: 3, published_page: 800, table: 'I'}
+      units: 'r dimensionless; temperature °C; time at temperature hours'
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed'
+        method_class: measured_tabulated
+        admission_status: pending
+        table_title_as_printed: 'Composition of liquid iron oxide in equilibrium with several atmospheres at various temperatures'
+        points:
+        - {T_C: '1485', time_at_temperature_h: '4', r_as_printed: '1.698', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: G1}}, atmosphere: &gas_g {state: {tag: value, value: 'CO2-H2; initial pCO2/pH2 = 28.3'}, locator: {page: 3, published_page: 800, table: 'I', row: G}}, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G1}}
+        - {T_C: '1491', time_at_temperature_h: '3', r_as_printed: '1.710', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: G2}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G2}}
+        - {T_C: '1496', time_at_temperature_h: '6', r_as_printed: '1.708', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: G3}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G3}}
+        - {T_C: '1496', time_at_temperature_h: '6', r_as_printed: '1.719', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: G4}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G4}}
+        - {T_C: '1535', time_at_temperature_h: '18', r_as_printed: '1.720', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: G5}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G5}}
+        - {T_C: '1535', time_at_temperature_h: '18', r_as_printed: '1.710', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: G6}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G6}}
+        - {T_C: '1594', time_at_temperature_h: '2', r_as_printed: '1.732', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: G7}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G7}}
+        - {T_C: '1594', time_at_temperature_h: '2', r_as_printed: '1.707', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: G8}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G8}}
+        - {T_C: '1598', time_at_temperature_h: '5', r_as_printed: '1.752', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: G9}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G9}}
+        - {T_C: '1598', time_at_temperature_h: '5', r_as_printed: '1.758', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: G10}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G10}}
+        - {T_C: '1603', time_at_temperature_h: '2', r_as_printed: '1.766', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: G11}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G11}}
+        - {T_C: '1603', time_at_temperature_h: '2', r_as_printed: '1.777', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: G12}}, atmosphere: *gas_g, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: G12}}
+
+    - observation_id: dg46_1946_table_i_liquid_composition_series_h
+      experiment: dg46_t1_h
+      phase: l
+      type: equilibrium_phase_composition
+      locator: {page: 3, published_page: 800, table: 'I'}
+      units: 'r dimensionless; temperature °C; time at temperature hours'
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed'
+        method_class: measured_tabulated
+        admission_status: pending
+        table_title_as_printed: 'Composition of liquid iron oxide in equilibrium with several atmospheres at various temperatures'
+        points:
+        - {T_C: '1594', time_at_temperature_h: '12', r_as_printed: '2.074', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: H1}}, atmosphere: &gas_h {state: {tag: value, value: 'Steam; 1 atmosphere'}, locator: {page: 3, published_page: 800, table: 'I', row: H}}}, locator: {page: 3, published_page: 800, table: 'I', row: H1}}
+        - {T_C: '1594', time_at_temperature_h: '12', r_as_printed: '2.080', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: H2}}, atmosphere: *gas_h}, locator: {page: 3, published_page: 800, table: 'I', row: H2}}
+        - {T_C: '1601', time_at_temperature_h: '18', r_as_printed: '2.045', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: H3}}, atmosphere: *gas_h}, locator: {page: 3, published_page: 800, table: 'I', row: H3}}
+        - {T_C: '1601', time_at_temperature_h: '18', r_as_printed: '2.055', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: H4}}, atmosphere: *gas_h}, locator: {page: 3, published_page: 800, table: 'I', row: H4}}
+
+    - observation_id: dg46_1946_table_i_liquid_composition_series_i
+      experiment: dg46_t1_i
+      phase: l
+      type: equilibrium_phase_composition
+      locator: {page: 3, published_page: 800, table: 'I'}
+      units: 'r dimensionless; temperature °C; time at temperature hours'
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed'
+        method_class: measured_tabulated
+        admission_status: pending
+        table_title_as_printed: 'Composition of liquid iron oxide in equilibrium with several atmospheres at various temperatures'
+        points:
+        - {T_C: '1577', time_at_temperature_h: '5', r_as_printed: '2.304', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: I1}}, atmosphere: &gas_i {state: {tag: value, value: 'CO2; 1 atmosphere'}, locator: {page: 3, published_page: 800, table: 'I', row: I}}}, locator: {page: 3, published_page: 800, table: 'I', row: I1}}
+        - {T_C: '1578', time_at_temperature_h: '2', r_as_printed: '2.309', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: I2}}, atmosphere: *gas_i}, locator: {page: 3, published_page: 800, table: 'I', row: I2}}
+        - {T_C: '1590', time_at_temperature_h: '3', r_as_printed: '2.302', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: I3}}, atmosphere: *gas_i}, locator: {page: 3, published_page: 800, table: 'I', row: I3}}
+        - {T_C: '1591', time_at_temperature_h: '5', r_as_printed: '2.291', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: I4}}, atmosphere: *gas_i}, locator: {page: 3, published_page: 800, table: 'I', row: I4}}
+        - {T_C: '1592', time_at_temperature_h: '5', r_as_printed: '2.286', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: I5}}, atmosphere: *gas_i}, locator: {page: 3, published_page: 800, table: 'I', row: I5}}
+        - {T_C: '1634', time_at_temperature_h: '4', r_as_printed: '2.256', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: I6}}, atmosphere: *gas_i}, locator: {page: 3, published_page: 800, table: 'I', row: I6}}
+
+    - observation_id: dg46_1946_table_i_liquid_composition_series_j
+      experiment: dg46_t1_j
+      phase: l
+      type: equilibrium_phase_composition
+      locator: {page: 3, published_page: 800, table: 'I'}
+      units: 'r dimensionless; temperature °C; time at temperature hours'
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed'
+        method_class: measured_tabulated
+        admission_status: pending
+        table_title_as_printed: 'Composition of liquid iron oxide in equilibrium with several atmospheres at various temperatures'
+        points:
+        - {T_C: '1605', time_at_temperature_h: '7', r_as_printed: '2.824', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: J1a}}, atmosphere: &gas_j {state: {tag: value, value: 'CO2-O2; 3.91% oxygen'}, locator: {page: 3, published_page: 800, table: 'I', row: J}}, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: J1a}}
+        - {T_C: '1605', time_at_temperature_h: '7', r_as_printed: '2.850', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: J1b}}, atmosphere: *gas_j, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: J1b}}
+        - {T_C: '1606', time_at_temperature_h: '3', r_as_printed: '2.838', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: J2}}, atmosphere: *gas_j, total_pressure: *pressure_unstated}, locator: {page: 3, published_page: 800, table: 'I', row: J2}}
+
+    - observation_id: dg46_1946_table_i_liquid_composition_series_k
+      experiment: dg46_t1_k
+      phase: l
+      type: equilibrium_phase_composition
+      locator: {page: 3, published_page: 800, table: 'I'}
+      units: 'r dimensionless; temperature °C; time at temperature hours'
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed'
+        method_class: measured_tabulated
+        admission_status: pending
+        table_title_as_printed: 'Composition of liquid iron oxide in equilibrium with several atmospheres at various temperatures'
+        points:
+        - {T_C: '1595', time_at_temperature_h: '2', r_as_printed: '3.529', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: K1}}, atmosphere: &gas_k {state: {tag: value, value: 'Air; 1 atmosphere'}, locator: {page: 3, published_page: 800, table: 'I', row: K}}}, locator: {page: 3, published_page: 800, table: 'I', row: K1}}
+        - {T_C: '1602', time_at_temperature_h: '2', r_as_printed: '3.492', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: K2}}, atmosphere: *gas_k}, locator: {page: 3, published_page: 800, table: 'I', row: K2}}
+        - {T_C: '1619', time_at_temperature_h: '3', r_as_printed: '3.439', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: K3}}, atmosphere: *gas_k}, locator: {page: 3, published_page: 800, table: 'I', row: K3}}
+        - {T_C: '1630', time_at_temperature_h: '1', r_as_printed: '3.348', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: K4}}, atmosphere: *gas_k}, locator: {page: 3, published_page: 800, table: 'I', row: K4}}
+        - {T_C: '1630', time_at_temperature_h: '6', r_as_printed: '3.308', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: K5}}, atmosphere: *gas_k}, locator: {page: 3, published_page: 800, table: 'I', row: K5}}
+        - {T_C: '1635', time_at_temperature_h: '4', r_as_printed: '3.301', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: K6}}, atmosphere: *gas_k}, locator: {page: 3, published_page: 800, table: 'I', row: K6}}
+        - {T_C: '1635', time_at_temperature_h: '4', r_as_printed: '3.281', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: K7}}, atmosphere: *gas_k}, locator: {page: 3, published_page: 800, table: 'I', row: K7}}
+
+    - observation_id: dg46_1946_table_i_liquid_composition_series_l
+      experiment: dg46_t1_l
+      phase: l
+      type: equilibrium_phase_composition
+      locator: {page: 3, published_page: 800, table: 'I'}
+      units: 'r dimensionless; temperature °C; time at temperature hours'
+      values:
+        quantity: equilibrium_phase_composition
+        basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed'
+        method_class: measured_tabulated
+        admission_status: pending
+        table_title_as_printed: 'Composition of liquid iron oxide in equilibrium with several atmospheres at various temperatures'
+        oxygen_partial_pressure: {value: 1, units: atm, locator: {page: 3, published_page: 800, table: 'I', row: L}}
+        points:
+        - {T_C: '1589', time_at_temperature_h: '6', r_as_printed: '4.237', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: L1}}, atmosphere: &gas_l {state: {tag: value, value: 'Oxygen; 1 atmosphere'}, locator: {page: 3, published_page: 800, table: 'I', row: L}}}, locator: {page: 3, published_page: 800, table: 'I', row: L1}}
+        - {T_C: '1589', time_at_temperature_h: '6', r_as_printed: '4.216', point_conditions: {starting_material: {state: {tag: value, value: Fe3O4}, locator: {page: 3, published_page: 800, table: 'I', row: L2}}, atmosphere: *gas_l}, locator: {page: 3, published_page: 800, table: 'I', row: L2}}
+        - {T_C: '1596', time_at_temperature_h: '1', r_as_printed: '4.067', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: L3}}, atmosphere: *gas_l}, locator: {page: 3, published_page: 800, table: 'I', row: L3}}
+        - {T_C: '1603', time_at_temperature_h: '1', r_as_printed: '4.053', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: L4}}, atmosphere: *gas_l}, locator: {page: 3, published_page: 800, table: 'I', row: L4}}
+        - {T_C: '1607', time_at_temperature_h: '4', r_as_printed: '4.023', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: L5}}, atmosphere: *gas_l}, locator: {page: 3, published_page: 800, table: 'I', row: L5}}
+        - {T_C: '1607', time_at_temperature_h: '4', r_as_printed: '4.007', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: L6}}, atmosphere: *gas_l}, locator: {page: 3, published_page: 800, table: 'I', row: L6}}
+        - {T_C: '1615', time_at_temperature_h: '1', r_as_printed: '3.881', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: L7}}, atmosphere: *gas_l}, locator: {page: 3, published_page: 800, table: 'I', row: L7}}
+        - {T_C: '1632', time_at_temperature_h: '5', r_as_printed: '4.033', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: L8}}, atmosphere: *gas_l}, locator: {page: 3, published_page: 800, table: 'I', row: L8}}
+        - {T_C: '1632', time_at_temperature_h: '5', r_as_printed: '3.958', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 3, published_page: 800, table: 'I', row: L9}}, atmosphere: *gas_l}, locator: {page: 3, published_page: 800, table: 'I', row: L9}}
+        - {T_C: '1636', time_at_temperature_h: '1', r_as_printed: '3.998', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 3, published_page: 800, table: 'I', row: L10}}, atmosphere: *gas_l}, locator: {page: 3, published_page: 800, table: 'I', row: L10}}
     - observation_id: dg46_1946_table_iii_a_iron_boundary
       experiment_id: dg46_1946_liquid_iron_oxide_equilibria
       phase: l
@@ -142,39 +399,24 @@ species:
       locator: {page: 6, published_page: 803, table: 'III A'}
       units: 'r dimensionless; temperature °C; time at temperature hours'
       values:
-        quantity: valence_ratio
-        valence_basis_as_printed: '(Fe++ + Fe+++)/Fe++; numerator includes Fe2+ and Fe3+, denominator Fe2+'
+        quantity: equilibrium_phase_composition
+        basis_as_published: 'r=(Fe++ + Fe+++)/Fe++ as printed'
         method_class: measured_tabulated
         admission_status: pending
         points:
-        - {T_C: '1390', starting_material: Fe2O3, time_at_temperature_h: '4', r: '1.081', point_conditions: {composition: {state: {tag: value, value: '1.081'}, locator: {page: 6, published_page: 803, table: 'III A', row: '1'}}, atmosphere: &gas_n2 {state: {tag: value, value: 'Purified nitrogen; iron crucible, line CN'}, locator: {page: 6, published_page: 803, table: 'III A', row: header}}, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '1'}}
-        - {T_C: '1390', starting_material: Fe3O4, time_at_temperature_h: '18', r: '1.076', point_conditions: {composition: {state: {tag: value, value: '1.076'}, locator: {page: 6, published_page: 803, table: 'III A', row: '2'}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '2'}}
-        - {T_C: '1392', starting_material: Wüstite, time_at_temperature_h: '2', r: '1.052', point_conditions: {composition: {state: {tag: value, value: '1.052'}, locator: {page: 6, published_page: 803, table: 'III A', row: '3a'}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '3a'}}
-        - {T_C: '1392', starting_material: Wüstite, time_at_temperature_h: '2', r: '1.056', point_conditions: {composition: {state: {tag: value, value: '1.056'}, locator: {page: 6, published_page: 803, table: 'III A', row: '3b'}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '3b'}}
-        - {T_C: '1393', starting_material: Fe3O4, time_at_temperature_h: '6.5', r: '1.077', point_conditions: {composition: {state: {tag: value, value: '1.077'}, locator: {page: 6, published_page: 803, table: 'III A', row: '4'}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '4'}}
-        - {T_C: '1397', starting_material: 'Wüstite + magnetite', time_at_temperature_h: '2.2', r: '1.069', point_conditions: {composition: {state: {tag: value, value: '1.069'}, locator: {page: 6, published_page: 803, table: 'III A', row: '5'}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '5'}}
-        - {T_C: '1454', starting_material: Fe2O3, time_at_temperature_h: '4.5', r: '1.057', point_conditions: {composition: {state: {tag: value, value: '1.057'}, locator: {page: 6, published_page: 803, table: 'III A', row: '6'}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '6'}}
-        - {T_C: '1461', starting_material: Fe2O3, time_at_temperature_h: '18', r: '1.055', point_conditions: {composition: {state: {tag: value, value: '1.055'}, locator: {page: 6, published_page: 803, table: 'III A', row: '7'}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '7'}}
-        - {T_C: '1495', starting_material: Fe2O3, time_at_temperature_h: '1', r: '1.056', point_conditions: {composition: {state: {tag: value, value: '1.056'}, locator: {page: 6, published_page: 803, table: 'III A', row: '8'}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '8'}}
-        - {T_C: '1501', starting_material: Fe2O3, time_at_temperature_h: '3.5', r: '1.051', point_conditions: {composition: {state: {tag: value, value: '1.051'}, locator: {page: 6, published_page: 803, table: 'III A', row: '9'}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '9'}}
-        - {T_C: '1502', starting_material: Fe2O3, time_at_temperature_h: '2.5', r: '1.045', point_conditions: {composition: {state: {tag: value, value: '1.045'}, locator: {page: 6, published_page: 803, table: 'III A', row: '10'}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '10'}}
-        - {T_C: '1502', starting_material: Fe2O3, time_at_temperature_h: '2', r: '1.049', point_conditions: {composition: {state: {tag: value, value: '1.049'}, locator: {page: 6, published_page: 803, table: 'III A', row: '11'}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '11'}}
-        - {T_C: '1455', starting_material: 'Fe wire', time_at_temperature_h: '24', r: '1.067', point_conditions: {composition: {state: {tag: value, value: '1.067'}, locator: {page: 6, published_page: 803, table: 'III A', row: '12'}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '12'}}
-    - observation_id: dg46_1946_table_iii_b_gas_ratios
-      experiment_id: dg46_1946_liquid_iron_oxide_equilibria
-      phase: l
-      type: gas_speciation
-      locator: {page: 6, published_page: 803, table: 'III B'}
-      units: 'pCO2/pCO dimensionless; temperature °C'
-      values:
-        quantity: gas_composition_ratio
-        method_class: measured_tabulated
-        admission_status: pending
-        table_title_as_printed: 'Composition of CO-CO2 mixtures in equilibrium with iron and liquid oxide'
-        points:
-        - {T_C: '1376', pCO2_over_pCO: '.268', point_conditions: {atmosphere: {state: {tag: value, value: 'CO-CO2 mixture in equilibrium with iron and liquid oxide'}, locator: {page: 6, published_page: 803, table: 'III B'}}, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III B'}}}, locator: {page: 6, published_page: 803, table: 'III B', row: '1'}}
-        - {T_C: '1436', pCO2_over_pCO: '.233', point_conditions: {atmosphere: {state: {tag: value, value: 'CO-CO2 mixture in equilibrium with iron and liquid oxide'}, locator: {page: 6, published_page: 803, table: 'III B'}}, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III B'}}}, locator: {page: 6, published_page: 803, table: 'III B', row: '2'}}
-        - {T_C: '1493', pCO2_over_pCO: '.199', point_conditions: {atmosphere: {state: {tag: value, value: 'CO-CO2 mixture in equilibrium with iron and liquid oxide'}, locator: {page: 6, published_page: 803, table: 'III B'}}, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III B'}}}, locator: {page: 6, published_page: 803, table: 'III B', row: '3'}}
+        - {T_C: '1390', time_at_temperature_h: '4', r_as_printed: '1.081', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 6, published_page: 803, table: 'III A', row: '1'}}, equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {page: 6, published_page: 803, table: III A}}, atmosphere: &gas_n2 {state: {tag: value, value: 'Purified nitrogen; iron crucible, line CN'}, locator: {page: 6, published_page: 803, table: 'III A', row: header}}, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '1'}}
+        - {T_C: '1390', time_at_temperature_h: '18', r_as_printed: '1.076', point_conditions: {starting_material: {state: {tag: value, value: Fe3O4}, locator: {page: 6, published_page: 803, table: 'III A', row: '2'}}, equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {page: 6, published_page: 803, table: III A}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '2'}}
+        - {T_C: '1392', time_at_temperature_h: '2', r_as_printed: '1.052', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 6, published_page: 803, table: 'III A', row: '3a'}}, equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {page: 6, published_page: 803, table: III A}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '3a'}}
+        - {T_C: '1392', time_at_temperature_h: '2', r_as_printed: '1.056', point_conditions: {starting_material: {state: {tag: value, value: Wüstite}, locator: {page: 6, published_page: 803, table: 'III A', row: '3b'}}, equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {page: 6, published_page: 803, table: III A}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '3b'}}
+        - {T_C: '1393', time_at_temperature_h: '6.5', r_as_printed: '1.077', point_conditions: {starting_material: {state: {tag: value, value: Fe3O4}, locator: {page: 6, published_page: 803, table: 'III A', row: '4'}}, equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {page: 6, published_page: 803, table: III A}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '4'}}
+        - {T_C: '1397', time_at_temperature_h: '2.2', r_as_printed: '1.069', point_conditions: {starting_material: {state: {tag: value, value: 'Wüstite + magnetite'}, locator: {page: 6, published_page: 803, table: 'III A', row: '5'}}, equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {page: 6, published_page: 803, table: III A}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '5'}}
+        - {T_C: '1454', time_at_temperature_h: '4.5', r_as_printed: '1.057', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 6, published_page: 803, table: 'III A', row: '6'}}, equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {page: 6, published_page: 803, table: III A}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '6'}}
+        - {T_C: '1461', time_at_temperature_h: '18', r_as_printed: '1.055', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 6, published_page: 803, table: 'III A', row: '7'}}, equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {page: 6, published_page: 803, table: III A}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '7'}}
+        - {T_C: '1495', time_at_temperature_h: '1', r_as_printed: '1.056', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 6, published_page: 803, table: 'III A', row: '8'}}, equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {page: 6, published_page: 803, table: III A}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '8'}}
+        - {T_C: '1501', time_at_temperature_h: '3.5', r_as_printed: '1.051', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 6, published_page: 803, table: 'III A', row: '9'}}, equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {page: 6, published_page: 803, table: III A}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '9'}}
+        - {T_C: '1502', time_at_temperature_h: '2.5', r_as_printed: '1.045', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 6, published_page: 803, table: 'III A', row: '10'}}, equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {page: 6, published_page: 803, table: III A}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '10'}}
+        - {T_C: '1502', time_at_temperature_h: '2', r_as_printed: '1.049', point_conditions: {starting_material: {state: {tag: value, value: Fe2O3}, locator: {page: 6, published_page: 803, table: 'III A', row: '11'}}, equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {page: 6, published_page: 803, table: III A}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '11'}}
+        - {T_C: '1455', time_at_temperature_h: '24', r_as_printed: '1.067', point_conditions: {starting_material: {state: {tag: value, value: 'Fe wire'}, locator: {page: 6, published_page: 803, table: 'III A', row: '12'}}, equilibrium_boundary: {state: {tag: value, value: iron-liquid oxide line CN}, locator: {page: 6, published_page: 803, table: III A}}, atmosphere: *gas_n2, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III A'}}}, locator: {page: 6, published_page: 803, table: 'III A', row: '12'}}
     - observation_id: dg46_1946_table_iv_a_wustite_liquid
       experiment_id: dg46_1946_liquid_iron_oxide_equilibria
       phase: l
@@ -417,3 +659,23 @@ species:
         - {T_C: '1400', N2_over_N1: '1.11', delta_S_as_printed: '4.72', point_conditions: {composition: {state: {tag: value, value: '1.11'}, locator: {page: 15, published_page: 812, table: 'X', row: '4'}}}, locator: {page: 15, published_page: 812, table: 'X', row: '4'}}
         - {T_C: '1400', N2_over_N1: '1.14', delta_S_as_printed: '4.59', point_conditions: {composition: {state: {tag: value, value: '1.14'}, locator: {page: 15, published_page: 812, table: 'X', row: '5'}}}, locator: {page: 15, published_page: 812, table: 'X', row: '5'}}
         - {T_C: '1400', N2_over_N1: '1.16', delta_S_as_printed: '4.49', point_conditions: {composition: {state: {tag: value, value: '1.16'}, locator: {page: 15, published_page: 812, table: 'X', row: '6'}}}, locator: {page: 15, published_page: 812, table: 'X', row: '6'}}
+  CO2:
+    observations:
+      - observation_id: dg46_1946_table_iii_b_gas_ratios
+        experiment_id: dg46_1946_liquid_iron_oxide_equilibria
+        phase: g
+        type: equilibrium_phase_composition
+        locator: {page: 6, published_page: 803, table: 'III B'}
+        units: 'pCO2/pCO dimensionless; temperature °C'
+        values:
+          quantity: equilibrium_phase_composition
+          basis_as_published: 'pCO2/pCO'
+          numerator_species: CO2
+          denominator_species: CO
+          method_class: measured_tabulated
+          admission_status: pending
+          table_title_as_printed: 'Composition of CO-CO2 mixtures in equilibrium with iron and liquid oxide'
+          points:
+          - {T_C: '1376', pCO2_over_pCO_as_printed: '0.268', point_conditions: {equilibrium_boundary: {state: {tag: value, value: 'iron and liquid oxide'}, locator: {page: 6, published_page: 803, table: 'III B'}}, atmosphere: {state: {tag: value, value: 'CO-CO2 mixture in equilibrium with iron and liquid oxide'}, locator: {page: 6, published_page: 803, table: 'III B'}}, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III B'}}}, locator: {page: 6, published_page: 803, table: 'III B', row: '1'}}
+          - {T_C: '1436', pCO2_over_pCO_as_printed: '0.233', point_conditions: {equilibrium_boundary: {state: {tag: value, value: 'iron and liquid oxide'}, locator: {page: 6, published_page: 803, table: 'III B'}}, atmosphere: {state: {tag: value, value: 'CO-CO2 mixture in equilibrium with iron and liquid oxide'}, locator: {page: 6, published_page: 803, table: 'III B'}}, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III B'}}}, locator: {page: 6, published_page: 803, table: 'III B', row: '2'}}
+          - {T_C: '1493', pCO2_over_pCO_as_printed: '0.199', point_conditions: {equilibrium_boundary: {state: {tag: value, value: 'iron and liquid oxide'}, locator: {page: 6, published_page: 803, table: 'III B'}}, atmosphere: {state: {tag: value, value: 'CO-CO2 mixture in equilibrium with iron and liquid oxide'}, locator: {page: 6, published_page: 803, table: 'III B'}}, total_pressure: {state: {tag: unknown, reason: not_stated_in_table}, locator: {page: 6, published_page: 803, table: 'III B'}}}, locator: {page: 6, published_page: 803, table: 'III B', row: '3'}}
