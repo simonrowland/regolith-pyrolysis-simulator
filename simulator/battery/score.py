@@ -400,6 +400,7 @@ FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED = "calibration-not-grounded"
 FLAGGED_STRATUM_CELL_MATERIAL_INFERRED = "cell-material-inferred"
 FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
 FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT = "source-internally-inconsistent"
+FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE = "source_flagged_less_reliable"
 FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
 FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion"
 FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
@@ -1229,7 +1230,16 @@ def _classify_flagged_notice_facts(
     if any(_is_fusion_conversion_reason(reason) for _kind, reason in notices):
         strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
     if any(
-        kind == NoticeKind.FIGURE_ONLY.value and reason == "figure_only"
+        isinstance(reason, str)
+        and reason.startswith(
+            f"{FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE}:"
+        )
+        for _kind, reason in notices
+    ):
+        strata.append(FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE)
+    if any(
+        kind == NoticeKind.FIGURE_ONLY.value
+        and (reason == "figure_only" or reason.startswith("figure_only:"))
         for kind, reason in notices
     ):
         strata.append(FLAGGED_STRATUM_FIGURE_ONLY)
@@ -1487,10 +1497,489 @@ def _b1259_tridymite_cristobalite_delta_g(
     return delta_h - temperature_K * delta_s, lower, upper, extrapolated
 
 
+# Holzheid 1997 p. 30 eq. (9), J/mol. Printed comparison only: it is not the
+# conversion. d/dT of a + b T - c T ln T is b - c (ln T + 1).
+_HOLZHEID_EQ9_J = (Decimal("-244118"), Decimal("115.559"), Decimal("8.474"))
+_HOLZHEID_EQ9_SLOPE_AT_K = Decimal("1673.15")
+# Holzheid 1997 pp. 30–31 printed γ_stoich/γ_wüstite. Comparison only.
+_HOLZHEID_PRINTED_FACTOR_1400_C = "1.94"
+_HOLZHEID_PRINTED_FACTOR_1600_C = "1.66"
+_FEO_WUSTITE_FORMULA = "Fe(1-x)O"
+_FEO_STOICHIOMETRIC_FORMULA = "FeO"
+_KELVIN_FROM_CELSIUS = Decimal("273.15")
+_IRON_SATURATED_FEO_MISSING_INPUT = "iron-saturated FeO conversion missing input:"
+# Cold and hot ends of the Holzheid and Distin rows this conversion scores.
+_FEO_SCORED_SPAN_K = (Decimal("1578"), Decimal("2233.15"))
+
+
+@dataclass(frozen=True)
+class _IronSaturatedFeOCalibration:
+    temperatures_K: tuple[Decimal, ...]
+    intercept_J: Decimal
+    slope_J_per_mol_K: Decimal
+    fusion_tm_K: Decimal
+    fusion_h_J: Decimal
+    fusion_s_J_per_mol_K: Decimal
+    window_low_K: Decimal
+    window_high_K: Decimal
+    comparison_text: str
+
+
+def _display_decimal(value: Decimal, quantum: str) -> str:
+    return format(value.quantize(Decimal(quantum)), "f")
+
+
+def _least_squares_line(
+    xs: tuple[Decimal, ...], ys: tuple[Decimal, ...]
+) -> tuple[Decimal, Decimal]:
+    """Exact least squares y = intercept + slope x for Decimal inputs."""
+
+    count = Decimal(len(xs))
+    sum_x = sum(xs, Decimal(0))
+    sum_y = sum(ys, Decimal(0))
+    sum_xx = sum((x * x for x in xs), Decimal(0))
+    sum_xy = sum((x * y for x, y in zip(xs, ys)), Decimal(0))
+    denominator = count * sum_xx - sum_x * sum_x
+    slope = (count * sum_xy - sum_x * sum_y) / denominator
+    intercept = (sum_y - slope * sum_x) / count
+    return intercept, slope
+
+
+def _janaf_formation_gibbs_J(table_id: str, temperature_K: Decimal) -> Decimal:
+    """Formation Gibbs energy in J/mol from the production JANAF interpolator."""
+
+    from simulator.battery.generators.janaf import (
+        _fusion_table_points,
+        _interpolate_formation_gibbs,
+    )
+
+    points, _digest = _fusion_table_points(table_id)
+    return _interpolate_formation_gibbs(points, temperature_K) * Decimal(1000)
+
+
+def _darken_gurry_iron_boundary_ratios() -> tuple[tuple[Decimal, Decimal], ...]:
+    """Stored Table III B rows: (T/K, pCO2/pCO) on the iron–liquid-oxide boundary."""
+
+    path = (
+        REPO_ROOT
+        / "data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml"
+    )
+    document = load_yaml(path)
+    if not isinstance(document, Mapping):
+        raise ValueError("Darken & Gurry extract is not a mapping")
+    species = document.get("species")
+    if not isinstance(species, Mapping):
+        raise ValueError("Darken & Gurry extract has no species map")
+    rows: list[tuple[Decimal, Decimal]] = []
+    for block in species.values():
+        if not isinstance(block, Mapping):
+            continue
+        observations = block.get("observations")
+        if not isinstance(observations, list):
+            continue
+        for obs in observations:
+            if not isinstance(obs, Mapping):
+                continue
+            values = obs.get("values")
+            if not isinstance(values, Mapping) or "pCO2_over_pCO_as_printed" not in values:
+                continue
+            conditions = obs.get("point_conditions")
+            boundary = None
+            if isinstance(conditions, Mapping):
+                raw_boundary = conditions.get("equilibrium_boundary")
+                if isinstance(raw_boundary, Mapping):
+                    state = raw_boundary.get("state")
+                    if isinstance(state, Mapping):
+                        boundary = state.get("value")
+            if boundary != "iron and liquid oxide":
+                continue
+            temperature_K = Decimal(str(values["T_C"])) + _KELVIN_FROM_CELSIUS
+            ratio = Decimal(str(values["pCO2_over_pCO_as_printed"]))
+            if ratio <= 0:
+                raise ValueError(
+                    f"Darken & Gurry iron-boundary ratio is not positive: {ratio}"
+                )
+            rows.append((temperature_K, ratio))
+    rows.sort()
+    if len(rows) != 3:
+        raise ValueError(
+            "expected 3 Darken & Gurry iron-boundary gas ratios, "
+            f"found {len(rows)}"
+        )
+    return tuple(rows)
+
+
+def _iron_fusion_from_janaf() -> tuple[Decimal, Decimal, Decimal]:
+    """ΔH_fus (J/mol), ΔS_fus (J/mol/K) and Tm (K) from the unparsed Fe-003 lines.
+
+    The 1809 K DELTA <-> LIQUID and TRANSITION rows fail the 8-column parser,
+    so enthalpy and entropy are read from the stored raw_line. Columns match
+    every parsed neighbour: T, Cp, S, -[G-H]/T, H-H(Tr), label.
+    """
+
+    from simulator.battery.generators.janaf import TABLES_DIR, load_table_document
+
+    document = load_table_document(TABLES_DIR / "Fe-003.yaml")
+    table = document.get("table") if isinstance(document, Mapping) else None
+    ambiguities = table.get("parse_ambiguities") if isinstance(table, Mapping) else None
+    if not isinstance(ambiguities, list):
+        raise ValueError("Fe-003 parse_ambiguities are missing")
+    solid: tuple[Decimal, Decimal] | None = None
+    liquid: tuple[Decimal, Decimal] | None = None
+    melting_K: Decimal | None = None
+    for item in ambiguities:
+        if not isinstance(item, Mapping):
+            continue
+        parts = str(item.get("raw_line") or "").split("\t")
+        if len(parts) < 6:
+            continue
+        temperature = Decimal(parts[0])
+        if temperature != Decimal("1809"):
+            continue
+        entropy = Decimal(parts[2])
+        enthalpy_kJ = Decimal(parts[4])
+        label = parts[5]
+        melting_K = temperature
+        if "DELTA" in label and "LIQUID" in label:
+            solid = (entropy, enthalpy_kJ)
+        elif label.startswith("TRANSITION"):
+            liquid = (entropy, enthalpy_kJ)
+    if solid is None or liquid is None or melting_K is None:
+        raise ValueError("Fe-003 is missing the 1809 K DELTA <-> LIQUID pair")
+    return (
+        (liquid[1] - solid[1]) * Decimal(1000),
+        liquid[0] - solid[0],
+        melting_K,
+    )
+
+
+def _holzheid_eq9_slope_J_per_mol_K(temperature_K: Decimal) -> Decimal:
+    """Temperature derivative of Holzheid eq. (9). Comparison only."""
+
+    _intercept, slope, log_coefficient = _HOLZHEID_EQ9_J
+    return slope - log_coefficient * (temperature_K.ln() + 1)
+
+
+def _feo_reference_delta_g_J(
+    intercept_J: Decimal,
+    slope_J_per_mol_K: Decimal,
+    temperature_K: Decimal,
+    fusion_tm_K: Decimal,
+    fusion_h_J: Decimal,
+    fusion_s_J_per_mol_K: Decimal,
+) -> Decimal:
+    """Iron-boundary ΔG versus the stable iron phase, in J/mol.
+
+    Premise: at iron saturation a_Fe = 1, so the measured gas ratio fixes
+    mu_FeO = mu_Fe + mu_O of the FeO component in the saturated liquid.
+    Algebra: ΔG_w,vs_solid = R T ln(pCO2/pCO) + ΔfG(CO2) - ΔfG(CO), fitted
+    as intercept + slope T. Above the iron melting point the stable element
+    phase is liquid, so subtract ΔG_fus(Fe) = ΔH_fus - T ΔS_fus. At exactly
+    Tm the solid branch is kept.
+    Units: R is J/(mol K), the JANAF formation values are converted from
+    kJ/mol to J/mol, and ΔH_fus is J/mol. The ratio ln(factor) is then
+    (ΔG_w,vs_stable - ΔfG(FeO,l)) / (R T), dimensionless.
+    Sanity: the fitted anchors display as 1.841, 1.724 and 1.627; the factor
+    stays above 1 from 1578 K through 2233.15 K; omitting the fusion shift
+    drops the 1960 °C factor through 1, so the shift is applied only for
+    T > 1809 K.
+    """
+
+    delta_g = intercept_J + slope_J_per_mol_K * temperature_K
+    if temperature_K > fusion_tm_K:
+        delta_g -= fusion_h_J - temperature_K * fusion_s_J_per_mol_K
+    return delta_g
+
+
+def _feo_reference_factor(
+    calibration: _IronSaturatedFeOCalibration,
+    temperature_K: Decimal,
+    *,
+    intercept_J: Decimal | None = None,
+    slope_J_per_mol_K: Decimal | None = None,
+) -> Decimal:
+    from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
+
+    intercept = calibration.intercept_J if intercept_J is None else intercept_J
+    slope = (
+        calibration.slope_J_per_mol_K
+        if slope_J_per_mol_K is None
+        else slope_J_per_mol_K
+    )
+    delta_g = _feo_reference_delta_g_J(
+        intercept,
+        slope,
+        temperature_K,
+        calibration.fusion_tm_K,
+        calibration.fusion_h_J,
+        calibration.fusion_s_J_per_mol_K,
+    )
+    delta_f_g = _janaf_formation_gibbs_J("Fe-019", temperature_K)
+    return (
+        (delta_g - delta_f_g) / (JANAF_R_J_PER_MOL_K * temperature_K)
+    ).exp()
+
+
+def _feo_jackknife_factors(
+    calibration: _IronSaturatedFeOCalibration,
+    temperature_K: Decimal,
+    delta_g_w_J: tuple[Decimal, ...],
+) -> tuple[Decimal, Decimal]:
+    """Min and max factor from the three pair-fits. A sensitivity, not a CI."""
+
+    factors: list[Decimal] = []
+    temperatures = calibration.temperatures_K
+    for left in range(len(temperatures)):
+        for right in range(left + 1, len(temperatures)):
+            intercept, slope = _least_squares_line(
+                (temperatures[left], temperatures[right]),
+                (delta_g_w_J[left], delta_g_w_J[right]),
+            )
+            factors.append(
+                _feo_reference_factor(
+                    calibration,
+                    temperature_K,
+                    intercept_J=intercept,
+                    slope_J_per_mol_K=slope,
+                )
+            )
+    return min(factors), max(factors)
+
+
+@lru_cache(maxsize=1)
+def _iron_saturated_feo_calibration() -> tuple[
+    _IronSaturatedFeOCalibration, tuple[Decimal, ...]
+]:
+    from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
+
+    ratios = _darken_gurry_iron_boundary_ratios()
+    temperatures = tuple(temperature for temperature, _ratio in ratios)
+    delta_g_w = tuple(
+        JANAF_R_J_PER_MOL_K * temperature * ratio.ln()
+        + _janaf_formation_gibbs_J("C-095", temperature)
+        - _janaf_formation_gibbs_J("C-093", temperature)
+        for temperature, ratio in ratios
+    )
+    intercept, slope = _least_squares_line(temperatures, delta_g_w)
+    fusion_h, fusion_s, fusion_tm = _iron_fusion_from_janaf()
+    calibration = _IronSaturatedFeOCalibration(
+        temperatures_K=temperatures,
+        intercept_J=intercept,
+        slope_J_per_mol_K=slope,
+        fusion_tm_K=fusion_tm,
+        fusion_h_J=fusion_h,
+        fusion_s_J_per_mol_K=fusion_s,
+        window_low_K=min(temperatures),
+        window_high_K=max(temperatures),
+        comparison_text="",
+    )
+    checked = (
+        temperatures
+        + _FEO_SCORED_SPAN_K
+        + (fusion_tm, Decimal("1673.15"), Decimal("1873.15"))
+    )
+    for temperature in checked:
+        if _feo_reference_factor(calibration, temperature) <= 1:
+            raise ValueError(
+                "iron-saturated FeO factor is not above 1 at "
+                f"{temperature} K"
+            )
+    at_melting = _feo_reference_delta_g_J(
+        intercept, slope, fusion_tm, fusion_tm, fusion_h, fusion_s
+    )
+    if at_melting != intercept + slope * fusion_tm:
+        raise ValueError("iron-fusion shift applied at the iron melting point")
+    above = fusion_tm + 1
+    shifted = _feo_reference_delta_g_J(
+        intercept, slope, above, fusion_tm, fusion_h, fusion_s
+    )
+    if not shifted > intercept + slope * above:
+        raise ValueError("iron-fusion shift missing above 1809 K")
+    factor_1400 = _feo_reference_factor(calibration, Decimal("1673.15"))
+    factor_1600 = _feo_reference_factor(calibration, Decimal("1873.15"))
+    eq9_slope = _holzheid_eq9_slope_J_per_mol_K(_HOLZHEID_EQ9_SLOPE_AT_K)
+    comparison = (
+        "Holzheid printed comparison at 1400 C: "
+        f"{_display_decimal(factor_1400, '0.001')} vs "
+        f"{_HOLZHEID_PRINTED_FACTOR_1400_C}; at 1600 C: "
+        f"{_display_decimal(factor_1600, '0.001')} vs "
+        f"{_HOLZHEID_PRINTED_FACTOR_1600_C}; equation (9) slope "
+        f"{_display_decimal(eq9_slope, '0')} vs "
+        f"{_display_decimal(slope, '0.0')} J/mol/K"
+    )
+    calibration = replace(calibration, comparison_text=comparison)
+    return calibration, delta_g_w
+
+
+def _iron_saturated_feo_comparison(
+    reference: Observation, *, engine: Engine | None
+) -> Observation | None:
+    """Retag iron-saturated Fe(1-x)O(l) onto stoichiometric FeO(l).
+
+    The standard-state change is the FeO component's chemical potential,
+    mu_FeO = mu_Fe + mu_O, in the iron-saturated liquid. a_Fe = 1 fixes
+    mu_Fe. Distin's dissolved-oxygen bound is a factor 0.972–0.985 on that
+    activity; it is not applied, and it sits inside the jackknife envelope.
+    No mole fraction redefines the reported activity or activity coefficient.
+
+    Both ΔG_w and JANAF ΔfG(FeO,l) use O2 at the same standard pressure
+    (1 bar), so that pressure cancels. The extracts' 1.01325 bar is the
+    condensed-phase standard state. V dP is about 0.01 J/mol and is not
+    applied. The gas ratios are Darken & Gurry's direct Table III B
+    iron-and-liquid-oxide measurements. Page 801 states
+    N_O/N_Fe = (3r−1)/(2r); that identity fixes composition and does not
+    multiply this partial. Distin p. 75 converts to the stoichiometric oxide
+    by an earlier procedure and prints no factor.
+
+    Supercooled liquid FeO(l) is the comparison convention for a melt
+    component below the oxide's melting marker. Rows outside the measured
+    gas window are scored and flagged, not refused.
+    """
+
+    identity = reference.identity
+    if (
+        reference.admission.status is not AdmissionStatus.ADMITTED
+        or not isinstance(identity, Identity)
+        or identity.reference_state is None
+        or not identity.reference_state.is_value
+        or not isinstance(identity.reference_state.value, StandardState)
+    ):
+        return None
+    quantity = quantity_token(identity)
+    if quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
+        return None
+    standard_state = identity.reference_state.value
+    if (
+        identity.species.formula != _FEO_STOICHIOMETRIC_FORMULA
+        or standard_state.endmember.formula != _FEO_WUSTITE_FORMULA
+        or standard_state.component_basis != _FEO_WUSTITE_FORMULA
+        or standard_state.convention is not ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        or phase_token(standard_state.endmember) is not Phase.L
+        or reference.value.kind is not ValueKind.POINT
+        or reference.value.point is None
+        or reference.value.point <= 0
+    ):
+        return None
+    if engine is not None:
+        from simulator.battery.waypoints import MELT_ACTIVITY_ENGINES
+
+        if engine.value not in MELT_ACTIVITY_ENGINES:
+            return None
+    temperature_K = temperature_of(identity)
+    if temperature_K is None:
+        if engine is None:
+            return None
+        notice = Notice(
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            affected_quantities=(quantity,),
+            reason=(
+                f"{_IRON_SATURATED_FEO_MISSING_INPUT} activity observation "
+                "has no temperature_K"
+            ),
+            origin=reference.observation_id,
+            band="Darken & Gurry iron-boundary conversion requires temperature_K",
+        )
+        return replace(reference, notices=union_notices(reference.notices, (notice,)))
+    try:
+        calibration, delta_g_w = _iron_saturated_feo_calibration()
+        factor = _feo_reference_factor(calibration, temperature_K)
+        jackknife_low, jackknife_high = _feo_jackknife_factors(
+            calibration, temperature_K, delta_g_w
+        )
+    except ValueError as exc:
+        notice = Notice(
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            affected_quantities=(quantity,),
+            reason=f"{_IRON_SATURATED_FEO_MISSING_INPUT} {exc}",
+            origin=reference.observation_id,
+            band=f"Darken & Gurry / JANAF FeO reference: {exc}",
+        )
+        return replace(reference, notices=union_notices(reference.notices, (notice,)))
+    converted = reference.value.point * factor
+    log_f_spread_dex = (
+        Decimal(_HOLZHEID_PRINTED_FACTOR_1400_C) / Decimal("1.792")
+    ).log10()
+    stoichiometric = replace(
+        standard_state,
+        endmember=replace(
+            standard_state.endmember, formula=_FEO_STOICHIOMETRIC_FORMULA
+        ),
+        component_basis=_FEO_STOICHIOMETRIC_FORMULA,
+    )
+    iron_phase = "liquid" if temperature_K > calibration.fusion_tm_K else "solid"
+    conversion_notice = Notice(
+        kind=NoticeKind.DERIVATION_USES_COMPILATION,
+        affected_quantities=(quantity,),
+        reason=(
+            "source_flagged_less_reliable: basis=Darken & Gurry 1946 "
+            "(JACS 68:798-816), Table III B, p. 803 direct Fe/wustite "
+            "pCO2/pCO ratios, which the authors flag as less reliable on "
+            "p. 811; uncertainty ±0.035 dex in log f centred on 1.792, "
+            "reaching Holzheid/Barin 1.94 at 1400 C; credible-route "
+            "log-f spread log10(1.94/1.792) = "
+            f"{_display_decimal(log_f_spread_dex, '0.0001')} dex; "
+            "IW shift Δlog10(fO2) = 2 Δlog10(f) = "
+            f"{_display_decimal(2 * log_f_spread_dex, '0.001')} dex; "
+            "Masson 1965 Temkin estimate 0.936 is EXCLUDED from the band "
+            "(stated validity N_Fe2+ 0.7-0.9; this case lies outside it); "
+            "iron-saturated Fe(1-x)O(l) reference converted to stoichiometric "
+            f"FeO(l); source_value={reference.value.point}; "
+            f"converted_value={converted}; "
+            f"factor={_display_decimal(factor, '0.001')}; "
+            "jackknife sensitivity factor "
+            f"[{_display_decimal(jackknife_low, '0.001')}, "
+            f"{_display_decimal(jackknife_high, '0.001')}] "
+            "is not a confidence interval; "
+            f"T={temperature_K} K; iron_phase={iron_phase}; "
+            f"{calibration.comparison_text}"
+        ),
+        origin=reference.observation_id,
+    )
+    notices: tuple[Notice, ...] = (conversion_notice,)
+    if (
+        temperature_K < calibration.window_low_K
+        or temperature_K > calibration.window_high_K
+    ):
+        notices += (
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(quantity,),
+                reason="D&G iron-boundary line extrapolated",
+                origin=reference.observation_id,
+                band=(
+                    f"{calibration.window_low_K}-{calibration.window_high_K} K"
+                ),
+            ),
+        )
+    row_band = _printed_uncertainty_band(
+        quantity,
+        reference.uncertainty,
+        reference.value.point,
+        source_observation=reference,
+    )
+    if row_band.notice is not None:
+        notices += (row_band.notice,)
+    return replace(
+        reference,
+        identity=replace(identity, reference_state=State.of(stoichiometric)),
+        value=replace(reference.value, point=converted),
+        notices=union_notices(reference.notices, notices),
+    )
+
+
 def fusion_comparison_reference(
     reference: Observation, *, engine: Engine | None = None
 ) -> Observation:
-    """Single owner of solid/liquid reference selection for both the battery scorer and melt-activity benchmark."""
+    """Single owner of reference-state selection for the scorer and the melt benchmark.
+
+    Crystal activities move onto the liquid endmember by the JANAF fusion
+    energy. Iron-saturated Fe(1-x)O(l) activities and activity coefficients
+    move onto stoichiometric FeO(l) by the Darken & Gurry oxygen potential.
+    """
+
+    iron_saturated = _iron_saturated_feo_comparison(reference, engine=engine)
+    if iron_saturated is not None:
+        return iron_saturated
 
     identity = reference.identity
     if (
@@ -7432,6 +7921,7 @@ def compile_residual(
             for notice in notices
             if notice.reason.startswith("fusion conversion missing input:")
             or notice.reason.startswith("fusion conversion missing input for ")
+            or notice.reason.startswith(_IRON_SATURATED_FEO_MISSING_INPUT)
         ),
         None,
     )
@@ -7441,7 +7931,11 @@ def compile_residual(
             and "MAGEMin native reference could not be resolved:"
             in missing_fusion_input.reason
         )
-        if native_pair_failure:
+        if missing_fusion_input.reason.startswith(_IRON_SATURATED_FEO_MISSING_INPUT):
+            missing_input = (
+                "Darken & Gurry iron-boundary ratios and JANAF formation rows"
+            )
+        elif native_pair_failure:
             missing_input = "JANAF source/target tables for MAGEMin native reference"
         elif "JANAF solid table " in missing_fusion_input.reason:
             missing_input = "JANAF solid polymorph matching the selected table"

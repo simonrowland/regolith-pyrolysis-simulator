@@ -4418,6 +4418,7 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
         _flagged_payload_strata,
@@ -4452,6 +4453,11 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
             "reference_converted_via_fusion;probe",
         ),
         (
+            FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
+            NoticeKind.DERIVATION_USES_COMPILATION,
+            "source_flagged_less_reliable:probe",
+        ),
+        (
             FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
             NoticeKind.LIQUIDUS_POSITION_CONTESTED,
             "liquidus_position_contested:probe",
@@ -4481,6 +4487,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
         FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
         _flagged_payload_strata,
@@ -4498,7 +4505,11 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
             NoticeKind.DERIVATION_USES_COMPILATION,
             "reference_converted_via_fusion;probe",
         ),
-        (NoticeKind.FIGURE_ONLY, "figure_only"),
+        (
+            NoticeKind.DERIVATION_USES_COMPILATION,
+            "source_flagged_less_reliable:probe",
+        ),
+        (NoticeKind.FIGURE_ONLY, "figure_only:probe"),
         (NoticeKind.REACTIVE_CELL_NOT_MODELLED, "reactive_cell_not_modelled:probe"),
         (
             NoticeKind.LIQUIDUS_POSITION_CONTESTED,
@@ -4522,6 +4533,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_FIGURE_ONLY,
         FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
