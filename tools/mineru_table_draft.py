@@ -268,7 +268,8 @@ def _header_row_count(grid: list[list[Cell]]) -> int:
             break
     axis_with_unit = re.compile(
         r"\b(?:temperature|pressure|time)\b"
-        r"[^\n]{0,24}\b(?:K|°C|bar|Pa|atm|mmHg|s|sec|min|h|hr)\b",
+        r"[^\n]{0,24}(?:\b(?:K|bar|Pa|atm|mmHg|s|sec|min|h|hr)\b|"
+        r"(?<![A-Za-z])°C(?![A-Za-z])|\bdeg(?:ree)?\s+C\b)",
         re.I,
     )
     count = tagged_count

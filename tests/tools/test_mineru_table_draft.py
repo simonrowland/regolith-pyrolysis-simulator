@@ -6,6 +6,7 @@ import json
 import shutil
 from pathlib import Path
 
+import pytest
 import yaml
 
 from tools import mineru_table_draft as draft
@@ -134,48 +135,51 @@ def test_comma_formats_distinguish_decimal_from_ambiguous_grouping() -> None:
     assert all(cell[0].numeric_value is None for cell in grid[2:8])
 
 
-def test_composition_header_without_unit_keeps_single_measurement_row() -> None:
-    grid = draft.parse_table_html(
-        "<table><tr><th>Composition</th></tr>"
-        "<tr><td>25.4</td><td>31.2</td></tr></table>"
+@pytest.mark.parametrize(
+    ("header", "header_tag", "axis_row", "following_row", "expected"),
+    [
+        ("Composition, wt%", "th", "50.1 12.3 8.4", "SiO2 Al2O3 FeO", 1),
+        ("Composition", "th", "25.4 31.2", "", 1),
+        ("composition of sample C", "th", "50.1 12.3", "SiO2 Al2O3", 1),
+        ("Temperature, K", "th", "1833 1883 1933", "Cr 1 2", 2),
+        ("Pressure, bar", "th", "1 2 5", "FeO 10 11", 2),
+        ("Temperature (°C)", "th", "1400 1500 1600", "Cr 1 2", 2),
+        ("Temperature (°C)", "td", "1400 1500 1600", "Cr 1 2", 2),
+        ("Temperature, °C", "th", "1400 1500", "SiO2 50.1", 2),
+        ("Temperature °C", "th", "1400 1500", "SiO2 50.1", 2),
+        ("Temperature (deg C)", "th", "1400 1500", "SiO2 1", 2),
+        ("T°C", "th", "1400 1500", "SiO2 1", 1),
+    ],
+)
+def test_axis_header_probe_table(
+    header: str,
+    header_tag: str,
+    axis_row: str,
+    following_row: str,
+    expected: int,
+) -> None:
+    header_cell = f"<{header_tag}>{header}</{header_tag}>"
+    rows = ["<tr>" + header_cell + "</tr>"]
+    rows.append(
+        "<tr>" + "".join(f"<td>{cell}</td>" for cell in axis_row.split()) + "</tr>"
     )
+    if following_row:
+        rows.append(
+            "<tr>"
+            + "".join(f"<td>{cell}</td>" for cell in following_row.split())
+            + "</tr>"
+        )
+    grid = draft.parse_table_html("<table>" + "".join(rows) + "</table>")
 
     header_count = draft._header_row_count(grid)
-    draft._add_cell_flags(grid, header_count, {0, 1})
-
-    assert header_count == 1
-    assert [cell.numeric_value for cell in grid[1]] == [25.4, 31.2]
-
-
-def test_composition_weight_percent_does_not_promote_measurements() -> None:
-    grid = draft.parse_table_html(
-        "<table><tr><th>Composition, wt%</th></tr>"
-        "<tr><td>50.1</td><td>12.3</td><td>8.4</td></tr>"
-        "<tr><td>SiO2</td><td>Al2O3</td><td>FeO</td></tr></table>"
-    )
-
-    assert draft._header_row_count(grid) == 1
-    assert [cell.text for cell in grid[1]] == ["50.1", "12.3", "8.4"]
-
-
-def test_composition_of_sample_c_does_not_match_a_celsius_unit() -> None:
-    grid = draft.parse_table_html(
-        "<table><tr><th>composition of sample C</th></tr>"
-        "<tr><td>50.1</td><td>12.3</td></tr>"
-        "<tr><td>SiO2</td><td>Al2O3</td></tr></table>"
-    )
-
-    assert draft._header_row_count(grid) == 1
-
-
-def test_axis_header_with_unit_promotes_following_numeric_axis_row() -> None:
-    grid = draft.parse_table_html(
-        "<table><tr><th>Temperature, K</th></tr>"
-        "<tr><td>1833</td><td>1883</td><td>1933</td></tr>"
-        "<tr><td>Cr</td><td>1</td><td>2</td></tr></table>"
-    )
-
-    assert draft._header_row_count(grid) == 2
+    assert header_count == expected
+    if expected == 1:
+        draft._add_cell_flags(
+            grid, header_count, draft._numeric_columns(grid, header_count)
+        )
+        assert [cell.numeric_value for cell in grid[1]] == [
+            float(value) for value in axis_row.split()
+        ]
 
 
 def test_latex_numeric_cells_convert_and_compare(tmp_path: Path) -> None:
@@ -209,15 +213,6 @@ def test_latex_numeric_cells_convert_and_compare(tmp_path: Path) -> None:
     }]}}}
     compared = draft.compare_extract_to_draft(extract, index_path)
     assert [row["status"] for row in compared] == ["presence-only"] * 3
-
-
-def test_temperature_values_immediately_below_axis_label_are_header() -> None:
-    grid = draft.parse_table_html(
-        "<table><tr><th>Temperature, K</th></tr>"
-        "<tr><td>1833</td><td>1883</td><td>1933</td><td>1983</td><td>2033</td><td>K</td></tr>"
-        "<tr><td>Cr</td><td>1</td><td>2</td><td>3</td><td>4</td></tr></table>"
-    )
-    assert draft._header_row_count(grid) == 2
 
 
 def test_nazarov_table_2_rowspan_temperature_header_is_not_a_body_row(
