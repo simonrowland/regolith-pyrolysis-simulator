@@ -1220,11 +1220,16 @@ def _campaign_retained_pool(
         for key in set(cumulative_inputs["cleanup"])
         | set(cumulative_withdrawals["cleanup"])
     }
+    # Retention uses one zero cutoff on the elemental atom-mol basis: for
+    # stoichiometry nu_e > 0, n_e = nu_e*n_species > 0 iff n_species > 0;
+    # at zero both vanish. Positive origin shares must still sum to n_e.
+    # The finite tolerance above resolves withdrawal allocation, not retention:
+    # pruning molecules and their elemental origins separately breaks closure.
     return (
         {
             key: amount
             for key, amount in retained.items()
-            if amount > float(tolerance_for_key(key))
+            if amount > 0.0
         },
         pooled_keys,
     )
