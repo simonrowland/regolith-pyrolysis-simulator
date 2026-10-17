@@ -9,6 +9,7 @@ from simulator.battery.enums import (
     QuenchState,
     ValenceDenominatorKind,
     ValenceValueForm,
+    ValueKind,
 )
 from simulator.battery.identity import ValenceBasis
 from simulator.battery.migrate import Migrator, load_yaml, wt_pct_to_mole_fraction
@@ -43,6 +44,7 @@ def test_burnham_table2_render_pins_and_row_count():
         for observation in extract["species"]["Eu"]["observations"]
     }
     assert len(rows) == 151
+    assert all(row.value.kind is ValueKind.POINT for row in rows)
     assert all(
         row.identity.quantity.is_value
         and row.identity.quantity.value is Quantity.VALENCE_RATIO
@@ -239,14 +241,20 @@ def test_burnham_table2_render_pins_and_row_count():
     assert by_id["burnham_2015_eu_glasses_cas_4_1400_fm13p0"].value.point == Decimal("-0.02")
     assert by_id["burnham_2015_eu_melts_morb_1450_fm9p5"].value.point == Decimal("0.26")
 
-    negative = [row for row in rows if row.value.point is not None and row.value.point < 0]
-    assert len(negative) == 2
-    assert all(
-        not row.notices
-        and "printed fraction below the physical bound 0; consistent with ~0 within the method's precision"
-        in row.locator.note
-        for row in negative
-    )
+    out_of_range = [
+        row
+        for row in rows
+        if any(
+            notice.kind is NoticeKind.SOURCE_VALUE_OUTSIDE_PHYSICAL_RANGE
+            for notice in row.notices
+        )
+    ]
+    assert len(out_of_range) == 3
+    assert {row.value.point for row in out_of_range} == {
+        Decimal("1.01"),
+        Decimal("-0.02"),
+        Decimal("-0.04"),
+    }
     assert all(
         row.identity.temperature_K.is_value
         and "fO2_log" in row.point_conditions
