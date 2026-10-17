@@ -156,7 +156,11 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
         fe2o3_mol = max(0.0, float(cleaned_melt.get("Fe2O3", 0.0) or 0.0))
         if controls.get('reaction') == 'fe0_comproportionation':
             metal = max(0.0, float(accounts.get(METAL_PHASE_ACCOUNT, {}).get('Fe', 0.0)))
-            extent = fe0_comproportionation_extent(metal, fe2o3_mol)
+            extent = fe0_comproportionation_extent(
+                metal, fe2o3_mol, feo_mol=feo_mol,
+                comp_wt=composition_wt_pct_from_account_view(
+                    request.account_view, CLEANED_MELT_ACCOUNT),
+                T_K=T_K, pressure_bar=pressure_bar)
             n = extent['extent_mol']
             proposal = None
             if n > NOOP_MOL:

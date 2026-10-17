@@ -85,8 +85,12 @@ def test_comproportionation_funds_both_reactants_and_closes_atoms(metal, ferric)
     proposal = result.transition
     validate_atom_balance(proposal, {})
     validate_proposal_accounts(proposal, provider.DECLARED_ACCOUNTS)
-    assert proposal.debits['process.metal_phase']['Fe'] == min(metal, ferric)
-    assert proposal.credits['process.cleaned_melt']['FeO'] == 3*min(metal, ferric)
+    extent = proposal.debits['process.metal_phase']['Fe']
+    assert 0 < extent <= min(metal, ferric)
+    assert proposal.debits['process.cleaned_melt']['Fe2O3'] == extent
+    assert proposal.credits['process.cleaned_melt']['FeO'] == 3*extent
+    if extent < metal:
+        assert result.diagnostic['equilibrium_gap_dex'] == pytest.approx(0., abs=1e-9)
     assert 'O2' not in proposal.credits.get('process.overhead_gas', {})
 
 

@@ -10,6 +10,9 @@ from tests.chemistry.conftest import _load_yaml
 
 def test_lunar_contact_stops_at_equilibrium_not_ferric_exhaustion():
     feed = _load_yaml('feedstocks.yaml')['lunar_mare_low_ti']
+    # Keep the historical 15020 proxy for the review's independent numeric
+    # check; F1 changes the production family proxy to the cited median.
+    feed['iron_speciation']['is_over_feo']['value'] = 70.
     prepared, _ = fe_redox.initialize_feedstock_iron(feed)
     mass = normalized_feedstock_component_masses_kg(prepared, 1000.)
     comp = {s: w for s, w in mass.items()
@@ -24,8 +27,7 @@ def test_lunar_contact_stops_at_equilibrium_not_ferric_exhaustion():
         T_K=1673.15, pressure_bar=1e-9)
     n = result['extent_mol']
     # Independent review of the old 15020 proxy load: 3.498 mol, versus
-    # the incorrect exhaustion extent 22.491 mol. F1 may change metal mass
-    # but leaves this equilibrium root in the metal-surplus regime.
+    # the incorrect exhaustion extent 22.491 mol.
     assert n == pytest.approx(3.50, abs=.03)
     assert result['metal_remaining_mol'] > 0
     assert result['fe2o3_remaining_mol'] > 18.

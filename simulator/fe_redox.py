@@ -1756,13 +1756,67 @@ def nanophase_iron_from_fmr(is_over_feo: float, feo_wt_pct: float) -> dict:
             'scope': '4-33 nm npFe0 only; coarser native/meteoritic metal unconstrained'}
 
 
-def fe0_comproportionation_extent(fe_mol: float, fe2o3_mol: float) -> dict:
-    # Fe0 + Fe2O3 -> 3 FeO: one mol metal and one mol ferric oxide
-    # supply three Fe atoms and three O atoms. Extent=min(available mol).
-    # mol coefficients are dimensionless; either absent reactant gives zero.
-    n = min(fe_mol, fe2o3_mol)
+def fe0_comproportionation_extent(
+    fe_mol: float, fe2o3_mol: float, *, feo_mol: float,
+    comp_wt: Mapping[str, float], T_K: float, pressure_bar: float,
+) -> dict:
+    from scipy.optimize import brentq
+    from simulator.state import MOLAR_MASS
+
+    # Fe0 + Fe2O3 -> 3 FeO gives F'=F+3n, C'=C-n, oxide Fe I'=I+n.
+    # On the Kress basis S'=N+I+n, where N is non-Fe oxide moles. At
+    # metal contact a=gamma(T)*F'/S' (capped at 1), and equilibrium requires
+    # q=2C'/(F'+2C') = q_Kress(IW(a)). Reuse the activity/forward owners.
+    # To see uniqueness, let g=a_K*ln(10)*(f_inverse-IW(a)). On the uncapped
+    # limb g'=-1/C'-(3+6a_K)/F'+2a_K/S'+D/S'^2, with
+    # D=sum((c_i+1.828)*N_i)<=8.043*N, from the existing Kress coefficients.
+    # For y=F'/S', S'g' < -4.176/y+.392+8.043*(1-y) < 0:
+    # its maximum is 8.435-2*sqrt(4.176*8.043) < 0. On the capped
+    # limb the corresponding bound -3/y+8.043*(1-y) is also negative.
+    # Hence there is at most one crossing; bracket it by reactant exhaustion.
+    # n, F, C, S are mol; g is dimensionless and g' is mol^-1. No reactant
+    # means zero extent; insufficient metal is fully consumed; ferric-surplus
+    # contact retains q_Kress rather than forcing an all-ferrous inventory.
+    high = min(fe_mol, fe2o3_mol)
+    if high <= 0.0:
+        return {'extent_mol': 0.0, 'feo_credit_mol': 0.0,
+                'metal_remaining_mol': fe_mol, 'fe2o3_remaining_mol': fe2o3_mol,
+                'equilibrium_gap_dex': None}
+    feo_w, ferric_w = iron_oxide_values(comp_wt)
+    basis = ((feo_mol*MOLAR_MASS['FeO']/feo_w) if feo_mol > 0.0 else
+             fe2o3_mol*MOLAR_MASS['Fe2O3']/ferric_w)
+
+    def contact(n):
+        comp = dict(comp_wt)
+        comp.update(FeO=(feo_mol+3*n)*MOLAR_MASS['FeO']/basis,
+                    Fe2O3=(fe2o3_mol-n)*MOLAR_MASS['Fe2O3']/basis)
+        normalize_component_masses_kg(comp, 100.0)
+        q = 2*(fe2o3_mol-n)/(feo_mol+2*fe2o3_mol+n)
+        # Any metal-saturation potential is <= pure IW: selecting that
+        # endpoint calls the same owner's metal-contact gamma-X limb.
+        activity = calphad_ferrous_feo_activity_diagnostic(
+            comp_wt=comp, fe3_over_sigma_fe=q, T_K=T_K,
+            pressure_bar=pressure_bar, fO2_log=feo_iw_log10_fO2_bar(T_K))
+        bound = _feo_activity_saturation_log10_fO2_bar(
+            T_K, a_feo=float(activity['a_FeO_authoritative']))
+        target = kress91_fe3_over_sigma_fe(
+            fO2_log=bound, mol_fractions=melt_mol_fractions_for_kress91(comp),
+            T_K=T_K, pressure_bar=pressure_bar)
+        return q-target, q, target
+
+    if contact(0.0)[0] <= 0.0:
+        n = 0.0
+    elif contact(high)[0] >= 0.0:
+        n = high
+    else:
+        n = brentq(lambda x: contact(x)[0], 0.0, high,
+                   xtol=1e-12, rtol=1e-14)
+    _, q, target = contact(n)
+    gap = (math.log10((q/(1-q))/(target/(1-target))) /
+           KRESS91_LN_FO2_COEFFICIENT) if 0 < q < 1 and 0 < target < 1 else None
     return {'extent_mol': n, 'feo_credit_mol': 3.0*n,
-            'metal_remaining_mol': fe_mol-n, 'fe2o3_remaining_mol': fe2o3_mol-n}
+            'metal_remaining_mol': fe_mol-n, 'fe2o3_remaining_mol': fe2o3_mol-n,
+            'equilibrium_gap_dex': gap}
 
 
 def _kress91_exchange_uptake_mol(

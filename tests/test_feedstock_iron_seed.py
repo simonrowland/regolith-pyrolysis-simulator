@@ -250,9 +250,10 @@ def test_lunar_first_liquid_comproportionation_is_atom_closed_and_visible(monkey
     start = len(sim.atom_ledger.transitions)
     diagnostic = sim._apply_feedstock_iron_comproportionation()
     after = sim.atom_ledger.mol_by_account('process.cleaned_melt')
-    assert after.get('Fe2O3', 0.) == pytest.approx(0., abs=1e-12)
-    assert after['FeO']-before['FeO'] == pytest.approx(3*before['Fe2O3'])
-    assert sim.atom_ledger.mol_by_account('process.metal_phase')['Fe'] == pytest.approx(metal-before['Fe2O3'])
+    extent = diagnostic['extent_mol']
+    assert 0 < extent < before['Fe2O3']
+    assert after['FeO']-before['FeO'] == pytest.approx(3*extent)
+    assert sim.atom_ledger.mol_by_account('process.metal_phase')['Fe'] == pytest.approx(metal-extent)
     for t in sim.atom_ledger.transitions[start:]:
         t.validate_conservation(sim.species_formula_registry)
         debit = t.debit_atom_moles(sim.atom_ledger.registry)
@@ -261,8 +262,7 @@ def test_lunar_first_liquid_comproportionation_is_atom_closed_and_visible(monkey
             assert 100*abs(credit.get(element, 0.)-n)/n <= 5e-12
     assert diagnostic['metal_remaining_mol'] > 0.
     state = sim._last_intrinsic_redox_state
-    assert state['fO2_log'] == state['iw_bound']
-    assert state['band_lower_unbounded'] is True
+    assert state['fO2_log'] == pytest.approx(state['iw_bound'], abs=1e-9)
     assert state['saturation_status'] == 'INDETERMINATE'
     sim._apply_feedstock_iron_comproportionation()
     assert len(sim.atom_ledger.transitions) == start+1
