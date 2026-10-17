@@ -233,9 +233,15 @@ def _run_fe2o3_lookup_only_case(mode: str) -> dict[str, object]:
     }
 
 
-# Captured calls 61/62, c2b7b4e/oimcc-calls-c2b7b4e-56179.jsonl.
+# Captured calls 60/61/62, c2b7b4e/oimcc-calls-c2b7b4e-56179.jsonl.
 # These are the projected OpenIMCC inputs (eight parents), not a reconstruction
 # of the full trace-bearing ledger. Activities are independently logged solves.
+_LUNAR_CALL_60 = {
+    "Al2O3": 1360.0091160900367, "CaO": 2014.8647042450932,
+    "K2O": 8.321603960594533, "MgO": 2291.8132822153393,
+    "Na2O": 1.9086093358233833e-07, "SiO2": 1412.300021522945,
+    "TiO2": 192.89859753851434, "FeO": 0.028054329027588403,
+}
 _LUNAR_CALL_61 = {
     "Al2O3": 1360.009115728947, "CaO": 2014.8643551874766,
     "K2O": 8.304955772557909, "MgO": 2291.4382038535123,
@@ -275,7 +281,11 @@ def test_refused_activity_holds_only_local_certified_gamma(
     monkeypatch, gap_K, hour_gap, held,
 ) -> None:
     provider = _provider()
-    certified = provider.dispatch(_history_request(_LUNAR_CALL_61, 2400.65, 61))
+    previous = provider.dispatch(_history_request(_LUNAR_CALL_60, 2393.15, 60))
+    certified = provider.dispatch(_history_request(
+        _LUNAR_CALL_61, 2400.65, 61,
+        previous.diagnostic["high_t_melt_activity"],
+    ))
     assert certified.diagnostic["high_t_melt_activity"]["provider"] == "openimcc"
 
     def nonconverge(**kwargs):
@@ -354,7 +364,10 @@ def test_refused_activity_holds_only_local_certified_gamma(
                    for n in again.diagnostic["high_t_melt_activity"]["notices"])
 
 
-def test_first_high_t_certificate_without_previous_temperature_can_hold(monkeypatch) -> None:
+@pytest.mark.parametrize("silica_factor, held", [(1.0, True), (0.99, False)])
+def test_first_high_t_certificate_without_previous_temperature_can_hold(
+    monkeypatch, silica_factor, held,
+) -> None:
     request = _request(BASE_MELT_MOL, 2400.65)
     provider = _provider()
     certified = provider.dispatch(replace(
@@ -365,17 +378,74 @@ def test_first_high_t_certificate_without_previous_temperature_can_hold(monkeypa
         raise ImccNonconvergenceError("next same-T call refused", {})
 
     monkeypatch.setattr(openimcc_bridge_module, "evaluate", nonconverge)
-    result = provider.dispatch(replace(request, control_inputs={
+    composition = {**BASE_MELT_MOL, "SiO2": BASE_MELT_MOL["SiO2"] * silica_factor}
+    refused_request = _request(composition, 2400.65)
+    result = provider.dispatch(replace(refused_request, control_inputs={
         **request.control_inputs, "simulation_hour": 2,
         "high_t_melt_activity_previous": certified,
     }))
     authority = result.diagnostic["high_t_melt_activity"]
-    held = authority["held_effective_gamma_by_parent"]["SiO2"]
-    assert held["window_K"] == 0.0
+    certificate = certified["certified_effective_gamma_by_parent"]["SiO2"]
+    assert certificate["window_K"] == 0.0
+    assert certificate["composition_window_L1"] == 0.0
+    assert bool(authority["held_effective_gamma_by_parent"]) is held
     activity = vapor_pressure_module._high_t_activity_for_parent(
-        "SiO2", BASE_MELT_MOL, temperature_K=2400.65, authority=authority,
+        "SiO2", composition, temperature_K=2400.65, authority=authority,
     )
-    assert activity.activity == pytest.approx(certified["activities_by_oxide"]["SiO2"])
+    if held:
+        assert activity.activity == pytest.approx(certified["activities_by_oxide"]["SiO2"])
+    else:
+        assert activity.activity == melt_oxide_activity("SiO2", composition).activity
+        assert "openimcc_refused_constant_gamma_fallback" in activity.warning
+
+
+@pytest.mark.parametrize("drift_mol, held", [(0.125, True), (0.25, True), (0.2578125, False)])
+def test_isothermal_refusal_expires_on_composition_drift(
+    monkeypatch, drift_mol, held,
+) -> None:
+    provider = _provider()
+    # Eight mol of cations, with dyadic amounts so the boundary is exact.
+    # Swap 1/8 mol Si for Mg: each X changes by 1/64, so the L1 step is
+    # 1/32 and the two-step window is 1/16 (dimensionless). A further
+    # 1/4 mol swap reaches that window; any larger swap must expire.
+    initial = {
+        "SiO2": 4.0, "MgO": 1.0, "FeO": 1.0, "CaO": 1.0,
+        "Al2O3": 0.25, "TiO2": 0.25, "Na2O": 0.0625, "K2O": 0.0625,
+    }
+    at_certificate = {**initial, "SiO2": 3.875, "MgO": 1.125}
+    previous = provider.dispatch(_history_request(initial, 2400.65, 60))
+    certified = provider.dispatch(_history_request(
+        at_certificate, 2400.65, 61,
+        previous.diagnostic["high_t_melt_activity"],
+    )).diagnostic["high_t_melt_activity"]
+
+    def nonconverge(**kwargs):
+        raise ImccNonconvergenceError("isothermal soak refusal", {})
+
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", nonconverge)
+    composition = {
+        **at_certificate,
+        "SiO2": at_certificate["SiO2"] - drift_mol,
+        "MgO": at_certificate["MgO"] + drift_mol,
+    }
+    authority = provider.dispatch(_history_request(
+        composition, 2400.65, 100, certified,
+    )).diagnostic["high_t_melt_activity"]
+    activity = vapor_pressure_module._high_t_activity_for_parent(
+        "SiO2", composition, temperature_K=2400.65, authority=authority,
+    )
+    assert bool(authority["held_effective_gamma_by_parent"]) is held
+    notice = next(n for n in authority["notices"] if n.get("parent") == "SiO2")
+    assert notice["temperature_gap_K"] == 0.0
+    assert notice["composition_window_L1"] == 0.0625
+    assert (notice["composition_distance_L1"] <= notice["composition_window_L1"]) is held
+    assert authority["certified_effective_gamma_by_parent"] == certified["certified_effective_gamma_by_parent"]
+    if held:
+        assert activity.activity_model == "hold_last_certified_effective_gamma"
+    else:
+        assert activity.activity == melt_oxide_activity("SiO2", composition).activity
+        assert "openimcc_refused_constant_gamma_fallback" in activity.warning
+    assert activity.evidence_tier == "PREDICT_AND_FLAG"
 
 
 def test_below_cap_is_activity_source_parity_with_pre_c3_path() -> None:
@@ -1059,7 +1129,8 @@ def test_recipe_default_and_constant_gamma_escape_are_threaded() -> None:
     assert legacy._session_config().high_t_melt_activity == "constant_gamma"
 
 
-def test_simulator_default_passes_openimcc_authority_into_flux_dispatch() -> None:
+@pytest.mark.parametrize("reset_kind", ["cold", "frozen"])
+def test_simulator_default_passes_openimcc_authority_into_flux_dispatch(reset_kind) -> None:
     with (DATA_DIR / "feedstocks.yaml").open() as handle:
         feedstocks = yaml.safe_load(handle) or {}
     with (DATA_DIR / "setpoints.yaml").open() as handle:
@@ -1090,6 +1161,22 @@ def test_simulator_default_passes_openimcc_authority_into_flux_dispatch() -> Non
     assert sim._high_t_melt_activity == "openimcc"
     assert sim._last_high_t_melt_activity["provider"] == "openimcc"
     assert sim._last_vapor_pressures_source
+
+    if reset_kind == "cold":
+        sim.melt.temperature_C = 100.0
+    else:
+        result.liquid_fraction = 0.0
+    sim._refresh_vapor_pressures_from_kernel(result)
+    assert sim._last_high_t_melt_activity == {}
+    assert sim._last_high_t_melt_activity_temperature_K is None
+
+    sim.melt.temperature_C = 1850.0
+    result.liquid_fraction = 1.0
+    sim._refresh_vapor_pressures_from_kernel(result)
+    certificates = sim._last_high_t_melt_activity["certified_effective_gamma_by_parent"]
+    assert certificates
+    assert all(c["window_K"] == 0.0 for c in certificates.values())
+    assert all(c["composition_window_L1"] == 0.0 for c in certificates.values())
 
 
 def test_constant_gamma_reproduces_pre_c3_physics_above_cap() -> None:
@@ -1231,17 +1318,25 @@ def test_projection_over_one_percent_refuses_and_provider_flags_fallback() -> No
     )
 
 
-def test_invalid_inventory_reaches_typed_constant_gamma_fallback() -> None:
+@pytest.mark.parametrize("parent, amount", [("NaCl", -1.0), ("MgO", -1.0), ("MgO", float("nan"))])
+def test_invalid_inventory_reaches_typed_constant_gamma_fallback(parent, amount) -> None:
+    certified = _provider().dispatch(_history_request(
+        BASE_MELT_MOL, CAP_PLUS_T_K, 1,
+    )).diagnostic["high_t_melt_activity"]
     authority = vapor_pressure_module._build_high_t_melt_activity_authority(
-        composition_mol={"SiO2": 1.0, "NaCl": -1.0},
+        composition_mol={"SiO2": 1.0, parent: amount},
         temperature_K=CAP_PLUS_T_K,
-        controls={"high_t_melt_activity": "openimcc"},
+        controls={
+            "high_t_melt_activity": "openimcc", "simulation_hour": 2,
+            "high_t_melt_activity_previous": certified,
+        },
         below_cap_fe_activity=0.1,
         below_cap_fe_activity_basis="constant_gamma",
     )
 
     assert authority["provider"] == "constant_gamma"
     assert authority["fallback"] is True
+    assert authority["held_effective_gamma_by_parent"] == {}
     assert authority["fallback_reason"]["code"] == (
         "openimcc_composition_invalid_input"
     )

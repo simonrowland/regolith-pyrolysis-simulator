@@ -111,6 +111,7 @@ from simulator.chemistry.melt_activity import (  # noqa: E402
     MELT_OXIDE_ACTIVITY_TIER,
     melt_oxide_activity,
     normalize_high_t_melt_activity,
+    single_cation_mole_fractions,
 )
 from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K  # noqa: E402
 from simulator.physical_constants import (  # noqa: E402
@@ -621,6 +622,23 @@ def openimcc_binding_selected_by_inputs(
     return not (temperature_K <= VAPOROCK_T_MAX_K or mode != "openimcc")
 
 
+def _high_t_composition_vector(composition_mol: Mapping[str, float]) -> dict[str, float]:
+    return {
+        parent: fraction
+        for parent, fraction in single_cation_mole_fractions(composition_mol).items()
+        if parent in _HIGH_T_FLUX_OXIDES
+    }
+
+
+def _high_t_composition_distance(
+    current: Mapping[str, float], previous: Mapping[str, float],
+) -> float:
+    return sum(
+        abs(current.get(p, 0.0) - previous.get(p, 0.0))
+        for p in _HIGH_T_FLUX_OXIDES
+    )
+
+
 def _build_high_t_melt_activity_authority(
     *,
     composition_mol: Mapping[str, float],
@@ -730,27 +748,43 @@ def _build_high_t_melt_activity_authority(
         if isinstance(relaxed_projection, Mapping):
             base["openimcc_projection_crmn_relaxed"] = dict(relaxed_projection)
         held = {}
-        if hour is not None:
+        if (
+            hour is not None and certificates
+            and code != "openimcc_composition_invalid_input"
+        ):
+            composition = _high_t_composition_vector(composition_mol)
             for parent, certificate in certificates.items():
                 temperature_gap = abs(temperature_K - certificate["temperature_K"])
                 hour_gap = float(hour) - certificate["hour"]
-                if (
-                    parent not in composition_mol
-                    or temperature_gap > certificate["window_K"]
-                ):
+                if parent not in composition_mol:
                     continue
+                composition_distance = _high_t_composition_distance(
+                    composition, certificate["composition_single_cation"],
+                )
+                expired = (
+                    temperature_gap > certificate["window_K"]
+                    or composition_distance > certificate["composition_window_L1"]
+                )
                 notice = {
-                    "code": "hold_last_certified_effective_gamma",
+                    "code": (
+                        "hold_last_certified_effective_gamma_expired" if expired
+                        else "hold_last_certified_effective_gamma"
+                    ),
                     "type": "typed_notice",
                     "authority": "extrapolated",
                     "parent": parent,
                     **certificate,
                     "temperature_gap_K": temperature_gap,
+                    "composition_distance_L1": composition_distance,
                     "hour_gap": hour_gap,
                     "original_refusal": dict(fallback_reason),
-                    "message": "Holding the last certified effective single-cation gamma",
+                    "message": (
+                        "Certified effective gamma expired; using the flagged table activity"
+                        if expired else "Holding the last certified effective single-cation gamma"
+                    ),
                 }
-                held[parent] = notice
+                if not expired:
+                    held[parent] = notice
                 base["notices"].append(notice)
         base["held_effective_gamma_by_parent"] = held
         return base
@@ -913,11 +947,18 @@ def _build_high_t_melt_activity_authority(
         )
     base["seam_max_abs_ratio_dex"] = max_abs_dex
     if hour is not None and not bridge.extrapolated:
+        composition = _high_t_composition_vector(composition_mol)
         previous_temperature = controls.get("high_t_melt_activity_previous_temperature_K")
-        # The local thermal continuation is limited to two observed steps;
-        # it does not certify a distant temperature. K differences equal C
-        # differences, so 2*|T-T_previous| is a window in K. Isothermal
-        # certification or no previous T gives a zero-K window (same-T only).
+        # Premise: continue only within two observed local steps. Thermal
+        # distance is |T-T_cert|, with window 2*|T_cert-T_previous| in K
+        # (K differences equal C differences). For composition, X contains
+        # the activity-bearing parents' bulk single-cation fractions on the
+        # same full-melt basis as gamma_eff. Use L1: D(X,Y)=sum_p |X_p-Y_p|,
+        # so no parent's drift cancels another's. The symmetric window is
+        # 2*D(X_cert,X_previous_cert), dimensionless like X. Either distance
+        # exceeding its window expires the hold, including isothermal drift.
+        # No prior anchor or a zero step gives a zero window: only identical
+        # T/X holds. Refused/extrapolated calls never refresh composition.
         window_K = (
             2.0 * abs(temperature_K - float(previous_temperature))
             if previous_temperature is not None else 0.0
@@ -930,6 +971,13 @@ def _build_high_t_melt_activity_authority(
             )
             if selected is None or selected.x_single_cation <= 0.0:
                 continue
+            previous_composition = certificates.get(parent, {}).get(
+                "composition_single_cation"
+            )
+            composition_window = (
+                2.0 * _high_t_composition_distance(composition, previous_composition)
+                if previous_composition is not None else 0.0
+            )
             # Premise: the bridge has already converted parent activities
             # to single-cation a; a = gamma_eff * X_bulk_single. Thus
             # gamma_eff,last = a_last / X_last, then on refusal use
@@ -949,6 +997,8 @@ def _build_high_t_melt_activity_authority(
                 "temperature_K": float(temperature_K),
                 "hour": float(hour),
                 "window_K": window_K,
+                "composition_single_cation": composition,
+                "composition_window_L1": composition_window,
                 "coefficient_basis": "bulk_single_cation",
             }
     return base

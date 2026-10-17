@@ -9835,6 +9835,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         T_C = float(self.melt.temperature_C)
         if T_C + 273.15 < 400:
             self._last_high_t_melt_activity = {}
+            self._last_high_t_melt_activity_temperature_K = None
             self._last_vapor_pressures_source = dict(
                 getattr(result, 'vapor_pressures_source', {}) or {}
             )
@@ -9886,6 +9887,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._last_vapor_pressures_source = {}
                 self._last_vapor_pressure_diagnostic = diagnostic
                 self._last_high_t_melt_activity = {}
+                self._last_high_t_melt_activity_temperature_K = None
                 return
         # F-B1: VAPOR_PRESSURE is read-only -- no commit_batch follows.
         # The dispatch-only helper still routes melt-derived T/P through
