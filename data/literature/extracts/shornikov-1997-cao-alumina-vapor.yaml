@@ -6,7 +6,13 @@ source:
   corpus_asset: shornikov-1997-cao-alumina-vapor.pdf
   corpus_sha256: 77e3fd13ba6ce30de43945c4d80be1f439de1fa93dd7685f6f7dff91afe69d90
 extraction:
-  method: pdftotext -layout transcription checked against the rendered PDF page; Table 2 measured p(Ca), p(Al), and p(AlO) pressures retained, calculated p(O) and p(O2) columns typed separately, Table 1 relative ion signals retained as unscored context, Figs. 1–2 left figure-only.
+  method: >-
+    pdftotext -layout transcription checked against rendered PDF pages. Table 2
+    pressure columns and Table 1 relative ion signals are retained as before.
+    Figure 1(a) marked comparison-series activities are digitized from the
+    600-dpi page render; the current-study curve and Figure 2 remain
+    figure-only. Tick calibration and raw pixel reads are in
+    crown4-1018-figure-read-audit.md.
   date: '2026-09-30'
   worker: codex
 review_status: draft
@@ -1802,21 +1808,508 @@ species:
       type: activity_coefficient
       locator:
         figure: '1'
+        panel: 'a'
         published_page: 21
         pdf_page_index: 2
-        note: This-work KEMS curve (1) at 1933 K; figure also compares earlier measurements and models.
-      T_range_K:
-      - 1933.0
-      - 1933.0
+        note: "This-work KEMS curve (1) at 1933 K; unmarked curve retained as typed figure-only evidence."
+      T_range_K: [1933.0, 1933.0]
       phase: CaO–Al2O3 melt
       regime: kems_effusion
-      units: dimensionless activity as plotted
+      units: dimensionless activity
       values:
-        quantity: CaO_activity_figure_only
+        quantity: activity
         method_class: figure_only
+        evidence_class: figure_only
         admission_status: figure_only
-        semantics: bound_not_point_ordering
-        reason: Figure 1 is not digitized; the CaO activity is reduced from measured partial pressures by the comparison method.
+        status: typed_refusal
+        reason: unmarked curve not digitized
+        activity: null
+        unavailable_reason: unmarked_curve_not_digitized
+    - observation_id: shornikov_1997_cao_fig1_series3_sulfide_1773k
+      type: activity_coefficient
+      locator:
+        figure: '1'
+        panel: 'a'
+        symbol: filled circles
+        published_page: 21
+        pdf_page_index: 2
+        note: "Figure 1(a), Series 3, filled circles; reference [31], 1773 K. Marked readings only."
+      T_range_K: [1773.0, 1773.0]
+      phase: CaO–Al2O3 melt
+      regime: literature_comparison
+      units: dimensionless activity
+      values:
+        quantity: activity
+        activity_component: CaO
+        composition_component: CaO
+        composition_basis: figure_axis_mole_percent
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        series: "Series 3; filled circles; reference [31]"
+        points:
+          - CaO_mole_percent_as_plotted: '58'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.58'
+              Al2O3: '0.42'
+            activity: 0.19
+            read_uncertainty_dex: 0.03
+            audit_read_id: shornikov_1997_cao_fig1_series3_sulfide_1773k-01
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.58']
+                    - [Al2O3, '0.42']
+                locator:
+                  page: 21
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: 'a'
+                  note: "x(CaO)=58 mole%; independent x reads 57.9/58.1 mole%; −log10(a_CaO)=0.72; independent pixel reads (1660,933) and (1664,942); read uncertainty 0.03 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-01."
+          - CaO_mole_percent_as_plotted: '60.5'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.605'
+              Al2O3: '0.395'
+            activity: 0.24
+            read_uncertainty_dex: 0.03
+            audit_read_id: shornikov_1997_cao_fig1_series3_sulfide_1773k-02
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.605']
+                    - [Al2O3, '0.395']
+                locator:
+                  page: 21
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: 'a'
+                  note: "x(CaO)=60.5 mole%; independent x reads 60.4/60.6 mole%; −log10(a_CaO)=0.62; independent pixel reads (1716,889) and (1721,898); read uncertainty 0.03 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-02."
+          - CaO_mole_percent_as_plotted: '62.5'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.625'
+              Al2O3: '0.375'
+            activity: 0.3
+            read_uncertainty_dex: 0.03
+            audit_read_id: shornikov_1997_cao_fig1_series3_sulfide_1773k-03
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.625']
+                    - [Al2O3, '0.375']
+                locator:
+                  page: 21
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: 'a'
+                  note: "x(CaO)=62.5 mole%; independent x reads 62.4/62.6 mole%; −log10(a_CaO)=0.52; independent pixel reads (1761,844) and (1766,853); read uncertainty 0.03 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-03."
+          - CaO_mole_percent_as_plotted: '64.5'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.645'
+              Al2O3: '0.355'
+            activity: 0.38
+            read_uncertainty_dex: 0.03
+            audit_read_id: shornikov_1997_cao_fig1_series3_sulfide_1773k-04
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.645']
+                    - [Al2O3, '0.355']
+                locator:
+                  page: 21
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: 'a'
+                  note: "x(CaO)=64.5 mole%; independent x reads 64.4/64.6 mole%; −log10(a_CaO)=0.42; independent pixel reads (1806,800) and (1811,809); read uncertainty 0.03 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-04."
+          - CaO_mole_percent_as_plotted: '66.5'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.665'
+              Al2O3: '0.335'
+            activity: 0.48
+            read_uncertainty_dex: 0.03
+            audit_read_id: shornikov_1997_cao_fig1_series3_sulfide_1773k-05
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.665']
+                    - [Al2O3, '0.335']
+                locator:
+                  page: 21
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: 'a'
+                  note: "x(CaO)=66.5 mole%; independent x reads 66.4/66.6 mole%; −log10(a_CaO)=0.32; independent pixel reads (1852,756) and (1856,765); read uncertainty 0.03 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-05."
+          - CaO_mole_percent_as_plotted: '68.5'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.685'
+              Al2O3: '0.315'
+            activity: 0.6
+            read_uncertainty_dex: 0.03
+            audit_read_id: shornikov_1997_cao_fig1_series3_sulfide_1773k-06
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.685']
+                    - [Al2O3, '0.315']
+                locator:
+                  page: 21
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: 'a'
+                  note: "x(CaO)=68.5 mole%; independent x reads 68.4/68.6 mole%; −log10(a_CaO)=0.22; independent pixel reads (1897,711) and (1901,720); read uncertainty 0.03 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-06."
+          - CaO_mole_percent_as_plotted: '71'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.71'
+              Al2O3: '0.29'
+            activity: 0.89
+            read_uncertainty_dex: 0.03
+            audit_read_id: shornikov_1997_cao_fig1_series3_sulfide_1773k-07
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.71']
+                    - [Al2O3, '0.29']
+                locator:
+                  page: 21
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: 'a'
+                  note: "x(CaO)=71 mole%; independent x reads 70.9/71.1 mole%; −log10(a_CaO)=0.05; independent pixel reads (1953,636) and (1958,645); read uncertainty 0.03 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-07."
+    - observation_id: shornikov_1997_cao_fig1_series4_sulfide_1873k
+      type: activity_coefficient
+      locator:
+        figure: '1'
+        panel: 'a'
+        symbol: filled squares
+        published_page: 21
+        pdf_page_index: 2
+        note: "Figure 1(a), Series 4, filled squares; reference [34], 1873 K. Marked readings only."
+      T_range_K: [1873.0, 1873.0]
+      phase: CaO–Al2O3 melt
+      regime: literature_comparison
+      units: dimensionless activity
+      values:
+        quantity: activity
+        activity_component: CaO
+        composition_component: CaO
+        composition_basis: figure_axis_mole_percent
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        series: "Series 4; filled squares; reference [34]"
+        points:
+          - CaO_mole_percent_as_plotted: '14'
+            T_K: '1873'
+            T_K_as_printed: '1873'
+            composition_mol:
+              CaO: '0.14'
+              Al2O3: '0.86'
+            activity: 0.01
+            read_uncertainty_dex: 0.03
+            audit_read_id: shornikov_1997_cao_fig1_series4_sulfide_1873k-01
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.14']
+                    - [Al2O3, '0.86']
+                locator:
+                  page: 21
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: 'a'
+                  note: "x(CaO)=14 mole%; independent x reads 13.9/14.1 mole%; −log10(a_CaO)=2; independent pixel reads (665,1502) and (670,1510); read uncertainty 0.03 dex; audit shornikov_1997_cao_fig1_series4_sulfide_1873k-01."
+          - CaO_mole_percent_as_plotted: '32'
+            T_K: '1873'
+            T_K_as_printed: '1873'
+            composition_mol:
+              CaO: '0.32'
+              Al2O3: '0.68'
+            activity: 0.025
+            read_uncertainty_dex: 0.03
+            audit_read_id: shornikov_1997_cao_fig1_series4_sulfide_1873k-02
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.32']
+                    - [Al2O3, '0.68']
+                locator:
+                  page: 21
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: 'a'
+                  note: "x(CaO)=32 mole%; independent x reads 31.9/32.1 mole%; −log10(a_CaO)=1.6; independent pixel reads (1072,1324) and (1076,1333); read uncertainty 0.03 dex; audit shornikov_1997_cao_fig1_series4_sulfide_1873k-02."
+          - CaO_mole_percent_as_plotted: '50'
+            T_K: '1873'
+            T_K_as_printed: '1873'
+            composition_mol:
+              CaO: '0.5'
+              Al2O3: '0.5'
+            activity: 0.1
+            read_uncertainty_dex: 0.03
+            audit_read_id: shornikov_1997_cao_fig1_series4_sulfide_1873k-03
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.5']
+                    - [Al2O3, '0.5']
+                locator:
+                  page: 21
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: 'a'
+                  note: "x(CaO)=50 mole%; independent x reads 49.9/50.1 mole%; −log10(a_CaO)=1; independent pixel reads (1479,1058) and (1483,1066); read uncertainty 0.03 dex; audit shornikov_1997_cao_fig1_series4_sulfide_1873k-03."
+          - CaO_mole_percent_as_plotted: '63'
+            T_K: '1873'
+            T_K_as_printed: '1873'
+            composition_mol:
+              CaO: '0.63'
+              Al2O3: '0.37'
+            activity: 0.35
+            read_uncertainty_dex: 0.03
+            audit_read_id: shornikov_1997_cao_fig1_series4_sulfide_1873k-04
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.63']
+                    - [Al2O3, '0.37']
+                locator:
+                  page: 21
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: 'a'
+                  note: "x(CaO)=63 mole%; independent x reads 62.9/63.1 mole%; −log10(a_CaO)=0.45; independent pixel reads (1773,813) and (1777,822); read uncertainty 0.03 dex; audit shornikov_1997_cao_fig1_series4_sulfide_1873k-04."
+          - CaO_mole_percent_as_plotted: '75'
+            T_K: '1873'
+            T_K_as_printed: '1873'
+            composition_mol:
+              CaO: '0.75'
+              Al2O3: '0.25'
+            activity: 0.89
+            read_uncertainty_dex: 0.03
+            audit_read_id: shornikov_1997_cao_fig1_series4_sulfide_1873k-05
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.75']
+                    - [Al2O3, '0.25']
+                locator:
+                  page: 21
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: 'a'
+                  note: "x(CaO)=75 mole%; independent x reads 74.9/75.1 mole%; −log10(a_CaO)=0.05; independent pixel reads (2044,636) and (2048,645); read uncertainty 0.03 dex; audit shornikov_1997_cao_fig1_series4_sulfide_1873k-05."
+    - observation_id: shornikov_1997_cao_fig1_series5_emf_1773k
+      type: activity_coefficient
+      locator:
+        figure: '1'
+        panel: 'a'
+        symbol: open triangles
+        published_page: 21
+        pdf_page_index: 2
+        note: "Figure 1(a), Series 5, open triangles; reference [18], 1773 K. Marked readings only."
+      T_range_K: [1773.0, 1773.0]
+      phase: CaO–Al2O3 melt
+      regime: literature_comparison
+      units: dimensionless activity
+      values:
+        quantity: activity
+        activity_component: CaO
+        composition_component: CaO
+        composition_basis: figure_axis_mole_percent
+        method_class: figure_only
+        evidence_class: figure_only
+        admission_status: figure_only
+        series: "Series 5; open triangles; reference [18]"
+        points:
+          - CaO_mole_percent_as_plotted: '14'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.14'
+              Al2O3: '0.86'
+            activity: 0.005
+            read_uncertainty_dex: 0.03
+            audit_read_id: shornikov_1997_cao_fig1_series5_emf_1773k-01
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.14']
+                    - [Al2O3, '0.86']
+                locator:
+                  page: 21
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: 'a'
+                  note: "x(CaO)=14 mole%; independent x reads 13.9/14.1 mole%; −log10(a_CaO)=2.3; independent pixel reads (665,1635) and (670,1644); read uncertainty 0.03 dex; audit shornikov_1997_cao_fig1_series5_emf_1773k-01."
+          - CaO_mole_percent_as_plotted: '49'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.49'
+              Al2O3: '0.51'
+            activity: 0.19
+            read_uncertainty_dex: 0.03
+            audit_read_id: shornikov_1997_cao_fig1_series5_emf_1773k-02
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.49']
+                    - [Al2O3, '0.51']
+                locator:
+                  page: 21
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: 'a'
+                  note: "x(CaO)=49 mole%; independent x reads 48.9/49.1 mole%; −log10(a_CaO)=0.72; independent pixel reads (1456,933) and (1461,942); read uncertainty 0.03 dex; audit shornikov_1997_cao_fig1_series5_emf_1773k-02."
+          - CaO_mole_percent_as_plotted: '57'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.57'
+              Al2O3: '0.43'
+            activity: 0.38
+            read_uncertainty_dex: 0.03
+            audit_read_id: shornikov_1997_cao_fig1_series5_emf_1773k-03
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.57']
+                    - [Al2O3, '0.43']
+                locator:
+                  page: 21
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: 'a'
+                  note: "x(CaO)=57 mole%; independent x reads 56.9/57.1 mole%; −log10(a_CaO)=0.42; independent pixel reads (1637,800) and (1641,809); read uncertainty 0.03 dex; audit shornikov_1997_cao_fig1_series5_emf_1773k-03."
+          - CaO_mole_percent_as_plotted: '64'
+            T_K: '1773'
+            T_K_as_printed: '1773'
+            composition_mol:
+              CaO: '0.64'
+              Al2O3: '0.36'
+            activity: 0.52
+            read_uncertainty_dex: 0.03
+            audit_read_id: shornikov_1997_cao_fig1_series5_emf_1773k-04
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: figure_axis_mole_percent
+                    amount_basis: mole_fraction
+                    components:
+                    - [CaO, '0.64']
+                    - [Al2O3, '0.36']
+                locator:
+                  page: 21
+                  published_page: 21
+                  pdf_page_index: 2
+                  figure: '1'
+                  panel: 'a'
+                  note: "x(CaO)=64 mole%; independent x reads 63.9/64.1 mole%; −log10(a_CaO)=0.28; independent pixel reads (1795,738) and (1800,747); read uncertainty 0.03 dex; audit shornikov_1997_cao_fig1_series5_emf_1773k-04."
   Al2O3:
     observations:
     - observation_id: shornikov_1997_al2o3_activities_fig1_figure_only

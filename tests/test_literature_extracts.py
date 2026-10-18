@@ -5264,3 +5264,192 @@ def test_offer10_extract_locators_use_physical_pdf_pages() -> None:
         "pdf_page_index": 11,
         "figure": "6",
     }
+
+
+def test_crown4_high_temperature_figure_reads_migrate_with_composition() -> None:
+    from simulator.battery.identity import quantity_token
+
+    files = {
+        "shornikov-1997-cao-alumina-vapor": {
+            "path": EXTRACTS / "shornikov-1997-cao-alumina-vapor.yaml",
+            "groups": {
+                "shornikov_1997_cao_fig1_series3_sulfide_1773k": 7,
+                "shornikov_1997_cao_fig1_series4_sulfide_1873k": 5,
+                "shornikov_1997_cao_fig1_series5_emf_1773k": 4,
+            },
+        },
+        "shornikov-2007-cao-aluminosilicate-melts": {
+            "path": EXTRACTS / "shornikov-2007-cao-aluminosilicate-melts.yaml",
+            "groups": {
+                "shornikov_2007_figure1_cao_activity_prior_markers": 11,
+                "shornikov_2007_figure1_al2o3_activity_prior_markers": 11,
+                "shornikov_2007_figure1_sio2_activity_prior_markers": 9,
+            },
+        },
+        "shornikov-2001-mgalumina-silica-vaporization": {
+            "path": EXTRACTS / "shornikov-2001-mgalumina-silica-vaporization.yaml",
+            "groups": {
+                "shornikov_2001_f2_mgo_ma_s_2050k": 6,
+                "shornikov_2001_f2_al2o3_ma_s_2050k": 6,
+                "shornikov_2001_f2_sio2_ma_s_2050k": 5,
+            },
+        },
+    }
+    documents = {
+        source_id: yaml.load(
+            source["path"].read_text(), Loader=_DuplicateRejectingLoader
+        )
+        for source_id, source in files.items()
+    }
+    audit = (EXTRACTS / "crown4-1018-figure-read-audit.md").read_text()
+
+    def assert_audit_pin(source_id: str, observation_id: str, read_id: str) -> None:
+        points = next(
+            observation["values"]["points"]
+            for species in documents[source_id]["species"].values()
+            for observation in species.get("observations", [])
+            if observation["observation_id"] == observation_id
+        )
+        point = next(row for row in points if row["audit_read_id"] == read_id)
+        audit_row = next(
+            line for line in audit.splitlines()
+            if line.startswith(f"| {read_id} |")
+        )
+        expected = Decimal(audit_row.strip().split("|")[-2].strip())
+        assert Decimal(str(point["activity"])) == expected
+        assert "pixel reads" in point["point_conditions"]["composition"]["locator"]["note"]
+
+    pins = (
+        (
+            "shornikov-1997-cao-alumina-vapor",
+            "shornikov_1997_cao_fig1_series3_sulfide_1773k",
+            "shornikov_1997_cao_fig1_series3_sulfide_1773k-01",
+        ),
+        (
+            "shornikov-2007-cao-aluminosilicate-melts",
+            "shornikov_2007_figure1_cao_activity_prior_markers",
+            "shornikov_2007_figure1_cao_activity_prior_markers-05",
+        ),
+        (
+            "shornikov-2001-mgalumina-silica-vaporization",
+            "shornikov_2001_f2_mgo_ma_s_2050k",
+            "shornikov_2001_f2_mgo_ma_s_2050k-01",
+        ),
+        (
+            "shornikov-2001-mgalumina-silica-vaporization",
+            "shornikov_2001_f2_sio2_ma_s_2050k",
+            "shornikov_2001_f2_sio2_ma_s_2050k-05",
+        ),
+    )
+    for source_id, observation_id, read_id in pins:
+        assert_audit_pin(source_id, observation_id, read_id)
+
+    # The source text prints these six binary compositions; they are not
+    # inferred from the curve.
+    printed_x = [
+        point["SiO2_mole_percent_as_printed"]
+        for point in documents[
+            "shornikov-2001-mgalumina-silica-vaporization"
+        ]["species"]["MgO"]["observations"][0]["values"]["points"]
+    ]
+    assert printed_x == ["0.00", "18.18", "52.21", "55.56", "64.89", "74.69"]
+
+    total_digitized = 0
+    for source_id, source in files.items():
+        document = documents[source_id]
+        expected_count = sum(source["groups"].values())
+        marker_observations = {
+            row["observation_id"]: row
+            for species in document["species"].values()
+            for row in species.get("observations", [])
+            if row["observation_id"] in source["groups"]
+        }
+        assert set(marker_observations) == set(source["groups"])
+        assert {
+            observation_id: len(row["values"]["points"])
+            for observation_id, row in marker_observations.items()
+        } == source["groups"]
+        assert sum(source["groups"].values()) == expected_count
+        total_digitized += expected_count
+
+        migrator = battery_migrate.Migrator(root=REPO_ROOT, index={}, aliases={})
+        migrator._migrate_extract(source["path"])
+        migrator.finalize()
+        migrated = [
+            row for row in migrator.result.observations.values()
+            if row.source_id == source_id
+            and any(group_id in row.observation_id for group_id in source["groups"])
+        ]
+        assert len(migrated) == expected_count
+        assert not [
+            issue for issue in migrator.result.validation.hard_issues
+            if source_id in issue.path
+        ]
+        for observation in migrated:
+            assert observation.value.kind.value == "point"
+            assert quantity_token(observation.identity).value == "activity"
+            assert observation.identity.temperature_K.is_value
+            composition = observation.point_conditions["composition"]
+            assert composition.state.is_value
+            assert composition.state.value.amount_basis.value == "mole_fraction"
+            assert composition.locator.figure is not None
+
+    assert total_digitized == 64
+
+    stolyarova = yaml.load(
+        (EXTRACTS / "stolyarova-1995-cao-alumina-kems.yaml").read_text(),
+        Loader=_DuplicateRejectingLoader,
+    )
+    cross_reference = stolyarova["species"]["CaO"]["observations"][0][
+        "locator"
+    ]["note"]
+    assert "stored once in shornikov-1997-cao-alumina-vapor.yaml" in cross_reference
+
+    unmarked_curve = documents["shornikov-1997-cao-alumina-vapor"][
+        "species"
+    ]["CaO"]["observations"][0]
+    assert unmarked_curve["values"]["quantity"] == "activity"
+    assert unmarked_curve["values"]["activity"] is None
+    assert "unmarked curve" in unmarked_curve["values"]["reason"]
+
+    ternary = documents["shornikov-2007-cao-aluminosilicate-melts"]
+    for species, observation_id in (
+        ("CaO", "shornikov_2007_figure1_cao_activity_calculated_curve"),
+        ("Al2O3", "shornikov_2007_figure1_al2o3_activity_calculated_curve"),
+        ("SiO2", "shornikov_2007_figure1_sio2_activity_calculated_curve"),
+    ):
+        curve = next(
+            row for row in ternary["species"][species]["observations"]
+            if row["observation_id"] == observation_id
+        )
+        assert curve["values"]["quantity"] == "activity"
+        assert curve["values"]["activity"] is None
+        assert "points" not in curve["values"]
+
+    gibbs = next(
+        row
+        for row in documents[
+            "shornikov-2001-mgalumina-silica-vaporization"
+        ]["species"]["SiO2"]["observations"]
+        if row["observation_id"] == "shornikov_2001_f3_ma_s_2050k"
+    )
+    assert gibbs["values"]["quantity"] == "delta_fG"
+    assert gibbs["values"]["delta_fG_kJ_mol"] is None
+    assert "ΔfG/RT=-1.4, T=2050 K" in gibbs["locator"]["note"]
+    assert "no quantity token for dimensionless ΔfG/RT" in audit
+
+    mutated = copy.deepcopy(
+        documents["shornikov-1997-cao-alumina-vapor"]
+    )
+    mutated["species"]["CaO"]["observations"][1]["values"]["points"][0][
+        "activity"
+    ] = 0.20
+    original = documents["shornikov-1997-cao-alumina-vapor"]
+    documents["shornikov-1997-cao-alumina-vapor"] = mutated
+    with pytest.raises(AssertionError):
+        assert_audit_pin(
+            "shornikov-1997-cao-alumina-vapor",
+            "shornikov_1997_cao_fig1_series3_sulfide_1773k",
+            "shornikov_1997_cao_fig1_series3_sulfide_1773k-01",
+        )
+    documents["shornikov-1997-cao-alumina-vapor"] = original
