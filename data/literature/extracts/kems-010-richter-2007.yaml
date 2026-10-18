@@ -57235,6 +57235,28 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
             paragraph: pressure at run conditions was always less than 10^-6 Torr
             line_range: '105'
+    - observation_id: richter_2007_al_quoted_non_loss_bound
+      experiment: type-b-cai-like-lab-melt
+      type: rate_series
+      class_tag: measured
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        published_page: 5551
+        section: 4.1. Evaporation kinetics
+      quote: Calcium and aluminum are sufficiently refractory that they do not experience any significant loss by evaporation
+        until virtually all of the magnesium has evaporated.
+      units: qualitative bound; no numeric rate
+      values:
+        quantity: qualitative_non_loss_bound
+        method_class: measured_direct_qualitative
+        system_class: silicate_melt
+        semantics: bound_not_point_ordering
+        component: Al
+        comparison_component: Mg
+        bound: no_significant_loss_until_Mg_virtually_exhausted
+        numeric_rate_status: not_reported_qualitative_bound_only
+      supersedes: richter_2007_al_non_loss_until_mg_exhausted
+      regime: langmuir_free_evaporation
   SiO2:
     observations:
     - observation_id: richter_2007_residue_table1_r3-12
@@ -58104,28 +58126,6 @@ species:
         method_class: measured_direct
         series:
         - {run_id: R3-5, sample: R3-5, T_C: '1600', t_min: '4285', MgO_wt_pct: '0.12', SiO2_wt_pct: '17.74', Al2O3_wt_pct: '38.36', CaO_wt_pct: '43.78'}
-    - observation_id: richter_2007_al_quoted_non_loss_bound
-      experiment: type-b-cai-like-lab-melt
-      type: rate_series
-      class_tag: measured
-      locator:
-        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
-        published_page: 5551
-        section: 4.1. Evaporation kinetics
-      quote: Calcium and aluminum are sufficiently refractory that they do not experience any significant loss by evaporation
-        until virtually all of the magnesium has evaporated.
-      units: qualitative bound; no numeric rate
-      values:
-        quantity: qualitative_non_loss_bound
-        method_class: measured_direct_qualitative
-        system_class: silicate_melt
-        semantics: bound_not_point_ordering
-        component: Al
-        comparison_component: Mg
-        bound: no_significant_loss_until_Mg_virtually_exhausted
-        numeric_rate_status: not_reported_qualitative_bound_only
-      supersedes: richter_2007_al_non_loss_until_mg_exhausted
-      regime: langmuir_free_evaporation
 fidelity_samples:
 - species: Mg
   observable: alpha
