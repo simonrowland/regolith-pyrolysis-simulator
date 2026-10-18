@@ -1,0 +1,61 @@
+source_id: shornikov-2015-cai-mineral-thermodynamics
+source:
+  citation: >-
+    Shornikov and Yakovlev (2015), High-Temperature Thermodynamic Properties of CAI Minerals,
+    46th Lunar and Planetary Science Conference, abstract 1270.
+  year: 2015
+  doi: null
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-18'
+  worker: w4a2-1018
+review_status: draft
+tables:
+  - page: 2
+    table_index: 1
+    type: gibbs_table
+    quantity: delta_fH
+    unit: kJ/mole
+    evidence_class: quoted_attributed
+    attribution: '[11–17]'
+    phase: cr
+    species_form: printed_formula
+    value_pairs:
+      - species_column: 1
+        value_column: 2
+  - page: 2
+    table_index: 1
+    type: gibbs_table
+    quantity: S
+    unit: J/mol K
+    evidence_class: quoted_attributed
+    attribution: '[11–17]'
+    phase: cr
+    species_form: printed_formula
+    value_pairs:
+      - species_column: 1
+        value_column: 3
+  - page: 2
+    table_index: 1
+    type: transition_point
+    quantity: transition_temperature
+    unit: K
+    evidence_class: quoted_attributed
+    attribution: '[11–17]'
+    species_form: printed_formula
+    rows: [2, 3, 5, 6, 8, 9, 10, 11, 12]
+    value_pairs:
+      - species_column: 1
+        value_column: 4
+  - page: 2
+    table_index: 1
+    type: heat_capacity_and_heat_content_series
+    quantity: heat_of_fusion
+    unit: kJ/mole
+    evidence_class: quoted_attributed
+    attribution: '[11–17]'
+    phase: cr
+    species_form: printed_formula
+    value_pairs:
+      - species_column: 1
+        value_column: 5
