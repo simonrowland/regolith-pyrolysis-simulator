@@ -2242,6 +2242,17 @@ def test_numeric_value_kind_plain_admission_pin(
     )
 
 
+def test_nested_approximate_value_qualifier_is_preserved() -> None:
+    from simulator.battery.migrate import _value_from_plain
+
+    value = _value_from_plain(
+        {"kind": "point", "point": "1.25", "qualifier": "approximate"}
+    )
+
+    assert value.point == Decimal("1.25")
+    assert value.approximate is True
+
+
 def test_missing_admission_status_keeps_unmeasured_row_pending(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     values = extract["species"]["Na"]["observations"][0]["values"]

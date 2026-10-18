@@ -1597,7 +1597,10 @@ def _value_from_plain(payload: object) -> Value:
         kwargs["expression_domain"] = str(payload["expression_domain"])
     if payload.get("unavailable_reason") is not None:
         kwargs["unavailable_reason"] = str(payload["unavailable_reason"])
-    kwargs["approximate"] = bool(payload.get("approximate", False))
+    kwargs["approximate"] = bool(
+        payload.get("approximate", False)
+        or (kind is ValueKind.POINT and payload.get("qualifier") == "approximate")
+    )
     return Value(**kwargs)
 
 
