@@ -1,0 +1,59 @@
+source_id: shornikov-2011-cao-mgo-alumina-melts
+source:
+  citation: >-
+    Shornikov, S. I. (2011), “Thermodynamic properties of CaO–MgO–Al2O3 melts,”
+    Vestnik Otdelenia nauk o Zemle RAN 3, NZ6100, doi:10.2205/2011NZ000230.
+  doi: 10.2205/2011NZ000230
+  year: 2011
+extraction:
+  method: MinerU table emit; emitted Table 2 scalar cells regrouped by printed row into composition records; prose and figure values transcribed separately.
+  date: '2026-10-18'
+  worker: trial-lxh-1018
+review_status: draft
+tables:
+  - page: 1
+    table_index: 1
+    type: gibbs_table
+    quantity: delta_fG
+    evidence_class: quoted_attributed
+    unit: kJ/mole
+    per: mol_species
+    rows: all
+    species_form: printed_formula
+    temperature:
+      as_printed: '1960'
+      unit: K
+      column_header: '$\Delta_{f}G^{\circ}_{1960}$, kJ/mole'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        note: '1960 K is printed in both Gibbs-energy column headers.'
+    attribution: >-
+      Table 1 caption: values calculated in the present study according to data
+      [Glushko et al., 1978–1982; Allibert et al., 1979; Shornikov et al., 1997].
+    value_pairs:
+      - species_column: 1
+        value_column: 2
+        phase: cr
+      - species_column: 3
+        value_column: 4
+        phase: l
+      - species_column: 5
+        value_column: 6
+        phase: g
+  - page: 2
+    table_index: 2
+    type: gibbs_table
+    quantity: composition
+    evidence_class: quoted_attributed
+    unit: as printed
+    rows: all
+    attribution: Table 2, investigated CaO–MgO–Al2O3 compositions in the present study.
+    values:
+      - {column: 2, species: CaO, quantity: composition, unit: wt.%}
+      - {column: 3, species: MgO, quantity: composition, unit: wt.%}
+      - {column: 4, species: Al2O3, quantity: composition, unit: wt.%}
+      - {column: 5, species: CaO, quantity: composition, unit: mole %}
+      - {column: 6, species: MgO, quantity: composition, unit: mole %}
+      - {column: 7, species: Al2O3, quantity: composition, unit: mole %}

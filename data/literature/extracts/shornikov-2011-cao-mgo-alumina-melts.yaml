@@ -1,0 +1,3629 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2011-cao-mgo-alumina-melts
+source:
+  citation: Shornikov, S. I. (2011), “Thermodynamic properties of CaO–MgO–Al2O3 melts,” Vestnik Otdelenia nauk o
+    Zemle RAN 3, NZ6100.
+  doi: 10.2205/2011NZ000230
+  year: 2011
+  corpus_source_id: shornikov-2011-cao-mgo-alumina-melts
+extraction:
+  method: MinerU emit for Table 1 and Table 2 numeric cells; emitted Table 2 scalar cells grouped by printed composition
+    row; figure 1 open-square markers digitized from a 600 dpi page render with independent centre reads.
+  date: '2026-10-18'
+  worker: trial-lxh-1018
+  dispatch_id: trial-lxh-1018
+review_status: draft
+fidelity_samples:
+- species: Al2O3
+  observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r03_c02
+  field: value
+  value: '-1046.788'
+  locator:
+    page: 1
+    pdf_page_index: 0
+    table: '1'
+    row: 3
+- species: CaO
+  observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r04_c02
+  field: value
+  value: '-425.847'
+  locator:
+    page: 1
+    pdf_page_index: 0
+    table: '1'
+    row: 4
+- species: O3
+  observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r16_c06
+  field: value
+  value: '271.522'
+  locator:
+    page: 1
+    pdf_page_index: 0
+    table: '1'
+    row: 15
+- species: CaO
+  observation_id: shornikov_2011_fig1_a_allibert_marker_01
+  field: activity
+  value: 0.5
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    panel: a
+    marker_symbol: open square
+    series: '1'
+    note: '600 dpi centre reads: fresh crop 1 page pixel (1402, 3436), fresh crop 2 page pixel (1402, 3436); plotted
+      ordinate -0.3038 −lg activity.'
+- species: MgO
+  observation_id: shornikov_2011_fig1_b_allibert_marker_01
+  field: activity
+  value: 0.4
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    panel: b
+    marker_symbol: open square
+    series: '1'
+    note: '600 dpi centre reads: fresh crop 1 page pixel (1374, 4738), fresh crop 2 page pixel (1374, 4738); plotted
+      ordinate -0.3996 −lg activity.'
+- species: Al2O3
+  observation_id: shornikov_2011_fig1_c_allibert_marker_01
+  field: activity
+  value: 0.01
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    panel: c
+    marker_symbol: open square
+    series: '1'
+    note: '600 dpi centre reads: fresh crop 1 page pixel (2691, 4043), fresh crop 2 page pixel (2691, 4043); plotted
+      ordinate -1.9954 −lg activity.'
+experiments:
+- experiment_id: shornikov_2011_table1_present_calculation
+  method: ideal associated solutions thermodynamic calculation
+  attribution_as_printed: Calculated in the present study according to data [Glushko et al., 1978–1982; Allibert
+    et al., 1979; Shornikov et al., 1997].
+  locator:
+    page: 1
+    pdf_page_index: 0
+    table: '1'
+    note: 'Table 1 title and caption: Gibbs energies calculated in the present study from the cited thermodynamic
+      data at 1960 K.'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1960'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        note: 'Table 1 title and caption: Gibbs energies calculated in the present study from the cited thermodynamic
+          data at 1960 K.'
+- experiment_id: shornikov_2011_figure1_series1_allibert_1979
+  method: mass-spectrometric Knudsen effusion method
+  attribution_as_printed: 'Figure 1 caption: series 1, obtained by mass-spectrometric Knudsen effusion method [Allibert
+    et al., 1979].'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    note: Experimental comparator data are attributed to Allibert et al. (1979).
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1960'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        note: Figure 1 caption states 1960 K for the melt system.
+    composition:
+      state:
+        tag: unknown
+        reason: incomplete_melt_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        note: Figure 1 caption states 1960 K for the melt system.
+- experiment_id: shornikov_2011_figure1_series2_hallstedt_1992
+  method: sublattice model calculation
+  attribution_as_printed: 'Figure 1 caption: series 2, calculated according to the sublattice model [Hallstedt,
+    1992].'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    note: Model curves shown in Figure 1; no curve points digitized.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1960'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        note: Figure 1 caption states 1960 K for the melt system.
+- experiment_id: shornikov_2011_figure1_series3_present_study
+  method: ideal associated solutions thermodynamic calculation
+  attribution_as_printed: 'Figure 1 caption: series 3, calculated in the present study.'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    note: Model curves shown in Figure 1; no curve points digitized.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1960'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        note: Figure 1 caption states 1960 K for the melt system.
+figures:
+- figure: '1'
+  caption_as_printed: 'The activities of oxides (a–c) and the Gibbs energy of formation from oxides (d) of the CaO–MgO–Al2O3
+    system melt at the temperature 1960 K: 1 – obtained by mass-spectrometric Knudsen effusion method [Allibert
+    et al., 1979], 2 – calculated according to the sublattice model [Hallstedt, 1992] and 3 – calculated in the
+    present study.'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    note: 600 dpi render of PDF page 2; the source has no conventional printed page number.
+  axes_as_published:
+    x: x(Al2O3), mole %
+    a: −lg a_1960(CaO)
+    b: −lg a_1960(MgO)
+    c: −lg a_1960(Al2O3)
+    d: −ΔfG_1960, kJ/mole
+  series_as_captioned:
+    '1': Mass-spectrometric Knudsen effusion method [Allibert et al., 1979]
+    '2': Sublattice model [Hallstedt, 1992]
+    '3': Calculated in the present study
+  digitized_data_markers: Series 1 open squares only; all other plotted series remain typed unavailable.
+species:
+  Al2O3:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r03_c02
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $Al_{2}O_{3}$
+        column_header: Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-1046.788'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r03_c04
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $Al_{2}O_{3}$
+        column_header: Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-1029.796'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: l
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r09_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $Al_{2}O_{3}$
+        column_header: Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-407.794'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+    - observation_id: shornikov_2011_fig1_c_allibert_marker_01
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: c
+        marker_symbol: open square
+        series: '1'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (2691, 4043), fresh crop 2 page pixel (2691, 4043);
+          plotted ordinate -1.9954 −lg activity.'
+      units: dimensionless activity; x(Al2O3), mole %
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series1_allibert_1979
+      standard_state: Activity notation is a_1960(component) as printed; a separate reference-state definition is
+        not given in this paper.
+      values:
+        quantity: activity
+        composition_component: Al2O3
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: admitted
+        activity: 0.01
+        log10_ordinate_as_plotted: 2.0
+        composition_Al2O3_mole_pct_as_plotted: 27.0
+        attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
+        series: '1'
+        T_K: '1960'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2691, 4043), fresh crop 2 page pixel (2691, 4043);
+              plotted ordinate -1.9954 −lg activity.'
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2691, 4043), fresh crop 2 page pixel (2691, 4043);
+              plotted ordinate -1.9954 −lg activity.'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2691, 4043), fresh crop 2 page pixel (2691, 4043);
+              plotted ordinate -1.9954 −lg activity.'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2691, 4043), fresh crop 2 page pixel (2691, 4043);
+              plotted ordinate -1.9954 −lg activity.'
+      uncertainty:
+        read_uncertainty_dex: 0.0
+    - observation_id: shornikov_2011_fig1_c_allibert_marker_02
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: c
+        marker_symbol: open square
+        series: '1'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (2819, 3732), fresh crop 2 page pixel (2819, 3732);
+          plotted ordinate -1.3120 −lg activity.'
+      units: dimensionless activity; x(Al2O3), mole %
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series1_allibert_1979
+      standard_state: Activity notation is a_1960(component) as printed; a separate reference-state definition is
+        not given in this paper.
+      values:
+        quantity: activity
+        composition_component: Al2O3
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: admitted
+        activity: 0.049
+        log10_ordinate_as_plotted: 1.3
+        composition_Al2O3_mole_pct_as_plotted: 30.0
+        attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
+        series: '1'
+        T_K: '1960'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2819, 3732), fresh crop 2 page pixel (2819, 3732);
+              plotted ordinate -1.3120 −lg activity.'
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2819, 3732), fresh crop 2 page pixel (2819, 3732);
+              plotted ordinate -1.3120 −lg activity.'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2819, 3732), fresh crop 2 page pixel (2819, 3732);
+              plotted ordinate -1.3120 −lg activity.'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2819, 3732), fresh crop 2 page pixel (2819, 3732);
+              plotted ordinate -1.3120 −lg activity.'
+      uncertainty:
+        read_uncertainty_dex: 0.0
+    - observation_id: shornikov_2011_fig1_c_allibert_marker_03
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: c
+        marker_symbol: open square
+        series: '1'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (2995, 3600), fresh crop 2 page pixel (2995, 3600);
+          plotted ordinate -1.0220 −lg activity.'
+      units: dimensionless activity; x(Al2O3), mole %
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series1_allibert_1979
+      standard_state: Activity notation is a_1960(component) as printed; a separate reference-state definition is
+        not given in this paper.
+      values:
+        quantity: activity
+        composition_component: Al2O3
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: admitted
+        activity: 0.095
+        log10_ordinate_as_plotted: 1.0
+        composition_Al2O3_mole_pct_as_plotted: 34.0
+        attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
+        series: '1'
+        T_K: '1960'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2995, 3600), fresh crop 2 page pixel (2995, 3600);
+              plotted ordinate -1.0220 −lg activity.'
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2995, 3600), fresh crop 2 page pixel (2995, 3600);
+              plotted ordinate -1.0220 −lg activity.'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2995, 3600), fresh crop 2 page pixel (2995, 3600);
+              plotted ordinate -1.0220 −lg activity.'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2995, 3600), fresh crop 2 page pixel (2995, 3600);
+              plotted ordinate -1.0220 −lg activity.'
+      uncertainty:
+        read_uncertainty_dex: 0.0
+    - observation_id: shornikov_2011_fig1_c_allibert_marker_04
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: c
+        marker_symbol: open square
+        series: '1'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (3131, 3464), fresh crop 2 page pixel (3131, 3464);
+          plotted ordinate -0.7231 −lg activity.'
+      units: dimensionless activity; x(Al2O3), mole %
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series1_allibert_1979
+      standard_state: Activity notation is a_1960(component) as printed; a separate reference-state definition is
+        not given in this paper.
+      values:
+        quantity: activity
+        composition_component: Al2O3
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: admitted
+        activity: 0.19
+        log10_ordinate_as_plotted: 0.72
+        composition_Al2O3_mole_pct_as_plotted: 38.0
+        attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
+        series: '1'
+        T_K: '1960'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3131, 3464), fresh crop 2 page pixel (3131, 3464);
+              plotted ordinate -0.7231 −lg activity.'
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3131, 3464), fresh crop 2 page pixel (3131, 3464);
+              plotted ordinate -0.7231 −lg activity.'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3131, 3464), fresh crop 2 page pixel (3131, 3464);
+              plotted ordinate -0.7231 −lg activity.'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3131, 3464), fresh crop 2 page pixel (3131, 3464);
+              plotted ordinate -0.7231 −lg activity.'
+      uncertainty:
+        read_uncertainty_dex: 0.0
+    - observation_id: shornikov_2011_fig1_c_allibert_marker_05
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: c
+        marker_symbol: open square
+        series: '1'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (3291, 3389), fresh crop 2 page pixel (3291, 3389);
+          plotted ordinate -0.5583 −lg activity.'
+      units: dimensionless activity; x(Al2O3), mole %
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series1_allibert_1979
+      standard_state: Activity notation is a_1960(component) as printed; a separate reference-state definition is
+        not given in this paper.
+      values:
+        quantity: activity
+        composition_component: Al2O3
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: admitted
+        activity: 0.28
+        log10_ordinate_as_plotted: 0.56
+        composition_Al2O3_mole_pct_as_plotted: 41.0
+        attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
+        series: '1'
+        T_K: '1960'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3291, 3389), fresh crop 2 page pixel (3291, 3389);
+              plotted ordinate -0.5583 −lg activity.'
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3291, 3389), fresh crop 2 page pixel (3291, 3389);
+              plotted ordinate -0.5583 −lg activity.'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3291, 3389), fresh crop 2 page pixel (3291, 3389);
+              plotted ordinate -0.5583 −lg activity.'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3291, 3389), fresh crop 2 page pixel (3291, 3389);
+              plotted ordinate -0.5583 −lg activity.'
+      uncertainty:
+        read_uncertainty_dex: 0.0
+    - observation_id: shornikov_2011_fig1_c_allibert_marker_06
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: c
+        marker_symbol: open square
+        series: '1'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (3483, 3333), fresh crop 2 page pixel (3482, 3333);
+          plotted ordinate -0.4353 −lg activity.'
+      units: dimensionless activity; x(Al2O3), mole %
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series1_allibert_1979
+      standard_state: Activity notation is a_1960(component) as printed; a separate reference-state definition is
+        not given in this paper.
+      values:
+        quantity: activity
+        composition_component: Al2O3
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: admitted
+        activity: 0.37
+        log10_ordinate_as_plotted: 0.44
+        composition_Al2O3_mole_pct_as_plotted: 46.0
+        attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
+        series: '1'
+        T_K: '1960'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3483, 3333), fresh crop 2 page pixel (3482, 3333);
+              plotted ordinate -0.4353 −lg activity.'
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3483, 3333), fresh crop 2 page pixel (3482, 3333);
+              plotted ordinate -0.4353 −lg activity.'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3483, 3333), fresh crop 2 page pixel (3482, 3333);
+              plotted ordinate -0.4353 −lg activity.'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: c
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3483, 3333), fresh crop 2 page pixel (3482, 3333);
+              plotted ordinate -0.4353 −lg activity.'
+      uncertainty:
+        read_uncertainty_dex: 0.0
+    - observation_id: shornikov_2011_fig1_c_series2_unavailable
+      type: activity_coefficient
+      locator: &id001
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: c
+        series: '2'
+        note: Figure 1 c model curve; no data markers digitized.
+      units: dimensionless activity
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series2_hallstedt_1992
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: typed_refusal
+        unavailable_reason: model_curve_not_digitized
+        series: '2'
+        attribution: Hallstedt (1992), sublattice model.
+        activity: null
+        status: typed_refusal
+        reason: The plotted model curve has no digitized marker values.
+        T_K: '1960'
+      T_range_K:
+      - 1960
+      - 1960
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator: *id001
+        composition:
+          state:
+            tag: unknown
+            reason: composition_not_printed_for_model_curve
+          locator: *id001
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure
+          locator: *id001
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure
+          locator: *id001
+    - observation_id: shornikov_2011_fig1_c_series3_unavailable
+      type: activity_coefficient
+      locator: &id002
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: c
+        series: '3'
+        note: Figure 1 c model curve; no data markers digitized.
+      units: dimensionless activity
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series3_present_study
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: typed_refusal
+        unavailable_reason: model_curve_not_digitized
+        series: '3'
+        attribution: Present-study calculation.
+        activity: null
+        status: typed_refusal
+        reason: The plotted model curve has no digitized marker values.
+        T_K: '1960'
+      T_range_K:
+      - 1960
+      - 1960
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator: *id002
+        composition:
+          state:
+            tag: unknown
+            reason: composition_not_printed_for_model_curve
+          locator: *id002
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure
+          locator: *id002
+    context:
+    - observation_id: shornikov_2011_text_conclusion_values
+      type: author_interpretation
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Results
+        note: Final paragraph on PDF page 2.
+      units: as printed
+      values:
+        method_class: quoted_attributed
+        statements_as_printed:
+        - Observable deviations of the calculated values of activities a(MgO) from experimental data (Fig. 1b) are insignificant – approximately in 2 times.
+        - The minimal value of the Gibbs energy of melt formation (from oxides) in the CaO–MgO–Al2O3 system is not large (ΔfG1960 = −31.5 kJ/mole).
+        - It corresponds to the composition containing 45 mole % Al2O3 close to liquidus line.
+        - It shown the instability in melt of the ternary compound Ca3MgAl4O10 containing 33.3 mole % Al2O3.
+        model_temperature_range_K_as_printed: ['1800', '2200']
+        delta_fG_kJ_per_mole_as_printed: −31.5
+        minimum_composition_Al2O3_mole_pct_as_printed: '45'
+        Ca3MgAl4O10_Al2O3_mole_pct_as_printed: '33.3'
+  Al:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r03_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: Al
+        column_header: Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '89.605'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+  CaO:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r04_c02
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: CaO
+        column_header: Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-425.847'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r04_c04
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: CaO
+        column_header: Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-413.472'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: l
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r11_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: CaO
+        column_header: Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-72.634'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+    - observation_id: shornikov_2011_fig1_a_allibert_marker_01
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: a
+        marker_symbol: open square
+        series: '1'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (1402, 3436), fresh crop 2 page pixel (1402, 3436);
+          plotted ordinate -0.3038 −lg activity.'
+      units: dimensionless activity; x(Al2O3), mole %
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series1_allibert_1979
+      standard_state: Activity notation is a_1960(component) as printed; a separate reference-state definition is
+        not given in this paper.
+      values:
+        quantity: activity
+        composition_component: CaO
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: admitted
+        activity: 0.5
+        log10_ordinate_as_plotted: 0.3
+        composition_Al2O3_mole_pct_as_plotted: 26.0
+        attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
+        series: '1'
+        T_K: '1960'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1402, 3436), fresh crop 2 page pixel (1402, 3436);
+              plotted ordinate -0.3038 −lg activity.'
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1402, 3436), fresh crop 2 page pixel (1402, 3436);
+              plotted ordinate -0.3038 −lg activity.'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1402, 3436), fresh crop 2 page pixel (1402, 3436);
+              plotted ordinate -0.3038 −lg activity.'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1402, 3436), fresh crop 2 page pixel (1402, 3436);
+              plotted ordinate -0.3038 −lg activity.'
+      uncertainty:
+        read_uncertainty_dex: 0.0
+    - observation_id: shornikov_2011_fig1_a_allibert_marker_02
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: a
+        marker_symbol: open square
+        series: '1'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (1478, 3508), fresh crop 2 page pixel (1480, 3508);
+          plotted ordinate -0.3990 −lg activity.'
+      units: dimensionless activity; x(Al2O3), mole %
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series1_allibert_1979
+      standard_state: Activity notation is a_1960(component) as printed; a separate reference-state definition is
+        not given in this paper.
+      values:
+        quantity: activity
+        composition_component: CaO
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: admitted
+        activity: 0.4
+        log10_ordinate_as_plotted: 0.4
+        composition_Al2O3_mole_pct_as_plotted: 28.0
+        attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
+        series: '1'
+        T_K: '1960'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1478, 3508), fresh crop 2 page pixel (1480, 3508);
+              plotted ordinate -0.3990 −lg activity.'
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1478, 3508), fresh crop 2 page pixel (1480, 3508);
+              plotted ordinate -0.3990 −lg activity.'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1478, 3508), fresh crop 2 page pixel (1480, 3508);
+              plotted ordinate -0.3990 −lg activity.'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1478, 3508), fresh crop 2 page pixel (1480, 3508);
+              plotted ordinate -0.3990 −lg activity.'
+      uncertainty:
+        read_uncertainty_dex: 0.0
+    - observation_id: shornikov_2011_fig1_a_allibert_marker_03
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: a
+        marker_symbol: open square
+        series: '1'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (1562, 3604), fresh crop 2 page pixel (1562, 3604);
+          plotted ordinate -0.5260 −lg activity.'
+      units: dimensionless activity; x(Al2O3), mole %
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series1_allibert_1979
+      standard_state: Activity notation is a_1960(component) as printed; a separate reference-state definition is
+        not given in this paper.
+      values:
+        quantity: activity
+        composition_component: CaO
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: admitted
+        activity: 0.3
+        log10_ordinate_as_plotted: 0.53
+        composition_Al2O3_mole_pct_as_plotted: 30.0
+        attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
+        series: '1'
+        T_K: '1960'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1562, 3604), fresh crop 2 page pixel (1562, 3604);
+              plotted ordinate -0.5260 −lg activity.'
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1562, 3604), fresh crop 2 page pixel (1562, 3604);
+              plotted ordinate -0.5260 −lg activity.'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1562, 3604), fresh crop 2 page pixel (1562, 3604);
+              plotted ordinate -0.5260 −lg activity.'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1562, 3604), fresh crop 2 page pixel (1562, 3604);
+              plotted ordinate -0.5260 −lg activity.'
+      uncertainty:
+        read_uncertainty_dex: 0.0
+    - observation_id: shornikov_2011_fig1_a_allibert_marker_04
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: a
+        marker_symbol: open square
+        series: '1'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (1658, 3736), fresh crop 2 page pixel (1658, 3736);
+          plotted ordinate -0.7006 −lg activity.'
+      units: dimensionless activity; x(Al2O3), mole %
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series1_allibert_1979
+      standard_state: Activity notation is a_1960(component) as printed; a separate reference-state definition is
+        not given in this paper.
+      values:
+        quantity: activity
+        composition_component: CaO
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: admitted
+        activity: 0.2
+        log10_ordinate_as_plotted: 0.7
+        composition_Al2O3_mole_pct_as_plotted: 32.0
+        attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
+        series: '1'
+        T_K: '1960'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1658, 3736), fresh crop 2 page pixel (1658, 3736);
+              plotted ordinate -0.7006 −lg activity.'
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1658, 3736), fresh crop 2 page pixel (1658, 3736);
+              plotted ordinate -0.7006 −lg activity.'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1658, 3736), fresh crop 2 page pixel (1658, 3736);
+              plotted ordinate -0.7006 −lg activity.'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1658, 3736), fresh crop 2 page pixel (1658, 3736);
+              plotted ordinate -0.7006 −lg activity.'
+      uncertainty:
+        read_uncertainty_dex: 0.0
+    - observation_id: shornikov_2011_fig1_a_allibert_marker_05
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: a
+        marker_symbol: open square
+        series: '1'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (1842, 3964), fresh crop 2 page pixel (1842, 3964);
+          plotted ordinate -1.0022 −lg activity.'
+      units: dimensionless activity; x(Al2O3), mole %
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series1_allibert_1979
+      standard_state: Activity notation is a_1960(component) as printed; a separate reference-state definition is
+        not given in this paper.
+      values:
+        quantity: activity
+        composition_component: CaO
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: admitted
+        activity: 0.099
+        log10_ordinate_as_plotted: 1.0
+        composition_Al2O3_mole_pct_as_plotted: 36.0
+        attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
+        series: '1'
+        T_K: '1960'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1842, 3964), fresh crop 2 page pixel (1842, 3964);
+              plotted ordinate -1.0022 −lg activity.'
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1842, 3964), fresh crop 2 page pixel (1842, 3964);
+              plotted ordinate -1.0022 −lg activity.'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1842, 3964), fresh crop 2 page pixel (1842, 3964);
+              plotted ordinate -1.0022 −lg activity.'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: a
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1842, 3964), fresh crop 2 page pixel (1842, 3964);
+              plotted ordinate -1.0022 −lg activity.'
+      uncertainty:
+        read_uncertainty_dex: 0.0
+    - observation_id: shornikov_2011_fig1_a_series2_unavailable
+      type: activity_coefficient
+      locator: &id003
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: a
+        series: '2'
+        note: Figure 1 a model curve; no data markers digitized.
+      units: dimensionless activity
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series2_hallstedt_1992
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: typed_refusal
+        unavailable_reason: model_curve_not_digitized
+        series: '2'
+        attribution: Hallstedt (1992), sublattice model.
+        activity: null
+        status: typed_refusal
+        reason: The plotted model curve has no digitized marker values.
+        T_K: '1960'
+      T_range_K:
+      - 1960
+      - 1960
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator: *id003
+        composition:
+          state:
+            tag: unknown
+            reason: composition_not_printed_for_model_curve
+          locator: *id003
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure
+          locator: *id003
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure
+          locator: *id003
+    - observation_id: shornikov_2011_fig1_a_series3_unavailable
+      type: activity_coefficient
+      locator: &id004
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: a
+        series: '3'
+        note: Figure 1 a model curve; no data markers digitized.
+      units: dimensionless activity
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series3_present_study
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: typed_refusal
+        unavailable_reason: model_curve_not_digitized
+        series: '3'
+        attribution: Present-study calculation.
+        activity: null
+        status: typed_refusal
+        reason: The plotted model curve has no digitized marker values.
+        T_K: '1960'
+      T_range_K:
+      - 1960
+      - 1960
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator: *id004
+        composition:
+          state:
+            tag: unknown
+            reason: composition_not_printed_for_model_curve
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure
+          locator: *id004
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure
+          locator: *id004
+  AlO:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r04_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: AlO
+        column_header: Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-72.492'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+  CaAl2O4:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r05_c02
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $CaAl_{2}O_{4}$
+        column_header: Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-1533.967'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r05_c04
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $CaAl_{2}O_{4}$
+        column_header: Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-1536.789'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: l
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+  AlO2:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r05_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $AlO_{2}$
+        column_header: Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-99.299'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+  CaAl4O7:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r06_c02
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $CaAl_{4}O_{7}$
+        column_header: Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-2596.897'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+  Al2:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r06_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $Al_{2}$
+        column_header: Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '196.232'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+  CaAl12O19:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r07_c02
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $CaAl_{12}O_{19}$
+        column_header: Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-6795.323'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+  Al2O:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r07_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $Al_{2}O$
+        column_header: Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-280.491'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+  Ca3Al2O6:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r08_c02
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $Ca_{3}Al_{2}O_{6}$
+        column_header: Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-2400.664'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+  Al2O2:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r08_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $Al_{2}O_{2}$
+        column_header: Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-387.192'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+  Ca5Al6O14:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r09_c02
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $Ca_{5}Al_{6}O_{14}$
+        column_header: Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-5489.050'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+  Ca12Al14O33:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r10_c02
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $Ca_{12}Al_{14}O_{33}$
+        column_header: Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-12932.929'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r10_c04
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $Ca_{12}Al_{14}O_{33}$
+        column_header: Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-13005.601'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: l
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+  Ca:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r10_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: Ca
+        column_header: Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-17.589'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+  Ca3MgAl4O10:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r11_c02
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $Ca_{3}MgAl_{4}O_{10}$
+        column_header: Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-3885.890'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r11_c04
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $Ca_{3}MgAl_{4}O_{10}$
+        column_header: Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-3885.257'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: l
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+  MgAl2O4:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r12_c02
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $MgAl_{2}O_{4}$
+        column_header: Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-1471.685'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r12_c04
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $MgAl_{2}O_{4}$
+        column_header: Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-1434.364'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: l
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+  Mg:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r12_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: Mg
+        column_header: Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-53.734'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+  MgO:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r13_c02
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: MgO
+        column_header: Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-381.143'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r13_c04
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: MgO
+        column_header: Condensed phases  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-359.587'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: l
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r13_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: MgO
+        column_header: Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '-106.108'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+    - observation_id: shornikov_2011_fig1_b_allibert_marker_01
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: b
+        marker_symbol: open square
+        series: '1'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (1374, 4738), fresh crop 2 page pixel (1374, 4738);
+          plotted ordinate -0.3996 −lg activity.'
+      units: dimensionless activity; x(Al2O3), mole %
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series1_allibert_1979
+      standard_state: Activity notation is a_1960(component) as printed; a separate reference-state definition is
+        not given in this paper.
+      values:
+        quantity: activity
+        composition_component: MgO
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: admitted
+        activity: 0.4
+        log10_ordinate_as_plotted: 0.4
+        composition_Al2O3_mole_pct_as_plotted: 25.0
+        attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
+        series: '1'
+        T_K: '1960'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: b
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1374, 4738), fresh crop 2 page pixel (1374, 4738);
+              plotted ordinate -0.3996 −lg activity.'
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: b
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1374, 4738), fresh crop 2 page pixel (1374, 4738);
+              plotted ordinate -0.3996 −lg activity.'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: b
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1374, 4738), fresh crop 2 page pixel (1374, 4738);
+              plotted ordinate -0.3996 −lg activity.'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: b
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1374, 4738), fresh crop 2 page pixel (1374, 4738);
+              plotted ordinate -0.3996 −lg activity.'
+      uncertainty:
+        read_uncertainty_dex: 0.0
+    - observation_id: shornikov_2011_fig1_b_allibert_marker_02
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: b
+        marker_symbol: open square
+        series: '1'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (1514, 4870), fresh crop 2 page pixel (1514, 4870);
+          plotted ordinate -0.5250 −lg activity.'
+      units: dimensionless activity; x(Al2O3), mole %
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series1_allibert_1979
+      standard_state: Activity notation is a_1960(component) as printed; a separate reference-state definition is
+        not given in this paper.
+      values:
+        quantity: activity
+        composition_component: MgO
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: admitted
+        activity: 0.3
+        log10_ordinate_as_plotted: 0.53
+        composition_Al2O3_mole_pct_as_plotted: 28.0
+        attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
+        series: '1'
+        T_K: '1960'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: b
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1514, 4870), fresh crop 2 page pixel (1514, 4870);
+              plotted ordinate -0.5250 −lg activity.'
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: b
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1514, 4870), fresh crop 2 page pixel (1514, 4870);
+              plotted ordinate -0.5250 −lg activity.'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: b
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1514, 4870), fresh crop 2 page pixel (1514, 4870);
+              plotted ordinate -0.5250 −lg activity.'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: b
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1514, 4870), fresh crop 2 page pixel (1514, 4870);
+              plotted ordinate -0.5250 −lg activity.'
+      uncertainty:
+        read_uncertainty_dex: 0.0
+    - observation_id: shornikov_2011_fig1_b_allibert_marker_03
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: b
+        marker_symbol: open square
+        series: '1'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (1828, 5054), fresh crop 2 page pixel (1828, 5054);
+          plotted ordinate -0.6999 −lg activity.'
+      units: dimensionless activity; x(Al2O3), mole %
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series1_allibert_1979
+      standard_state: Activity notation is a_1960(component) as printed; a separate reference-state definition is
+        not given in this paper.
+      values:
+        quantity: activity
+        composition_component: MgO
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: admitted
+        activity: 0.2
+        log10_ordinate_as_plotted: 0.7
+        composition_Al2O3_mole_pct_as_plotted: 36.0
+        attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
+        series: '1'
+        T_K: '1960'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: b
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1828, 5054), fresh crop 2 page pixel (1828, 5054);
+              plotted ordinate -0.6999 −lg activity.'
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: b
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1828, 5054), fresh crop 2 page pixel (1828, 5054);
+              plotted ordinate -0.6999 −lg activity.'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: b
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1828, 5054), fresh crop 2 page pixel (1828, 5054);
+              plotted ordinate -0.6999 −lg activity.'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: b
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1828, 5054), fresh crop 2 page pixel (1828, 5054);
+              plotted ordinate -0.6999 −lg activity.'
+      uncertainty:
+        read_uncertainty_dex: 0.0
+    - observation_id: shornikov_2011_fig1_b_allibert_marker_04
+      type: activity_coefficient
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: b
+        marker_symbol: open square
+        series: '1'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (2034, 5054), fresh crop 2 page pixel (2034, 5054);
+          plotted ordinate -0.6999 −lg activity.'
+      units: dimensionless activity; x(Al2O3), mole %
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series1_allibert_1979
+      standard_state: Activity notation is a_1960(component) as printed; a separate reference-state definition is
+        not given in this paper.
+      values:
+        quantity: activity
+        composition_component: MgO
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: admitted
+        activity: 0.2
+        log10_ordinate_as_plotted: 0.7
+        composition_Al2O3_mole_pct_as_plotted: 41.0
+        attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
+        series: '1'
+        T_K: '1960'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: b
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2034, 5054), fresh crop 2 page pixel (2034, 5054);
+              plotted ordinate -0.6999 −lg activity.'
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: b
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2034, 5054), fresh crop 2 page pixel (2034, 5054);
+              plotted ordinate -0.6999 −lg activity.'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: b
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2034, 5054), fresh crop 2 page pixel (2034, 5054);
+              plotted ordinate -0.6999 −lg activity.'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: b
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2034, 5054), fresh crop 2 page pixel (2034, 5054);
+              plotted ordinate -0.6999 −lg activity.'
+      uncertainty:
+        read_uncertainty_dex: 0.0
+    - observation_id: shornikov_2011_fig1_b_series2_unavailable
+      type: activity_coefficient
+      locator: &id005
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: b
+        series: '2'
+        note: Figure 1 b model curve; no data markers digitized.
+      units: dimensionless activity
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series2_hallstedt_1992
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: typed_refusal
+        unavailable_reason: model_curve_not_digitized
+        series: '2'
+        attribution: Hallstedt (1992), sublattice model.
+        activity: null
+        status: typed_refusal
+        reason: The plotted model curve has no digitized marker values.
+        T_K: '1960'
+      T_range_K:
+      - 1960
+      - 1960
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator: *id005
+        composition:
+          state:
+            tag: unknown
+            reason: composition_not_printed_for_model_curve
+          locator: *id005
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure
+          locator: *id005
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure
+          locator: *id005
+    - observation_id: shornikov_2011_fig1_b_series3_unavailable
+      type: activity_coefficient
+      locator: &id006
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: b
+        series: '3'
+        note: Figure 1 b model curve; no data markers digitized.
+      units: dimensionless activity
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series3_present_study
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: typed_refusal
+        unavailable_reason: model_curve_not_digitized
+        series: '3'
+        attribution: Present-study calculation.
+        activity: null
+        status: typed_refusal
+        reason: The plotted model curve has no digitized marker values.
+        T_K: '1960'
+      T_range_K:
+      - 1960
+      - 1960
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator: *id006
+        composition:
+          state:
+            tag: unknown
+            reason: composition_not_printed_for_model_curve
+          locator: *id006
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure
+          locator: *id006
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure
+          locator: *id006
+    context:
+    - observation_id: shornikov_2011_table2_composition_r01
+      type: composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '2'
+        row: 1
+        note: Printed investigated composition; all six emitter cells in this row were assigned against the 600
+          dpi table render.
+      units: wt. % and mole % as printed
+      values:
+        quantity: composition
+        method_class: quoted_attributed
+        attribution: Table 2, investigated compositions in the present study.
+        row_number_as_printed: '1'
+        concentration_wt_pct:
+          CaO: '52.84'
+          MgO: '7.16'
+          Al2O3: '40.00'
+        concentration_mole_pct:
+          CaO: '59.48'
+          MgO: '15.76'
+          Al2O3: '24.76'
+    - observation_id: shornikov_2011_table2_composition_r02
+      type: composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '2'
+        row: 2
+        note: Printed investigated composition; all six emitter cells in this row were assigned against the 600
+          dpi table render.
+      units: wt. % and mole % as printed
+      values:
+        quantity: composition
+        method_class: quoted_attributed
+        attribution: Table 2, investigated compositions in the present study.
+        row_number_as_printed: '2'
+        concentration_wt_pct:
+          CaO: '50.24'
+          MgO: '7.16'
+          Al2O3: '42.60'
+        concentration_mole_pct:
+          CaO: '57.31'
+          MgO: '15.97'
+          Al2O3: '26.73'
+    - observation_id: shornikov_2011_table2_composition_r03
+      type: composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '2'
+        row: 3
+        note: Printed investigated composition; all six emitter cells in this row were assigned against the 600
+          dpi table render.
+      units: wt. % and mole % as printed
+      values:
+        quantity: composition
+        method_class: quoted_attributed
+        attribution: Table 2, investigated compositions in the present study.
+        row_number_as_printed: '3'
+        concentration_wt_pct:
+          CaO: '47.64'
+          MgO: '7.16'
+          Al2O3: '45.20'
+        concentration_mole_pct:
+          CaO: '55.07'
+          MgO: '16.19'
+          Al2O3: '28.74'
+    - observation_id: shornikov_2011_table2_composition_r04
+      type: composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '2'
+        row: 4
+        note: Printed investigated composition; all six emitter cells in this row were assigned against the 600
+          dpi table render.
+      units: wt. % and mole % as printed
+      values:
+        quantity: composition
+        method_class: quoted_attributed
+        attribution: Table 2, investigated compositions in the present study.
+        row_number_as_printed: '4'
+        concentration_wt_pct:
+          CaO: '45.04'
+          MgO: '7.16'
+          Al2O3: '47.80'
+        concentration_mole_pct:
+          CaO: '52.78'
+          MgO: '16.41'
+          Al2O3: '30.81'
+    - observation_id: shornikov_2011_table2_composition_r05
+      type: composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '2'
+        row: 5
+        note: Printed investigated composition; all six emitter cells in this row were assigned against the 600
+          dpi table render.
+      units: wt. % and mole % as printed
+      values:
+        quantity: composition
+        method_class: quoted_attributed
+        attribution: Table 2, investigated compositions in the present study.
+        row_number_as_printed: '5'
+        concentration_wt_pct:
+          CaO: '41.98'
+          MgO: '7.16'
+          Al2O3: '50.86'
+        concentration_mole_pct:
+          CaO: '50.00'
+          MgO: '16.68'
+          Al2O3: '33.32'
+    - observation_id: shornikov_2011_table2_composition_r06
+      type: composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '2'
+        row: 6
+        note: Printed investigated composition; all six emitter cells in this row were assigned against the 600
+          dpi table render.
+      units: wt. % and mole % as printed
+      values:
+        quantity: composition
+        method_class: quoted_attributed
+        attribution: Table 2, investigated compositions in the present study.
+        row_number_as_printed: '6'
+        concentration_wt_pct:
+          CaO: '39.38'
+          MgO: '7.16'
+          Al2O3: '53.46'
+        concentration_mole_pct:
+          CaO: '47.57'
+          MgO: '16.91'
+          Al2O3: '35.52'
+    - observation_id: shornikov_2011_table2_composition_r07
+      type: composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '2'
+        row: 7
+        note: Printed investigated composition; all six emitter cells in this row were assigned against the 600
+          dpi table render.
+      units: wt. % and mole % as printed
+      values:
+        quantity: composition
+        method_class: quoted_attributed
+        attribution: Table 2, investigated compositions in the present study.
+        row_number_as_printed: '7'
+        concentration_wt_pct:
+          CaO: '36.78'
+          MgO: '7.16'
+          Al2O3: '56.06'
+        concentration_mole_pct:
+          CaO: '45.07'
+          MgO: '17.15'
+          Al2O3: '37.78'
+    - observation_id: shornikov_2011_table2_composition_r08
+      type: composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '2'
+        row: 8
+        note: Printed investigated composition; all six emitter cells in this row were assigned against the 600
+          dpi table render.
+      units: wt. % and mole % as printed
+      values:
+        quantity: composition
+        method_class: quoted_attributed
+        attribution: Table 2, investigated compositions in the present study.
+        row_number_as_printed: '8'
+        concentration_wt_pct:
+          CaO: '34.18'
+          MgO: '7.16'
+          Al2O3: '58.66'
+        concentration_mole_pct:
+          CaO: '42.49'
+          MgO: '17.40'
+          Al2O3: '40.11'
+    - observation_id: shornikov_2011_table2_composition_r09
+      type: composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '2'
+        row: 9
+        note: Printed investigated composition; all six emitter cells in this row were assigned against the 600
+          dpi table render.
+      units: wt. % and mole % as printed
+      values:
+        quantity: composition
+        method_class: quoted_attributed
+        attribution: Table 2, investigated compositions in the present study.
+        row_number_as_printed: '9'
+        concentration_wt_pct:
+          CaO: '31.58'
+          MgO: '7.16'
+          Al2O3: '61.26'
+        concentration_mole_pct:
+          CaO: '39.84'
+          MgO: '17.66'
+          Al2O3: '42.50'
+    - observation_id: shornikov_2011_table2_composition_r10
+      type: composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '2'
+        row: 10
+        note: Printed investigated composition; all six emitter cells in this row were assigned against the 600
+          dpi table render.
+      units: wt. % and mole % as printed
+      values:
+        quantity: composition
+        method_class: quoted_attributed
+        attribution: Table 2, investigated compositions in the present study.
+        row_number_as_printed: '10'
+        concentration_wt_pct:
+          CaO: '28.98'
+          MgO: '7.16'
+          Al2O3: '63.86'
+        concentration_mole_pct:
+          CaO: '37.10'
+          MgO: '17.93'
+          Al2O3: '44.97'
+    - observation_id: shornikov_2011_table2_composition_r11
+      type: composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '2'
+        row: 11
+        note: Printed investigated composition; all six emitter cells in this row were assigned against the 600
+          dpi table render.
+      units: wt. % and mole % as printed
+      values:
+        quantity: composition
+        method_class: quoted_attributed
+        attribution: Table 2, investigated compositions in the present study.
+        row_number_as_printed: '11'
+        concentration_wt_pct:
+          CaO: '26.38'
+          MgO: '7.16'
+          Al2O3: '66.46'
+        concentration_mole_pct:
+          CaO: '34.29'
+          MgO: '18.20'
+          Al2O3: '47.51'
+    - observation_id: shornikov_2011_table2_composition_r12
+      type: composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '2'
+        row: 12
+        note: Printed investigated composition; all six emitter cells in this row were assigned against the 600
+          dpi table render.
+      units: wt. % and mole % as printed
+      values:
+        quantity: composition
+        method_class: quoted_attributed
+        attribution: Table 2, investigated compositions in the present study.
+        row_number_as_printed: '12'
+        concentration_wt_pct:
+          CaO: '23.91'
+          MgO: '7.16'
+          Al2O3: '68.93'
+        concentration_mole_pct:
+          CaO: '31.53'
+          MgO: '18.46'
+          Al2O3: '50.00'
+  O:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r14_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: O
+        column_header: Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '124.333'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+  O2:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r15_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $O_{2}$
+        column_header: Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '0.000'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+  O3:
+    observations:
+    - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r16_c06
+      type: gibbs_table
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        row_label: $O_{3}$
+        column_header: Gas phase  $\Delta_{f}G^{\circ}_{1960}$ , kJ/mole
+      units: kJ/mole
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1960'
+        value: '271.522'
+        attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
+          1978–1982; Allibert et al., 1979; Shornikov et al., 1997].'
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 1
+            pdf_page_index: 0
+            table: '1'
+            note: 1960 K is printed in both Gibbs-energy column headers.
+      experiment: shornikov_2011_table1_present_calculation
+      evidence_class: quoted_attributed
+  CaO-MgO-Al2O3_melt:
+    observations:
+    - observation_id: shornikov_2011_fig1_d_allibert_marker_01
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: d
+        marker_symbol: open square
+        series: '1'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (2555, 5233), fresh crop 2 page pixel (2555, 5233);
+          plotted ordinate 22.6214 −ΔfG1960, kJ/mole.'
+      units: kJ/mole
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series1_allibert_1979
+      standard_state: Gibbs energy of melt formation from oxides, as captioned.
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: admitted
+        value: -23.0
+        composition_Al2O3_mole_pct_as_plotted: 24.0
+        attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
+        series: '1'
+        T_K: '1960'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: d
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2555, 5233), fresh crop 2 page pixel (2555, 5233);
+              plotted ordinate 22.6214 −ΔfG1960, kJ/mole.'
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: d
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2555, 5233), fresh crop 2 page pixel (2555, 5233);
+              plotted ordinate 22.6214 −ΔfG1960, kJ/mole.'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: d
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2555, 5233), fresh crop 2 page pixel (2555, 5233);
+              plotted ordinate 22.6214 −ΔfG1960, kJ/mole.'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: d
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2555, 5233), fresh crop 2 page pixel (2555, 5233);
+              plotted ordinate 22.6214 −ΔfG1960, kJ/mole.'
+      uncertainty:
+        read_uncertainty_kJ_mol: 0.0
+    - observation_id: shornikov_2011_fig1_d_allibert_marker_02
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: d
+        marker_symbol: open square
+        series: '1'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (2723, 5066), fresh crop 2 page pixel (2723, 5066);
+          plotted ordinate 24.2427 −ΔfG1960, kJ/mole.'
+      units: kJ/mole
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series1_allibert_1979
+      standard_state: Gibbs energy of melt formation from oxides, as captioned.
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: admitted
+        value: -24.0
+        composition_Al2O3_mole_pct_as_plotted: 28.0
+        attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
+        series: '1'
+        T_K: '1960'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: d
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2723, 5066), fresh crop 2 page pixel (2723, 5066);
+              plotted ordinate 24.2427 −ΔfG1960, kJ/mole.'
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: d
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2723, 5066), fresh crop 2 page pixel (2723, 5066);
+              plotted ordinate 24.2427 −ΔfG1960, kJ/mole.'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: d
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2723, 5066), fresh crop 2 page pixel (2723, 5066);
+              plotted ordinate 24.2427 −ΔfG1960, kJ/mole.'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: d
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2723, 5066), fresh crop 2 page pixel (2723, 5066);
+              plotted ordinate 24.2427 −ΔfG1960, kJ/mole.'
+      uncertainty:
+        read_uncertainty_kJ_mol: 0.0
+    - observation_id: shornikov_2011_fig1_d_allibert_marker_03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: d
+        marker_symbol: open square
+        series: '1'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (2897, 4736), fresh crop 2 page pixel (2897, 4736);
+          plotted ordinate 27.4466 −ΔfG1960, kJ/mole.'
+      units: kJ/mole
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series1_allibert_1979
+      standard_state: Gibbs energy of melt formation from oxides, as captioned.
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: admitted
+        value: -27.0
+        composition_Al2O3_mole_pct_as_plotted: 32.0
+        attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
+        series: '1'
+        T_K: '1960'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: d
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2897, 4736), fresh crop 2 page pixel (2897, 4736);
+              plotted ordinate 27.4466 −ΔfG1960, kJ/mole.'
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: d
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2897, 4736), fresh crop 2 page pixel (2897, 4736);
+              plotted ordinate 27.4466 −ΔfG1960, kJ/mole.'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: d
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2897, 4736), fresh crop 2 page pixel (2897, 4736);
+              plotted ordinate 27.4466 −ΔfG1960, kJ/mole.'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: d
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2897, 4736), fresh crop 2 page pixel (2897, 4736);
+              plotted ordinate 27.4466 −ΔfG1960, kJ/mole.'
+      uncertainty:
+        read_uncertainty_kJ_mol: 0.0
+    - observation_id: shornikov_2011_fig1_d_allibert_marker_04
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: d
+        marker_symbol: open square
+        series: '1'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (3079, 4503), fresh crop 2 page pixel (3079, 4503);
+          plotted ordinate 29.7087 −ΔfG1960, kJ/mole.'
+      units: kJ/mole
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series1_allibert_1979
+      standard_state: Gibbs energy of melt formation from oxides, as captioned.
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: admitted
+        value: -30.0
+        composition_Al2O3_mole_pct_as_plotted: 36.0
+        attribution: Allibert et al. (1979), as attributed in the Figure 1 caption.
+        series: '1'
+        T_K: '1960'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: d
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3079, 4503), fresh crop 2 page pixel (3079, 4503);
+              plotted ordinate 29.7087 −ΔfG1960, kJ/mole.'
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: d
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3079, 4503), fresh crop 2 page pixel (3079, 4503);
+              plotted ordinate 29.7087 −ΔfG1960, kJ/mole.'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: d
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3079, 4503), fresh crop 2 page pixel (3079, 4503);
+              plotted ordinate 29.7087 −ΔfG1960, kJ/mole.'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure_comparator
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+            panel: d
+            marker_symbol: open square
+            series: '1'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3079, 4503), fresh crop 2 page pixel (3079, 4503);
+              plotted ordinate 29.7087 −ΔfG1960, kJ/mole.'
+      uncertainty:
+        read_uncertainty_kJ_mol: 0.0
+    - observation_id: shornikov_2011_fig1_d_series2_unavailable
+      type: gibbs_table
+      locator: &id007
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: d
+        series: '2'
+        note: Figure 1 d model curve; no data markers digitized.
+      units: kJ/mole
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series2_hallstedt_1992
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: typed_refusal
+        unavailable_reason: model_curve_not_digitized
+        series: '2'
+        attribution: Hallstedt (1992), sublattice model.
+        value: null
+        status: typed_refusal
+        reason: The plotted model curve has no digitized marker values.
+        T_K: '1960'
+      T_range_K:
+      - 1960
+      - 1960
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator: *id007
+        composition:
+          state:
+            tag: unknown
+            reason: composition_not_printed_for_model_curve
+          locator: *id007
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure
+          locator: *id007
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure
+          locator: *id007
+    - observation_id: shornikov_2011_fig1_d_series3_unavailable
+      type: gibbs_table
+      locator: &id008
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        panel: d
+        series: '3'
+        note: Figure 1 d model curve; no data markers digitized.
+      units: kJ/mole
+      phase: l
+      regime: figure_comparison
+      experiment: shornikov_2011_figure1_series3_present_study
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        evidence_class: figure_only
+        admission_status: typed_refusal
+        unavailable_reason: model_curve_not_digitized
+        series: '3'
+        attribution: Present-study calculation.
+        value: null
+        status: typed_refusal
+        reason: The plotted model curve has no digitized marker values.
+        T_K: '1960'
+      T_range_K:
+      - 1960
+      - 1960
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator: *id008
+        composition:
+          state:
+            tag: unknown
+            reason: composition_not_printed_for_model_curve
+          locator: *id008
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure
+          locator: *id008
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_figure
+          locator: *id008
