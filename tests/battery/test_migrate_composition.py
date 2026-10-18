@@ -37,7 +37,11 @@ from simulator.battery.migrate import (
     wt_pct_to_mole_fraction,
     wt_pct_to_mole_fraction_derivation,
 )
-from simulator.battery.records import INITIAL_CHARGE_ONLY_PROXY_FLAG, as_decimal
+from simulator.battery.records import (
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    Composition,
+    as_decimal,
+)
 from tests.battery.test_migrate import _migrate_real_extract, _write_min_tree
 from tests.battery.factories import tabulation_experiment
 
@@ -1317,6 +1321,37 @@ def test_equivalent_initial_inventories_keep_richer_owner_provenance() -> None:
     assert existing_initial is not None and incoming_initial is not None
     assert not migrate_module._initial_compositions_conflict(
         existing_initial, incoming_initial
+    )
+    mass_percent_initial = replace(
+        existing_initial,
+        state=replace(
+            existing_initial.state,
+            value=Composition(
+                basis="different_engine_label",
+                components=(("SiO2", Decimal("60")), ("MgO", Decimal("40"))),
+                amount_basis=AmountBasis.MASS_PERCENT,
+            ),
+        ),
+    )
+    assert not migrate_module._initial_compositions_conflict(
+        existing_initial, mass_percent_initial
+    )
+    mole_inventory_initial = replace(
+        existing_initial,
+        state=replace(
+            existing_initial.state,
+            value=Composition(
+                basis="molar_inventory",
+                components=tuple(
+                    (oxide, amount * Decimal("10"))
+                    for oxide, amount in existing_initial.state.value.components
+                ),
+                amount_basis=AmountBasis.MOL_INVENTORY,
+            ),
+        ),
+    )
+    assert not migrate_module._initial_compositions_conflict(
+        existing_initial, mole_inventory_initial
     )
 
     experiment = tabulation_experiment("equivalent-owner-initials")
