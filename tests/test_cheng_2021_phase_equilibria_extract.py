@@ -47,6 +47,19 @@ def _assert_render_pins(document: dict) -> None:
         observation = _observation(document, observation_id)
         assert observation["values"]["value"] == expected
         assert observation["locator"]["page"] == pdf_page
+        assert observation["locator"]["published_page"] == pdf_page
+        assert observation["locator"]["pdf_page_index"] == pdf_page - 1
+
+
+def _locators(value: object):
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if key == "locator" and isinstance(child, dict):
+                yield child
+            yield from _locators(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from _locators(child)
 
 
 def test_cheng_table_rows_and_600_dpi_render_pins() -> None:
@@ -95,6 +108,24 @@ def test_cheng_render_pin_rejects_a_changed_cell() -> None:
     _observation(document, "cheng21_t5_e001_liq_feo1p5")["values"]["value"] = 87.4
     with pytest.raises(AssertionError):
         _assert_render_pins(document)
+
+
+def test_cheng_all_locators_use_printed_pages_and_zero_based_pdf_indices() -> None:
+    document = _document()
+    locators = list(_locators(document))
+    assert len(locators) == 9172
+    assert all(
+        locator["published_page"] == locator["page"]
+        and locator["pdf_page_index"] == locator["page"] - 1
+        for locator in locators
+    )
+    experiments = {
+        row["experiment_id"]: row["locator"]
+        for row in document["experiments"]
+        if row["experiment_id"] in {"cheng21_table3_a", "cheng21_table3_b"}
+    }
+    assert set(experiments) == {"cheng21_table3_a", "cheng21_table3_b"}
+    assert all(locator["page"] == 11 for locator in experiments.values())
 
 
 def test_cheng_isolated_migration_carries_temperature_and_conditions(tmp_path: Path) -> None:
