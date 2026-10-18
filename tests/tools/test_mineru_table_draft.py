@@ -671,6 +671,42 @@ def test_compare_phase_is_bound_to_the_candidate_column(tmp_path: Path) -> None:
     assert result["matched_cell"] is None
 
 
+def test_compare_accepts_a_neutral_equation_column_for_a_typed_phase(
+    tmp_path: Path,
+) -> None:
+    csv_path = tmp_path / "p006-t03.csv"
+    with csv_path.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=draft._CSV_FIELDS)
+        writer.writeheader()
+        writer.writerow({
+            "row": 5, "column": 3, "row_type": "body", "text": "1.29e-9",
+            "value_text": "1.29e-9", "mark": "", "numeric_column": 3,
+            "origin_row": 5, "origin_column": 3, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+    index_path = tmp_path / "index.yaml"
+    index_path.write_text(yaml.safe_dump({"tables": [{
+        "table_key": "p006-t03", "pdf_page": 6, "csv": csv_path.name,
+        "columns": [{"column": 3, "header": "(24)"}],
+    }]}), encoding="utf-8")
+    extract = {"species": {"O": {"observations": [{
+        "observation_id": "equation-24-oxygen-pressure",
+        "locator": {"pdf_page": 6, "table": "3"},
+        "phase": "gas",
+        "values": {"points": [{
+            "pressure_atm": 1.29e-9,
+            "table_row_number": 5,
+            "table_column_number": 3,
+        }]},
+    }]}}}
+
+    result = draft.compare_extract_to_draft(extract, index_path)[0]
+
+    assert result["status"] == "matched"
+    assert result["matched_cell"]["row"] == 5
+    assert result["matched_cell"]["column"] == 3
+
+
 def test_phase_tokens_do_not_match_words_in_other_column_headers(tmp_path: Path) -> None:
     csv_path = tmp_path / "p005-t01.csv"
     with csv_path.open("w", encoding="utf-8", newline="") as stream:

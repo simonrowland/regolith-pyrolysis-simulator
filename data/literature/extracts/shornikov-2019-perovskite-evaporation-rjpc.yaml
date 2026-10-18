@@ -8,7 +8,7 @@ source:
   corpus_sha256: e0f388db7dffd5bc8bb1ac21fd3d1d77c9efb9beeae161a2262c65f737dc11c0
 extraction:
   method: >-
-    MinerU tables and pdftotext-layout were compared; mapped numeric cells were emitted and checked against the page renders. Table 2 and Table 5 are shared with the TMS chapter extract and are cross-referenced. Table 3 model values, Table 4 fit refusals, unique cited context, and deferred figure records are retained in species context containers.
+    MinerU tables and pdftotext-layout were compared; mapped numeric cells were emitted and checked against the page renders. Table 2 and Table 5 are shared with the TMS chapter extract and are cross-referenced. Table 3 was transcribed as one measured and five quoted-attributed partial-pressure series because its equations have mixed evidence classes. Table 4 fit refusals, unique cited context, and deferred figure records remain in species context containers.
   date: '2026-10-18'
   worker: w4b-1018
 review_status: draft
@@ -18,35 +18,49 @@ notes:
   - >-
     Table 5 matches all ten existing TMS thermochemistry context rows. Its three negative values retain their negative signs in the RJPC and TMS renders; differing OCR dash glyphs are not value differences. Existing IDs are cross-referenced below.
   - >-
+    Table 3 is unique to RJPC: the 13 equation (22), (23) pressures are the measured_tabulated Hertz–Knudsen series; equations (24)–(28) are quoted_attributed because their thermochemical K values from [9] are not printed. The five series omit dash cells and retain the printed minus glyph.
+  - >-
     The relative ion-current ratio at 2182 K differs between the publications. Both readings and locators are preserved in the CaTiO3 context and flagged for controller decision; the existing TMS extract is unchanged.
   - >-
     Table 4 prints a function fit and coefficients but the extract schema has no token for this coefficient form. Eight fit records are typed refusals with their printed coefficients retained in context; no pressures are reconstructed.
 fidelity_samples:
-  - species: O
-    observation_id: shornikov_2019_rjpc_table3_atomic_oxygen_calculations
-    index: 0
-    field: equation_22_23_as_printed
-    value: '1.26 × 10–10'
+  - path: species.O.observations[shornikov_2019_rjpc_table3_eq22_23_atomic_oxygen_pressure].values.points[0].pressure_atm_as_printed
+    value: '1.26 × 10−10'
     locator:
       page: 6
       published_page: 1029
       pdf_page_index: 5
       table: '3'
-  - species: O
-    observation_id: shornikov_2019_rjpc_table3_atomic_oxygen_calculations
-    index: 3
-    field: equation_24_as_printed
-    value: '1.29 × 10–9'
+  - path: species.O.observations[shornikov_2019_rjpc_table3_eq24_atomic_oxygen_pressure].values.points[0].pressure_atm_as_printed
+    value: '1.29 × 10−9'
     locator:
       page: 6
       published_page: 1029
       pdf_page_index: 5
       table: '3'
-  - species: O
-    observation_id: shornikov_2019_rjpc_table3_atomic_oxygen_calculations
-    index: 12
-    field: equation_28_as_printed
-    value: '7.78 × 10–8'
+  - path: species.O.observations[shornikov_2019_rjpc_table3_eq25_atomic_oxygen_pressure].values.points[0].pressure_atm_as_printed
+    value: '6.02 × 10−10'
+    locator:
+      page: 6
+      published_page: 1029
+      pdf_page_index: 5
+      table: '3'
+  - path: species.O.observations[shornikov_2019_rjpc_table3_eq26_atomic_oxygen_pressure].values.points[0].pressure_atm_as_printed
+    value: '1.25 × 10−10'
+    locator:
+      page: 6
+      published_page: 1029
+      pdf_page_index: 5
+      table: '3'
+  - path: species.O.observations[shornikov_2019_rjpc_table3_eq27_atomic_oxygen_pressure].values.points[0].pressure_atm_as_printed
+    value: '2.53 × 10−9'
+    locator:
+      page: 6
+      published_page: 1029
+      pdf_page_index: 5
+      table: '3'
+  - path: species.O.observations[shornikov_2019_rjpc_table3_eq28_atomic_oxygen_pressure].values.points[0].pressure_atm_as_printed
+    value: '1.31 × 10−10'
     locator:
       page: 6
       published_page: 1029
@@ -442,134 +456,365 @@ species:
           marker_count_note: visual counts from the 600-dpi render; some symbols overlap
           digitisation: deferred to a figure pass
   O:
-    observations: []
-    context:
-      - observation_id: shornikov_2019_rjpc_table3_atomic_oxygen_calculations
-        type: model_derived_table
-        locator:
-          page: 6
-          published_page: 1029
-          pdf_page_index: 5
-          table: '3'
-        units: atm; T in K
-        quantity: partial_pressure
+    observations:
+      - observation_id: shornikov_2019_rjpc_table3_eq24_atomic_oxygen_pressure
+        type: partial_pressure
+        locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3'}
         phase: gas
-        method_class: model_derived
-        table_caption_as_printed: 'Table 3. Partial vapor pressures of atomic oxygen over perovskite, atm (calculated by (22)–(28))'
-        equation_columns_as_printed:
-          - (22), (23)
-          - (24)
-          - (25)
-          - (26)
-          - (27)
-          - (28)
-        row_count: 13
-        numeric_cell_count: 68
+        regime: knudsen_effusion
+        units: atm
         values:
-          - T_K: 1791
-            equation_22_23_as_printed: '1.26 × 10–10'
-            equation_24_as_printed: '—'
-            equation_25_as_printed: '—'
-            equation_26_as_printed: '1.25 × 10–10'
-            equation_27_as_printed: '—'
-            equation_28_as_printed: '1.31 × 10–10'
-            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 2}
-          - T_K: 1845
-            equation_22_23_as_printed: '3.52 × 10–10'
-            equation_24_as_printed: '—'
-            equation_25_as_printed: '—'
-            equation_26_as_printed: '3.61 × 10–10'
-            equation_27_as_printed: '—'
-            equation_28_as_printed: '3.69 × 10–10'
-            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 3}
-          - T_K: 1875
-            equation_22_23_as_printed: '6.10 × 10–10'
-            equation_24_as_printed: '—'
-            equation_25_as_printed: '6.02 × 10–10'
-            equation_26_as_printed: '5.96 × 10–10'
-            equation_27_as_printed: '—'
-            equation_28_as_printed: '6.01 × 10–10'
-            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 4}
-          - T_K: 1920
-            equation_22_23_as_printed: '1.36 × 10–9'
-            equation_24_as_printed: '1.29 × 10–9'
-            equation_25_as_printed: '1.24 × 10–9'
-            equation_26_as_printed: '1.36 × 10–9'
-            equation_27_as_printed: '—'
-            equation_28_as_printed: '1.43 × 10–9'
-            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 5}
-          - T_K: 1941
-            equation_22_23_as_printed: '1.97 × 10–9'
-            equation_24_as_printed: '2.12 × 10–9'
-            equation_25_as_printed: '1.80 × 10–9'
-            equation_26_as_printed: '2.04 × 10–9'
-            equation_27_as_printed: '—'
-            equation_28_as_printed: '1.88 × 10–9'
-            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 6}
-          - T_K: 1956
-            equation_22_23_as_printed: '2.52 × 10–9'
-            equation_24_as_printed: '2.61 × 10–9'
-            equation_25_as_printed: '2.34 × 10–9'
-            equation_26_as_printed: '2.43 × 10–9'
-            equation_27_as_printed: '2.53 × 10–9'
-            equation_28_as_printed: '2.49 × 10–9'
-            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 7}
-          - T_K: 1976
-            equation_22_23_as_printed: '3.52 × 10–9'
-            equation_24_as_printed: '3.58 × 10–9'
-            equation_25_as_printed: '3.31 × 10–9'
-            equation_26_as_printed: '3.52 × 10–9'
-            equation_27_as_printed: '3.53 × 10–9'
-            equation_28_as_printed: '3.45 × 10–9'
-            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 8}
-          - T_K: 1992
-            equation_22_23_as_printed: '4.57 × 10–9'
-            equation_24_as_printed: '3.87 × 10–9'
-            equation_25_as_printed: '4.33 × 10–9'
-            equation_26_as_printed: '4.46 × 10–9'
-            equation_27_as_printed: '4.37 × 10–9'
-            equation_28_as_printed: '4.56 × 10–9'
-            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 9}
-          - T_K: 2027
-            equation_22_23_as_printed: '7.76 × 10–9'
-            equation_24_as_printed: '6.71 × 10–9'
-            equation_25_as_printed: '7.73 × 10–9'
-            equation_26_as_printed: '7.96 × 10–9'
-            equation_27_as_printed: '7.75 × 10–9'
-            equation_28_as_printed: '7.94 × 10–9'
-            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 10}
-          - T_K: 2037
-            equation_22_23_as_printed: '9.31 × 10–9'
-            equation_24_as_printed: '9.67 × 10–9'
-            equation_25_as_printed: '9.08 × 10–9'
-            equation_26_as_printed: '9.30 × 10–9'
-            equation_27_as_printed: '9.43 × 10–9'
-            equation_28_as_printed: '9.10 × 10–9'
-            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 11}
-          - T_K: 2051
-            equation_22_23_as_printed: '1.13 × 10–8'
-            equation_24_as_printed: '1.12 × 10–8'
-            equation_25_as_printed: '1.14 × 10–8'
-            equation_26_as_printed: '1.13 × 10–8'
-            equation_27_as_printed: '1.19 × 10–8'
-            equation_28_as_printed: '1.18 × 10–8'
-            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 12}
-          - T_K: 2100
-            equation_22_23_as_printed: '2.39 × 10–8'
-            equation_24_as_printed: '2.45 × 10–8'
-            equation_25_as_printed: '2.43 × 10–8'
-            equation_26_as_printed: '2.50 × 10–8'
-            equation_27_as_printed: '2.34 × 10–8'
-            equation_28_as_printed: '2.31 × 10–8'
-            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 13}
-          - T_K: 2182
-            equation_22_23_as_printed: '7.73 × 10–8'
-            equation_24_as_printed: '7.40 × 10–8'
-            equation_25_as_printed: '8.00 × 10–8'
-            equation_26_as_printed: '6.88 × 10–8'
-            equation_27_as_printed: '7.56 × 10–8'
-            equation_28_as_printed: '7.78 × 10–8'
-            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 14}
+          quantity: partial_pressure
+          gas_species: 'O(g)'
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          attribution: 'calculated in the present study from the thermochemical data of [9], equation (24)'
+          points:
+            - T_K: 1920
+              pressure_atm: 1.29e-9
+              pressure_atm_as_printed: '1.29 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 3, table_row_number: 5}
+            - T_K: 1941
+              pressure_atm: 2.12e-9
+              pressure_atm_as_printed: '2.12 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 3, table_row_number: 6}
+            - T_K: 1956
+              pressure_atm: 2.61e-9
+              pressure_atm_as_printed: '2.61 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 3, table_row_number: 7}
+            - T_K: 1976
+              pressure_atm: 3.58e-9
+              pressure_atm_as_printed: '3.58 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 3, table_row_number: 8}
+            - T_K: 1992
+              pressure_atm: 3.87e-9
+              pressure_atm_as_printed: '3.87 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 3, table_row_number: 9}
+            - T_K: 2027
+              pressure_atm: 6.71e-9
+              pressure_atm_as_printed: '6.71 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 3, table_row_number: 10}
+            - T_K: 2037
+              pressure_atm: 9.67e-9
+              pressure_atm_as_printed: '9.67 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 3, table_row_number: 11}
+            - T_K: 2051
+              pressure_atm: 1.12e-8
+              pressure_atm_as_printed: '1.12 × 10−8'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 3, table_row_number: 12}
+            - T_K: 2100
+              pressure_atm: 2.45e-8
+              pressure_atm_as_printed: '2.45 × 10−8'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 3, table_row_number: 13}
+            - T_K: 2182
+              pressure_atm: 7.4e-8
+              pressure_atm_as_printed: '7.40 × 10−8'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 3, table_row_number: 14}
+      - observation_id: shornikov_2019_rjpc_table3_eq25_atomic_oxygen_pressure
+        type: partial_pressure
+        locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3'}
+        phase: gas
+        regime: knudsen_effusion
+        units: atm
+        values:
+          quantity: partial_pressure
+          gas_species: 'O(g)'
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          attribution: 'calculated in the present study from the thermochemical data of [9], equation (25)'
+          points:
+            - T_K: 1875
+              pressure_atm: 6.02e-10
+              pressure_atm_as_printed: '6.02 × 10−10'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 4, table_row_number: 4}
+            - T_K: 1920
+              pressure_atm: 1.24e-9
+              pressure_atm_as_printed: '1.24 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 4, table_row_number: 5}
+            - T_K: 1941
+              pressure_atm: 1.8e-9
+              pressure_atm_as_printed: '1.80 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 4, table_row_number: 6}
+            - T_K: 1956
+              pressure_atm: 2.34e-9
+              pressure_atm_as_printed: '2.34 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 4, table_row_number: 7}
+            - T_K: 1976
+              pressure_atm: 3.31e-9
+              pressure_atm_as_printed: '3.31 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 4, table_row_number: 8}
+            - T_K: 1992
+              pressure_atm: 4.33e-9
+              pressure_atm_as_printed: '4.33 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 4, table_row_number: 9}
+            - T_K: 2027
+              pressure_atm: 7.73e-9
+              pressure_atm_as_printed: '7.73 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 4, table_row_number: 10}
+            - T_K: 2037
+              pressure_atm: 9.08e-9
+              pressure_atm_as_printed: '9.08 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 4, table_row_number: 11}
+            - T_K: 2051
+              pressure_atm: 1.14e-8
+              pressure_atm_as_printed: '1.14 × 10−8'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 4, table_row_number: 12}
+            - T_K: 2100
+              pressure_atm: 2.43e-8
+              pressure_atm_as_printed: '2.43 × 10−8'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 4, table_row_number: 13}
+            - T_K: 2182
+              pressure_atm: 8e-8
+              pressure_atm_as_printed: '8.00 × 10−8'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 4, table_row_number: 14}
+      - observation_id: shornikov_2019_rjpc_table3_eq26_atomic_oxygen_pressure
+        type: partial_pressure
+        locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3'}
+        phase: gas
+        regime: knudsen_effusion
+        units: atm
+        values:
+          quantity: partial_pressure
+          gas_species: 'O(g)'
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          attribution: 'calculated in the present study from the thermochemical data of [9], equation (26)'
+          points:
+            - T_K: 1791
+              pressure_atm: 1.25e-10
+              pressure_atm_as_printed: '1.25 × 10−10'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 5, table_row_number: 2}
+            - T_K: 1845
+              pressure_atm: 3.61e-10
+              pressure_atm_as_printed: '3.61 × 10−10'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 5, table_row_number: 3}
+            - T_K: 1875
+              pressure_atm: 5.96e-10
+              pressure_atm_as_printed: '5.96 × 10−10'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 5, table_row_number: 4}
+            - T_K: 1920
+              pressure_atm: 1.36e-9
+              pressure_atm_as_printed: '1.36 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 5, table_row_number: 5}
+            - T_K: 1941
+              pressure_atm: 2.04e-9
+              pressure_atm_as_printed: '2.04 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 5, table_row_number: 6}
+            - T_K: 1956
+              pressure_atm: 2.43e-9
+              pressure_atm_as_printed: '2.43 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 5, table_row_number: 7}
+            - T_K: 1976
+              pressure_atm: 3.52e-9
+              pressure_atm_as_printed: '3.52 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 5, table_row_number: 8}
+            - T_K: 1992
+              pressure_atm: 4.46e-9
+              pressure_atm_as_printed: '4.46 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 5, table_row_number: 9}
+            - T_K: 2027
+              pressure_atm: 7.96e-9
+              pressure_atm_as_printed: '7.96 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 5, table_row_number: 10}
+            - T_K: 2037
+              pressure_atm: 9.3e-9
+              pressure_atm_as_printed: '9.30 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 5, table_row_number: 11}
+            - T_K: 2051
+              pressure_atm: 1.13e-8
+              pressure_atm_as_printed: '1.13 × 10−8'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 5, table_row_number: 12}
+            - T_K: 2100
+              pressure_atm: 2.5e-8
+              pressure_atm_as_printed: '2.50 × 10−8'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 5, table_row_number: 13}
+            - T_K: 2182
+              pressure_atm: 6.88e-8
+              pressure_atm_as_printed: '6.88 × 10−8'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 5, table_row_number: 14}
+      - observation_id: shornikov_2019_rjpc_table3_eq27_atomic_oxygen_pressure
+        type: partial_pressure
+        locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3'}
+        phase: gas
+        regime: knudsen_effusion
+        units: atm
+        values:
+          quantity: partial_pressure
+          gas_species: 'O(g)'
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          attribution: 'calculated in the present study from the thermochemical data of [9], equation (27)'
+          points:
+            - T_K: 1956
+              pressure_atm: 2.53e-9
+              pressure_atm_as_printed: '2.53 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 6, table_row_number: 7}
+            - T_K: 1976
+              pressure_atm: 3.53e-9
+              pressure_atm_as_printed: '3.53 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 6, table_row_number: 8}
+            - T_K: 1992
+              pressure_atm: 4.37e-9
+              pressure_atm_as_printed: '4.37 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 6, table_row_number: 9}
+            - T_K: 2027
+              pressure_atm: 7.75e-9
+              pressure_atm_as_printed: '7.75 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 6, table_row_number: 10}
+            - T_K: 2037
+              pressure_atm: 9.43e-9
+              pressure_atm_as_printed: '9.43 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 6, table_row_number: 11}
+            - T_K: 2051
+              pressure_atm: 1.19e-8
+              pressure_atm_as_printed: '1.19 × 10−8'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 6, table_row_number: 12}
+            - T_K: 2100
+              pressure_atm: 2.34e-8
+              pressure_atm_as_printed: '2.34 × 10−8'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 6, table_row_number: 13}
+            - T_K: 2182
+              pressure_atm: 7.56e-8
+              pressure_atm_as_printed: '7.56 × 10−8'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 6, table_row_number: 14}
+      - observation_id: shornikov_2019_rjpc_table3_eq28_atomic_oxygen_pressure
+        type: partial_pressure
+        locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3'}
+        phase: gas
+        regime: knudsen_effusion
+        units: atm
+        values:
+          quantity: partial_pressure
+          gas_species: 'O(g)'
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          admission_status: admitted
+          attribution: 'calculated in the present study from the thermochemical data of [9], equation (28)'
+          points:
+            - T_K: 1791
+              pressure_atm: 1.31e-10
+              pressure_atm_as_printed: '1.31 × 10−10'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 7, table_row_number: 2}
+            - T_K: 1845
+              pressure_atm: 3.69e-10
+              pressure_atm_as_printed: '3.69 × 10−10'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 7, table_row_number: 3}
+            - T_K: 1875
+              pressure_atm: 6.01e-10
+              pressure_atm_as_printed: '6.01 × 10−10'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 7, table_row_number: 4}
+            - T_K: 1920
+              pressure_atm: 1.43e-9
+              pressure_atm_as_printed: '1.43 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 7, table_row_number: 5}
+            - T_K: 1941
+              pressure_atm: 1.88e-9
+              pressure_atm_as_printed: '1.88 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 7, table_row_number: 6}
+            - T_K: 1956
+              pressure_atm: 2.49e-9
+              pressure_atm_as_printed: '2.49 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 7, table_row_number: 7}
+            - T_K: 1976
+              pressure_atm: 3.45e-9
+              pressure_atm_as_printed: '3.45 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 7, table_row_number: 8}
+            - T_K: 1992
+              pressure_atm: 4.56e-9
+              pressure_atm_as_printed: '4.56 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 7, table_row_number: 9}
+            - T_K: 2027
+              pressure_atm: 7.94e-9
+              pressure_atm_as_printed: '7.94 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 7, table_row_number: 10}
+            - T_K: 2037
+              pressure_atm: 9.1e-9
+              pressure_atm_as_printed: '9.10 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 7, table_row_number: 11}
+            - T_K: 2051
+              pressure_atm: 1.18e-8
+              pressure_atm_as_printed: '1.18 × 10−8'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 7, table_row_number: 12}
+            - T_K: 2100
+              pressure_atm: 2.31e-8
+              pressure_atm_as_printed: '2.31 × 10−8'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 7, table_row_number: 13}
+            - T_K: 2182
+              pressure_atm: 7.78e-8
+              pressure_atm_as_printed: '7.78 × 10−8'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 7, table_row_number: 14}
+      - observation_id: shornikov_2019_rjpc_table3_eq22_23_atomic_oxygen_pressure
+        type: partial_pressure
+        locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3'}
+        phase: gas
+        regime: knudsen_effusion
+        units: atm
+        values:
+          quantity: partial_pressure
+          gas_species: 'O(g)'
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          admission_status: admitted
+          method: 'Hertz–Knudsen and Komlev equations (22) and (23)'
+          method_as_printed: 'Partial pressures of atomic oxygen determined by equations (22) and (23)'
+          points:
+            - T_K: 1791
+              pressure_atm: 1.26e-10
+              pressure_atm_as_printed: '1.26 × 10−10'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 2, table_row_number: 2}
+            - T_K: 1845
+              pressure_atm: 3.52e-10
+              pressure_atm_as_printed: '3.52 × 10−10'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 2, table_row_number: 3}
+            - T_K: 1875
+              pressure_atm: 6.1e-10
+              pressure_atm_as_printed: '6.10 × 10−10'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 2, table_row_number: 4}
+            - T_K: 1920
+              pressure_atm: 1.36e-9
+              pressure_atm_as_printed: '1.36 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 2, table_row_number: 5}
+            - T_K: 1941
+              pressure_atm: 1.97e-9
+              pressure_atm_as_printed: '1.97 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 2, table_row_number: 6}
+            - T_K: 1956
+              pressure_atm: 2.52e-9
+              pressure_atm_as_printed: '2.52 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 2, table_row_number: 7}
+            - T_K: 1976
+              pressure_atm: 3.52e-9
+              pressure_atm_as_printed: '3.52 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 2, table_row_number: 8}
+            - T_K: 1992
+              pressure_atm: 4.57e-9
+              pressure_atm_as_printed: '4.57 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 2, table_row_number: 9}
+            - T_K: 2027
+              pressure_atm: 7.76e-9
+              pressure_atm_as_printed: '7.76 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 2, table_row_number: 10}
+            - T_K: 2037
+              pressure_atm: 9.31e-9
+              pressure_atm_as_printed: '9.31 × 10−9'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 2, table_row_number: 11}
+            - T_K: 2051
+              pressure_atm: 1.13e-8
+              pressure_atm_as_printed: '1.13 × 10−8'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 2, table_row_number: 12}
+            - T_K: 2100
+              pressure_atm: 2.39e-8
+              pressure_atm_as_printed: '2.39 × 10−8'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 2, table_row_number: 13}
+            - T_K: 2182
+              pressure_atm: 7.73e-8
+              pressure_atm_as_printed: '7.73 × 10−8'
+              locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_column_number: 2, table_row_number: 14}
+    context:
       - observation_id: shornikov_2019_rjpc_table4_oxygen_fit_refusal
         type: fit_refusal
         locator:
@@ -787,7 +1032,7 @@ species:
           quantity: existing_narrative_context
           existing_source_id: shornikov-2019-perovskite-evaporation
           references:
-            - existing_observation_id: shornikov_2019_mi1201_mo
+            - existing_bench_id: shornikov_2019_mi1201_mo
               matching_rjpc_locators:
                 - page: 5
                   published_page: 1028
@@ -796,6 +1041,13 @@ species:
               matching_items:
                 - MI-1201 mass spectrometer and operating temperature capability
                 - molybdenum Knudsen cell and 20 eV ionization energy
+            - existing_experiment_id: shornikov_2019_mo_cell_kems
+              matching_rjpc_locators:
+                - page: 5
+                  published_page: 1028
+                  pdf_page_index: 4
+                  section: Experimental
+              matching_items:
                 - sample preparation schedule
             - existing_observation_id: shornikov_2019_qualifying_statements
               matching_rjpc_locators:

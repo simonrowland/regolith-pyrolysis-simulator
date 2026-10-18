@@ -811,10 +811,12 @@ def _phase_matches_column(phase: Any, column_header: str) -> bool:
     token = str(phase).strip().casefold()
     if token not in {"gas", "liquid", "solid"}:
         return False
-    return (
-        re.search(rf"(?<!\w){re.escape(token)}(?!\w)", column_header, re.I)
-        is not None
-    )
+    header_phases = {
+        candidate
+        for candidate in ("gas", "liquid", "solid")
+        if re.search(rf"(?<!\w){candidate}(?!\w)", column_header, re.I)
+    }
+    return not header_phases or token in header_phases
 
 
 def compare_extract_to_draft(
