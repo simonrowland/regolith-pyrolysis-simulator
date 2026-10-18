@@ -440,6 +440,8 @@ _FREEZE_GATE_COMPOSITION_SPECIES = frozenset((
     'Cr2O3',
     'MnO',
     'P2O5',
+    'NiO',
+    'CoO',
 ))
 
 
@@ -2591,7 +2593,7 @@ class EvaporationMixin:
                 (species_key, normalized_elements)
             )
         return FreezeGateCurveCacheKey(
-            schema='oxide_mol_fraction_p_fO2_v5',
+            schema='oxide_mol_fraction_p_fO2_v6',
             pressure_bar=round(pressure_bucket, 6),
             fO2_log=round(fO2_bucket, 6),
             composition_mol_fractions=tuple(sorted(composition_key)),

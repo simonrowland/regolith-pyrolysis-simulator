@@ -492,6 +492,68 @@ def test_freeze_gate_cache_key_distinguishes_provider_inputs(
     )
 
 
+@pytest.mark.parametrize('species', ['NiO', 'CoO'])
+def test_freeze_gate_cache_key_distinguishes_nio_coo_moles(
+    species,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.evaporation import _FREEZE_GATE_COMPOSITION_SPECIES
+
+    baseline_sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    changed_sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    baseline_mol = baseline_sim.atom_ledger.project_account_mol(
+        _CLEANED_MELT_ACCOUNT
+    )
+    changed_mol = changed_sim.atom_ledger.project_account_mol(
+        _CLEANED_MELT_ACCOUNT
+    )
+    base_oxide_species = _FREEZE_GATE_COMPOSITION_SPECIES - {'NiO', 'CoO'}
+    base_oxide_total = sum(
+        float(baseline_mol.get(base_species, 0.0))
+        for base_species in base_oxide_species
+    )
+    trace_mol = base_oxide_total * 0.002
+    for sim in (baseline_sim, changed_sim):
+        sim.atom_ledger.load_external_mol(
+            _CLEANED_MELT_ACCOUNT,
+            {'NiO': trace_mol, 'CoO': trace_mol},
+            source='b-839 fixed nickel and cobalt oxide fractions',
+            material_origin='feedstock',
+        )
+    changed_sim.atom_ledger.load_external_mol(
+        _CLEANED_MELT_ACCOUNT,
+        {species: base_oxide_total * 0.004},
+        source=f'b-839 changed {species} fraction',
+        material_origin='feedstock',
+    )
+    baseline_mol = baseline_sim.atom_ledger.project_account_mol(
+        _CLEANED_MELT_ACCOUNT
+    )
+    changed_mol = changed_sim.atom_ledger.project_account_mol(
+        _CLEANED_MELT_ACCOUNT
+    )
+    assert all(
+        baseline_mol.get(base_species, 0.0)
+        == changed_mol.get(base_species, 0.0)
+        for base_species in base_oxide_species
+    )
+    assert _freeze_gate_key_for_current_state(baseline_sim) != (
+        _freeze_gate_key_for_current_state(changed_sim)
+    )
+
+
 def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
     from simulator.core import PyrolysisSimulator
     from simulator.melt_backend.magemin import MAGEMinBackend
