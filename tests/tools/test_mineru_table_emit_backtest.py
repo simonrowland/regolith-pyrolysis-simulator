@@ -729,13 +729,14 @@ def test_column_headers_preserve_sample_and_mass_spectrum_groups() -> None:
             "Initial", "950°C 2 hr",
         ],
     ]
-    kems_headers = draft._column_headers(kems_rows, {2, 4, 6}, 7)
+    kems_headers = draft._column_headers(kems_rows, {1, 3, 5}, 7)
     landed_k = yaml.safe_load(
         (EXTRACTS / "kems-024-gibson-hubbard-1972.yaml").read_text(
             encoding="utf-8"
         )
     )
     k_observations = landed_k["species"]["K"]["observations"]
+    expected_kems_headers: dict[int, str] = {}
     for column, sample, quote in (
         (2, "10017", "K | 10017 | Initial | 2610"),
         (4, "10073", "K | 10073 | Initial | 1200"),
@@ -753,7 +754,10 @@ def test_column_headers_preserve_sample_and_mass_spectrum_groups() -> None:
             f"{sample} {values['sample_form'].title()} "
             f"{values['condition_as_printed']}"
         )
-        assert kems_headers[column - 1] == expected_header
+        expected_kems_headers[column] = expected_header
+    assert {
+        column: kems_headers[column - 1] for column in expected_kems_headers
+    } == expected_kems_headers
 
     vapor_group = "Mass spectra of vapor (relative units)"
     ternary = r"$CaO \cdot Al_{2}O_{3} \cdot SiO_{2}$"
@@ -765,7 +769,7 @@ def test_column_headers_preserve_sample_and_mass_spectrum_groups() -> None:
             "$CaO$", "$Al_{2}O_{3}$", "$SiO_{2}$",
         ],
     ]
-    spectrum_headers = draft._column_headers(spectrum_rows, {2, 4}, 7)
+    spectrum_headers = draft._column_headers(spectrum_rows, {1, 3}, 7)
     landed_spectrum = yaml.safe_load(
         (EXTRACTS / "stolyarova-1996-cao-alumina-silica-kems.yaml").read_text(
             encoding="utf-8"
