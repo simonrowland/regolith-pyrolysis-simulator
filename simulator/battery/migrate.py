@@ -10449,7 +10449,15 @@ def _printed_map_is_typed_initial(
     if role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
         return True
     target = _printed_fingerprint(printed.state.value)
-    return target is not None and any(
+    if target is None:
+        return False
+    if (
+        isinstance(values, Mapping)
+        and values.get("composition_material_state") == "starting_glass"
+        and _printed_fingerprint(values.get("composition_wt_pct")) == target
+    ):
+        return True
+    return any(
         fingerprint == target and name == "starting_glass_wt_pct"
         for fingerprint, _located, name in _printed_composition_candidates(
             _lab_roots(equipment, values), vocabulary, fallback_locator=locator
@@ -14515,7 +14523,10 @@ class Migrator:
                 point_conditions["composition"] = row_sample.initial_composition
         if declared_experiment_id is None or (
             declared_experiment_id in self.result.experiments
-            and bool(obs.get("equipment"))
+            and (
+                bool(obs.get("equipment"))
+                or row_sample.initial_composition is not None
+            )
         ):
             self._ensure_experiment(
                 work_id=work.work_id,

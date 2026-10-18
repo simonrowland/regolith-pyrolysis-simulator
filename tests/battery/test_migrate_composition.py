@@ -291,7 +291,9 @@ def test_volovetskii_starting_glass_material_state_is_initial() -> None:
         values=observation["values"],
         locator=migrate_module.locator_from_mapping(observation["locator"]),
     )
-    assert selected.initial_composition is not None
+    expected = selected.initial_composition
+    assert expected is not None and not expected.state.is_value
+    assert "unsupported numeric component(s): Cl" in expected.state.reason
 
     migrator = Migrator()
     migrator._migrate_extract(path)
@@ -303,10 +305,7 @@ def test_volovetskii_starting_glass_material_state_is_initial() -> None:
     )
     actual = migrator.result.experiments[row.experiment_id].sample.initial_composition
 
-    assert actual is not None and actual.state.is_value
-    assert dict(actual.state.value.components) == dict(
-        selected.initial_composition.state.value.components
-    )
+    assert actual is not None and actual.state == expected.state
 
 
 def _plante_analytical_composition(doc: dict) -> tuple[dict[str, Decimal], object]:
