@@ -150,7 +150,12 @@ species:
               The earlier Navrotsky activity discussion and the ion-source
               temperature capability are already represented in the
               referenced RJPC contexts.
-          discrepancy: none found in the shared boundary values or findings checked
+          discrepancy: >-
+            EG describes MgO activities as average between Sasamoto et al.
+            (1981) and Fujii et al. (2000); RJPC says intermediate between
+            references [5, 14] and [10, 13]. EG attributes the MgO activity
+            excess to Sakamoto et al. (1981), while RJPC attributes the
+            overestimate to references [10, 16].
       - observation_id: shornikov_2018_eg_fig1_phase_diagram
         type: thermodynamic_example
         locator:
@@ -218,7 +223,7 @@ species:
             phase_and_temperature_as_printed: gas over spinel solid solutions at 2100 K
           axes_as_printed:
             x: Al2O3, mole %
-            y: log p_i, atm
+            y: lg p_i, atm
           panels:
             - panel: main
               phase: gas
@@ -364,9 +369,9 @@ species:
             phase_and_temperature_as_printed: spinel solid solutions at 2100 K
           axes_as_printed:
             x: Al2O3, mole %
-            y_panel_a: Δμ_i, ΔG_2100°, kJ/mole
-            y_panel_b: ΔH_i, ΔH_T, 2100°, kJ/mole
-            y_panel_c: ΔS_i, ΔS_T, 2100°, J/(mole·K)
+            y_panel_a: Δμ_i,2100, ΔG_2100, kJ/mole
+            y_panel_b: ΔH_i,2100, ΔH_2100, kJ/mole
+            y_panel_c: ΔS_i,2100, ΔS_2100, J/(mole·K)
           panels:
             - panel: a
               phase: spinel solid solutions

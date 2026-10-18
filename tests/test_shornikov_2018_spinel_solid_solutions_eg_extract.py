@@ -87,7 +87,11 @@ def test_shared_boundary_and_table_findings_are_cross_referenced_not_repeated():
         "referenced_observation_ids"
     ]
     assert shared["discrepancy"] == (
-        "none found in the shared boundary values or findings checked"
+        "EG describes MgO activities as average between Sasamoto et al. "
+        "(1981) and Fujii et al. (2000); RJPC says intermediate between "
+        "references [5, 14] and [10, 13]. EG attributes the MgO activity "
+        "excess to Sakamoto et al. (1981), while RJPC attributes the "
+        "overestimate to references [10, 16]."
     )
     assert document["species"]["MgAl2O4"].get("observations", []) == []
 
@@ -114,10 +118,29 @@ def test_all_figures_are_metadata_only_and_keep_axes_and_marker_counts():
                 assert isinstance(series["marker_count"], int)
 
     pressure = _context(document, "shornikov_2018_eg_fig2_partial_pressures")
+    assert pressure["values"]["axes_as_printed"] == {
+        "x": "Al2O3, mole %",
+        "y": "lg p_i, atm",
+    }
     assert sum(
         series["marker_count"]
         for series in pressure["values"]["panels"][0]["species"]
     ) == 96
+
+    thermodynamic = _context(
+        document, "shornikov_2018_eg_fig4_thermodynamic_functions"
+    )["values"]
+    assert thermodynamic["axes_as_printed"] == {
+        "x": "Al2O3, mole %",
+        "y_panel_a": "Δμ_i,2100, ΔG_2100, kJ/mole",
+        "y_panel_b": "ΔH_i,2100, ΔH_2100, kJ/mole",
+        "y_panel_c": "ΔS_i,2100, ΔS_2100, J/(mole·K)",
+    }
+
+    activities = _context(document, "shornikov_2018_eg_fig3_activities")["values"]
+    assert activities["marker_count_note"] == (
+        "Estimated from the 600 dpi render; overlapping symbols may merge."
+    )
 
 
 def test_context_only_overlap_passes_validation_and_has_no_scored_rows():
@@ -139,10 +162,11 @@ def test_context_only_overlap_passes_validation_and_has_no_scored_rows():
         if row["source_id"] == document["source_id"]
     ]
 
+    if migrated:
+        assert all(row.identity.temperature_K.is_value for row in migrated)
     assert migrated == []
     assert len(migrated_context) == len(_contexts(document)) == 9
     assert len(migrator.result.works) == 1
     assert not migrator.result.experiments
     assert not migrator.result.registry_issues
     assert not migrator.result.validation.hard_issues
-    assert all(row.identity.temperature_K.is_value for row in migrated)
