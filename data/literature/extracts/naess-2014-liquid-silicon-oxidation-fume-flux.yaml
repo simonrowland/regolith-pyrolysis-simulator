@@ -1,0 +1,1041 @@
+schema_version: literature_extract.v1
+source_id: naess-2014-liquid-silicon-oxidation-fume-flux
+source:
+  citation: M. K. Næss, J. E. Olsen, S. Andersson, G. Tranell (2014), "Parameters Affecting the Rate and Product
+    of Liquid Silicon Oxidation", Oxidation of Metals 82:395–413.
+  doi: 10.1007/s11085-014-9498-z
+  url: https://doi.org/10.1007/s11085-014-9498-z
+  year: 2014
+  sha256: d3b93bc274f14ad2fa3c225584b872ea0297df4d81687a7585ddb2e76891d102
+  version: publisher PDF, 19 pages
+extraction:
+  method: manual transcription from born-digital pdftotext-layout.txt; all five table pages were render-checked
+    at 600 dpi; MinerU table tool found no content-list JSON
+  date: '2026-10-18'
+  worker: w8-1018
+  provenance_path: data/literature/extracts/naess-2014-liquid-silicon-oxidation-fume-flux.yaml
+review_status: draft
+scope_assessment:
+  document_type: experimental liquid-silicon oxidation and CFD/kinetic modeling study
+  typed_observations: 0
+  context_records: 43
+  subject_scope: measured SiO2 fume fluxes, gas-flow conditions, oxygen consumption, BET particle sizes, and model-derived
+    transport/condensation results
+  schema_gap: The existing quantity enum has no silica-fume flux in mol m^-2 s^-1, BET particle diameter in nm,
+    oxygen-consumption percentage, hydrodynamic boundary-layer thickness in mm, or modeled particle formation time
+    in seconds. These values and their printed conditions are preserved in context; no substitute rate or mass-loss
+    quantity is used.
+species:
+  SiO2:
+    observations: []
+    context:
+    - observation_id: naess14_table1_prior_industrial_and_small_scale_results
+      type: experiment_series
+      locator:
+        page: 4
+        published_page: 398
+        table: '1'
+      units: flux units as printed; pO2 in atm
+      values:
+        method_class: quoted_attributed
+        attribution_as_printed: '[1, 3]'
+        columns_as_printed:
+        - Industrial measurements
+        - Small scale experiments
+        industrial_surface_and_flow_as_printed: Turbulent, moving surface; turbulent natural convection in air above
+          silicon surface
+        small_scale_surface_and_flow_as_printed: Stagnant surface; forced, laminar flow of Ar-O2 above silicon surface
+        industrial_pO2_atm_as_printed: '0.21'
+        small_scale_pO2_atm_as_printed: 2 × 10^-3
+        industrial_JSi_as_printed: 0.018–0.037 mol m^-2 s^-1
+        small_scale_JSi_as_printed: 2.5 × 10^-4–7.5 × 10^-4 mol m^-2 s^-1
+        table_caption_as_printed: Comparison of the conditions and results from industrial measurements of fume
+          formation and fundamental small scale experiments.
+    - observation_id: naess14_prior_fume_characterisation_and_industrial_flux
+      type: experiment_series
+      locator:
+        page: 2
+        published_page: 396
+      units: diameter in nm; flux in kg SiO2 per ton Si; annual production in ton
+      values:
+        method_class: quoted_attributed
+        attribution_as_printed: '[1, 3] for fume composition/diameter; [4] for industrial flux and annual estimate'
+        fume_as_printed: spherical, amorphous silica particles
+        mean_diameter_as_printed: ~60 nm
+        industrial_flux_as_printed: approximately 1 kg SiO2 per ton of Si produced
+        annual_equivalent_as_printed: 25 tons of silica per year for a typical 25,000 ton annual production furnace
+        detailed_characterisation_as_printed: small, amorphous spheres of glassy silica
+        detailed_characterisation_attribution_as_printed: '[1, 3, 5]'
+        approximation_preserved: true
+    - observation_id: naess14_quoted_passivation_threshold
+      type: experiment_series
+      locator:
+        page: 2
+        published_page: 396
+      units: pO2 in atm; temperature in °C
+      values:
+        method_class: quoted_attributed
+        attribution_as_printed: Wagner [5]
+        passivation_threshold_as_printed: 6.1 × 10^-3 atm at 1,410 °C
+    - observation_id: naess14_oxidation_reaction_and_passivation_context
+      type: experiment_series
+      locator:
+        page: 2
+        published_page: 396
+      units: pO2 in atm; temperature in °C
+      values:
+        reaction_1_as_printed: Si(l) + 1/2 O2(g) → SiO(g)
+        reaction_2_as_printed: SiO(g) + 1/2 O2(g) → SiO2(l/s)
+        product_path_as_printed: SiO(g) escapes the liquid-silicon surface and is further oxidized to SiO2 fume.
+    - observation_id: naess14_experimental_apparatus_and_common_temperature
+      type: experiment_series
+      locator:
+        page: 5
+        published_page: 399
+      units: as printed
+      values:
+        furnace_as_printed: 75 kW induction furnace
+        silicon_as_printed: MG silicon; typical sample batch 1,750 g of refined metallurgical-grade silicon (99
+          % Si)
+        gas_delivery_as_printed: synthetic air (99,9995 % purity) delivered by mass-flow meter through a lance
+        lance_inner_diameter_as_printed: 5 mm
+        lance_tip_height_as_printed: 2.5 cm above the silicon melt surface
+        filter_and_cooling_as_printed: Gore Acid Resistant Fiberglass filter; cooling used because filter maximum
+          working temperature was 280 °C
+        temperature_C_as_printed: 1,550 ± 11 °C, held during gas blowing
+        dry_air_durations_as_printed: 60 min at 5 m s^-1; 30 min at 16, 21, and 26 m s^-1
+        humid_air_conditions_as_printed: synthetic air bubbled through a 23.5 °C water bath to p(H2O) = 0.03 atm;
+          16 m s^-1; 20 min
+        diluted_air_durations_as_printed: 20 min
+        silica_collection_as_printed: cooler and filter weighed before and after; weight gains summed for total
+          silica
+        assumed_exposed_silicon_area_as_printed: 102 cm^2
+        sem_method_as_printed: Zeiss Ultra 55 Limited Edition field-emission SEM; 5 kV; 2–50 k magnification
+        bet_method_as_printed: samples degassed overnight at 250 °C under vacuum, then analyzed with liquid nitrogen
+        table2_and_text_count_note: The text says fifteen dry-air experiments; Table 2 lists eight dry-air runs
+          and Table 4 has eight dry-air rows. The source counts are retained as printed.
+        table2_table4_diluted_3_2_count_note: Table 2 lists two Air:Ar 3:2 experiments; Table 4 prints three such
+          rows (Experiments 15–17). The printed counts are retained as printed.
+    - observation_id: naess14_table2_experimental_matrix
+      type: experiment_series
+      locator:
+        page: 6
+        published_page: 400
+        table: '2'
+      units: as printed
+      values:
+        method_class: measured_direct
+        velocity_unit_as_printed: linear gas velocity at lance tip, m s^-1
+        velocity_columns_as_printed:
+        - '5'
+        - '16'
+        - '21'
+        - '26'
+        air_argon_ratio_basis_as_printed: proportional mixture of air:argon
+        counts_as_printed:
+          Dry:
+            '5': '2'
+            '16': '2'
+            '21': '2'
+            '26': '2'
+          Wet:
+            '5': ''
+            '16': '2'
+            '21': ''
+            '26': ''
+          Diluted 1:4:
+            '5': ''
+            '16': ''
+            '21': ''
+            '26': '2'
+          Diluted 1:2:
+            '5': ''
+            '16': '2'
+            '21': ''
+            '26': ''
+          Diluted 3:2:
+            '5': ''
+            '16': ''
+            '21': ''
+            '26': '2'
+        condition_note_as_printed: Two dilutions used 26 m s^-1 with the oxygen amounts from the 5 and 16 m s^-1
+          experiments; the third used 16 m s^-1 with the 5 m s^-1 experiment's oxygen amount.
+    - observation_id: naess14_table3_reaction_i
+      type: experiment_series
+      locator:
+        page: 7
+        published_page: 401
+        table: '3'
+        row: reaction I
+      units: 'A: as printed (unit not stated); n: dimensionless; E: J/kmol'
+      values:
+        method_class: model_derived
+        reaction_as_printed: Si(l) + 1/2 O2(g) → SiO(g)
+        A_as_printed: '*'
+        n_as_printed: '*'
+        E_as_printed: '*'
+        attribution_as_printed: present study
+        note_as_printed: Not known; available by model calibration against experiments.
+        table_caption_as_printed: Reactions and rate coefficients implemented in the CFD model.
+    - observation_id: naess14_table3_reaction_ii
+      type: experiment_series
+      locator:
+        page: 7
+        published_page: 401
+        table: '3'
+        row: reaction II
+      units: 'A: as printed (unit not stated); n: dimensionless; E: J/kmol'
+      values:
+        method_class: quoted_attributed
+        reaction_as_printed: SiO(g) + O2(g) ↔ SiO2(g) + O(g)
+        A_as_printed: 1.0 × 10^10
+        n_as_printed: '0.0'
+        E_as_printed: 2.720 × 10^7
+        attribution_as_printed: '[11]'
+        note_as_printed: Coefficient originally derived by Jachimowski and McLain [11].
+        table_caption_as_printed: Reactions and rate coefficients implemented in the CFD model.
+    - observation_id: naess14_table3_reaction_iii
+      type: experiment_series
+      locator:
+        page: 7
+        published_page: 401
+        table: '3'
+        row: reaction III
+      units: 'A: as printed (unit not stated); n: dimensionless; E: J/kmol'
+      values:
+        method_class: quoted_attributed
+        reaction_as_printed: SiO(g) + O(g) + M ↔ SiO2(g) + M
+        A_as_printed: 2.5 × 10^9
+        n_as_printed: '0.0'
+        E_as_printed: 1.828 × 10^7
+        attribution_as_printed: '[11]'
+        note_as_printed: Coefficient originally derived by Jachimowski and McLain [11].
+        table_caption_as_printed: Reactions and rate coefficients implemented in the CFD model.
+    - observation_id: naess14_table3_reaction_iv
+      type: experiment_series
+      locator:
+        page: 7
+        published_page: 401
+        table: '3'
+        row: reaction IV
+      units: 'A: as printed (unit not stated); n: dimensionless; E: J/kmol'
+      values:
+        method_class: model_derived
+        reaction_as_printed: SiO2(g) → SiO2(s)
+        A_as_printed: 5.0 × 10^10
+        n_as_printed: '0.5'
+        E_as_printed: '0'
+        attribution_as_printed: present study
+        note_as_printed: Estimated by kinetic gas theory.
+        table_caption_as_printed: Reactions and rate coefficients implemented in the CFD model.
+    - observation_id: naess14_table4_experiment_01
+      type: experiment_series
+      locator:
+        page: 9
+        published_page: 403
+        table: '4'
+        row: experiment 1
+      units: Table 4 headers preserved; measured flux multiplier is ×10^-3 mol m^-2 s^-1
+      values:
+        experiment_number_as_printed: '1'
+        gas_as_printed: Dry air
+        gas_velocity_m_s_as_printed: '5'
+        pO2_atm_as_printed: '0.21'
+        oxygen_feed_moles_min_as_printed: '0.009'
+        temperature_C_as_printed: 1,550 ± 11
+        duration_as_printed_or_common_method_condition: 60 min
+        measured_or_calculated_results:
+          measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1: '0.98'
+          calculated_oxygen_used_percent_as_printed: '7'
+          measured_particle_diameter_BET_nm_as_printed: 91 ± 0.14
+        model_derived_results:
+          CFD_average_hydrodynamic_boundary_layer_thickness_mm_as_printed: '4.6'
+          calculated_particle_formation_time_s_as_printed: '0.013'
+        evidence_note: Flux and BET diameter are measured; oxygen used, hydrodynamic boundary-layer thickness, and
+          particle formation time are calculated/model-derived.
+        particle_diameter_uncertainty_convention: The table prints ± values for selected rows but does not state
+          the uncertainty convention.
+    - observation_id: naess14_table4_experiment_02
+      type: experiment_series
+      locator:
+        page: 9
+        published_page: 403
+        table: '4'
+        row: experiment 2
+      units: Table 4 headers preserved; measured flux multiplier is ×10^-3 mol m^-2 s^-1
+      values:
+        experiment_number_as_printed: '2'
+        gas_as_printed: Dry air
+        gas_velocity_m_s_as_printed: '5'
+        pO2_atm_as_printed: '0.21'
+        oxygen_feed_moles_min_as_printed: '0.009'
+        temperature_C_as_printed: 1,550 ± 11
+        duration_as_printed_or_common_method_condition: 60 min
+        measured_or_calculated_results:
+          measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1: '1.43'
+          calculated_oxygen_used_percent_as_printed: '10'
+          measured_particle_diameter_BET_nm_as_printed: ''
+        model_derived_results:
+          CFD_average_hydrodynamic_boundary_layer_thickness_mm_as_printed: '4.6'
+          calculated_particle_formation_time_s_as_printed: ''
+        evidence_note: Flux and BET diameter are measured; oxygen used, hydrodynamic boundary-layer thickness, and
+          particle formation time are calculated/model-derived.
+        particle_diameter_uncertainty_convention: The table prints ± values for selected rows but does not state
+          the uncertainty convention.
+    - observation_id: naess14_table4_experiment_03
+      type: experiment_series
+      locator:
+        page: 9
+        published_page: 403
+        table: '4'
+        row: experiment 3
+      units: Table 4 headers preserved; measured flux multiplier is ×10^-3 mol m^-2 s^-1
+      values:
+        experiment_number_as_printed: '3'
+        gas_as_printed: Dry air
+        gas_velocity_m_s_as_printed: '16'
+        pO2_atm_as_printed: '0.21'
+        oxygen_feed_moles_min_as_printed: '0.026'
+        temperature_C_as_printed: 1,550 ± 11
+        duration_as_printed_or_common_method_condition: 30 min
+        measured_or_calculated_results:
+          measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1: '1.48'
+          calculated_oxygen_used_percent_as_printed: '4'
+          measured_particle_diameter_BET_nm_as_printed: 63 ± 0.11
+        model_derived_results:
+          CFD_average_hydrodynamic_boundary_layer_thickness_mm_as_printed: '3.2'
+          calculated_particle_formation_time_s_as_printed: '0.011'
+        evidence_note: Flux and BET diameter are measured; oxygen used, hydrodynamic boundary-layer thickness, and
+          particle formation time are calculated/model-derived.
+        particle_diameter_uncertainty_convention: The table prints ± values for selected rows but does not state
+          the uncertainty convention.
+    - observation_id: naess14_table4_experiment_04
+      type: experiment_series
+      locator:
+        page: 9
+        published_page: 403
+        table: '4'
+        row: experiment 4
+      units: Table 4 headers preserved; measured flux multiplier is ×10^-3 mol m^-2 s^-1
+      values:
+        experiment_number_as_printed: '4'
+        gas_as_printed: Dry air
+        gas_velocity_m_s_as_printed: '16'
+        pO2_atm_as_printed: '0.21'
+        oxygen_feed_moles_min_as_printed: '0.026'
+        temperature_C_as_printed: 1,550 ± 11
+        duration_as_printed_or_common_method_condition: 30 min
+        measured_or_calculated_results:
+          measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1: '1.93'
+          calculated_oxygen_used_percent_as_printed: '5'
+          measured_particle_diameter_BET_nm_as_printed: ''
+        model_derived_results:
+          CFD_average_hydrodynamic_boundary_layer_thickness_mm_as_printed: '3.2'
+          calculated_particle_formation_time_s_as_printed: ''
+        evidence_note: Flux and BET diameter are measured; oxygen used, hydrodynamic boundary-layer thickness, and
+          particle formation time are calculated/model-derived.
+        particle_diameter_uncertainty_convention: The table prints ± values for selected rows but does not state
+          the uncertainty convention.
+    - observation_id: naess14_table4_experiment_05
+      type: experiment_series
+      locator:
+        page: 9
+        published_page: 403
+        table: '4'
+        row: experiment 5
+      units: Table 4 headers preserved; measured flux multiplier is ×10^-3 mol m^-2 s^-1
+      values:
+        experiment_number_as_printed: '5'
+        gas_as_printed: Dry air
+        gas_velocity_m_s_as_printed: '21'
+        pO2_atm_as_printed: '0.21'
+        oxygen_feed_moles_min_as_printed: '0.034'
+        temperature_C_as_printed: 1,550 ± 11
+        duration_as_printed_or_common_method_condition: 30 min
+        measured_or_calculated_results:
+          measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1: '3.50'
+          calculated_oxygen_used_percent_as_printed: '6'
+          measured_particle_diameter_BET_nm_as_printed: 72 ± 0.14
+        model_derived_results:
+          CFD_average_hydrodynamic_boundary_layer_thickness_mm_as_printed: '3.0'
+          calculated_particle_formation_time_s_as_printed: '0.0091'
+        evidence_note: Flux and BET diameter are measured; oxygen used, hydrodynamic boundary-layer thickness, and
+          particle formation time are calculated/model-derived.
+        particle_diameter_uncertainty_convention: The table prints ± values for selected rows but does not state
+          the uncertainty convention.
+    - observation_id: naess14_table4_experiment_06
+      type: experiment_series
+      locator:
+        page: 9
+        published_page: 403
+        table: '4'
+        row: experiment 6
+      units: Table 4 headers preserved; measured flux multiplier is ×10^-3 mol m^-2 s^-1
+      values:
+        experiment_number_as_printed: '6'
+        gas_as_printed: Dry air
+        gas_velocity_m_s_as_printed: '21'
+        pO2_atm_as_printed: '0.21'
+        oxygen_feed_moles_min_as_printed: '0.034'
+        temperature_C_as_printed: 1,550 ± 11
+        duration_as_printed_or_common_method_condition: 30 min
+        measured_or_calculated_results:
+          measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1: '4.36'
+          calculated_oxygen_used_percent_as_printed: '8'
+          measured_particle_diameter_BET_nm_as_printed: ''
+        model_derived_results:
+          CFD_average_hydrodynamic_boundary_layer_thickness_mm_as_printed: '3.0'
+          calculated_particle_formation_time_s_as_printed: ''
+        evidence_note: Flux and BET diameter are measured; oxygen used, hydrodynamic boundary-layer thickness, and
+          particle formation time are calculated/model-derived.
+        particle_diameter_uncertainty_convention: The table prints ± values for selected rows but does not state
+          the uncertainty convention.
+    - observation_id: naess14_table4_experiment_07
+      type: experiment_series
+      locator:
+        page: 9
+        published_page: 403
+        table: '4'
+        row: experiment 7
+      units: Table 4 headers preserved; measured flux multiplier is ×10^-3 mol m^-2 s^-1
+      values:
+        experiment_number_as_printed: '7'
+        gas_as_printed: Dry air
+        gas_velocity_m_s_as_printed: '26'
+        pO2_atm_as_printed: '0.21'
+        oxygen_feed_moles_min_as_printed: '0.043'
+        temperature_C_as_printed: 1,550 ± 11
+        duration_as_printed_or_common_method_condition: 30 min
+        measured_or_calculated_results:
+          measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1: '3.50'
+          calculated_oxygen_used_percent_as_printed: '5'
+          measured_particle_diameter_BET_nm_as_printed: 66 ± 0.15
+        model_derived_results:
+          CFD_average_hydrodynamic_boundary_layer_thickness_mm_as_printed: '2.5'
+          calculated_particle_formation_time_s_as_printed: '0.010'
+        evidence_note: Flux and BET diameter are measured; oxygen used, hydrodynamic boundary-layer thickness, and
+          particle formation time are calculated/model-derived.
+        particle_diameter_uncertainty_convention: The table prints ± values for selected rows but does not state
+          the uncertainty convention.
+    - observation_id: naess14_table4_experiment_08
+      type: experiment_series
+      locator:
+        page: 9
+        published_page: 403
+        table: '4'
+        row: experiment 8
+      units: Table 4 headers preserved; measured flux multiplier is ×10^-3 mol m^-2 s^-1
+      values:
+        experiment_number_as_printed: '8'
+        gas_as_printed: Dry air
+        gas_velocity_m_s_as_printed: '26'
+        pO2_atm_as_printed: '0.21'
+        oxygen_feed_moles_min_as_printed: '0.043'
+        temperature_C_as_printed: 1,550 ± 11
+        duration_as_printed_or_common_method_condition: 30 min
+        measured_or_calculated_results:
+          measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1: '3.40'
+          calculated_oxygen_used_percent_as_printed: '5'
+          measured_particle_diameter_BET_nm_as_printed: ''
+        model_derived_results:
+          CFD_average_hydrodynamic_boundary_layer_thickness_mm_as_printed: '2.5'
+          calculated_particle_formation_time_s_as_printed: ''
+        evidence_note: Flux and BET diameter are measured; oxygen used, hydrodynamic boundary-layer thickness, and
+          particle formation time are calculated/model-derived.
+        particle_diameter_uncertainty_convention: The table prints ± values for selected rows but does not state
+          the uncertainty convention.
+    - observation_id: naess14_table4_experiment_09
+      type: experiment_series
+      locator:
+        page: 9
+        published_page: 403
+        table: '4'
+        row: experiment 9
+      units: Table 4 headers preserved; measured flux multiplier is ×10^-3 mol m^-2 s^-1
+      values:
+        experiment_number_as_printed: '9'
+        gas_as_printed: Humid air
+        gas_velocity_m_s_as_printed: '16'
+        pO2_atm_as_printed: '0.225'
+        oxygen_feed_moles_min_as_printed: '0.026'
+        temperature_C_as_printed: 1,550 ± 11
+        duration_as_printed_or_common_method_condition: 20 min
+        measured_or_calculated_results:
+          measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1: '2.76'
+          calculated_oxygen_used_percent_as_printed: '6'
+          measured_particle_diameter_BET_nm_as_printed: 57 ± 0.10
+        model_derived_results:
+          CFD_average_hydrodynamic_boundary_layer_thickness_mm_as_printed: '3.2'
+          calculated_particle_formation_time_s_as_printed: '0.0050'
+        evidence_note: Flux and BET diameter are measured; oxygen used, hydrodynamic boundary-layer thickness, and
+          particle formation time are calculated/model-derived.
+        particle_diameter_uncertainty_convention: The table prints ± values for selected rows but does not state
+          the uncertainty convention.
+    - observation_id: naess14_table4_experiment_10
+      type: experiment_series
+      locator:
+        page: 9
+        published_page: 403
+        table: '4'
+        row: experiment 10
+      units: Table 4 headers preserved; measured flux multiplier is ×10^-3 mol m^-2 s^-1
+      values:
+        experiment_number_as_printed: '10'
+        gas_as_printed: Humid air
+        gas_velocity_m_s_as_printed: '16'
+        pO2_atm_as_printed: '0.225'
+        oxygen_feed_moles_min_as_printed: '0.026'
+        temperature_C_as_printed: 1,550 ± 11
+        duration_as_printed_or_common_method_condition: 20 min
+        measured_or_calculated_results:
+          measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1: '2.98'
+          calculated_oxygen_used_percent_as_printed: '7'
+          measured_particle_diameter_BET_nm_as_printed: ''
+        model_derived_results:
+          CFD_average_hydrodynamic_boundary_layer_thickness_mm_as_printed: '3.2'
+          calculated_particle_formation_time_s_as_printed: ''
+        evidence_note: Flux and BET diameter are measured; oxygen used, hydrodynamic boundary-layer thickness, and
+          particle formation time are calculated/model-derived.
+        particle_diameter_uncertainty_convention: The table prints ± values for selected rows but does not state
+          the uncertainty convention.
+    - observation_id: naess14_table4_experiment_11
+      type: experiment_series
+      locator:
+        page: 9
+        published_page: 403
+        table: '4'
+        row: experiment 11
+      units: Table 4 headers preserved; measured flux multiplier is ×10^-3 mol m^-2 s^-1
+      values:
+        experiment_number_as_printed: '11'
+        gas_as_printed: Air:Ar 1:4
+        gas_velocity_m_s_as_printed: '26'
+        pO2_atm_as_printed: '0.042'
+        oxygen_feed_moles_min_as_printed: '0.009'
+        temperature_C_as_printed: 1,550 ± 11
+        duration_as_printed_or_common_method_condition: 20 min
+        measured_or_calculated_results:
+          measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1: '5.99'
+          calculated_oxygen_used_percent_as_printed: '43'
+          measured_particle_diameter_BET_nm_as_printed: 40 ± 0.070
+        model_derived_results:
+          CFD_average_hydrodynamic_boundary_layer_thickness_mm_as_printed: '2.5'
+          calculated_particle_formation_time_s_as_printed: '0.0019'
+        evidence_note: Flux and BET diameter are measured; oxygen used, hydrodynamic boundary-layer thickness, and
+          particle formation time are calculated/model-derived.
+        particle_diameter_uncertainty_convention: The table prints ± values for selected rows but does not state
+          the uncertainty convention.
+    - observation_id: naess14_table4_experiment_12
+      type: experiment_series
+      locator:
+        page: 9
+        published_page: 403
+        table: '4'
+        row: experiment 12
+      units: Table 4 headers preserved; measured flux multiplier is ×10^-3 mol m^-2 s^-1
+      values:
+        experiment_number_as_printed: '12'
+        gas_as_printed: Air:Ar 1:4
+        gas_velocity_m_s_as_printed: '26'
+        pO2_atm_as_printed: '0.042'
+        oxygen_feed_moles_min_as_printed: '0.009'
+        temperature_C_as_printed: 1,550 ± 11
+        duration_as_printed_or_common_method_condition: 20 min
+        measured_or_calculated_results:
+          measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1: '4.69'
+          calculated_oxygen_used_percent_as_printed: '33'
+          measured_particle_diameter_BET_nm_as_printed: ''
+        model_derived_results:
+          CFD_average_hydrodynamic_boundary_layer_thickness_mm_as_printed: '2.5'
+          calculated_particle_formation_time_s_as_printed: ''
+        evidence_note: Flux and BET diameter are measured; oxygen used, hydrodynamic boundary-layer thickness, and
+          particle formation time are calculated/model-derived.
+        particle_diameter_uncertainty_convention: The table prints ± values for selected rows but does not state
+          the uncertainty convention.
+    - observation_id: naess14_table4_experiment_13
+      type: experiment_series
+      locator:
+        page: 9
+        published_page: 403
+        table: '4'
+        row: experiment 13
+      units: Table 4 headers preserved; measured flux multiplier is ×10^-3 mol m^-2 s^-1
+      values:
+        experiment_number_as_printed: '13'
+        gas_as_printed: Air:Ar 1:2
+        gas_velocity_m_s_as_printed: '16'
+        pO2_atm_as_printed: '0.07'
+        oxygen_feed_moles_min_as_printed: '0.009'
+        temperature_C_as_printed: 1,550 ± 11
+        duration_as_printed_or_common_method_condition: 20 min
+        measured_or_calculated_results:
+          measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1: '3.46'
+          calculated_oxygen_used_percent_as_printed: '25'
+          measured_particle_diameter_BET_nm_as_printed: 57 ± 0.13
+        model_derived_results:
+          CFD_average_hydrodynamic_boundary_layer_thickness_mm_as_printed: '3.2'
+          calculated_particle_formation_time_s_as_printed: '0.0038'
+        evidence_note: Flux and BET diameter are measured; oxygen used, hydrodynamic boundary-layer thickness, and
+          particle formation time are calculated/model-derived.
+        particle_diameter_uncertainty_convention: The table prints ± values for selected rows but does not state
+          the uncertainty convention.
+    - observation_id: naess14_table4_experiment_14
+      type: experiment_series
+      locator:
+        page: 9
+        published_page: 403
+        table: '4'
+        row: experiment 14
+      units: Table 4 headers preserved; measured flux multiplier is ×10^-3 mol m^-2 s^-1
+      values:
+        experiment_number_as_printed: '14'
+        gas_as_printed: Air:Ar 1:2
+        gas_velocity_m_s_as_printed: '16'
+        pO2_atm_as_printed: '0.07'
+        oxygen_feed_moles_min_as_printed: '0.009'
+        temperature_C_as_printed: 1,550 ± 11
+        duration_as_printed_or_common_method_condition: 20 min
+        measured_or_calculated_results:
+          measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1: '4.31'
+          calculated_oxygen_used_percent_as_printed: '31'
+          measured_particle_diameter_BET_nm_as_printed: ''
+        model_derived_results:
+          CFD_average_hydrodynamic_boundary_layer_thickness_mm_as_printed: '3.2'
+          calculated_particle_formation_time_s_as_printed: ''
+        evidence_note: Flux and BET diameter are measured; oxygen used, hydrodynamic boundary-layer thickness, and
+          particle formation time are calculated/model-derived.
+        particle_diameter_uncertainty_convention: The table prints ± values for selected rows but does not state
+          the uncertainty convention.
+    - observation_id: naess14_table4_experiment_15
+      type: experiment_series
+      locator:
+        page: 9
+        published_page: 403
+        table: '4'
+        row: experiment 15
+      units: Table 4 headers preserved; measured flux multiplier is ×10^-3 mol m^-2 s^-1
+      values:
+        experiment_number_as_printed: '15'
+        gas_as_printed: Air:Ar 3:2
+        gas_velocity_m_s_as_printed: '26'
+        pO2_atm_as_printed: '0.126'
+        oxygen_feed_moles_min_as_printed: '0.026'
+        temperature_C_as_printed: 1,550 ± 11
+        duration_as_printed_or_common_method_condition: 20 min
+        measured_or_calculated_results:
+          measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1: '6.55'
+          calculated_oxygen_used_percent_as_printed: '16'
+          measured_particle_diameter_BET_nm_as_printed: 55 ± 0.12
+        model_derived_results:
+          CFD_average_hydrodynamic_boundary_layer_thickness_mm_as_printed: '2.5'
+          calculated_particle_formation_time_s_as_printed: '0.0026'
+        evidence_note: Flux and BET diameter are measured; oxygen used, hydrodynamic boundary-layer thickness, and
+          particle formation time are calculated/model-derived.
+        particle_diameter_uncertainty_convention: The table prints ± values for selected rows but does not state
+          the uncertainty convention.
+    - observation_id: naess14_table4_experiment_16
+      type: experiment_series
+      locator:
+        page: 9
+        published_page: 403
+        table: '4'
+        row: experiment 16
+      units: Table 4 headers preserved; measured flux multiplier is ×10^-3 mol m^-2 s^-1
+      values:
+        experiment_number_as_printed: '16'
+        gas_as_printed: Air:Ar 3:2
+        gas_velocity_m_s_as_printed: '26'
+        pO2_atm_as_printed: '0.126'
+        oxygen_feed_moles_min_as_printed: '0.026'
+        temperature_C_as_printed: 1,550 ± 11
+        duration_as_printed_or_common_method_condition: 20 min
+        measured_or_calculated_results:
+          measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1: '10.74'
+          calculated_oxygen_used_percent_as_printed: '26'
+          measured_particle_diameter_BET_nm_as_printed: ''
+        model_derived_results:
+          CFD_average_hydrodynamic_boundary_layer_thickness_mm_as_printed: '2.5'
+          calculated_particle_formation_time_s_as_printed: ''
+        evidence_note: Flux and BET diameter are measured; oxygen used, hydrodynamic boundary-layer thickness, and
+          particle formation time are calculated/model-derived.
+        particle_diameter_uncertainty_convention: The table prints ± values for selected rows but does not state
+          the uncertainty convention.
+    - observation_id: naess14_table4_experiment_17
+      type: experiment_series
+      locator:
+        page: 9
+        published_page: 403
+        table: '4'
+        row: experiment 17
+      units: Table 4 headers preserved; measured flux multiplier is ×10^-3 mol m^-2 s^-1
+      values:
+        experiment_number_as_printed: '17'
+        gas_as_printed: Air:Ar 3:2
+        gas_velocity_m_s_as_printed: '26'
+        pO2_atm_as_printed: '0.126'
+        oxygen_feed_moles_min_as_printed: '0.026'
+        temperature_C_as_printed: 1,550 ± 11
+        duration_as_printed_or_common_method_condition: 20 min
+        measured_or_calculated_results:
+          measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1: '11.34'
+          calculated_oxygen_used_percent_as_printed: '27'
+          measured_particle_diameter_BET_nm_as_printed: ''
+        model_derived_results:
+          CFD_average_hydrodynamic_boundary_layer_thickness_mm_as_printed: '2.5'
+          calculated_particle_formation_time_s_as_printed: ''
+        evidence_note: Flux and BET diameter are measured; oxygen used, hydrodynamic boundary-layer thickness, and
+          particle formation time are calculated/model-derived.
+        particle_diameter_uncertainty_convention: The table prints ± values for selected rows but does not state
+          the uncertainty convention.
+    - observation_id: naess14_table5_measured_flux_by_dry_air_velocity
+      type: experiment_series
+      locator:
+        page: 12
+        published_page: 406
+        table: '5'
+        row: Measured JSiO2
+      units: 10^-3 mol m^-2 s^-1
+      values:
+        method_class: measured_direct
+        quantity_as_printed: Measured JSiO2
+        gas_velocity_at_nozzle_exit_m_s:
+          '5': '1.2'
+          '16': '1.7'
+          '21': '3.9'
+          '26': '3.5'
+        printed_flux_unit_scale: 10^-3 mol m^-2 s^-1
+        table_caption_as_printed: Comparison of measured flux of Si and theoretical flux of Si, calculated with
+          mass transfer coefficient from laminar impinging jet theory, and using a sticking coefficient of 0.01.
+    - observation_id: naess14_table5_theoretical_flux_by_dry_air_velocity
+      type: experiment_series
+      locator:
+        page: 12
+        published_page: 406
+        table: '5'
+        row: Theoretical JSiO2
+      units: 10^-3 mol m^-2 s^-1
+      values:
+        method_class: model_derived
+        quantity_as_printed: Theoretical JSiO2
+        gas_velocity_at_nozzle_exit_m_s:
+          '5': '1.0'
+          '16': '2.3'
+          '21': '2.9'
+          '26': '3.4'
+        printed_flux_unit_scale: 10^-3 mol m^-2 s^-1
+        sticking_coefficient_as_printed: '0.01'
+        sticking_coefficient_attribution_as_printed: Lander and Morrison (1962) [16]
+        method_as_printed: Laminar impinging jet mass transfer coefficient and Fick's law.
+    - observation_id: naess14_quoted_sticking_coefficient
+      type: experiment_series
+      locator:
+        page: 11
+        published_page: 405
+      units: dimensionless coefficient; temperature in °C
+      values:
+        method_class: quoted_attributed
+        attribution_as_printed: Lander and Morrison (1962) [16]
+        sticking_coefficient_as_printed: '0.01'
+        basis_as_printed: Measured from pressure drop due to oxygen consumption by solid silicon at 875 °C.
+        temperature_dependence_as_printed: Not strongly temperature dependent; authors concluded active oxidation
+          has a low activation energy.
+    - observation_id: naess14_text_particle_size_flow_summary
+      type: experiment_series
+      locator:
+        page: 11
+        published_page: 405
+      units: mean particle diameter in nm
+      values:
+        method_class: measured_direct
+        quantity_as_printed: average BET particle diameter
+        lower_gas_flow_mean_as_printed: 91 nm
+        higher_gas_flow_mean_as_printed: 66 nm
+        interpretation_as_printed: Particles formed at a lower gas flow rate had a larger average diameter than
+          particles formed at higher gas flow rates.
+        locator_note: Prose immediately preceding Table 5; detailed measured values and uncertainties are in Table
+          4.
+    - observation_id: naess14_model_derived_siO_partial_pressure_and_transport
+      type: experiment_series
+      locator:
+        page: 10
+        published_page: 404
+      units: partial pressure in atm; diffusion coefficient in m^2 s^-1; boundary thickness in mm
+      values:
+        method_class: model_derived
+        SiO_partial_pressure_as_printed: 0.0037–0.0068 atm
+        SiO_partial_pressure_standard_deviation_as_printed: 25 %
+        method_as_printed: Calculated using mass transfer coefficient derived from impinging jet theory.
+        SiO_diffusion_coefficient_at_1550C_as_printed: 3.9 × 10^-4 m^2 s^-1
+        O2_diffusion_coefficient_at_1550C_as_printed: 4.7 × 10^-4 m^2 s^-1
+        diffusion_coefficient_attribution_as_printed: Bird, Stewart and Lightfoot [15]; see [4] for derivation description.
+        SiO_boundary_layer_thickness_as_printed: approximately 0.5 mm at all gas flow rates
+        O2_boundary_layer_thickness_at_26_m_s_as_printed: 3.25 mm
+    - observation_id: naess14_quoted_industrial_particle_diameter_range
+      type: experiment_series
+      locator:
+        page: 11
+        published_page: 405
+      units: particle diameter in nm
+      values:
+        method_class: quoted_attributed
+        attribution_as_printed: '[1, 3]'
+        industrial_particle_diameter_range_as_printed: 56–66 nm
+    - observation_id: naess14_fig3_dry_air_regression
+      type: experiment_series
+      locator:
+        page: 8
+        published_page: 402
+        figure: '3'
+      units: regression relation between JSiO2 and vg^(3/4); R^2 dimensionless
+      values:
+        method_class: model_derived
+        fit_as_printed: Linear regression of dry-air experimental results against vg^(3/4)
+        R_squared_as_printed: '0.91'
+        flat_plate_comparison_R_squared_as_printed: '0.76'
+        figure_note: No plotted marker values were digitised; fit statistics and relation are printed text/annotations.
+    - observation_id: naess14_cfd_oxygen_consumption_summary
+      type: experiment_series
+      locator:
+        page: 10
+        published_page: 404
+      units: oxygen consumed percent
+      values:
+        method_class: measured_reduced
+        dry_air_at_5_m_s_as_printed: 9 % average
+        dry_air_at_26_m_s_as_printed: 5 % average
+        humid_air_at_16_m_s_as_printed: 6 % versus 4 % for dry air
+        air_argon_1_4_at_26_m_s_as_printed: 38 % average versus 9 % at 5 m s^-1 dry air
+        non_significance_note_as_printed: The humid-air increase was not statistically significant.
+    - observation_id: naess14_appendix_particle_condensation_model
+      type: experiment_series
+      locator:
+        page: 18
+        published_page: 412
+      units: particle size in number of SiO2 units and nm; formation rate s^-1
+      values:
+        method_class: model_derived
+        N_solid_as_printed: 7,000 SiO2 units
+        spherical_quartz_diameter_for_N_solid_as_printed: 8 nm
+        solidity_exponent_l_as_printed: 1/3
+        reaction_as_printed: (SiO2)N-1 + SiO2 → (SiO2)N
+        particle_formation_rate_constant_equation_22_as_printed: k_particle = 5 × 10^10 T^(1/2) s^-1
+        amorphous_silica_density_as_printed: 2.2 g cm^-3
+        particle_rate_constant_with_amorphous_density_as_printed: 6 × 10^10 T^(1/2) s^-1
+        difference_as_printed: about 20 % higher than using quartz density
+        model_source_as_printed: Cluster binding-energy calculations from Catlow et al. [18]; growth based on hard-sphere
+          collision theory.
+    - observation_id: naess14_figure_1_deferred
+      type: figure_record
+      locator:
+        page: 3
+        published_page: 397
+        figure: '1'
+      units: not applicable (schematic)
+      values:
+        quantity_as_printed: oxidation process and experimental/industrial conditions (schematic)
+        species:
+        - Si
+        - SiO
+        - O2
+        - SiO2
+        phase: liquid Si and gas/fume
+        temperature_as_printed: not stated
+        axes_as_printed: not applicable (schematic)
+        caption_as_printed: Comparison of the conditions in earlier industrial measurements of fume formation and
+          small scale laboratory experiments. The mechanism for the oxidation, given in the top right inset, is
+          the same for both cases; active oxidation [1, 3].
+        panel: whole figure
+        series:
+        - name: industrial measurement schematic
+          marker_count: 0
+          attribution: '[1, 3]'
+        - name: small-scale experiment schematic
+          marker_count: 0
+          attribution: '[1, 3]'
+        attribution: present study
+        digitisation: deferred to a figure pass
+        non_data_annotations_as_printed: ~7000 kg industrial charge; 10 g small-scale charge
+    - observation_id: naess14_figure_2_deferred
+      type: figure_record
+      locator:
+        page: 5
+        published_page: 399
+        figure: '2'
+      units: not applicable (apparatus sketch)
+      values:
+        quantity_as_printed: experimental apparatus and dimensions
+        species:
+        - Si
+        - O2
+        - SiO2
+        phase: liquid silicon, gas flow, collected silica fume
+        temperature_as_printed: 1,550 ± 11 °C in the experiments
+        axes_as_printed: not applicable (apparatus sketch)
+        caption_as_printed: Sketch of experimental setup
+        panel: whole figure
+        series:
+        - name: apparatus components
+          marker_count: 0
+          attribution: present study
+        attribution: present study
+        digitisation: deferred to a figure pass
+        non_data_annotations_as_printed: H = 40 cm; ID = 11.4 cm; lance/furnace dimensions as labelled
+    - observation_id: naess14_figure_3_deferred
+      type: figure_record
+      locator:
+        page: 8
+        published_page: 402
+        figure: '3'
+      units: 'x: (vg)^(3/4), [(m s^-1)^0.75]; y: flux of SiO2, 10^-3 mol m^-2 s^-1'
+      values:
+        quantity_as_printed: measured SiO2 fume flux versus gas velocity
+        species:
+        - SiO2
+        phase: silica fume; SiO2(g) oxidation product
+        temperature_as_printed: 1,550 ± 11 °C experimental temperature
+        axes_as_printed: 'x: (vg)^(3/4), [(m s^-1)^0.75]; y: flux of SiO2, 10^-3 mol m^-2 s^-1'
+        caption_as_printed: Measured flux of SiO2 as a function of vg^(3/4) for three different flow rates with
+          the same oxygen amount per time (Diamonds Exp. 1 and 2, Triangles Exp. 13 and 14, Squares Exp. 11 and
+          12).
+        panel: whole figure
+        series:
+        - name: dry air, diamonds (Experiments 1 and 2)
+          marker_count: 2
+          attribution: present study
+        - name: diluted air:Ar 1:2, triangles (Experiments 13 and 14)
+          marker_count: 2
+          attribution: present study
+        - name: diluted air:Ar 1:4, squares (Experiments 11 and 12)
+          marker_count: 2
+          attribution: present study
+        attribution: present study
+        digitisation: deferred to a figure pass
+    - observation_id: naess14_figure_4_deferred
+      type: figure_record
+      locator:
+        page: 10
+        published_page: 404
+        figure: '4'
+      units: 'x: δhyd, mm; y: oxygen consumption, %'
+      values:
+        quantity_as_printed: oxygen consumption versus hydrodynamic boundary-layer thickness
+        species:
+        - O2
+        - Si
+        - SiO2
+        phase: oxygen transported to liquid silicon; gas/fume
+        temperature_as_printed: 1,550 ± 11 °C experimental temperature
+        axes_as_printed: 'x: δhyd, mm; y: oxygen consumption, %'
+        caption_as_printed: The average oxygen consumption as a function of average hydrodynamic boundary layer
+          thickness from CFD modeling, δhyd.
+        panel: whole figure
+        series:
+        - name: dry
+          marker_count: 8
+          attribution: present study
+        - name: wet
+          marker_count: 2
+          attribution: present study
+        - name: diluted 1:4
+          marker_count: 2
+          attribution: present study
+        - name: diluted 1:2
+          marker_count: 2
+          attribution: present study
+        - name: diluted 3:2
+          marker_count: 3
+          attribution: present study
+        attribution: present study
+        digitisation: deferred to a figure pass
+    - observation_id: naess14_figure_5_deferred
+      type: figure_record
+      locator:
+        page: 12
+        published_page: 406
+        figure: '5'
+      units: 'x: distance above Si surface, mm; y (left graph): O2 mole fraction; y (right graph): SiO mole fraction
+        and O2 mole fraction'
+      values:
+        quantity_as_printed: O2 and SiO gas concentration profiles versus distance above silicon
+        species:
+        - O2
+        - SiO
+        phase: gas profiles above liquid silicon
+        temperature_as_printed: 1,550 ± 11 °C experimental temperature
+        axes_as_printed: 'x: distance above Si surface, mm; y (left graph): O2 mole fraction; y (right graph): SiO
+          mole fraction and O2 mole fraction'
+        caption_as_printed: Concentration profile of O2 and SiO at the highest and lowest gas flow rates. Note the
+          different y-scales in the right graph.
+        panel: whole figure
+        series:
+        - name: SiO, 5 m/s
+          marker_count: 0
+          attribution: CFD model
+        - name: SiO, 26 m/s
+          marker_count: 0
+          attribution: CFD model
+        - name: O2, 5 m/s
+          marker_count: 0
+          attribution: CFD model
+        - name: O2, 26 m/s
+          marker_count: 0
+          attribution: CFD model
+        attribution: present study
+        digitisation: deferred to a figure pass
+    - observation_id: naess14_figure_6_deferred
+      type: figure_record
+      locator:
+        page: 12
+        published_page: 406
+        figure: '6'
+      units: not applicable (SEM image)
+      values:
+        quantity_as_printed: morphology of filter-collected silica fume
+        species:
+        - SiO2
+        phase: amorphous spherical silica particles
+        temperature_as_printed: not stated
+        axes_as_printed: not applicable (SEM image)
+        caption_as_printed: SEM image of the silica collected in the filter
+        panel: whole figure
+        series:
+        - name: filter-collected silica particles
+          marker_count: 0
+          attribution: present study
+        attribution: present study
+        digitisation: deferred to a figure pass
+        non_data_annotations_as_printed: 200 nm scale bar
+    - observation_id: naess14_figure_7_deferred
+      type: figure_record
+      locator:
+        page: 13
+        published_page: 407
+        figure: '7'
+      units: not applicable (mechanism sketch)
+      values:
+        quantity_as_printed: active oxidation reaction mechanism (schematic)
+        species:
+        - Si
+        - O2
+        - SiO
+        - SiO2
+        phase: liquid Si, gaseous SiO/O2, particulate SiO2
+        temperature_as_printed: not stated
+        axes_as_printed: not applicable (mechanism sketch)
+        caption_as_printed: 'Sketch of suggested molecular mechanism for the active oxidation of liquid silicon.
+          The boundary layer of SiO(g) is one order of magnitude thinner that the O2(g) boundary layer. The gas
+          velocity will affect the O2(g) boundary layer, but not the SiO(g) boundary layer. When the oxygen travels
+          through the SiO(g) boundary layer, there are two possible paths: (1) it meets an outgoing SiO(g) molecule
+          and reacts to become an SiO2(g) molecule and an O*radical, which further will (a) react with the Si surface
+          and make a new SiO(g) molecule, or (b) react with a SiO(g) molecule to form more SiO2(g). (2) it reacts
+          directly with the Si(l) surface to form two SiO(g) molecules which are oxidized to SiO2(g)'
+        panel: whole figure
+        series:
+        - name: captioned reaction path 1
+          marker_count: 0
+          attribution: present study
+        - name: captioned reaction path 2
+          marker_count: 0
+          attribution: present study
+        attribution: present study
+        digitisation: deferred to a figure pass
