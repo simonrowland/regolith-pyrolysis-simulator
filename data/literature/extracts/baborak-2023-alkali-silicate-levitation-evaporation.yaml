@@ -21,13 +21,13 @@ extraction:
   worker: codex-w7-1018
 review_status: draft
 fidelity_samples:
-  - species: Li2O
+  - species: Li2Si2O5
     observable: phase_transition
     observation_id: baborak_2023_ls2_tg_table1
     field: T_K_as_printed
     value: '726 ± 5'
     locator: {pdf_page_index: 4, published_page: 459, table: '1', row: LS2}
-  - species: Na2O
+  - species: Na2Si2O5
     observable: phase_transition
     observation_id: baborak_2023_ns2_t_liquidus_table1
     field: T_K_as_printed
@@ -40,13 +40,19 @@ fidelity_samples:
     value: 0.52
     locator: {pdf_page_index: 4, published_page: 459, table: '2', row: KS8}
 species:
-  Li2O:
+  Li2Si2O5:
     observations:
       - observation_id: baborak_2023_ls2_tg_table1
         type: phase_transition
         locator: {pdf_page_index: 4, published_page: 459, table: '1', row: LS2, column: Tg}
         phase: glass
+        quench_statement:
+          text: "Finally, the samples were extracted from the furnace and quenched by rapidly immersing the bottom of the Pt crucible in water."
+          preservation: not_stated
+          locator: {pdf_page_index: 2, published_page: 457, section: Experimental}
         units: K
+        uncertainty:
+          note: Printed ±5 K; confidence level not stated.
         values:
           quantity: transition_temperature
           method_class: measured_direct
@@ -55,8 +61,9 @@ species:
           composition_as_published: Li2O·2SiO2
           T_K: 726
           T_K_as_printed: '726 ± 5'
-          temperature_uncertainty_K: 5
+          T_m_uncertainty_K: 5
         point_conditions:
+          quench_state: {state: {tag: value, value: not_stated}, locator: {pdf_page_index: 2, published_page: 457, section: Experimental}}
           temperature_K:
             state: {tag: value, value: {kind: point, point: '726'}}
             locator: {pdf_page_index: 4, published_page: 459, table: '1', row: LS2, column: Tg}
@@ -66,13 +73,19 @@ species:
           composition:
             state:
               tag: value
-              value: {basis: nominal formula-unit ratio normalized to mole fraction, components: [[Li2O, '0.3333333333333333'], [SiO2, '0.6666666666666667']], amount_basis: mole_fraction}
+              value: {basis: nominal formula-unit ratio as printed, components: [[Li2O, 1], [SiO2, 2]], amount_basis: mol_inventory}
             locator: {pdf_page_index: 4, published_page: 459, table: '1', row: LS2, note: Printed composition Li2O·2SiO2}
       - observation_id: baborak_2023_ls2_tc_table1
         type: phase_transition
         locator: {pdf_page_index: 4, published_page: 459, table: '1', row: LS2, column: Tc}
         phase: glass
+        quench_statement:
+          text: "Finally, the samples were extracted from the furnace and quenched by rapidly immersing the bottom of the Pt crucible in water."
+          preservation: not_stated
+          locator: {pdf_page_index: 2, published_page: 457, section: Experimental}
         units: K
+        uncertainty:
+          note: Printed ±5 K; confidence level not stated.
         values:
           quantity: transition_temperature
           method_class: measured_direct
@@ -81,9 +94,10 @@ species:
           composition_as_published: Li2O·2SiO2
           T_K: 837
           T_K_as_printed: '837 ± 5'
-          temperature_uncertainty_K: 5
+          T_m_uncertainty_K: 5
           technique_as_published: simple DSC upscan at 10 K min−1
         point_conditions:
+          quench_state: {state: {tag: value, value: not_stated}, locator: {pdf_page_index: 2, published_page: 457, section: Experimental}}
           temperature_K:
             state: {tag: value, value: {kind: point, point: '837'}}
             locator: {pdf_page_index: 4, published_page: 459, table: '1', row: LS2, column: Tc}
@@ -93,12 +107,12 @@ species:
           composition:
             state:
               tag: value
-              value: {basis: nominal formula-unit ratio normalized to mole fraction, components: [[Li2O, '0.3333333333333333'], [SiO2, '0.6666666666666667']], amount_basis: mole_fraction}
+              value: {basis: nominal formula-unit ratio as printed, components: [[Li2O, 1], [SiO2, 2]], amount_basis: mol_inventory}
             locator: {pdf_page_index: 4, published_page: 459, table: '1', row: LS2, note: Printed composition Li2O·2SiO2}
       - observation_id: baborak_2023_ls2_t_liquidus_table1
         type: phase_transition
         locator: {pdf_page_index: 4, published_page: 459, table: '1', row: LS2, column: Tm}
-        phase: glass
+        phase: l
         units: K
         values:
           quantity: transition_temperature
@@ -106,6 +120,10 @@ species:
           property_kind: liquidus
           sample_id: LS2
           composition_as_published: Li2O·2SiO2
+          composition_mol:
+            basis: nominal_formula_unit_ratio_as_published
+            Li2O: 1
+            SiO2: 2
           T_K: 1306
           T_K_as_printed: '1306'
           attribution: Literature refs. 73–75, phase diagrams cited in the Table 1 caption
@@ -119,59 +137,8 @@ species:
           composition:
             state:
               tag: value
-              value: {basis: nominal formula-unit ratio normalized to mole fraction, components: [[Li2O, '0.3333333333333333'], [SiO2, '0.6666666666666667']], amount_basis: mole_fraction}
+              value: {basis: nominal formula-unit ratio as printed, components: [[Li2O, 1], [SiO2, 2]], amount_basis: mol_inventory}
             locator: {pdf_page_index: 4, published_page: 459, table: '1', row: LS2, note: Printed composition Li2O·2SiO2}
-      - observation_id: baborak_2023_lb2_t_liquidus_table3
-        type: phase_transition
-        locator: {pdf_page_index: 7, published_page: 462, table: '3', row: LB2, column: Tm}
-        phase: glass
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          property_kind: melting_point
-          sample_id: LB2
-          composition_as_published: Li2O·2B2O3
-          T_K: 1190
-          T_K_as_printed: '1190'
-          attribution: Literature refs. 96, 101, and 102, as cited in the Table 3 caption
-        point_conditions:
-          temperature_K:
-            state: {tag: value, value: {kind: point, point: '1190'}}
-            locator: {pdf_page_index: 7, published_page: 462, table: '3', row: LB2, column: Tm}
-          total_pressure_Pa:
-            state: {tag: unknown, reason: not_published}
-            locator: {pdf_page_index: 7, published_page: 462, table: '3', row: LB2}
-          composition:
-            state:
-              tag: value
-              value: {basis: nominal formula-unit ratio normalized to mole fraction, components: [[Li2O, '0.3333333333333333'], [B2O3, '0.6666666666666667']], amount_basis: mole_fraction}
-            locator: {pdf_page_index: 7, published_page: 462, table: '3', row: LB2, note: Printed composition Li2O·2B2O3}
-      - observation_id: baborak_2023_lb2_high_temperature_mass_loss
-        type: mass_loss
-        locator: {pdf_page_index: 8, published_page: 463, figure: '9', section: Discussion}
-        phase: glass bead
-        units: percent of expected mass
-        values:
-          quantity: mass_loss_fraction
-          method_class: measured_direct
-          sample_id: LB2
-          mass_loss_wt_pct: 45
-          mass_loss_bound_as_printed: up to 45% of the expected mass
-          condition_as_printed: two LB2 beads intentionally melted at higher temperatures to induce volatilization
-          measurement: bead mass relative to expected mass; individual values are figure-only and not digitized
-        point_conditions:
-          temperature_K:
-            state: {tag: unknown, reason: individual bead pyrometer temperatures not published}
-            locator: {pdf_page_index: 8, published_page: 463, section: Discussion, note: A nearby text statement reports ∼1200°C for intentional LB2 heating; the two individual bead temperatures are not given.}
-          total_pressure_Pa:
-            state: {tag: unknown, reason: not_published}
-            locator: {pdf_page_index: 8, published_page: 463, section: Discussion}
-          composition:
-            state:
-              tag: value
-              value: {basis: nominal formula-unit ratio normalized to mole fraction, components: [[Li2O, '0.3333333333333333'], [B2O3, '0.6666666666666667']], amount_basis: mole_fraction}
-            locator: {pdf_page_index: 8, published_page: 463, figure: '9', note: Printed composition Li2O·2B2O3}
     context:
       - observation_id: baborak_2023_ls2_viscosity_fit_table1
         type: thermodynamic_context
@@ -204,33 +171,19 @@ species:
           melting_temperature_attribution: 'Refs. 96, 101, and 102, as cited in the Table 3 caption'
           definition: 'revap = Tm,Σ / Tm; Δevap = revap,max − revap,min.'
           schema_gap: Log viscosity, revap, and Δevap are not represented by existing quantity tokens; the printed values are retained here.
-      - observation_id: baborak_2023_figure9_composition_context
-        type: thermodynamic_context
-        locator: {pdf_page_index: 8, published_page: 463, figure: '9'}
-        units: mol% as printed in figure axes
-        values:
-          quantity: measured_glass_composition_context
-          method_class: measured_direct
-          samples:
-            - sample_id: NP
-              nominal_composition_as_published: Na2O·P2O5
-              analyzed_composition: {tag: unknown, reason: numeric_composition_points_in_figure_9_deferred_by_wave_7_ruling}
-            - sample_id: LB2
-              nominal_composition_as_published: Li2O·2B2O3
-              analyzed_composition: {tag: unknown, reason: numeric_composition_points_in_figure_9_deferred_by_wave_7_ruling}
-            - sample_id: LB2_high_temperature_bead_ML_36_percent
-              analyzed_composition: {tag: unknown, reason: numeric_composition_points_in_figure_9_deferred_by_wave_7_ruling}
-            - sample_id: LB2_high_temperature_bead_ML_45_percent
-              analyzed_composition: {tag: unknown, reason: numeric_composition_points_in_figure_9_deferred_by_wave_7_ruling}
-          basis: LA-ICP-MS molar Li2O and B2O3 or Na2O and P2O5 plotted in panel A; panel B recalculates the Li2O and B2O3 mole content for two LB2 beads.
-    
-  Na2O:
+  Na2Si2O5:
     observations:
       - observation_id: baborak_2023_ns2_tg_table1
         type: phase_transition
         locator: {pdf_page_index: 4, published_page: 459, table: '1', row: NS2, column: Tg}
         phase: glass
+        quench_statement:
+          text: "Finally, the samples were extracted from the furnace and quenched by rapidly immersing the bottom of the Pt crucible in water."
+          preservation: not_stated
+          locator: {pdf_page_index: 2, published_page: 457, section: Experimental}
         units: K
+        uncertainty:
+          note: Printed ±5 K; confidence level not stated.
         values:
           quantity: transition_temperature
           method_class: measured_direct
@@ -239,18 +192,25 @@ species:
           composition_as_published: Na2O·2SiO2
           T_K: 728
           T_K_as_printed: '728 ± 5'
-          temperature_uncertainty_K: 5
+          T_m_uncertainty_K: 5
         point_conditions:
+          quench_state: {state: {tag: value, value: not_stated}, locator: {pdf_page_index: 2, published_page: 457, section: Experimental}}
           temperature_K: {state: {tag: value, value: {kind: point, point: '728'}}, locator: {pdf_page_index: 4, published_page: 459, table: '1', row: NS2, column: Tg}}
           total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {pdf_page_index: 4, published_page: 459, table: '1', row: NS2}}
           composition:
-            state: {tag: value, value: {basis: nominal formula-unit ratio normalized to mole fraction, components: [[Na2O, '0.3333333333333333'], [SiO2, '0.6666666666666667']], amount_basis: mole_fraction}}
+            state: {tag: value, value: {basis: nominal formula-unit ratio as printed, components: [[Na2O, 1], [SiO2, 2]], amount_basis: mol_inventory}}
             locator: {pdf_page_index: 4, published_page: 459, table: '1', row: NS2, note: Printed composition Na2O·2SiO2}
       - observation_id: baborak_2023_ns2_tc_table1
         type: phase_transition
         locator: {pdf_page_index: 4, published_page: 459, table: '1', row: NS2, column: Tc}
         phase: glass
+        quench_statement:
+          text: "Finally, the samples were extracted from the furnace and quenched by rapidly immersing the bottom of the Pt crucible in water."
+          preservation: not_stated
+          locator: {pdf_page_index: 2, published_page: 457, section: Experimental}
         units: K
+        uncertainty:
+          note: Printed ±5 K; confidence level not stated.
         values:
           quantity: transition_temperature
           method_class: measured_direct
@@ -259,18 +219,19 @@ species:
           composition_as_published: Na2O·2SiO2
           T_K: 916
           T_K_as_printed: '916 ± 5'
-          temperature_uncertainty_K: 5
+          T_m_uncertainty_K: 5
           technique_as_published: simple DSC upscan at 10 K min−1
         point_conditions:
+          quench_state: {state: {tag: value, value: not_stated}, locator: {pdf_page_index: 2, published_page: 457, section: Experimental}}
           temperature_K: {state: {tag: value, value: {kind: point, point: '916'}}, locator: {pdf_page_index: 4, published_page: 459, table: '1', row: NS2, column: Tc}}
           total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {pdf_page_index: 4, published_page: 459, table: '1', row: NS2}}
           composition:
-            state: {tag: value, value: {basis: nominal formula-unit ratio normalized to mole fraction, components: [[Na2O, '0.3333333333333333'], [SiO2, '0.6666666666666667']], amount_basis: mole_fraction}}
+            state: {tag: value, value: {basis: nominal formula-unit ratio as printed, components: [[Na2O, 1], [SiO2, 2]], amount_basis: mol_inventory}}
             locator: {pdf_page_index: 4, published_page: 459, table: '1', row: NS2, note: Printed composition Na2O·2SiO2}
       - observation_id: baborak_2023_ns2_t_liquidus_table1
         type: phase_transition
         locator: {pdf_page_index: 4, published_page: 459, table: '1', row: NS2, column: Tm}
-        phase: glass
+        phase: l
         units: K
         values:
           quantity: transition_temperature
@@ -278,6 +239,10 @@ species:
           property_kind: liquidus
           sample_id: NS2
           composition_as_published: Na2O·2SiO2
+          composition_mol:
+            basis: nominal_formula_unit_ratio_as_published
+            Na2O: 1
+            SiO2: 2
           T_K: 1148
           T_K_as_printed: '1148'
           attribution: Literature refs. 73–75, phase diagrams cited in the Table 1 caption
@@ -285,28 +250,8 @@ species:
           temperature_K: {state: {tag: value, value: {kind: point, point: '1148'}}, locator: {pdf_page_index: 4, published_page: 459, table: '1', row: NS2, column: Tm}}
           total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {pdf_page_index: 4, published_page: 459, table: '1', row: NS2}}
           composition:
-            state: {tag: value, value: {basis: nominal formula-unit ratio normalized to mole fraction, components: [[Na2O, '0.3333333333333333'], [SiO2, '0.6666666666666667']], amount_basis: mole_fraction}}
+            state: {tag: value, value: {basis: nominal formula-unit ratio as printed, components: [[Na2O, 1], [SiO2, 2]], amount_basis: mol_inventory}}
             locator: {pdf_page_index: 4, published_page: 459, table: '1', row: NS2, note: Printed composition Na2O·2SiO2}
-      - observation_id: baborak_2023_np_t_melting_table3
-        type: phase_transition
-        locator: {pdf_page_index: 7, published_page: 462, table: '3', row: NP, column: Tm}
-        phase: glass
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          property_kind: melting_point
-          sample_id: NP
-          composition_as_published: Na2O·P2O5
-          T_K: 900
-          T_K_as_printed: '900'
-          attribution: Literature refs. 96, 101, and 102, as cited in the Table 3 caption
-        point_conditions:
-          temperature_K: {state: {tag: value, value: {kind: point, point: '900'}}, locator: {pdf_page_index: 7, published_page: 462, table: '3', row: NP, column: Tm}}
-          total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {pdf_page_index: 7, published_page: 462, table: '3', row: NP}}
-          composition:
-            state: {tag: value, value: {basis: nominal formula-unit ratio normalized to mole fraction, components: [[Na2O, '0.5'], [P2O5, '0.5']], amount_basis: mole_fraction}}
-            locator: {pdf_page_index: 7, published_page: 462, table: '3', row: NP, note: Printed composition Na2O·P2O5}
     context:
       - observation_id: baborak_2023_ns2_viscosity_fit_table1
         type: thermodynamic_context
@@ -350,13 +295,19 @@ species:
           statement_as_printed: SiO2-rich matrices such as NS8 and KS8 lost up to 80% of their initial alkali oxide content.
           note: The individual measured compositions are plotted in Figure 6 and are deferred; this group bound is not a reconstructed composition.
 
-  K2O:
+  K2Si2O5:
     observations:
       - observation_id: baborak_2023_ks2_tg_table1
         type: phase_transition
         locator: {pdf_page_index: 4, published_page: 459, table: '1', row: KS2, column: Tg}
         phase: glass
+        quench_statement:
+          text: "Finally, the samples were extracted from the furnace and quenched by rapidly immersing the bottom of the Pt crucible in water."
+          preservation: not_stated
+          locator: {pdf_page_index: 2, published_page: 457, section: Experimental}
         units: K
+        uncertainty:
+          note: Printed ±5 K; confidence level not stated.
         values:
           quantity: transition_temperature
           method_class: measured_direct
@@ -365,18 +316,25 @@ species:
           composition_as_published: K2O·2SiO2
           T_K: 768
           T_K_as_printed: '768 ± 5'
-          temperature_uncertainty_K: 5
+          T_m_uncertainty_K: 5
         point_conditions:
+          quench_state: {state: {tag: value, value: not_stated}, locator: {pdf_page_index: 2, published_page: 457, section: Experimental}}
           temperature_K: {state: {tag: value, value: {kind: point, point: '768'}}, locator: {pdf_page_index: 4, published_page: 459, table: '1', row: KS2, column: Tg}}
           total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {pdf_page_index: 4, published_page: 459, table: '1', row: KS2}}
           composition:
-            state: {tag: value, value: {basis: nominal formula-unit ratio normalized to mole fraction, components: [[K2O, '0.3333333333333333'], [SiO2, '0.6666666666666667']], amount_basis: mole_fraction}}
+            state: {tag: value, value: {basis: nominal formula-unit ratio as printed, components: [[K2O, 1], [SiO2, 2]], amount_basis: mol_inventory}}
             locator: {pdf_page_index: 4, published_page: 459, table: '1', row: KS2, note: Printed composition K2O·2SiO2}
       - observation_id: baborak_2023_ks2_tc_table1
         type: phase_transition
         locator: {pdf_page_index: 4, published_page: 459, table: '1', row: KS2, column: Tc}
         phase: glass
+        quench_statement:
+          text: "Finally, the samples were extracted from the furnace and quenched by rapidly immersing the bottom of the Pt crucible in water."
+          preservation: not_stated
+          locator: {pdf_page_index: 2, published_page: 457, section: Experimental}
         units: K
+        uncertainty:
+          note: Printed ±5 K; confidence level not stated.
         values:
           quantity: transition_temperature
           method_class: measured_direct
@@ -385,18 +343,19 @@ species:
           composition_as_published: K2O·2SiO2
           T_K: 1043
           T_K_as_printed: '1043 ± 5'
-          temperature_uncertainty_K: 5
+          T_m_uncertainty_K: 5
           technique_as_published: simple DSC upscan at 10 K min−1
         point_conditions:
+          quench_state: {state: {tag: value, value: not_stated}, locator: {pdf_page_index: 2, published_page: 457, section: Experimental}}
           temperature_K: {state: {tag: value, value: {kind: point, point: '1043'}}, locator: {pdf_page_index: 4, published_page: 459, table: '1', row: KS2, column: Tc}}
           total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {pdf_page_index: 4, published_page: 459, table: '1', row: KS2}}
           composition:
-            state: {tag: value, value: {basis: nominal formula-unit ratio normalized to mole fraction, components: [[K2O, '0.3333333333333333'], [SiO2, '0.6666666666666667']], amount_basis: mole_fraction}}
+            state: {tag: value, value: {basis: nominal formula-unit ratio as printed, components: [[K2O, 1], [SiO2, 2]], amount_basis: mol_inventory}}
             locator: {pdf_page_index: 4, published_page: 459, table: '1', row: KS2, note: Printed composition K2O·2SiO2}
       - observation_id: baborak_2023_ks2_t_liquidus_table1
         type: phase_transition
         locator: {pdf_page_index: 4, published_page: 459, table: '1', row: KS2, column: Tm}
-        phase: glass
+        phase: l
         units: K
         values:
           quantity: transition_temperature
@@ -404,6 +363,10 @@ species:
           property_kind: liquidus
           sample_id: KS2
           composition_as_published: K2O·2SiO2
+          composition_mol:
+            basis: nominal_formula_unit_ratio_as_published
+            K2O: 1
+            SiO2: 2
           T_K: 1309
           T_K_as_printed: '1309'
           attribution: Literature refs. 73–75, phase diagrams cited in the Table 1 caption
@@ -411,7 +374,7 @@ species:
           temperature_K: {state: {tag: value, value: {kind: point, point: '1309'}}, locator: {pdf_page_index: 4, published_page: 459, table: '1', row: KS2, column: Tm}}
           total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {pdf_page_index: 4, published_page: 459, table: '1', row: KS2}}
           composition:
-            state: {tag: value, value: {basis: nominal formula-unit ratio normalized to mole fraction, components: [[K2O, '0.3333333333333333'], [SiO2, '0.6666666666666667']], amount_basis: mole_fraction}}
+            state: {tag: value, value: {basis: nominal formula-unit ratio as printed, components: [[K2O, 1], [SiO2, 2]], amount_basis: mol_inventory}}
             locator: {pdf_page_index: 4, published_page: 459, table: '1', row: KS2, note: Printed composition K2O·2SiO2}
     context:
       - observation_id: baborak_2023_ks2_viscosity_fit_table1
@@ -452,6 +415,93 @@ species:
             - {sample_id: KS8, nominal: K2O·8SiO2, analyzed: {tag: unknown, reason: numeric_composition_points_in_figure_6_deferred_by_wave_7_ruling}}
           printed_basis: Nominal batch composition is the oxide formula-unit ratio; Figure 6 axes give nominal and LA-ICP-MS measured M2O content in mol%.
           schema_gap: Per-sample analytical mole fractions are plotted only and deferred under the wave-7 figure ruling.
+
+  Li2B4O7:
+    observations:
+      - observation_id: baborak_2023_lb2_t_liquidus_table3
+        type: phase_transition
+        locator: {pdf_page_index: 7, published_page: 462, table: '3', row: LB2, column: Tm}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          property_kind: melting_point
+          sample_id: LB2
+          composition_as_published: Li2O·2B2O3
+          T_K: 1190
+          T_K_as_printed: '1190'
+          attribution: Literature refs. 96, 101, and 102, as cited in the Table 3 caption
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: point, point: '1190'}}
+            locator: {pdf_page_index: 7, published_page: 462, table: '3', row: LB2, column: Tm}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {pdf_page_index: 7, published_page: 462, table: '3', row: LB2}
+          composition:
+            state:
+              tag: value
+              value: {basis: nominal formula-unit ratio as printed, components: [[Li2O, 1], [B2O3, 2]], amount_basis: mol_inventory}
+            locator: {pdf_page_index: 7, published_page: 462, table: '3', row: LB2, note: Printed composition Li2O·2B2O3}
+
+    context:
+      - observation_id: baborak_2023_lb2_high_temperature_mass_loss
+        type: thermodynamic_context
+        locator: {pdf_page_index: 8, published_page: 463, figure: '9', section: Discussion}
+        phase: glass
+        units: percent of expected mass
+        values:
+          quantity: mass_loss_fraction
+          method_class: measured_direct
+          sample_id: LB2
+          mass_loss_wt_pct_as_printed: {value: 45, bound: upper}
+          pyrometer_temperature_C_as_printed: {value: 1200, approximate: true}
+          mass_loss_bound_as_printed: up to 45% of the expected mass
+          condition_as_printed: two LB2 beads intentionally melted at higher temperatures to induce volatilization
+          measurement: bead mass relative to expected mass; individual values are figure-only and not digitized
+      - observation_id: baborak_2023_figure9_composition_context
+        type: thermodynamic_context
+        locator: {pdf_page_index: 8, published_page: 463, figure: '9'}
+        units: mol% as printed in figure axes
+        values:
+          quantity: measured_glass_composition_context
+          method_class: measured_direct
+          samples:
+            - sample_id: NP
+              nominal_composition_as_published: Na2O·P2O5
+              analyzed_composition: {tag: unknown, reason: numeric_composition_points_in_figure_9_deferred_by_wave_7_ruling}
+            - sample_id: LB2
+              nominal_composition_as_published: Li2O·2B2O3
+              analyzed_composition: {tag: unknown, reason: numeric_composition_points_in_figure_9_deferred_by_wave_7_ruling}
+            - sample_id: LB2_high_temperature_bead_ML_45_percent
+              analyzed_composition: {tag: unknown, reason: numeric_composition_points_in_figure_9_deferred_by_wave_7_ruling}
+          basis: LA-ICP-MS molar Li2O and B2O3 or Na2O and P2O5 plotted in panel A; panel B recalculates the Li2O and B2O3 mole content for two LB2 beads.
+
+
+  NaPO3:
+    observations:
+      - observation_id: baborak_2023_np_t_melting_table3
+        type: phase_transition
+        locator: {pdf_page_index: 7, published_page: 462, table: '3', row: NP, column: Tm}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          property_kind: melting_point
+          sample_id: NP
+          composition_as_published: Na2O·P2O5
+          T_K: 900
+          T_K_as_printed: '900'
+          attribution: Literature refs. 96, 101, and 102, as cited in the Table 3 caption
+        point_conditions:
+          temperature_K: {state: {tag: value, value: {kind: point, point: '900'}}, locator: {pdf_page_index: 7, published_page: 462, table: '3', row: NP, column: Tm}}
+          total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {pdf_page_index: 7, published_page: 462, table: '3', row: NP}}
+          composition:
+            state: {tag: value, value: {basis: nominal formula-unit ratio as printed, components: [[Na2O, 1], [P2O5, 1]], amount_basis: mol_inventory}}
+            locator: {pdf_page_index: 7, published_page: 462, table: '3', row: NP, note: Printed composition Na2O·P2O5}
+
 
   SiO2:
     observations: []
@@ -753,9 +803,9 @@ species:
           panels:
             - panel: A
               axes_as_printed: Li2O or Na2O content (mol%) versus B2O3 or P2O5 content (mol%)
-              series: [{name: NP nominal and NP ICP mean, marker_count: 2}, {name: LB2 nominal and LB2 ICP mean, marker_count: 2}, {name: LB2 ICP ML=36%, marker_count: 1}, {name: LB2 ICP ML=45%, marker_count: 1}]
+              series: [{name: NP nominal and NP ICP mean, marker_count: 2}, {name: LB2 nominal and LB2 ICP mean, marker_count: 2}, {name: LB2 ICP ML=45%, marker_count: 1}]
             - panel: B
-              axes_as_printed: oxide content (mol%) versus LB2 ML=36% and ML=45% samples
+              axes_as_printed: 'Oxide content (mol); scale 0.00–0.30'
               series: [{name: final Li2O, marker_count: 0}, {name: Li2O loss, marker_count: 0}, {name: final B2O3, marker_count: 0}, {name: B2O3 loss, marker_count: 0}]
           attribution: LA-ICP-MS measurements and bead mass measurements from this work
           digitisation: deferred to a figure pass
