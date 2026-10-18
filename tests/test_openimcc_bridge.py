@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import json
+import math
 from dataclasses import replace
 from pathlib import Path
 import subprocess
@@ -30,6 +31,9 @@ from simulator.state import MOLAR_MASS
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 GREEN_ACTIVITY_FIXTURE = REPO_ROOT / "tests/fixtures/imcc_green_d9bd25f0b_activities.json"
+GREEN_ACTIVITY_BOUNDS_FIXTURE = (
+    REPO_ROOT / "tests/fixtures/imcc_green_d9bd25f0b_activity_bounds.json"
+)
 PACKS = ("published-core", "published-ext")
 TEMPERATURES_K = (1700.0, 1950.0, 2200.0, 2500.0, 3000.0)
 
@@ -99,6 +103,40 @@ def _openimcc_or_skip():
             "checkout's src/ directory on PYTHONPATH before running the parity check"
         ),
     )
+
+
+def _load_activity_bounds() -> dict[tuple[str, str, float], dict]:
+    fixture = json.loads("\n".join(
+        line for line in GREEN_ACTIVITY_BOUNDS_FIXTURE.read_text().splitlines()
+        if not line.startswith("#")
+    ))
+    assert fixture["schema"] == "imcc-green-activity-bounds.v1"
+    assert fixture["openimcc_commit"] == "e1423d82237486f58dc8ffbb1f8c295f54f169c0"
+    assert fixture["generator"] == "tests/helpers/generate_openimcc_activity_bounds.py"
+    return {
+        (row["pack"], row["composition"], float(row["temperature_K"])): row
+        for row in fixture["rows"]
+    }
+
+
+def _activity_bounds_for_row(row, bounds_by_key) -> dict:
+    key = (row["pack"], row["composition"], float(row["temperature_K"]))
+    return bounds_by_key[key]
+
+
+def _assert_activity_parity(actual, row, log_bounds) -> None:
+    for name, value in actual.items():
+        expected = float.fromhex(row["activities_hex"][name])
+        if expected == 0.0:
+            assert float(value) == expected, f"{row['composition']} {name}"
+            continue
+        observed = abs(math.log(float(value) / expected))
+        bound = log_bounds["parent_bounds"][name]["total_log_activity_bound"]
+        assert observed <= bound, (
+            f"{row['composition']} {row['temperature_K']} K {name}: "
+            f"observed |delta ln(activity)|={observed:.6g}, "
+            f"frozen-oracle bound={bound:.6g}"
+        )
 
 
 @pytest.mark.parametrize(
@@ -425,6 +463,7 @@ def test_openimcc_parent_activity_parity(pack_name: str) -> None:
         "published-ext": "ext-v4",
     }[pack_name]
     rows = [row for row in fixture["rows"] if row["pack"] == fixture_pack_name]
+    bounds_by_key = _load_activity_bounds()
     assert len(rows) >= 20
     assert len({row["composition"] for row in rows}) >= 5
     assert len({row["temperature_K"] for row in rows}) >= 4
@@ -438,7 +477,9 @@ def test_openimcc_parent_activity_parity(pack_name: str) -> None:
             "SiO2", "MgO", "FeO", "CaO", "Al2O3", "TiO2", "Na2O", "K2O"
         ) + (("S", "P2O5") if pack_name == "published-ext" else ())
         assert tuple(bridge_result.parent_oxides) == expected_parent_oxides
-        assert {name: float(value).hex() for name, value in actual.items()} == row["activities_hex"]
+        _assert_activity_parity(
+            actual, row, _activity_bounds_for_row(row, bounds_by_key)
+        )
         expected_labels = row["labels_legacy"]
         labels = bridge_result.labels
         assert dict(labels.coverage) == expected_labels["coverage"]
@@ -453,9 +494,32 @@ def test_openimcc_parent_activity_parity(pack_name: str) -> None:
         assert {key: identity[key] for key in expected_identity} == expected_identity
 
 
+def test_openimcc_activity_parity_fails_when_ln_k_is_scaled(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _openimcc_or_skip()
+    import openimcc.kernel as kernel_module
+    original = kernel_module.active_residual_jacobian
+
+    def scale_ln_k(
+        y, x_target, nu, ln_k, stoichiometric_totals, xp=kernel_module.np
+    ):
+        return original(
+            y,
+            x_target,
+            nu,
+            ln_k * (1.0 + 1.0e-9),
+            stoichiometric_totals,
+            xp,
+        )
+
+    monkeypatch.setattr(kernel_module, "active_residual_jacobian", scale_ln_k)
+    with pytest.raises(AssertionError, match="frozen-oracle bound"):
+        test_openimcc_parent_activity_parity("published-core")
+
+
 def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
     _openimcc_or_skip()
-    from dataclasses import replace
     import openimcc
     from openimcc import label_research_datapack
 
@@ -470,11 +534,11 @@ def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
     baseline = openimcc.evaluate(
         composition, row["temperature_K"], pack, basis_type=basis_type
     )
-    baseline_hex = {
-        str(name): float(value).hex()
-        for name, value in zip(baseline.parent_oxides, baseline.parent_activity, strict=True)
-    }
-    assert baseline_hex == row["activities_hex"]
+    log_bounds = _activity_bounds_for_row(row, _load_activity_bounds())
+    baseline_activities = dict(
+        zip(baseline.parent_oxides, baseline.parent_activity, strict=True)
+    )
+    _assert_activity_parity(baseline_activities, row, log_bounds)
     kernel = replace(pack.kernel_datapack, A=pack.kernel_datapack.A.copy())
     kernel.A[0] += 0.01
     mutated_pack = label_research_datapack(
@@ -483,22 +547,33 @@ def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
     mutated = openimcc.evaluate(
         composition, row["temperature_K"], mutated_pack, basis_type=basis_type
     )
-    mutated_hex = {
-        str(name): float(value).hex()
-        for name, value in zip(mutated.parent_oxides, mutated.parent_activity, strict=True)
+    mutated_activities = dict(
+        zip(mutated.parent_oxides, mutated.parent_activity, strict=True)
+    )
+    mutation_ratios = {
+        name: abs(
+            math.log(
+                float(mutated_activities[name])
+                / float.fromhex(row["activities_hex"][name])
+            )
+        ) / terms["total_log_activity_bound"]
+        for name, terms in log_bounds["parent_bounds"].items()
     }
-    assert mutated_hex != row["activities_hex"]
+    assert max(mutation_ratios.values()) > 1.0e6, (
+        "in-memory coefficient mutation stayed inside the frozen-oracle "
+        f"parity bounds: {mutation_ratios}"
+    )
 
 
 def test_pack_digest_preserves_the_published_binding_value() -> None:
     _openimcc_or_skip()
-    expected = "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05"
+    expected = "ae979b68295f6e653fb1c37d6b381f06cb0be8d4c5b421e673420a6e4596357c"
     assert _pack_digest(_load_pack("published-core")) == expected
 
 
 def test_pack_digest_uses_ext_binding_digest() -> None:
     _openimcc_or_skip()
-    expected = "4cbec2ee85cd95314a5f62f5ce4e00cbe660935bde12df3a7e5daa425612ad03"
+    expected = "de51a9bcf52724fd4b06e9cb639779f31189d86ecf304073fd72fc3019f29770"
     assert _pack_digest(_load_pack("published-ext")) == expected
 
 

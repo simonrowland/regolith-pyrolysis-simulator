@@ -528,7 +528,7 @@ _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS: dict[str, dict[str, str]] = {
 # The content digest keys each evaluation so packs sharing a model id cannot
 # reuse one another's numbers.
 _K2O_PACK_EVALUATIONS_BY_DIGEST: dict[str, dict[str, Any]] = {
-    "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05": {
+    "ae979b68295f6e653fb1c37d6b381f06cb0be8d4c5b421e673420a6e4596357c": {
         "pack_alias": "published-core",
         "model_id": "IMCC-SF04",
         "pack_version": "1.0.2",
@@ -541,7 +541,7 @@ _K2O_PACK_EVALUATIONS_BY_DIGEST: dict[str, dict[str, Any]] = {
             1673.15: True,
         },
     },
-    "d894f4e5ce79ba393f7068ec7d9032336eda8276293c4f46cafb18944a8b247e": {
+    "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75": {
         "pack_alias": "default",
         "model_id": "IMCC-SF04-D066",
         "pack_version": "1.0.3-d066-v1",

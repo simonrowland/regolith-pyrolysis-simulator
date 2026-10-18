@@ -19,6 +19,8 @@ from simulator.account_ids import (
 )
 from simulator.accounting import AccountingError, resolve_species_formula
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
+from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+from simulator.chemistry.kernel.validation import _proposal_to_ledger_transition
 from simulator.core import (
     FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
     FERRIC_DIVERGENCE_WARNING_THRESHOLD,
@@ -27,6 +29,8 @@ from simulator.core import (
     PyrolysisSimulator,
 )
 from simulator.fe_redox import (
+    KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+    floor_vacuum_pressure_bar,
     KRESS91_INV_T_COEFFICIENT_K,
     KRESS91_LN_FO2_COEFFICIENT,
     kress91_oxygen_demand_mol,
@@ -1930,9 +1934,12 @@ def test_c3_na_spent_residue_credit_does_not_cancel_reduction_source() -> None:
     ][label] == pytest.approx(-0.5 * feo_mol)
 
 
-def test_c7_external_al_credit_changes_ledger_potential_without_scalar_step(
+def _make_c7_aluminothermic_simulator(
     monkeypatch,
-) -> None:
+    *,
+    al_credit_limit_kg: float,
+    in_situ_al_mol: float = 0.0,
+) -> PyrolysisSimulator:
     monkeypatch.setattr(
         BuiltinCaAluminothermicStepProvider,
         "_computed_thermo_margin_kj_per_mol_o2",
@@ -1940,7 +1947,11 @@ def test_c7_external_al_credit_changes_ledger_potential_without_scalar_step(
     )
     setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
     setpoints["campaigns"]["C7"].update(
-        {"enabled": True, "al_credit_limit_kg": 20.0, "extent_fraction": 0.1}
+        {
+            "enabled": True,
+            "al_credit_limit_kg": al_credit_limit_kg,
+            "extent_fraction": 0.1,
+        }
     )
     sim = _create_test_owned_simulator(
         InternalAnalyticalBackend(),
@@ -1949,98 +1960,219 @@ def test_c7_external_al_credit_changes_ledger_potential_without_scalar_step(
         _load_yaml("vapor_pressures.yaml"),
     )
     sim.load_batch("targeted_super_kreep_ore", mass_kg=1000.0)
+    if in_situ_al_mol > 0.0:
+        sim.atom_ledger.load_external_mol(
+            "process.metal_phase",
+            {"Al": in_situ_al_mol},
+            source="test in-situ Al inventory",
+            material_origin="feedstock",
+        )
     sim.start_campaign(CampaignPhase.C7_CA_ALUMINOTHERMIC)
     sim.melt.temperature_C = 1200.0
-    # C7 shell band (0.01–0.1 mbar) at D=0.12 is transitional (Kn>0.01);
-    # enlarge D so Kn is viscous and ledger yields stay authorized — this
-    # test covers redox/credit accounting, not transport-domain refusal.
+    # Keep Kn viscous so C7 ledger extent is authorized; these tests cover
+    # redox and credit accounting, not transport-domain refusal.
     sim.overhead_model.pipe_diameter_m = 1.0
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
     sim._sync_oxygen_reservoir_mirror()
-    before_mol = sim.atom_ledger.mol_by_account('process.cleaned_melt')
+    return sim
 
-    sim._step_c7_ca_aluminothermic()
 
-    transition = next(
-        transition
-        for transition in reversed(sim.atom_ledger.transitions)
-        if transition.name == "ca_aluminothermic_c3a_credit_al"
-    )
-    label = "redox_source:c7_ca_aluminothermic_reduction"
-    ca_mol = _transition_account_species_mol(
-        sim,
-        transition,
-        side="credits",
-        account="process.overhead_gas",
-        species="Ca",
-    )
+def _assert_c7_redox_neutral(sim, transitions, label: str) -> None:
+    for transition in transitions:
+        assert sim._c7_aluminothermic_redox_source_terms_from_transition(
+            transition,
+            label=label,
+        ) == {}
+        assert sim._apply_c7_aluminothermic_redox_source_terms(
+            transition,
+            label=label,
+            exchange_direction=label,
+        ) is None
+
     breakdown = sim._redox_source_breakdown_diagnostic()
+    assert label not in breakdown.get("terms_mol_o2_equiv_by_label", {})
+    assert label not in breakdown.get("applied_terms_mol_o2_equiv_by_label", {})
+    assert label not in breakdown.get("skipped_reasons_by_label", {})
+    assert sim.melt.oxygen_reservoir.redox_source_delta_ln_fO2 == 0.0
 
-    assert ca_mol > 0.0
-    assert _transition_account_species_mol(
-        sim,
-        transition,
-        side="debits",
-        account=C7_AL_CREDIT_ACCOUNT,
-        species="Al",
-    ) > 0.0
-    assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
-        -0.5 * ca_mol
+
+def _assert_c7_fe_inventory_unchanged(sim, before, after, transitions) -> None:
+    for species in ("FeO", "Fe2O3"):
+        assert after.get(species, 0.0) == before.get(species, 0.0)
+        for transition in transitions:
+            debited_mol = _transition_account_species_mol(
+                sim,
+                transition,
+                side="debits",
+                account="process.cleaned_melt",
+                species=species,
+            )
+            credited_mol = _transition_account_species_mol(
+                sim,
+                transition,
+                side="credits",
+                account="process.cleaned_melt",
+                species=species,
+            )
+            assert credited_mol - debited_mol == 0.0
+
+
+def _assert_c7_intrinsic_fO2_is_self_consistent(sim) -> None:
+    inventory = sim.atom_ledger.mol_by_account("process.cleaned_melt")
+    composition = sim._melt_oxide_wt_pct()
+    reference_T_K = sim._current_melt_redox_reference_T_K()
+    T_K = reference_T_K or max(
+        float(sim.melt.temperature_C) + 273.15,
+        KRESS91_LIQUID_CALIBRATION_MIN_T_C + 273.15,
     )
-    assert breakdown["redox_source_terms_applied"] is False
-    assert breakdown["skipped_reasons_by_label"][label] == "no_melt_redox_capacity"
-    # 6 CaO + 2 Al -> Ca3Al2O6 + 3 Ca changes the residual CaO basis,
-    # while Fe is unchanged. Its oxygen-equivalent export label is not a
-    # second redox command or a universal direction for intrinsic potential.
-    assert _cleaned_melt_debit_mol(sim, transition, 'CaO') == pytest.approx(2.0 * ca_mol)
-    after_mol = sim.atom_ledger.mol_by_account('process.cleaned_melt')
-    assert after_mol['FeO'] == before_mol['FeO']
-    assert after_mol['Fe2O3'] == before_mol['Fe2O3']
-    transition.validate_conservation(sim.species_formula_registry)
-    pressure_bar = max(sim.melt.p_total_mbar / 1000.0, sim._vacuum_floor_bar())
+    pressure_bar = floor_vacuum_pressure_bar(
+        float(sim.melt.p_total_mbar) / 1000.0,
+        floor_bar=sim._vacuum_floor_bar(),
+    )
+    head_o2_mol = max(
+        0.0,
+        float(
+            sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+                "O2",
+                0.0,
+            )
+        ),
+    )
+    ledger_pO2_bar = sim._headspace_ledger_pO2_bar_from_o2_mol(head_o2_mol)
+    exchange_pO2_bar = sim._headspace_transport_pO2_bar_from_ledger(
+        ledger_pO2_bar,
+        head_o2_mol=head_o2_mol,
+    )
+    feedstock_iron = sim._feedstock_iron_initialization
     expected = kress91_intrinsic_state(
-        feo_mol=after_mol['FeO'], fe2o3_mol=after_mol['Fe2O3'],
-        mol_fractions=melt_mol_fractions_for_kress91(sim._melt_oxide_wt_pct()),
-        T_K=sim._current_melt_redox_reference_T_K(), pressure_bar=pressure_bar,
-        exchange_fO2_log=math.log10(pressure_bar))['fO2_log']
-    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(expected, abs=2e-13)
-    assert sim.melt.oxygen_reservoir.redox_source_delta_ln_fO2 == 0.0
+        feo_mol=float(inventory.get("FeO", 0.0)),
+        fe2o3_mol=float(inventory.get("Fe2O3", 0.0)),
+        mol_fractions=melt_mol_fractions_for_kress91(composition),
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+        exchange_fO2_log=math.log10(
+            max(exchange_pO2_bar, sim._vacuum_floor_bar())
+        ),
+        composition_wt_pct=composition,
+        prior_half_width_dex=float(
+            feedstock_iron.get("prior_half_width_dex", 0.0)
+        ),
+        seed_basis=feedstock_iron.get("seed_basis"),
+        iron_seed=feedstock_iron,
+    )["fO2_log"]
+
+    # Self-consistency: the redox owner and this check evaluate the same
+    # kress91_intrinsic_state on the same post-transition ledger inputs, so the
+    # two log10 fO2 values should agree to float round-off (observed: 0.0 dex).
+    # 2e-13 dex is a round-off allowance only, about 900 ulp at |log10 fO2| ~ 10
+    # (ulp(10.0) = 1.78e-15). It is not a physics tolerance; the composition-only
+    # C7 shift itself (+0.079 dex in the lunar probe) is NOT bounded here.
+    assert sim._current_melt_redox_fO2_log() == pytest.approx(
+        expected,
+        rel=0.0,
+        abs=2e-13,
+    )
 
 
-def test_c7_external_al_credit_lowers_fO2_from_committed_transition(
+@pytest.mark.parametrize(
+    (
+        "mode",
+        "source_account",
+        "extent_mol",
+        "objective_extent_mol",
+        "extent_fraction",
+    ),
+    [
+        ("C3A", C7_AL_CREDIT_ACCOUNT, 10.0, 10.0, 1.0),
+        ("C3A", "process.metal_phase", 10.0, 10.0, 1.0),
+        ("C12A7", C7_AL_CREDIT_ACCOUNT, 1.0, 1.0, 1.0),
+        ("C12A7", "process.metal_phase", 1.0, 1.0, 1.0),
+        ("C3A", C7_AL_CREDIT_ACCOUNT, 10.0, 100.0, 0.1),
+    ],
+)
+def test_c7_provider_proposal_round_trip_snaps_balanced_float_residual(
     monkeypatch,
+    mode: str,
+    source_account: str,
+    extent_mol: float,
+    objective_extent_mol: float,
+    extent_fraction: float,
 ) -> None:
-    """The old scalar decrement cannot hold: C7 changes the CaO basis, not Fe valence.
-
-    Its committed ledger change sets the potential; the reduction label
-    cannot prescribe a direction or integrate a second oxygen loss.
-    """
     monkeypatch.setattr(
         BuiltinCaAluminothermicStepProvider,
         "_computed_thermo_margin_kj_per_mol_o2",
         lambda self, hold_temp_C, p_ca_pa=None: 2.0,
     )
-    setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
-    setpoints["campaigns"]["C7"].update(
-        {"enabled": True, "al_credit_limit_kg": 20.0, "extent_fraction": 0.1}
+    stoich = BuiltinCaAluminothermicStepProvider._stoich(mode)
+    accounts = {
+        source_account: {"Al": objective_extent_mol * stoich["Al"]},
+        "process.cleaned_melt": {
+            "CaO": objective_extent_mol * stoich["CaO"]
+        },
+    }
+    provider_request = IntentRequest(
+        intent=ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
+        account_view=ProviderAccountView(
+            accounts=accounts,
+            species_formula_registry={},
+        ),
+        temperature_C=1200.0,
+        pressure_bar=5.0e-5,
+        control_inputs={
+            "reaction_family": "c7_ca_aluminothermic",
+            "campaign": "C7_CA_ALUMINOTHERMIC",
+            "decision": "yes",
+            "reductant_species": "Al",
+            "objective": "ree_enrichment",
+            "aluminate_mode": mode,
+            "al_source_account": source_account,
+            "extent_fraction": extent_fraction,
+            "allow_partial_extent": True,
+            "hold_temp_C": 1200.0,
+            "p_total_mbar": 0.05,
+            "pO2_mbar": 0.0,
+            "active_ca_condensation_route": True,
+            "dedicated_ca_condenser": True,
+            "ca_condensation_species": "Ca",
+            "ca_condenser_temperature_C": 780.0,
+            "thermo_margin_kj_per_mol_o2": 2.0,
+            "transport_extent_mol": 1000.0,
+            "objective_extent_mol": objective_extent_mol,
+        },
     )
-    sim = _create_test_owned_simulator(
-        InternalAnalyticalBackend(),
-        setpoints,
-        _load_yaml("feedstocks.yaml"),
-        _load_yaml("vapor_pressures.yaml"),
+    provider_result = BuiltinCaAluminothermicStepProvider().dispatch(
+        provider_request
     )
-    sim.load_batch("targeted_super_kreep_ore", mass_kg=1000.0)
-    sim.start_campaign(CampaignPhase.C7_CA_ALUMINOTHERMIC)
-    sim.melt.temperature_C = 1200.0
-    # C7 shell band (0.01–0.1 mbar) at D=0.12 is transitional (Kn>0.01);
-    # enlarge D so Kn is viscous and ledger yields stay authorized — this
-    # test covers redox/credit accounting, not transport-domain refusal.
-    sim.overhead_model.pipe_diameter_m = 1.0
-    sim._sync_oxygen_reservoir_mirror()
-    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
-    before_mol = sim.atom_ledger.mol_by_account('process.cleaned_melt')
-    count = len(sim.atom_ledger.transitions)
+    assert provider_result.status == "ok"
+    assert provider_result.transition is not None
+    assert provider_result.diagnostic["r_c7"] == pytest.approx(extent_mol)
+    sim = object.__new__(PyrolysisSimulator)
+    sim.species_formula_registry = {}
+    transition = _proposal_to_ledger_transition(
+        provider_result.transition,
+        sim.species_formula_registry,
+    )
+    transition.validate_conservation(sim.species_formula_registry)
+
+    label = "redox_source:c7_ca_aluminothermic_reduction"
+    assert sim._c7_aluminothermic_redox_source_terms_from_transition(
+        transition,
+        label=label,
+    ) == {}
+    assert sim._apply_c7_aluminothermic_redox_source_terms(
+        transition,
+        label=label,
+        exchange_direction=label,
+    ) is None
+
+
+def test_c7_external_al_credit_changes_cao_basis_without_fe_redox_step(
+    monkeypatch,
+) -> None:
+    sim = _make_c7_aluminothermic_simulator(
+        monkeypatch,
+        al_credit_limit_kg=20.0,
+    )
+    before_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
 
     sim._step_c7_ca_aluminothermic()
 
@@ -2057,67 +2189,48 @@ def test_c7_external_al_credit_lowers_fO2_from_committed_transition(
         account="process.overhead_gas",
         species="Ca",
     )
-    breakdown = sim._redox_source_breakdown_diagnostic()
-
-    assert ca_mol > 0.0
-    assert _transition_account_species_mol(
+    external_al_mol = _transition_account_species_mol(
         sim,
         transition,
         side="debits",
         account=C7_AL_CREDIT_ACCOUNT,
         species="Al",
-    ) > 0.0
-    assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
-        -0.5 * ca_mol
     )
-    assert breakdown["redox_source_terms_applied"] is False
-    assert breakdown["skipped_reasons_by_label"][label] == "no_melt_redox_capacity"
-    assert sum(t.name == transition.name for t in sim.atom_ledger.transitions[count:]) == 1
+    assert ca_mol > 0.0
+    assert external_al_mol > 0.0
+    assert _transition_account_species_mol(
+        sim,
+        transition,
+        side="debits",
+        account="process.metal_phase",
+        species="Al",
+    ) == 0.0
+    assert 0.75 * external_al_mol == pytest.approx(0.5 * ca_mol)
+    assert _transition_account_species_mol(
+        sim,
+        transition,
+        side="debits",
+        account="process.cleaned_melt",
+        species="CaO",
+    ) == pytest.approx(2.0 * ca_mol)
+    after_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
+    assert after_mol["CaO"] < before_mol["CaO"]
     transition.validate_conservation(sim.species_formula_registry)
-    after_mol = sim.atom_ledger.mol_by_account('process.cleaned_melt')
-    assert after_mol['FeO'] == before_mol['FeO']
-    assert after_mol['Fe2O3'] == before_mol['Fe2O3']
-    assert after_mol['CaO'] < before_mol['CaO']
-    expected = sim._current_melt_redox_fO2_log()
-    assert expected != before_fO2
-    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == expected
-    sim._apply_oxygen_reservoir_redox_source_terms({label: -0.5 * ca_mol})
-    assert sim._current_melt_redox_fO2_log() == expected
-    assert sim.melt.oxygen_reservoir.redox_source_delta_ln_fO2 == 0.0
+
+    _assert_c7_redox_neutral(sim, [transition], label)
+    _assert_c7_fe_inventory_unchanged(sim, before_mol, after_mol, [transition])
+    _assert_c7_intrinsic_fO2_is_self_consistent(sim)
 
 
-def test_c7_in_situ_al_route_does_not_double_count_prior_reducing_power(
+def test_c7_in_situ_al_route_has_no_redox_source_term(
     monkeypatch,
 ) -> None:
-    monkeypatch.setattr(
-        BuiltinCaAluminothermicStepProvider,
-        "_computed_thermo_margin_kj_per_mol_o2",
-        lambda self, hold_temp_C, p_ca_pa=None: 2.0,
+    sim = _make_c7_aluminothermic_simulator(
+        monkeypatch,
+        al_credit_limit_kg=0.0,
+        in_situ_al_mol=1000.0,
     )
-    setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
-    setpoints["campaigns"]["C7"].update(
-        {"enabled": True, "al_credit_limit_kg": 0.0, "extent_fraction": 0.1}
-    )
-    sim = _create_test_owned_simulator(
-        InternalAnalyticalBackend(),
-        setpoints,
-        _load_yaml("feedstocks.yaml"),
-        _load_yaml("vapor_pressures.yaml"),
-    )
-    sim.load_batch("targeted_super_kreep_ore", mass_kg=1000.0)
-    sim.atom_ledger.load_external_mol(
-        "process.metal_phase",
-        {"Al": 1000.0},
-        source="test in-situ Al inventory",
-        material_origin="feedstock",
-    )
-    sim.start_campaign(CampaignPhase.C7_CA_ALUMINOTHERMIC)
-    sim.melt.temperature_C = 1200.0
-    # Keep Kn viscous so C7 ledger extent is authorized (see external-credit twin).
-    sim.overhead_model.pipe_diameter_m = 1.0
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
-    sim._sync_oxygen_reservoir_mirror()
-    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    before_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
 
     sim._step_c7_ca_aluminothermic()
 
@@ -2127,8 +2240,6 @@ def test_c7_in_situ_al_route_does_not_double_count_prior_reducing_power(
         if transition.name == "ca_aluminothermic_c3a_in_situ_al"
     )
     label = "redox_source:c7_ca_aluminothermic_reduction"
-    breakdown = sim._redox_source_breakdown_diagnostic()
-
     assert _transition_account_species_mol(
         sim,
         transition,
@@ -2136,43 +2247,24 @@ def test_c7_in_situ_al_route_does_not_double_count_prior_reducing_power(
         account="process.metal_phase",
         species="Al",
     ) > 0.0
-    assert label not in breakdown.get("terms_mol_o2_equiv_by_label", {})
-    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
-        before_fO2
-    )
+    after_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
+    assert after_mol["CaO"] < before_mol["CaO"]
+    transition.validate_conservation(sim.species_formula_registry)
+
+    _assert_c7_redox_neutral(sim, [transition], label)
+    _assert_c7_fe_inventory_unchanged(sim, before_mol, after_mol, [transition])
+    _assert_c7_intrinsic_fO2_is_self_consistent(sim)
 
 
-def test_c7_mixed_in_situ_and_external_al_counts_only_external_credit_sink(
+def test_c7_mixed_in_situ_and_external_al_balances_both_source_accounts(
     monkeypatch,
 ) -> None:
-    monkeypatch.setattr(
-        BuiltinCaAluminothermicStepProvider,
-        "_computed_thermo_margin_kj_per_mol_o2",
-        lambda self, hold_temp_C, p_ca_pa=None: 2.0,
+    sim = _make_c7_aluminothermic_simulator(
+        monkeypatch,
+        al_credit_limit_kg=20.0,
+        in_situ_al_mol=2.0,
     )
-    setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
-    setpoints["campaigns"]["C7"].update(
-        {"enabled": True, "al_credit_limit_kg": 20.0, "extent_fraction": 0.1}
-    )
-    sim = _create_test_owned_simulator(
-        InternalAnalyticalBackend(),
-        setpoints,
-        _load_yaml("feedstocks.yaml"),
-        _load_yaml("vapor_pressures.yaml"),
-    )
-    sim.load_batch("targeted_super_kreep_ore", mass_kg=1000.0)
-    sim.atom_ledger.load_external_mol(
-        "process.metal_phase",
-        {"Al": 2.0},
-        source="test limited in-situ Al inventory",
-        material_origin="feedstock",
-    )
-    sim.start_campaign(CampaignPhase.C7_CA_ALUMINOTHERMIC)
-    sim.melt.temperature_C = 1200.0
-    # Keep Kn viscous so C7 ledger extent is authorized (see external-credit twin).
-    sim.overhead_model.pipe_diameter_m = 1.0
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
-    sim._sync_oxygen_reservoir_mirror()
+    before_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
 
     sim._step_c7_ca_aluminothermic()
 
@@ -2187,34 +2279,53 @@ def test_c7_mixed_in_situ_and_external_al_counts_only_external_credit_sink(
         if transition.name == "ca_aluminothermic_c3a_credit_al"
     )
     label = "redox_source:c7_ca_aluminothermic_reduction"
-    credit_ca_mol = _transition_account_species_mol(
+    in_situ_al_mol = _transition_account_species_mol(
+        sim,
+        in_situ,
+        side="debits",
+        account="process.metal_phase",
+        species="Al",
+    )
+    external_al_mol = _transition_account_species_mol(
+        sim,
+        credit,
+        side="debits",
+        account=C7_AL_CREDIT_ACCOUNT,
+        species="Al",
+    )
+    in_situ_ca_mol = _transition_account_species_mol(
+        sim,
+        in_situ,
+        side="credits",
+        account="process.overhead_gas",
+        species="Ca",
+    )
+    external_ca_mol = _transition_account_species_mol(
         sim,
         credit,
         side="credits",
         account="process.overhead_gas",
         species="Ca",
     )
-    total_ca_mol = credit_ca_mol + _transition_account_species_mol(
-        sim,
-        in_situ,
-        side="credits",
-        account="process.overhead_gas",
-        species="Ca",
-    )
-    breakdown = sim._redox_source_breakdown_diagnostic()
+    assert in_situ_al_mol > 0.0
+    assert external_al_mol > 0.0
+    assert in_situ_ca_mol > 0.0
+    assert external_ca_mol > 0.0
+    assert external_ca_mol + in_situ_ca_mol > external_ca_mol
+    after_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
+    assert after_mol["CaO"] < before_mol["CaO"]
+    for transition in (in_situ, credit):
+        transition.validate_conservation(sim.species_formula_registry)
 
-    assert sim._c7_aluminothermic_redox_source_terms_from_transition(
-        in_situ,
-        label=label,
-    ) == {}
-    assert credit_ca_mol > 0.0
-    assert total_ca_mol > credit_ca_mol
-    assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
-        -0.5 * credit_ca_mol
+    _assert_c7_redox_neutral(sim, [in_situ, credit], label)
+    _assert_c7_fe_inventory_unchanged(
+        sim,
+        before_mol,
+        after_mol,
+        [in_situ, credit],
     )
-    assert breakdown["terms_mol_o2_equiv_by_label"][label] != pytest.approx(
-        -0.5 * total_ca_mol
-    )
+    _assert_c7_intrinsic_fO2_is_self_consistent(sim)
+
 
 
 def test_c7_transport_diagnostic_uses_provider_route_gate(monkeypatch) -> None:
