@@ -221,6 +221,54 @@ def test_respeciation_provider_refuses_below_authoritative_temperature_band(
     assert result.diagnostic["temperature_band_case"] == "below_1200C_extrapolation"
 
 
+def test_1670c_respeciation_predicts_flagged_kress_split(formula_registry):
+    """1670 °C is the experimentally confirmed Kress extrapolation band.
+
+    The same split is the 1670 °C point of
+    test_hot_respeciation_predicts_flagged_kress_split. This name keeps
+    that case: a flagged, atom-balanced ferric credit from the provider.
+    """
+    from engines.builtin._common import composition_wt_pct_from_account_view
+    from simulator.fe_redox import (
+        kress91_fe3_over_sigma_fe, melt_mol_fractions_for_kress91,
+    )
+
+    request = _request(
+        formula_registry,
+        {
+            "process.cleaned_melt": {"FeO": 10.0, "SiO2": 20.0},
+            "process.overhead_gas": {"O2": 10.0},
+        },
+        fO2_log=-3.6989700043360187,  # pure O2 at 0.2 mbar = 2e-4 bar
+        temperature_C=1670.0,
+        pressure_bar=2e-4,
+    )
+    result = BuiltinFeRedoxRespeciationProvider().dispatch(
+        request,
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert result.diagnostic["temperature_band_authoritative"] is False
+    assert "OUT_OF_CERTIFIED_BAND" in result.diagnostic["flags"]
+    assert result.diagnostic["temperature_band_case"] == (
+        "1630C_2100C_extrapolation_experimentally_confirmed"
+    )
+    validate_atom_balance(result.transition, formula_registry)
+    expected = kress91_fe3_over_sigma_fe(
+        fO2_log=request.fO2_log, T_K=1943.15, pressure_bar=2e-4,
+        mol_fractions=melt_mol_fractions_for_kress91(
+            composition_wt_pct_from_account_view(request.account_view, "process.cleaned_melt"),
+        ),
+    )
+    assert result.transition.credits["process.cleaned_melt"]["Fe2O3"] == pytest.approx(
+        5.0 * expected,
+    )
+    assert result.transition.debits["process.cleaned_melt"]["FeO"] == pytest.approx(
+        10.0 * expected,
+    )
+
+
 @pytest.mark.parametrize("temperature_C", [1670.0, 2300.0, 2600.0])
 def test_hot_respeciation_predicts_flagged_kress_split(formula_registry, temperature_C):
     from engines.builtin._common import composition_wt_pct_from_account_view

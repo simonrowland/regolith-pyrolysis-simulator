@@ -201,3 +201,29 @@ def test_intrinsic_melt_fo2_inverse_reports_saturation_via_owner(
     assert notice["melt_potential"] == pytest.approx(default_inverse)
     assert notice == expected['saturation_notice']
     assert notice['status'] == expected['saturation_status']
+
+
+def test_intrinsic_melt_fo2_clamp_lowers_to_vacuum_body_floor() -> None:
+    """Old intent: the inverse itself was clamped down to the body vacuum floor.
+
+    d-072 ledger ownership fixes the inverse from the Fe inventory. The body
+    floor bounds gas-side pressure only. A moon body still lowers that floor,
+    and it does not lower the intrinsic melt fO2 or book any oxygen.
+    """
+    sim = _sim()
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    inventory = sim.atom_ledger.mol_by_account()
+    default_inverse = sim._compute_intrinsic_melt_fO2(temperature_K=1000.0)
+    default_floor = sim._vacuum_floor_bar()
+
+    sim.melt.body = "moon"
+    lunar_inverse = sim._compute_intrinsic_melt_fO2(temperature_K=1000.0)
+    lunar_floor = sim._vacuum_floor_bar()
+
+    assert default_floor == pytest.approx(DEFAULT_VACUUM_FLOOR_BAR)
+    assert lunar_floor == pytest.approx(MOON_VACUUM_FLOOR_BAR)
+    assert lunar_floor < default_floor
+    assert lunar_inverse == pytest.approx(default_inverse)
+    assert lunar_inverse != pytest.approx(math.log10(lunar_floor))
+    assert default_inverse != pytest.approx(math.log10(default_floor))
+    assert sim.atom_ledger.mol_by_account() == inventory

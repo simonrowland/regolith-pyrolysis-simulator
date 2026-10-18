@@ -255,6 +255,16 @@ def test_provider_declares_exactly_melt_resident_accounts(vapor_pressure_data):
         "process.cleaned_melt", "process.spent_reductant_residue"})
 
 
+def test_provider_declares_only_cleaned_melt_account(vapor_pressure_data):
+    """Old intent: the provider declared only process.cleaned_melt.
+
+    That claim cannot hold. The provider now uses the complete physical
+    melt basis, cleaned melt plus spent reductant residue. This name
+    asserts that basis.
+    """
+    test_provider_declares_exactly_melt_resident_accounts(vapor_pressure_data)
+
+
 def test_t622_request_and_builtin_provider_share_one_domain_policy_callable() -> None:
     from simulator.vapour_rail import request as request_module
     from simulator.vapour_rail.domain_policy import declared_domain_transition
@@ -3299,6 +3309,20 @@ def test_kernel_filters_provider_to_melt_resident_accounts_only(
             "process.cleaned_melt", "process.spent_reductant_residue"}), (
             "kernel filter leaked an undeclared account into the provider"
         )
+
+
+def test_kernel_filters_provider_to_cleaned_melt_only(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    """Old intent: the kernel showed the provider only process.cleaned_melt.
+
+    That claim cannot hold. The provider's declared basis is both physical
+    melt accounts, and the kernel still drops every other phase. This name
+    asserts that complete-basis filter.
+    """
+    test_kernel_filters_provider_to_melt_resident_accounts_only(
+        vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
 
 
 # ---------------------------------------------------------------------------

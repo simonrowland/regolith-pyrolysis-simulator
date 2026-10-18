@@ -1469,6 +1469,41 @@ def test_redox_source_label_cannot_advance_potential_without_ledger_change() -> 
     assert reservoir.redox_source_refusal_context == {}
 
 
+def test_redox_source_valid_candidate_fo2_still_applies_exact_delta() -> None:
+    """The old label-only increment now requires the exact funded Fe/O2 transition."""
+    sim = _make_sim()
+    # b-899 redox reads commanded melt.p_total_mbar (floored), not the b-901
+    # actual-N2 headspace install. 10 mbar keeps -8.75 below the gas ceiling.
+    sim.melt.p_total_mbar = 10.0
+    sim.melt.temperature_C = 1600.0
+    temperature_K = 1873.15
+    sim._apply_feedstock_iron_comproportionation()
+    _seed_melt_redox(sim, -9.0)
+    before = sim._current_melt_redox_fO2_log()
+    demand = _finite_redox_demand(sim, -8.75)
+    sim.atom_ledger.load_external_mol(
+        'process.overhead_gas', {'O2': demand},
+        source='test exact redox candidate funding', material_origin='reagent',
+    )
+    diagnostic = sim._apply_fe_redox_respeciation(fO2_log_override=-8.75)
+    transition = sim.atom_ledger.transitions[-1]
+    assert transition.name == 'fe_redox_respeciation'
+    transition.validate_conservation(sim.species_formula_registry)
+    assert diagnostic['o2_debit_mol'] == pytest.approx(demand)
+
+    reservoir = sim._apply_oxygen_reservoir_redox_source_terms(
+        {"redox_source:test_valid": demand},
+        temperature_K=temperature_K,
+    )
+
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(-8.75)
+    assert reservoir.melt_intrinsic_fO2_log - before == pytest.approx(0.25)
+    assert reservoir.redox_source_delta_ln_fO2 == 0.0
+    assert reservoir.redox_source_terms_applied is True
+    assert reservoir.redox_source_skip_reason == ""
+    assert reservoir.redox_source_refusal_context == {}
+
+
 def test_corrupt_output_mirror_cannot_replace_ledger_redox_state() -> None:
     sim = _make_sim()
     sim.melt.temperature_C = 1600.0
@@ -1478,6 +1513,31 @@ def test_corrupt_output_mirror_cannot_replace_ledger_redox_state() -> None:
     sim._sync_oxygen_reservoir_mirror()
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == expected
     assert sim.melt.melt_fO2_log == expected
+
+
+def test_nonfinite_reservoir_fo2_raises_accounting_error_with_attribution(monkeypatch) -> None:
+    """The old mirror guard is superseded by typed refusal naming the corrupt ledger input."""
+    from simulator.fe_redox import Kress91InvalidControls
+
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim._redox_source_terms_this_hr = {"redox_source:test": 1.25}
+    original = sim.atom_ledger.mol_by_account
+
+    def corrupt_ledger(account=None):
+        inventory = original(account)
+        if account == 'process.cleaned_melt':
+            inventory['FeO'] = math.inf
+        return inventory
+
+    monkeypatch.setattr(sim.atom_ledger, 'mol_by_account', corrupt_ledger)
+
+    with pytest.raises(Kress91InvalidControls) as excinfo:
+        sim._sync_oxygen_reservoir_mirror()
+
+    message = str(excinfo.value)
+    assert "FeO mol" in message
+    assert "finite non-negative" in message
 
 
 def test_c3_na_source_term_comes_from_committed_transition() -> None:
@@ -1947,6 +2007,85 @@ def test_c7_external_al_credit_changes_ledger_potential_without_scalar_step(
     assert sim.melt.oxygen_reservoir.redox_source_delta_ln_fO2 == 0.0
 
 
+def test_c7_external_al_credit_lowers_fO2_from_committed_transition(
+    monkeypatch,
+) -> None:
+    """The old scalar decrement cannot hold: C7 changes the CaO basis, not Fe valence.
+
+    Its committed ledger change sets the potential; the reduction label
+    cannot prescribe a direction or integrate a second oxygen loss.
+    """
+    monkeypatch.setattr(
+        BuiltinCaAluminothermicStepProvider,
+        "_computed_thermo_margin_kj_per_mol_o2",
+        lambda self, hold_temp_C, p_ca_pa=None: 2.0,
+    )
+    setpoints = copy.deepcopy(_load_yaml("setpoints.yaml"))
+    setpoints["campaigns"]["C7"].update(
+        {"enabled": True, "al_credit_limit_kg": 20.0, "extent_fraction": 0.1}
+    )
+    sim = _create_test_owned_simulator(
+        InternalAnalyticalBackend(),
+        setpoints,
+        _load_yaml("feedstocks.yaml"),
+        _load_yaml("vapor_pressures.yaml"),
+    )
+    sim.load_batch("targeted_super_kreep_ore", mass_kg=1000.0)
+    sim.start_campaign(CampaignPhase.C7_CA_ALUMINOTHERMIC)
+    sim.melt.temperature_C = 1200.0
+    # C7 shell band (0.01–0.1 mbar) at D=0.12 is transitional (Kn>0.01);
+    # enlarge D so Kn is viscous and ledger yields stay authorized — this
+    # test covers redox/credit accounting, not transport-domain refusal.
+    sim.overhead_model.pipe_diameter_m = 1.0
+    sim._sync_oxygen_reservoir_mirror()
+    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    before_mol = sim.atom_ledger.mol_by_account('process.cleaned_melt')
+    count = len(sim.atom_ledger.transitions)
+
+    sim._step_c7_ca_aluminothermic()
+
+    transition = next(
+        transition
+        for transition in reversed(sim.atom_ledger.transitions)
+        if transition.name == "ca_aluminothermic_c3a_credit_al"
+    )
+    label = "redox_source:c7_ca_aluminothermic_reduction"
+    ca_mol = _transition_account_species_mol(
+        sim,
+        transition,
+        side="credits",
+        account="process.overhead_gas",
+        species="Ca",
+    )
+    breakdown = sim._redox_source_breakdown_diagnostic()
+
+    assert ca_mol > 0.0
+    assert _transition_account_species_mol(
+        sim,
+        transition,
+        side="debits",
+        account=C7_AL_CREDIT_ACCOUNT,
+        species="Al",
+    ) > 0.0
+    assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
+        -0.5 * ca_mol
+    )
+    assert breakdown["redox_source_terms_applied"] is False
+    assert breakdown["skipped_reasons_by_label"][label] == "no_melt_redox_capacity"
+    assert sum(t.name == transition.name for t in sim.atom_ledger.transitions[count:]) == 1
+    transition.validate_conservation(sim.species_formula_registry)
+    after_mol = sim.atom_ledger.mol_by_account('process.cleaned_melt')
+    assert after_mol['FeO'] == before_mol['FeO']
+    assert after_mol['Fe2O3'] == before_mol['Fe2O3']
+    assert after_mol['CaO'] < before_mol['CaO']
+    expected = sim._current_melt_redox_fO2_log()
+    assert expected != before_fO2
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == expected
+    sim._apply_oxygen_reservoir_redox_source_terms({label: -0.5 * ca_mol})
+    assert sim._current_melt_redox_fO2_log() == expected
+    assert sim.melt.oxygen_reservoir.redox_source_delta_ln_fO2 == 0.0
+
+
 def test_c7_in_situ_al_route_does_not_double_count_prior_reducing_power(
     monkeypatch,
 ) -> None:
@@ -2410,6 +2549,36 @@ def test_formation_reference_survives_cold_tick_and_reanchors_at_first_liquid_ti
     assert sim.atom_ledger.mol_by_account() == before_mol
 
 
+def test_load_seed_references_on_first_liquid_tick_not_low_temperature() -> None:
+    """An arbitrary scalar seed is obsolete; first liquid T reanchors the formation split."""
+    sim = _make_sim()
+    sim._overhead_headspace_config["enabled"] = False
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
+    sim._sync_oxygen_reservoir_mirror()
+    formation_T_K = sim._current_melt_redox_reference_T_K()
+    formation_fO2 = sim._current_melt_redox_fO2_log()
+    inventory = sim.atom_ledger.mol_by_account()
+
+    sim.melt.temperature_C = 1200.0
+    low = sim._apply_oxygen_reservoir_exchange()
+    assert low.melt_intrinsic_fO2_log == formation_fO2
+    assert low.reference_T_K == formation_T_K
+
+    sim.melt.temperature_C = 1425.0
+    liquid = sim._apply_oxygen_reservoir_exchange()
+    # b-899's redox reader uses commanded p_total_mbar, not b-901's
+    # _melt_headspace_total_pressure_bar(). Same pressure on both sides of
+    # the Kress reference shift, floored the way the exchange solves it.
+    pressure_bar = max(sim.melt.p_total_mbar / 1000.0, sim._vacuum_floor_bar())
+    expected = kress91_referenced_log_fO2(
+        formation_fO2, reference_T_K=formation_T_K, target_T_K=1425.0 + 273.15,
+        reference_pressure_bar=pressure_bar, target_pressure_bar=pressure_bar,
+    )
+    assert liquid.melt_intrinsic_fO2_log == pytest.approx(expected, abs=2e-13)
+    assert liquid.reference_T_K == pytest.approx(1425.0 + 273.15)
+    assert sim.atom_ledger.mol_by_account() == inventory
+
+
 def test_selectivity_map_temperature_sweep_rides_kress91_curve(monkeypatch) -> None:
     sim = _make_sim()
     sim.melt.p_total_mbar = 10.0  # Match the requested sweep's pressure below.
@@ -2801,6 +2970,37 @@ def test_fe_redox_respeciation_commits_funded_ferric_equilibrium() -> None:
     assert before_melt['FeO'] - melt_mol['FeO'] == pytest.approx(2.0 * ferric_gain)
     assert before_o2 - after_o2 == pytest.approx(0.5 * ferric_gain)
     assert sim._current_melt_redox_fO2_log() == pytest.approx(-3.0, abs=2e-13)
+
+
+def test_fe_redox_respeciation_closes_scalar_ledger_divergence_with_real_o2() -> None:
+    """Mirror edits once created divergence; ledger authority now repairs them without O2."""
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 10_000.0},
+        source="test explicit headspace oxygen for Fe redox re-speciation",
+        material_origin="feedstock",
+    )
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -3.0
+    sim._sync_oxygen_reservoir_mirror()
+
+    before = sim._ledger_ferric_fraction_diagnostic()
+    before_o2 = sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"]
+
+    diagnostic = sim._apply_fe_redox_respeciation()
+
+    after = sim._ledger_ferric_fraction_diagnostic()
+    after_o2 = sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"]
+    melt_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
+    assert before["status"] == "ok"
+    assert diagnostic["status"] == "ok"
+    assert diagnostic["direction"] == "none"
+    assert after["status"] == "ok"
+    assert after["delta_abs"] <= FERRIC_DIVERGENCE_WARNING_THRESHOLD
+    assert melt_mol.get("Fe2O3", 0.0) > 0.0
+    assert after_o2 == before_o2
 
 
 def test_fe_redox_respeciation_refuses_managed_floor_without_phantom_o2() -> None:

@@ -1024,13 +1024,15 @@ def test_mars_carbon_cleanup_routes_products_and_keeps_melt_oxide_only():
 
     assert inv.stage0_profile == "mars_carbon_cleanup"
     assert inv.stage0_temp_range_C == (20.0, 1050.0)
-    assert inv.carbon_reductant_required_kg == pytest.approx(45.0)
+    # d-156/d-166 item 1: ferric-oxygen batch renormalization. Supplied 45 kg C
+    # exceeds the corrected demand; the residual stays as unspent reagent.
+    assert inv.carbon_reductant_required_kg == pytest.approx(44.97543376474245)
     assert sim.atom_ledger.kg_by_account(
-        "reservoir.reagent.C").get("C", 0.0) == pytest.approx(0.0)
+        "reservoir.reagent.C").get("C", 0.0) == pytest.approx(0.0245662352575567)
     assert sim.atom_ledger.kg_by_account(
         "process.reagent_inventory").get("C", 0.0) == pytest.approx(0.0)
-    assert sim.product_ledger()["consumed_C_reagent"] == pytest.approx(45.0)
-    assert "unspent_C_reagent" not in sim.product_ledger()
+    assert sim.product_ledger()["consumed_C_reagent"] == pytest.approx(44.97543376474245)
+    assert sim.product_ledger()["unspent_C_reagent"] == pytest.approx(0.0245662352575567)
     terminal_offgas = sim.atom_ledger.kg_by_account("terminal.offgas")
     assert terminal_offgas.get("C", 0.0) == pytest.approx(0.0)
     molar = {
@@ -1042,7 +1044,11 @@ def test_mars_carbon_cleanup_routes_products_and_keeps_melt_oxide_only():
     so3_initial_kg = inv.raw_components_kg["SO3"]
     sulfate_extent_mol = so3_initial_kg / molar["SO3"]
     c_to_sulfate_kg = sulfate_extent_mol * molar["C"]
-    boudouard_extent_mol = (45.0 - c_to_sulfate_kg) / molar["C"]
+    # Extent uses the corrected demand, not the 45 kg supplied. The surplus
+    # is the unspent reagent above, not a second Boudouard increment.
+    boudouard_extent_mol = (
+        inv.carbon_reductant_required_kg - c_to_sulfate_kg
+    ) / molar["C"]
     assert terminal_offgas["SO2"] == pytest.approx(
         sulfate_extent_mol * molar["SO2"])
     assert terminal_offgas["CO"] == pytest.approx(
@@ -1056,7 +1062,8 @@ def test_mars_carbon_cleanup_routes_products_and_keeps_melt_oxide_only():
     assert "SO3" not in sim.melt.composition_kg
     assert "Cl" not in sim.melt.composition_kg
     assert inv.salt_phase_kg.get("SO3", 0.0) == pytest.approx(0.0)
-    assert inv.chloride_salt_phase_kg["Cl"] == pytest.approx(8.060692)
+    # d-156/d-166 item 1: same batch renormalization scales the chloride passenger.
+    assert inv.chloride_salt_phase_kg["Cl"] == pytest.approx(8.05629180760362)
     assert "sulfuric_acid_feedstock" not in inv.salt_phase_kg
     assert "O2_extra" not in inv.gas_volatiles_kg
     assert "SO3" not in inv.residual_components_kg
@@ -1153,8 +1160,10 @@ def test_consumed_c_reagent_in_product_ledger():
         }
     )
     sim.load_batch("mars", mass_kg=1000.0, additives_kg={"C": 45.0})
-    assert sim.product_ledger()["consumed_C_reagent"] == pytest.approx(45.0)
-    assert "unspent_C_reagent" not in sim.product_ledger()
+    # d-156/d-166 item 1: measured consumption on the corrected carbon demand;
+    # the residual of the 45 kg charge is unspent reagent.
+    assert sim.product_ledger()["consumed_C_reagent"] == pytest.approx(44.97780272488762)
+    assert sim.product_ledger()["unspent_C_reagent"] == pytest.approx(0.02219727511238506)
 
 
 def test_surplus_c_reports_unspent():

@@ -373,7 +373,12 @@ def test_na2co3_below_nist_silicate_displacement_onset_stays_salt_phase():
     sim = _sim({"na2co3_low_t": feedstock})
     sim.load_batch("na2co3_low_t", mass_kg=1000.0)
 
-    assert sim.inventory.salt_phase_kg["Na2CO3"] > 49.99
+    # d-156/d-166 item 1: FeOt re-split adds ferric oxygen inside the fixed
+    # batch, so 50 kg Na2CO3 scales to 49.974704524361094 kg. No carbonate
+    # reaction; the salt phase still holds that passenger.
+    assert sim.inventory.salt_phase_kg["Na2CO3"] == pytest.approx(
+        49.974704524361094, abs=1e-9,
+    )
     assert sim.inventory.melt_oxide_kg.get("Na2O", 0.0) < 0.01
 
     snapshot = sim._make_snapshot()
