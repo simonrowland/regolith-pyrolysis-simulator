@@ -1567,6 +1567,20 @@ def test_lunar_mare_low_ti_full_run_ledger_pin(
     isolated_engine_config,
 ) -> None:
     """Pin the normal runner's complete lunar run ledgers and final state."""
+    from simulator import engine_local_config
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    backend = MAGEMinBackend()
+    monkeypatch.setattr(
+        engine_local_config,
+        "cache_version_for",
+        lambda _engine: None,
+    )
+    if not backend.initialize(
+        {"python_bridge": "subprocess", "warm_worker": False}
+    ):
+        pytest.skip("requires an installed MAGEMin executable for the pinned ledger")
+
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         hours=500,
