@@ -1,6 +1,6 @@
 # Figure 1 digitization audit — shornikov-2011-cao-mgo-alumina-melts
 
-PDF page 2, rendered at 600 dpi (4961 × 7017 px). Page coordinates below are full-page pixels. The 13 open-square markers that carry a read uncertainty were read again from scratch. The previous pixel was not used as either read. Read A is the area centre of the strict-black outer ink on a fresh crop of the 600 dpi page. Read B is the area centre of the same ink on a fresh crop of the embedded JPEG, a different zoom, mapped through the page image matrix and rounded half up. The centre is the outer square, on the boundary of the black cap and the white window. Activities are the antilog of the mean plotted ordinate, stored at 12 significant figures so both calibrated ordinates fall inside the band. Panel d stores the exact mean of its two Gibbs ordinates, the negative of plotted −ΔfG. Where the two page pixels share a y coordinate, the uncertainty is a positive half-pixel width in axis units. Where they differ by one pixel, the uncertainty is half that ordinate difference. a2 touches a1, so its 600 dpi black body is 72 px wide (page x 1444–1515) rather than 76; its centre is the area centre of that body.
+PDF page 2, rendered at 600 dpi (4961 × 7017 px). Page coordinates below are full-page pixels. The 13 open-square markers that carry a read uncertainty were read again from fresh crops. None of the 26 recorded coordinates is the eead470ca read-1 integer. Read A is the index midpoint of the strict-black outer square, pixels with max(R, G, B) <= 40, on a fresh 600 dpi crop of that marker's own body. Read B is the index midpoint of the same ink on a fresh crop of the embedded JPEG, mapped through the page image matrix and recorded at 0.01 page pixel. a1 and a2 touch. On the page the bridge is x 1440–1443, y 3470–3473; a1's body is x 1364–1439, y 3398–3473 and a2's body is x 1444–1515, y 3470–3545. On the JPEG the bridge is the single pixel (118, 164); a1 is columns 99–117 and a2 is columns 119–136. The other eleven bodies are their own 4-connected strict-black components. c5's page centre is (3290.5, 3388.0); its JPEG centre maps to (3289.41, 3387.22). The previous pair (3291, 3389) is not either read. Activities are the antilog of the mean plotted ordinate, stored at three significant figures. Panel d stores the mean Gibbs ordinate rounded to 0.01 kJ/mol. The locator note keeps both raw page pixels and that unrounded mean ordinate. The uncertainty is the larger distance from the rounded point to the two recorded ordinates, rounded up to 0.000001 dex, or to 0.00001 kJ/mol on panel d, so the band contains both ordinates. Read A is the outer-square centre, so the same band contains that centre.
 
 ## Axis calibration
 
@@ -39,44 +39,44 @@ Linear fits (pixel -> axis value), from the labelled ticks above:
 
 ## Open-square marker reads
 
-Read A is crop 1 and read B is crop 2. Plotted y is the existing calibration of that page pixel. The stored value is the mean of the two plotted ordinates (activity = 10^(−y); panel d Gibbs energy = −y). Uncertainty is in dex on panels a–c and in kJ/mol on panel d. Markers b4, c1, c2, d1, d3 and d4 were not re-read; their rows are the previous record and they still have no uncertainty key.
+Read A is crop 1 and read B is crop 2. Plotted y is the existing calibration of that recorded page pixel. The stored activity is the antilog of the mean plotted ordinate, rounded to three significant figures. Panel d stores the negative of that mean, rounded to 0.01 kJ/mol. The note ordinate is the unrounded mean. Uncertainty is the distance from the rounded point to the farther recorded ordinate, in dex on panels a–c and in kJ/mol on panel d, rounded up so the band contains both ordinates and the outer-square centre. Markers b4, c1, c2, d1, d3 and d4 were not re-read; their rows are the previous record and they still have no uncertainty key.
 
 | Panel | Marker | Read | Page pixel (x, y) | x(Al2O3), mole % | Plotted y | Stored value | Uncertainty |
 |---|---:|---:|---|---:|---:|---:|---:|
-| a | 1 | 1 | (1402, 3436) | 25.880 | 0.30379724 | 0.496068202426 | 0.00066137 |
-| a | 1 | 2 | (1402, 3437) | 25.880 | 0.30511998 | 0.496068202426 | 0.00066137 |
-| a | 2 | 1 | (1480, 3508) | 27.685 | 0.39903452 | 0.398386038407 | 0.00066137 |
-| a | 2 | 2 | (1480, 3509) | 27.685 | 0.40035726 | 0.398386038407 | 0.00066137 |
-| a | 3 | 1 | (1562, 3604) | 29.583 | 0.52601756 | 0.297386376996 | 0.00066137 |
-| a | 3 | 2 | (1562, 3605) | 29.583 | 0.52734030 | 0.297386376996 | 0.00066137 |
-| a | 4 | 1 | (1658, 3736) | 31.806 | 0.70061924 | 0.199241939190 | 0.00066137 |
-| a | 4 | 2 | (1658, 3736) | 31.806 | 0.70061924 | 0.199241939190 | 0.00066137 |
-| a | 5 | 1 | (1842, 3964) | 36.065 | 1.00220396 | 0.0994938049629 | 0.00066137 |
-| a | 5 | 2 | (1843, 3964) | 36.088 | 1.00220396 | 0.0994938049629 | 0.00066137 |
-| b | 1 | 1 | (1374, 4738) | 25.231 | 0.39957696 | 0.398495149947 | 0.000475285 |
-| b | 1 | 2 | (1374, 4738) | 25.231 | 0.39957696 | 0.398495149947 | 0.000475285 |
-| b | 2 | 1 | (1514, 4870) | 28.472 | 0.52505220 | 0.298502381259 | 0.000475285 |
-| b | 2 | 2 | (1514, 4870) | 28.472 | 0.52505220 | 0.298502381259 | 0.000475285 |
-| b | 3 | 1 | (1826, 5054) | 35.694 | 0.69995708 | 0.199764450507 | 0.000475285 |
-| b | 3 | 2 | (1827, 5053) | 35.718 | 0.69900651 | 0.199764450507 | 0.000475285 |
+| a | 1 | 1 | (1401.5, 3435.5) | 25.868 | 0.30313587 | 0.498 | 0.000366 |
+| a | 1 | 2 | (1400.26, 3435.11) | 25.839 | 0.30262000 | 0.498 | 0.000366 |
+| a | 2 | 1 | (1479.5, 3507.5) | 27.674 | 0.39837315 | 0.400 | 0.000434 |
+| a | 2 | 2 | (1478.31, 3506.95) | 27.646 | 0.39764564 | 0.400 | 0.000434 |
+| a | 3 | 1 | (1561.5, 3603.5) | 29.572 | 0.52535619 | 0.299 | 0.001028 |
+| a | 3 | 2 | (1560.36, 3602.74) | 29.545 | 0.52435091 | 0.299 | 0.001028 |
+| a | 4 | 1 | (1657.5, 3735.5) | 31.794 | 0.69995787 | 0.200 | 0.000988 |
+| a | 4 | 2 | (1656.42, 3734.44) | 31.769 | 0.69855577 | 0.200 | 0.000988 |
+| a | 5 | 1 | (1841.5, 3963.0) | 36.053 | 1.00088122 | 0.100 | 0.000882 |
+| a | 5 | 2 | (1840.53, 3961.93) | 36.031 | 0.99946589 | 0.100 | 0.000882 |
+| b | 1 | 1 | (1373.5, 4737.5) | 25.220 | 0.39910168 | 0.400 | 0.001162 |
+| b | 1 | 2 | (1372.24, 4736.19) | 25.191 | 0.39785643 | 0.400 | 0.001162 |
+| b | 2 | 1 | (1513.5, 4869.5) | 28.461 | 0.52457692 | 0.299 | 0.001273 |
+| b | 2 | 2 | (1512.33, 4867.9) | 28.434 | 0.52305600 | 0.299 | 0.001273 |
+| b | 3 | 1 | (1825.5, 5053.5) | 35.683 | 0.69948180 | 0.200 | 0.001399 |
+| b | 3 | 2 | (1824.52, 5051.49) | 35.660 | 0.69757115 | 0.200 | 0.001399 |
 | b | 4 | 1 | (2034, 5054) | 40.509 | 0.7000 | 0.2 | — |
 | b | 4 | 2 | (2034, 5054) | 40.509 | 0.7000 | 0.2 | — |
 | c | 1 | 1 | (2691, 4043) | 27.454 | 1.9954 | 0.01 | — |
 | c | 1 | 2 | (2689, 4043) | 27.407 | 1.9954 | 0.01 | — |
 | c | 2 | 1 | (2819, 3732) | 30.417 | 1.3120 | 0.049 | — |
 | c | 2 | 2 | (2820, 3732) | 30.440 | 1.3120 | 0.049 | — |
-| c | 3 | 1 | (2995, 3600) | 34.491 | 1.02196310 | 0.0948283633277 | 0.001098645 |
-| c | 3 | 2 | (2995, 3601) | 34.491 | 1.02416039 | 0.0948283633277 | 0.001098645 |
-| c | 4 | 1 | (3131, 3464) | 37.639 | 0.72313166 | 0.188699041863 | 0.001098645 |
-| c | 4 | 2 | (3131, 3465) | 37.639 | 0.72532895 | 0.188699041863 | 0.001098645 |
-| c | 5 | 1 | (3291, 3389) | 41.343 | 0.55833491 | 0.276480871660 | 0.001098645 |
-| c | 5 | 2 | (3291, 3389) | 41.343 | 0.55833491 | 0.276480871660 | 0.001098645 |
-| c | 6 | 1 | (3483, 3333) | 45.787 | 0.43528667 | 0.367039944034 | 0.001098645 |
-| c | 6 | 2 | (3484, 3333) | 45.810 | 0.43528667 | 0.367039944034 | 0.001098645 |
+| c | 3 | 1 | (2994.5, 3599.5) | 34.479 | 1.02086446 | 0.0955 | 0.000868 |
+| c | 3 | 2 | (2993.23, 3598.75) | 34.450 | 1.01921649 | 0.0955 | 0.000868 |
+| c | 4 | 1 | (3130.5, 3463.5) | 37.627 | 0.72203302 | 0.190 | 0.000787 |
+| c | 4 | 2 | (3129.31, 3463.05) | 37.600 | 0.72104423 | 0.190 | 0.000787 |
+| c | 5 | 1 | (3290.5, 3388.0) | 41.331 | 0.55613762 | 0.278 | 0.001532 |
+| c | 5 | 2 | (3289.41, 3387.22) | 41.306 | 0.55442373 | 0.278 | 0.001532 |
+| c | 6 | 1 | (3482.5, 3332.5) | 45.775 | 0.43418803 | 0.369 | 0.001313 |
+| c | 6 | 2 | (3481.52, 3331.35) | 45.753 | 0.43166114 | 0.369 | 0.001313 |
 | d | 1 | 1 | (2555, 5233) | 24.306 | 22.6213 | -23.0 | — |
 | d | 1 | 2 | (2557, 5233) | 24.352 | 22.6213 | -23.0 | — |
-| d | 2 | 1 | (2723, 5066) | 28.194 | 24.24270766 | -24.24756203 | 0.00485437 |
-| d | 2 | 2 | (2723, 5065) | 28.194 | 24.25241640 | -24.24756203 | 0.00485437 |
+| d | 2 | 1 | (2722.5, 5065.5) | 28.183 | 24.24756203 | -24.26 | 0.01244 |
+| d | 2 | 2 | (2721.06, 5063.46) | 28.150 | 24.26736786 | -24.26 | 0.01244 |
 | d | 3 | 1 | (2897, 4736) | 32.222 | 27.4466 | -27.0 | — |
 | d | 3 | 2 | (2897, 4736) | 32.222 | 27.4466 | -27.0 | — |
 | d | 4 | 1 | (3079, 4503) | 36.435 | 29.7087 | -30.0 | — |
@@ -84,22 +84,22 @@ Read A is crop 1 and read B is crop 2. Plotted y is the existing calibration of 
 
 ## Stored-value corrections
 
-These are corrections of the stored point, not only of the uncertainty. The shift for panels a–c is log10(new/old). Panel d is in kJ/mol.
+These are corrections of the stored point relative to the previous 12-significant-figure means, not only of the uncertainty. The shift for panels a–c is log10(new/old). Panel d is in kJ/mol.
 
 | Marker | Old stored | New stored | Shift |
 |---|---:|---:|---:|
-| a1 | 0.5 | 0.496068202426 | −0.003429 dex |
-| a2 | 0.4 | 0.398386038407 | −0.001756 dex |
-| a3 | 0.3 | 0.297386376996 | −0.003800 dex |
-| a4 | 0.2 | 0.199241939190 | −0.001649 dex |
-| a5 | 0.099 | 0.0994938049629 | +0.002161 dex |
-| b1 | 0.4 | 0.398495149947 | −0.001637 dex |
-| b2 | 0.3 | 0.298502381259 | −0.002173 dex |
-| b3 | 0.2 | 0.199764450507 | −0.000512 dex |
-| c3 | 0.095 | 0.0948283633277 | −0.000785 dex |
-| c4 | 0.19 | 0.188699041863 | −0.002984 dex |
-| c5 | 0.28 | 0.276480871660 | −0.005493 dex |
-| c6 | 0.37 | 0.367039944034 | −0.003488 dex |
-| d2 | −24.0 | −24.24756203 | −0.247562 kJ/mol |
+| a1 | 0.496068202426 | 0.498 | +0.001688 dex |
+| a2 | 0.398386038407 | 0.400 | +0.001756 dex |
+| a3 | 0.297386376996 | 0.299 | +0.002350 dex |
+| a4 | 0.199241939190 | 0.200 | +0.001649 dex |
+| a5 | 0.0994938049629 | 0.100 | +0.002204 dex |
+| b1 | 0.398495149947 | 0.400 | +0.001637 dex |
+| b2 | 0.298502381259 | 0.299 | +0.000723 dex |
+| b3 | 0.199764450507 | 0.200 | +0.000512 dex |
+| c3 | 0.0948283633277 | 0.0955 | +0.003065 dex |
+| c4 | 0.188699041863 | 0.190 | +0.002984 dex |
+| c5 | 0.276480871660 | 0.278 | +0.002380 dex |
+| c6 | 0.367039944034 | 0.369 | +0.002313 dex |
+| d2 | -24.24756203 | -24.26 | -0.012438 kJ/mol |
 
-Both reads of a4, b1, b2 and c5 land on the same page pixel, and a5 and c6 share a y pixel, so those six stored widths are a half pixel of the y axis rather than half of a zero difference. Table 2 composition provides context for the model series; the experimental Allibert markers show only x(Al2O3), so their complete melt compositions remain typed unknown.
+No recorded pair is a single shared page pixel, and none of the coordinates above is the previous integer read. a5's page centre is (1841.5, 3963.0) and its JPEG centre maps to (1840.53, 3961.93). c5's page centre is (3290.5, 3388.0); its JPEG centre maps to (3289.41, 3387.22). Table 2 composition provides context for the model series; the experimental Allibert markers show only x(Al2O3), so their complete melt compositions remain typed unknown.

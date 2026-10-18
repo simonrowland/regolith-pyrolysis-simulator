@@ -44,21 +44,22 @@ _Y_AXIS = {
     "d": (Decimal("73.4271845"), Decimal("-0.00970874")),
 }
 
-# species, id, panel, read A, read B, value field, stored value, uncertainty key, width, note ordinate
+# species, id, panel, read A (outer-square centre), read B, value field, stored value,
+# uncertainty key, width, note ordinate
 _FRESH_READS = (
-    ("CaO", "shornikov_2011_fig1_a_allibert_marker_01", "a", (1402, 3436), (1402, 3437), "activity", "0.496068202426", "read_uncertainty_dex", "0.00066137", "0.30445861"),
-    ("CaO", "shornikov_2011_fig1_a_allibert_marker_02", "a", (1480, 3508), (1480, 3509), "activity", "0.398386038407", "read_uncertainty_dex", "0.00066137", "0.39969589"),
-    ("CaO", "shornikov_2011_fig1_a_allibert_marker_03", "a", (1562, 3604), (1562, 3605), "activity", "0.297386376996", "read_uncertainty_dex", "0.00066137", "0.52667893"),
-    ("CaO", "shornikov_2011_fig1_a_allibert_marker_04", "a", (1658, 3736), (1658, 3736), "activity", "0.199241939190", "read_uncertainty_dex", "0.00066137", "0.70061924"),
-    ("CaO", "shornikov_2011_fig1_a_allibert_marker_05", "a", (1842, 3964), (1843, 3964), "activity", "0.0994938049629", "read_uncertainty_dex", "0.00066137", "1.00220396"),
-    ("MgO", "shornikov_2011_fig1_b_allibert_marker_01", "b", (1374, 4738), (1374, 4738), "activity", "0.398495149947", "read_uncertainty_dex", "0.000475285", "0.39957696"),
-    ("MgO", "shornikov_2011_fig1_b_allibert_marker_02", "b", (1514, 4870), (1514, 4870), "activity", "0.298502381259", "read_uncertainty_dex", "0.000475285", "0.52505220"),
-    ("MgO", "shornikov_2011_fig1_b_allibert_marker_03", "b", (1826, 5054), (1827, 5053), "activity", "0.199764450507", "read_uncertainty_dex", "0.000475285", "0.699481795"),
-    ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_03", "c", (2995, 3600), (2995, 3601), "activity", "0.0948283633277", "read_uncertainty_dex", "0.001098645", "1.023061745"),
-    ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_04", "c", (3131, 3464), (3131, 3465), "activity", "0.188699041863", "read_uncertainty_dex", "0.001098645", "0.724230305"),
-    ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_05", "c", (3291, 3389), (3291, 3389), "activity", "0.276480871660", "read_uncertainty_dex", "0.001098645", "0.55833491"),
-    ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_06", "c", (3483, 3333), (3484, 3333), "activity", "0.367039944034", "read_uncertainty_dex", "0.001098645", "0.43528667"),
-    ("CaO-MgO-Al2O3_melt", "shornikov_2011_fig1_d_allibert_marker_02", "d", (2723, 5066), (2723, 5065), "value", "-24.24756203", "read_uncertainty_kJ_mol", "0.00485437", "24.24756203"),
+    ("CaO", "shornikov_2011_fig1_a_allibert_marker_01", "a", ("1401.5", "3435.5"), ("1400.26", "3435.11"), "activity", "0.498", "read_uncertainty_dex", "0.000366", "0.302878"),
+    ("CaO", "shornikov_2011_fig1_a_allibert_marker_02", "a", ("1479.5", "3507.5"), ("1478.31", "3506.95"), "activity", "0.400", "read_uncertainty_dex", "0.000434", "0.398009"),
+    ("CaO", "shornikov_2011_fig1_a_allibert_marker_03", "a", ("1561.5", "3603.5"), ("1560.36", "3602.74"), "activity", "0.299", "read_uncertainty_dex", "0.001028", "0.524854"),
+    ("CaO", "shornikov_2011_fig1_a_allibert_marker_04", "a", ("1657.5", "3735.5"), ("1656.42", "3734.44"), "activity", "0.200", "read_uncertainty_dex", "0.000988", "0.699257"),
+    ("CaO", "shornikov_2011_fig1_a_allibert_marker_05", "a", ("1841.5", "3963.0"), ("1840.53", "3961.93"), "activity", "0.100", "read_uncertainty_dex", "0.000882", "1.000174"),
+    ("MgO", "shornikov_2011_fig1_b_allibert_marker_01", "b", ("1373.5", "4737.5"), ("1372.24", "4736.19"), "activity", "0.400", "read_uncertainty_dex", "0.001162", "0.398479"),
+    ("MgO", "shornikov_2011_fig1_b_allibert_marker_02", "b", ("1513.5", "4869.5"), ("1512.33", "4867.9"), "activity", "0.299", "read_uncertainty_dex", "0.001273", "0.523816"),
+    ("MgO", "shornikov_2011_fig1_b_allibert_marker_03", "b", ("1825.5", "5053.5"), ("1824.52", "5051.49"), "activity", "0.200", "read_uncertainty_dex", "0.001399", "0.698526"),
+    ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_03", "c", ("2994.5", "3599.5"), ("2993.23", "3598.75"), "activity", "0.0955", "read_uncertainty_dex", "0.000868", "1.020040"),
+    ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_04", "c", ("3130.5", "3463.5"), ("3129.31", "3463.05"), "activity", "0.190", "read_uncertainty_dex", "0.000787", "0.721539"),
+    ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_05", "c", ("3290.5", "3388.0"), ("3289.41", "3387.22"), "activity", "0.278", "read_uncertainty_dex", "0.001532", "0.555281"),
+    ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_06", "c", ("3482.5", "3332.5"), ("3481.52", "3331.35"), "activity", "0.369", "read_uncertainty_dex", "0.001313", "0.432925"),
+    ("CaO-MgO-Al2O3_melt", "shornikov_2011_fig1_d_allibert_marker_02", "d", ("2722.5", "5065.5"), ("2721.06", "5063.46"), "value", "-24.26", "read_uncertainty_kJ_mol", "0.01244", "24.257465"),
 )
 
 _UNCHANGED_MARKERS = (
@@ -78,9 +79,9 @@ def _migrated() -> list:
     return list(migrator.result.observations.values())
 
 
-def _ordinate_distance(panel: str, y_px: int, point: Decimal) -> Decimal:
+def _ordinate_distance(panel: str, y_px: str, point: Decimal) -> Decimal:
     intercept, slope = _Y_AXIS[panel]
-    plotted = intercept + slope * Decimal(y_px)
+    plotted = intercept + slope * Decimal(str(y_px))
     if panel == "d":
         return abs((-plotted) - point)
     candidate = Decimal(10) ** (-plotted)
@@ -98,11 +99,11 @@ def _assert_printed_band_contains_both_reads(observation, panel: str, pixels, wi
     assert resolution.band is not None
     assert resolution.band.value == Decimal(width)
     assert resolution.band.value > 0
-    # 12-sig-fig activity is the antilog of the mean; that rounding is within 1e-12 dex.
-    slack = Decimal(0) if panel == "d" else Decimal("1e-12")
+    # Read A is the outer-square centre. The stored width itself has to contain
+    # that centre and both recorded ordinates after the value is rounded.
     for _x_px, y_px in pixels:
         distance = _ordinate_distance(panel, y_px, observation.value.point)
-        assert distance <= resolution.band.value + slack
+        assert distance <= resolution.band.value
 
 
 def _render_pins(document: dict) -> None:
@@ -126,8 +127,8 @@ def _render_pins(document: dict) -> None:
     )["values"]["value"] == "271.522"
 
     marker_pins = (
-        ("CaO", "a", "0.496068202426", "(1402, 3436)", "(1402, 3437)", "0.30445861", "0.00066137"),
-        ("MgO", "b", "0.398495149947", "(1374, 4738)", "(1374, 4738)", "0.39957696", "0.000475285"),
+        ("CaO", "a", "0.498", "(1401.5, 3435.5)", "(1400.26, 3435.11)", "0.302878", "0.000366"),
+        ("MgO", "b", "0.400", "(1373.5, 4737.5)", "(1372.24, 4736.19)", "0.398479", "0.001162"),
         ("Al2O3", "c", 0.010, "(2691, 4043)", "(2689, 4043)", "1.9954", None),
     )
     for species, panel, activity, first_pixel, second_pixel, log_ordinate, width in marker_pins:
@@ -287,7 +288,7 @@ def test_printed_band_rejects_a_1e_9_width() -> None:
             _assert_printed_band_contains_both_reads(
                 narrowed,
                 "a",
-                ((1402, 3436), (1402, 3437)),
+                (("1401.5", "3435.5"), ("1400.26", "3435.11")),
                 "1e-9",
             )
 
