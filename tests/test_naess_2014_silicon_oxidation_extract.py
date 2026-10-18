@@ -99,6 +99,7 @@ PUBLISHED_FOOTERS = {
     11: 405,
     12: 406,
     13: 407,
+    14: 408,
     18: 412,
 }
 
@@ -112,9 +113,72 @@ def _assert_render_pins(document: dict) -> None:
         assert record["locator"]["pdf_page_index"] == pdf_page - 1
 
 
+def _assert_locator(record: dict, page: int, published_page: int) -> None:
+    assert record["locator"]["page"] == page
+    assert record["locator"]["published_page"] == published_page
+    assert record["locator"]["pdf_page_index"] == page - 1
+
+
+def _assert_review_fix_pins(document: dict) -> None:
+    figure_fit = _context(document, "naess14_fig3_dry_air_regression")["values"]
+    assert "R_squared_as_printed" not in figure_fit
+    assert figure_fit["flat_plate_comparison_R_squared_as_printed"] == "0.76"
+    for figure_number in (1, 2, 6):
+        figure = _context(document, f"naess14_figure_{figure_number}_deferred")
+        assert "non_data_annotations_as_printed" not in figure["values"]
+
+    partial_pressure = _context(
+        document, "naess14_model_derived_siO_partial_pressure_and_transport"
+    )
+    _assert_locator(partial_pressure, 10, 404)
+    diffusion = _context(document, "naess14_model_derived_diffusion_coefficients")
+    _assert_locator(diffusion, 11, 405)
+    assert diffusion["values"]["SiO_diffusion_coefficient_at_1550C_as_printed"] == (
+        "3.9 × 10^-4 m^2 s^-1"
+    )
+    assert diffusion["values"]["O2_diffusion_coefficient_at_1550C_as_printed"] == (
+        "4.7 × 10^-4 m^2 s^-1"
+    )
+    sio_boundary = _context(
+        document, "naess14_model_derived_sio_boundary_layer_thickness"
+    )
+    _assert_locator(sio_boundary, 11, 405)
+    assert sio_boundary["values"]["SiO_boundary_layer_thickness_as_printed"] == (
+        "<0.5 mm at all gas flow rates"
+    )
+    o2_boundary = _context(
+        document, "naess14_model_derived_o2_boundary_layer_thickness"
+    )
+    _assert_locator(o2_boundary, 14, 408)
+    assert o2_boundary["values"]["O2_boundary_layer_thickness_at_26_m_s_as_printed"] == (
+        "3.25 mm"
+    )
+
+    humid_air = _context(
+        document, "naess14_cfd_humid_air_oxygen_consumption_comparison"
+    )
+    _assert_locator(humid_air, 8, 402)
+    assert humid_air["values"]["humid_air_at_16_m_s_as_printed"] == (
+        "6 % versus 4 % for dry air"
+    )
+    assert humid_air["values"]["non_significance_note_as_printed"] == (
+        "The humid-air increase was not statistically significant."
+    )
+    dry_air = _context(document, "naess14_cfd_oxygen_consumption_summary")
+    _assert_locator(dry_air, 10, 404)
+    assert "humid_air_at_16_m_s_as_printed" not in dry_air["values"]
+    assert "non_significance_note_as_printed" not in dry_air["values"]
+    assert dry_air["values"]["dry_air_at_5_m_s_as_printed"] == "9 % average"
+    assert dry_air["values"]["dry_air_at_26_m_s_as_printed"] == "5 % average"
+    assert dry_air["values"]["air_argon_1_4_at_26_m_s_as_printed"] == (
+        "38 % average versus 9 % at 5 m s^-1 dry air"
+    )
+
+
 def test_naess_table_rows_and_render_pins() -> None:
     document = _document()
     _assert_render_pins(document)
+    _assert_review_fix_pins(document)
 
     context = document["species"]["SiO2"]["context"]
     ids = [row["observation_id"] for row in context]
@@ -177,6 +241,53 @@ def test_naess_render_pin_rejects_a_changed_cell() -> None:
     ] = "11.35"
     with pytest.raises(AssertionError):
         _assert_render_pins(document)
+
+
+@pytest.mark.parametrize(
+    "regression",
+    (
+        "figure_r_squared",
+        "figure_1_annotation",
+        "figure_2_annotation",
+        "figure_6_annotation",
+        "diffusion_page",
+        "boundary_wording",
+        "o2_boundary_page",
+        "humid_cfd_page",
+    ),
+)
+def test_naess_review_fix_pins_reject_regressions(regression: str) -> None:
+    document = deepcopy(_document())
+    if regression == "figure_r_squared":
+        _context(document, "naess14_fig3_dry_air_regression")["values"][
+            "R_squared_as_printed"
+        ] = "0.91"
+    elif regression.startswith("figure_"):
+        figure_number = regression.split("_")[1]
+        _context(document, f"naess14_figure_{figure_number}_deferred")["values"][
+            "non_data_annotations_as_printed"
+        ] = "returned annotation"
+    elif regression == "diffusion_page":
+        _context(document, "naess14_model_derived_diffusion_coefficients")["locator"][
+            "page"
+        ] = 10
+    elif regression == "boundary_wording":
+        _context(
+            document, "naess14_model_derived_sio_boundary_layer_thickness"
+        )["values"]["SiO_boundary_layer_thickness_as_printed"] = (
+            "approximately 0.5 mm at all gas flow rates"
+        )
+    elif regression == "o2_boundary_page":
+        _context(document, "naess14_model_derived_o2_boundary_layer_thickness")[
+            "locator"
+        ]["page"] = 10
+    else:
+        _context(
+            document, "naess14_cfd_humid_air_oxygen_consumption_comparison"
+        )["locator"]["page"] = 10
+
+    with pytest.raises(AssertionError):
+        _assert_review_fix_pins(document)
 
 
 def test_naess_isolated_migration_preserves_context_without_typed_substitutes(

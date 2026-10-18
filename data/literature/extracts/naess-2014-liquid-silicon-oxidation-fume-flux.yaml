@@ -791,16 +791,43 @@ species:
         page: 10
         published_page: 404
         pdf_page_index: 9
-      units: partial pressure in atm; diffusion coefficient in m^2 s^-1; boundary thickness in mm
+      units: partial pressure in atm
       values:
         method_class: model_derived
         SiO_partial_pressure_as_printed: 0.0037–0.0068 atm
         SiO_partial_pressure_standard_deviation_as_printed: 25 %
         method_as_printed: Calculated using mass transfer coefficient derived from impinging jet theory.
+    - observation_id: naess14_model_derived_diffusion_coefficients
+      type: experiment_series
+      locator:
+        page: 11
+        published_page: 405
+        pdf_page_index: 10
+      units: diffusion coefficient in m^2 s^-1
+      values:
+        method_class: model_derived
         SiO_diffusion_coefficient_at_1550C_as_printed: 3.9 × 10^-4 m^2 s^-1
         O2_diffusion_coefficient_at_1550C_as_printed: 4.7 × 10^-4 m^2 s^-1
         diffusion_coefficient_attribution_as_printed: Bird, Stewart and Lightfoot [15]; see [4] for derivation description.
-        SiO_boundary_layer_thickness_as_printed: approximately 0.5 mm at all gas flow rates
+    - observation_id: naess14_model_derived_sio_boundary_layer_thickness
+      type: experiment_series
+      locator:
+        page: 11
+        published_page: 405
+        pdf_page_index: 10
+      units: boundary thickness in mm
+      values:
+        method_class: model_derived
+        SiO_boundary_layer_thickness_as_printed: '<0.5 mm at all gas flow rates'
+    - observation_id: naess14_model_derived_o2_boundary_layer_thickness
+      type: experiment_series
+      locator:
+        page: 14
+        published_page: 408
+        pdf_page_index: 13
+      units: boundary thickness in mm
+      values:
+        method_class: model_derived
         O2_boundary_layer_thickness_at_26_m_s_as_printed: 3.25 mm
     - observation_id: naess14_quoted_industrial_particle_diameter_range
       type: experiment_series
@@ -824,9 +851,8 @@ species:
       values:
         method_class: model_derived
         fit_as_printed: Linear regression of dry-air experimental results against vg^(3/4)
-        R_squared_as_printed: '0.91'
         flat_plate_comparison_R_squared_as_printed: '0.76'
-        figure_note: No plotted marker values were digitised; fit statistics and relation are printed text/annotations.
+        figure_note: No plotted marker values were digitised.
     - observation_id: naess14_cfd_oxygen_consumption_summary
       type: experiment_series
       locator:
@@ -838,8 +864,17 @@ species:
         method_class: measured_reduced
         dry_air_at_5_m_s_as_printed: 9 % average
         dry_air_at_26_m_s_as_printed: 5 % average
-        humid_air_at_16_m_s_as_printed: 6 % versus 4 % for dry air
         air_argon_1_4_at_26_m_s_as_printed: 38 % average versus 9 % at 5 m s^-1 dry air
+    - observation_id: naess14_cfd_humid_air_oxygen_consumption_comparison
+      type: experiment_series
+      locator:
+        page: 8
+        published_page: 402
+        pdf_page_index: 7
+      units: oxygen consumed percent
+      values:
+        method_class: measured_reduced
+        humid_air_at_16_m_s_as_printed: 6 % versus 4 % for dry air
         non_significance_note_as_printed: The humid-air increase was not statistically significant.
     - observation_id: naess14_appendix_particle_condensation_model
       type: experiment_series
@@ -891,7 +926,6 @@ species:
           attribution: '[1, 3]'
         attribution: present study
         digitisation: deferred to a figure pass
-        non_data_annotations_as_printed: ~7000 kg industrial charge; 10 g small-scale charge
     - observation_id: naess14_figure_2_deferred
       type: figure_record
       locator:
@@ -917,7 +951,6 @@ species:
           attribution: present study
         attribution: present study
         digitisation: deferred to a figure pass
-        non_data_annotations_as_printed: H = 40 cm; ID = 11.4 cm; lance/furnace dimensions as labelled
     - observation_id: naess14_figure_3_deferred
       type: figure_record
       locator:
@@ -1046,7 +1079,6 @@ species:
           attribution: present study
         attribution: present study
         digitisation: deferred to a figure pass
-        non_data_annotations_as_printed: 200 nm scale bar
     - observation_id: naess14_figure_7_deferred
       type: figure_record
       locator:
