@@ -996,28 +996,30 @@ def _located_point(located: object | None) -> float | None:
 
 
 def _initial_oxide_wt_percent(sample: object) -> dict[str, float]:
-    printed = getattr(sample, "printed_composition", None)
-    state = None if printed is None else getattr(printed, "state", None)
-    if state is not None and getattr(state, "is_value", False):
-        raw = getattr(state, "value", None)
-        if isinstance(raw, Mapping):
-            try:
-                values = {
-                    str(oxide): float(amount) for oxide, amount in raw.items()
-                }
-            except (TypeError, ValueError, OverflowError):
-                values = {}
-            if values and all(math.isfinite(x) and x >= 0.0 for x in values.values()):
-                return values
-
     initial = getattr(sample, "initial_composition", None)
     state = None if initial is None else getattr(initial, "state", None)
     if state is None or not getattr(state, "is_value", False):
-        raise ResidueInventoryRefusal("initial_composition_not_stated")
+        raise ResidueInventoryRefusal(
+            "initial_composition_not_stated", "sample.initial_composition"
+        )
+    role_note = str(
+        getattr(getattr(initial, "locator", None), "note", "") or ""
+    ).casefold()
+    residue_labeled = "residu" in role_note or "final" in role_note
+    explicitly_starting_glass = (
+        "starting-material composition" in role_note
+        and "not the evaporation-residue row" in role_note
+    )
+    if residue_labeled and not explicitly_starting_glass:
+        raise ResidueInventoryRefusal(
+            "initial_composition_not_stated", "sample.initial_composition"
+        )
     composition = getattr(state, "value", None)
     components = getattr(composition, "components", None)
     if not components:
-        raise ResidueInventoryRefusal("initial_composition_not_stated")
+        raise ResidueInventoryRefusal(
+            "initial_composition_not_stated", "sample.initial_composition"
+        )
     raw_basis = getattr(composition, "amount_basis", "")
     amount_basis = str(getattr(raw_basis, "value", raw_basis))
     if amount_basis not in {"mole_fraction", "moles", "mole"}:
