@@ -131,7 +131,7 @@ def test_letter_for_digit_flags_casefold_confusables_without_a_scale_token() -> 
     assert "letter_for_digit" not in draft._render_traps(
         {"text": "0.23 x", "value_text": "0.23 x"}, None
     )
-    for text in ("SiO2", "solid", "Olivine"):
+    for text in ("SiO2", "SiO2 x 10", "solid", "Olivine"):
         assert "letter_for_digit" not in draft._render_traps(
             {"text": text, "value_text": text}, None
         )
@@ -564,6 +564,19 @@ def test_compare_applies_mapped_scale_and_requires_mapping_for_scale_headers(
     assert unmapped_correct["matched_cell"] is None
     assert unmapped_raw["status"] == "needs_mapping"
     assert unmapped_raw["matched_cell"] is None
+
+    temperature_only = {
+        "species": {"O": {"observations": [{
+            "observation_id": "unmapped-temperature",
+            "locator": {"pdf_page": 1, "table": "1"},
+            "values": {"points": [{"value": "1416", "table_row_number": 2}]},
+        }]}}
+    }
+    temperature_match = draft.compare_extract_to_draft(
+        temperature_only, index_path
+    )[0]
+    assert temperature_match["status"] == "matched"
+    assert temperature_match["matched_cell"]["column"] == 1
 
 
 def test_compare_carries_flags_for_matched_cells(tmp_path: Path) -> None:

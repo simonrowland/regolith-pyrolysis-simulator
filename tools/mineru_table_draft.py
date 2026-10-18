@@ -586,17 +586,31 @@ def _column_headers(
     for column in range(width):
         parts = [row[column] for row in header_rows if column < len(row)]
         leaf = leaf_headers[column].strip() if column < len(leaf_headers) else ""
+        group_header = " ".join(
+            row[column].strip()
+            for row in header_rows[:-1]
+            if column < len(row) and row[column].strip()
+        ).casefold()
+        previous_leaf = (
+            leaf_headers[column - 1].strip()
+            if column > 0 and column - 1 < len(leaf_headers)
+            else ""
+        )
         if (
             column in numeric_columns
             and repeated_numeric_headers[leaf] > 1
             and column > 0
             and column - 1 < len(leaf_headers)
             and column - 1 not in numeric_columns
-            and leaf_headers[column - 1].strip()
+            and group_header in {"gas phase", "condensed phases"}
+            and re.search(
+                r"\b(?:solid|liquid|gas|vapor|vapour)\b",
+                previous_leaf.casefold(),
+            )
         ):
             # Paired species/value tables put the phase heading over the species
             # cell and repeat one generic value heading over each numeric cell.
-            parts = [leaf_headers[column - 1].strip(), leaf]
+            parts = [previous_leaf, leaf]
         headers.append(" ".join(parts).strip())
     return headers
 
@@ -973,8 +987,12 @@ def compare_extract_to_draft(
             )
             and _phase_matches_column(point.get("phase"), candidate["column_header"])
         ]
-        needs_mapping = mapping is None and any(
-            _HEADER_POWER_OF_TEN.search(candidate["column_header"])
+        mapped_column = point.get("table_column_number")
+        if mapped_column is None:
+            mapped_column = point.get("table_phase_column")
+        needs_mapping = mapping is None and mapped_column is not None and any(
+            candidate["column"] == int(mapped_column)
+            and _HEADER_POWER_OF_TEN.search(candidate["column_header"])
             for _, candidate, _, _ in located_candidates
         )
         matching_candidates = [
@@ -1015,10 +1033,10 @@ def compare_extract_to_draft(
 # cell flags rather than a second detector.
 _LETTER_FOR_DIGIT = re.compile(
     r"(?<![A-Za-z0-9])"
-    r"(?P<mantissa>[+\-−]?[0-9IlOS]+(?:\.[0-9IlOS]+)?)"
+    r"(?P<mantissa>[+\-−]?[0-9ILlOoSs]+(?:\.[0-9ILlOoSs]+)?)"
     r"\s*(?:×|\\times|x)\s*"
-    r"(?P<scale>[0-9IlOS]+(?:\s*\^\s*\{?[+\-−]?[0-9IlOS]+\}?)?)?",
-    re.IGNORECASE | re.ASCII,
+    r"(?P<scale>[0-9ILlOoSs]+(?:\s*\^\s*\{?[+\-−]?[0-9ILlOoSs]+\}?)?)?",
+    re.ASCII,
 )
 _RUN_TOGETHER = re.compile(r"\d+\.\d+\.\d")
 _FUSED_SUPERSCRIPT_EXPONENT = re.compile(r"(?<![A-Za-z0-9])10[-−]\d+(?!\w)")
@@ -1317,7 +1335,7 @@ def _stacked_values(text: str) -> bool:
 def _has_letter_for_digit(text: str) -> bool:
     return any(
         any(
-            char in "IiLlOoSs"
+            char in "ILlOoSs"
             for group in ("mantissa", "scale")
             for char in (match.group(group) or "")
         )
