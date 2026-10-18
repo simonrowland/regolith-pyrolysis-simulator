@@ -18,6 +18,8 @@ from simulator.account_ids import (
 )
 from simulator.accounting import AccountingError, resolve_species_formula
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
+from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+from simulator.chemistry.kernel.validation import _proposal_to_ledger_transition
 from simulator.core import (
     FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
     FERRIC_DIVERGENCE_WARNING_THRESHOLD,
@@ -1797,6 +1799,98 @@ def test_c3_na_spent_residue_credit_does_not_cancel_reduction_source() -> None:
     assert sim._redox_source_breakdown_diagnostic()[
         "terms_mol_o2_equiv_by_label"
     ][label] == pytest.approx(-0.5 * feo_mol)
+
+
+@pytest.mark.parametrize(
+    (
+        "mode",
+        "source_account",
+        "extent_mol",
+        "objective_extent_mol",
+        "extent_fraction",
+    ),
+    [
+        ("C3A", C7_AL_CREDIT_ACCOUNT, 10.0, 10.0, 1.0),
+        ("C3A", "process.metal_phase", 10.0, 10.0, 1.0),
+        ("C12A7", C7_AL_CREDIT_ACCOUNT, 1.0, 1.0, 1.0),
+        ("C12A7", "process.metal_phase", 1.0, 1.0, 1.0),
+        ("C3A", C7_AL_CREDIT_ACCOUNT, 10.0, 100.0, 0.1),
+    ],
+)
+def test_c7_provider_proposal_round_trip_snaps_balanced_float_residual(
+    monkeypatch,
+    mode: str,
+    source_account: str,
+    extent_mol: float,
+    objective_extent_mol: float,
+    extent_fraction: float,
+) -> None:
+    monkeypatch.setattr(
+        BuiltinCaAluminothermicStepProvider,
+        "_computed_thermo_margin_kj_per_mol_o2",
+        lambda self, hold_temp_C, p_ca_pa=None: 2.0,
+    )
+    stoich = BuiltinCaAluminothermicStepProvider._stoich(mode)
+    accounts = {
+        source_account: {"Al": objective_extent_mol * stoich["Al"]},
+        "process.cleaned_melt": {
+            "CaO": objective_extent_mol * stoich["CaO"]
+        },
+    }
+    provider_request = IntentRequest(
+        intent=ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
+        account_view=ProviderAccountView(
+            accounts=accounts,
+            species_formula_registry={},
+        ),
+        temperature_C=1200.0,
+        pressure_bar=5.0e-5,
+        control_inputs={
+            "reaction_family": "c7_ca_aluminothermic",
+            "campaign": "C7_CA_ALUMINOTHERMIC",
+            "decision": "yes",
+            "reductant_species": "Al",
+            "objective": "ree_enrichment",
+            "aluminate_mode": mode,
+            "al_source_account": source_account,
+            "extent_fraction": extent_fraction,
+            "allow_partial_extent": True,
+            "hold_temp_C": 1200.0,
+            "p_total_mbar": 0.05,
+            "pO2_mbar": 0.0,
+            "active_ca_condensation_route": True,
+            "dedicated_ca_condenser": True,
+            "ca_condensation_species": "Ca",
+            "ca_condenser_temperature_C": 780.0,
+            "thermo_margin_kj_per_mol_o2": 2.0,
+            "transport_extent_mol": 1000.0,
+            "objective_extent_mol": objective_extent_mol,
+        },
+    )
+    provider_result = BuiltinCaAluminothermicStepProvider().dispatch(
+        provider_request
+    )
+    assert provider_result.status == "ok"
+    assert provider_result.transition is not None
+    assert provider_result.diagnostic["r_c7"] == pytest.approx(extent_mol)
+    sim = object.__new__(PyrolysisSimulator)
+    sim.species_formula_registry = {}
+    transition = _proposal_to_ledger_transition(
+        provider_result.transition,
+        sim.species_formula_registry,
+    )
+    transition.validate_conservation(sim.species_formula_registry)
+
+    label = "redox_source:c7_ca_aluminothermic_reduction"
+    assert sim._c7_aluminothermic_redox_source_terms_from_transition(
+        transition,
+        label=label,
+    ) == {}
+    assert sim._apply_c7_aluminothermic_redox_source_terms(
+        transition,
+        label=label,
+        exchange_direction=label,
+    ) is None
 
 
 def test_c7_external_al_credit_changes_cao_basis_without_fe_redox_step(
