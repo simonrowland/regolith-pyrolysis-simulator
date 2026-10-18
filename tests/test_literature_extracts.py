@@ -5274,23 +5274,23 @@ def test_crown4_high_temperature_figure_reads_migrate_with_composition() -> None
             "path": EXTRACTS / "shornikov-1997-cao-alumina-vapor.yaml",
             "groups": {
                 "shornikov_1997_cao_fig1_series3_sulfide_1773k": 7,
-                "shornikov_1997_cao_fig1_series4_sulfide_1873k": 5,
-                "shornikov_1997_cao_fig1_series5_emf_1773k": 4,
+                "shornikov_1997_cao_fig1_series4_sulfide_1873k": 6,
+                "shornikov_1997_cao_fig1_series5_emf_1773k": 5,
             },
         },
         "shornikov-2007-cao-aluminosilicate-melts": {
             "path": EXTRACTS / "shornikov-2007-cao-aluminosilicate-melts.yaml",
             "groups": {
                 "shornikov_2007_figure1_cao_activity_prior_markers": 11,
-                "shornikov_2007_figure1_al2o3_activity_prior_markers": 11,
-                "shornikov_2007_figure1_sio2_activity_prior_markers": 9,
+                "shornikov_2007_figure1_al2o3_activity_prior_markers": 10,
+                "shornikov_2007_figure1_sio2_activity_prior_markers": 10,
             },
         },
         "shornikov-2001-mgalumina-silica-vaporization": {
             "path": EXTRACTS / "shornikov-2001-mgalumina-silica-vaporization.yaml",
             "groups": {
                 "shornikov_2001_f2_mgo_ma_s_2050k": 6,
-                "shornikov_2001_f2_al2o3_ma_s_2050k": 6,
+                "shornikov_2001_f2_al2o3_ma_s_2050k": 5,
                 "shornikov_2001_f2_sio2_ma_s_2050k": 5,
             },
         },
@@ -5303,7 +5303,14 @@ def test_crown4_high_temperature_figure_reads_migrate_with_composition() -> None
     }
     audit = (EXTRACTS / "crown4-1018-figure-read-audit.md").read_text()
 
-    def assert_audit_pin(source_id: str, observation_id: str, read_id: str) -> None:
+    def assert_literal_pin(
+        source_id: str,
+        observation_id: str,
+        read_id: str,
+        t_k: str,
+        activity: float,
+        pixels: tuple[str, str],
+    ) -> None:
         points = next(
             observation["values"]["points"]
             for species in documents[source_id]["species"].values()
@@ -5311,38 +5318,39 @@ def test_crown4_high_temperature_figure_reads_migrate_with_composition() -> None
             if observation["observation_id"] == observation_id
         )
         point = next(row for row in points if row["audit_read_id"] == read_id)
-        audit_row = next(
-            line for line in audit.splitlines()
-            if line.startswith(f"| {read_id} |")
-        )
-        expected = Decimal(audit_row.strip().split("|")[-2].strip())
-        assert Decimal(str(point["activity"])) == expected
-        assert "pixel reads" in point["point_conditions"]["composition"]["locator"]["note"]
+        note = point["point_conditions"]["composition"]["locator"]["note"]
+        assert point["T_K"] == t_k
+        assert point["activity"] == pytest.approx(activity)
+        assert "pixel reads" in note
+        for pixel in pixels:
+            assert pixel in note
 
-    pins = (
-        (
-            "shornikov-1997-cao-alumina-vapor",
-            "shornikov_1997_cao_fig1_series3_sulfide_1773k",
-            "shornikov_1997_cao_fig1_series3_sulfide_1773k-01",
-        ),
-        (
-            "shornikov-2007-cao-aluminosilicate-melts",
-            "shornikov_2007_figure1_cao_activity_prior_markers",
-            "shornikov_2007_figure1_cao_activity_prior_markers-05",
-        ),
-        (
-            "shornikov-2001-mgalumina-silica-vaporization",
-            "shornikov_2001_f2_mgo_ma_s_2050k",
-            "shornikov_2001_f2_mgo_ma_s_2050k-01",
-        ),
-        (
-            "shornikov-2001-mgalumina-silica-vaporization",
-            "shornikov_2001_f2_sio2_ma_s_2050k",
-            "shornikov_2001_f2_sio2_ma_s_2050k-05",
-        ),
+    # Literal T, activity and both pixel reads. These are not taken from the
+    # audit file, so editing the YAML and the audit together still fails.
+    assert_literal_pin(
+        "shornikov-1997-cao-alumina-vapor",
+        "shornikov_1997_cao_fig1_series5_emf_1773k",
+        "shornikov_1997_cao_fig1_series5_emf_1773k-01",
+        "1773",
+        0.0057,
+        ("(675.55,1619.08)", "(675.50,1620.00)"),
     )
-    for source_id, observation_id, read_id in pins:
-        assert_audit_pin(source_id, observation_id, read_id)
+    assert_literal_pin(
+        "shornikov-2007-cao-aluminosilicate-melts",
+        "shornikov_2007_figure1_al2o3_activity_prior_markers",
+        "shornikov_2007_figure1_al2o3_activity_prior_markers-04",
+        "2033",
+        0.23,
+        ("(1755.75,857.75)", "(1755.75,857.76)"),
+    )
+    assert_literal_pin(
+        "shornikov-2001-mgalumina-silica-vaporization",
+        "shornikov_2001_f2_mgo_ma_s_2050k",
+        "shornikov_2001_f2_mgo_ma_s_2050k-03",
+        "2050",
+        0.18,
+        ("(5747.25,1191.50)", "(5749.09,1192.49)"),
+    )
 
     # The source text prints these six binary compositions; they are not
     # inferred from the curve.
@@ -5394,7 +5402,7 @@ def test_crown4_high_temperature_figure_reads_migrate_with_composition() -> None
             assert composition.state.value.amount_basis.value == "mole_fraction"
             assert composition.locator.figure is not None
 
-    assert total_digitized == 64
+    assert total_digitized == 65
 
     stolyarova = yaml.load(
         (EXTRACTS / "stolyarova-1995-cao-alumina-kems.yaml").read_text(),
@@ -5435,21 +5443,31 @@ def test_crown4_high_temperature_figure_reads_migrate_with_composition() -> None
     )
     assert gibbs["values"]["quantity"] == "delta_fG"
     assert gibbs["values"]["delta_fG_kJ_mol"] is None
-    assert "ΔfG/RT=-1.4, T=2050 K" in gibbs["locator"]["note"]
+    assert "ΔfG/RT=-1.3, T=2050 K" in gibbs["locator"]["note"]
     assert "no quantity token for dimensionless ΔfG/RT" in audit
 
     mutated = copy.deepcopy(
         documents["shornikov-1997-cao-alumina-vapor"]
     )
-    mutated["species"]["CaO"]["observations"][1]["values"]["points"][0][
-        "activity"
-    ] = 0.20
+    series5 = next(
+        row for row in mutated["species"]["CaO"]["observations"]
+        if row["observation_id"] == "shornikov_1997_cao_fig1_series5_emf_1773k"
+    )
+    series5["values"]["points"][0]["activity"] = 0.99
+    series5["values"]["points"][0]["point_conditions"]["composition"]["locator"][
+        "note"
+    ] = series5["values"]["points"][0]["point_conditions"]["composition"]["locator"][
+        "note"
+    ].replace("(675.55,1619.08)", "(1.00,1.00)")
     original = documents["shornikov-1997-cao-alumina-vapor"]
     documents["shornikov-1997-cao-alumina-vapor"] = mutated
     with pytest.raises(AssertionError):
-        assert_audit_pin(
+        assert_literal_pin(
             "shornikov-1997-cao-alumina-vapor",
-            "shornikov_1997_cao_fig1_series3_sulfide_1773k",
-            "shornikov_1997_cao_fig1_series3_sulfide_1773k-01",
+            "shornikov_1997_cao_fig1_series5_emf_1773k",
+            "shornikov_1997_cao_fig1_series5_emf_1773k-01",
+            "1773",
+            0.0057,
+            ("(675.55,1619.08)", "(675.50,1620.00)"),
         )
     documents["shornikov-1997-cao-alumina-vapor"] = original
