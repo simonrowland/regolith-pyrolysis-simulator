@@ -2088,7 +2088,7 @@ def test_bracketed_root_iteration_cap_is_typed_refusal():
     assert caught.value.refusal.iterations == 4
 
 
-def test_source_duct_h_refine_exhaustion_is_typed_refusal():
+def test_source_duct_h_refine_exhaustion_is_predict_and_flag():
     P_eq = 10.0
     mass = 0.055845
 
@@ -2103,6 +2103,138 @@ def test_source_duct_h_refine_exhaustion_is_typed_refusal():
         G_mol_s_Pa2=0.002,
         capacity=NoColdTrain(),
     )
-    assert isinstance(result, CapacityShadowRefusal)
-    assert result.reason == "source_duct_h_refine_non_convergence"
+    assert isinstance(result, CapacityShadowResult)
     assert result.authoritative is False
+    reasons = [notice.get("reason") for notice in result.closure_notices]
+    assert "source_duct_h_refine_non_convergence" in reasons
+    assert all(notice.get("status") == "model_limit" for notice in result.closure_notices
+               if notice.get("reason") == "source_duct_h_refine_non_convergence")
+
+
+def test_mixture_free_molecular_closed_form_is_independent_and_limits():
+    from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
+
+    P_eq = {"Fe": 9.0, "Na": 25.0}
+    H = {"Fe": 0.001, "Na": 0.002}
+    C = {"Fe": 0.004, "Na": 0.001}
+    P_down = 0.5
+
+    def knudsen_at_total(_total):
+        return FREE_MOLECULAR_KNUDSEN_MIN
+
+    partials = mixture_surface_partials_Pa(
+        P_eq_Pa=P_eq,
+        H_mol_s_Pa=H,
+        G_mol_s_Pa2=0.002,
+        P_downstream_Pa=P_down,
+        molecular_C_mol_s_Pa=C,
+        knudsen_at_total_Pa=knudsen_at_total,
+    )
+    for species in P_eq:
+        expected = (H[species] * P_eq[species] + C[species] * P_down) / (
+            H[species] + C[species]
+        )
+        assert partials[species] == pytest.approx(expected, rel=1.0e-12)
+    # Species are independent: Na's C does not enter Fe's closed form.
+    assert partials["Fe"] == pytest.approx(
+        (H["Fe"] * P_eq["Fe"] + C["Fe"] * P_down) / (H["Fe"] + C["Fe"])
+    )
+
+    infinite_C = mixture_surface_partials_Pa(
+        P_eq_Pa={"Fe": 9.0},
+        H_mol_s_Pa={"Fe": 0.001},
+        G_mol_s_Pa2=0.002,
+        P_downstream_Pa=P_down,
+        molecular_C_mol_s_Pa={"Fe": 1.0e12},
+        knudsen_at_total_Pa=knudsen_at_total,
+    )
+    assert infinite_C["Fe"] == pytest.approx(P_down, rel=1.0e-9)
+
+    infinite_H = mixture_surface_partials_Pa(
+        P_eq_Pa={"Fe": 9.0},
+        H_mol_s_Pa={"Fe": 1.0e12},
+        G_mol_s_Pa2=0.002,
+        P_downstream_Pa=P_down,
+        molecular_C_mol_s_Pa={"Fe": 0.004},
+        knudsen_at_total_Pa=knudsen_at_total,
+    )
+    assert infinite_H["Fe"] == pytest.approx(9.0, rel=1.0e-9)
+
+
+def test_mixture_viscous_kn_ignores_molecular_C():
+    P_eq = {"Fe": 9.0, "Na": 25.0}
+    H = {"Fe": 0.001, "Na": 0.002}
+    G = 0.002
+    viscous = mixture_surface_partials_Pa(
+        P_eq_Pa=P_eq, H_mol_s_Pa=H, G_mol_s_Pa2=G,
+    )
+    with_callback = mixture_surface_partials_Pa(
+        P_eq_Pa=P_eq,
+        H_mol_s_Pa=H,
+        G_mol_s_Pa2=G,
+        molecular_C_mol_s_Pa={"Fe": 0.004, "Na": 0.001},
+        knudsen_at_total_Pa=lambda _total: 1.0e-4,
+    )
+    assert with_callback["Fe"] == pytest.approx(viscous["Fe"], rel=1.0e-12)
+    assert with_callback["Na"] == pytest.approx(viscous["Na"], rel=1.0e-12)
+
+
+def test_mixture_transitional_weights_viscous_and_molecular_at_candidate_P():
+    from simulator.transport_constants import (
+        FREE_MOLECULAR_KNUDSEN_MIN,
+        VISCOUS_KNUDSEN_MAX,
+    )
+
+    P_eq = 10.0
+    H = 0.001
+    G = 0.002
+    C = 0.003
+    kn = 1.0
+    w_v = (
+        math.log(FREE_MOLECULAR_KNUDSEN_MIN) - math.log(kn)
+    ) / (
+        math.log(FREE_MOLECULAR_KNUDSEN_MIN) - math.log(VISCOUS_KNUDSEN_MAX)
+    )
+    w_m = 1.0 - w_v
+    # Vacuum single species: w_v*G*p^2 + (H + w_m*C)*p - H*P_eq = 0.
+    a = w_v * G
+    b = H + w_m * C
+    disc = b * b + 4.0 * a * H * P_eq
+    expected = 2.0 * H * P_eq / (b + math.sqrt(disc))
+    partials = mixture_surface_partials_Pa(
+        P_eq_Pa={"Fe": P_eq},
+        H_mol_s_Pa={"Fe": H},
+        G_mol_s_Pa2=G,
+        molecular_C_mol_s_Pa={"Fe": C},
+        knudsen_at_total_Pa=lambda _total: kn,
+    )
+    assert partials["Fe"] == pytest.approx(expected, rel=1.0e-9)
+
+
+def test_long_tube_molar_C_matches_owner_and_units():
+    from simulator.physical_constants import GAS_CONSTANT
+    from simulator.transport_regime import long_tube_molecular_conductance_m3_s
+
+    diameter_m = 0.12
+    length_m = 1.2
+    temperature_K = 300.0
+    mass = 0.0280134
+    c_m3 = long_tube_molecular_conductance_m3_s(
+        diameter_m,
+        length_m,
+        temperature_K,
+        mass,
+        knudsen_number=math.inf,
+    )
+    c_mol, notice = capacity_coupling._long_tube_molar_conductance_mol_s_Pa(
+        diameter_m=diameter_m,
+        length_m=length_m,
+        temperature_K=temperature_K,
+        molar_mass_kg_mol=mass,
+    )
+    assert notice is None
+    assert c_mol == pytest.approx(c_m3 / (GAS_CONSTANT * temperature_K), rel=1.0e-12)
+    # H and C share mol/(s Pa).
+    H = 0.001
+    p = H * 9.0 / (H + c_mol)
+    assert H * (9.0 - p) == pytest.approx(c_mol * p, rel=1.0e-12)
