@@ -47,14 +47,18 @@ Both axes are linear. Read 1 coordinates are local to the original panel
 crops, whose page origins are panel a (300, 2350) and panel b (2199, 2349).
 Each marker has an independent second visual centre estimate from its own
 fresh crop from the page render. The `read_2.crop_id`, full-page crop origin,
-and within-crop centre are stored with that read. Read 2 is not made by
-translating the first coordinate. Crosses were placed on marker centres,
-including ring centres where visible. The axis maps below apply to panel-local
-coordinates. Stored values are the mean of both converted reads, rounded to
-two significant figures. Read uncertainty is half the absolute difference
-between the two log10 activities. If independent centres share an ordinate,
-the uncertainty key is omitted instead of storing a zero-width band. Both
-plotted axes are linear, so the ordinate remains activity.
+and within-crop centre are stored with that read. Read 2 is a second measurement
+of the half-disk centre, not a translation of the first coordinate. Where the
+diameter is clear, the centre is the white/black equator: panel a is dark below
+that boundary and panel b is dark above it. Where a curve breaks the diameter,
+the centre is the peak of a half-disk template of radius 22 px. The axis maps
+below apply to panel-local coordinates. Stored values are the mean of both
+converted reads, rounded to two significant figures. Read uncertainty is half
+the absolute difference of the two log10 activities when the ordinates differ.
+When the two centres share an ordinate, the uncertainty is the dex width of
+half a pixel on the activity axis. The key is present and positive on every
+marker. Panel-b marker 2 has no separable half-disk: the read-1 click lies in
+the counter of the printed curve label 5, and read 2 is the centre of that ink.
 
 | Panel | x tick labels and pixel x | Fitted x map | y tick labels and pixel y | Fitted y map |
 | --- | --- | --- | --- | --- |
@@ -65,42 +69,42 @@ The Figure 2 caption assigns marker symbol 1 to Ban-Ya et al. (1980) in panel a 
 
 | Marker | Read 1 pixel (x,y) | Read 1 (FeO mol%, aFeO) | Read 2 crop; page origin; pixel | Read 2 (FeO mol%, aFeO) | Stored (FeO mol%, aFeO) | Read uncertainty (dex) |
 | --- | --- | --- | --- | --- | --- | ---: |
-| a1 | (733, 576) | (59.2628, 0.4679) | review-p1-a-1; (956, 2856); (76, 70) | (59.2308, 0.4679) | (59, 0.47) | omitted (coincident ordinate) |
-| a2 | (800, 528) | (61.4103, 0.5146) | review-p1-a-2; (1030, 2794); (70, 83) | (61.4103, 0.5156) | (61, 0.52) | 0.000422 |
-| a3 | (970, 478) | (66.859, 0.5632) | review-p1-a-3; (1207, 2755); (66, 73) | (66.9551, 0.5632) | (67, 0.56) | omitted (coincident ordinate) |
-| a4 | (1022, 464) | (68.5256, 0.5768) | review-p1-a-4; (1241, 2752); (79, 62) | (68.4615, 0.5768) | (68, 0.58) | omitted (coincident ordinate) |
+| a1 | (733, 576) | (59.2628, 0.4679) | lmax-r2-a01; (1011, 2896); (21, 30) | (59.2308, 0.4679) | (59, 0.47) | 0.000451 |
+| a2 | (800, 528) | (61.4103, 0.5146) | lmax-r2-a02; (1052, 2860); (48, 18) | (61.4103, 0.5146) | (61, 0.51) | 0.00041 |
+| a3 | (970, 478) | (66.859, 0.5632) | lmax-r2-a03; (1240, 2773); (34, 55) | (66.9872, 0.5632) | (67, 0.56) | 0.000375 |
+| a4 | (1022, 464) | (68.5256, 0.5768) | lmax-r2-a04; (1262, 2774); (57, 37) | (68.4295, 0.5798) | (68, 0.58) | 0.001126 |
 | a5 | (1065, 437) | (69.9038, 0.6031) | review-p1-a-5; (1291, 2711); (74, 72) | (69.9038, 0.607) | (70, 0.61) | 0.0014 |
 | a6 | (1112, 385) | (71.4103, 0.6537) | review-p1-a-6; (1345, 2670); (69, 68) | (71.4744, 0.6508) | (71, 0.65) | 0.000965 |
 | a7 | (1152, 384) | (72.6923, 0.6547) | review-p1-a-7; (1392, 2655); (57, 78) | (72.5962, 0.6556) | (73, 0.66) | 0.000298 |
 | a8 | (1269, 333) | (76.4423, 0.7043) | review-p1-a-8; (1491, 2615); (80, 69) | (76.5064, 0.7033) | (76, 0.7) | 0.000309 |
-| a9 | (1294, 329) | (77.2436, 0.7082) | review-p1-a-9; (1523, 2597); (71, 82) | (77.2436, 0.7082) | (77, 0.71) | omitted (coincident ordinate) |
+| a9 | (1294, 329) | (77.2436, 0.7082) | lmax-r2-a09; (1576, 2617); (19, 60) | (77.2756, 0.7101) | (77, 0.71) | 0.000582 |
 | a10 | (1354, 281) | (79.1667, 0.7549) | review-p1-a-10; (1590, 2560); (62, 70) | (79.1026, 0.7558) | (79, 0.76) | 0.000259 |
-| a11 | (1412, 271) | (81.0256, 0.7646) | review-p1-a-11; (1630, 2561); (83, 59) | (81.0577, 0.7656) | (81, 0.77) | 0.000284 |
+| a11 | (1412, 271) | (81.0256, 0.7646) | lmax-r2-a11; (1672, 2599); (41, 20) | (81.0577, 0.7665) | (81, 0.77) | 0.000539 |
 | a12 | (1480, 232) | (83.2051, 0.8025) | review-p1-a-12; (1705, 2508); (78, 73) | (83.3013, 0.8035) | (83, 0.8) | 0.00027 |
 | a13 | (1566, 166) | (85.9615, 0.8667) | review-p1-a-13; (1798, 2453); (68, 61) | (85.9615, 0.8687) | (86, 0.87) | 0.000501 |
-| a14 | (1629, 175) | (87.9808, 0.858) | review-p1-a-14; (1868, 2448); (61, 78) | (87.9808, 0.857) | (88, 0.86) | 0.000253 |
-| a15 | (1658, 135) | (88.9103, 0.8969) | review-p1-a-15; (1879, 2419); (78, 65) | (88.8782, 0.8979) | (89, 0.9) | 0.000242 |
-| a16 | (1664, 107) | (89.1026, 0.9241) | review-p1-a-16; (1892, 2377); (71, 83) | (89.0705, 0.9212) | (89, 0.92) | 0.000683 |
-| a17 | (1731, 69) | (91.25, 0.9611) | review-p1-a-17; (1966, 2350); (66, 70) | (91.2821, 0.9601) | (91, 0.96) | 0.000226 |
-| a18 | (1813, 45) | (93.8782, 0.9844) | review-p1-a-18; (2030, 2312); (83, 83) | (93.8782, 0.9844) | (94, 0.98) | omitted (coincident ordinate) |
+| a14 | (1629, 175) | (87.9808, 0.858) | lmax-r2-a14; (1874, 2467); (55, 56) | (87.9808, 0.8599) | (88, 0.86) | 0.00048 |
+| a15 | (1658, 135) | (88.9103, 0.8969) | lmax-r2-a15; (1932, 2441); (24, 35) | (88.8462, 0.9056) | (89, 0.9) | 0.002096 |
+| a16 | (1664, 107) | (89.1026, 0.9241) | lmax-r2-a16; (1900, 2429); (64, 27) | (89.1026, 0.9251) | (89, 0.92) | 0.000235 |
+| a17 | (1731, 69) | (91.25, 0.9611) | lmax-r2-a17; (1997, 2403); (35, 16) | (91.2821, 0.9611) | (91, 0.96) | 0.00022 |
+| a18 | (1813, 45) | (93.8782, 0.9844) | lmax-r2-a18; (2067, 2345); (46, 49) | (93.8782, 0.9854) | (94, 0.98) | 0.00022 |
 | b1 | (331, 581) | (60, 0.4591) | review-p1-b-1; (2464, 2849); (68, 84) | (60.0641, 0.4561) | (60, 0.46) | 0.001424 |
-| b2 | (363, 521) | (61.0256, 0.5175) | review-p1-b-2; (2478, 2800); (83, 69) | (60.9936, 0.5185) | (61, 0.52) | 0.000419 |
+| b2 | (363, 521) | (61.0256, 0.5175) | lmax-r2-b02; (2542, 2834); (26, 32) | (61.2179, 0.5214) | (61, 0.52) | 0.00163 |
 | b3 | (379, 592) | (61.5385, 0.4483) | review-p1-b-3; (2501, 2857); (77, 87) | (61.5385, 0.4454) | (62, 0.45) | 0.001409 |
-| b4 | (431, 597) | (63.2051, 0.4435) | review-p1-b-4; (2560, 2873); (70, 73) | (63.2051, 0.4435) | (63, 0.44) | omitted (coincident ordinate) |
+| b4 | (431, 597) | (63.2051, 0.4435) | lmax-r2-b04; (2572, 2882); (57, 64) | (63.1731, 0.4435) | (63, 0.44) | 0.000477 |
 | b5 | (453, 495) | (63.9103, 0.5429) | review-p1-b-5; (2589, 2782); (66, 63) | (64.0064, 0.5419) | (64, 0.54) | 0.0004 |
 | b6 | (517, 443) | (65.9615, 0.5936) | review-p1-b-6; (2635, 2716); (85, 78) | (66.0897, 0.5916) | (66, 0.59) | 0.000733 |
-| b7 | (577, 442) | (67.8846, 0.5945) | review-p1-b-7; (2702, 2726); (75, 66) | (67.9167, 0.5936) | (68, 0.59) | 0.000329 |
+| b7 | (577, 442) | (67.8846, 0.5945) | lmax-r2-b07; (2738, 2763); (38, 29) | (67.8846, 0.5936) | (68, 0.59) | 0.000329 |
 | b8 | (659, 347) | (70.5128, 0.6871) | review-p1-b-8; (2791, 2617); (68, 81) | (70.5449, 0.6852) | (71, 0.69) | 0.000601 |
 | b9 | (923, 224) | (78.9744, 0.807) | review-p1-b-9; (3062, 2505); (60, 70) | (78.9744, 0.8051) | (79, 0.81) | 0.000512 |
-| b10 | (923, 265) | (78.9744, 0.7671) | review-p1-b-10; (3044, 2532); (77, 82) | (78.9423, 0.7671) | (79, 0.77) | omitted (coincident ordinate) |
+| b10 | (923, 265) | (78.9744, 0.7671) | lmax-r2-b10; (3070, 2568); (52, 52) | (78.9744, 0.7612) | (79, 0.76) | 0.001677 |
 | b11 | (985, 195) | (80.9615, 0.8353) | review-p1-b-11; (3113, 2473); (73, 72) | (81.0256, 0.8343) | (81, 0.83) | 0.00026 |
-| b12 | (1043, 181) | (82.8205, 0.8489) | review-p1-b-12; (3178, 2470); (66, 60) | (82.8846, 0.8489) | (83, 0.85) | omitted (coincident ordinate) |
+| b12 | (1043, 181) | (82.8205, 0.8489) | lmax-r2-b12; (3218, 2472); (27, 60) | (82.9167, 0.847) | (83, 0.85) | 0.000487 |
 | b13 | (1102, 141) | (84.7115, 0.8879) | review-p1-b-13; (3219, 2416); (83, 77) | (84.7436, 0.885) | (85, 0.89) | 0.00071 |
 | b14 | (1110, 189) | (84.9679, 0.8411) | review-p1-b-14; (3234, 2475); (77, 61) | (85.0321, 0.8431) | (85, 0.84) | 0.000516 |
 | b15 | (1142, 165) | (85.9936, 0.8645) | review-p1-b-15; (3273, 2437); (66, 76) | (85.9295, 0.8655) | (86, 0.86) | 0.000251 |
-| b16 | (1292, 131) | (90.8013, 0.8977) | review-p1-b-16; (3430, 2414); (61, 66) | (90.8013, 0.8977) | (91, 0.9) | omitted (coincident ordinate) |
+| b16 | (1292, 131) | (90.8013, 0.8977) | lmax-r2-b16; (3447, 2460); (44, 22) | (90.8013, 0.8957) | (91, 0.9) | 0.000484 |
 | b17 | (1347, 82) | (92.5641, 0.9454) | review-p1-b-17; (3467, 2351); (81, 83) | (92.6282, 0.9425) | (93, 0.94) | 0.000667 |
-| b18 | (1381, 112) | (93.6538, 0.9162) | review-p1-b-18; (3508, 2392); (71, 69) | (93.6218, 0.9162) | (94, 0.92) | omitted (coincident ordinate) |
+| b18 | (1381, 112) | (93.6538, 0.9162) | lmax-r2-b18; (3518, 2425); (62, 38) | (93.6538, 0.9142) | (94, 0.92) | 0.000475 |
 
 All 36 activity values and printed FeO mol% coordinates are retained in the
 extract with their independent read centres and the new crop provenance. The migrator identity marks

@@ -41,11 +41,11 @@ def test_table_and_figure_rows_are_render_pinned_and_migrate_with_conditions():
             0,
             59,
             0.47,
-            None,
+            0.000451,
             [733, 576],
-            [76, 70],
-            "review-p1-a-1",
-            [956, 2856],
+            [21, 30],
+            "lmax-r2-a01",
+            [1011, 2896],
         ),
         (
             "1673",
@@ -148,11 +148,26 @@ def test_table_and_figure_rows_are_render_pinned_and_migrate_with_conditions():
 
     all_points = [point for series in figure_series for point in series["values"]["points"]]
     assert len({point["read_2"]["crop_id"] for point in all_points}) == 36
-    assert all(
-        point.get("read_uncertainty_dex") is None
-        or point["read_uncertainty_dex"] > 0
-        for point in all_points
-    )
+    assert all(point["read_uncertainty_dex"] > 0 for point in all_points)
+    # Read 1 was taken in the panel crop. A second read records a different crop
+    # origin. Offsets may coincide for a real pair; one shared offset for a whole
+    # panel is a translated copy, not a second read.
+    panel_origins = ((300, 2350), (2199, 2349))
+    for series, origin in zip(figure_series, panel_origins, strict=True):
+        offsets = []
+        for point in series["values"]["points"]:
+            read_1 = point["read_1"]["pixel_xy_crop"]
+            read_2 = point["read_2"]
+            crop = read_2["crop_origin_xy_page_px"]
+            pixel = read_2["pixel_xy_crop"]
+            assert crop != [origin[0], origin[1]]
+            offsets.append(
+                (
+                    crop[0] + pixel[0] - origin[0] - read_1[0],
+                    crop[1] + pixel[1] - origin[1] - read_1[1],
+                )
+            )
+        assert len(set(offsets)) > 1
 
     for row in migrated:
         temperature = row.point_conditions["temperature_K"]
