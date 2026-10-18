@@ -9,8 +9,8 @@ source:
 extraction:
   method: Corpus PDF is a born-digital 3-page Vestnik typeset PDF (not a scan). Table of O2 pressure transcribed
     from a 400 dpi pdftoppm PNG of PDF page 2; method numbers from the same-resolution render of PDF page
-    1. MinerU figure grids were not used as data. Figs 1–2 (lg P_i atm vs T) listed figure-only and were
-    not digitised. The O2 table is the authors' calculated p(O2) in bar (thermodynamic analysis of CAI
+    1. MinerU figure grids were not used as data. Figs 1–2 (lg P_i atm vs T) were digitised at printed marker centres;
+    log ordinates are retained in point notes and the audit. The O2 table is the authors' calculated p(O2) in bar (thermodynamic analysis of CAI
     vs chondrite vaporization) and is labelled model_derived; it is the torr table of Yakovlev et al.
     LPSC XV 945–946 (kems-028) converted to bar (1.4×10^-6 torr ≈ 1.9×10^-9 bar). Complementary vapor
     wt% are derived from this-work KEMS partial pressures via the Hertz–Knudsen equation, kept distinct
@@ -22,6 +22,20 @@ extraction:
 review_status: draft
 corrections: []
 fidelity_samples:
+- path: species.Fe.observations[kems_029_fig1_Fe_psat_digitized].values.points[0].p_atm
+  value: 7.0167651e-08
+  locator:
+    published_page: 2
+    pdf_page_index: 2
+    figure: '1'
+    note: First calibrated marker-value fidelity pin.
+- path: species.SiO.observations[kems_029_fig2_SiO_psat_digitized].values.points[0].p_atm
+  value: 3.2846126e-07
+  locator:
+    published_page: 2
+    pdf_page_index: 2
+    figure: '2'
+    note: First calibrated marker-value fidelity pin.
 - species: Na
   observable: apparatus
   observation_id: yakovlev_shornikov_2011_kems_method_geometry
@@ -234,6 +248,131 @@ experiments:
 species:
   Na:
     observations:
+    - observation_id: kems_029_fig1_Na_psat_digitized
+      experiment: meteorite-and-cai-series
+      type: psat_series
+      locator:
+        figure: '1'
+        published_page: 2
+        pdf_page_index: 2
+        marker_symbol: black filled circle
+        note: Murchison chondrite vaporization
+      T_range_K:
+      - 1308.46
+      - 1734.7
+      phase: Murchison_CM_and_ordinary_chondrite_melts_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison (CM), Krymka (LL3), Saratov chondrules (L4); tungsten cell, rhenium boat.
+      standard_state: partial pressure in atm; ordinate lg P_i (atm) versus temperature
+      regime: kems_effusion
+      units: atm as plotted
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: figure_only
+        digitized_from_figure: true
+        gas_species: Na(g)
+        axis: linear temperature versus log10 partial pressure
+        points:
+        - T_C: 1035.31
+          p_atm: 2.2047036e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: black filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(910, 905), log10 ordinate=-6.65665; independent repeat pixel=(910, 905),
+              log10 ordinate=-6.65665; x-axis reading=1035.3054
+        - T_C: 1200.5
+          p_atm: 2.2047036e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: black filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1072, 905), log10 ordinate=-6.65665; independent repeat pixel=(1072, 905),
+              log10 ordinate=-6.65665; x-axis reading=1200.4990
+        - T_C: 1230.07
+          p_atm: 1.12894213e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: black filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1101, 981), log10 ordinate=-6.94733; independent repeat pixel=(1101, 981),
+              log10 ordinate=-6.94733; x-axis reading=1230.0706
+        - T_C: 1384.05
+          p_atm: 1.010878784e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: black filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1252, 1255), log10 ordinate=-7.99530; independent repeat pixel=(1252, 1255),
+              log10 ordinate=-7.99530; x-axis reading=1384.0474
+        - T_C: 1461.55
+          p_atm: 9.6733186552e-09
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: black filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1328, 1260), log10 ordinate=-8.01442; independent repeat pixel=(1328, 1260),
+              log10 ordinate=-8.01442; x-axis reading=1461.5456
+      uncertainty:
+        digitization:
+          read_uncertainty: 0.05
+          unit: dex
+          method: marker half-width and axis calibration
+          note: Per-marker read uncertainty; pressure/activity log-axis uncertainty is expressed in dex.
     - observation_id: yakovlev_shornikov_2011_complementary_vapor_wt_pct
       experiment: meteorite-and-cai-series
       type: rate_series
@@ -285,62 +424,6 @@ species:
           rates were used to determine residual-melt and vapor compositions.
       uncertainty:
         note: Ranges and ~ values as printed; no further numeric uncertainty.
-    - observation_id: yakovlev_shornikov_2011_fig1_murchison_psat_figure_only
-      experiment: meteorite-and-cai-series
-      type: psat_series
-      locator:
-        figure: '1'
-        published_page: 2
-        pdf_page_index: 2
-        note: Partial pressures dependences on temperature for Murchison chondrite vaporization
-      T_range_K:
-      - 1073.15
-      - 2673.15
-      phase: Murchison_CM_and_ordinary_chondrite_melts_knudsen
-      condensed_form:
-        state: liquid
-        metastable: false
-        basis: explicit_author
-        note: Murchison (CM), Krymka (LL3), Saratov chondrules (L4); tungsten cell, rhenium boat.
-      standard_state: lg P_i (atm) vs T C; gold-calibrated KEMS
-      regime: kems_effusion
-      units: atm as published (ordinate lg P_i, atm)
-      values:
-        quantity: partial_pressure
-        gas_species: Na(g)
-        method_class: measured_direct
-        admission_status: figure_only
-        semantics: bound_not_point_ordering
-        axis: lg10_P_atm vs T_C
-        co_species_this_work:
-        - Na
-        - K
-        - Fe
-        - SiO
-        - Mg
-        - Al
-        - Ca
-        - TiO
-        T_axis_ticks_C_as_printed:
-        - 800
-        - 1000
-        - 1200
-        - 1400
-        - 1600
-        - 1800
-        - 2000
-        - 2200
-        - 2400
-        ordinate_ticks_as_printed:
-        - -4
-        - -5
-        - -6
-        - -7
-        - -8
-        - -9
-        - -10
-      uncertainty:
-        note: Figure-only; curve not digitised.
     context:
     - observation_id: yakovlev_shornikov_2011_kems_method_geometry
       experiment: meteorite-and-cai-series
@@ -423,6 +506,472 @@ species:
         note: No numeric uncertainty printed for gold calibration or ion currents.
   SiO:
     observations:
+    - observation_id: kems_029_fig1_SiO_psat_digitized
+      experiment: meteorite-and-cai-series
+      type: psat_series
+      locator:
+        figure: '1'
+        published_page: 2
+        pdf_page_index: 2
+        marker_symbol: blue filled circle
+        note: Murchison chondrite vaporization
+      T_range_K:
+      - 1679.63
+      - 2083.44
+      phase: Murchison_CM_and_ordinary_chondrite_melts_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison (CM), Krymka (LL3), Saratov chondrules (L4); tungsten cell, rhenium boat.
+      standard_state: partial pressure in atm; ordinate lg P_i (atm) versus temperature
+      regime: kems_effusion
+      units: atm as plotted
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: figure_only
+        digitized_from_figure: true
+        gas_species: SiO(g)
+        axis: linear temperature versus log10 partial pressure
+        points:
+        - T_C: 1406.48
+          p_atm: 3.689203029e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1274, 1108), log10 ordinate=-7.43307; independent repeat pixel=(1274, 1108),
+              log10 ordinate=-7.43307; x-axis reading=1406.4811
+        - T_C: 1467.66
+          p_atm: 1.1047742e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1334, 722), log10 ordinate=-5.95673; independent repeat pixel=(1333, 721),
+              log10 ordinate=-5.95290; x-axis reading=1467.6639
+        - T_C: 1569.64
+          p_atm: 2.6187608e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1434, 624), log10 ordinate=-5.58190; independent repeat pixel=(1434, 623),
+              log10 ordinate=-5.57808; x-axis reading=1569.6352
+        - T_C: 1643.05
+          p_atm: 8.0846212e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1506, 496), log10 ordinate=-5.09234; independent repeat pixel=(1506, 496),
+              log10 ordinate=-5.09234; x-axis reading=1643.0546
+        - T_C: 1663.45
+          p_atm: 1.034551e-05
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1526, 468), log10 ordinate=-4.98525; independent repeat pixel=(1526, 468),
+              log10 ordinate=-4.98525; x-axis reading=1663.4488
+        - T_C: 1714.43
+          p_atm: 1.635449e-05
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1576, 416), log10 ordinate=-4.78636; independent repeat pixel=(1576, 416),
+              log10 ordinate=-4.78636; x-axis reading=1714.4345
+        - T_C: 1755.22
+          p_atm: 1.866413e-05
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1616, 401), log10 ordinate=-4.72899; independent repeat pixel=(1616, 401),
+              log10 ordinate=-4.72899; x-axis reading=1755.2230
+        - T_C: 1810.29
+          p_atm: 2.495879e-05
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1670, 368), log10 ordinate=-4.60278; independent repeat pixel=(1671, 367),
+              log10 ordinate=-4.59895; x-axis reading=1810.2876
+      uncertainty:
+        digitization:
+          read_uncertainty: 0.05
+          unit: dex
+          method: marker half-width and axis calibration
+          note: Per-marker read uncertainty; pressure/activity log-axis uncertainty is expressed in dex.
+    - observation_id: kems_029_fig2_SiO_psat_digitized
+      experiment: meteorite-and-cai-series
+      type: psat_series
+      locator:
+        figure: '2'
+        published_page: 2
+        pdf_page_index: 2
+        marker_symbol: blue filled circle
+        note: CAI vaporization
+      T_range_K:
+      - 1854.12
+      - 2541.37
+      phase: Efremovka_CAI_type_A_and_B_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: CAI types A and B from Efremovka (CV).
+      standard_state: partial pressure in atm; ordinate lg P_i (atm) versus temperature
+      regime: kems_effusion
+      units: atm as plotted
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: figure_only
+        digitized_from_figure: true
+        gas_species: SiO(g)
+        axis: linear temperature versus log10 partial pressure
+        points:
+        - T_C: 1580.97
+          p_atm: 3.28461255e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(2969, 1018), log10 ordinate=-6.48352; independent repeat pixel=(2969, 1018),
+              log10 ordinate=-6.48352; x-axis reading=1580.9684
+        - T_C: 1585.98
+          p_atm: 5.72222352e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(2978, 940), log10 ordinate=-6.24244; independent repeat pixel=(2978, 940),
+              log10 ordinate=-6.24244; x-axis reading=1585.9768
+        - T_C: 1641.07
+          p_atm: 8.83287866e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3077, 879), log10 ordinate=-6.05390; independent repeat pixel=(3077, 879),
+              log10 ordinate=-6.05390; x-axis reading=1641.0686
+        - T_C: 1675.01
+          p_atm: 1.1741765e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3138, 839), log10 ordinate=-5.93027; independent repeat pixel=(3138, 839),
+              log10 ordinate=-5.93027; x-axis reading=1675.0140
+        - T_C: 1725.1
+          p_atm: 1.9186557e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3228, 770), log10 ordinate=-5.71700; independent repeat pixel=(3228, 770),
+              log10 ordinate=-5.71700; x-axis reading=1725.0975
+        - T_C: 1777.96
+          p_atm: 2.6999417e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3323, 722), log10 ordinate=-5.56865; independent repeat pixel=(3323, 722),
+              log10 ordinate=-5.56865; x-axis reading=1777.9633
+        - T_C: 1823.04
+          p_atm: 5.6195883e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3404, 619), log10 ordinate=-5.25030; independent repeat pixel=(3404, 619),
+              log10 ordinate=-5.25030; x-axis reading=1823.0385
+        - T_C: 1870.9
+          p_atm: 8.0785639e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3490, 568), log10 ordinate=-5.09267; independent repeat pixel=(3490, 568),
+              log10 ordinate=-5.09267; x-axis reading=1870.8960
+        - T_C: 1918.2
+          p_atm: 3.9090824e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3575, 670), log10 ordinate=-5.40793; independent repeat pixel=(3575, 670),
+              log10 ordinate=-5.40793; x-axis reading=1918.1970
+        - T_C: 1974.4
+          p_atm: 1.712161e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3676, 786), log10 ordinate=-5.76646; independent repeat pixel=(3676, 786),
+              log10 ordinate=-5.76646; x-axis reading=1974.4018
+        - T_C: 2012.8
+          p_atm: 1.5170552e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3745, 803), log10 ordinate=-5.81900; independent repeat pixel=(3745, 803),
+              log10 ordinate=-5.81900; x-axis reading=2012.7991
+        - T_C: 2077.35
+          p_atm: 1.5945452e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3861, 796), log10 ordinate=-5.79736; independent repeat pixel=(3861, 796),
+              log10 ordinate=-5.79736; x-axis reading=2077.3511
+        - T_C: 2117.42
+          p_atm: 1.5608619e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3933, 799), log10 ordinate=-5.80664; independent repeat pixel=(3933, 799),
+              log10 ordinate=-5.80664; x-axis reading=2117.4179
+        - T_C: 2268.22
+          p_atm: 9.15284597e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: blue filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(4204, 874), log10 ordinate=-6.03844; independent repeat pixel=(4204, 874),
+              log10 ordinate=-6.03844; x-axis reading=2268.2247
+      uncertainty:
+        digitization:
+          read_uncertainty: 0.05
+          unit: dex
+          method: marker half-width and axis calibration
+          note: Per-marker read uncertainty; pressure/activity log-axis uncertainty is expressed in dex.
     - observation_id: yakovlev_shornikov_2011_CAI_SiO_highT_about_1e-6_bar
       experiment: meteorite-and-cai-series
       type: psat_series
@@ -463,55 +1012,1879 @@ species:
           (>2000 C); authors attribute the high SiO2 persistence to higher p(O2).
       uncertainty:
         note: Order-of-magnitude ~10^-6 bar as printed; not a single tabulated point.
-    - observation_id: yakovlev_shornikov_2011_fig2_CAI_psat_figure_only
+  K:
+    observations:
+    - observation_id: kems_029_fig1_K_psat_digitized
+      experiment: meteorite-and-cai-series
+      type: psat_series
+      locator:
+        figure: '1'
+        published_page: 2
+        pdf_page_index: 2
+        marker_symbol: gray filled circle
+        note: Murchison chondrite vaporization
+      T_range_K:
+      - 1304.38
+      - 1660.26
+      phase: Murchison_CM_and_ordinary_chondrite_melts_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison (CM), Krymka (LL3), Saratov chondrules (L4); tungsten cell, rhenium boat.
+      standard_state: partial pressure in atm; ordinate lg P_i (atm) versus temperature
+      regime: kems_effusion
+      units: atm as plotted
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: figure_only
+        digitized_from_figure: true
+        gas_species: K(g)
+        axis: linear temperature versus log10 partial pressure
+        points:
+        - T_C: 1031.23
+          p_atm: 2.593844017e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: gray filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(906, 1148), log10 ordinate=-7.58606; independent repeat pixel=(905, 1149),
+              log10 ordinate=-7.58988; x-axis reading=1031.2265
+        - T_C: 1217.83
+          p_atm: 5.679939563e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: gray filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1089, 1059), log10 ordinate=-7.24566; independent repeat pixel=(1088, 1058),
+              log10 ordinate=-7.24183; x-axis reading=1217.8341
+        - T_C: 1276.98
+          p_atm: 2.548557409e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: gray filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1147, 1150), log10 ordinate=-7.59371; independent repeat pixel=(1150, 1149),
+              log10 ordinate=-7.58988; x-axis reading=1276.9775
+        - T_C: 1301.45
+          p_atm: 2.882972276e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: gray filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1171, 1136), log10 ordinate=-7.54016; independent repeat pixel=(1169, 1137),
+              log10 ordinate=-7.54398; x-axis reading=1301.4506
+        - T_C: 1336.12
+          p_atm: 1.400275951e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: gray filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1205, 1218), log10 ordinate=-7.85379; independent repeat pixel=(1205, 1218),
+              log10 ordinate=-7.85379; x-axis reading=1336.1208
+        - T_C: 1387.11
+          p_atm: 6.6824752482e-09
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: gray filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1255, 1302), log10 ordinate=-8.17506; independent repeat pixel=(1256, 1303),
+              log10 ordinate=-8.17889; x-axis reading=1387.1065
+      uncertainty:
+        digitization:
+          read_uncertainty: 0.05
+          unit: dex
+          method: marker half-width and axis calibration
+          note: Per-marker read uncertainty; pressure/activity log-axis uncertainty is expressed in dex.
+  Fe:
+    observations:
+    - observation_id: kems_029_fig1_Fe_psat_digitized
+      experiment: meteorite-and-cai-series
+      type: psat_series
+      locator:
+        figure: '1'
+        published_page: 2
+        pdf_page_index: 2
+        marker_symbol: red filled circle
+        note: Murchison chondrite vaporization
+      T_range_K:
+      - 1457.33
+      - 1989.62
+      phase: Murchison_CM_and_ordinary_chondrite_melts_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison (CM), Krymka (LL3), Saratov chondrules (L4); tungsten cell, rhenium boat.
+      standard_state: partial pressure in atm; ordinate lg P_i (atm) versus temperature
+      regime: kems_effusion
+      units: atm as plotted
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: figure_only
+        digitized_from_figure: true
+        gas_species: Fe(g)
+        axis: linear temperature versus log10 partial pressure
+        points:
+        - T_C: 1184.18
+          p_atm: 7.016765053e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: red filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1056, 1035), log10 ordinate=-7.15386; independent repeat pixel=(1055, 1035),
+              log10 ordinate=-7.15386; x-axis reading=1184.1835
+        - T_C: 1220.89
+          p_atm: 4.12007532e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: red filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1092, 834), log10 ordinate=-6.38509; independent repeat pixel=(1092, 834),
+              log10 ordinate=-6.38509; x-axis reading=1220.8932
+        - T_C: 1285.14
+          p_atm: 8.86452724e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: red filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1155, 747), log10 ordinate=-6.05234; independent repeat pixel=(1155, 746),
+              log10 ordinate=-6.04852; x-axis reading=1285.1352
+        - T_C: 1335.1
+          p_atm: 1.9756266e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: red filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1204, 656), log10 ordinate=-5.70430; independent repeat pixel=(1204, 653),
+              log10 ordinate=-5.69282; x-axis reading=1335.1011
+        - T_C: 1385.07
+          p_atm: 7.2738286e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: red filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1253, 508), log10 ordinate=-5.13824; independent repeat pixel=(1253, 508),
+              log10 ordinate=-5.13824; x-axis reading=1385.0671
+        - T_C: 1514.57
+          p_atm: 1.57884e-05
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: red filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1380, 420), log10 ordinate=-4.80166; independent repeat pixel=(1380, 420),
+              log10 ordinate=-4.80166; x-axis reading=1514.5707
+        - T_C: 1567.6
+          p_atm: 1.866413e-05
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: red filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1432, 401), log10 ordinate=-4.72899; independent repeat pixel=(1432, 401),
+              log10 ordinate=-4.72899; x-axis reading=1567.5958
+        - T_C: 1612.46
+          p_atm: 2.111319e-05
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: red filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1476, 387), log10 ordinate=-4.67545; independent repeat pixel=(1476, 387),
+              log10 ordinate=-4.67545; x-axis reading=1612.4632
+        - T_C: 1716.47
+          p_atm: 9.9874104e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: red filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1578, 472), log10 ordinate=-5.00055; independent repeat pixel=(1578, 472),
+              log10 ordinate=-5.00055; x-axis reading=1716.4739
+      uncertainty:
+        digitization:
+          read_uncertainty: 0.05
+          unit: dex
+          method: marker half-width and axis calibration
+          note: Per-marker read uncertainty; pressure/activity log-axis uncertainty is expressed in dex.
+    - observation_id: kems_029_fig2_Fe_psat_digitized
       experiment: meteorite-and-cai-series
       type: psat_series
       locator:
         figure: '2'
         published_page: 2
         pdf_page_index: 2
-        note: Partial pressures dependences on temperature for Ca-Al-inclusion vaporization
+        marker_symbol: red filled circle
+        note: CAI vaporization
       T_range_K:
-      - 1873.15
-      - 2673.15
+      - 1854.12
+      - 2051.11
       phase: Efremovka_CAI_type_A_and_B_knudsen
       condensed_form:
         state: liquid
         metastable: false
         basis: explicit_author
         note: CAI types A and B from Efremovka (CV).
-      standard_state: lg P_i (atm) vs T C
+      standard_state: partial pressure in atm; ordinate lg P_i (atm) versus temperature
       regime: kems_effusion
-      units: atm as published (ordinate lg P_i, atm)
+      units: atm as plotted
       values:
         quantity: partial_pressure
-        gas_species: SiO(g)
         method_class: measured_direct
         admission_status: figure_only
-        semantics: bound_not_point_ordering
-        axis: lg10_P_atm vs T_C
-        co_species_this_work:
-        - SiO
-        - Mg
-        - Fe
-        - Ca
-        - Al
-        - TiO
-        T_axis_ticks_C_as_printed:
-        - 1600
-        - 1800
-        - 2000
-        - 2200
-        - 2400
-        ordinate_ticks_as_printed:
-        - -4
-        - -5
-        - -6
-        - -7
-        - -8
-        - -9
+        digitized_from_figure: true
+        gas_species: Fe(g)
+        axis: linear temperature versus log10 partial pressure
+        points:
+        - T_C: 1580.97
+          p_atm: 4.140643156e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: red filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(2969, 1309), log10 ordinate=-7.38293; independent repeat pixel=(2969, 1309),
+              log10 ordinate=-7.38293; x-axis reading=1580.9684
+        - T_C: 1641.07
+          p_atm: 7.011087101e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: red filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3077, 1235), log10 ordinate=-7.15421; independent repeat pixel=(3077, 1235),
+              log10 ordinate=-7.15421; x-axis reading=1641.0686
+        - T_C: 1675.01
+          p_atm: 2.376769877e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: red filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3138, 1387), log10 ordinate=-7.62401; independent repeat pixel=(3138, 1387),
+              log10 ordinate=-7.62401; x-axis reading=1675.0140
+        - T_C: 1725.1
+          p_atm: 2.462867363e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: red filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3228, 1382), log10 ordinate=-7.60856; independent repeat pixel=(3228, 1382),
+              log10 ordinate=-7.60856; x-axis reading=1725.0975
+        - T_C: 1777.96
+          p_atm: 1.243730697e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: red filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3323, 1478), log10 ordinate=-7.90527; independent repeat pixel=(3323, 1478),
+              log10 ordinate=-7.90527; x-axis reading=1777.9633
       uncertainty:
-        note: Figure-only; curve not digitised.
+        digitization:
+          read_uncertainty: 0.05
+          unit: dex
+          method: marker half-width and axis calibration
+          note: Per-marker read uncertainty; pressure/activity log-axis uncertainty is expressed in dex.
+  Mg:
+    observations:
+    - observation_id: kems_029_fig1_Mg_psat_digitized
+      experiment: meteorite-and-cai-series
+      type: psat_series
+      locator:
+        figure: '1'
+        published_page: 2
+        pdf_page_index: 2
+        marker_symbol: cyan filled circle
+        note: Murchison chondrite vaporization
+      T_range_K:
+      - 1787.72
+      - 2122.19
+      phase: Murchison_CM_and_ordinary_chondrite_melts_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison (CM), Krymka (LL3), Saratov chondrules (L4); tungsten cell, rhenium boat.
+      standard_state: partial pressure in atm; ordinate lg P_i (atm) versus temperature
+      regime: kems_effusion
+      units: atm as plotted
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: figure_only
+        digitized_from_figure: true
+        gas_species: Mg(g)
+        axis: linear temperature versus log10 partial pressure
+        points:
+        - T_C: 1514.57
+          p_atm: 1.09950581e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: cyan filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1380, 984), log10 ordinate=-6.95880; independent repeat pixel=(1380, 984),
+              log10 ordinate=-6.95880; x-axis reading=1514.5707
+        - T_C: 1612.46
+          p_atm: 3.21968263e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: cyan filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1476, 862), log10 ordinate=-6.49219; independent repeat pixel=(1476, 862),
+              log10 ordinate=-6.49219; x-axis reading=1612.4632
+        - T_C: 1663.45
+          p_atm: 5.85994926e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: cyan filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1526, 794), log10 ordinate=-6.23211; independent repeat pixel=(1526, 794),
+              log10 ordinate=-6.23211; x-axis reading=1663.4488
+        - T_C: 1674.67
+          p_atm: 1.0296172e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: cyan filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1537, 730), log10 ordinate=-5.98732; independent repeat pixel=(1537, 730),
+              log10 ordinate=-5.98732; x-axis reading=1674.6657
+        - T_C: 1716.47
+          p_atm: 1.5713112e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: cyan filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1578, 682), log10 ordinate=-5.80374; independent repeat pixel=(1578, 682),
+              log10 ordinate=-5.80374; x-axis reading=1716.4739
+        - T_C: 1754.2
+          p_atm: 5.940111e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: cyan filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1615, 531), log10 ordinate=-5.22621; independent repeat pixel=(1615, 531),
+              log10 ordinate=-5.22621; x-axis reading=1754.2033
+        - T_C: 1816.41
+          p_atm: 1.071644e-05
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: cyan filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1676, 464), log10 ordinate=-4.96995; independent repeat pixel=(1676, 464),
+              log10 ordinate=-4.96995; x-axis reading=1816.4058
+        - T_C: 1849.04
+          p_atm: 4.7244571e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: cyan filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1708, 557), log10 ordinate=-5.32565; independent repeat pixel=(1708, 557),
+              log10 ordinate=-5.32565; x-axis reading=1849.0367
+      uncertainty:
+        digitization:
+          read_uncertainty: 0.05
+          unit: dex
+          method: marker half-width and axis calibration
+          note: Per-marker read uncertainty; pressure/activity log-axis uncertainty is expressed in dex.
+    - observation_id: kems_029_fig2_Mg_psat_digitized
+      experiment: meteorite-and-cai-series
+      type: psat_series
+      locator:
+        figure: '2'
+        published_page: 2
+        pdf_page_index: 2
+        marker_symbol: cyan filled circle
+        note: CAI vaporization
+      T_range_K:
+      - 1854.12
+      - 2144.05
+      phase: Efremovka_CAI_type_A_and_B_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: CAI types A and B from Efremovka (CV).
+      standard_state: partial pressure in atm; ordinate lg P_i (atm) versus temperature
+      regime: kems_effusion
+      units: atm as plotted
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: figure_only
+        digitized_from_figure: true
+        gas_species: Mg(g)
+        axis: linear temperature versus log10 partial pressure
+        points:
+        - T_C: 1580.97
+          p_atm: 1.37850789e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: cyan filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(2969, 1140), log10 ordinate=-6.86059; independent repeat pixel=(2969, 1140),
+              log10 ordinate=-6.86059; x-axis reading=1580.9684
+        - T_C: 1641.07
+          p_atm: 2.50630887e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: cyan filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3077, 1056), log10 ordinate=-6.60097; independent repeat pixel=(3077, 1056),
+              log10 ordinate=-6.60097; x-axis reading=1641.0686
+        - T_C: 1682.8
+          p_atm: 3.01574638e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: cyan filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3152, 1030), log10 ordinate=-6.52061; independent repeat pixel=(3150, 1030),
+              log10 ordinate=-6.52061; x-axis reading=1682.8048
+        - T_C: 1725.1
+          p_atm: 4.06637553e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: cyan filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3228, 988), log10 ordinate=-6.39079; independent repeat pixel=(3228, 988),
+              log10 ordinate=-6.39079; x-axis reading=1725.0975
+        - T_C: 1772.95
+          p_atm: 4.12466839e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: cyan filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3314, 986), log10 ordinate=-6.38461; independent repeat pixel=(3315, 986),
+              log10 ordinate=-6.38461; x-axis reading=1772.9550
+        - T_C: 1820.81
+          p_atm: 7.60669373e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: cyan filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3400, 900), log10 ordinate=-6.11880; independent repeat pixel=(3400, 900),
+              log10 ordinate=-6.11880; x-axis reading=1820.8125
+        - T_C: 1870.9
+          p_atm: 3.78703836e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: cyan filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3490, 998), log10 ordinate=-6.42170; independent repeat pixel=(3490, 998),
+              log10 ordinate=-6.42170; x-axis reading=1870.8960
+      uncertainty:
+        digitization:
+          read_uncertainty: 0.05
+          unit: dex
+          method: marker half-width and axis calibration
+          note: Per-marker read uncertainty; pressure/activity log-axis uncertainty is expressed in dex.
+  Al:
+    observations:
+    - observation_id: kems_029_fig1_Al_psat_digitized
+      experiment: meteorite-and-cai-series
+      type: psat_series
+      locator:
+        figure: '1'
+        published_page: 2
+        pdf_page_index: 2
+        marker_symbol: green filled circle
+        note: Murchison chondrite vaporization
+      T_range_K:
+      - 2089.56
+      - 2400.57
+      phase: Murchison_CM_and_ordinary_chondrite_melts_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison (CM), Krymka (LL3), Saratov chondrules (L4); tungsten cell, rhenium boat.
+      standard_state: partial pressure in atm; ordinate lg P_i (atm) versus temperature
+      regime: kems_effusion
+      units: atm as plotted
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: figure_only
+        digitized_from_figure: true
+        gas_species: Al(g)
+        axis: linear temperature versus log10 partial pressure
+        points:
+        - T_C: 1816.41
+          p_atm: 2.686845697e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: green filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1676, 1144), log10 ordinate=-7.57076; independent repeat pixel=(1676, 1144),
+              log10 ordinate=-7.57076; x-axis reading=1816.4058
+        - T_C: 1922.46
+          p_atm: 1.57765103e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: green filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1780, 943), log10 ordinate=-6.80199; independent repeat pixel=(1780, 943),
+              log10 ordinate=-6.80199; x-axis reading=1922.4560
+        - T_C: 1965.28
+          p_atm: 3.83978949e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: green filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1822, 842), log10 ordinate=-6.41569; independent repeat pixel=(1822, 842),
+              log10 ordinate=-6.41569; x-axis reading=1965.2840
+        - T_C: 2017.29
+          p_atm: 1.4137272e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: green filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1873, 694), log10 ordinate=-5.84963; independent repeat pixel=(1873, 694),
+              log10 ordinate=-5.84963; x-axis reading=2017.2894
+        - T_C: 2072.35
+          p_atm: 2.2546318e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: green filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1927, 641), log10 ordinate=-5.64692; independent repeat pixel=(1927, 641),
+              log10 ordinate=-5.64692; x-axis reading=2072.3539
+        - T_C: 2127.42
+          p_atm: 2.1575062e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: green filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1981, 646), log10 ordinate=-5.66605; independent repeat pixel=(1981, 646),
+              log10 ordinate=-5.66605; x-axis reading=2127.4184
+      uncertainty:
+        digitization:
+          read_uncertainty: 0.05
+          unit: dex
+          method: marker half-width and axis calibration
+          note: Per-marker read uncertainty; pressure/activity log-axis uncertainty is expressed in dex.
+    - observation_id: kems_029_fig2_Al_psat_digitized
+      experiment: meteorite-and-cai-series
+      type: psat_series
+      locator:
+        figure: '2'
+        published_page: 2
+        pdf_page_index: 2
+        marker_symbol: green filled circle
+        note: CAI vaporization
+      T_range_K:
+      - 2191.35
+      - 2622.06
+      phase: Efremovka_CAI_type_A_and_B_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: CAI types A and B from Efremovka (CV).
+      standard_state: partial pressure in atm; ordinate lg P_i (atm) versus temperature
+      regime: kems_effusion
+      units: atm as plotted
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: figure_only
+        digitized_from_figure: true
+        gas_species: Al(g)
+        axis: linear temperature versus log10 partial pressure
+        points:
+        - T_C: 1918.2
+          p_atm: 1.750183917e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: green filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3575, 1430), log10 ordinate=-7.75692; independent repeat pixel=(3575, 1430),
+              log10 ordinate=-7.75692; x-axis reading=1918.1970
+        - T_C: 1973.85
+          p_atm: 2.60715737e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: green filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3675, 1374), log10 ordinate=-7.58383; independent repeat pixel=(3675, 1375),
+              log10 ordinate=-7.58692; x-axis reading=1973.8453
+        - T_C: 2077.35
+          p_atm: 7.111593399e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: green filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3861, 1233), log10 ordinate=-7.14803; independent repeat pixel=(3861, 1233),
+              log10 ordinate=-7.14803; x-axis reading=2077.3511
+        - T_C: 2117.97
+          p_atm: 4.36631698e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: green filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3934, 978), log10 ordinate=-6.35988; independent repeat pixel=(3934, 978),
+              log10 ordinate=-6.35988; x-axis reading=2117.9744
+        - T_C: 2131.89
+          p_atm: 1.1331293e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: green filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3959, 844), log10 ordinate=-5.94572; independent repeat pixel=(3959, 844),
+              log10 ordinate=-5.94572; x-axis reading=2131.8864
+        - T_C: 2164.16
+          p_atm: 2.0166591e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: green filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(4017, 763), log10 ordinate=-5.69537; independent repeat pixel=(4017, 763),
+              log10 ordinate=-5.69537; x-axis reading=2164.1624
+        - T_C: 2209.24
+          p_atm: 2.0897117e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: green filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(4098, 758), log10 ordinate=-5.67991; independent repeat pixel=(4098, 760),
+              log10 ordinate=-5.68610; x-axis reading=2209.2376
+        - T_C: 2268.22
+          p_atm: 5.9488185e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: green filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(4204, 611), log10 ordinate=-5.22557; independent repeat pixel=(4204, 611),
+              log10 ordinate=-5.22557; x-axis reading=2268.2247
+        - T_C: 2348.91
+          p_atm: 1.264891e-05
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: green filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(4349, 505), log10 ordinate=-4.89795; independent repeat pixel=(4349, 505),
+              log10 ordinate=-4.89795; x-axis reading=2348.9148
+      uncertainty:
+        digitization:
+          read_uncertainty: 0.05
+          unit: dex
+          method: marker half-width and axis calibration
+          note: Per-marker read uncertainty; pressure/activity log-axis uncertainty is expressed in dex.
+  Ca:
+    observations:
+    - observation_id: kems_029_fig1_Ca_psat_digitized
+      experiment: meteorite-and-cai-series
+      type: psat_series
+      locator:
+        figure: '1'
+        published_page: 2
+        pdf_page_index: 2
+        marker_symbol: brown filled circle
+        note: Murchison chondrite vaporization
+      T_range_K:
+      - 2026.33
+      - 2401.59
+      phase: Murchison_CM_and_ordinary_chondrite_melts_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison (CM), Krymka (LL3), Saratov chondrules (L4); tungsten cell, rhenium boat.
+      standard_state: partial pressure in atm; ordinate lg P_i (atm) versus temperature
+      regime: kems_effusion
+      units: atm as plotted
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: figure_only
+        digitized_from_figure: true
+        gas_species: Ca(g)
+        axis: linear temperature versus log10 partial pressure
+        points:
+        - T_C: 1753.18
+          p_atm: 1.714676251e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1614, 1195), log10 ordinate=-7.76582; independent repeat pixel=(1614, 1196),
+              log10 ordinate=-7.76964; x-axis reading=1753.1836
+        - T_C: 1816.41
+          p_atm: 9.383235426e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1676, 1002), log10 ordinate=-7.02765; independent repeat pixel=(1676, 1002),
+              log10 ordinate=-7.02765; x-axis reading=1816.4058
+        - T_C: 1849.04
+          p_atm: 3.08098424e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1708, 867), log10 ordinate=-6.51131; independent repeat pixel=(1710, 868),
+              log10 ordinate=-6.51514; x-axis reading=1849.0367
+        - T_C: 1872.49
+          p_atm: 2.62932676e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1731, 885), log10 ordinate=-6.58016; independent repeat pixel=(1729, 884),
+              log10 ordinate=-6.57633; x-axis reading=1872.4901
+        - T_C: 1921.44
+          p_atm: 4.19328702e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1779, 832), log10 ordinate=-6.37745; independent repeat pixel=(1779, 832),
+              log10 ordinate=-6.37745; x-axis reading=1921.4363
+        - T_C: 1954.07
+          p_atm: 5.91178421e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1811, 793), log10 ordinate=-6.22828; independent repeat pixel=(1811, 795),
+              log10 ordinate=-6.23593; x-axis reading=1954.0671
+        - T_C: 2017.29
+          p_atm: 5.80856881e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1873, 795), log10 ordinate=-6.23593; independent repeat pixel=(1873, 794),
+              log10 ordinate=-6.23211; x-axis reading=2017.2894
+        - T_C: 2073.37
+          p_atm: 2.79651778e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1928, 878), log10 ordinate=-6.55338; independent repeat pixel=(1928, 878),
+              log10 ordinate=-6.55338; x-axis reading=2073.3736
+        - T_C: 2128.44
+          p_atm: 8.007698217e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1982, 1020), log10 ordinate=-7.09649; independent repeat pixel=(1982, 1021),
+              log10 ordinate=-7.10032; x-axis reading=2128.4381
+      uncertainty:
+        digitization:
+          read_uncertainty: 0.05
+          unit: dex
+          method: marker half-width and axis calibration
+          note: Per-marker read uncertainty; pressure/activity log-axis uncertainty is expressed in dex.
+    - observation_id: kems_029_fig2_Ca_psat_digitized
+      experiment: meteorite-and-cai-series
+      type: psat_series
+      locator:
+        figure: '2'
+        published_page: 2
+        pdf_page_index: 2
+        marker_symbol: brown filled circle
+        note: CAI vaporization
+      T_range_K:
+      - 1998.25
+      - 2622.06
+      phase: Efremovka_CAI_type_A_and_B_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: CAI types A and B from Efremovka (CV).
+      standard_state: partial pressure in atm; ordinate lg P_i (atm) versus temperature
+      regime: kems_effusion
+      units: atm as plotted
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: figure_only
+        digitized_from_figure: true
+        gas_species: Ca(g)
+        axis: linear temperature versus log10 partial pressure
+        points:
+        - T_C: 1725.1
+          p_atm: 1.701063701e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3228, 1434), log10 ordinate=-7.76928; independent repeat pixel=(3228, 1434),
+              log10 ordinate=-7.76928; x-axis reading=1725.0975
+        - T_C: 1777.96
+          p_atm: 9.320012077e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3323, 1195), log10 ordinate=-7.03058; independent repeat pixel=(3323, 1195),
+              log10 ordinate=-7.03058; x-axis reading=1777.9633
+        - T_C: 1823.04
+          p_atm: 1.87202956e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3404, 1097), log10 ordinate=-6.72769; independent repeat pixel=(3404, 1097),
+              log10 ordinate=-6.72769; x-axis reading=1823.0385
+        - T_C: 1918.2
+          p_atm: 8.95950096e-07
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3575, 877), log10 ordinate=-6.04772; independent repeat pixel=(3575, 877),
+              log10 ordinate=-6.04772; x-axis reading=1918.1970
+        - T_C: 1973.85
+          p_atm: 2.5870791e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3675, 728), log10 ordinate=-5.58719; independent repeat pixel=(3675, 728),
+              log10 ordinate=-5.58719; x-axis reading=1973.8453
+        - T_C: 2012.8
+          p_atm: 4.4433327e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3745, 652), log10 ordinate=-5.35229; independent repeat pixel=(3745, 652),
+              log10 ordinate=-5.35229; x-axis reading=2012.7991
+        - T_C: 2076.79
+          p_atm: 5.7408583e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3860, 616), log10 ordinate=-5.24102; independent repeat pixel=(3860, 616),
+              log10 ordinate=-5.24102; x-axis reading=2076.7946
+        - T_C: 2117.97
+          p_atm: 5.7408583e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3934, 616), log10 ordinate=-5.24102; independent repeat pixel=(3934, 616),
+              log10 ordinate=-5.24102; x-axis reading=2117.9744
+        - T_C: 2150.81
+          p_atm: 3.6665518e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3993, 679), log10 ordinate=-5.43574; independent repeat pixel=(3993, 679),
+              log10 ordinate=-5.43574; x-axis reading=2150.8069
+        - T_C: 2209.24
+          p_atm: 2.7977459e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(4098, 717), log10 ordinate=-5.55319; independent repeat pixel=(4098, 717),
+              log10 ordinate=-5.55319; x-axis reading=2209.2376
+        - T_C: 2268.22
+          p_atm: 2.4966394e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(4204, 733), log10 ordinate=-5.60264; independent repeat pixel=(4204, 733),
+              log10 ordinate=-5.60264; x-axis reading=2268.2247
+        - T_C: 2348.91
+          p_atm: 1.8384524e-06
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: brown filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(4349, 776), log10 ordinate=-5.73555; independent repeat pixel=(4349, 776),
+              log10 ordinate=-5.73555; x-axis reading=2348.9148
+      uncertainty:
+        digitization:
+          read_uncertainty: 0.05
+          unit: dex
+          method: marker half-width and axis calibration
+          note: Per-marker read uncertainty; pressure/activity log-axis uncertainty is expressed in dex.
+  TiO:
+    observations:
+    - observation_id: kems_029_fig1_TiO_psat_digitized
+      experiment: meteorite-and-cai-series
+      type: psat_series
+      locator:
+        figure: '1'
+        published_page: 2
+        pdf_page_index: 2
+        marker_symbol: orange filled circle
+        note: Murchison chondrite vaporization
+      T_range_K:
+      - 2167.05
+      - 2234.36
+      phase: Murchison_CM_and_ordinary_chondrite_melts_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison (CM), Krymka (LL3), Saratov chondrules (L4); tungsten cell, rhenium boat.
+      standard_state: partial pressure in atm; ordinate lg P_i (atm) versus temperature
+      regime: kems_effusion
+      units: atm as plotted
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: figure_only
+        digitized_from_figure: true
+        gas_species: TiO(g)
+        axis: linear temperature versus log10 partial pressure
+        points:
+        - T_C: 1893.9
+          p_atm: 3.378200185e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: orange filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1752, 1118), log10 ordinate=-7.47131; independent repeat pixel=(1752, 1118),
+              log10 ordinate=-7.47131; x-axis reading=1893.9041
+        - T_C: 1922.46
+          p_atm: 4.93342164e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: orange filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1780, 1075), log10 ordinate=-7.30685; independent repeat pixel=(1780, 1075),
+              log10 ordinate=-7.30685; x-axis reading=1922.4560
+        - T_C: 1961.21
+          p_atm: 6.202844441e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '1'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '1'
+            marker_symbol: orange filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(1818, 1049), log10 ordinate=-7.20741; independent repeat pixel=(1818, 1049),
+              log10 ordinate=-7.20741; x-axis reading=1961.2051
+      uncertainty:
+        digitization:
+          read_uncertainty: 0.05
+          unit: dex
+          method: marker half-width and axis calibration
+          note: Per-marker read uncertainty; pressure/activity log-axis uncertainty is expressed in dex.
+    - observation_id: kems_029_fig2_TiO_psat_digitized
+      experiment: meteorite-and-cai-series
+      type: psat_series
+      locator:
+        figure: '2'
+        published_page: 2
+        pdf_page_index: 2
+        marker_symbol: orange filled circle
+        note: CAI vaporization
+      T_range_K:
+      - 2144.05
+      - 2622.06
+      phase: Efremovka_CAI_type_A_and_B_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: CAI types A and B from Efremovka (CV).
+      standard_state: partial pressure in atm; ordinate lg P_i (atm) versus temperature
+      regime: kems_effusion
+      units: atm as plotted
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: figure_only
+        digitized_from_figure: true
+        gas_species: TiO(g)
+        axis: linear temperature versus log10 partial pressure
+        points:
+        - T_C: 1870.9
+          p_atm: 4.383227647e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: orange filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3490, 1301), log10 ordinate=-7.35821; independent repeat pixel=(3490, 1301),
+              log10 ordinate=-7.35821; x-axis reading=1870.8960
+        - T_C: 1923.21
+          p_atm: 5.543572027e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: orange filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3584, 1268), log10 ordinate=-7.25621; independent repeat pixel=(3583, 1268),
+              log10 ordinate=-7.25621; x-axis reading=1923.2054
+        - T_C: 1977.18
+          p_atm: 3.441181513e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: orange filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3681, 1335), log10 ordinate=-7.46329; independent repeat pixel=(3681, 1335),
+              log10 ordinate=-7.46329; x-axis reading=1977.1842
+        - T_C: 2013.36
+          p_atm: 2.359914979e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: orange filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3746, 1388), log10 ordinate=-7.62710; independent repeat pixel=(3746, 1388),
+              log10 ordinate=-7.62710; x-axis reading=2013.3556
+        - T_C: 2076.79
+          p_atm: 2.462867363e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: orange filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3860, 1382), log10 ordinate=-7.60856; independent repeat pixel=(3860, 1382),
+              log10 ordinate=-7.60856; x-axis reading=2076.7946
+        - T_C: 2121.31
+          p_atm: 9.320012077e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: orange filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(3940, 1195), log10 ordinate=-7.03058; independent repeat pixel=(3940, 1196),
+              log10 ordinate=-7.03367; x-axis reading=2121.3133
+        - T_C: 2268.22
+          p_atm: 2.64453185e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: orange filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(4204, 1372), log10 ordinate=-7.57765; independent repeat pixel=(4204, 1372),
+              log10 ordinate=-7.57765; x-axis reading=2268.2247
+        - T_C: 2348.91
+          p_atm: 1.383846822e-08
+          point_conditions:
+            composition:
+              state:
+                tag: unknown
+                reason: composition_not_published
+              locator:
+                figure: '2'
+                published_page: 2
+                pdf_page_index: 2
+          locator:
+            figure: '2'
+            marker_symbol: orange filled circle
+            published_page: 2
+            pdf_page_index: 2
+            note: first marker centre pixel=(4349, 1463), log10 ordinate=-7.85891; independent repeat pixel=(4349, 1463),
+              log10 ordinate=-7.85891; x-axis reading=2348.9148
+      uncertainty:
+        digitization:
+          read_uncertainty: 0.05
+          unit: dex
+          method: marker half-width and axis calibration
+          note: Per-marker read uncertainty; pressure/activity log-axis uncertainty is expressed in dex.
   O2:
     observations:
     - observation_id: yakovlev_shornikov_2011_Po2_table_bar_calculated
@@ -680,9 +3053,20 @@ deepening:
     derived:
     - yakovlev_shornikov_2011_complementary_vapor_wt_pct
     figure_only:
-    - yakovlev_shornikov_2011_fig1_murchison_psat_figure_only
-    - yakovlev_shornikov_2011_fig2_CAI_psat_figure_only
+    - kems_029_fig1_Na_psat_digitized
+    - kems_029_fig1_K_psat_digitized
+    - kems_029_fig1_Fe_psat_digitized
+    - kems_029_fig2_Fe_psat_digitized
+    - kems_029_fig1_SiO_psat_digitized
+    - kems_029_fig2_SiO_psat_digitized
+    - kems_029_fig1_Mg_psat_digitized
+    - kems_029_fig2_Mg_psat_digitized
+    - kems_029_fig1_Al_psat_digitized
+    - kems_029_fig2_Al_psat_digitized
+    - kems_029_fig1_Ca_psat_digitized
+    - kems_029_fig2_Ca_psat_digitized
+    - kems_029_fig1_TiO_psat_digitized
+    - kems_029_fig2_TiO_psat_digitized
     model:
     - yakovlev_shornikov_2011_Po2_table_bar_calculated
-  battery_limitation: Figs 1–2 are the P(T) series and were not digitised. Numeric P anchors in this paper
-    are the ~10^-6 bar CAI SiO statement and the calculated O2 table.
+  battery_limitation: Figs 1–2 are digitised marker-centre P(T) series; log ordinates are retained in point notes and the audit. Numeric P anchors in this paper are the ~10^-6 bar CAI SiO statement and the calculated O2 table.

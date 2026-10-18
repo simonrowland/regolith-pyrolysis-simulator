@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+import yaml
 
 import simulator.battery.migrate as migrate_module
 from simulator.battery.enums import Quantity, ValueKind
@@ -28,6 +29,20 @@ _TARGET_SIDS = (
 def migrated_targets():
     extract_dir = _REPO_ROOT / "data" / "literature" / "extracts"
     extracts = [extract_dir / f"{sid}.yaml" for sid in _TARGET_SIDS]
+    with patch.object(migrate_module, "discover_extracts", return_value=extracts):
+        migrator = migrate_module.Migrator(root=_REPO_ROOT)
+        migrator.migrate_extracts()
+        migrator.finalize()
+    return migrator.result
+
+
+@pytest.fixture(scope="module")
+def crown_high_t_migrated():
+    extract_dir = _REPO_ROOT / "data" / "literature" / "extracts"
+    extracts = [
+        extract_dir / "kems-029-yakovlev-shornikov-2011.yaml",
+        extract_dir / "yakovlev-2024-cai-vaporization.yaml",
+    ]
     with patch.object(migrate_module, "discover_extracts", return_value=extracts):
         migrator = migrate_module.Migrator(root=_REPO_ROOT)
         migrator.migrate_extracts()
@@ -254,3 +269,56 @@ def test_halwax_figure_only_pressures_have_no_numeric_points(migrated_targets) -
         and observation.value.kind is ValueKind.POINT
         for observation in observations
     )
+
+
+def test_crown_high_t_markers_keep_values_pixels_and_conditions(
+    crown_high_t_migrated,
+) -> None:
+    by_source = {
+        source_id: [
+            observation
+            for observation in crown_high_t_migrated.observations.values()
+            if observation.source_id == source_id
+            and observation.value.kind is ValueKind.POINT
+            and (
+                "kems_029_fig" in observation.observation_id
+                or "yakovlev_2024_fig" in observation.observation_id
+            )
+        ]
+        for source_id in (
+            "kems-029-yakovlev-shornikov-2011",
+            "yakovlev-2024-cai-vaporization",
+        )
+    }
+    assert len(by_source["kems-029-yakovlev-shornikov-2011"]) == 109
+    assert len(by_source["yakovlev-2024-cai-vaporization"]) == 167
+    for source_id, observations in by_source.items():
+        for observation in observations:
+            assert observation.point_conditions is not None
+            temperature = observation.point_conditions["temperature_K"]
+            composition = observation.point_conditions["composition"]
+            assert temperature.locator is not None
+            assert composition.locator is not None
+            assert observation.identity.species.formula
+            if source_id == "yakovlev-2024-cai-vaporization":
+                assert observation.identity.species.phase.is_value
+
+    extract_dir = _REPO_ROOT / "data" / "literature" / "extracts"
+    yakovlev = yaml.safe_load(
+        (extract_dir / "yakovlev-2024-cai-vaporization.yaml").read_text()
+    )
+    ca = yakovlev["species"]["Ca"]["observations"][0]["values"]["points"][0]
+    cao = yakovlev["species"]["CaO"]["observations"][0]["values"]["points"][0]
+    gehlenite = yakovlev["species"]["Ca2Al2SiO7"]["observations"][0]["values"]["points"][0]
+    assert ca["p_atm"] == pytest.approx(1.0e-7, rel=0.10)
+    assert "pixel=(1048, 1237)" in ca["locator"]["note"]
+    assert cao["activity"] == pytest.approx(9.8e-3, rel=0.10)
+    assert "pixel=(2476, 1499)" in cao["locator"]["note"]
+    assert gehlenite["activity"] == pytest.approx(5.3e-2, rel=0.10)
+    assert "pixel=(356, 1467)" in gehlenite["locator"]["note"]
+    profile = yakovlev["extraction"]["printed_text_values"][0]["values"]
+    assert [profile[key] for key in (
+        "core_akermanite_wt_pct",
+        "mantle_akermanite_wt_pct",
+        "rim_akermanite_wt_pct",
+    )] == [50.0, 20.0, 7.0]
