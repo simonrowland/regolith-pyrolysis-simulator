@@ -13092,8 +13092,11 @@ class Migrator:
 
         Registry declarations already own experiment.sample.printed_composition
         and are left untouched. Experiments whose observations all carry one
-        identical printed fingerprint receive that map at sample level so
-        normalized_composition can fall back without subset leakage.
+        identical printed fingerprint receive that map as sample-level printed
+        composition so normalized_composition can fall back without subset
+        leakage. Observation rows do not retain the source roots needed to
+        establish a starting-charge role, so this promotion never creates an
+        initial_composition.
 
         ROR fix: only observation-level maps count. A child carrying its own
         series-row map (``_row_local_printed_observations``) blocks promotion:
@@ -13135,17 +13138,9 @@ class Migrator:
                 continue
             located = fingerprints[0][1]
             experiment = self.result.experiments[experiment_id]
-            printed = located
-            initial = None
-            raw = located.state.value
-            if isinstance(raw, Mapping):
-                _, initial = _located_printed_and_initial(raw, located.locator)
             sample = replace(
                 experiment.sample,
-                printed_composition=printed,
-                initial_composition=initial
-                if experiment.sample.initial_composition is None
-                else experiment.sample.initial_composition,
+                printed_composition=located,
             )
             self.result.experiments[experiment_id] = replace(
                 experiment, sample=sample
