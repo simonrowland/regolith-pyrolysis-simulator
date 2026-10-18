@@ -1314,7 +1314,8 @@ def load_scored_residuals(root: Path) -> dict[str, str]:
 def git_uncommitted_paths(root: Path) -> tuple[list[str], str | None]:
     try:
         result = subprocess.run(
-            ["git", "-C", str(root), "status", "--porcelain", "-uall"],
+            # Exclude untracked paths so committed status stays host-independent.
+            ["git", "-C", str(root), "status", "--porcelain", "-uno"],
             capture_output=True, text=True, check=False,
         )
     except OSError:

@@ -619,17 +619,14 @@ def test_source_status_wired_zero_today_and_positive_control(tmp_path, monkeypat
 
 
 def test_source_status_anti_loss_nonempty_cases(tmp_path, monkeypatch):
-    """Each anti-loss check has a non-empty fixture case; a forever-zero check is not a check."""
+    """Anti-loss checks report tracked changes and concrete parity/staleness cases."""
     root, corpus = _status_tree(tmp_path, monkeypatch, git_corpus=True)
     now = datetime(2026, 9, 18, tzinfo=timezone.utc)
-
-    uncommitted = corpus / "raw" / "uncommitted-src" / "note.txt"
-    uncommitted.parent.mkdir(parents=True)
-    uncommitted.write_text("not committed")
 
     (corpus / "tracked.txt").write_text("tracked")
     subprocess.run(["git", "-C", str(corpus), "add", "tracked.txt"], check=True, capture_output=True)
     subprocess.run(["git", "-C", str(corpus), "commit", "-m", "base"], check=True, capture_output=True)
+    (corpus / "tracked.txt").write_text("tracked edit")
     bare = tmp_path / "mirror.git"
     subprocess.run(["git", "init", "--bare", str(bare)], check=True, capture_output=True)
     subprocess.run(["git", "-C", str(corpus), "remote", "add", "origin", str(bare)],
@@ -669,8 +666,7 @@ def test_source_status_anti_loss_nonempty_cases(tmp_path, monkeypatch):
     _, status = _status_rows(root, now=now)
     anti = status["anti_loss"]
 
-    assert anti["corpus_uncommitted"]["count"] >= 1
-    assert any("uncommitted-src" in item for item in anti["corpus_uncommitted"]["ids"])
+    assert anti["corpus_uncommitted"] == {"count": 1, "ids": ["tracked.txt"]}
 
     assert anti["corpus_unpushed"]["count"] >= 1
     assert unpushed_sha in anti["corpus_unpushed"]["ids"]
@@ -689,6 +685,30 @@ def test_source_status_anti_loss_nonempty_cases(tmp_path, monkeypatch):
 
     assert claim_sid in anti["stale_claims"]["ids"]
     assert anti["stale_claims"]["count"] >= 1
+
+
+def test_source_status_untracked_corpus_scratch_is_excluded(tmp_path, monkeypatch):
+    root, corpus = _status_tree(tmp_path, monkeypatch, git_corpus=True)
+    tracked = corpus / "tracked.txt"
+    tracked.write_text("base")
+    subprocess.run(["git", "-C", str(corpus), "add", "tracked.txt"], check=True, capture_output=True)
+    subprocess.run(["git", "-C", str(corpus), "commit", "-m", "base"], check=True, capture_output=True)
+    tracked.write_text("modified")
+
+    scratch = corpus / ".agent-scratch" / "nested"
+    scratch.mkdir(parents=True)
+    private_names = [f"private-note-{i:02}.txt" for i in range(12)]
+    for name in private_names:
+        (scratch / name).write_text("untracked")
+
+    _, status = _status_rows(root)
+    out_dir = tmp_path / "out"
+    builder.write_source_status(status, out_dir)
+    output = (out_dir / "SOURCE_STATUS.yaml").read_text()
+
+    assert status["anti_loss"]["corpus_uncommitted"] == {"count": 1, "ids": ["tracked.txt"]}
+    assert "tracked.txt" in output
+    assert all(name not in output for name in private_names)
 
 
 def test_observation_store_summary_matches_full_scan():
