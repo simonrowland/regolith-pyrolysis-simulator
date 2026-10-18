@@ -1856,14 +1856,17 @@ def _sample_from_plain(
     if printed_from_initial:
         printed_located = _mass_percent_printed_from_plain(initial)
     composition_role, _role_refusal = _declared_composition_role(payload)
-    owner_initial = _owner_initial_from_printed(
-        printed_located,
-        initial_located,
-        declared_start=(
-            printed_from_initial
-            or composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG
-        ),
-    )
+    selected_column = _selected_printed_composition_column(initial_located)
+    owner_initial = None
+    if (
+        printed_from_initial
+        or composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        or selected_column is not None
+    ):
+        owner_initial = _owner_initial_from_printed(
+            printed_located,
+            initial_located,
+        )
     if owner_initial is not None:
         initial_located = owner_initial
     return Sample(
@@ -3887,33 +3890,37 @@ def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
     return None, None
 
 
+def _selected_printed_composition_column(
+    selected_initial: Located[Composition] | None,
+) -> str | None:
+    if selected_initial is None:
+        return None
+    selection_text = " ".join(
+        selected_initial.inference.inputs
+        if selected_initial.inference is not None
+        else ()
+    ).casefold()
+    return next(
+        (
+            column
+            for column in ("analytical", "nominal")
+            if re.search(rf"\b{column}\b.*\bcolumn selected\b", selection_text)
+        ),
+        None,
+    )
+
+
 def _owner_initial_from_printed(
     printed: Located[Any] | None,
     selected_initial: Located[Composition] | None = None,
-    *,
-    declared_start: bool = False,
 ) -> Located[Composition] | None:
-    """Derive the sample initial from its printed wt% through the owner."""
+    """Convert the printed map already selected by the typed-role owner."""
 
     if printed is None or not printed.state.is_value:
         return None
     raw = printed.state.value
     locator = printed.locator
-    selected_column = None
-    if selected_initial is not None:
-        selection_text = " ".join(
-            selected_initial.inference.inputs
-            if selected_initial.inference is not None
-            else ()
-        ).casefold()
-        selected_column = next(
-            (
-                column
-                for column in ("analytical", "nominal")
-                if re.search(rf"\b{column}\b.*\bcolumn selected\b", selection_text)
-            ),
-            None,
-    )
+    selected_column = _selected_printed_composition_column(selected_initial)
     if selected_column is not None:
         if not isinstance(raw, Mapping) or not isinstance(
             raw.get(selected_column), Mapping
@@ -3927,8 +3934,6 @@ def _owner_initial_from_printed(
             )
         raw = raw[selected_column]
         locator = selected_initial.locator or printed.locator
-    elif not declared_start:
-        return None
     refusal_reason: list[str] = []
     pairs = _mass_percent_pairs(raw)
     if pairs is not None:
@@ -10731,13 +10736,31 @@ def _merge_pressure(
     )
 
 
+def _initial_compositions_conflict(
+    old: Located[Composition] | None,
+    new: Located[Composition] | None,
+) -> bool:
+    if (
+        old is None
+        or new is None
+        or not old.state.is_value
+        or not new.state.is_value
+    ):
+        return False
+    old_value = old.state.value
+    new_value = new.state.value
+    return (
+        old_value.basis != new_value.basis
+        or old_value.amount_basis is not new_value.amount_basis
+        or old_value.as_map() != new_value.as_map()
+    )
+
+
 def _merge_experiment_lab_params(
     existing: Experiment,
     sample: Sample,
     apparatus: Apparatus | None,
     pressure_env: PressureEnvironment,
-    *,
-    prefer_existing_initial: bool = False,
 ) -> Experiment:
     existing_initial = existing.sample.initial_composition
     incoming_initial = sample.initial_composition
@@ -10746,22 +10769,17 @@ def _merge_experiment_lab_params(
         sample.printed_composition,
         numeric_mapping=True,
     )
-    if (
-        prefer_existing_initial
-        and existing_initial is not None
+    if _initial_compositions_conflict(existing_initial, incoming_initial):
+        initial_composition = None
+    elif (
+        existing_initial is not None
+        and incoming_initial is not None
         and existing_initial.state.is_value
+        and incoming_initial.state.is_value
     ):
         initial_composition = existing_initial
     else:
-        owner_initial = _owner_initial_from_printed(
-            printed_composition,
-            incoming_initial,
-            declared_start=incoming_initial is not None,
-        )
-        if owner_initial is not None:
-            initial_composition = owner_initial
-        else:
-            initial_composition = _prefer_located(existing_initial, incoming_initial)
+        initial_composition = _prefer_located(existing_initial, incoming_initial)
     merged_sample = Sample(
         mass_kg=_prefer_located(existing.sample.mass_kg, sample.mass_kg),
         volume_m3=_prefer_located(existing.sample.volume_m3, sample.volume_m3),
@@ -10899,11 +10917,7 @@ def sample_from_equipment(
             values, composition_units
         ),
     ):
-        raw = printed.state.value
-        if isinstance(raw, Mapping):
-            _, initial = _located_printed_and_initial(
-                raw, printed.locator or locator
-            )
+        initial = _owner_initial_from_printed(printed)
     if (
         mass_located is None
         and volume_located is None
@@ -12023,9 +12037,7 @@ class Migrator:
         self._pending_supersedes: list[tuple[str, str, str, Locator, str]] = []
         self._oxygen_pressure_landed: dict[str, Decimal] = {}
         self._oxygen_pressure_conflict: set[str] = set()
-        # Only an initial composition declared as a registry value may take
-        # precedence over later legacy lab-parameter rows.
-        self._registry_value_initial_experiments: set[str] = set()
+        self._initial_composition_conflicts: set[str] = set()
         self._registry_printed_composition_experiments: set[str] = set()
         # b-718 ROR: exploded children whose printed map is their own row's
         # (not the parent observation's). A row-local map describes that row
@@ -12174,7 +12186,6 @@ class Migrator:
         conditions: dict[str, Located[Decimal]] | None = None,
         observation_id: str | None = None,
         source: str | None = None,
-        prefer_existing_initial: bool = False,
     ) -> Experiment:
         existing = self.result.experiments.get(experiment_id)
         cond = conditions or {
@@ -12202,16 +12213,60 @@ class Migrator:
             locator=locator,
             composition_units=composition_units,
         )
+        if experiment_id in self._initial_composition_conflicts:
+            sample = replace(sample, initial_composition=None)
+            if existing is not None:
+                existing = replace(
+                    existing,
+                    sample=replace(existing.sample, initial_composition=None),
+                )
+        elif existing is not None and _initial_compositions_conflict(
+            existing.sample.initial_composition,
+            sample.initial_composition,
+        ):
+            self._initial_composition_conflicts.add(experiment_id)
+            candidates = []
+            for label, initial in (
+                ("existing", existing.sample.initial_composition),
+                ("incoming", sample.initial_composition),
+            ):
+                composition = initial.state.value
+                inference = initial.inference
+                candidates.append(
+                    f"{label}: basis={composition.basis!r}, "
+                    f"amount_basis={composition.amount_basis.value!r}, "
+                    f"components={composition.as_map()!r}, "
+                    f"proxy_flag={composition.proxy_flag!r}, "
+                    f"proxy_source={composition.proxy_source!r}, "
+                    f"selection={composition.analysis_selection_rule!r}, "
+                    f"locator={initial.locator!r}, "
+                    f"inference={None if inference is None else inference.relation!r}"
+                )
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=(
+                        f"experiment[{experiment_id}].sample.initial_composition"
+                    ),
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=(
+                        "initial_composition_conflict: different typed starting "
+                        "inventories were selected; neither is authoritative; "
+                        + "; ".join(candidates)
+                    ),
+                )
+            )
+            existing = replace(
+                existing,
+                sample=replace(existing.sample, initial_composition=None),
+            )
+            sample = replace(sample, initial_composition=None)
+
         # b-718: observation-row printed maps stay on the observation
         # (attached by the caller). Promote to experiment.sample only from an
         # explicit registry declaration, or later when every row shares one map.
         row_printed = sample.printed_composition
         if experiment_id in self._registry_printed_composition_experiments:
             sample = replace(sample, printed_composition=None)
-            if row_printed is not None and not self._repeats_declared_sample_map(
-                experiment_id, row_printed
-            ):
-                sample = replace(sample, initial_composition=None)
         elif row_printed is not None and not _printed_map_is_typed_initial(
             row_printed,
             equipment=equipment,
@@ -12222,19 +12277,13 @@ class Migrator:
                 values, composition_units
             ),
         ):
-            sample = replace(
-                sample,
-                printed_composition=None,
-                initial_composition=None,
-            )
+            sample = replace(sample, printed_composition=None)
         if existing is not None:
             merged = _merge_experiment_lab_params(
                 existing,
                 sample,
                 apparatus,
                 pressure_env,
-                prefer_existing_initial=prefer_existing_initial
-                or experiment_id in self._registry_printed_composition_experiments,
             )
             self.result.experiments[experiment_id] = merged
             return merged
@@ -12925,11 +12974,6 @@ class Migrator:
                         )
                     )
                 continue
-            if (
-                experiment.sample.initial_composition is not None
-                and experiment.sample.initial_composition.state.is_value
-            ):
-                self._registry_value_initial_experiments.add(experiment.experiment_id)
             # Only a declared oxide map owns the sample. A prose string
             # ("12 MgO, 46 SiO2, ...") is not a composition the readers can
             # use, so it must not block the parsed observation map (ROR fix:
@@ -14538,9 +14582,6 @@ class Migrator:
                 composition_units=obs.get("units"),
                 observation_id=obs_id,
                 source=source_key,
-                prefer_existing_initial=(
-                    declared_experiment_id in self._registry_value_initial_experiments
-                ),
             )
         oxygen_roots: list[object] = []
         if isinstance(values, Mapping):

@@ -593,7 +593,7 @@ def test_declared_composition_map_refuses_combined_alkali_label_by_name() -> Non
     ]
 
 
-def test_merge_honors_preferred_starting_initial_over_printed_sibling() -> None:
+def test_merge_preserves_selected_initial_without_incoming_initial() -> None:
     path = REPO_ROOT / "data/literature/extracts/kems-010-richter-2007.yaml"
     source = yaml.safe_load(path.read_text(encoding="utf-8"))
     raw_experiment = next(
@@ -620,7 +620,6 @@ def test_merge_honors_preferred_starting_initial_over_printed_sibling() -> None:
         incoming,
         existing.apparatus,
         existing.pressure_environment,
-        prefer_existing_initial=True,
     )
 
     assert merged.sample.initial_composition == starting
@@ -1298,7 +1297,9 @@ def test_sample_catalogue_composition_is_typed_proxy_not_printed() -> None:
     )
 
 
-def test_conflicting_owner_selected_initials_are_withheld_with_migration_issue() -> None:
+def test_conflicting_owner_selected_initials_are_withheld_with_migration_issue(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     old_initial = sample_from_equipment(
         {},
         values={
@@ -1316,26 +1317,55 @@ def test_conflicting_owner_selected_initials_are_withheld_with_migration_issue()
         },
     ).initial_composition
     assert old_initial is not None and incoming_initial is not None
+    basis_conflict = replace(
+        old_initial,
+        state=replace(
+            old_initial.state,
+            value=replace(old_initial.state.value, basis="other_engine_basis"),
+        ),
+    )
+    assert migrate_module._initial_compositions_conflict(
+        old_initial, basis_conflict
+    )
 
-    existing = tabulation_experiment("catalogue-initial-conflict")
+    experiment_id = "catalogue-initial-conflict"
+    registry_printed = migrate_module._located_printed_and_initial(
+        {"SiO2": Decimal("70"), "MgO": Decimal("30")}, None
+    )[0]
+    row_printed = migrate_module._located_printed_and_initial(
+        {"SiO2": Decimal("40"), "MgO": Decimal("60")}, None
+    )[0]
+    assert registry_printed is not None and row_printed is not None
+    existing = tabulation_experiment(experiment_id)
     existing = replace(
         existing,
-        sample=replace(existing.sample, initial_composition=old_initial),
+        sample=replace(
+            existing.sample,
+            initial_composition=old_initial,
+            printed_composition=registry_printed,
+        ),
     )
-    assert incoming_initial is not None
     migrator = Migrator()
     migrator.result.experiments[existing.experiment_id] = existing
+    migrator._registry_printed_composition_experiments.add(experiment_id)
+    current_sample = {
+        "value": replace(
+            existing.sample,
+            initial_composition=incoming_initial,
+            printed_composition=row_printed,
+        )
+    }
+    monkeypatch.setattr(
+        migrate_module,
+        "sample_from_equipment",
+        lambda *args, **kwargs: current_sample["value"],
+    )
     merged = migrator._ensure_experiment(
         work_id=existing.work_id,
-        experiment_id=existing.experiment_id,
+        experiment_id=experiment_id,
         locator=existing.locator,
         method=existing.method,
         equipment={},
-        values={
-            "composition_from_sample_catalog": True,
-            "composition_source": "second catalogue source",
-            "sample_oxide_composition_wt_pct": {"SiO2": 55, "MgO": 45},
-        },
     )
 
     assert merged.sample.initial_composition is None
@@ -1348,6 +1378,32 @@ def test_conflicting_owner_selected_initials_are_withheld_with_migration_issue()
         "experiment[catalogue-initial-conflict].sample.initial_composition"
     )
     assert conflict.reason is RefusalReason.INVALID_SOURCE
+    assert "first catalogue source" in conflict.detail
+    assert "second catalogue source" in conflict.detail
+    assert "basis=" in conflict.detail
+    assert "amount_basis=" in conflict.detail
+    assert "proxy_flag='composition_from_sample_catalog'" in conflict.detail
+
+    current_sample["value"] = replace(
+        existing.sample,
+        initial_composition=old_initial,
+        printed_composition=row_printed,
+    )
+    later = migrator._ensure_experiment(
+        work_id=existing.work_id,
+        experiment_id=experiment_id,
+        locator=existing.locator,
+        method=existing.method,
+        equipment={},
+    )
+    assert later.sample.initial_composition is None
+    assert len(
+        [
+            issue
+            for issue in migrator.result.registry_issues
+            if "initial_composition_conflict" in issue.detail
+        ]
+    ) == 1
 
 
 def test_ambiguous_mass_percent_initial_preserves_print_and_withholds_canonical() -> None:
