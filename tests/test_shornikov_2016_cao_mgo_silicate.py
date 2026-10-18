@@ -64,6 +64,17 @@ FIGURE_READS = (
         [929.71, 131.94],
         None,
     ),
+    (
+        "MgO",
+        "shornikov_2016_fig1b_MgO_rein1965_activity",
+        "1873",
+        "0.5",
+        [884.0, 49.0],
+        [3244.3, 4731.2],
+        [3247.5, 4730.0],
+        [885.06, 48.61],
+        "0.002",
+    ),
 )
 
 # The five experimental markers the first pass missed. Coordinates are the
