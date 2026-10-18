@@ -2144,6 +2144,9 @@ def test_solved_effusion_lifts_only_derived_oxygen_provenance_blocker() -> None:
     assert IMCC_ENGINES == frozenset({Engine.OPENIMCC})
     assert has_own_engine_solved_oxygen_balance(Engine.OPENIMCC, (solved,))
     assert not has_own_engine_solved_oxygen_balance(Engine.ALPHAMELTS, (solved,))
+    for engine in (Engine.ALPHAMELTS, Engine.VAPOROCK):
+        engine_solved = replace(solved, origin=f"engine:{engine.value}")
+        assert has_own_engine_solved_oxygen_balance(engine, (engine_solved,))
     foreign_origin = replace(solved, origin="engine:imcc_sf04")
     assert not has_own_engine_solved_oxygen_balance(
         Engine.OPENIMCC, (foreign_origin,)

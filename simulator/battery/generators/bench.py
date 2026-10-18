@@ -653,7 +653,7 @@ def melt_activity_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]
                     "engine_reports": reported,
                 },
             }
-            if redox or engine == "internal-analytical":
+            if redox or engine in {"internal-analytical", "alphamelts"}:
                 oxygen_waypoint = inputs.waypoints["oxygen_condition"].selected
                 if oxygen_waypoint is not None:
                     oxygen_log = _point(inputs, "oxygen_condition")

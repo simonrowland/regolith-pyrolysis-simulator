@@ -11,6 +11,7 @@ import tempfile
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -695,8 +696,10 @@ def test_reactive_cell_wo3_dominated_balance_matches_analytic_root(monkeypatch) 
     )
     species = openimcc.oxygen_balance_species_metadata({"Si": "SiO2"})
 
-    def pressure_model(logp: float) -> dict[str, float]:
-        return {"Si": si_o_pressure_scale * 10.0 ** (-logp)}
+    def pressure_model(po2_bar: float) -> dict[str, float]:
+        return {
+            "Si": si_o_pressure_scale * 10.0 ** (-math.log10(po2_bar))
+        }
 
     solved, pressures, _balance, fraction, info = battery._solve_cell_oxygen_balance(
         pressure_model,
@@ -727,8 +730,8 @@ def test_reactive_cell_buffer_pins_at_selected_buffer(monkeypatch) -> None:
     )
     species = openimcc.oxygen_balance_species_metadata({"Si": "SiO2"})
 
-    def pressure_model(logp: float) -> dict[str, float]:
-        return {"Si": 1e-12 * 10.0 ** (-logp)}
+    def pressure_model(po2_bar: float) -> dict[str, float]:
+        return {"Si": 1e-12 * 10.0 ** (-math.log10(po2_bar))}
 
     solved, _pressures, _balance, _fraction, info = battery._solve_cell_oxygen_balance(
         pressure_model,
@@ -741,6 +744,328 @@ def test_reactive_cell_buffer_pins_at_selected_buffer(monkeypatch) -> None:
     assert info["buffer_pinned"] is True
     assert solved == pytest.approx(10.0**-15.0)
     assert info["buffer_pO2_bar"] == pytest.approx(solved)
+
+
+def test_openimcc_cell_balance_pre_generalization_golden(monkeypatch) -> None:
+    import openimcc
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    monkeypatch.setattr(
+        battery,
+        "_cell_oxide_thermodynamics",
+        lambda _material, _temperature: (
+            {"WO3": (-250_000.0, 3.0)},
+            -15.0,
+            {"WO3": {"table_id": "O-068", "source_sha256": "test"}},
+        ),
+    )
+    species = openimcc.oxygen_balance_species_metadata({"Si": "SiO2"})
+
+    def pressure_model(po2_bar: float) -> dict[str, float]:
+        return {"Si": 1e-12 * 10.0 ** (-math.log10(po2_bar))}
+
+    solved, pressures, balance, fraction, info = battery._solve_cell_oxygen_balance(
+        pressure_model,
+        species,
+        temperature_K=1933.0,
+        cell_material="W",
+        oxygen_balance_from_pressure_model=openimcc.oxygen_balance_from_pressure_model,
+    )
+
+    assert (
+        solved.hex(),
+        pressures["Si"].hex(),
+        pressures["WO3"].hex(),
+        balance["residual"].hex(),
+        fraction.hex(),
+        info["buffer_pO2_bar"].hex(),
+    ) == (
+        "0x1.203af9ee75616p-50",
+        "0x1.f400000000000p+9",
+        "0x1.9f47e60278c26p-53",
+        "0x1.0000000000000p+0",
+        "0x1.0000000000000p+0",
+        "0x1.203af9ee75616p-50",
+    )
+
+
+def test_cell_balance_calls_pressure_model_at_commanded_po2(monkeypatch) -> None:
+    import math
+    import openimcc
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    monkeypatch.setattr(
+        battery,
+        "_cell_oxide_thermodynamics",
+        lambda _material, _temperature: ({}, None, {}),
+    )
+    species = openimcc.oxygen_balance_species_metadata(
+        {"Mg": "MgO", "O": None}
+    )
+
+    def pressure_model(po2_bar: float) -> dict[str, float]:
+        assert math.isfinite(po2_bar) and po2_bar > 0.0
+        root_po2 = math.sqrt(po2_bar)
+        return {
+            "Mg": 1e-8 / root_po2,
+            "O": 2e-8 * root_po2,
+        }
+
+    solved, pressures, _balance, _fraction, _info = (
+        battery._solve_cell_oxygen_balance(
+            pressure_model,
+            species,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+    )
+
+    ratio = (
+        pressures["O"]
+        * math.sqrt(species["Mg"].molar_mass)
+        / (pressures["Mg"] * math.sqrt(species["O"].molar_mass))
+    )
+    assert solved > 0.0
+    assert ratio == pytest.approx(1.0, rel=1e-9)
+
+
+def test_vapor_engine_brackets_inside_vaporock_sum_pressure_domain() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+    from simulator.melt_backend.vaporock import vaporock_sum_pressure_sane
+
+    trials: list[tuple[float, bool, float]] = []
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        pressures_pa = {
+            "K": 1e-6 * po2_bar**-0.25 * 1e5,
+            "O2": 0.02264 * po2_bar * 1e5,
+        }
+        admitted, sum_bar = vaporock_sum_pressure_sane(pressures_pa)
+        trials.append((po2_bar, admitted, sum_bar))
+        return SimpleNamespace(
+            status="ok" if admitted else "refusal",
+            refusal_reason=None if admitted else "sum_pressure_sanity",
+            engine_reason=f"sum pressure {sum_bar:g} bar",
+            gas_partial_pressures_Pa=pressures_pa,
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    po2_bar, pressures, balance, _fraction, _info = (
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+    )
+
+    assert po2_bar == pytest.approx(9.99164171950111e-05, rel=1e-8)
+    assert balance["residual"] < 1e-12
+    assert all(admitted for _po2, admitted, _sum_bar in trials)
+    assert pressures["O2"] > 0.0
+
+
+def test_vapor_engine_reports_domain_when_no_admitted_bracket_exists() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OxygenBalanceRefusal,
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+    from simulator.melt_backend.vaporock import vaporock_sum_pressure_sane
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        pressures_pa = {"K": 1e-6 * po2_bar**-0.25 * 1e5}
+        admitted, sum_bar = vaporock_sum_pressure_sane(pressures_pa)
+        return SimpleNamespace(
+            status="ok" if admitted else "refusal",
+            refusal_reason=None if admitted else "sum_pressure_sanity",
+            engine_reason=f"sum pressure {sum_bar:g} bar",
+            gas_partial_pressures_Pa=pressures_pa,
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    with pytest.raises(_OxygenBalanceRefusal) as exc_info:
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+
+    detail = str(exc_info.value)
+    assert exc_info.value.reason_code == "oxygen_balance_no_admitted_bracket"
+    assert "no sign-changing bracket was found in the admitted pO2 window" in detail
+    assert "reachable from the chosen start" in detail
+    assert "start_pO2_bar=1e-06" in detail
+    assert "searched_window_pO2_bar=[1e-28, 1]" in detail
+    assert "does not establish whether a root exists in another admitted window" in detail
+    assert "lower_stop=" in detail and "lower_stop=None" not in detail
+    assert "upper_stop=" in detail and "upper_stop=None" not in detail
+    assert "lower_stop=pO2=1e-29 bar; guard=sum_pressure_sanity" in detail
+    assert "upper_stop=OpenIMCC Knudsen molecular-flow limit pO2=1 bar" in detail
+
+
+def test_vapor_engine_finds_admitted_start_away_from_seed() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+
+    trials: list[tuple[float, str]] = []
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        logp = math.log10(po2_bar)
+        if not -14.0 <= logp <= -9.0:
+            trials.append((po2_bar, "domain"))
+            return SimpleNamespace(
+                status="refusal",
+                refusal_reason="outside_test_domain",
+                engine_reason=f"outside admitted window at log10(pO2)={logp:g}",
+                gas_partial_pressures_Pa={},
+                invalid_gas_partial_pressure_components=(),
+            )
+
+        trials.append((po2_bar, "ok"))
+        return SimpleNamespace(
+            status="ok",
+            gas_partial_pressures_Pa={
+                "K": 1e-16 * po2_bar**-0.25 * 1e5,
+                "O2": 0.02264 * po2_bar * 1e5,
+            },
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    solved_po2_bar, pressures_bar, balance, _fraction, _info = (
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+    )
+
+    assert trials[0][0] == pytest.approx(1e-6)
+    assert trials[0][1] == "domain"
+    assert [round(math.log10(po2)) for po2, _status in trials[:7]] == [
+        -6,
+        -5,
+        -7,
+        -4,
+        -8,
+        -3,
+        -9,
+    ]
+    first_admitted = next(po2 for po2, status in trials if status == "ok")
+    assert first_admitted == pytest.approx(1e-9)
+    assert 1e-14 <= solved_po2_bar <= 1e-9
+    assert balance["residual"] < 1e-12
+
+    direct_cell = engine_call_at_po2(solved_po2_bar)
+    assert direct_cell.status == "ok"
+    for species, pressure_pa in direct_cell.gas_partial_pressures_Pa.items():
+        assert pressures_bar[species] == pytest.approx(
+            pressure_pa / 1e5, rel=1e-9
+        )
+
+
+def test_vapor_engine_lists_guards_when_every_start_grid_point_is_refused() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OxygenBalanceRefusal,
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+
+    trials: list[float] = []
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        logp = round(math.log10(po2_bar))
+        trials.append(logp)
+        if logp < -15:
+            reason, engine_reason = "engine_crash", "subprocess_died"
+        elif logp < -5:
+            reason, engine_reason = (
+                "engine_crash",
+                "subprocess_fe_free_absolute_fo2_crash",
+            )
+        else:
+            reason, engine_reason = "out_of_basis", "temperature_range"
+        return SimpleNamespace(
+            status="refusal",
+            refusal_reason=reason,
+            engine_reason=engine_reason,
+            gas_partial_pressures_Pa={},
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    with pytest.raises(_OxygenBalanceRefusal) as exc_info:
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+
+    detail = str(exc_info.value)
+    assert exc_info.value.reason_code == "oxygen_balance_no_admitted_bracket"
+    assert sorted(trials) == list(range(-30, 1))
+    assert "engine_crash: subprocess_died: 15" in detail
+    assert "engine_crash: subprocess_fe_free_absolute_fo2_crash: 10" in detail
+    assert "out_of_basis: temperature_range: 6" in detail
+
+
+def test_feo_association_channel_uses_catalog_parent_for_oxygen_balance() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _engine_gas_pressures_bar_for_oxygen_balance,
+        _vapor_engine_oxygen_balance_species_metadata,
+    )
+    from simulator.melt_backend.vaporock import _parent_oxide_for_vaporock_gas
+    from simulator.yaml_cache import load_cached_safe_yaml
+
+    channel = "FeO_association_gas"
+    vapor_data = load_cached_safe_yaml(
+        (Path(__file__).resolve().parents[1] / "data" / "vapor_pressures.yaml")
+        .read_text(encoding="utf-8")
+    )
+    expected_parent = vapor_data["families"][
+        "oxide_vapors_feo_association_family"
+    ]["physical_properties"]["species"][channel]["parent_oxide"]
+    assert _parent_oxide_for_vaporock_gas(channel) == expected_parent
+    metadata = _vapor_engine_oxygen_balance_species_metadata((channel,))
+
+    pressures_bar = _engine_gas_pressures_bar_for_oxygen_balance(
+        {channel: 1.0e5}, metadata
+    )
+
+    assert set(metadata) == {expected_parent}
+    assert pressures_bar == {expected_parent: pytest.approx(1.0)}
+
+
+@pytest.mark.parametrize("gas_species", ("NaOH(g)", "KOH(g)"))
+def test_positive_hydroxide_pressure_refuses_dry_cell_oxygen_balance(
+    gas_species: str,
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OxygenBalanceRefusal,
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        return SimpleNamespace(
+            status="ok",
+            gas_partial_pressures_Pa={
+                "K": 1e-6 * po2_bar**-0.25 * 1e5,
+                "O2": 0.02264 * po2_bar * 1e5,
+                gas_species: 1.0,
+            },
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    with pytest.raises(_OxygenBalanceRefusal) as exc_info:
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+
+    assert (
+        exc_info.value.reason_code == "h_bearing_channel_in_dry_cell_balance"
+    )
+    assert gas_species in str(exc_info.value)
 
 
 def test_unknown_cell_material_is_a_typed_refusal() -> None:

@@ -622,12 +622,15 @@ class PT0DeterminismStore:
         sim._last_vapor_pressure_diagnostic = vapor_pressure_diagnostic
         sulfur = getattr(result, "sulfur_saturation", None)
         sim._last_sulfur_saturation_result = sulfur
-        if getattr(result, "fO2_log", None) is not None:
+        replay_fO2_log = getattr(result, "requested_fO2_log", None)
+        if replay_fO2_log is None:
+            replay_fO2_log = getattr(result, "fO2_log", None)
+        if replay_fO2_log is not None:
             sync = getattr(sim, "_sync_oxygen_reservoir_mirror", None)
             if callable(sync):
                 sync()
             else:
-                fO2_log = float(result.fO2_log)
+                fO2_log = float(replay_fO2_log)
                 sim.melt.fO2_log = fO2_log
                 if hasattr(sim.melt, "melt_fO2_log"):
                     sim.melt.melt_fO2_log = fO2_log
@@ -3221,6 +3224,10 @@ def canonical_replay_output_projection(
             )
             for field in dataclasses.fields(EquilibriumResult)
             if field.name != "ledger_transition"
+            and not (
+                field.name in {"requested_fO2_log", "printed_fO2_echo_log"}
+                and getattr(result, field.name) is None
+            )
         },
         "last_vapor_pressures_source": dict(
             getattr(sim, "_last_vapor_pressures_source", {}) or {}

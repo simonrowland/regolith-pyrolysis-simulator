@@ -282,6 +282,7 @@ _VAPOROCK_GAS_PARENT_OXIDE: Mapping[str, str] = {
     'Al2(g)': 'Al2O3',
     'Al2O(g)': 'Al2O3',
     'Al2O2(g)': 'Al2O3',
+    'Ti2O3(g)': 'TiO2',
     'Si(g)': 'SiO2',
     'SiO(g)': 'SiO2',
     'SiO2(g)': 'SiO2',
@@ -295,6 +296,12 @@ _VAPOROCK_GAS_PARENT_OXIDE: Mapping[str, str] = {
     'K2(g)': 'K2O',
     'Fe(g)': 'FeO',
     'FeO(g)': 'FeO',
+    # FeO association pressure channel from the NASA CEA Fe/FeO/O2 data.
+    # Its catalog formula and parent oxide are both FeO; see
+    # data/vapor_pressures.yaml::families.oxide_vapors_feo_association_family
+    # and Gordon & McBride, NASA RP-1311 (1994):
+    # https://ntrs.nasa.gov/citations/19950013764
+    'FeO_association_gas': 'FeO',
     'Ti(g)': 'TiO2',
     'TiO(g)': 'TiO2',
     'TiO2(g)': 'TiO2',

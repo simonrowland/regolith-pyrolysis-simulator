@@ -15,7 +15,12 @@ from simulator.physical_constants import GAS_CONSTANT
 
 IMCC_ENGINES: frozenset[Engine] = frozenset({Engine.OPENIMCC})
 OXYGEN_BALANCE_EFFUSION_ENGINES: frozenset[Engine] = frozenset(
-    {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
+    {
+        Engine.OPENIMCC,
+        Engine.INTERNAL_ANALYTICAL,
+        Engine.VAPOROCK,
+        Engine.ALPHAMELTS,
+    }
 )
 OXYGEN_BALANCE_NOTICE_PREFIX = "fo2_oxygen_balance_effusion_solved:"
 OxygenBalanceBracketBoundary = Literal["lower", "upper"]

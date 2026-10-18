@@ -1512,6 +1512,18 @@ class _OxygenBalanceRefusal(RuntimeError):
         super().__init__(self.backend_status_reason)
 
 
+class _OxygenBalanceEngineTrialRefusal(_OxygenBalanceRefusal):
+    def __init__(self, cell: Any) -> None:
+        self.cell = cell
+        code = str(
+            getattr(cell, "refusal_reason", None)
+            or getattr(cell, "status", None)
+            or "oxygen_balance_engine_trial_refused"
+        )
+        detail = str(getattr(cell, "engine_reason", None) or code)
+        super().__init__(code, detail)
+
+
 _CELL_OXIDE_GAS_TABLES: dict[str, tuple[tuple[str, str], ...]] = {
     "W": (
         ("WO", "O-027"),
@@ -1650,19 +1662,31 @@ def _solve_cell_oxygen_balance(
     species_metadata: Mapping[str, Any],
     *,
     temperature_K: float,
-    cell_material: str,
-    oxygen_balance_from_pressure_model: Callable[..., Any],
+    cell_material: str | None,
+    oxygen_balance_from_pressure_model: Callable[..., Any] | None = None,
+    bracket: tuple[float, float] = (-30.0, 0.0),
 ) -> tuple[float, Mapping[str, float], Mapping[str, Any], float, dict[str, Any]]:
-    """Add shared JANAF wall gases to one engine's pressure model and solve."""
+    """Add shared JANAF wall gases to an engine's commanded-pO2 pressure model.
 
-    if cell_material not in _CELL_OXIDE_GAS_TABLES:
+    For molar flux, Knudsen effusion gives J_i = p_i / sqrt(2*pi*M_i*R*T),
+    where M_i is molar mass and R is the gas constant. Balancing oxygen atoms
+    over every effusing species, including cell oxides, leaves
+    sum((nu_O,i - parent_demand_i) * p_i / sqrt(M_i)) = 0 because the common
+    sqrt(2*pi*R*T) cancels. For a pure MO evaporating congruently as M + O,
+    the solved p_O*sqrt(M_M)/(p_M*sqrt(M_O)) is 1.
+    """
+
+    if cell_material not in {None, *_CELL_OXIDE_GAS_TABLES}:
         raise _OxygenBalanceRefusal(
             "oxygen_balance_cell_material_invalid",
             f"unknown cell_material {cell_material!r}; expected None, 'W', or 'Mo'",
         )
-    gas_data, buffer_log10_bar, sources = _cell_oxide_thermodynamics(
-        cell_material, temperature_K
-    )
+    if cell_material is None:
+        gas_data, buffer_log10_bar, sources = {}, None, {}
+    else:
+        gas_data, buffer_log10_bar, sources = _cell_oxide_thermodynamics(
+            cell_material, temperature_K
+        )
     if not species_metadata:
         raise _OxygenBalanceRefusal(
             "imcc_gas_oxygen_balance_failed",
@@ -1695,7 +1719,7 @@ def _solve_cell_oxygen_balance(
     all_metadata = {**species_metadata, **cell_metadata}
 
     def combined_pressure_model(logp: float) -> dict[str, float]:
-        pressures = dict(pressure_model(logp))
+        pressures = dict(pressure_model(10.0**logp))
         for species, (gibbs_j, _oxygen_atoms) in gas_data.items():
             log_pressure = (
                 -gibbs_j / (_CELL_GAS_CONSTANT_J_MOL_K * temperature_K)
@@ -1708,17 +1732,29 @@ def _solve_cell_oxygen_balance(
         return pressures
 
     try:
-        pO2_bar, pressures, balance = oxygen_balance_from_pressure_model(
-            combined_pressure_model, all_metadata, bracket=(-30.0, 0.0)
+        if oxygen_balance_from_pressure_model is None:
+            from openimcc import (
+                oxygen_balance_from_pressure_model as oxygen_balance_solver,
+            )
+        else:
+            oxygen_balance_solver = oxygen_balance_from_pressure_model
+        pO2_bar, pressures, balance = oxygen_balance_solver(
+            combined_pressure_model, all_metadata, bracket=bracket
         )
+    except _OxygenBalanceRefusal:
+        raise
     except Exception as exc:  # noqa: BLE001 - preserve engine refusal as typed
         raise _OxygenBalanceRefusal(
             str(getattr(exc, "code", "") or "imcc_gas_oxygen_balance_failed"),
             str(exc),
         ) from exc
 
-    buffer_pinned = math.log10(float(pO2_bar)) > buffer_log10_bar
+    buffer_pinned = (
+        buffer_log10_bar is not None
+        and math.log10(float(pO2_bar)) > buffer_log10_bar
+    )
     if buffer_pinned:
+        assert buffer_log10_bar is not None
         pO2_bar = 10.0**buffer_log10_bar
         pressures = combined_pressure_model(buffer_log10_bar)
         oxygen_flux = math.fsum(
@@ -1781,10 +1817,416 @@ def _solve_cell_oxygen_balance(
         "cell_material": cell_material,
         "cell_oxide_flux_fraction": fraction,
         "buffer_pinned": buffer_pinned,
-        "buffer_pO2_bar": 10.0**buffer_log10_bar,
+        "buffer_pO2_bar": (
+            None if buffer_log10_bar is None else 10.0**buffer_log10_bar
+        ),
         "cell_oxide_janaf_sources": sources,
     }
     return float(pO2_bar), pressures, balance, fraction, info
+
+
+def _gas_formula_for_oxygen_balance(species: Any) -> str:
+    try:
+        from simulator.melt_backend.vaporock import (
+            _GAS_NAMESPACE_SUFFIX,
+            _parent_oxide_for_vaporock_gas,
+        )
+    except Exception as exc:  # noqa: BLE001 - keep adapter metadata failures typed
+        raise _OxygenBalanceRefusal(
+            "oxygen_balance_species_metadata_failed", str(exc)
+        ) from exc
+
+    name = str(species).strip()
+    if name.endswith(_GAS_NAMESPACE_SUFFIX):
+        formula = name[: -len(_GAS_NAMESPACE_SUFFIX)]
+        if "_" in formula:
+            # Catalog channel IDs can carry a chemical formula plus a name
+            # suffix; use their declared parent when that ID is mapped.
+            parent = _parent_oxide_for_vaporock_gas(name)
+            if parent is not None:
+                return parent
+        return formula
+    return name
+
+
+def _vapor_engine_oxygen_balance_species_metadata(
+    channels: Sequence[str],
+) -> dict[str, Any]:
+    """Build common oxygen metadata for channels returned by the engine."""
+
+    try:
+        from openimcc import oxygen_balance_species_metadata
+        from simulator.melt_backend.vaporock import (
+            _parent_oxide_for_vaporock_gas,
+        )
+        from simulator.state import OXIDE_SPECIES
+    except Exception as exc:  # noqa: BLE001 - keep optional-engine failure typed
+        raise _OxygenBalanceRefusal(
+            "oxygen_balance_species_metadata_failed", str(exc)
+        ) from exc
+
+    parent_by_formula: dict[str, str | None] = {}
+    for channel in channels:
+        formula = _gas_formula_for_oxygen_balance(channel)
+        if not formula or formula in parent_by_formula:
+            continue
+        parent = _parent_oxide_for_vaporock_gas(channel)
+        if parent is None and formula in OXIDE_SPECIES:
+            parent = formula
+        if parent is None and formula not in {"O", "O2"}:
+            continue
+        parent_by_formula[formula] = parent
+
+    if not parent_by_formula:
+        raise _OxygenBalanceRefusal(
+            "oxygen_balance_species_metadata_failed",
+            "engine gas catalog has no species with a known parent-oxide balance",
+        )
+    try:
+        return oxygen_balance_species_metadata(parent_by_formula)
+    except Exception as exc:  # noqa: BLE001 - preserve a typed metadata refusal
+        raise _OxygenBalanceRefusal(
+            "oxygen_balance_species_metadata_failed", str(exc)
+        ) from exc
+
+
+def _engine_gas_pressures_bar_for_oxygen_balance(
+    pressures_pa: Mapping[str, Any],
+    species_metadata: Mapping[str, Any],
+) -> dict[str, float]:
+    """Normalize positive engine gas channels to formula keys for the solver."""
+
+    by_formula: dict[str, float] = {}
+    for channel, raw_pressure in pressures_pa.items():
+        formula = _gas_formula_for_oxygen_balance(channel)
+        try:
+            pressure_pa = float(raw_pressure)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise _OxygenBalanceRefusal(
+                "oxygen_balance_engine_pressure_invalid",
+                f"engine pressure for {channel!r} is not numeric: {raw_pressure!r}",
+            ) from exc
+        if not math.isfinite(pressure_pa) or pressure_pa < 0.0:
+            raise _OxygenBalanceRefusal(
+                "oxygen_balance_engine_pressure_invalid",
+                f"engine pressure for {channel!r} is not finite and non-negative",
+            )
+        if formula not in species_metadata:
+            if pressure_pa > 0.0:
+                raise _OxygenBalanceRefusal(
+                    "oxygen_balance_species_metadata_failed",
+                    f"engine returned positive pressure for unmapped gas {channel!r}",
+                )
+            continue
+        if formula in by_formula:
+            raise _OxygenBalanceRefusal(
+                "oxygen_balance_species_metadata_failed",
+                f"engine returned duplicate gas channels for {formula!r}",
+            )
+        by_formula[formula] = pressure_pa / PA_PER_BAR
+    return {formula: by_formula.get(formula, 0.0) for formula in species_metadata}
+
+
+def _solve_vapor_engine_cell_oxygen_balance(
+    engine_call_at_po2: Callable[[float], Any],
+    *,
+    temperature_K: float,
+    cell_material: str | None,
+    fixed_point_activities: bool = False,
+) -> tuple[float, Mapping[str, float], Mapping[str, Any], float, dict[str, Any]]:
+    from simulator.accounting.formulas import resolve_species_formula
+
+    cells_by_po2: dict[float, Any] = {}
+    last_admitted_po2_bar: float | None = None
+    last_refused_trial: tuple[float, _OxygenBalanceEngineTrialRefusal] | None = None
+
+    def cell_at_po2(pO2_bar: float) -> Any:
+        nonlocal last_admitted_po2_bar, last_refused_trial
+        if pO2_bar not in cells_by_po2:
+            cell = engine_call_at_po2(pO2_bar)
+            if getattr(cell, "status", None) != "ok":
+                refusal = _OxygenBalanceEngineTrialRefusal(cell)
+                last_refused_trial = (pO2_bar, refusal)
+                raise refusal
+            for channel, raw_pressure in (
+                getattr(cell, "gas_partial_pressures_Pa", None) or {}
+            ).items():
+                formula = _gas_formula_for_oxygen_balance(channel)
+                try:
+                    contains_hydrogen = (
+                        "H" in resolve_species_formula(formula).elements
+                    )
+                except ValueError:
+                    continue
+                if not contains_hydrogen:
+                    continue
+                try:
+                    pressure_pa = float(raw_pressure)
+                except (TypeError, ValueError, OverflowError):
+                    continue
+                if math.isfinite(pressure_pa) and pressure_pa > 0.0:
+                    raise _OxygenBalanceRefusal(
+                        "h_bearing_channel_in_dry_cell_balance",
+                        "positive H-bearing gas cannot be balanced against a dry "
+                        f"cell: channel={channel!r}; pressure_Pa={pressure_pa:g}",
+                    )
+            cells_by_po2[pO2_bar] = cell
+        last_admitted_po2_bar = pO2_bar
+        return cells_by_po2[pO2_bar]
+
+    start_logp = -6.0
+    start_cell = None
+    starting_refusal_counts: dict[str, int] = {}
+    # -6 is an arbitrary interior seed, not a domain boundary: refusing that
+    # cell says nothing about the solver's log10(pO2/bar) range [-30, 0]. Try
+    # it first, then walk outward by 1 dex, preferring the higher side at each
+    # tie. Rows admitted at -6 therefore keep the same anchor and solver path.
+    # Nearest-to-seed window selection is an algorithmic convention, not a
+    # physical branch choice; expansion never jumps across a refused gap.
+    for candidate_logp in sorted(
+        range(-30, 1),
+        key=lambda logp: (abs(logp - start_logp), logp < start_logp),
+    ):
+        try:
+            start_cell = cell_at_po2(10.0**candidate_logp)
+        except _OxygenBalanceEngineTrialRefusal as exc:
+            guard_reason = exc.reason_code
+            engine_reason = getattr(exc.cell, "engine_reason", None)
+            if engine_reason:
+                guard_reason = f"{guard_reason}: {engine_reason}"
+            starting_refusal_counts[guard_reason] = (
+                starting_refusal_counts.get(guard_reason, 0) + 1
+            )
+            continue
+        start_logp = float(candidate_logp)
+        break
+
+    if start_cell is None:
+        refusal_counts = ", ".join(
+            f"{reason}: {count}"
+            for reason, count in sorted(starting_refusal_counts.items())
+        )
+        raise _OxygenBalanceRefusal(
+            "oxygen_balance_no_admitted_bracket",
+            "no admitted starting cell in log10(pO2/bar) range [-30, 0]; "
+            f"last_admitted_pO2_bar=none; starting-cell guard refusals: {refusal_counts}",
+        )
+
+    channels = list(
+        dict.fromkeys(
+            getattr(start_cell, "gas_partial_pressures_Pa", None) or {}
+        )
+    )
+    species_metadata = _vapor_engine_oxygen_balance_species_metadata(channels)
+    activity_anchor_logp = start_logp
+    activity_anchor_cell = start_cell
+
+    def update_species_metadata(cell: Any) -> None:
+        nonlocal species_metadata
+        candidate_channels = tuple(
+            getattr(cell, "gas_partial_pressures_Pa", None) or {}
+        )
+        new_channels = [
+            channel for channel in candidate_channels if channel not in channels
+        ]
+        if new_channels:
+            channels.extend(new_channels)
+            species_metadata = _vapor_engine_oxygen_balance_species_metadata(
+                channels
+            )
+
+    def pressure_model(pO2_bar: float) -> Mapping[str, float]:
+        cell = cell_at_po2(pO2_bar)
+        invalid = tuple(
+            getattr(cell, "invalid_gas_partial_pressure_components", ()) or ()
+        )
+        if invalid:
+            raise _OxygenBalanceRefusal(
+                "oxygen_balance_engine_pressure_invalid",
+                f"engine returned invalid gas channels {list(invalid)!r}",
+            )
+        if fixed_point_activities:
+            update_species_metadata(cell)
+            anchor_pressures_bar = _engine_gas_pressures_bar_for_oxygen_balance(
+                getattr(activity_anchor_cell, "gas_partial_pressures_Pa", None)
+                or {},
+                species_metadata,
+            )
+            delta_logp = math.log10(pO2_bar) - activity_anchor_logp
+            # Hold the engine's melt activities at the anchor state during this
+            # root solve; only the catalogued pO2 exponents vary. The outer
+            # loop re-equilibrates the engine at the root and refreshes them.
+            return {
+                species: pressure_bar
+                * 10.0 ** (species_metadata[species].pO2_exponent * delta_logp)
+                for species, pressure_bar in anchor_pressures_bar.items()
+            }
+        return _engine_gas_pressures_bar_for_oxygen_balance(
+            getattr(cell, "gas_partial_pressures_Pa", None) or {},
+            species_metadata,
+        )
+
+    previous_root_logp: float | None = None
+    max_fixed_point_iterations = 8
+    # The inner OpenIMCC solve uses Brent xtol=1e-12 dex. Require the
+    # re-anchored engine root to settle to that same resolution before its
+    # pressure map and closure diagnostics are published.
+    fixed_point_tolerance_dex = 1e-12
+    iteration_count = max_fixed_point_iterations if fixed_point_activities else 1
+    for iteration in range(1, iteration_count + 1):
+        low_logp = high_logp = activity_anchor_logp
+        lower_stop: str | None = None
+        upper_stop: str | None = None
+        solution = None
+        while lower_stop is None or upper_stop is None:
+            for side in ("lower", "upper"):
+                if side == "lower":
+                    if lower_stop is not None:
+                        continue
+                    candidate_logp = low_logp - 1.0
+                    if candidate_logp < -30.0:
+                        lower_stop = (
+                            "OpenIMCC Knudsen bracket lower limit "
+                            "log10(pO2/bar)=-30"
+                        )
+                        continue
+                else:
+                    if upper_stop is not None:
+                        continue
+                    candidate_logp = high_logp + 1.0
+                    if candidate_logp > 0.0:
+                        upper_stop = (
+                            "OpenIMCC Knudsen molecular-flow limit pO2=1 bar"
+                        )
+                        continue
+
+                candidate_po2_bar = 10.0**candidate_logp
+                try:
+                    candidate_cell = cell_at_po2(candidate_po2_bar)
+                except _OxygenBalanceEngineTrialRefusal as exc:
+                    stop = (
+                        f"pO2={candidate_po2_bar:g} bar; "
+                        f"guard={exc.backend_status_reason}"
+                    )
+                    if side == "lower":
+                        lower_stop = stop
+                    else:
+                        upper_stop = stop
+                    continue
+
+                update_species_metadata(candidate_cell)
+                if side == "lower":
+                    low_logp = candidate_logp
+                else:
+                    high_logp = candidate_logp
+
+                try:
+                    solution = _solve_cell_oxygen_balance(
+                        pressure_model,
+                        species_metadata,
+                        temperature_K=temperature_K,
+                        cell_material=cell_material,
+                        bracket=(low_logp, high_logp),
+                    )
+                    break
+                except _OxygenBalanceEngineTrialRefusal as exc:
+                    refused_po2 = (
+                        "unknown"
+                        if last_refused_trial is None
+                        else f"{last_refused_trial[0]:g}"
+                    )
+                    raise _OxygenBalanceRefusal(
+                        "oxygen_balance_no_admitted_bracket",
+                        "engine refused a trial while checking an admitted bracket; "
+                        f"last_admitted_pO2_bar={last_admitted_po2_bar!r}; "
+                        f"guard at pO2={refused_po2} bar: "
+                        f"{exc.backend_status_reason}",
+                    ) from exc
+                except _OxygenBalanceRefusal as exc:
+                    detail = str(exc)
+                    no_sign_change = "oxygen-balance root is not bracketed" in detail
+                    above_knudsen_limit = (
+                        "oxygen-balance root lies above pO2 = 1 bar" in detail
+                    )
+                    if not (no_sign_change or above_knudsen_limit):
+                        raise
+
+            if solution is not None:
+                break
+
+        if solution is None:
+            last_admitted = (
+                "none"
+                if last_admitted_po2_bar is None
+                else f"{last_admitted_po2_bar:g} bar"
+            )
+            raise _OxygenBalanceRefusal(
+                "oxygen_balance_no_admitted_bracket",
+                "no sign-changing bracket was found in the admitted pO2 window "
+                "reachable from the chosen start; "
+                f"start_pO2_bar={10.0**activity_anchor_logp:g}; "
+                "searched_window_pO2_bar="
+                f"[{10.0**low_logp:g}, {10.0**high_logp:g}]; "
+                f"lower_stop={lower_stop}; upper_stop={upper_stop}; "
+                "expansion stops at the first refused one-dex trial or solver "
+                "limit on each side and does not establish whether a root exists "
+                "in another admitted window in log10(pO2/bar) range [-30, 0]",
+            )
+
+        if not fixed_point_activities:
+            return solution
+        solved_logp = math.log10(solution[0])
+        activity_anchor_cell = cell_at_po2(solution[0])
+        activity_anchor_logp = solved_logp
+        if (
+            previous_root_logp is not None
+            and abs(solved_logp - previous_root_logp) <= fixed_point_tolerance_dex
+        ):
+            fresh_solution = _solve_cell_oxygen_balance(
+                pressure_model,
+                species_metadata,
+                temperature_K=temperature_K,
+                cell_material=cell_material,
+                bracket=tuple(solution[2]["bracket"]),
+            )
+            fresh_logp = math.log10(fresh_solution[0])
+            if abs(fresh_logp - solved_logp) <= fixed_point_tolerance_dex:
+                # The refreshed solve is within Brent's xtol of this pO2.
+                # Return the pO2 where the engine cell was evaluated so the
+                # pressure and closure diagnostics stay tied to that cell.
+                return (
+                    solution[0],
+                    fresh_solution[1],
+                    fresh_solution[2],
+                    fresh_solution[3],
+                    fresh_solution[4],
+                )
+            if iteration == max_fixed_point_iterations:
+                raise _OxygenBalanceRefusal(
+                    "oxygen_balance_activity_fixed_point_not_converged",
+                    "alphaMELTS fresh-cell oxygen-balance root did not converge; "
+                    f"tolerance={fixed_point_tolerance_dex:g} dex; "
+                    f"last_pO2_bar={fresh_solution[0]:g}",
+                )
+            previous_root_logp = fresh_logp
+            activity_anchor_logp = fresh_logp
+            activity_anchor_cell = cell_at_po2(fresh_solution[0])
+            continue
+        if iteration == max_fixed_point_iterations:
+            raise _OxygenBalanceRefusal(
+                "oxygen_balance_activity_fixed_point_not_converged",
+                "alphaMELTS melt activities did not converge at the oxygen-balance "
+                f"root within {max_fixed_point_iterations} iterations; "
+                f"tolerance={fixed_point_tolerance_dex:g} dex; "
+                f"last_pO2_bar={solution[0]:g}",
+            )
+        previous_root_logp = solved_logp
+        activity_anchor_logp = solved_logp
+
+    raise _OxygenBalanceRefusal(
+        "oxygen_balance_activity_fixed_point_not_converged",
+        "alphaMELTS melt activities did not converge at the oxygen-balance root",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -2034,11 +2476,11 @@ class _OpenImccBatteryBackend:
                             "does not match formula metadata",
                         )
 
-                def pressure_model(logp: float) -> Mapping[str, float]:
+                def pressure_model(pO2_bar: float) -> Mapping[str, float]:
                     return evaluate_gas(
                         result.parent_oxide_activities,
                         temperature_K,
-                        10.0**logp,
+                        pO2_bar,
                         self._gas,
                         parent_oxides=result.parent_oxides,
                         allow_extrapolation=True,
