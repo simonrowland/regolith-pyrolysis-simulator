@@ -18,6 +18,7 @@ review_status: draft
 corrections: []
 species:
   SiO2:
+    observations: []
     context:
       - observation_id: schaefer_fegley_2009_table1_continental_crust
         type: relation
@@ -185,6 +186,7 @@ species:
                     approximate: false
                   as_printed: '5.5 × 10^-4 bars'
           bulk_silicate_earth_at_2200K:
+            locator: {page: 7, published_page: 7, pdf_page_index: 6, section: Results}
             sodium_loss_fraction:
               value:
                 kind: point
@@ -263,6 +265,7 @@ species:
                   approximate: true
                 as_printed: '~10^-7 bars'
           bulk_silicate_earth_temperature_dependence:
+            locator: {page: 8, published_page: 8, pdf_page_index: 7, section: Results}
             sodium_loss_fraction:
               - temperature_K: 1800
                 value:
@@ -294,6 +297,7 @@ species:
                 units: '%'
                 as_printed: '~22%'
           crust_at_2200K:
+            locator: {page: 8, published_page: 8, pdf_page_index: 7, section: Results}
             Na_dominant_until_fraction:
               value:
                 kind: point

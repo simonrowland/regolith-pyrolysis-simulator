@@ -78,6 +78,62 @@ def test_quoted_table_and_model_figures_remain_context_only(tmp_path: Path) -> N
         ]["value"]["kind"]
         == "bound"
     )
+    assert [
+        point["value"]["point"]
+        if "value" in point
+        else [edge["value"]["point"] for edge in point["pressure_endpoints_bar"]]
+        for point in model_results["initial_atmospheric_pressure"]
+    ] == [0.1, 0.0000001, [0.001, 0.00055]]
+
+    bse = model_results["bulk_silicate_earth_at_2200K"]
+    assert bse["locator"]["pdf_page_index"] == 6
+    assert [
+        bse[key]["value"]["point"]
+        for key in (
+            "sodium_loss_fraction",
+            "potassium_loss_fraction",
+            "SiO_peak_fraction",
+            "Mg_dominant_from_fraction",
+            "Fe_most_abundant_at_fraction",
+            "Fe_loss_fraction",
+        )
+    ] == [2, 22, 16, 27, 2, 90]
+    assert bse["refractory_gas_regime_from_fraction"]["value"][
+        "bound_value"
+    ] == 90
+    assert [
+        [edge["value"]["point"] for edge in bse[key]]
+        for key in (
+            "pressure_after_sodium_loss_bar",
+            "pressure_after_90_percent_vaporized_bar",
+        )
+    ] == [[0.001, 0.0001], [0.000001, 0.0000001]]
+
+    temperature_dependence = model_results[
+        "bulk_silicate_earth_temperature_dependence"
+    ]
+    assert temperature_dependence["locator"]["pdf_page_index"] == 7
+    assert [
+        point["value"]["point"]
+        for point in temperature_dependence["sodium_loss_fraction"]
+    ] == [1, 11]
+    assert temperature_dependence["at_1800K"]["Fe_dominant_until_fraction"][
+        "value"]["point"] == 8
+    assert temperature_dependence["at_1800K"]["Mg_dominant_from_fraction"][
+        "value"]["point"] == 22
+
+    crust = model_results["crust_at_2200K"]
+    assert crust["locator"]["pdf_page_index"] == 7
+    assert [
+        crust[key]["value"]["point"]
+        for key in (
+            "Na_dominant_until_fraction",
+            "sodium_persists_until_fraction",
+            "pressure_drop_by_fraction",
+            "continental_crust_potassium_peak_fraction",
+            "continental_crust_potassium_loss_fraction",
+        )
+    ] == [11, 50, 63, 67, 74]
 
     source = EXTRACT.read_text(encoding="utf-8")
     loader = YAML12SafeLoader(source)
