@@ -10810,31 +10810,13 @@ def _initial_composition_authority(initial: Located[Composition]) -> int:
     """Return the ordered authority of an equivalent typed starting value."""
 
     composition = initial.state.value
-    # Higher values win: explicit measured starting analyses (4), source-typed
-    # starts including initial charges (3), catalogue selections (2), then
-    # other proxies (1). When an unflagged value has no measured/nominal
-    # selection metadata, the record cannot distinguish those roles; they tie
-    # at the source-typed level so the existing candidate stays selected.
+    # Composition has no typed measured-versus-nominal marker. Owner-selected
+    # source values, including initial charges, therefore tie; only the typed
+    # catalogue marker and proxy flag can lower or raise their authority.
     if composition.proxy_flag == "composition_from_sample_catalog":
         return 2
     if composition.proxy_flag not in (None, INITIAL_CHARGE_ONLY_PROXY_FLAG):
         return 1
-    provenance = " ".join(
-        (
-            composition.analysis_selection_rule or "",
-            " ".join(initial.inference.inputs)
-            if initial.inference is not None
-            else "",
-            initial.locator.note or "" if initial.locator is not None else "",
-        )
-    ).casefold()
-    explicitly_measured = (
-        re.search(r"\b(?:measured|analytical|epma)\b", provenance) is not None
-        and re.search(r"\b(?:starting|initial|sample assay)\b", provenance)
-        is not None
-    )
-    if explicitly_measured:
-        return 4
     return 3
 
 
