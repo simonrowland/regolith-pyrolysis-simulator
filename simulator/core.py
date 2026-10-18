@@ -9283,6 +9283,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'reason': dict(authority.get('fallback_reason') or {}),
             'held_effective_gamma_notices': list(
                 authority.get('held_effective_gamma_by_parent', {}).values()
+            ) + (
+                [dict(authority['projected_composition_solve'])]
+                if authority.get('projected_composition_solve') else []
             ),
         }
         steps = getattr(self, '_high_t_melt_activity_fallback_steps', None)

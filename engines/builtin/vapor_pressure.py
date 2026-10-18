@@ -886,6 +886,8 @@ def _same_composition_temperature_bridge(
     composition_mol: Mapping[str, float],
     temperature_K: float,
     refusal_types: tuple[type[BaseException], ...],
+    *,
+    activity_basis_mol: Mapping[str, float],
 ) -> dict[str, Any]:
     """Re-solve one composition at T±25, ±50 and ±75 K until it brackets."""
 
@@ -936,7 +938,7 @@ def _same_composition_temperature_bridge(
                     continue
                 activity = _high_t_activity_for_parent(
                     oxide,
-                    composition_mol,
+                    activity_basis_mol,
                     temperature_K=probe_T,
                     authority=probe_authority,
                 )
@@ -1009,6 +1011,7 @@ def _build_high_t_melt_activity_authority(
     hour = controls.get("simulation_hour")
     from simulator.melt_backend.openimcc_bridge import (
         _IMCC_REFUSAL_ERROR_TYPE,
+        _cleaned_melt_projection,
         OpenImccCompositionPolicyRefusal,
         OpenImccUnavailableError,
         evaluate_cleaned_melt,
@@ -1020,12 +1023,62 @@ def _build_high_t_melt_activity_authority(
     )
     if _IMCC_REFUSAL_ERROR_TYPE is not None:
         expected_refusal_types += (_IMCC_REFUSAL_ERROR_TYPE,)
+    solve_composition = composition_mol
+    projection_notice = None
+    projection_classification = None
     try:
-        cleaned = evaluate_cleaned_melt(
-            composition_mol=composition_mol,
-            temperature_K=temperature_K,
-            allow_extrapolation=temperature_K > 3000.0,
-        )
+        try:
+            cleaned = evaluate_cleaned_melt(
+                composition_mol=solve_composition,
+                temperature_K=temperature_K,
+                allow_extrapolation=temperature_K > 3000.0,
+            )
+        except OpenImccCompositionPolicyRefusal as policy_refusal:
+            if policy_refusal.code != "openimcc_projection_over_threshold":
+                raise
+            # d-175 (2026-10-18): composition coverage is not a numerical
+            # gap. Reuse OpenIMCC's projection (including Fe2O3 -> FeO) and
+            # solve the remaining oxide basis at the actual T. Its existing
+            # mole -> wt% conversion normalizes the retained mass to 100%:
+            # w'_i = 100 m_i / sum(retained m), all masses in kg, so w' is
+            # wt%. Dropping a mass fraction f rescales retained weights by
+            # 1/(1-f); f -> 0 recovers the unprojected input. This removes
+            # the omitted components' interactions, not their ledger mass.
+            # A fresh equilibrium tracks current T and retained chemistry;
+            # a frozen gamma can drift for hundreds of kelvin and cannot.
+            # Activities keep the projected pure-liquid reference. Reporting
+            # gamma_eff = a_projected / X_bulk_single absorbs the changed
+            # cation denominator; do NOT dilute a by (1-f), a mass fraction
+            # rather than a cation fraction. Then gamma_eff*X_bulk returns
+            # a_projected exactly (all dimensionless). The omitted chemistry
+            # is unmodelled, so this is extrapolated, never a certificate.
+            _, solve_composition = _cleaned_melt_projection(composition_mol)
+            projection_classification = dict(
+                policy_refusal.diagnostics["composition_projection_classification"]
+            )
+            projection_notice = {
+                "code": "projected_composition_solve",
+                "method": "projected_composition_solve",
+                "authority": "extrapolated",
+                "temperature_K": float(temperature_K),
+                "omitted_component_wt_pct": dict(
+                    projection_classification["dropped_component_wt_pct"]
+                ),
+                "omitted_total_wt_pct": projection_classification["dropped_total_wt_pct"],
+                "projection_threshold_wt_pct": projection_classification["threshold_wt_pct"],
+                "original_refusal": {
+                    "code": policy_refusal.code,
+                    "type": type(policy_refusal).__name__,
+                    "detail": str(policy_refusal),
+                },
+            }
+            base["projected_composition_solve"] = projection_notice
+            base["notices"].append(projection_notice)
+            cleaned = evaluate_cleaned_melt(
+                composition_mol=solve_composition,
+                temperature_K=temperature_K,
+                allow_extrapolation=temperature_K > 3000.0,
+            )
     except expected_refusal_types as exc:
         code = str(getattr(exc, "code", "openimcc_evaluation_refused"))
         diagnostics = getattr(exc, "diagnostics", {})
@@ -1057,14 +1110,14 @@ def _build_high_t_melt_activity_authority(
                 "fallback": True,
                 "authority": "extrapolated",
                 "fallback_reason": fallback_reason,
-                "notices": [fallback_notice],
+                "notices": base["notices"] + [fallback_notice],
                 "activities_by_oxide": {},
                 "openimcc_extrapolated": False,
                 "openimcc_flags": [],
                 "openimcc_notices": [],
                 "composition_projection_classification": (
-                    dict(classification)
-                    if isinstance(classification, Mapping)
+                    dict(projection_classification or classification)
+                    if projection_classification or isinstance(classification, Mapping)
                     else {}
                 ),
             }
@@ -1085,7 +1138,8 @@ def _build_high_t_melt_activity_authority(
         # a gamma.
         bridge_result = (
             _same_composition_temperature_bridge(
-                composition_mol, float(temperature_K), expected_refusal_types,
+                solve_composition, float(temperature_K), expected_refusal_types,
+                activity_basis_mol=composition_mol,
             )
             if code == "imcc_nonconvergence"
             else None
@@ -1101,8 +1155,12 @@ def _build_high_t_melt_activity_authority(
             }
         can_continue = (
             hour is not None and bool(certificates)
-            and code != "openimcc_composition_invalid_input"
+            and not isinstance(exc, OpenImccCompositionPolicyRefusal)
         )
+        # Composition-policy refusals never enter secant/freeze. A projected
+        # numerical refusal bridges the projected composition above.
+        # ImccTOutsideDatapackDomainError keeps its existing secant/freeze
+        # route; the MELTS handoff below 1700 K is t-1314, not d-175.
         if bridge_fits or can_continue:
             composition = _high_t_composition_vector(composition_mol)
             prior_extrapolated = dict(
@@ -1303,6 +1361,14 @@ def _build_high_t_melt_activity_authority(
     if isinstance(relaxed_projection, Mapping):
         base["openimcc_projection_crmn_relaxed"] = dict(relaxed_projection)
 
+    if projection_notice is not None:
+        base.update({
+            "fallback": True,
+            "authority": "extrapolated",
+            "fallback_reason": dict(projection_notice["original_refusal"]),
+            "composition_projection_classification": projection_classification,
+        })
+
     max_abs_dex = 0.0
     for oxide in _HIGH_T_FLUX_OXIDES:
         if oxide == "FeO":
@@ -1405,7 +1471,7 @@ def _build_high_t_melt_activity_authority(
             }
         )
     base["seam_max_abs_ratio_dex"] = max_abs_dex
-    if hour is not None and not bridge.extrapolated:
+    if hour is not None and not bridge.extrapolated and projection_notice is None:
         composition = _high_t_composition_vector(composition_mol)
         previous_temperature = controls.get("high_t_melt_activity_previous_temperature_K")
         # The recorded window is still two observed local steps: thermal
@@ -1511,7 +1577,7 @@ def _high_t_activity_for_parent(
         return legacy
     if parent_oxide in _HIGH_T_ACTIVITY_AUTHORITY_EXCLUSIONS:
         return legacy
-    if authority.get("fallback"):
+    if authority.get("fallback") and authority.get("provider") != "openimcc":
         fallback_reason = dict(authority.get("fallback_reason") or {})
         held = authority.get("held_effective_gamma_by_parent", {}).get(parent_oxide)
         if held is not None:
@@ -1562,9 +1628,12 @@ def _high_t_activity_for_parent(
             f"{authority.get('openimcc_pack_version', '')} "
             f"digest={authority.get('openimcc_pack_digest', '')}"
         ),
-        warning=None,
+        warning=("projected_composition_solve" if authority.get("projected_composition_solve") else None),
         effective_gamma=effective_gamma,
-        activity_model="openimcc_single_cation_activity",
+        activity_model=(
+            "projected_composition_solve" if authority.get("projected_composition_solve")
+            else "openimcc_single_cation_activity"
+        ),
         evidence_tier="PREDICT_AND_FLAG",
         authority_status="openimcc",
     )
@@ -1703,6 +1772,13 @@ def _attach_high_t_activity_provenance(
                     provenance["melt_activity_flag"] = held["flag"]
             if fallback_reason.get("code"):
                 token += f"_{fallback_reason['code']}"
+        projected = authority.get("projected_composition_solve")
+        if projected and exclusion is None:
+            provenance["projected_composition_solve"] = dict(projected)
+            provenance["melt_activity_fallback"] = True
+            if provider == "openimcc":
+                provenance["melt_activity_authority"] = "projected_composition_solve"
+                token = "projected_composition_solve"
         classification = authority.get("composition_projection_classification")
         if classification:
             provenance["composition_projection_classification"] = dict(

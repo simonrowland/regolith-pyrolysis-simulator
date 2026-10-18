@@ -3613,6 +3613,9 @@ def _high_t_melt_activity_fallback_sentence(notice: Mapping[str, Any]) -> str:
     bridged = any(
         item.get("method") == "same_composition_T_bridge" for item in items
     )
+    projected = any(
+        item.get("method") == "projected_composition_solve" for item in items
+    )
     frozen = any(
         item.get("flag") == "extrapolation_capped_frozen" for item in items
     )
@@ -3620,7 +3623,11 @@ def _high_t_melt_activity_fallback_sentence(notice: Mapping[str, Any]) -> str:
         item.get("code") == "hold_last_certified_effective_gamma"
         for item in items
     )
-    if bridged:
+    if projected:
+        prediction = "projected-composition extrapolated predictions"
+        if bridged:
+            prediction += ", with a temperature bridge on the projected composition"
+    elif bridged:
         prediction = "same-composition temperature-bridge predictions"
         if first_order or frozen:
             prediction += (
