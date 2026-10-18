@@ -1,0 +1,793 @@
+schema_version: literature_extract.v1
+source_id: morishita-2004-sio2-partial-enthalpy
+source:
+  citation: 'Morishita, M., Navrotsky, A. and Wilding, M.C. (2004). Direct Measurement of Relative Partial Molar Enthalpy of SiO2 in SiO2-M2O (M = Li, Na, K, Cs) Binary and SiO2-CaO-Al2O3 Ternary Melts. Journal of the American Ceramic Society, 87(8), 1550-1555.'
+  year: 2004
+  corpus_asset: raw/morishita-2004-sio2-partial-enthalpy/morishita-2004-sio2-partial-enthalpy.pdf
+extraction:
+  method: >-
+    Manual transcription from the authoritative pdftotext-layout file. The source is born-digital and has no MinerU table blocks, and the table tool only accepts MinerU content-list tables. All six tables were checked against 600 dpi PDF renders; table III's final SiO2-K2O row prints 21.9 as its final composition although its printed average is 78.1, so the source value is retained as printed.
+  date: '2026-10-18'
+  worker: fam3-1018
+review_status: draft
+fidelity_samples:
+  - path: species.SiO2.observations[morishita_2004_table_iii_na2o_1465k].values.points[0].partial_molar_enthalpy_as_printed
+    value:
+      value: -17.06
+      units: kJ/mol
+      as_printed: '−17.06'
+    locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III'}
+  - path: species.SiO2.observations[morishita_2004_table_iv_li2o_1663k].values.points[0].partial_molar_enthalpy_as_printed
+    value:
+      value: -4.61
+      units: kJ/mol
+      as_printed: '−4.61'
+    locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV'}
+  - path: species.SiO2.observations[morishita_2004_table_vi_cas_1663k].values.points[0].partial_molar_enthalpy_as_printed
+    value:
+      value: -25.38
+      units: kJ/mol
+      as_printed: '−25.38'
+    locator: {page: 5, published_page: 1554, pdf_page_index: 4, table: 'VI'}
+species:
+  SiO2:
+    observations:
+      - observation_id: morishita_2004_table_iii_na2o_1465k
+        type: gibbs_table
+        locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O binary melt series'}
+        phase: l
+        standard_state: Pure liquid SiO2 at the measurement temperature; pressure is not reported.
+        regime: high_temperature_drop_solution_calorimetry
+        units: kJ_per_declared_mol_basis
+        uncertainty:
+          sigma: 3.2
+          units: kJ_per_declared_mol_basis
+          reported_status: estimated
+          confidence_level: not_stated
+          value_semantics: Estimated enthalpy error from Table II footnote d; confidence level not stated.
+        values:
+          quantity: partial_molar_enthalpy
+          method_class: measured_direct
+          formula: SiO2
+          T_K: 1465
+          points:
+            - average_sio2_mol_percent_as_printed: 67.3
+              composition_mol: {SiO2: '0.673', Na2O: '0.327', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -17.06, units: kJ/mol, as_printed: '−17.06'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 1'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.673'], [Na2O, '0.327']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 1 average composition'}}
+            - average_sio2_mol_percent_as_printed: 67.3
+              composition_mol: {SiO2: '0.673', Na2O: '0.327', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -16.98, units: kJ/mol, as_printed: '−16.98'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 2'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.673'], [Na2O, '0.327']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 2 average composition'}}
+            - average_sio2_mol_percent_as_printed: 67.7
+              composition_mol: {SiO2: '0.677', Na2O: '0.323', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -10.97, units: kJ/mol, as_printed: '−10.97'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 3'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.677'], [Na2O, '0.323']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 3 average composition'}}
+            - average_sio2_mol_percent_as_printed: 67.8
+              composition_mol: {SiO2: '0.678', Na2O: '0.322', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -11.99, units: kJ/mol, as_printed: '−11.99'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 4'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.678'], [Na2O, '0.322']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 4 average composition'}}
+            - average_sio2_mol_percent_as_printed: 68.0
+              composition_mol: {SiO2: '0.680', Na2O: '0.320', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -14.56, units: kJ/mol, as_printed: '−14.56'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 5'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.680'], [Na2O, '0.320']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 5 average composition'}}
+            - average_sio2_mol_percent_as_printed: 68.1
+              composition_mol: {SiO2: '0.681', Na2O: '0.319', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -10.27, units: kJ/mol, as_printed: '−10.27'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 6'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.681'], [Na2O, '0.319']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 6 average composition'}}
+            - average_sio2_mol_percent_as_printed: 68.4
+              composition_mol: {SiO2: '0.684', Na2O: '0.316', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -11.49, units: kJ/mol, as_printed: '−11.49'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 7'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.684'], [Na2O, '0.316']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 7 average composition'}}
+            - average_sio2_mol_percent_as_printed: 68.6
+              composition_mol: {SiO2: '0.686', Na2O: '0.314', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -16.07, units: kJ/mol, as_printed: '−16.07'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 8'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.686'], [Na2O, '0.314']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 8 average composition'}}
+            - average_sio2_mol_percent_as_printed: 68.6
+              composition_mol: {SiO2: '0.686', Na2O: '0.314', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -13.71, units: kJ/mol, as_printed: '−13.71'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 9'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.686'], [Na2O, '0.314']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 9 average composition'}}
+      - observation_id: morishita_2004_table_iii_k2o_1465k
+        type: gibbs_table
+        locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O binary melt series'}
+        phase: l
+        standard_state: Pure liquid SiO2 at the measurement temperature; pressure is not reported.
+        regime: high_temperature_drop_solution_calorimetry
+        units: kJ_per_declared_mol_basis
+        uncertainty:
+          sigma: 3.2
+          units: kJ_per_declared_mol_basis
+          reported_status: estimated
+          confidence_level: not_stated
+          value_semantics: Estimated enthalpy error from Table II footnote d; confidence level not stated.
+        values:
+          quantity: partial_molar_enthalpy
+          method_class: measured_direct
+          formula: SiO2
+          T_K: 1465
+          points:
+            - average_sio2_mol_percent_as_printed: 75.2
+              composition_mol: {SiO2: '0.752', K2O: '0.248', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -13.32, units: kJ/mol, as_printed: '−13.32'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 1'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.752'], [K2O, '0.248']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 1 average composition'}}
+            - average_sio2_mol_percent_as_printed: 75.2
+              composition_mol: {SiO2: '0.752', K2O: '0.248', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -10.28, units: kJ/mol, as_printed: '−10.28'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 2'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.752'], [K2O, '0.248']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 2 average composition'}}
+            - average_sio2_mol_percent_as_printed: 75.3
+              composition_mol: {SiO2: '0.753', K2O: '0.247', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -13.83, units: kJ/mol, as_printed: '−13.83'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 3'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.753'], [K2O, '0.247']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 3 average composition'}}
+            - average_sio2_mol_percent_as_printed: 75.5
+              composition_mol: {SiO2: '0.755', K2O: '0.245', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -11.92, units: kJ/mol, as_printed: '−11.92'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 4'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.755'], [K2O, '0.245']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 4 average composition'}}
+            - average_sio2_mol_percent_as_printed: 75.5
+              composition_mol: {SiO2: '0.755', K2O: '0.245', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -9.48, units: kJ/mol, as_printed: '−9.48'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 5'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.755'], [K2O, '0.245']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 5 average composition'}}
+            - average_sio2_mol_percent_as_printed: 75.8
+              composition_mol: {SiO2: '0.758', K2O: '0.242', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -9.13, units: kJ/mol, as_printed: '−9.13'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 6'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.758'], [K2O, '0.242']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 6 average composition'}}
+            - average_sio2_mol_percent_as_printed: 75.9
+              composition_mol: {SiO2: '0.759', K2O: '0.241', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -12.20, units: kJ/mol, as_printed: '−12.20'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 7'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.759'], [K2O, '0.241']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 7 average composition'}}
+            - average_sio2_mol_percent_as_printed: 76.2
+              composition_mol: {SiO2: '0.762', K2O: '0.238', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -6.19, units: kJ/mol, as_printed: '−6.19'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 8'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.762'], [K2O, '0.238']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 8 average composition'}}
+            - average_sio2_mol_percent_as_printed: 76.3
+              composition_mol: {SiO2: '0.763', K2O: '0.237', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -11.36, units: kJ/mol, as_printed: '−11.36'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 9'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.763'], [K2O, '0.237']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 9 average composition'}}
+            - average_sio2_mol_percent_as_printed: 76.8
+              composition_mol: {SiO2: '0.768', K2O: '0.232', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -6.68, units: kJ/mol, as_printed: '−6.68'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 10'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.768'], [K2O, '0.232']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 10 average composition'}}
+            - average_sio2_mol_percent_as_printed: 77.0
+              composition_mol: {SiO2: '0.770', K2O: '0.230', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -10.80, units: kJ/mol, as_printed: '−10.80'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 11'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.770'], [K2O, '0.230']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 11 average composition'}}
+            - average_sio2_mol_percent_as_printed: 77.6
+              composition_mol: {SiO2: '0.776', K2O: '0.224', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -10.74, units: kJ/mol, as_printed: '−10.74'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 12'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.776'], [K2O, '0.224']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 12 average composition'}}
+            - average_sio2_mol_percent_as_printed: 78.1
+              composition_mol: {SiO2: '0.781', K2O: '0.219', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -6.80, units: kJ/mol, as_printed: '−6.80'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 13; final SiO2 cell is 21.9 as printed'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.781'], [K2O, '0.219']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 13 printed average composition'}}
+      - observation_id: morishita_2004_table_iii_cs2o_1465k
+        type: gibbs_table
+        locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O binary melt series'}
+        phase: l
+        standard_state: Pure liquid SiO2 at the measurement temperature; pressure is not reported.
+        regime: high_temperature_drop_solution_calorimetry
+        units: kJ_per_declared_mol_basis
+        uncertainty:
+          sigma: 3.2
+          units: kJ_per_declared_mol_basis
+          reported_status: estimated
+          confidence_level: not_stated
+          value_semantics: Estimated enthalpy error from Table II footnote d; confidence level not stated.
+        values:
+          quantity: partial_molar_enthalpy
+          method_class: measured_direct
+          formula: SiO2
+          T_K: 1465
+          points:
+            - average_sio2_mol_percent_as_printed: 75.5
+              composition_mol: {SiO2: '0.755', Cs2O: '0.245', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -16.48, units: kJ/mol, as_printed: '−16.48'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 1'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.755'], [Cs2O, '0.245']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 1 average composition'}}
+            - average_sio2_mol_percent_as_printed: 76.5
+              composition_mol: {SiO2: '0.765', Cs2O: '0.235', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -14.79, units: kJ/mol, as_printed: '−14.79'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 2'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.765'], [Cs2O, '0.235']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 2 average composition'}}
+            - average_sio2_mol_percent_as_printed: 76.7
+              composition_mol: {SiO2: '0.767', Cs2O: '0.233', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -15.99, units: kJ/mol, as_printed: '−15.99'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 3'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.767'], [Cs2O, '0.233']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 3 average composition'}}
+            - average_sio2_mol_percent_as_printed: 77.2
+              composition_mol: {SiO2: '0.772', Cs2O: '0.228', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -13.90, units: kJ/mol, as_printed: '−13.90'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 4'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.772'], [Cs2O, '0.228']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 4 average composition'}}
+            - average_sio2_mol_percent_as_printed: 77.3
+              composition_mol: {SiO2: '0.773', Cs2O: '0.227', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -14.14, units: kJ/mol, as_printed: '−14.14'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 5'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.773'], [Cs2O, '0.227']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 5 average composition'}}
+            - average_sio2_mol_percent_as_printed: 77.8
+              composition_mol: {SiO2: '0.778', Cs2O: '0.222', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -12.96, units: kJ/mol, as_printed: '−12.96'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 6'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.778'], [Cs2O, '0.222']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 6 average composition'}}
+            - average_sio2_mol_percent_as_printed: 78.3
+              composition_mol: {SiO2: '0.783', Cs2O: '0.217', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -14.97, units: kJ/mol, as_printed: '−14.97'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 7'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.783'], [Cs2O, '0.217']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 7 average composition'}}
+      - observation_id: morishita_2004_table_iv_li2o_1663k
+        type: gibbs_table
+        locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O binary melt series'}
+        phase: l
+        standard_state: Pure liquid SiO2 at the measurement temperature; pressure is not reported.
+        regime: high_temperature_drop_solution_calorimetry
+        units: kJ_per_declared_mol_basis
+        uncertainty:
+          sigma: 5.6
+          units: kJ_per_declared_mol_basis
+          reported_status: estimated
+          confidence_level: not_stated
+          value_semantics: Estimated enthalpy error from Table II footnote d; confidence level not stated.
+        values:
+          quantity: partial_molar_enthalpy
+          method_class: measured_direct
+          formula: SiO2
+          T_K: 1663
+          points:
+            - average_sio2_mol_percent_as_printed: 62.3
+              composition_mol: {SiO2: '0.623', Li2O: '0.377', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -4.61, units: kJ/mol, as_printed: '−4.61'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 1'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.623'], [Li2O, '0.377']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 1 average composition'}}
+            - average_sio2_mol_percent_as_printed: 62.5
+              composition_mol: {SiO2: '0.625', Li2O: '0.375', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -2.83, units: kJ/mol, as_printed: '−2.83'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 2'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.625'], [Li2O, '0.375']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 2 average composition'}}
+            - average_sio2_mol_percent_as_printed: 62.8
+              composition_mol: {SiO2: '0.628', Li2O: '0.372', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -0.60, units: kJ/mol, as_printed: '−0.60'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 3'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.628'], [Li2O, '0.372']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 3 average composition'}}
+            - average_sio2_mol_percent_as_printed: 62.9
+              composition_mol: {SiO2: '0.629', Li2O: '0.371', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -2.05, units: kJ/mol, as_printed: '−2.05'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 4'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.629'], [Li2O, '0.371']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 4 average composition'}}
+            - average_sio2_mol_percent_as_printed: 62.9
+              composition_mol: {SiO2: '0.629', Li2O: '0.371', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: 2.05, units: kJ/mol, as_printed: '2.05'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 5'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.629'], [Li2O, '0.371']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 5 average composition'}}
+            - average_sio2_mol_percent_as_printed: 63.4
+              composition_mol: {SiO2: '0.634', Li2O: '0.366', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: -0.19, units: kJ/mol, as_printed: '−0.19'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 6'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.634'], [Li2O, '0.366']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 6 average composition'}}
+            - average_sio2_mol_percent_as_printed: 63.5
+              composition_mol: {SiO2: '0.635', Li2O: '0.365', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: 2.50, units: kJ/mol, as_printed: '2.50'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 7'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.635'], [Li2O, '0.365']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 7 average composition'}}
+            - average_sio2_mol_percent_as_printed: 63.9
+              composition_mol: {SiO2: '0.639', Li2O: '0.361', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: 0.61, units: kJ/mol, as_printed: '0.61'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 8'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.639'], [Li2O, '0.361']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 8 average composition'}}
+            - average_sio2_mol_percent_as_printed: 66.9
+              composition_mol: {SiO2: '0.669', Li2O: '0.331', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: 3.16, units: kJ/mol, as_printed: '3.16'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 9'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.669'], [Li2O, '0.331']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 9 average composition'}}
+            - average_sio2_mol_percent_as_printed: 67.4
+              composition_mol: {SiO2: '0.674', Li2O: '0.326', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: 2.50, units: kJ/mol, as_printed: '2.50'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 10'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.674'], [Li2O, '0.326']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 10 average composition'}}
+            - average_sio2_mol_percent_as_printed: 67.9
+              composition_mol: {SiO2: '0.679', Li2O: '0.321', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: 4.17, units: kJ/mol, as_printed: '4.17'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 11'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.679'], [Li2O, '0.321']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 11 average composition'}}
+      - observation_id: morishita_2004_table_iv_na2o_1663k
+        type: gibbs_table
+        locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O binary melt series'}
+        phase: l
+        standard_state: Pure liquid SiO2 at the measurement temperature; pressure is not reported.
+        regime: high_temperature_drop_solution_calorimetry
+        units: kJ_per_declared_mol_basis
+        uncertainty:
+          sigma: 5.6
+          units: kJ_per_declared_mol_basis
+          reported_status: estimated
+          confidence_level: not_stated
+          value_semantics: Estimated enthalpy error from Table II footnote d; confidence level not stated.
+        values:
+          quantity: partial_molar_enthalpy
+          method_class: measured_direct
+          formula: SiO2
+          T_K: 1663
+          points:
+            - average_sio2_mol_percent_as_printed: 75.2
+              composition_mol: {SiO2: '0.752', Na2O: '0.248', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: 2.61, units: kJ/mol, as_printed: '2.61'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 1'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.752'], [Na2O, '0.248']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 1 average composition'}}
+            - average_sio2_mol_percent_as_printed: 75.8
+              composition_mol: {SiO2: '0.758', Na2O: '0.242', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: 2.63, units: kJ/mol, as_printed: '2.63'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 2'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.758'], [Na2O, '0.242']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 2 average composition'}}
+            - average_sio2_mol_percent_as_printed: 76.2
+              composition_mol: {SiO2: '0.762', Na2O: '0.238', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: 1.98, units: kJ/mol, as_printed: '1.98'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 3'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.762'], [Na2O, '0.238']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 3 average composition'}}
+            - average_sio2_mol_percent_as_printed: 76.6
+              composition_mol: {SiO2: '0.766', Na2O: '0.234', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: 1.00, units: kJ/mol, as_printed: '1.00'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 4'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.766'], [Na2O, '0.234']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 4 average composition'}}
+            - average_sio2_mol_percent_as_printed: 76.9
+              composition_mol: {SiO2: '0.769', Na2O: '0.231', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: 3.03, units: kJ/mol, as_printed: '3.03'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 5'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.769'], [Na2O, '0.231']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 5 average composition'}}
+            - average_sio2_mol_percent_as_printed: 77.2
+              composition_mol: {SiO2: '0.772', Na2O: '0.228', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: 1.57, units: kJ/mol, as_printed: '1.57'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 6'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.772'], [Na2O, '0.228']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 6 average composition'}}
+      - observation_id: morishita_2004_table_iv_k2o_1663k
+        type: gibbs_table
+        locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O binary melt series'}
+        phase: l
+        standard_state: Pure liquid SiO2 at the measurement temperature; pressure is not reported.
+        regime: high_temperature_drop_solution_calorimetry
+        units: kJ_per_declared_mol_basis
+        uncertainty:
+          sigma: 5.6
+          units: kJ_per_declared_mol_basis
+          reported_status: estimated
+          confidence_level: not_stated
+          value_semantics: Estimated enthalpy error from Table II footnote d; confidence level not stated.
+        values:
+          quantity: partial_molar_enthalpy
+          method_class: measured_direct
+          formula: SiO2
+          T_K: 1663
+          points:
+            - average_sio2_mol_percent_as_printed: 85.2
+              composition_mol: {SiO2: '0.852', K2O: '0.148', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: 0.87, units: kJ/mol, as_printed: '0.87'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 1'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.852'], [K2O, '0.148']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 1 average composition'}}
+            - average_sio2_mol_percent_as_printed: 85.2
+              composition_mol: {SiO2: '0.852', K2O: '0.148', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: 1.51, units: kJ/mol, as_printed: '1.51'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 2'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.852'], [K2O, '0.148']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 2 average composition'}}
+            - average_sio2_mol_percent_as_printed: 85.2
+              composition_mol: {SiO2: '0.852', K2O: '0.148', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: 0.06, units: kJ/mol, as_printed: '0.06'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 3'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.852'], [K2O, '0.148']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 3 average composition'}}
+            - average_sio2_mol_percent_as_printed: 85.4
+              composition_mol: {SiO2: '0.854', K2O: '0.146', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: 2.68, units: kJ/mol, as_printed: '2.68'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 4'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.854'], [K2O, '0.146']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 4 average composition'}}
+            - average_sio2_mol_percent_as_printed: 85.6
+              composition_mol: {SiO2: '0.856', K2O: '0.144', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: 2.29, units: kJ/mol, as_printed: '2.29'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 5'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.856'], [K2O, '0.144']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 5 average composition'}}
+            - average_sio2_mol_percent_as_printed: 85.6
+              composition_mol: {SiO2: '0.856', K2O: '0.144', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: 1.46, units: kJ/mol, as_printed: '1.46'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 6'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.856'], [K2O, '0.144']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 6 average composition'}}
+            - average_sio2_mol_percent_as_printed: 85.9
+              composition_mol: {SiO2: '0.859', K2O: '0.141', basis: printed_mole_fraction}
+              partial_molar_enthalpy_as_printed: {value: 3.06, units: kJ/mol, as_printed: '3.06'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 7'}
+              point_conditions:
+                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.859'], [K2O, '0.141']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 7 average composition'}}
+      - observation_id: morishita_2004_table_vi_cas_1663k
+        type: gibbs_table
+        locator: {page: 5, published_page: 1554, pdf_page_index: 4, table: 'VI', note: 'SiO2-CaO-Al2O3 ternary melt along the printed SiO2-E join'}
+        phase: l
+        standard_state: Pure liquid SiO2 at the measurement temperature; pressure is not reported.
+        regime: high_temperature_drop_solution_calorimetry
+        units: kJ_per_declared_mol_basis
+        uncertainty:
+          sigma: 5.6
+          units: kJ_per_declared_mol_basis
+          reported_status: estimated
+          confidence_level: not_stated
+          value_semantics: Estimated enthalpy error from Table VI footnote; confidence level not stated.
+        values:
+          quantity: partial_molar_enthalpy
+          method_class: measured_direct
+          formula: SiO2
+          T_K: 1663
+          points:
+            - average_sio2_mol_percent_as_printed: 45.3
+              partial_molar_enthalpy_as_printed: {value: -25.38, units: kJ/mol, as_printed: '−25.38'}
+              locator: {page: 5, published_page: 1554, pdf_page_index: 4, table: 'VI', note: 'row 1'}
+              point_conditions:
+                composition: {state: {tag: unknown, reason: not_published}, locator: {page: 5, published_page: 1554, pdf_page_index: 4, table: 'VI', note: 'only SiO2 mol% is given for this ternary series; CaO and Al2O3 row amounts are not printed'}}
+            - average_sio2_mol_percent_as_printed: 45.4
+              partial_molar_enthalpy_as_printed: {value: -16.88, units: kJ/mol, as_printed: '−16.88'}
+              locator: {page: 5, published_page: 1554, pdf_page_index: 4, table: 'VI', note: 'row 2'}
+              point_conditions:
+                composition: {state: {tag: unknown, reason: not_published}, locator: {page: 5, published_page: 1554, pdf_page_index: 4, table: 'VI', note: 'only SiO2 mol% is given for this ternary series; CaO and Al2O3 row amounts are not printed'}}
+            - average_sio2_mol_percent_as_printed: 46.2
+              partial_molar_enthalpy_as_printed: {value: -20.00, units: kJ/mol, as_printed: '−20.00'}
+              locator: {page: 5, published_page: 1554, pdf_page_index: 4, table: 'VI', note: 'row 3'}
+              point_conditions:
+                composition: {state: {tag: unknown, reason: not_published}, locator: {page: 5, published_page: 1554, pdf_page_index: 4, table: 'VI', note: 'only SiO2 mol% is given for this ternary series; CaO and Al2O3 row amounts are not printed'}}
+            - average_sio2_mol_percent_as_printed: 46.4
+              partial_molar_enthalpy_as_printed: {value: -11.27, units: kJ/mol, as_printed: '−11.27'}
+              locator: {page: 5, published_page: 1554, pdf_page_index: 4, table: 'VI', note: 'row 4'}
+              point_conditions:
+                composition: {state: {tag: unknown, reason: not_published}, locator: {page: 5, published_page: 1554, pdf_page_index: 4, table: 'VI', note: 'only SiO2 mol% is given for this ternary series; CaO and Al2O3 row amounts are not printed'}}
+            - average_sio2_mol_percent_as_printed: 46.9
+              partial_molar_enthalpy_as_printed: {value: -3.59, units: kJ/mol, as_printed: '−3.59'}
+              locator: {page: 5, published_page: 1554, pdf_page_index: 4, table: 'VI', note: 'row 5'}
+              point_conditions:
+                composition: {state: {tag: unknown, reason: not_published}, locator: {page: 5, published_page: 1554, pdf_page_index: 4, table: 'VI', note: 'only SiO2 mol% is given for this ternary series; CaO and Al2O3 row amounts are not printed'}}
+            - average_sio2_mol_percent_as_printed: 47.2
+              partial_molar_enthalpy_as_printed: {value: -8.87, units: kJ/mol, as_printed: '−8.87'}
+              locator: {page: 5, published_page: 1554, pdf_page_index: 4, table: 'VI', note: 'row 6'}
+              point_conditions:
+                composition: {state: {tag: unknown, reason: not_published}, locator: {page: 5, published_page: 1554, pdf_page_index: 4, table: 'VI', note: 'only SiO2 mol% is given for this ternary series; CaO and Al2O3 row amounts are not printed'}}
+            - average_sio2_mol_percent_as_printed: 47.6
+              partial_molar_enthalpy_as_printed: {value: -4.76, units: kJ/mol, as_printed: '−4.76'}
+              locator: {page: 5, published_page: 1554, pdf_page_index: 4, table: 'VI', note: 'row 7'}
+              point_conditions:
+                composition: {state: {tag: unknown, reason: not_published}, locator: {page: 5, published_page: 1554, pdf_page_index: 4, table: 'VI', note: 'only SiO2 mol% is given for this ternary series; CaO and Al2O3 row amounts are not printed'}}
+    context:
+      - observation_id: morishita_2004_table_i_initial_compositions
+        type: composition
+        locator: {page: 2, published_page: 1551, pdf_page_index: 1, table: 'I'}
+        units: mol% as printed
+        values:
+          quantity_as_printed: Initial composition of silicate melts used as solvents for calorimetry
+          method_class: measured_direct
+          analyzed_compositions_are_averages_of_five_analyses: true
+          printed_dashes: Absent components are printed as dashes and are not recorded as zero.
+          rows:
+            - system_as_printed: SiO2-Li2O
+              nominal: {Li2O: 38.0, SiO2: 62.0}
+              analyzed: {Li2O: {value: 38.5, as_printed: '38.5*', obtained_by_difference: true}, SiO2: 61.5}
+            - system_as_printed: SiO2-Li2O
+              nominal: {Li2O: 33.3, SiO2: 66.7}
+              analyzed: {Li2O: {value: 34.7, as_printed: '34.7*', obtained_by_difference: true}, SiO2: 65.3}
+            - system_as_printed: SiO2-Na2O
+              nominal: {Na2O: 33.3, SiO2: 66.7}
+              analyzed: {Na2O: 32.4, SiO2: 67.6}
+            - system_as_printed: SiO2-Na2O
+              nominal: {Na2O: 25.0, SiO2: 75.0}
+              analyzed: {Na2O: 24.4, SiO2: 75.6}
+            - system_as_printed: SiO2-K2O
+              nominal: {K2O: 25.0, SiO2: 75.0}
+              analyzed: {K2O: 25.4, SiO2: 74.6}
+            - system_as_printed: SiO2-K2O
+              nominal: {K2O: 15.0, SiO2: 85.0}
+              analyzed: {K2O: 14.6, SiO2: 85.3}
+            - system_as_printed: SiO2-Cs2O
+              nominal: {Cs2O: 25.0, SiO2: 75.0}
+              analyzed: {Cs2O: 24.7, SiO2: 75.3}
+            - system_as_printed: SiO2-CaO-Al2O3
+              nominal: {Al2O3: 12.4, CaO: 42.7, SiO2: 44.9}
+              analyzed: {Al2O3: 12.8, CaO: 42.0, SiO2: 45.2}
+      - observation_id: morishita_2004_table_ii_thermodynamic_cycle
+        type: thermodynamic_example
+        locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'II'}
+        units: kJ mol-1 as printed
+        values:
+          quantity_as_printed: Relative partial molar enthalpy of liquid SiO2 calculated by a thermodynamic cycle
+          cycle_as_printed: 'ΔHbar_SiO2 = measured Δdrop_solution_H_SiO2 − Δvitrification_H_SiO2 − Δ298_to_T_H_SiO2'
+          measured_drop_solution_error:
+            method_class: measured_direct
+            at_1465_K: {value: 2, as_printed: '±2'}
+            at_1663_K: {value: 5, as_printed: '±5'}
+          negative_vitrification_enthalpy:
+            method_class: quoted_attributed
+            attribution: 'NIST-JANAF tables [40], as cited in Table II'
+            value: -8.20
+            uncertainty: 1.2
+            as_printed: '−8.20 ± 1.2'
+          heat_content_from_298_K:
+            method_class: quoted_attributed
+            attribution: 'NIST-JANAF tables [40], as cited in Table II; the authors state that the error is their estimate'
+            at_1465_K: {value: 77.00, uncertainty: 1.5, as_printed: '77.00 ± 1.5'}
+            at_1663_K: {value: 92.50, uncertainty: 1.5, as_printed: '92.50 ± 1.5'}
+          propagated_partial_enthalpy_error:
+            method_class: model_derived
+            at_1465_K: {value: 3.2, as_printed: '±3.2'}
+            at_1663_K: {value: 5.6, as_printed: '±5.6'}
+            confidence_level: not_stated
+      - observation_id: morishita_2004_table_iii_drop_solution_heat
+        type: thermodynamic_example
+        locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III'}
+        units: kJ mol-1 as printed
+        values:
+          quantity_as_printed: Heat of drop solution of SiO2 (Δdrop_solution_H)
+          quantity_token: unavailable
+          schema_gap: No existing Quantity token types the printed heat-of-drop-solution value.
+          method_class: measured_direct
+          uncertainty_as_printed: '±2 kJ mol-1 at 1465 K'
+          rows:
+            - {system_as_printed: SiO2-Na2O, initial_sio2_mol_percent: 67.1, final_sio2_mol_percent: 67.5, drop_solution_enthalpy: 68.14}
+            - {system_as_printed: SiO2-Na2O, initial_sio2_mol_percent: 67.1, final_sio2_mol_percent: 67.5, drop_solution_enthalpy: 68.22}
+            - {system_as_printed: SiO2-Na2O, initial_sio2_mol_percent: 67.5, final_sio2_mol_percent: 67.9, drop_solution_enthalpy: 74.23}
+            - {system_as_printed: SiO2-Na2O, initial_sio2_mol_percent: 67.5, final_sio2_mol_percent: 68.0, drop_solution_enthalpy: 73.21}
+            - {system_as_printed: SiO2-Na2O, initial_sio2_mol_percent: 67.7, final_sio2_mol_percent: 68.3, drop_solution_enthalpy: 70.64}
+            - {system_as_printed: SiO2-Na2O, initial_sio2_mol_percent: 68.0, final_sio2_mol_percent: 68.3, drop_solution_enthalpy: 74.93}
+            - {system_as_printed: SiO2-Na2O, initial_sio2_mol_percent: 68.2, final_sio2_mol_percent: 68.6, drop_solution_enthalpy: 73.71}
+            - {system_as_printed: SiO2-Na2O, initial_sio2_mol_percent: 68.3, final_sio2_mol_percent: 68.9, drop_solution_enthalpy: 69.13}
+            - {system_as_printed: SiO2-Na2O, initial_sio2_mol_percent: 68.3, final_sio2_mol_percent: 68.9, drop_solution_enthalpy: 71.49}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 75.0, final_sio2_mol_percent: 75.4, drop_solution_enthalpy: 71.88}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 75.0, final_sio2_mol_percent: 75.3, drop_solution_enthalpy: 74.92}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 75.0, final_sio2_mol_percent: 75.5, drop_solution_enthalpy: 71.37}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 75.5, final_sio2_mol_percent: 75.6, drop_solution_enthalpy: 73.28}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 75.3, final_sio2_mol_percent: 75.6, drop_solution_enthalpy: 75.72}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 75.6, final_sio2_mol_percent: 76.0, drop_solution_enthalpy: 76.07}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 75.5, final_sio2_mol_percent: 76.3, drop_solution_enthalpy: 73.00}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 76.0, final_sio2_mol_percent: 76.3, drop_solution_enthalpy: 79.01}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 76.1, final_sio2_mol_percent: 76.5, drop_solution_enthalpy: 73.84}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 76.5, final_sio2_mol_percent: 77.0, drop_solution_enthalpy: 78.52}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 76.7, final_sio2_mol_percent: 77.4, drop_solution_enthalpy: 74.40}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 77.4, final_sio2_mol_percent: 77.8, drop_solution_enthalpy: 74.46}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 77.8, final_sio2_mol_percent: 21.9, drop_solution_enthalpy: 78.40}
+            - {system_as_printed: SiO2-Cs2O, initial_sio2_mol_percent: 75.0, final_sio2_mol_percent: 76.1, drop_solution_enthalpy: 68.72}
+            - {system_as_printed: SiO2-Cs2O, initial_sio2_mol_percent: 76.1, final_sio2_mol_percent: 77.0, drop_solution_enthalpy: 70.41}
+            - {system_as_printed: SiO2-Cs2O, initial_sio2_mol_percent: 76.4, final_sio2_mol_percent: 76.9, drop_solution_enthalpy: 69.21}
+            - {system_as_printed: SiO2-Cs2O, initial_sio2_mol_percent: 76.9, final_sio2_mol_percent: 77.5, drop_solution_enthalpy: 71.30}
+            - {system_as_printed: SiO2-Cs2O, initial_sio2_mol_percent: 77.0, final_sio2_mol_percent: 77.8, drop_solution_enthalpy: 71.06}
+            - {system_as_printed: SiO2-Cs2O, initial_sio2_mol_percent: 77.5, final_sio2_mol_percent: 78.0, drop_solution_enthalpy: 72.24}
+            - {system_as_printed: SiO2-Cs2O, initial_sio2_mol_percent: 77.8, final_sio2_mol_percent: 78.8, drop_solution_enthalpy: 70.23}
+      - observation_id: morishita_2004_table_iv_drop_solution_heat
+        type: thermodynamic_example
+        locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV'}
+        units: kJ mol-1 as printed
+        values:
+          quantity_as_printed: Heat of drop solution of SiO2 (Δdrop_solution_H)
+          quantity_token: unavailable
+          schema_gap: No existing Quantity token types the printed heat-of-drop-solution value.
+          method_class: measured_direct
+          uncertainty_as_printed: '±5 kJ mol-1 at 1663 K'
+          rows:
+            - {system_as_printed: SiO2-Li2O, initial_sio2_mol_percent: 62.0, final_sio2_mol_percent: 62.6, drop_solution_enthalpy: 96.09}
+            - {system_as_printed: SiO2-Li2O, initial_sio2_mol_percent: 62.3, final_sio2_mol_percent: 62.6, drop_solution_enthalpy: 97.87}
+            - {system_as_printed: SiO2-Li2O, initial_sio2_mol_percent: 62.6, final_sio2_mol_percent: 63.9, drop_solution_enthalpy: 100.10}
+            - {system_as_printed: SiO2-Li2O, initial_sio2_mol_percent: 62.6, final_sio2_mol_percent: 63.2, drop_solution_enthalpy: 98.65}
+            - {system_as_printed: SiO2-Li2O, initial_sio2_mol_percent: 62.6, final_sio2_mol_percent: 63.2, drop_solution_enthalpy: 102.75}
+            - {system_as_printed: SiO2-Li2O, initial_sio2_mol_percent: 63.2, final_sio2_mol_percent: 63.6, drop_solution_enthalpy: 100.51}
+            - {system_as_printed: SiO2-Li2O, initial_sio2_mol_percent: 63.2, final_sio2_mol_percent: 63.8, drop_solution_enthalpy: 103.20}
+            - {system_as_printed: SiO2-Li2O, initial_sio2_mol_percent: 63.6, final_sio2_mol_percent: 64.3, drop_solution_enthalpy: 101.31}
+            - {system_as_printed: SiO2-Li2O, initial_sio2_mol_percent: 66.7, final_sio2_mol_percent: 67.2, drop_solution_enthalpy: 103.86}
+            - {system_as_printed: SiO2-Li2O, initial_sio2_mol_percent: 67.2, final_sio2_mol_percent: 67.6, drop_solution_enthalpy: 103.20}
+            - {system_as_printed: SiO2-Li2O, initial_sio2_mol_percent: 67.6, final_sio2_mol_percent: 68.1, drop_solution_enthalpy: 104.87}
+            - {system_as_printed: SiO2-Na2O, initial_sio2_mol_percent: 75.0, final_sio2_mol_percent: 75.3, drop_solution_enthalpy: 103.31}
+            - {system_as_printed: SiO2-Na2O, initial_sio2_mol_percent: 75.6, final_sio2_mol_percent: 76.0, drop_solution_enthalpy: 103.33}
+            - {system_as_printed: SiO2-Na2O, initial_sio2_mol_percent: 76.0, final_sio2_mol_percent: 76.4, drop_solution_enthalpy: 102.68}
+            - {system_as_printed: SiO2-Na2O, initial_sio2_mol_percent: 76.4, final_sio2_mol_percent: 76.7, drop_solution_enthalpy: 101.7}
+            - {system_as_printed: SiO2-Na2O, initial_sio2_mol_percent: 76.7, final_sio2_mol_percent: 77.0, drop_solution_enthalpy: 103.73}
+            - {system_as_printed: SiO2-Na2O, initial_sio2_mol_percent: 77.0, final_sio2_mol_percent: 77.3, drop_solution_enthalpy: 102.27}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 85.0, final_sio2_mol_percent: 85.3, drop_solution_enthalpy: 101.57}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 85.0, final_sio2_mol_percent: 85.3, drop_solution_enthalpy: 102.21}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 85.0, final_sio2_mol_percent: 85.3, drop_solution_enthalpy: 100.76}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 85.3, final_sio2_mol_percent: 85.5, drop_solution_enthalpy: 103.38}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 85.5, final_sio2_mol_percent: 85.7, drop_solution_enthalpy: 102.99}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 85.5, final_sio2_mol_percent: 85.7, drop_solution_enthalpy: 102.16}
+            - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 85.7, final_sio2_mol_percent: 86.0, drop_solution_enthalpy: 103.76}
+      - observation_id: morishita_2004_table_vi_drop_solution_heat
+        type: thermodynamic_example
+        locator: {page: 5, published_page: 1554, pdf_page_index: 4, table: 'VI'}
+        units: kJ mol-1 as printed
+        values:
+          quantity_as_printed: Heat of drop solution of SiO2 (Δdrop_solution_H)
+          quantity_token: unavailable
+          schema_gap: No existing Quantity token types the printed heat-of-drop-solution value.
+          method_class: measured_direct
+          uncertainty_as_printed: '±5 kJ mol-1 at 1663 K'
+          rows:
+            - {system_as_printed: SiO2-CaO-Al2O3, initial_sio2_mol_percent: 44.9, final_sio2_mol_percent: 45.7, drop_solution_enthalpy: 75.32}
+            - {system_as_printed: SiO2-CaO-Al2O3, initial_sio2_mol_percent: 44.9, final_sio2_mol_percent: 45.9, drop_solution_enthalpy: 83.82}
+            - {system_as_printed: SiO2-CaO-Al2O3, initial_sio2_mol_percent: 45.7, final_sio2_mol_percent: 46.6, drop_solution_enthalpy: 80.7}
+            - {system_as_printed: SiO2-CaO-Al2O3, initial_sio2_mol_percent: 45.9, final_sio2_mol_percent: 46.9, drop_solution_enthalpy: 89.43}
+            - {system_as_printed: SiO2-CaO-Al2O3, initial_sio2_mol_percent: 46.6, final_sio2_mol_percent: 47.2, drop_solution_enthalpy: 97.11}
+            - {system_as_printed: SiO2-CaO-Al2O3, initial_sio2_mol_percent: 46.9, final_sio2_mol_percent: 47.5, drop_solution_enthalpy: 91.83}
+            - {system_as_printed: SiO2-CaO-Al2O3, initial_sio2_mol_percent: 47.2, final_sio2_mol_percent: 47.9, drop_solution_enthalpy: 95.94}
+      - observation_id: morishita_2004_table_v_nmr_qn_contributions
+        type: thermodynamic_example
+        locator: {page: 4, published_page: 1553, pdf_page_index: 3, table: 'V'}
+        units: percent contribution as printed
+        values:
+          quantity_as_printed: Percent contribution of each Qn unit in silicate glasses
+          quantity_token: unavailable
+          schema_gap: No existing Quantity token types the Qn structural percentages.
+          evidence_class: quoted_attributed
+          attribution: 'Emerson [11] and Maekawa [12], as cited in the Table V caption; percent cells retained as printed.'
+          rows:
+            - {study: Emerson, composition_mol_percent: {Li2O: 20.0, SiO2: 80.0}, Q4: 63, Q3: 24, Q2: 13, Q1: 0, present_study_delta_Hbar_sign: unavailable}
+            - {study: Emerson, composition_mol_percent: {Li2O: 33.3, SiO2: 66.7}, Q4: 14.5, Q3: 71, Q2: 14.5, Q1: 0, present_study_delta_Hbar_sign: positive}
+            - {study: Emerson, composition_mol_percent: {Li2O: 50.0, SiO2: 50.0}, Q4: 0, Q3: 8.5, Q2: 83, Q1: 8.5, present_study_delta_Hbar_sign: unavailable}
+            - {study: Emerson, composition_mol_percent: {Na2O: 20.0, SiO2: 80.0}, Q4: 54, Q3: 40, Q2: 6, Q1: 0, present_study_delta_Hbar_sign: positive}
+            - {study: Emerson, composition_mol_percent: {Na2O: 33.3, SiO2: 66.7}, Q4: 7.5, Q3: 85, Q2: 7.5, Q1: 0, present_study_delta_Hbar_sign: negative}
+            - {study: Emerson, composition_mol_percent: {Na2O: 50.0, SiO2: 50.0}, Q4: 0, Q3: 7.5, Q2: 85, Q1: 7.5, present_study_delta_Hbar_sign: unavailable}
+            - {study: Emerson, composition_mol_percent: {K2O: 20.0, SiO2: 80.0}, Q4: 57, Q3: 35, Q2: 8, Q1: 0, present_study_delta_Hbar_sign: positive}
+            - {study: Emerson, composition_mol_percent: {K2O: 33.3, SiO2: 66.7}, Q4: 5.5, Q3: 89, Q2: 5.5, Q1: 0, present_study_delta_Hbar_sign: unavailable}
+            - {study: Emerson, composition_mol_percent: {K2O: 50.0, SiO2: 50.0}, Q4: 0, Q3: 2, Q2: 96, Q1: 2, present_study_delta_Hbar_sign: unavailable}
+            - {study: Maekawa, composition_mol_percent: {Li2O: 20.0, SiO2: 80.0}, Q4: {value: 53, as_printed: '53b', qualifier: b}, Q3: {value: 44, as_printed: '44b', qualifier: b}, Q2: {value: 3, as_printed: '3b', qualifier: b}, Q1: {value: 0, as_printed: '0b', qualifier: b}, present_study_delta_Hbar_sign: unavailable}
+            - {study: Maekawa, composition_mol_percent: {Li2O: 33.3, SiO2: 66.7}, Q4: 23, Q3: 63, Q2: 14, Q1: 0, present_study_delta_Hbar_sign: positive}
+            - {study: Maekawa, composition_mol_percent: {Li2O: 38.0, SiO2: 62.0}, Q4: {value: 16, as_printed: '16a', qualifier: a}, Q3: {value: 60, as_printed: '60a', qualifier: a}, Q2: {value: 24, as_printed: '24a', qualifier: a}, Q1: {value: 0, as_printed: '0a', qualifier: a}, present_study_delta_Hbar_sign: negative}
+            - {study: Maekawa, composition_mol_percent: {Na2O: 25.0, SiO2: 75.0}, Q4: 38, Q3: 61, Q2: 1, Q1: 0, present_study_delta_Hbar_sign: positive}
+            - {study: Maekawa, composition_mol_percent: {Na2O: 33.3, SiO2: 66.7}, Q4: 10, Q3: 79, Q2: 11, Q1: 0, present_study_delta_Hbar_sign: negative}
+            - {study: Maekawa, composition_mol_percent: {Na2O: 50.0, SiO2: 50.0}, Q4: 0, Q3: 15, Q2: 70, Q1: 15, present_study_delta_Hbar_sign: unavailable}
+            - {study: Maekawa, composition_mol_percent: {K2O: 15.0, SiO2: 85.0}, Q4: {value: 58, as_printed: '58b', qualifier: b}, Q3: {value: 42, as_printed: '42b', qualifier: b}, Q2: {value: 0, as_printed: '0b', qualifier: b}, Q1: {value: 0, as_printed: '0b', qualifier: b}, present_study_delta_Hbar_sign: positive}
+            - {study: Maekawa, composition_mol_percent: {K2O: 25.0, SiO2: 75.0}, Q4: {value: 34, as_printed: '34a', qualifier: a}, Q3: {value: 64, as_printed: '64a', qualifier: a}, Q2: {value: 2, as_printed: '2a', qualifier: a}, Q1: {value: 0, as_printed: '0a', qualifier: a}, present_study_delta_Hbar_sign: negative}
+            - {study: Maekawa, composition_mol_percent: {K2O: 33.3, SiO2: 66.7}, Q4: 6, Q3: 85, Q2: 9, Q1: 0, present_study_delta_Hbar_sign: unavailable}
+            - {study: Maekawa, composition_mol_percent: {K2O: 50.0, SiO2: 50.0}, Q4: 0, Q3: 9, Q2: 83, Q1: 8, present_study_delta_Hbar_sign: unavailable}
+          footnotes:
+            a: Percent contribution obtained by interpolating the original datum [12].
+            b: Percent contribution obtained by extrapolating the original datum [12].
+      - observation_id: morishita_2004_figure_1_binary_enthalpy
+        type: figure_record
+        locator: {page: 4, published_page: 1553, pdf_page_index: 3, figure: '1'}
+        panel: whole_figure
+        attribution: Present study markers; comparison series retain their printed attributions below.
+        units: kJ/mol
+        values:
+          quantity: partial_molar_enthalpy
+          species: SiO2
+          phase: l
+          temperature_as_printed: 1465 K and 1663 K in the referenced Tables III-IV
+          axes_as_printed: {x: mol% SiO2, y: relative partial molar enthalpy ΔHbar_SiO2 (kJ mol-1)}
+          caption: 'Relative partial molar enthalpy of SiO2 in the SiO2-M2O binary system (M = Li, Na, K, Cs), compared with data by Charles, Neudorf, Muller, and Navrotsky.'
+          series:
+            - {name: SiO2-Li2O present study, marker: open square, marker_count: 11, evidence_class: measured_direct}
+            - {name: SiO2-Na2O present study, marker: open triangle, marker_count: 15, evidence_class: measured_direct}
+            - {name: SiO2-K2O present study, marker: open circle, marker_count: 20, evidence_class: measured_direct}
+            - {name: SiO2-Cs2O present study, marker: open diamond, marker_count: 7, evidence_class: measured_direct}
+            - {name: 'Charles [28] Li-Na-K curves', style: dotted curve, marker_count: 0, evidence_class: quoted_attributed, attribution: 'Charles [28]'}
+            - {name: 'Neudorf [33] Na curve', style: dash-dot curve, marker_count: 0, evidence_class: quoted_attributed, attribution: 'Neudorf [33]'}
+            - {name: 'Muller [22] Na curve', style: dash-dot curve, marker_count: 0, evidence_class: quoted_attributed, attribution: 'Muller [22]'}
+            - {name: 'Navrotsky [41] Na-K curves', style: dashed curve, marker_count: 0, evidence_class: model_derived, attribution: 'Navrotsky [41]'}
+          digitisation: deferred to a figure pass
+      - observation_id: morishita_2004_figure_2_binary_partial_entropy
+        type: figure_record
+        locator: {page: 5, published_page: 1554, pdf_page_index: 4, figure: '2'}
+        panel: whole_figure
+        attribution: Present study and ideal Raoultian comparison as printed in the caption.
+        units: J K-1 mol-1
+        values:
+          quantity_as_printed: relative partial molar entropy of SiO2
+          quantity_token: unavailable
+          schema_gap: No existing Quantity token types relative partial molar entropy; Quantity.S is absolute entropy and is not used.
+          species: SiO2
+          phase: l
+          temperature_as_printed_in_discussion: 1873 K
+          axes_as_printed: {x: mol% SiO2, y: relative partial molar entropy ΔSbar_SiO2 (J K-1 mol-1)}
+          caption: 'Relative partial molar entropy of SiO2 in the SiO2-M2O binary system (M = Li, Na, K, Cs), compared with ideal Raoultian relative partial molar entropy.'
+          series:
+            - {name: SiO2-Li2O present study, marker: open square, marker_count: 11, evidence_class: model_derived}
+            - {name: SiO2-Na2O present study, marker: open triangle, marker_count: 15, evidence_class: model_derived}
+            - {name: SiO2-K2O present study, marker: open circle, marker_count: 20, evidence_class: model_derived}
+            - {name: ideal Raoultian relative partial molar entropy, style: dotted curve, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
+      - observation_id: morishita_2004_figure_3_ternary_enthalpy
+        type: figure_record
+        locator: {page: 5, published_page: 1554, pdf_page_index: 4, figure: '3'}
+        panel: whole_figure
+        attribution: Present study markers; Rein [35] curve as printed.
+        units: kJ/mol
+        values:
+          quantity: partial_molar_enthalpy
+          species: SiO2
+          phase: l
+          temperature_as_printed: 1663 K
+          system_as_printed: SiO2-CaO-Al2O3 ternary melt near eutectic E
+          axes_as_printed: {x: mol% SiO2, y: relative partial molar enthalpy ΔHbar_SiO2 (kJ mol-1)}
+          caption: 'Relative partial molar enthalpy of SiO2 in the vicinity of ternary eutectic point E, compared with data calculated from activity by Rein [35].'
+          series:
+            - {name: Present study, marker: filled circle, marker_count: 7, evidence_class: measured_direct}
+            - {name: 'Rein [35] activity-derived curve', style: dotted curve, marker_count: 0, evidence_class: model_derived, attribution: 'Rein [35]'}
+          digitisation: deferred to a figure pass
+      - observation_id: morishita_2004_figure_4_ternary_partial_entropy
+        type: figure_record
+        locator: {page: 5, published_page: 1554, pdf_page_index: 4, figure: '4'}
+        panel: whole_figure
+        attribution: Present study markers and ideal Raoultian comparison as printed in the caption.
+        units: J K-1 mol-1
+        values:
+          quantity_as_printed: relative partial molar entropy of SiO2
+          quantity_token: unavailable
+          schema_gap: No existing Quantity token types relative partial molar entropy; Quantity.S is absolute entropy and is not used.
+          species: SiO2
+          phase: l
+          temperature_state: {tag: unknown, reason: source_caption_and_discussion_conflict}
+          temperature_claims_as_printed:
+            caption: 1663 K
+            discussion: 1873 K
+          system_as_printed: SiO2-CaO-Al2O3 ternary melt near eutectic E
+          axes_as_printed: {x: mol% SiO2, y: relative partial molar entropy ΔSbar_SiO2 (J K-1 mol-1)}
+          caption: 'Relative partial molar entropy of SiO2 in the vicinity of ternary eutectic point E, compared with ideal Raoultian relative partial molar entropy.'
+          series:
+            - {name: Present study, marker: filled circle, marker_count: 7, evidence_class: model_derived}
+            - {name: ideal Raoultian relative partial molar entropy, style: dotted curve, marker_count: 0, evidence_class: model_derived}
+          digitisation: deferred to a figure pass
