@@ -113,10 +113,14 @@ def test_shornikov_2023_table_and_deferred_figures_migrate_as_context() -> None:
         context
         for context in cai_contexts
         if context["observation_id"]
-        == "shornikov_2023_yakovlev_murchison_comparison_context"
+        == "shornikov_2023_murchison_comparison_context"
     )
-    assert murchison["values"]["method_class"] == "quoted_unattributed"
+    assert murchison["values"]["method_class"] == "author_estimate"
     assert "attribution" not in murchison["values"]
+    assert murchison["locator"]["note"] == (
+        "This article's comparison of its CAI type A/B curves with the "
+        "Murchison curve in Fig. 2C (Murchison data: Yakovlev et al. 1987, PDF p4)."
+    )
     assert murchison["values"]["sample_as_printed"] == "Murchison chondrite (CM2)"
     assert murchison["values"]["temperature_ranges_K_as_printed"] == {
         "higher_volatility": "1800–2100",
