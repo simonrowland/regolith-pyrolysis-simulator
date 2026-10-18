@@ -20,6 +20,7 @@ review_status: draft
 corrections: []
 species:
   SiO2:
+    observations: []
     context:
       - observation_id: toguri_1961_experimental_conditions
         type: laboratory_conditions
@@ -43,8 +44,11 @@ species:
           mass_per_briquette_g: 10
           spring_balance_weight_change_as_printed: 0.020 ± 0.005 g
           degassing_temperature_C: 750
+          degassing_locator: {page: 542, published_page: 542, pdf_page_index: 2}
           degassing_duration_min: 10
+          degassing_duration_locator: {page: 542, published_page: 542, pdf_page_index: 2}
           time_to_reach_operating_temperature_min: [2, 5]
+          heat_up_locator: {page: 542, published_page: 542, pdf_page_index: 2}
           system_pressure_during_run:
             value:
               kind: point
@@ -52,6 +56,7 @@ species:
               approximate: true
             units: micron of Hg
             as_printed: approximately one micron
+            locator: {page: 542, published_page: 542, pdf_page_index: 2}
           blank_run_result: MgO-only briquettes had negligible weight loss over 1100–1440 °C.
       - observation_id: toguri_1961_measured_results_in_prose
         type: relation
@@ -81,6 +86,48 @@ species:
             temperature_C: 1350
             duration_h: 1
             result: no measurable loss in weight after one hour
+      - observation_id: toguri_1961_measured_residue_xrd_phases
+        type: relation
+        locator:
+          page: 545
+          published_page: 545
+          pdf_page_index: 5
+          section: Results and Discussion
+        phase: solid reaction residue
+        units: °C and qualitative phase identification as printed
+        values:
+          method_class: measured_direct
+          quantity_as_printed: X-ray identification of reaction residue phases
+          below_1280C:
+            temperature_condition: below 1280 °C
+            phases: [MgO, Mg2SiO4, Si]
+          above_1280C:
+            temperature_condition: above 1280 °C
+            phases: [MgO, Mg2SiO4]
+          method_as_printed: X-ray diffraction
+      - observation_id: toguri_1961_measured_mg2si_dissociation
+        type: relation
+        locator:
+          page: 546
+          published_page: 546
+          pdf_page_index: 6
+          section: Results and Discussion
+        phase: magnesium silicide and reaction residue
+        units: °C and qualitative reaction/X-ray results as printed
+        values:
+          method_class: measured_direct
+          quantity_as_printed: Mg2Si dissociation and effect on MgO-silicon reduction
+          added_Mg2Si_dissociation:
+            temperature_C: 1100
+            atmosphere: vacuum
+            reaction_as_printed: Mg2Si = 2Mg(g) + Si
+            result: complete dissociation
+            verification: X-ray diffraction
+          replacement_of_silicon_with_Mg2Si:
+            reaction_rate_change: none
+          reaction_residue:
+            magnesium_silicides_present: false
+            verification: X-ray diffraction
       - observation_id: toguri_1961_table1_calculated_reaction_thermodynamics
         type: relation
         locator:

@@ -38,6 +38,42 @@ def test_reaction_table_and_deferred_figures_remain_context_only(
     ]
     assert table["locator"]["pdf_page_index"] == 5
 
+    conditions = by_id["toguri_1961_experimental_conditions"]["values"]
+    assert conditions["degassing_temperature_C"] == 750
+    assert conditions["degassing_locator"]["pdf_page_index"] == 2
+    assert conditions["degassing_duration_min"] == 10
+    assert conditions["degassing_duration_locator"]["pdf_page_index"] == 2
+    assert conditions["time_to_reach_operating_temperature_min"] == [2, 5]
+    assert conditions["heat_up_locator"]["pdf_page_index"] == 2
+    assert conditions["system_pressure_during_run"]["locator"][
+        "pdf_page_index"
+    ] == 2
+
+    residue = by_id["toguri_1961_measured_residue_xrd_phases"]
+    assert residue["locator"]["pdf_page_index"] == 5
+    assert residue["values"]["below_1280C"]["phases"] == [
+        "MgO",
+        "Mg2SiO4",
+        "Si",
+    ]
+    assert residue["values"]["above_1280C"]["phases"] == ["MgO", "Mg2SiO4"]
+
+    dissociation = by_id["toguri_1961_measured_mg2si_dissociation"]
+    assert dissociation["locator"]["pdf_page_index"] == 6
+    assert dissociation["values"]["added_Mg2Si_dissociation"] == {
+        "temperature_C": 1100,
+        "atmosphere": "vacuum",
+        "reaction_as_printed": "Mg2Si = 2Mg(g) + Si",
+        "result": "complete dissociation",
+        "verification": "X-ray diffraction",
+    }
+    assert dissociation["values"]["replacement_of_silicon_with_Mg2Si"][
+        "reaction_rate_change"
+    ] == "none"
+    assert dissociation["values"]["reaction_residue"][
+        "magnesium_silicides_present"
+    ] is False
+
     quoted = by_id["toguri_1961_quoted_silicon_vapor_pressure"]["values"]
     assert quoted["method_class"] == quoted["evidence_class"] == "quoted_attributed"
     assert quoted["value"]["approximate"] is True
