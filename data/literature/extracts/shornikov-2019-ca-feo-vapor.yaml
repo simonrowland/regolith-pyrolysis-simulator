@@ -1,0 +1,1572 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2019-ca-feo-vapor
+source:
+  citation: Shornikov, S. I., and M. S. Shornikova (2019), “Thermodynamic properties of the CaO–FeO melts,” Experiment in Geosciences 25(1), 82–85.
+  year: 2019
+  corpus_asset: raw/shornikov-2019-ca-feo-vapor/shornikov-2019-ca-feo-vapor.pdf
+extraction:
+  method: >-
+    MinerU table_draft emit; all 16 emitted numeric cells agree with the exact
+    pdftotext layer and their row/column assignments were checked against a
+    600 dpi render of PDF page 3. No table values were hand-corrected.
+  date: '2026-10-18'
+  worker: trial-lmax-1018
+review_status: draft
+skipped_empty_or_dash:
+  total: 17
+  tables:
+  - page: 3
+    table_index: 1
+    count: 17
+fidelity_samples:
+  - species: CaO
+    observable: gibbs_table
+    observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r03_c02
+    field: value
+    value: '-435.296'
+    locator:
+      page: 3
+      published_page: 84
+      pdf_page_index: 2
+      table: '1'
+  - species: CaO
+    observable: gibbs_table
+    observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r03_c04
+    field: value
+    value: '-422.317'
+    locator:
+      page: 3
+      published_page: 84
+      pdf_page_index: 2
+      table: '1'
+  - species: Ca
+    observable: gibbs_table
+    observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r03_c06
+    field: value
+    value: '-9.985'
+    locator:
+      page: 3
+      published_page: 84
+      pdf_page_index: 2
+      table: '1'
+experiments:
+- experiment_id: shornikov-2019-table1
+  kind: thermodynamic_model
+  locator: {page: 3, pdf_page_index: 2, published_page: 84, table: '1'}
+  method: >-
+    The paper reports present-study calculations within the theory of ideal
+    associated solutions; the table does not give per-row model input lineage.
+- experiment_id: ban-ya-1980-fig2a
+  kind: literature
+  locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
+  citation: Ban-Ya et al. (1980), as attributed in the Figure 2 caption.
+  method: Hydrogen-water gas mixture equilibria with slag, as described in the text.
+- experiment_id: fujita-1968-fig2b
+  kind: literature
+  locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
+  citation: Fujita et al. (1968), as attributed in the Figure 2 caption.
+  method: Oxygen distribution between molten iron and slag, as described in the text.
+- experiment_id: shornikov-2019-model-curves
+  kind: thermodynamic_model
+  locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2'}
+  method: Present-study activity calculations within the ideal associated solution model.
+- experiment_id: oelsen-maetz-1941
+  kind: literature
+  locator: {page: 2, pdf_page_index: 1, published_page: 82, section: Introduction}
+  citation: Oelsen and Maetz (1941), as attributed in the text.
+- experiment_id: allen-snow-1955
+  kind: literature
+  locator: {page: 2, pdf_page_index: 1, published_page: 82, section: Introduction}
+  citation: Allen and Snow (1955), as attributed in the text.
+- experiment_id: shugurov-2005
+  kind: literature
+  locator: {page: 2, pdf_page_index: 1, published_page: 82, section: Introduction}
+  citation: Shugurov et al. (2005), as attributed in the text.
+species:
+  CaO:
+    observations:
+    - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r03_c02
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: 'CaO'
+        column_header: 'Condensed phases  $\Delta G^{\circ}_{1873}$ , kJ/mol'
+        published_page: 84
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1873'
+        value: '-435.296'
+        attribution: Table 1 caption says the values were calculated in the present study. The paper cites source data for the model but does not provide per-row input lineage, so these are attributed values rather than model_derived rows.
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator: &id001
+            page: 3
+            pdf_page_index: 2
+            published_page: 84
+            table: '1'
+            column_header: ΔG°1873, kJ/mol
+            note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+    - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r03_c04
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: 'CaO'
+        column_header: 'Condensed phases  $\Delta G^{\circ}_{1873}$ , kJ/mol'
+        published_page: 84
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1873'
+        value: '-422.317'
+        attribution: Table 1 caption says the values were calculated in the present study. The paper cites source data for the model but does not provide per-row input lineage, so these are attributed values rather than model_derived rows.
+      phase: l
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator: *id001
+    - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r05_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: 'CaO'
+        column_header: 'Gas phase  $\Delta G^{\circ}_{1873}$ , kJ/mol'
+        published_page: 84
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1873'
+        value: '-68.953'
+        attribution: Table 1 caption says the values were calculated in the present study. The paper cites source data for the model but does not provide per-row input lineage, so these are attributed values rather than model_derived rows.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator: &id003
+            page: 3
+            pdf_page_index: 2
+            published_page: 84
+            table: '1'
+            column_header: ΔG°1873, kJ/mol
+            note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+    - observation_id: shornikov_2019_fig2_cao_panel_a_curve_4
+      type: activity_coefficient
+      experiment: shornikov-2019-model-curves
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '2'
+        panel: a
+        curve: '4'
+      phase: l
+      units: dimensionless activity; FeO mol% as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1673'}}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no mole-percent composition basis exists in the schema.'}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
+        component: CaO
+        activity_basis_as_published: a_CaO
+        curve_number: '4'
+        T_K: '1673'
+        attribution: Wu et al. (1993)
+    - observation_id: shornikov_2019_fig2_cao_panel_a_curve_6
+      type: activity_coefficient
+      experiment: shornikov-2019-model-curves
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '2'
+        panel: a
+        curve: '6'
+      phase: l
+      units: dimensionless activity; FeO mol% as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1673'}}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no mole-percent composition basis exists in the schema.'}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
+        component: CaO
+        activity_basis_as_published: a_CaO
+        curve_number: '6'
+        attribution: Bjorkvall et al. (2001)
+    - observation_id: shornikov_2019_fig2_cao_panel_a_curve_8
+      type: activity_coefficient
+      experiment: shornikov-2019-model-curves
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '2'
+        panel: a
+        curve: '8'
+      phase: l
+      units: dimensionless activity; FeO mol% as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1673'}}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no mole-percent composition basis exists in the schema.'}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
+        component: CaO
+        activity_basis_as_published: a_CaO
+        curve_number: '8'
+        attribution: the present study
+    - observation_id: shornikov_2019_fig2_cao_panel_b_curve_4
+      type: activity_coefficient
+      experiment: shornikov-2019-model-curves
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '2'
+        panel: b
+        curve: '4'
+      phase: l
+      units: dimensionless activity; FeO mol% as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1873'}}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no mole-percent composition basis exists in the schema.'}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
+        component: CaO
+        activity_basis_as_published: a_CaO
+        curve_number: '4'
+        attribution: Wu et al. (1993)
+    - observation_id: shornikov_2019_fig2_cao_panel_b_curve_6
+      type: activity_coefficient
+      experiment: shornikov-2019-model-curves
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '2'
+        panel: b
+        curve: '6'
+      phase: l
+      units: dimensionless activity; FeO mol% as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1873'}}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no mole-percent composition basis exists in the schema.'}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
+        component: CaO
+        activity_basis_as_published: a_CaO
+        curve_number: '6'
+        attribution: Bjorkvall et al. (2001)
+    - observation_id: shornikov_2019_fig2_cao_panel_b_curve_8
+      type: activity_coefficient
+      experiment: shornikov-2019-model-curves
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '2'
+        panel: b
+        curve: '8'
+      phase: l
+      units: dimensionless activity; FeO mol% as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1873'}}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no mole-percent composition basis exists in the schema.'}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
+        component: CaO
+        activity_basis_as_published: a_CaO
+        curve_number: '8'
+        attribution: the present study
+  Ca:
+    observations:
+    - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r03_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: 'Ca'
+        column_header: 'Gas phase  $\Delta G^{\circ}_{1873}$ , kJ/mol'
+        published_page: 84
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1873'
+        value: '-9.985'
+        attribution: Table 1 caption says the values were calculated in the present study. The paper cites source data for the model but does not provide per-row input lineage, so these are attributed values rather than model_derived rows.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator: *id001
+  CaFeO2:
+    observations:
+    - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r04_c02
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: '$CaFeO_2$'
+        column_header: 'Condensed phases  $\Delta G^{\circ}_{1873}$ , kJ/mol'
+        published_page: 84
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1873'
+        value: '-599.816'
+        attribution: Table 1 caption says the values were calculated in the present study. The paper cites source data for the model but does not provide per-row input lineage, so these are attributed values rather than model_derived rows.
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator: &id002
+            page: 3
+            pdf_page_index: 2
+            published_page: 84
+            table: '1'
+            column_header: ΔG°1873, kJ/mol
+            note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+    - observation_id: shornikov_2019_cafeo2_delta_fh298_shugurov_2005
+      experiment: shugurov-2005
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 82
+        section: Introduction
+        note: The cited calculation is described in the sentence on CaFeO2 formation enthalpy.
+      units: kJ/mol
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '298'}}
+          locator: {page: 2, pdf_page_index: 1, published_page: 82, section: Introduction, note: 'ΔfH298'}
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_K: '298'
+        value: '-213.7'
+        attribution: Shugurov et al. (2005), as cited by Shornikov and Shornikova (2019).
+        quote: The calculated value of the enthalpy of formation (ΔfH298) was equal to −213.7 kJ/mol.
+  Ca2:
+    observations:
+    - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r04_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: '$Ca_2$'
+        column_header: 'Gas phase  $\Delta G^{\circ}_{1873}$ , kJ/mol'
+        published_page: 84
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1873'
+        value: '90.363'
+        attribution: Table 1 caption says the values were calculated in the present study. The paper cites source data for the model but does not provide per-row input lineage, so these are attributed values rather than model_derived rows.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator: *id002
+  FeO:
+    observations:
+    - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r05_c02
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: 'FeO'
+        column_header: 'Condensed phases  $\Delta G^{\circ}_{1873}$ , kJ/mol'
+        published_page: 84
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1873'
+        value: '-153.762'
+        attribution: Table 1 caption says the values were calculated in the present study. The paper cites source data for the model but does not provide per-row input lineage, so these are attributed values rather than model_derived rows.
+      phase: cr
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator: *id003
+    - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r05_c04
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: 'FeO'
+        column_header: 'Condensed phases  $\Delta G^{\circ}_{1873}$ , kJ/mol'
+        published_page: 84
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1873'
+        value: '-157.951'
+        attribution: Table 1 caption says the values were calculated in the present study. The paper cites source data for the model but does not provide per-row input lineage, so these are attributed values rather than model_derived rows.
+      phase: l
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator: *id003
+    - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r08_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: 'FeO'
+        column_header: 'Gas phase  $\Delta G^{\circ}_{1873}$ , kJ/mol'
+        published_page: 84
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1873'
+        value: '76.891'
+        attribution: Table 1 caption says the values were calculated in the present study. The paper cites source data for the model but does not provide per-row input lineage, so these are attributed values rather than model_derived rows.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 84
+            table: '1'
+            column_header: ΔG°1873, kJ/mol
+            note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+    - observation_id: shornikov_2019_fig2_panel_a_ban_ya_or_fujita_markers
+      experiment: ban-ya-1980-fig2a
+      type: activity_coefficient
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '2'
+        panel: a
+        marker_symbol: '1'
+        markers: 1-18
+      phase: l
+      units: dimensionless activity; FeO mol% as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1673'}}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
+        composition:
+          state: {tag: unknown, reason: 'FeO mol% is printed, but the schema has no mole-percent composition basis; original x values are retained per point and these reads are typed-refused.'}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: FeO mol% composition cannot be represented by the existing composition basis token.
+        component: FeO
+        attribution: Ban-Ya et al. (1980)
+        marker_symbol: '1'
+        activity_basis_as_published: a_FeO
+        composition_axis_as_published: FeO mol%
+        read_count_per_marker: 2
+        marker_count: 18
+        points:
+        - marker: 1
+          T_K: '1673'
+          FeO_mol_pct_as_read: 59
+          activity: 0.47
+          read_uncertainty_dex: 0
+          read_1:
+            pixel_xy_crop: [733, 576]
+            FeO_mol_pct: 59.2628
+            activity: 0.4679
+          read_2:
+            pixel_xy_crop: [734, 576]
+            FeO_mol_pct: 59.2949
+            activity: 0.4679
+        - marker: 2
+          T_K: '1673'
+          FeO_mol_pct_as_read: 61
+          activity: 0.51
+          read_uncertainty_dex: 0.0004
+          read_1:
+            pixel_xy_crop: [800, 528]
+            FeO_mol_pct: 61.4103
+            activity: 0.5146
+          read_2:
+            pixel_xy_crop: [801, 529]
+            FeO_mol_pct: 61.4423
+            activity: 0.5136
+        - marker: 3
+          T_K: '1673'
+          FeO_mol_pct_as_read: 67
+          activity: 0.56
+          read_uncertainty_dex: 0
+          read_1:
+            pixel_xy_crop: [970, 478]
+            FeO_mol_pct: 66.859
+            activity: 0.5632
+          read_2:
+            pixel_xy_crop: [972, 478]
+            FeO_mol_pct: 66.9231
+            activity: 0.5632
+        - marker: 4
+          T_K: '1673'
+          FeO_mol_pct_as_read: 69
+          activity: 0.57
+          read_uncertainty_dex: 0.0029
+          read_1:
+            pixel_xy_crop: [1022, 464]
+            FeO_mol_pct: 68.5256
+            activity: 0.5768
+          read_2:
+            pixel_xy_crop: [1026, 472]
+            FeO_mol_pct: 68.6538
+            activity: 0.5691
+        - marker: 5
+          T_K: '1673'
+          FeO_mol_pct_as_read: 70
+          activity: 0.6
+          read_uncertainty_dex: 0.0007
+          read_1:
+            pixel_xy_crop: [1065, 437]
+            FeO_mol_pct: 69.9038
+            activity: 0.6031
+          read_2:
+            pixel_xy_crop: [1070, 439]
+            FeO_mol_pct: 70.0641
+            activity: 0.6012
+        - marker: 6
+          T_K: '1673'
+          FeO_mol_pct_as_read: 71
+          activity: 0.65
+          read_uncertainty_dex: 0.0003
+          read_1:
+            pixel_xy_crop: [1112, 385]
+            FeO_mol_pct: 71.4103
+            activity: 0.6537
+          read_2:
+            pixel_xy_crop: [1110, 386]
+            FeO_mol_pct: 71.3462
+            activity: 0.6527
+        - marker: 7
+          T_K: '1673'
+          FeO_mol_pct_as_read: 73
+          activity: 0.65
+          read_uncertainty_dex: 0.0016
+          read_1:
+            pixel_xy_crop: [1152, 384]
+            FeO_mol_pct: 72.6923
+            activity: 0.6547
+          read_2:
+            pixel_xy_crop: [1153, 389]
+            FeO_mol_pct: 72.7244
+            activity: 0.6498
+        - marker: 8
+          T_K: '1673'
+          FeO_mol_pct_as_read: 77
+          activity: 0.7
+          read_uncertainty_dex: 0.0003
+          read_1:
+            pixel_xy_crop: [1269, 333]
+            FeO_mol_pct: 76.4423
+            activity: 0.7043
+          read_2:
+            pixel_xy_crop: [1274, 334]
+            FeO_mol_pct: 76.6026
+            activity: 0.7033
+        - marker: 9
+          T_K: '1673'
+          FeO_mol_pct_as_read: 77
+          activity: 0.71
+          read_uncertainty_dex: 0.0003
+          read_1:
+            pixel_xy_crop: [1294, 329]
+            FeO_mol_pct: 77.2436
+            activity: 0.7082
+          read_2:
+            pixel_xy_crop: [1295, 330]
+            FeO_mol_pct: 77.2756
+            activity: 0.7072
+        - marker: 10
+          T_K: '1673'
+          FeO_mol_pct_as_read: 79
+          activity: 0.75
+          read_uncertainty_dex: 0.0006
+          read_1:
+            pixel_xy_crop: [1354, 281]
+            FeO_mol_pct: 79.1667
+            activity: 0.7549
+          read_2:
+            pixel_xy_crop: [1353, 283]
+            FeO_mol_pct: 79.1346
+            activity: 0.7529
+        - marker: 11
+          T_K: '1673'
+          FeO_mol_pct_as_read: 81
+          activity: 0.77
+          read_uncertainty_dex: 0.0003
+          read_1:
+            pixel_xy_crop: [1412, 271]
+            FeO_mol_pct: 81.0256
+            activity: 0.7646
+          read_2:
+            pixel_xy_crop: [1413, 270]
+            FeO_mol_pct: 81.0577
+            activity: 0.7656
+        - marker: 12
+          T_K: '1673'
+          FeO_mol_pct_as_read: 83
+          activity: 0.8
+          read_uncertainty_dex: 0
+          read_1:
+            pixel_xy_crop: [1480, 232]
+            FeO_mol_pct: 83.2051
+            activity: 0.8025
+          read_2:
+            pixel_xy_crop: [1483, 232]
+            FeO_mol_pct: 83.3013
+            activity: 0.8025
+        - marker: 13
+          T_K: '1673'
+          FeO_mol_pct_as_read: 86
+          activity: 0.87
+          read_uncertainty_dex: 0.0005
+          read_1:
+            pixel_xy_crop: [1566, 166]
+            FeO_mol_pct: 85.9615
+            activity: 0.8667
+          read_2:
+            pixel_xy_crop: [1568, 168]
+            FeO_mol_pct: 86.0256
+            activity: 0.8648
+        - marker: 14
+          T_K: '1673'
+          FeO_mol_pct_as_read: 88
+          activity: 0.86
+          read_uncertainty_dex: 0.0002
+          read_1:
+            pixel_xy_crop: [1629, 175]
+            FeO_mol_pct: 87.9808
+            activity: 0.858
+          read_2:
+            pixel_xy_crop: [1630, 176]
+            FeO_mol_pct: 88.0128
+            activity: 0.857
+        - marker: 15
+          T_K: '1673'
+          FeO_mol_pct_as_read: 89
+          activity: 0.9
+          read_uncertainty_dex: 0.0009
+          read_1:
+            pixel_xy_crop: [1658, 135]
+            FeO_mol_pct: 88.9103
+            activity: 0.8969
+          read_2:
+            pixel_xy_crop: [1658, 131]
+            FeO_mol_pct: 88.9103
+            activity: 0.9008
+        - marker: 16
+          T_K: '1673'
+          FeO_mol_pct_as_read: 89
+          activity: 0.92
+          read_uncertainty_dex: 0
+          read_1:
+            pixel_xy_crop: [1664, 107]
+            FeO_mol_pct: 89.1026
+            activity: 0.9241
+          read_2:
+            pixel_xy_crop: [1662, 107]
+            FeO_mol_pct: 89.0385
+            activity: 0.9241
+        - marker: 17
+          T_K: '1673'
+          FeO_mol_pct_as_read: 91
+          activity: 0.96
+          read_uncertainty_dex: 0.0002
+          read_1:
+            pixel_xy_crop: [1731, 69]
+            FeO_mol_pct: 91.25
+            activity: 0.9611
+          read_2:
+            pixel_xy_crop: [1732, 70]
+            FeO_mol_pct: 91.2821
+            activity: 0.9601
+        - marker: 18
+          T_K: '1673'
+          FeO_mol_pct_as_read: 94
+          activity: 0.98
+          read_uncertainty_dex: 0
+          read_1:
+            pixel_xy_crop: [1813, 45]
+            FeO_mol_pct: 93.8782
+            activity: 0.9844
+          read_2:
+            pixel_xy_crop: [1813, 45]
+            FeO_mol_pct: 93.8782
+            activity: 0.9844
+
+    - observation_id: shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers
+      experiment: fujita-1968-fig2b
+      type: activity_coefficient
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '2'
+        panel: b
+        marker_symbol: '2'
+        markers: 1-18
+      phase: l
+      units: dimensionless activity; FeO mol% as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1873'}}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
+        composition:
+          state: {tag: unknown, reason: 'FeO mol% is printed, but the schema has no mole-percent composition basis; original x values are retained per point and these reads are typed-refused.'}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: FeO mol% composition cannot be represented by the existing composition basis token.
+        component: FeO
+        attribution: Fujita et al. (1968)
+        marker_symbol: '2'
+        activity_basis_as_published: a_FeO
+        composition_axis_as_published: FeO mol%
+        read_count_per_marker: 2
+        marker_count: 18
+        points:
+        - marker: 1
+          T_K: '1873'
+          FeO_mol_pct_as_read: 60
+          activity: 0.46
+          read_uncertainty_dex: 0.0005
+          read_1:
+            pixel_xy_crop: [331, 581]
+            FeO_mol_pct: 60
+            activity: 0.4591
+          read_2:
+            pixel_xy_crop: [331, 582]
+            FeO_mol_pct: 60
+            activity: 0.4581
+        - marker: 2
+          T_K: '1873'
+          FeO_mol_pct_as_read: 61
+          activity: 0.52
+          read_uncertainty_dex: 0.0004
+          read_1:
+            pixel_xy_crop: [363, 521]
+            FeO_mol_pct: 61.0256
+            activity: 0.5175
+          read_2:
+            pixel_xy_crop: [364, 522]
+            FeO_mol_pct: 61.0577
+            activity: 0.5166
+        - marker: 3
+          T_K: '1873'
+          FeO_mol_pct_as_read: 62
+          activity: 0.45
+          read_uncertainty_dex: 0
+          read_1:
+            pixel_xy_crop: [379, 592]
+            FeO_mol_pct: 61.5385
+            activity: 0.4483
+          read_2:
+            pixel_xy_crop: [379, 592]
+            FeO_mol_pct: 61.5385
+            activity: 0.4483
+        - marker: 4
+          T_K: '1873'
+          FeO_mol_pct_as_read: 63
+          activity: 0.44
+          read_uncertainty_dex: 0.0005
+          read_1:
+            pixel_xy_crop: [431, 597]
+            FeO_mol_pct: 63.2051
+            activity: 0.4435
+          read_2:
+            pixel_xy_crop: [432, 598]
+            FeO_mol_pct: 63.2372
+            activity: 0.4425
+        - marker: 5
+          T_K: '1873'
+          FeO_mol_pct_as_read: 64
+          activity: 0.55
+          read_uncertainty_dex: 0.0019
+          read_1:
+            pixel_xy_crop: [453, 495]
+            FeO_mol_pct: 63.9103
+            activity: 0.5429
+          read_2:
+            pixel_xy_crop: [458, 490]
+            FeO_mol_pct: 64.0705
+            activity: 0.5478
+        - marker: 6
+          T_K: '1873'
+          FeO_mol_pct_as_read: 66
+          activity: 0.59
+          read_uncertainty_dex: 0
+          read_1:
+            pixel_xy_crop: [517, 443]
+            FeO_mol_pct: 65.9615
+            activity: 0.5936
+          read_2:
+            pixel_xy_crop: [518, 443]
+            FeO_mol_pct: 65.9936
+            activity: 0.5936
+        - marker: 7
+          T_K: '1873'
+          FeO_mol_pct_as_read: 68
+          activity: 0.59
+          read_uncertainty_dex: 0
+          read_1:
+            pixel_xy_crop: [577, 442]
+            FeO_mol_pct: 67.8846
+            activity: 0.5945
+          read_2:
+            pixel_xy_crop: [577, 442]
+            FeO_mol_pct: 67.8846
+            activity: 0.5945
+        - marker: 8
+          T_K: '1873'
+          FeO_mol_pct_as_read: 71
+          activity: 0.69
+          read_uncertainty_dex: 0.0003
+          read_1:
+            pixel_xy_crop: [659, 347]
+            FeO_mol_pct: 70.5128
+            activity: 0.6871
+          read_2:
+            pixel_xy_crop: [660, 348]
+            FeO_mol_pct: 70.5449
+            activity: 0.6862
+        - marker: 9
+          T_K: '1873'
+          FeO_mol_pct_as_read: 79
+          activity: 0.81
+          read_uncertainty_dex: 0
+          read_1:
+            pixel_xy_crop: [923, 224]
+            FeO_mol_pct: 78.9744
+            activity: 0.807
+          read_2:
+            pixel_xy_crop: [923, 224]
+            FeO_mol_pct: 78.9744
+            activity: 0.807
+        - marker: 10
+          T_K: '1873'
+          FeO_mol_pct_as_read: 79
+          activity: 0.77
+          read_uncertainty_dex: 0
+          read_1:
+            pixel_xy_crop: [923, 265]
+            FeO_mol_pct: 78.9744
+            activity: 0.7671
+          read_2:
+            pixel_xy_crop: [924, 265]
+            FeO_mol_pct: 79.0064
+            activity: 0.7671
+        - marker: 11
+          T_K: '1873'
+          FeO_mol_pct_as_read: 81
+          activity: 0.84
+          read_uncertainty_dex: 0
+          read_1:
+            pixel_xy_crop: [985, 195]
+            FeO_mol_pct: 80.9615
+            activity: 0.8353
+          read_2:
+            pixel_xy_crop: [986, 195]
+            FeO_mol_pct: 80.9936
+            activity: 0.8353
+        - marker: 12
+          T_K: '1873'
+          FeO_mol_pct_as_read: 83
+          activity: 0.85
+          read_uncertainty_dex: 0
+          read_1:
+            pixel_xy_crop: [1043, 181]
+            FeO_mol_pct: 82.8205
+            activity: 0.8489
+          read_2:
+            pixel_xy_crop: [1043, 181]
+            FeO_mol_pct: 82.8205
+            activity: 0.8489
+        - marker: 13
+          T_K: '1873'
+          FeO_mol_pct_as_read: 85
+          activity: 0.89
+          read_uncertainty_dex: 0.0002
+          read_1:
+            pixel_xy_crop: [1102, 141]
+            FeO_mol_pct: 84.7115
+            activity: 0.8879
+          read_2:
+            pixel_xy_crop: [1103, 142]
+            FeO_mol_pct: 84.7436
+            activity: 0.8869
+        - marker: 14
+          T_K: '1873'
+          FeO_mol_pct_as_read: 85
+          activity: 0.84
+          read_uncertainty_dex: 0.0003
+          read_1:
+            pixel_xy_crop: [1110, 189]
+            FeO_mol_pct: 84.9679
+            activity: 0.8411
+          read_2:
+            pixel_xy_crop: [1110, 190]
+            FeO_mol_pct: 84.9679
+            activity: 0.8402
+        - marker: 15
+          T_K: '1873'
+          FeO_mol_pct_as_read: 86
+          activity: 0.86
+          read_uncertainty_dex: 0
+          read_1:
+            pixel_xy_crop: [1142, 165]
+            FeO_mol_pct: 85.9936
+            activity: 0.8645
+          read_2:
+            pixel_xy_crop: [1142, 165]
+            FeO_mol_pct: 85.9936
+            activity: 0.8645
+        - marker: 16
+          T_K: '1873'
+          FeO_mol_pct_as_read: 91
+          activity: 0.9
+          read_uncertainty_dex: 0
+          read_1:
+            pixel_xy_crop: [1292, 131]
+            FeO_mol_pct: 90.8013
+            activity: 0.8977
+          read_2:
+            pixel_xy_crop: [1293, 131]
+            FeO_mol_pct: 90.8333
+            activity: 0.8977
+        - marker: 17
+          T_K: '1873'
+          FeO_mol_pct_as_read: 93
+          activity: 0.95
+          read_uncertainty_dex: 0
+          read_1:
+            pixel_xy_crop: [1347, 82]
+            FeO_mol_pct: 92.5641
+            activity: 0.9454
+          read_2:
+            pixel_xy_crop: [1348, 82]
+            FeO_mol_pct: 92.5962
+            activity: 0.9454
+        - marker: 18
+          T_K: '1873'
+          FeO_mol_pct_as_read: 94
+          activity: 0.92
+          read_uncertainty_dex: 0.0002
+          read_1:
+            pixel_xy_crop: [1381, 112]
+            FeO_mol_pct: 93.6538
+            activity: 0.9162
+          read_2:
+            pixel_xy_crop: [1381, 113]
+            FeO_mol_pct: 93.6538
+            activity: 0.9152
+
+        temperature_disagreement_as_printed: 'Figure 2 caption: 1873 K; prose: 1833 K'
+    - observation_id: shornikov_2019_fig2_feo_panel_a_curve_3
+      type: activity_coefficient
+      experiment: shornikov-2019-model-curves
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '2'
+        panel: a
+        curve: '3'
+      phase: l
+      units: dimensionless activity; FeO mol% as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1673'}}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no mole-percent composition basis exists in the schema.'}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
+        component: FeO
+        activity_basis_as_published: a_FeO
+        curve_number: '3'
+        attribution: Wu et al. (1993)
+    - observation_id: shornikov_2019_fig2_feo_panel_a_curve_5
+      type: activity_coefficient
+      experiment: shornikov-2019-model-curves
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '2'
+        panel: a
+        curve: '5'
+      phase: l
+      units: dimensionless activity; FeO mol% as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1673'}}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no mole-percent composition basis exists in the schema.'}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
+        component: FeO
+        activity_basis_as_published: a_FeO
+        curve_number: '5'
+        attribution: Bjorkvall et al. (2001)
+    - observation_id: shornikov_2019_fig2_feo_panel_a_curve_7
+      type: activity_coefficient
+      experiment: shornikov-2019-model-curves
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '2'
+        panel: a
+        curve: '7'
+      phase: l
+      units: dimensionless activity; FeO mol% as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1673'}}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no mole-percent composition basis exists in the schema.'}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
+        component: FeO
+        activity_basis_as_published: a_FeO
+        curve_number: '7'
+        attribution: the present study
+    - observation_id: shornikov_2019_fig2_feo_panel_b_curve_3
+      type: activity_coefficient
+      experiment: shornikov-2019-model-curves
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '2'
+        panel: b
+        curve: '3'
+      phase: l
+      units: dimensionless activity; FeO mol% as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1873'}}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no mole-percent composition basis exists in the schema.'}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
+        component: FeO
+        activity_basis_as_published: a_FeO
+        curve_number: '3'
+        attribution: Wu et al. (1993)
+    - observation_id: shornikov_2019_fig2_feo_panel_b_curve_5
+      type: activity_coefficient
+      experiment: shornikov-2019-model-curves
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '2'
+        panel: b
+        curve: '5'
+      phase: l
+      units: dimensionless activity; FeO mol% as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1873'}}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no mole-percent composition basis exists in the schema.'}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
+        component: FeO
+        activity_basis_as_published: a_FeO
+        curve_number: '5'
+        attribution: Bjorkvall et al. (2001)
+    - observation_id: shornikov_2019_fig2_feo_panel_b_curve_7
+      type: activity_coefficient
+      experiment: shornikov-2019-model-curves
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '2'
+        panel: b
+        curve: '7'
+      phase: l
+      units: dimensionless activity; FeO mol% as printed
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1873'}}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
+        composition:
+          state: {tag: unknown, reason: 'Curve spans composition; no mole-percent composition basis exists in the schema.'}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
+        component: FeO
+        activity_basis_as_published: a_FeO
+        curve_number: '7'
+        attribution: the present study
+  Fe:
+    observations:
+    - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r06_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: 'Fe'
+        column_header: 'Gas phase  $\Delta G^{\circ}_{1873}$ , kJ/mol'
+        published_page: 84
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1873'
+        value: '145.501'
+        attribution: Table 1 caption says the values were calculated in the present study. The paper cites source data for the model but does not provide per-row input lineage, so these are attributed values rather than model_derived rows.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 84
+            table: '1'
+            column_header: ΔG°1873, kJ/mol
+            note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+  Fe2:
+    observations:
+    - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r07_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: '$Fe_2$'
+        column_header: 'Gas phase  $\Delta G^{\circ}_{1873}$ , kJ/mol'
+        published_page: 84
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1873'
+        value: '399.724'
+        attribution: Table 1 caption says the values were calculated in the present study. The paper cites source data for the model but does not provide per-row input lineage, so these are attributed values rather than model_derived rows.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 84
+            table: '1'
+            column_header: ΔG°1873, kJ/mol
+            note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+  FeO2:
+    observations:
+    - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r09_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: '$FeO_2$'
+        column_header: 'Gas phase  $\Delta G^{\circ}_{1873}$ , kJ/mol'
+        published_page: 84
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1873'
+        value: '34.624'
+        attribution: Table 1 caption says the values were calculated in the present study. The paper cites source data for the model but does not provide per-row input lineage, so these are attributed values rather than model_derived rows.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 84
+            table: '1'
+            column_header: ΔG°1873, kJ/mol
+            note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+  O:
+    observations:
+    - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r10_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: 'O'
+        column_header: 'Gas phase  $\Delta G^{\circ}_{1873}$ , kJ/mol'
+        published_page: 84
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1873'
+        value: '130.138'
+        attribution: Table 1 caption says the values were calculated in the present study. The paper cites source data for the model but does not provide per-row input lineage, so these are attributed values rather than model_derived rows.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 84
+            table: '1'
+            column_header: ΔG°1873, kJ/mol
+            note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+  O2:
+    observations:
+    - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r11_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: '$O_2$'
+        column_header: 'Gas phase  $\Delta G^{\circ}_{1873}$ , kJ/mol'
+        published_page: 84
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1873'
+        value: '0.000'
+        attribution: Table 1 caption says the values were calculated in the present study. The paper cites source data for the model but does not provide per-row input lineage, so these are attributed values rather than model_derived rows.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 84
+            table: '1'
+            column_header: ΔG°1873, kJ/mol
+            note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+  O3:
+    observations:
+    - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r12_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: '$O_3$'
+        column_header: 'Gas phase  $\Delta G^{\circ}_{1873}$ , kJ/mol'
+        published_page: 84
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1873'
+        value: '266.369'
+        attribution: Table 1 caption says the values were calculated in the present study. The paper cites source data for the model but does not provide per-row input lineage, so these are attributed values rather than model_derived rows.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 84
+            table: '1'
+            column_header: ΔG°1873, kJ/mol
+            note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+  O4:
+    observations:
+    - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r13_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: '$O_4$'
+        column_header: 'Gas phase  $\Delta G^{\circ}_{1873}$ , kJ/mol'
+        published_page: 84
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1873'
+        value: '181.230'
+        attribution: Table 1 caption says the values were calculated in the present study. The paper cites source data for the model but does not provide per-row input lineage, so these are attributed values rather than model_derived rows.
+      phase: g
+      per: mol_species
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 84
+            table: '1'
+            column_header: ΔG°1873, kJ/mol
+            note: The 1873 K temperature is printed in the Gibbs-energy column heading.
+
+  Ca2Fe2O5:
+    observations:
+    - observation_id: shornikov_2019_c2f2o5_decomposition_oelsen_maetz_1941
+      experiment: oelsen-maetz-1941
+      type: transition_point
+      locator: {page: 2, pdf_page_index: 1, published_page: 82, section: Introduction}
+      units: K
+      phase: cr
+      T_range_K: ['1423', '1423']
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1423'}}
+          locator: {page: 2, pdf_page_index: 1, published_page: 82, section: Introduction}
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_K: '1423'
+        T_K_as_printed: '1423'
+        event_as_printed: decomposition
+        attribution: Oelsen and Maetz (1941), as cited by Shornikov and Shornikova (2019).
+        confidence_level: not stated
+  CaFe2O3:
+    observations:
+    - observation_id: shornikov_2019_c2feo3_dissociation_allen_snow_1955
+      experiment: allen-snow-1955
+      type: transition_point
+      locator: {page: 2, pdf_page_index: 1, published_page: 82, section: Introduction}
+      units: K
+      phase: cr
+      T_range_K: ['1406', '1406']
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1406'}}
+          locator: {page: 2, pdf_page_index: 1, published_page: 82, section: Introduction}
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_K: '1406'
+        T_K_as_printed: '1406 ± 3'
+        temperature_uncertainty_K: '3'
+        event_as_printed: dissociation
+        attribution: Allen and Snow (1955), as cited by Shornikov and Shornikova (2019).
+        uncertainty_note: Confidence level not stated; width retained as printed.
+    - observation_id: shornikov_2019_c2f2o5_decomposition_allen_snow_1955
+      experiment: allen-snow-1955
+      type: transition_point
+      locator: {page: 2, pdf_page_index: 1, published_page: 82, section: Introduction}
+      units: K
+      phase: cr
+      T_range_K: ['1381', '1381']
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1381'}}
+          locator: {page: 2, pdf_page_index: 1, published_page: 82, section: Introduction}
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_K: '1381'
+        T_K_as_printed: '1381 ± 3'
+        temperature_uncertainty_K: '3'
+        event_as_printed: decomposition
+        attribution: Allen and Snow (1955), as cited by Shornikov and Shornikova (2019).
+        uncertainty_note: Confidence level not stated; width retained as printed.
