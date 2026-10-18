@@ -574,6 +574,16 @@ _TEMPERATURE_BRIDGE_MAX_CALLS = 6
 _TEMPERATURE_BRIDGE_CAP_K = 75.0
 _TEMPERATURE_BRIDGE_DOMAIN_K = (1700.0, 3000.0)
 
+# One diagnostic-tier data table. This is the warning threshold suggested
+# by d-175, not an accuracy calibration or a ceiling on projected solves.
+_PROJECTED_COMPOSITION_WARNING_TIERS = (
+    {
+        "flag": "projected_composition_high_omission",
+        "above_omitted_wt_pct": 5.0,
+        "provenance": "owner d-175 / b-921 round 4 brief, 2026-10-18: flag above 5 wt%; no solve cap",
+    },
+)
+
 # Gamma(KO0.5) is read from the production bridge's activity_coefficients row.
 # Its activity is the square root of the K2O parent activity, and its x is the
 # single-cation mole fraction: K cation moles divided by all cation moles.
@@ -1041,9 +1051,12 @@ def _build_high_t_melt_activity_authority(
             # solve the remaining oxide basis at the actual T. Its existing
             # mole -> wt% conversion normalizes the retained mass to 100%:
             # w'_i = 100 m_i / sum(retained m), all masses in kg, so w' is
-            # wt%. Dropping a mass fraction f rescales retained weights by
-            # 1/(1-f); f -> 0 recovers the unprojected input. This removes
-            # the omitted components' interactions, not their ledger mass.
+            # wt%. On the folded-iron basis, omitting fraction f of that
+            # represented mass rescales retained weights by 1/(1-f); f -> 0
+            # recovers the unprojected folded-iron input. Reported omitted
+            # wt% uses the original source mass (before the iron fold).
+            # This removes the omitted components' interactions, not their
+            # ledger mass.
             # A fresh equilibrium tracks current T and retained chemistry;
             # a frozen gamma can drift for hundreds of kelvin and cannot.
             # Activities keep the projected pure-liquid reference. Reporting
@@ -1072,6 +1085,10 @@ def _build_high_t_melt_activity_authority(
                     "detail": str(policy_refusal),
                 },
             }
+            projection_notice["warning_tiers"] = [
+                dict(tier) for tier in _PROJECTED_COMPOSITION_WARNING_TIERS
+                if projection_notice["omitted_total_wt_pct"] > tier["above_omitted_wt_pct"]
+            ]
             base["projected_composition_solve"] = projection_notice
             base["notices"].append(projection_notice)
             cleaned = evaluate_cleaned_melt(
