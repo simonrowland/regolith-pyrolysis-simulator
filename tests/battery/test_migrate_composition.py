@@ -255,7 +255,11 @@ def test_hastie_typed_initial_charge_reaches_experiment_sample() -> None:
         if item["observation_id"] == "hastie_1981_fig11_k1_slag_k2o_gamma_digitized"
     )
     assert observation["values"]["composition_role"]["value"] == "initial_charge_only"
-    selected = sample_from_equipment(None, values=observation["values"])
+    selected = sample_from_equipment(
+        None,
+        values=observation["values"],
+        locator=migrate_module.locator_from_mapping(observation["locator"]),
+    )
     assert selected.initial_composition is not None
 
     migrator = Migrator()
@@ -265,7 +269,44 @@ def test_hastie_typed_initial_charge_reaches_experiment_sample() -> None:
         "10.6028/nbs.ir.81-2279::experiment::hastie-1981-k1-kms"
     ]
 
-    assert experiment.sample.initial_composition == selected.initial_composition
+    actual = experiment.sample.initial_composition
+    assert actual is not None and actual.state.is_value
+    assert dict(actual.state.value.components) == dict(
+        selected.initial_composition.state.value.components
+    )
+
+
+def test_volovetskii_starting_glass_material_state_is_initial() -> None:
+    path = REPO_ROOT / "data/literature/extracts/volovetskii-2012-iron-redox.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    observation = next(
+        item
+        for species in document["species"].values()
+        for item in species["observations"]
+        if item["observation_id"] == "volo12_p9_initial_fe_redox"
+    )
+    assert observation["values"]["composition_material_state"] == "starting_glass"
+    selected = sample_from_equipment(
+        None,
+        values=observation["values"],
+        locator=migrate_module.locator_from_mapping(observation["locator"]),
+    )
+    assert selected.initial_composition is not None
+
+    migrator = Migrator()
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    row = next(
+        row
+        for row in migrator.result.observations.values()
+        if row.observation_id.endswith("volo12_p9_initial_fe_redox")
+    )
+    actual = migrator.result.experiments[row.experiment_id].sample.initial_composition
+
+    assert actual is not None and actual.state.is_value
+    assert dict(actual.state.value.components) == dict(
+        selected.initial_composition.state.value.components
+    )
 
 
 def _plante_analytical_composition(doc: dict) -> tuple[dict[str, Decimal], object]:
