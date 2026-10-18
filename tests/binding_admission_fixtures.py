@@ -147,6 +147,7 @@ def seed_gate_curve_memo_record(
 ) -> dict[str, Any]:
     """Seed the runtime slot through the production origin-record writer."""
     from simulator.engine_binding_admission import write_gate_curve_memo_record
+    from simulator.reduced_real_determinism import GateCurveProviderOutcome
 
     if key is None:
         fO2_log = float(sim._current_melt_redox_fO2_log())
@@ -161,6 +162,7 @@ def seed_gate_curve_memo_record(
         sim,
         curve,
         repair_notices,
+        provider_outcome=GateCurveProviderOutcome.PRODUCED,
     )
     sim._freeze_gate_liquid_fraction_cache = {
         **record,

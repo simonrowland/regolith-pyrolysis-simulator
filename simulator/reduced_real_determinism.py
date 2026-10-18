@@ -2647,7 +2647,7 @@ class GateCurveProviderOutcome(str, Enum):
     FAILED = "failed"
 
 
-_GATE_CURVE_TRANSIENT_PROVIDER_REASONS = frozenset({
+_GATE_CURVE_EXTRA_TRANSIENT_PROVIDER_REASONS = frozenset({
     "engine_crash",
     "engine_worker_timeout",
     "engine_worker_unavailable",
@@ -2655,7 +2655,6 @@ _GATE_CURVE_TRANSIENT_PROVIDER_REASONS = frozenset({
     "negative_convergence_evidence",
     "no_convergence",
     "nonzero_exit",
-    "not_converged",
     "parse_empty_output",
     "phase_mass_incomplete",
     "smoke_equilibrium_timeout",
@@ -2668,27 +2667,22 @@ _GATE_CURVE_TRANSIENT_PROVIDER_REASONS = frozenset({
     "worker_pool_error",
 })
 
-_GATE_CURVE_STABLE_REFUSAL_REASONS = frozenset({
-    "clamped_operating_point",
-    "composition_projected",
-    "input_composition_projected",
-    "invalid_fo2_log",
-    "invalid_input",
-    "invalid_pressure_bar",
-    "non_finite_composition",
-    "out_of_domain",
-    "redox_state_not_expressible",
-    "subprocess_pressure_below_minimum",
-    "subprocess_temperature_below_minimum",
-    "unsupported_input",
-})
-
 
 def gate_curve_provider_outcome_for_status(
     status: str,
     diagnostic: Mapping[str, Any] | None = None,
 ) -> GateCurveProviderOutcome:
-    """Classify outcomes by whether the cache key determines the result."""
+    """Classify provider diagnostics before deciding whether to reuse a curve.
+
+    No-reason domain refusals remain stable for backends that omit diagnostics;
+    an unrecognized reason on a refusal is conservatively treated as failed.
+    """
+
+    from engines.domain_reason import (
+        STABLE_OUT_OF_DOMAIN_REASONS,
+        TRANSIENT_OUT_OF_DOMAIN_REASONS,
+        reason_value,
+    )
 
     normalized_status = str(status).strip().lower()
     reasons: list[str] = []
@@ -2699,19 +2693,27 @@ def gate_curve_provider_outcome_for_status(
             "reason",
             "reason_refused",
         ):
-            value = diagnostic.get(field)
-            if value is not None and str(value).strip():
-                reasons.append(str(value).strip().lower())
+            value = reason_value(diagnostic.get(field))
+            if value is not None and value.strip():
+                reasons.append(value.strip().lower())
+    transient_reasons = {
+        reason_value(reason).lower()
+        for reason in TRANSIENT_OUT_OF_DOMAIN_REASONS
+    } | _GATE_CURVE_EXTRA_TRANSIENT_PROVIDER_REASONS
+    stable_reasons = {
+        reason_value(reason).lower()
+        for reason in STABLE_OUT_OF_DOMAIN_REASONS
+    }
     if any(
-        reason in _GATE_CURVE_TRANSIENT_PROVIDER_REASONS
+        reason in transient_reasons
         for reason in reasons
     ):
         return GateCurveProviderOutcome.FAILED
     if normalized_status == "ok":
         return GateCurveProviderOutcome.PRODUCED
-    if normalized_status in {"out_of_domain", "unsupported"}:
+    if normalized_status in {"out_of_domain", "unsupported", "refused"}:
         if not reasons or all(
-            reason in _GATE_CURVE_STABLE_REFUSAL_REASONS
+            reason in stable_reasons
             for reason in reasons
         ):
             return GateCurveProviderOutcome.STABLE_REFUSAL

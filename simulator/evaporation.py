@@ -2100,7 +2100,6 @@ class EvaporationMixin:
         redox_state: RedoxState | None = None,
     ) -> dict[str, Any]:
         from simulator.reduced_real_determinism import (
-            GateCurveProviderOutcome,
             gate_curve_memo_record,
             gate_curve_memo_is_cacheable,
             record_repair_notice,
@@ -2420,13 +2419,8 @@ class EvaporationMixin:
                 curve,
                 repair_notices,
                 evidence=evidence,
+                provider_outcome=self._freeze_gate_provider_outcome,
                 **redox_state_kwargs,
-            )
-            provider_outcome = self._freeze_gate_provider_outcome
-            record['provider_outcome'] = (
-                GateCurveProviderOutcome(provider_outcome)
-                if provider_outcome is not None
-                else None
             )
             origin = record['origin']
             if cache_eligible:
@@ -2694,12 +2688,15 @@ class EvaporationMixin:
         fallback_provider = diagnostic.get('kernel_fallback_used')
         if fallback_provider:
             source = f'gate_liquid_fraction:fallback:{fallback_provider}'
-        if status != 'ok':
-            status_outcome = gate_curve_provider_outcome_for_status(
-                status,
-                diagnostic,
-            )
-            record_gate_curve_provider_outcome(self, status_outcome)
+        status_outcome = gate_curve_provider_outcome_for_status(
+            status,
+            diagnostic,
+        )
+        record_gate_curve_provider_outcome(self, status_outcome)
+        if (
+            status_outcome is GateCurveProviderOutcome.FAILED
+            or status != 'ok'
+        ):
             projected = self._composition_projected_freeze_gate_curve(
                 diagnostic,
                 source=source,

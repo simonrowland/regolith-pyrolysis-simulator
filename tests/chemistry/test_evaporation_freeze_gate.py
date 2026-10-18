@@ -5356,6 +5356,51 @@ def test_missing_gate_provider_outcome_is_not_reusable():
         ('unsupported', {}, GateCurveProviderOutcome.STABLE_REFUSAL),
         (
             'out_of_domain',
+            {'backend_status_reason': 'forbidden_species'},
+            GateCurveProviderOutcome.STABLE_REFUSAL,
+        ),
+        (
+            'out_of_domain',
+            {'backend_status_reason': 'silicate_window'},
+            GateCurveProviderOutcome.STABLE_REFUSAL,
+        ),
+        (
+            'out_of_domain',
+            {'backend_status_reason': 'major_sum'},
+            GateCurveProviderOutcome.STABLE_REFUSAL,
+        ),
+        (
+            'out_of_domain',
+            {'backend_status_reason': 'magemin_mode_vector_mass_deficit'},
+            GateCurveProviderOutcome.STABLE_REFUSAL,
+        ),
+        (
+            'out_of_domain',
+            {'backend_status_reason': 'temperature_range'},
+            GateCurveProviderOutcome.STABLE_REFUSAL,
+        ),
+        (
+            'out_of_domain',
+            {'backend_status_reason': 'liquid_state'},
+            GateCurveProviderOutcome.STABLE_REFUSAL,
+        ),
+        (
+            'out_of_domain',
+            {'backend_status_reason': 'sum_pressure_sanity'},
+            GateCurveProviderOutcome.STABLE_REFUSAL,
+        ),
+        (
+            'out_of_domain',
+            {'backend_status_reason': 'input_composition_projected'},
+            GateCurveProviderOutcome.STABLE_REFUSAL,
+        ),
+        (
+            'out_of_domain',
+            {'backend_status_reason': 'clamped_operating_point'},
+            GateCurveProviderOutcome.STABLE_REFUSAL,
+        ),
+        (
+            'out_of_domain',
             {'backend_status_reason': 'invalid_input'},
             GateCurveProviderOutcome.STABLE_REFUSAL,
         ),
@@ -5391,6 +5436,31 @@ def test_missing_gate_provider_outcome_is_not_reusable():
         ),
         (
             'ok',
+            {'backend_failure_reason_code': 'timeout'},
+            GateCurveProviderOutcome.FAILED,
+        ),
+        (
+            'ok',
+            {'reason_refused': 'engine_crash'},
+            GateCurveProviderOutcome.FAILED,
+        ),
+        (
+            'ok',
+            {'reason': 'backend_unavailable'},
+            GateCurveProviderOutcome.FAILED,
+        ),
+        (
+            'ok',
+            {'backend_status_reason': 'composition_projected'},
+            GateCurveProviderOutcome.PRODUCED,
+        ),
+        (
+            'ok',
+            {'backend_status_reason': 'informational_unknown'},
+            GateCurveProviderOutcome.PRODUCED,
+        ),
+        (
+            'ok',
             {
                 'backend_status_reason': 'unrecognized',
                 'reason': 'timeout',
@@ -5400,7 +5470,17 @@ def test_missing_gate_provider_outcome_is_not_reusable():
         (
             'refused',
             {'reason': 'invalid_input'},
-            GateCurveProviderOutcome.FAILED,
+            GateCurveProviderOutcome.STABLE_REFUSAL,
+        ),
+        (
+            'refused',
+            {},
+            GateCurveProviderOutcome.STABLE_REFUSAL,
+        ),
+        (
+            'refused',
+            {'reason': 'forbidden_species'},
+            GateCurveProviderOutcome.STABLE_REFUSAL,
         ),
         (
             'refused',
@@ -6434,11 +6514,17 @@ def test_core_gate_curve_memo_does_not_reuse_fallback_after_provider_unavailable
     assert key not in sim._freeze_gate_liquid_fraction_curve_memo
 
 
+@pytest.mark.parametrize(
+    'stable_reason',
+    [None, 'forbidden_species'],
+    ids=['no-reason', 'forbidden-species'],
+)
 def test_core_gate_curve_memo_reuses_fallback_after_stable_out_of_domain(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    stable_reason,
 ):
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
@@ -6458,11 +6544,14 @@ def test_core_gate_curve_memo_reuses_fallback_after_stable_out_of_domain(
     def stable_out_of_domain(intent, *args, **kwargs):
         assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
         provider_calls.append(intent)
+        diagnostic = {'backend_status': 'out_of_domain'}
+        if stable_reason is not None:
+            diagnostic['backend_status_reason'] = stable_reason
         return IntentResult(
             intent=intent,
             status='out_of_domain',
             transition=None,
-            diagnostic={'backend_status': 'out_of_domain'},
+            diagnostic=diagnostic,
         )
 
     monkeypatch.setattr(sim, '_dispatch_only', stable_out_of_domain)
@@ -6495,11 +6584,81 @@ def test_core_gate_curve_memo_reuses_fallback_after_stable_out_of_domain(
     assert len(provider_calls) == 1
 
 
+def test_ok_gate_curve_with_informational_reason_is_reused(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    provider_calls = []
+
+    def informational_provider_result(intent, *args, **kwargs):
+        assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
+        provider_calls.append(intent)
+        return IntentResult(
+            intent=intent,
+            status='ok',
+            transition=None,
+            diagnostic={
+                'backend_status': 'ok',
+                'backend_status_reason': 'composition_projected',
+                'solidus_T_C': 1000.0,
+                'liquidus_T_C': 1300.0,
+                'liquid_fraction_path': (
+                    (1000.0, 0.0),
+                    (1300.0, 1.0),
+                ),
+            },
+        )
+
+    monkeypatch.setattr(sim, '_dispatch_only', informational_provider_result)
+
+    first = sim._melt_redox_liquidus_gate_curve()
+    key = _freeze_gate_key_for_current_state(sim)
+    second = sim._melt_redox_liquidus_gate_curve()
+
+    assert first == second
+    assert first['source'] == 'gate_liquid_fraction'
+    assert len(provider_calls) == 1
+    assert sim._freeze_gate_liquid_fraction_curve_memo[key][
+        'provider_outcome'
+    ] is GateCurveProviderOutcome.PRODUCED
+
+
+@pytest.mark.parametrize(
+    ('initial_status', 'initial_diagnostic', 'fallback_diagnostic'),
+    [
+        pytest.param(
+            'not_converged',
+            {'backend_status': 'not_converged'},
+            None,
+            id='gate-provider-transient',
+        ),
+        pytest.param(
+            'out_of_domain',
+            {'backend_status': 'out_of_domain'},
+            {
+                'backend_status': 'out_of_domain',
+                'backend_status_reason': 'timeout',
+            },
+            id='dropped-gate-diagnostic-then-backend-timeout',
+        ),
+    ],
+)
 def test_core_gate_curve_memo_recomputes_after_transient_provider_failure(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    initial_status,
+    initial_diagnostic,
+    fallback_diagnostic,
 ):
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
@@ -6520,9 +6679,9 @@ def test_core_gate_curve_memo_recomputes_after_transient_provider_failure(
             if len(provider_calls) == 1:
                 return IntentResult(
                     intent=intent,
-                    status='not_converged',
+                    status=initial_status,
                     transition=None,
-                    diagnostic={'backend_status': 'not_converged'},
+                    diagnostic=initial_diagnostic,
                 )
             return IntentResult(
                 intent=intent,
@@ -6547,14 +6706,31 @@ def test_core_gate_curve_memo_recomputes_after_transient_provider_failure(
         None,
         raising=False,
     )
+    def backend_timeout_fallback(reasons, **kwargs):
+        if fallback_diagnostic is not None:
+            from simulator.reduced_real_determinism import (
+                gate_curve_provider_outcome_for_status,
+                record_gate_curve_provider_outcome,
+            )
+
+            record_gate_curve_provider_outcome(
+                sim,
+                gate_curve_provider_outcome_for_status(
+                    'out_of_domain',
+                    fallback_diagnostic,
+                ),
+            )
+        return dict(fallback_curve)
+
     monkeypatch.setattr(
         sim,
         '_freeze_gate_curve_from_backend_liquidus',
-        lambda reasons, **kwargs: dict(fallback_curve),
+        backend_timeout_fallback,
     )
 
     first = sim._melt_redox_liquidus_gate_curve()
     key = _freeze_gate_key_for_current_state(sim)
+    assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.FAILED
     assert key not in sim._freeze_gate_liquid_fraction_curve_memo
     second = sim._melt_redox_liquidus_gate_curve()
 
@@ -7289,6 +7465,20 @@ def test_freeze_gate_backend_fallback_receives_redox_state(
                 'liquidus_T_C': 1200.0,
             },
             id='invalid-bounds',
+        ),
+        pytest.param(
+            'ok',
+            {
+                'backend_status': 'ok',
+                'backend_status_reason': 'timeout',
+                'solidus_T_C': 1000.0,
+                'liquidus_T_C': 1300.0,
+                'liquid_fraction_path': (
+                    (1000.0, 0.0),
+                    (1300.0, 1.0),
+                ),
+            },
+            id='ok-timeout-retries-provider',
         ),
         pytest.param(
             'unavailable',
