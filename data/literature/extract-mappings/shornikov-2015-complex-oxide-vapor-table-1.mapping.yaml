@@ -1,0 +1,25 @@
+# Staging map only: Table 1 is a cited-study summary, not new measurements.
+# The final extract keeps each complete row in species context records.
+source_id: shornikov-2015-complex-oxide-vapor
+source:
+  citation: 'Shornikov, S. I., and Yakovlev, O. I. (2015), "Study of Complex Molecular Species in the Gas Phase over the CaO–MgO–Al2O3–TiO2–SiO2 System," Geochemistry International, 53(8), 690–699.'
+  doi: 10.1134/S0016702915080066
+  year: 2015
+extraction:
+  method: 'MinerU table draft emit, then manual context transcription checked against the 600 dpi page render.'
+  date: '2026-10-18'
+  worker: w4c-1018
+review_status: draft
+tables:
+  - page: 2
+    table_index: 1
+    type: literature_context
+    quantity: cited_study_temperature_range
+    evidence_class: quoted_attributed
+    unit: K as printed
+    phase: gas
+    published_page: 691
+    rows: all
+    values:
+      - column: 3
+        species: O
