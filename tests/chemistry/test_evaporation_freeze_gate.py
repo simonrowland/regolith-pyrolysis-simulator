@@ -449,6 +449,27 @@ def test_freeze_gate_cache_key_distinguishes_provider_inputs(
         water_mol_fraction=baseline_key.water_mol_fraction
     ) == baseline_key
 
+    citation_sim = build_sim()
+    citation_sim.species_formula_registry = dict(
+        citation_sim.species_formula_registry
+    )
+    citation_sim.species_formula_registry['SiO2'] = SpeciesFormula.from_atoms(
+        'SiO2',
+        {'Si': 1, 'O': 2},
+        source='citation metadata changed',
+    )
+    assert _freeze_gate_key_for_current_state(citation_sim) == baseline_key
+
+    jitter_sim = build_sim()
+    jitter_sim.species_formula_registry = dict(
+        jitter_sim.species_formula_registry
+    )
+    jitter_sim.species_formula_registry['SiO2'] = SpeciesFormula.from_atoms(
+        'SiO2',
+        {'Si': 1, 'O': 2.0000000000000022},
+    )
+    assert _freeze_gate_key_for_current_state(jitter_sim) == baseline_key
+
     formula_sim = build_sim()
     formula_sim.species_formula_registry = dict(
         formula_sim.species_formula_registry

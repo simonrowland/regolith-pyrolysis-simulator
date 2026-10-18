@@ -404,6 +404,10 @@ _FREEZE_GATE_FRACTION_QUANTUM = 0.0001
 # change of 5.6e-5. Scaling the 0.1/100 solidus response to q gives 0.015 C,
 # below MAGEMin's 2 C search tolerance.
 _FREEZE_GATE_WATER_FRACTION_QUANTUM = 1e-7
+# Formula counts are the provider's identity input; ignore count noise smaller
+# than 1e-12 atom. The reported 3.5e-17 kg/mol mass jitter is about 2.2e-15
+# oxygen atoms, while a real stoichiometric change is many orders larger.
+_FREEZE_GATE_FORMULA_ATOM_COUNT_QUANTUM = 1e-12
 _FREEZE_GATE_PRESSURE_BAR_QUANTUM = 0.01
 _FREEZE_GATE_FO2_LOG_QUANTUM = 1.0
 _FREEZE_GATE_FO2_LOG_BOUND = 30.0
@@ -2561,14 +2565,39 @@ class EvaporationMixin:
             None if redox_identity is None
             else tuple(sorted(redox_identity.items()))
         )
+        formula_registry = getattr(self, 'species_formula_registry', {}) or {}
+        provider_formula_species = set(_FREEZE_GATE_COMPOSITION_SPECIES)
+        provider_formula_species.add('H2O')
+        provider_formula_species.update(
+            str(species)
+            for species, mol in cleaned_mol.items()
+            if float(mol) > _FREEZE_GATE_EPSILON
+        )
+        provider_formula_identity = []
+        for species_key in sorted(provider_formula_species):
+            formula = resolve_species_formula(species_key, formula_registry)
+            normalized_elements = tuple(
+                (
+                    element,
+                    round(
+                        float(count)
+                        / _FREEZE_GATE_FORMULA_ATOM_COUNT_QUANTUM
+                    )
+                    * _FREEZE_GATE_FORMULA_ATOM_COUNT_QUANTUM,
+                )
+                for element, count in sorted(formula.elements.items())
+            )
+            provider_formula_identity.append(
+                (species_key, normalized_elements)
+            )
         return FreezeGateCurveCacheKey(
-            schema='oxide_mol_fraction_p_fO2_v4',
+            schema='oxide_mol_fraction_p_fO2_v5',
             pressure_bar=round(pressure_bucket, 6),
             fO2_log=round(fO2_bucket, 6),
             composition_mol_fractions=tuple(sorted(composition_key)),
             water_mol_fraction=round(water_bucket, 7),
             formula_registry_digest=_digest(
-                getattr(self, 'species_formula_registry', {}) or {}
+                tuple(sorted(provider_formula_identity))
             ),
             inert_species=inert_species,
             redox_state_identity=redox_identity_key,
