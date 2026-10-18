@@ -13694,6 +13694,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self, '_yield_disposition_ledger_snapshots', None,
         )
         if defer_committed_history and isinstance(yield_disposition_history, dict):
+            # No in-hour table writes; see test_yield_table_unwritten_on_refusal.
             # Accounting captures this table after a successful step. A failed
             # core hour cannot mutate it, so retain the committed rows by
             # identity instead of copying the full run history every hour.

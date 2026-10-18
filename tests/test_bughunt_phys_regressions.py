@@ -865,7 +865,45 @@ def test_successful_step_structurally_shares_committed_history(monkeypatch) -> N
     assert isinstance(direct_snapshot.value.__cause__, AssertionError)
 
 
-def test_terminal_refusal_materializes_detached_committed_history() -> None:
+def test_yield_table_unwritten_on_refusal(monkeypatch) -> None:
+    class WriteTrackingDict(dict):
+        def __init__(self, *args, **kwargs) -> None:
+            super().__init__(*args, **kwargs)
+            self.write_operations = 0
+
+        def __setitem__(self, key, value) -> None:
+            self.write_operations += 1
+            super().__setitem__(key, value)
+
+        def __delitem__(self, key) -> None:
+            self.write_operations += 1
+            super().__delitem__(key)
+
+        def clear(self) -> None:
+            self.write_operations += 1
+            super().clear()
+
+        def pop(self, key, *args):
+            self.write_operations += 1
+            return super().pop(key, *args)
+
+        def popitem(self):
+            self.write_operations += 1
+            return super().popitem()
+
+        def setdefault(self, key, default=None):
+            if key not in self:
+                self.write_operations += 1
+            return super().setdefault(key, default)
+
+        def update(self, *args, **kwargs) -> None:
+            self.write_operations += 1
+            super().update(*args, **kwargs)
+
+        def __ior__(self, other):
+            self.write_operations += 1
+            return super().__ior__(other)
+
     class FakeLedger:
         def __init__(self) -> None:
             self._balances = {}
@@ -878,6 +916,39 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
         def transitions(self):
             return self._transitions
 
+        def mol_by_account(self):
+            return {}
+
+        def origin_atom_moles_by_account(self):
+            return {}
+
+        def unresolved_origin_atom_moles_by_account(self):
+            return {}
+
+        def origin_attribution_methods_by_account(self):
+            return {}
+
+        def gross_account_flows(self):
+            return {"inputs": {}, "withdrawals": {}}
+
+        def gross_account_flow_events(self):
+            return []
+
+    from simulator import runner as runner_module
+    from simulator.accounting import yield_disposition as yield_disposition_module
+
+    capture_calls = []
+    original_capture = yield_disposition_module.capture_ledger_snapshot
+
+    def capture_spy(*args, **kwargs):
+        capture_calls.append((args, kwargs))
+        return original_capture(*args, **kwargs)
+
+    monkeypatch.setattr(
+        yield_disposition_module, "capture_ledger_snapshot", capture_spy,
+    )
+    monkeypatch.setattr(runner_module, "capture_ledger_snapshot", capture_spy)
+
     refusal = EvaporationFluxRefusal("terminal", {"reason": "test"})
     committed = HourSnapshot(
         hour=3,
@@ -889,7 +960,10 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=37)
     sim.record = BatchRecord(snapshots=[committed])
-    yield_disposition_history = {"committed": {"hour": 37}}
+    yield_disposition_history = WriteTrackingDict(
+        {"committed": {"hour": 37}},
+    )
+    yield_disposition_contents = copy.deepcopy(yield_disposition_history)
     sim._yield_disposition_ledger_snapshots = yield_disposition_history
     operating_prefix = {"pressures": {"Na": 1.0}}
     operating_tail = {"pressures": {"Na": 2.0}}
@@ -926,6 +1000,9 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
     assert raised.value is refusal
     assert sim.runtime_state["nested"] == {"temperature_C": 25.0}
     assert sim._yield_disposition_ledger_snapshots is yield_disposition_history
+    assert sim._yield_disposition_ledger_snapshots == yield_disposition_contents
+    assert yield_disposition_history.write_operations == 0
+    assert capture_calls == []
     cold_spot_history = sim._condensation_model.cold_spot_history
     assert cold_spot_history == [cold_spot_prefix]
     assert cold_spot_history[0] is not cold_spot_prefix
