@@ -20,7 +20,7 @@ The ordinate is lg a_i, which is log10(activity). Major y ticks sit at embedded 
 
 ## Figure 1 marker reads
 
-Open squares: read 1 is the centroid of the enclosed hole. Read 2 is the centroid of that square's stroke inside the hole box expanded by 3 px. Filled circles: read 1 is the peak of a radius-4 disk fill. Read 2 is the centroid of the same-colour pixels in a ±7 px window. Neither second read is a fixed offset of the first. `read_uncertainty_dex` is half the unrounded ordinate difference. No pair exceeds 0.02 dex.
+Open squares: read 1 is the centroid of the enclosed hole. Read 2 is the centroid of that square's stroke inside the hole box expanded by 3 px. Filled circles: read 1 is the peak of a radius-4 disk fill. Read 2 is the centroid of the same-colour pixels in a ±7 px window. Neither second read is a fixed offset of the first. `read_uncertainty_dex` is half the unrounded ordinate difference. Where the two reads coincide, the key is omitted rather than stored as zero. No pair exceeds 0.02 dex.
 
 Stored once as linear activity at 1873 K, phase liquid, evidence figure_only. 102 points.
 

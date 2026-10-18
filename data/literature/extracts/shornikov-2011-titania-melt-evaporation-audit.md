@@ -35,7 +35,7 @@ Fig. 2 activity panels have no x tick at 0. The corner 0 is the activity ordinat
 
 ## Marker reads
 
-Read 1 is the distance-transform peak of the colour mask, checked on a 25 px window and on the red-column run through each circle. Read 2 is a separate centre: the centroid of that symbol's pixels inside one marker radius, not a fixed offset of read 1. Where the radius also covered the next circle (Fig. 1a TiO2 index 15), read 2 is the midpoint of this circle's own contiguous run. That re-read lands on the same pixel as the peak, (307, 322). `read_uncertainty_dex` is half the ordinate difference. No activity pair exceeds 0.02 dex.
+Read 1 is the distance-transform peak of the colour mask, checked on a 25 px window and on the red-column run through each circle. Read 2 is a separate centre: the centroid of that symbol's pixels inside one marker radius, not a fixed offset of read 1. Where the radius also covered the next circle (Fig. 1a TiO2 index 15), read 2 is the midpoint of this circle's own contiguous run. That re-read lands on the same pixel as the peak, (307, 322). `read_uncertainty_dex` is half the ordinate difference. Where the two reads coincide, the key is omitted rather than stored as zero. No activity pair exceeds 0.02 dex.
 
 Fig. 1 symbols 1–3 (KEMS markers, Shornikov et al. 2000 and Shornikov and Archakov 2003): black square CaO, red circle TiO2, blue triangle SiO2. Stored once as linear activity. Panel a 12 + 19 + 15 points. Panel b 7 + 7 + 7 points. Legend keys at the centre divider were not stored.
 

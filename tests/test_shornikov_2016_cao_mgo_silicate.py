@@ -49,7 +49,7 @@ FIGURE_READS = (
         [258.95, 106.95],
         [1368.1, 4905.0],
         [258.88, 106.99],
-        "0.000",
+        None,
     ),
     (
         "SiO2",
@@ -133,7 +133,10 @@ def test_table_and_figure_reads_are_pinned():
         assert point["activity"] == activity
         assert point["page_600dpi_px_read_1"] == page
         assert point["embedded_px_read_2"] == embedded_2
-        assert point["read_uncertainty_dex"] == uncertainty
+        if uncertainty is None:
+            assert "read_uncertainty_dex" not in point
+        else:
+            assert point["read_uncertainty_dex"] == uncertainty
         assert point["log10_activity_ordinate"].startswith("-")
 
     mixing = next(

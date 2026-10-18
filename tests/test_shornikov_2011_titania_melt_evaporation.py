@@ -50,7 +50,7 @@ FIGURE_READS = (
         [109.0, 262.0],
         [1416.4, 2469.8],
         [108.96, 261.96],
-        "0.000",
+        None,
     ),
     (
         "SiO2",
@@ -134,7 +134,10 @@ def test_table_and_figure_reads_are_pinned():
         assert point["embedded_px_read_1"] == embedded
         assert point["page_600dpi_px_read_1"] == page
         assert point["embedded_px_read_2"] == embedded_2
-        assert point["read_uncertainty_dex"] == uncertainty
+        if uncertainty is None:
+            assert "read_uncertainty_dex" not in point
+        else:
+            assert point["read_uncertainty_dex"] == uncertainty
 
 
 def test_mutating_the_consumed_gibbs_value_or_deleting_a_row_fails_the_pin():
