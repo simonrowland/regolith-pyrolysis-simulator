@@ -137,30 +137,18 @@ extraction:
 review_status: draft
 corrections: []
 fidelity_samples:
-- species: V
-  observable: average_oxidation_state
-  observation_id: sutton_2005_table2_schreiber
-  field: points[0].value
-  value: 4.87
-  locator: {table: '2', published_page: 2339, pdf_page_index: 6, note: 'Schreiber FAD X116 valence'}
-- species: V
-  observable: average_oxidation_state
-  observation_id: sutton_2005_table2_synthetic
-  field: points[34].value
-  value: 2.88
-  locator: {table: '2', published_page: 2339, pdf_page_index: 6, note: 'Karner Orange IW - 2 valence'}
-- species: V
-  observable: average_oxidation_state
-  observation_id: sutton_2005_table3_natural
-  field: points[0].value
-  value: 2.87
-  locator: {table: '3', published_page: 2344, pdf_page_index: 11, note: 'Lunar green glass valence'}
-- species: V
-  observable: average_oxidation_state
-  observation_id: sutton_2005_table3_natural
-  field: points[9].value
-  value: 4.06
-  locator: {table: '3', published_page: 2344, pdf_page_index: 11, note: 'Cerro Negro inclusions valence'}
+  - path: species.V.observations[sutton_2005_table2_schreiber].values.points[0].value
+    value: 4.87
+    locator: {table: '2', published_page: 2339, pdf_page_index: 6, note: 'Schreiber FAD X116 valence'}
+  - path: species.V.observations[sutton_2005_table2_synthetic].values.points[34].value
+    value: 2.88
+    locator: {table: '2', published_page: 2339, pdf_page_index: 6, note: 'Karner Orange IW - 2 valence'}
+  - path: species.V.observations[sutton_2005_table3_natural].values.points[0].value
+    value: 2.87
+    locator: {table: '3', published_page: 2344, pdf_page_index: 11, note: 'Lunar green glass valence'}
+  - path: species.V.observations[sutton_2005_table3_natural].values.points[9].value
+    value: 4.06
+    locator: {table: '3', published_page: 2344, pdf_page_index: 11, note: 'Cerro Negro inclusions valence'}
 species:
   V:
     observations:

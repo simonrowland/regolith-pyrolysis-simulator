@@ -12,17 +12,27 @@ extraction:
 review_status: draft
 corrections: []
 fidelity_samples:
-  - species: Ce
-    observation_id: smythe_brenan_2015_table3_ce_log_ratio
-    field: points
-    value:
-      - {sample: DS11-C38, value: -0.15, pdf_page_index: 38}
-      - {sample: DS09-C2-13, value: -0.41, pdf_page_index: 38}
-      - {sample: DS11-C66, value: -2.57, pdf_page_index: 39}
-      - {sample: DS09-C3-15, value: -1.93, pdf_page_index: 39}
-      - {sample: DS11-C22, value: -1.68, pdf_page_index: 40}
-      - {sample: DS09-C3-14, value: -2.98, pdf_page_index: 40}
-      - {sample: DS09-C3-04, value: -1.12, pdf_page_index: 40}
+  - path: species.Ce.observations[smythe_brenan_2015_table3_ce_log_ratio].values.series[0].value
+    value: -0.15
+    locator: {table: '3', pdf_page_index: 38, row: DS11-C38}
+  - path: species.Ce.observations[smythe_brenan_2015_table3_ce_log_ratio].values.series[4].value
+    value: -0.41
+    locator: {table: '3', pdf_page_index: 38, row: DS09-C2-13}
+  - path: species.Ce.observations[smythe_brenan_2015_table3_ce_log_ratio].values.series[10].value
+    value: -2.57
+    locator: {table: '3', pdf_page_index: 39, row: DS11-C66}
+  - path: species.Ce.observations[smythe_brenan_2015_table3_ce_log_ratio].values.series[21].value
+    value: -1.93
+    locator: {table: '3', pdf_page_index: 39, row: DS09-C3-15}
+  - path: species.Ce.observations[smythe_brenan_2015_table3_ce_log_ratio].values.series[27].value
+    value: -1.68
+    locator: {table: '3', pdf_page_index: 40, row: DS11-C22}
+  - path: species.Ce.observations[smythe_brenan_2015_table3_ce_log_ratio].values.series[36].value
+    value: -2.98
+    locator: {table: '3', pdf_page_index: 40, row: DS09-C3-14}
+  - path: species.Ce.observations[smythe_brenan_2015_table3_ce_log_ratio].values.series[44].value
+    value: -1.12
+    locator: {table: '3', pdf_page_index: 40, row: DS09-C3-04}
 species:
   Ce:
     observations:

@@ -13,20 +13,14 @@ extraction:
   provenance_path: data/literature/extracts/cottrell-2009-iron-xanes.yaml
 review_status: draft
 fidelity_samples:
-  - species: Fe
-    observation_id: cottrell_2009_basalt_mossbauer
-    field: Fe3_over_FeT
-    index: 3
+  - path: species.Fe.observations[cottrell_2009_basalt_mossbauer].values.series[3].Fe3_over_FeT
     value: '0.088'
     locator:
       page: 6
       table: '2'
       published_page: '172'
       row: 'LW_− 20'
-  - species: Fe
-    observation_id: cottrell_2009_basalt_mossbauer
-    field: cross_session_drift_corrected_centroid_eV
-    index: 3
+  - path: species.Fe.observations[cottrell_2009_basalt_mossbauer].values.series[3].cross_session_drift_corrected_centroid_eV
     value: '7112.112'
     locator:
       page: 6

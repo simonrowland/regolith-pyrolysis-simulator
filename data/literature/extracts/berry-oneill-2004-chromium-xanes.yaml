@@ -22,6 +22,10 @@ extraction:
   figure_only_candidates: Figures 3, 5, and 6 contain plotted XANES/redox points; no values visible only in figures
     were digitized. They remain figure-read candidates.
 review_status: draft
+fidelity_samples:
+- path: species.Cr.observations[berry_2004_table3_ad_r01].values.points[0].value
+  value: '0.050'
+  locator: {table: '3', published_page: 794, pdf_page_index: 5, record: 'Table 3 row -0.68*; AD; Cr2+/SumCr cell'}
 experiments:
 - experiment_id: berry_2004_table3_one_bar
   method: {tag: unknown, reason: not_mapped}
@@ -59,7 +63,7 @@ species:
         output_unit: "Cr2+/SumCr fraction as printed"
       uncertainty:
         as_printed: Abstract reports sigma(Cr2+/SumCr) = +/- 0.015 overall; not cell-specific
-        confidence_level: not stated
+        confidence_level: not_stated
       values:
         quantity: Cr2plus_over_total_Cr
         method_class: measured_reduced
