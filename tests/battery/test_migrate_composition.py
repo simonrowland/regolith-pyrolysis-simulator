@@ -2038,6 +2038,7 @@ def _plante_evolving_extract() -> dict:
         },
     }
     equipment = {
+        "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
         "cell_material": {
             "value": "platinum Knudsen cell",
             "locator": {"published_page": 267, "figure": "2"},
@@ -2132,8 +2133,16 @@ def test_registry_charge_repeated_by_row_keeps_derived_initial_composition(
             "experiment_id": "k2o-sio2-effusion-series",
             "method": "knudsen_effusion",
             "sample": {
-                "printed_composition": {
-                    "state": {"tag": "value", "value": charge},
+                "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
+                "initial_composition": {
+                    "state": {
+                        "tag": "value",
+                        "value": {
+                            "basis": "printed_oxides",
+                            "amount_basis": "mass_percent",
+                            "components": [[key, value] for key, value in charge.items()],
+                        },
+                    },
                     "locator": {"table": "2", "published_page": 276},
                 }
             },
