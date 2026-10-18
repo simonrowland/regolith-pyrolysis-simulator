@@ -1,0 +1,37 @@
+# Table 4's T_c/T_r cells are direct temperatures. Its heat/composition labels
+# remain row context that this mapping format cannot attach per emitted cell.
+# Table 2 is omitted: the printed cells are ΔT offsets while the extract stores
+# both a standard temperature and delta readings; emit has no offset field.
+source_id: ueshima-1982-fe-mo-thermal
+source:
+  citation: >-
+    Ueshima, Ichise and Mori (1982), Thermal Analysis of Fe-Mo Alloys by the
+    Use of Knudsen Cell Mass Spectrometry, Tetsu-to-Hagane 68(16), 2569-2577.
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-18'
+  worker: emitbt-1018
+review_status: draft
+tables:
+  - page: 5
+    table_index: 4
+    type: transition_point
+    quantity: transition_temperature
+    evidence_class: author_reduced_kems
+    unit: degC as printed
+    phase: Fe-Mo alloy transformation
+    published_page: 2573
+    rows: all
+    values:
+      - column: 4
+        species: Fe
+      - column: 5
+        species: Fe
+      - column: 6
+        species: Fe
+      - column: 7
+        species: Fe
+      - column: 8
+        species: Fe
+      - column: 9
+        species: Fe

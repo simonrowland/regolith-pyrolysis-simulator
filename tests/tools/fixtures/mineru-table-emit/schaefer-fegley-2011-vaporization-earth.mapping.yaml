@@ -1,0 +1,14 @@
+# The extract stores Tables 2-3 as scenario composition/speciation bundles and
+# Table 4 as per-gas rate/lifetime rows. The emitter's scalar cell observations
+# cannot preserve these table-specific row identities and paired quantities.
+source_id: schaefer-fegley-2011-vaporization-earth
+source:
+  citation: >-
+    Schaefer, Lodders and Fegley (2012), Vaporization of the Earth:
+    Application to Exoplanet Atmospheres, The Astrophysical Journal 755(1).
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-18'
+  worker: emitbt-1018
+review_status: draft
+tables: []

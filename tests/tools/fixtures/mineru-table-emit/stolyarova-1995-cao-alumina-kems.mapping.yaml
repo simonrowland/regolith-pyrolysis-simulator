@@ -1,0 +1,15 @@
+# Table 2 scales pressure columns by 10^9, 10^10, or 10^11. emit deliberately
+# accepts only direct atm/bar/Pa values and has no scale conversion; recording
+# these cells as unscaled atm would change their physical values. The landed
+# thermochemistry and activity rows are from figures, not MinerU tables.
+source_id: stolyarova-1995-cao-alumina-kems
+source:
+  citation: >-
+    Stolyarova, Shornikov and Shultz (1995), High-temperature Mass
+    Spectrometric Study of the Thermodynamic Properties of the CaO-Al2O3 System.
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-18'
+  worker: emitbt-1018
+review_status: draft
+tables: []

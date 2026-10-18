@@ -1,0 +1,60 @@
+# Table 2 only. The paper has four Fe3+/ΣFe columns; their measurement
+# temperatures differ, so each column is mapped separately.
+source_id: berry-2018-morb-iron-redox
+source:
+  citation: >-
+    Berry et al. (2018), A re-assessment of the oxidation state of iron in
+    MORB glasses, Earth and Planetary Science Letters 483.
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-18'
+  worker: emitbt-1018
+review_status: draft
+tables:
+  - page: 6
+    table_index: 2
+    type: concentration_series
+    quantity: Fe3plus_over_total_Fe
+    evidence_class: measured_direct
+    unit: fraction of total Fe (Fe3+/SumFe)
+    phase: glass
+    published_page: 119
+    rows: all
+    temperature:
+      as_printed: '295'
+      unit: K
+    values:
+      - column: 5
+        species: Fe
+  - page: 6
+    table_index: 2
+    type: concentration_series
+    quantity: Fe3plus_over_total_Fe
+    evidence_class: measured_direct
+    unit: fraction of total Fe (Fe3+/SumFe)
+    phase: glass
+    published_page: 119
+    rows: all
+    temperature:
+      as_printed: '77.5'
+      unit: K
+    values:
+      - column: 6
+        species: Fe
+  - page: 6
+    table_index: 2
+    type: concentration_series
+    quantity: Fe3plus_over_total_Fe
+    evidence_class: model_derived
+    unit: fraction of total Fe (Fe3+/SumFe)
+    phase: glass
+    published_page: 119
+    rows: all
+    temperature:
+      as_printed: '295'
+      unit: K
+    values:
+      - column: 7
+        species: Fe
+      - column: 8
+        species: Fe
