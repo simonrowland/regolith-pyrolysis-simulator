@@ -1789,6 +1789,33 @@ def test_projection_over_one_percent_refuses_and_provider_solves_projected(
     assert "projected-composition" in _high_t_melt_activity_fallback_sentence(run_notice)
 
 
+@pytest.mark.parametrize("omitted_wt_pct,high_omission", [(4.9, False), (5.1, True), (56.0, True)])
+def test_projected_solve_warns_above_five_percent_without_a_ceiling(
+    omitted_wt_pct, high_omission,
+) -> None:
+    # Preserve the retained oxide ratios while allocating the specified
+    # wt% to P2O5. The original weights sum to 100 wt%; scaling them by
+    # the dimensionless retained fraction leaves 100 - omitted wt%.
+    weights = {
+        parent: wt * (100.0 - omitted_wt_pct) / 100.0
+        for parent, wt in _cr_mn_projection_weights(include_cr_mn=False).items()
+    }
+    weights["P2O5"] = omitted_wt_pct
+    result = _provider().dispatch(_request(_moles_from_wt(weights), CAP_PLUS_T_K))
+    authority = result.diagnostic["high_t_melt_activity"]
+    assert authority["provider"] == "openimcc"
+    notice = authority["projected_composition_solve"]
+    assert notice["omitted_total_wt_pct"] == pytest.approx(omitted_wt_pct)
+    tiers = notice["warning_tiers"]
+    assert bool(tiers) is high_omission
+    if high_omission:
+        assert len(tiers) == 1
+        assert tiers[0]["flag"] == "projected_composition_high_omission"
+        assert tiers[0]["above_omitted_wt_pct"] == 5.0
+        assert "d-175" in tiers[0]["provenance"]
+        assert tiers[0] in result.diagnostic["vapor_pressure_numerator_provenance"]["SiO"]["projected_composition_solve"]["warning_tiers"]
+
+
 def test_projected_nonconvergence_bridges_the_projected_composition(monkeypatch) -> None:
     composition = _moles_from_wt(_projected_weights(over_threshold=True))
     _, projected = openimcc_bridge_module._cleaned_melt_projection(composition)
