@@ -1855,10 +1855,14 @@ def _sample_from_plain(
     printed_from_initial = printed_located is None and initial is not None
     if printed_from_initial:
         printed_located = _mass_percent_printed_from_plain(initial)
+    composition_role, _role_refusal = _declared_composition_role(payload)
     owner_initial = _owner_initial_from_printed(
         printed_located,
         initial_located,
-        declared_start=printed_from_initial,
+        declared_start=(
+            printed_from_initial
+            or composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        ),
     )
     if owner_initial is not None:
         initial_located = owner_initial
@@ -3898,17 +3902,9 @@ def _owner_initial_from_printed(
     selected_column = None
     if selected_initial is not None:
         selection_text = " ".join(
-            (
-                selected_initial.locator.note
-                if selected_initial.locator is not None
-                and selected_initial.locator.note is not None
-                else "",
-                *(
-                    selected_initial.inference.inputs
-                    if selected_initial.inference is not None
-                    else ()
-                ),
-            )
+            selected_initial.inference.inputs
+            if selected_initial.inference is not None
+            else ()
         ).casefold()
         selected_column = next(
             (
@@ -3931,20 +3927,8 @@ def _owner_initial_from_printed(
             )
         raw = raw[selected_column]
         locator = selected_initial.locator or printed.locator
-    else:
-        note = (
-            printed.locator.note.casefold()
-            if printed.locator is not None and printed.locator.note is not None
-            else ""
-        )
-        if (
-            "residue" in note
-            or "final state" in note
-            or "not the starting material" in note
-        ):
-            return None
-        if not declared_start and "starting" not in note and "initial charge" not in note:
-            return None
+    elif not declared_start:
+        return None
     refusal_reason: list[str] = []
     pairs = _mass_percent_pairs(raw)
     if pairs is not None:
@@ -10446,6 +10430,33 @@ def _is_printed_initial_charge(
     ) == _printed_fingerprint(printed.state.value)
 
 
+def _printed_map_is_typed_initial(
+    printed: Located[Mapping[str, Any]] | None,
+    *,
+    equipment: object,
+    values: object,
+    vocabulary: tuple[VocabEntry, ...],
+    locator: Locator | None,
+    declared_map: bool = False,
+) -> bool:
+    """Recognize only source-typed starting compositions and the selected T0 charge."""
+
+    if printed is None or not printed.state.is_value:
+        return False
+    if _is_printed_initial_charge(printed, values, declared_map=declared_map):
+        return True
+    role, _refusal = _declared_composition_role(equipment, values)
+    if role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
+        return True
+    target = _printed_fingerprint(printed.state.value)
+    return target is not None and any(
+        fingerprint == target and name == "starting_glass_wt_pct"
+        for fingerprint, _located, name in _printed_composition_candidates(
+            _lab_roots(equipment, values), vocabulary, fallback_locator=locator
+        )
+    )
+
+
 def _values_without_row_lists(values: object) -> object:
     """``values`` with every nested list of row mappings removed.
 
@@ -10735,7 +10746,9 @@ def _merge_experiment_lab_params(
         initial_composition = existing_initial
     else:
         owner_initial = _owner_initial_from_printed(
-            printed_composition, incoming_initial
+            printed_composition,
+            incoming_initial,
+            declared_start=incoming_initial is not None,
         )
         if owner_initial is not None:
             initial_composition = owner_initial
@@ -10851,22 +10864,33 @@ def sample_from_equipment(
     initial = catalogue
     if printed is None and catalogue is None and not catalogue_marked:
         refusal_reason: list[str] = []
+        declared_map = _declared_wt_composition_point_map(
+            values, composition_units
+        )
         oxide_map = _initial_oxide_map_from_values(
             values,
             refusal_reason=refusal_reason,
-            declared_map=_declared_wt_composition_point_map(
-                values, composition_units
-            ),
+            declared_map=declared_map,
         )
         printed, _ = _located_printed_and_initial(oxide_map, locator)
-        if oxide_map is None and refusal_reason:
+        role, _role_refusal = _declared_composition_role(equipment, values)
+        if oxide_map is None and refusal_reason and role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
             initial = Located(
                 State.unknown(
                     f"mass-percent composition is not usable: {refusal_reason[0]}"
                 ),
                 locator=locator,
             )
-    if initial is None and printed is not None and printed.state.is_value:
+    if initial is None and _printed_map_is_typed_initial(
+        printed,
+        equipment=equipment,
+        values=values,
+        vocabulary=vocab,
+        locator=locator,
+        declared_map=_declared_wt_composition_point_map(
+            values, composition_units
+        ),
+    ):
         raw = printed.state.value
         if isinstance(raw, Mapping):
             _, initial = _located_printed_and_initial(
@@ -12180,9 +12204,12 @@ class Migrator:
                 experiment_id, row_printed
             ):
                 sample = replace(sample, initial_composition=None)
-        elif row_printed is not None and not _is_printed_initial_charge(
+        elif row_printed is not None and not _printed_map_is_typed_initial(
             row_printed,
-            values,
+            equipment=equipment,
+            values=values,
+            vocabulary=self._vocab,
+            locator=locator,
             declared_map=_declared_wt_composition_point_map(
                 values, composition_units
             ),

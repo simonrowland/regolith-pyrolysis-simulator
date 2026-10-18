@@ -1008,18 +1008,6 @@ def _initial_oxide_wt_percent(sample: object) -> dict[str, float]:
         raise ResidueInventoryRefusal(
             "initial_composition_not_stated", "sample.initial_composition"
         )
-    role_note = str(
-        getattr(getattr(initial, "locator", None), "note", "") or ""
-    ).casefold()
-    residue_labeled = "residu" in role_note or "final" in role_note
-    explicitly_starting_glass = (
-        "starting-material composition" in role_note
-        and "not the evaporation-residue row" in role_note
-    )
-    if residue_labeled and not explicitly_starting_glass:
-        raise ResidueInventoryRefusal(
-            "initial_composition_not_stated", "sample.initial_composition"
-        )
     composition = getattr(state, "value", None)
     components = getattr(composition, "components", None)
     if not components:
