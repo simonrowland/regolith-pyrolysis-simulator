@@ -325,6 +325,46 @@ def test_dropped_plusminus_needs_a_confirming_pdftotext_page(tmp_path: Path) -> 
     assert row["values"]["pressure_atm"] == "1851±02"
 
 
+def test_numeric_header_row_requires_render_verification_and_is_emitted(
+    tmp_path: Path,
+) -> None:
+    draft_dir = _convert_html(
+        tmp_path,
+        "<table><tr><th>Temperature during experiment (°C)</th>"
+        "<th>Extractive loss (mg)</th><th>Gravimetric loss (mg)</th></tr>"
+        "<tr><td>1416</td><td>112</td><td>125</td></tr>"
+        "<tr><td>1437</td><td>146</td><td>153</td></tr></table>",
+    )
+    table = {
+        "page": 1,
+        "table_index": 1,
+        "type": "rate_series",
+        "quantity": "sodium_disilicate_total_weight_loss",
+        "evidence_class": "measured_direct",
+        "unit": "mg",
+        "rows": "all",
+        "temperature": {"column": 1, "unit": "C"},
+        "values": [
+            {"column": 2, "species": "Na"},
+            {"column": 3, "species": "Na"},
+        ],
+    }
+    with pytest.raises(
+        ValueError,
+        match=r"row 2 column 2: needs_render_check \['numeric_header_row'\]",
+    ):
+        _emit(tmp_path / "bare", draft_dir, _base_mapping(table))
+
+    table["render_verified"] = [
+        {"row": 2, "column": 2, "text": "112"},
+        {"row": 2, "column": 3, "text": "125"},
+    ]
+    document = _emit(tmp_path / "verified", draft_dir, _base_mapping(table))
+    rows = _observations(document)
+    assert [row["values"]["value"] for row in rows] == ["112", "125", "146", "153"]
+    assert [row["locator"]["row_label"] for row in rows[:2]] == ["1416", "1416"]
+
+
 def test_emit_refuses_a_pdftotext_only_table_and_a_csv_without_flags(
     tmp_path: Path,
 ) -> None:

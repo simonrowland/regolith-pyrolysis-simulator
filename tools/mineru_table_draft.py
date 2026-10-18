@@ -32,7 +32,8 @@ Table keys:
 - ``evidence_class`` — stored as ``values.method_class``; a value column may override it
 - ``phase``, ``per``, ``experiment``, ``regime``, ``condensed_form`` — copied when set
 - ``rows`` — ``all`` (default) or a list of 1-based CSV row numbers (header rows included
-  in the numbering, but only body rows emit)
+  in the numbering; numeric mapped cells in header rows are also selected and require
+  ``render_verified``)
 - ``row_predicate`` — ``{column, equals}`` or ``{column, matches}`` on that row's cell.
   Do not combine it with a ``rows`` list
 - ``temperature`` — ``{column, unit}`` where ``unit`` is ``K`` or ``C`` / ``°C``,
@@ -56,17 +57,19 @@ Table keys:
 - ``published_page`` — copied onto locators when the worker knows it
 - ``render_verified`` — ``{row, column, text}`` for a trapped cell. ``row`` and
   ``column`` are the 1-based CSV coordinates. ``text`` is the spelling the
-  worker read on the page render; that spelling is stored
+  worker read on the page render; that spelling is stored. Numeric cells in
+  MinerU header rows also require render verification before emission
 
 Cell text is stored verbatim after stripping surrounding whitespace. Units are
 not converted. Empty cells and cells whose text is only
 ``-``, ``–``, ``—``, or ``−`` are skipped and counted under
-``skipped_empty_or_dash``. They are never written as zero. A cell whose draft
-flags include ``comma_decimal_suspect`` or ``ambiguous_comma_separator``, or
-that this command marks as ``fused_superscript``, ``run_together``,
-``letter_for_digit``, ``stacked_values``, or ``dropped_plusminus``, is a
-``needs_render_check`` cell. ``emit`` raises ``ValueError`` naming those traps
-unless ``render_verified`` supplies a spelling for that cell. The marker is not
+``skipped_empty_or_dash``. They are never written as zero. A cell needs a
+render check if its draft flags include ``comma_decimal_suspect`` or
+``ambiguous_comma_separator``, if this command marks it as
+``fused_superscript``, ``run_together``, ``letter_for_digit``,
+``stacked_values``, or ``dropped_plusminus``, or if it is numeric in a header
+row. ``emit`` raises ``ValueError`` naming those traps unless
+``render_verified`` supplies a spelling for that cell. The marker is not
 written onto the row. ``dropped_plusminus`` is marked only when a pdftotext
 page confirms the ``±`` (``--pdftotext``, ``<draft>/pdftotext-layout.txt``, or
 index ``pdftotext_layout``). Traps are read on the measured value cell, not on
@@ -878,6 +881,7 @@ _TRAP_ORDER = (
     "letter_for_digit",
     "stacked_values",
     "dropped_plusminus",
+    "numeric_header_row",
 )
 _DOCUMENT_KEYS = frozenset(
     {
@@ -1141,6 +1145,11 @@ def _render_traps(cell: Mapping[str, Any], page_text: str | None) -> list[str]:
         found.append("stacked_values")
     if _dropped_plusminus(text, page_text):
         found.append("dropped_plusminus")
+    if (
+        cell.get("row_type") == "header"
+        and _number_decimal(value_text or text) is not None
+    ):
+        found.append("numeric_header_row")
     return [name for name in _TRAP_ORDER if name in found]
 
 
@@ -1415,6 +1424,30 @@ def _emit_table(
     measurements = _measurement_columns(spec)
     temperature = _temperature_spec(spec)
     rows = _selected_body_rows(spec, cells)
+    measurement_columns = {
+        int(measurement["column"])
+        if measurement["kind"] == "fixed"
+        else int(measurement["value_column"])
+        for measurement in measurements
+    }
+    numeric_header_rows = sorted(
+        {
+            int(cell["row"])
+            for cell in cells
+            if cell["row_type"] == "header"
+            and int(cell["column"]) in measurement_columns
+            and _is_origin(cell)
+            and _number_decimal(str(cell.get("value_text") or cell["text"]))
+            is not None
+        }
+    )
+    if numeric_header_rows:
+        if spec.get("rows", "all") != "all":
+            raise ValueError(
+                f"numeric header rows contain mapped values and cannot be skipped: "
+                f"{numeric_header_rows}"
+            )
+        rows = sorted(set(rows) | set(numeric_header_rows))
     point_conditions = _copy_conditions(spec)
     published_page = spec.get("published_page")
     verified_spellings = _render_verified_spellings(spec)
@@ -1472,6 +1505,16 @@ def _emit_table(
             if cell is None or _blank_or_dash(str(cell["text"])):
                 skipped += 1
                 continue
+            if (
+                row in numeric_header_rows
+                and cell["row_type"] == "header"
+                and _number_decimal(str(cell.get("value_text") or cell["text"]))
+                is None
+            ):
+                raise ValueError(
+                    f"numeric header row {row} has nonnumeric mapped value "
+                    f"in column {column}"
+                )
             if measurement["kind"] == "pair" and not species:
                 raise ValueError(f"row {row} column {column} has an empty species cell")
             quantity = str(measurement.get("quantity") or spec["quantity"])

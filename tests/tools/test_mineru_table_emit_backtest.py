@@ -181,22 +181,6 @@ def _emitted_cells(document: dict) -> dict[tuple[str, str, str, str], Counter[De
     return emitted
 
 
-def _first_kems46_table_row(extract: dict) -> Counter[Decimal]:
-    missing: Counter[Decimal] = Counter()
-    for block in (extract.get("species") or {}).values():
-        for observation in block.get("observations") or []:
-            values = observation.get("values") or {}
-            if values.get("quantity") != "sodium_disilicate_total_weight_loss":
-                continue
-            rows = values.get("rows") or []
-            if rows:
-                for key in ("extractive_weight_loss_mg", "gravimetric_weight_loss_mg"):
-                    number = _decimal(rows[0].get(key))
-                    if number is not None:
-                        missing[number] += 1
-    return missing
-
-
 @pytest.mark.parametrize(
     "mapping_path",
     MAPPINGS,
@@ -233,22 +217,6 @@ def test_committed_emit_mappings_reproduce_landed_decimal_cells(
         absent = counts - emitted.get(key, Counter())
         if absent:
             missing[key] = absent
-
-    if source_id == "kems-046-van-limpt-2007" and missing:
-        missing_key = (
-            "sodium_disilicate_total_weight_loss",
-            "Na",
-            "pdf_page",
-            str(mapping["tables"][0]["page"]),
-        )
-        assert set(missing) == {missing_key}
-        assert missing[missing_key] == (
-            _first_kems46_table_row(extract)
-        )
-        pytest.xfail(
-            "MinerU classified Table 4.4's first numeric row as a header; "
-            "emit cannot select it"
-        )
 
     assert not missing, f"landed cells absent from emit: {missing}"
     for observation in (

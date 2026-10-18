@@ -1,6 +1,6 @@
-# Table 4.4 has a table-header row misclassified as the first data row by
-# MinerU; the emitter consequently drops that row. Table 4.2/4.3 composition
-# vectors are structured observations and cannot be emitted as scalar rows.
+# Table 4.4's first numeric data row is classified as a header by MinerU and
+# requires render verification. Table 4.2/4.3 composition vectors are
+# structured observations and cannot be emitted as scalar rows.
 source_id: kems-046-van-limpt-2007
 source:
   citation: >-
@@ -28,3 +28,10 @@ tables:
         species: Na
       - column: 3
         species: Na
+    render_verified:
+      - row: 2
+        column: 2
+        text: '112'
+      - row: 2
+        column: 3
+        text: '125'
