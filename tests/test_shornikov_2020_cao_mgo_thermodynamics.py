@@ -26,15 +26,16 @@ RENDERED_CELLS = (
     ("MgO", "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r10_c05", "63.718", Phase.CR, "3246"),
 )
 
-# Nominal T and mol% are two significant figures. Read 1 (0.1 K / 0.1 mol%)
-# and the visual page centre stay beside them. s4_04 is the maroon disk.
+# Nominal T and mol% are three significant figures of the two raw reads.
+# The stored band contains both reads. Read 1 (0.1 K / 0.1 mol%) and the
+# visual page centre stay beside them. s4_04 is the maroon disk.
 # s3_07 is the horizontal solidus. s3_04 is not an observation.
 FIGURE_READS = (
     (
         "shornikov_2020_fig1_s1_01",
-        "3.0e3",
+        "2.96e3",
         "2960.7",
-        "2.0e1",
+        "20.1",
         [206.0, 136.5],
         [928.0, 2536.5],
         "liquidus",
@@ -42,9 +43,9 @@ FIGURE_READS = (
     ),
     (
         "shornikov_2020_fig1_s4_04",
-        "2.7e3",
+        "2.70e3",
         "2697.2",
-        "5.0e1",
+        "50.0",
         [372.5, 256.0],
         [1426.5, 2896.5],
         "liquidus",
@@ -52,15 +53,27 @@ FIGURE_READS = (
     ),
     (
         "shornikov_2020_fig1_s3_07",
-        "2.6e3",
+        "2.64e3",
         "2642.9",
-        "5.9e1",
+        "59.3",
         [424.38, 280.65],
         [1582.5, 2969.5],
         "solidus",
         "symbol 3 blue filled circle",
     ),
 )
+
+# Markers the caption's curves identify, moved out of the schema-gap context.
+CURVE_KINDS = {
+    "shornikov_2020_fig1_s2_01": "liquidus",
+    "shornikov_2020_fig1_s3_01": "liquidus",
+    "shornikov_2020_fig1_s2_02": "liquidus",
+    "shornikov_2020_fig1_s3_05": "liquidus",
+    "shornikov_2020_fig1_s2_10": "liquidus",
+    "shornikov_2020_fig1_s3_02": "solidus",
+    "shornikov_2020_fig1_s3_03": "solidus",
+    "shornikov_2020_fig1_s3_10": "solidus",
+}
 
 
 def _load():
@@ -85,15 +98,15 @@ def _figure_markers(document):
 
 def _assert_figure_reads(document) -> None:
     markers = _figure_markers(document)
-    assert len(markers) == 19
-    assert sum(row["values"]["property_kind"] == "liquidus" for row in markers) == 15
-    assert sum(row["values"]["property_kind"] == "solidus" for row in markers) == 4
+    assert len(markers) == 27
+    assert sum(row["values"]["property_kind"] == "liquidus" for row in markers) == 20
+    assert sum(row["values"]["property_kind"] == "solidus" for row in markers) == 7
     gaps = [
         row
         for row in document["species"]["CaO-MgO"]["context"]
         if row["type"] == "figure_boundary_schema_gap"
     ]
-    assert len(gaps) == 21
+    assert len(gaps) == 13
     assert len(markers) + len(gaps) == 40
     for row in markers:
         values = row["values"]
@@ -101,13 +114,42 @@ def _assert_figure_reads(document) -> None:
         assert values["status"] == "typed_refusal"
         assert "DERIVED" in values["reason"]
         assert values["read_2_method"] == "visual_page_grid"
+        assert "visual_page_grid" in row["locator"]["note"]
+        assert "diameter" not in row["locator"]["note"]
+        assert "centroid" not in row["locator"]["note"]
         assert Decimal(values["read_uncertainty_K"]) > 0
         assert Decimal(values["read_uncertainty_mol_pct"]) > 0
+        for key, raw_key in (
+            ("T_K", "T_K_read_1"),
+            ("T_K", "T_K_read_2"),
+        ):
+            nominal = Decimal(values["T_K"])
+            width = Decimal(values["read_uncertainty_K"])
+            assert nominal - width <= Decimal(values[raw_key]) <= nominal + width
+        nominal = Decimal(values["cao_mol_pct_read"])
+        width = Decimal(values["read_uncertainty_mol_pct"])
+        for raw_key in ("cao_mol_pct_read_1", "cao_mol_pct_read_2"):
+            assert nominal - width <= Decimal(values[raw_key]) <= nominal + width
+    for observation_id, kind in CURVE_KINDS.items():
+        match = next(item for item in markers if item["observation_id"] == observation_id)
+        assert match["type"] == "transition_point"
+        assert match["values"]["property_kind"] == kind
+        assert "schema_gap" not in match["values"]
     for row in gaps:
+        assert row["observation_id"] not in CURVE_KINDS
         assert row["values"]["property_kind"] == "not_a_liquidus_or_solidus"
         assert "liquidus" in row["values"]["schema_gap"]
         assert "solidus" in row["values"]["schema_gap"]
         assert Decimal(row["values"]["read_uncertainty_K"]) > 0
+        assert Decimal(row["values"]["read_uncertainty_mol_pct"]) > 0
+        nominal = Decimal(row["values"]["T_K"])
+        width = Decimal(row["values"]["read_uncertainty_K"])
+        for raw_key in ("T_K_read_1", "T_K_read_2"):
+            assert nominal - width <= Decimal(row["values"][raw_key]) <= nominal + width
+        nominal = Decimal(row["values"]["cao_mol_pct_read"])
+        width = Decimal(row["values"]["read_uncertainty_mol_pct"])
+        for raw_key in ("cao_mol_pct_read_1", "cao_mol_pct_read_2"):
+            assert nominal - width <= Decimal(row["values"][raw_key]) <= nominal + width
     for (
         observation_id,
         temperature,
@@ -134,6 +176,21 @@ def _assert_figure_reads(document) -> None:
     assert solvus["values"]["T_K_read_1"] == "2603.9"
     assert solvus["values"]["page_600dpi_px_read_2"] == [699.5, 3022.0]
     assert "regions I and II contain no liquid" in solvus["values"]["schema_gap"]
+    cao_solvus = next(
+        row
+        for row in gaps
+        if row["observation_id"] == "shornikov_2020_fig1_s3_09"
+    )
+    assert cao_solvus["values"]["T_K_read_1"] == "2609.5"
+    assert cao_solvus["values"]["page_600dpi_px_read_2"] == [1938.5, 3015.5]
+    assert "regions I and II contain no liquid" in cao_solvus["values"]["schema_gap"]
+    apex = next(
+        item for item in markers if item["observation_id"] == "shornikov_2020_fig1_s3_01"
+    )
+    assert apex["values"]["T_K"] == "3.10e3"
+    assert apex["values"]["T_K_read_1"] == "3103.8"
+    assert apex["values"]["page_600dpi_px_read_2"] == [586.0, 2342.5]
+    assert apex["values"]["property_kind"] == "liquidus"
     crescent = next(
         row
         for row in gaps
@@ -278,7 +335,7 @@ def test_isolated_migration_reaches_temperature_on_every_printed_row():
         for row in result.observations.values()
         if row.source_id == document["source_id"]
     ]
-    assert len(migrated) == 69
+    assert len(migrated) == 77
     assert not result.registry_issues
     assert not result.validation.hard_issues
 
@@ -295,7 +352,7 @@ def test_isolated_migration_reaches_temperature_on_every_printed_row():
     ]
     assert len(gibbs) == 15
     assert len(fusion) == 14
-    assert len(transitions) == 34
+    assert len(transitions) == 42
     assert len(curves) == 6
 
     for formula, observation_id, value, _phase, temperature in RENDERED_CELLS:
@@ -330,9 +387,9 @@ def test_isolated_migration_reaches_temperature_on_every_printed_row():
         assert row.identity.subtype.is_value
 
     figure_rows = [row for row in transitions if "fig1_" in row.observation_id]
-    assert len(figure_rows) == 19
-    assert sum(row.identity.subtype.value == "liquidus" for row in figure_rows) == 15
-    assert sum(row.identity.subtype.value == "solidus" for row in figure_rows) == 4
+    assert len(figure_rows) == 27
+    assert sum(row.identity.subtype.value == "liquidus" for row in figure_rows) == 20
+    assert sum(row.identity.subtype.value == "solidus" for row in figure_rows) == 7
     assert not any(row.observation_id.endswith("fig1_s3_04") for row in figure_rows)
     for row in figure_rows:
         assert row.identity.subtype.value in {"liquidus", "solidus"}
@@ -349,7 +406,7 @@ def test_isolated_migration_reaches_temperature_on_every_printed_row():
     from simulator.battery.score import _printed_uncertainty_band
 
     overlap = next(row for row in figure_rows if row.observation_id.endswith("fig1_s4_04"))
-    assert overlap.value.point == Decimal("2.7e3")
+    assert overlap.value.point == Decimal("2.70e3")
     assert overlap.identity.subtype.value == "liquidus"
     band = _printed_uncertainty_band(
         overlap.identity.quantity.value,
@@ -359,7 +416,11 @@ def test_isolated_migration_reaches_temperature_on_every_printed_row():
     assert band.band is None
     solidus = next(row for row in figure_rows if row.observation_id.endswith("fig1_s3_07"))
     assert solidus.identity.subtype.value == "solidus"
-    assert solidus.value.point == Decimal("2.6e3")
+    assert solidus.value.point == Decimal("2.64e3")
+    apex = next(row for row in figure_rows if row.observation_id.endswith("fig1_s3_01"))
+    assert apex.identity.subtype.value == "liquidus"
+    assert apex.value.point == Decimal("3.10e3")
+    assert apex.admission.status is AdmissionStatus.REJECTED
 
     table_tm = next(row for row in transitions if row.observation_id.endswith("tm_cao_r08"))
     assert table_tm.value.point == Decimal("3222")
@@ -375,5 +436,5 @@ def test_isolated_migration_reaches_temperature_on_every_printed_row():
         for row in rows
         if row.get("source_id") == document["source_id"]
     ]
-    assert len(contexts) == 31
+    assert len(contexts) == 23
     assert not any(quantity(row) == "delta_fG" and "fig2" in row.observation_id for row in migrated)
