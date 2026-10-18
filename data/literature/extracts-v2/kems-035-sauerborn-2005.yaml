@@ -164,6 +164,187 @@ observations:
     figure: '2.2'
     paragraph: Kapitel 2.1.2
   read_from: pdf:kems-035-sauerborn-2005
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.513465703173792996060452264'
+          - - Al2O3
+            - '0.09514933882544856591610812716'
+          - - CaO
+            - '0.1199480627193263721234413181'
+          - - MgO
+            - '0.1444238871547512704497711421'
+          - - FeO
+            - '0.0666171250276056525421376922'
+          - - Fe2O3
+            - '0.01377063685195923114475036148'
+          - - K2O
+            - '0.005492929698424314421110093002'
+          - - TiO2
+            - '0.01295711034122324801815858953'
+          - - Na2O
+            - '0.02817520620746834932407041259'
+          amount_basis: mole_fraction
+      locator:
+        page: 17
+        figure: '2.2'
+        paragraph: Kapitel 2.1.2
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.7'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.4'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '9'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '7.4'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.4'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.8'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.6'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.7'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        output_unit: mole_fraction
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig22_jsc1_oxide_pie_deep2
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
@@ -230,6 +411,187 @@ observations:
     figure: '2.2'
     paragraph: Kapitel 2.1.2
   read_from: pdf:kems-035-sauerborn-2005
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.513465703173792996060452264'
+          - - Al2O3
+            - '0.09514933882544856591610812716'
+          - - CaO
+            - '0.1199480627193263721234413181'
+          - - MgO
+            - '0.1444238871547512704497711421'
+          - - FeO
+            - '0.0666171250276056525421376922'
+          - - Fe2O3
+            - '0.01377063685195923114475036148'
+          - - K2O
+            - '0.005492929698424314421110093002'
+          - - TiO2
+            - '0.01295711034122324801815858953'
+          - - Na2O
+            - '0.02817520620746834932407041259'
+          amount_basis: mole_fraction
+      locator:
+        page: 17
+        figure: '2.2'
+        paragraph: Kapitel 2.1.2
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.7'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.4'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '9'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - original_FeO_wt_pct
+          - state:
+              tag: value
+              value: '7.4'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - M_FeO_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '3.4'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.8'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.6'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.7'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 17
+              figure: '2.2'
+              paragraph: Kapitel 2.1.2
+        output_unit: mole_fraction
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig523_ms1_epma_glass
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-ms1
   identity:

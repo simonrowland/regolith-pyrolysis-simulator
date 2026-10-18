@@ -6,8 +6,8 @@ observations:
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_intermediate_range_reliable'
+      tag: value
+      value: p_partial
     species:
       formula: Al2O
       phase:
@@ -20,15 +20,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2060'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier intermediate_range_reliable does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.00051371775'
     approximate: false
   uncertainty:
     kind: printed
@@ -40,9 +93,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2060.0:row=12022:h=84d7d0fd39de
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -60,12 +118,36 @@ observations:
         paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000507'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2104.0:row=12022:h=082c24ac6f3c
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_intermediate_range_reliable'
+      tag: value
+      value: p_partial
     species:
       formula: Al2O
       phase:
@@ -78,15 +160,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2104'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier intermediate_range_reliable does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0011449725'
     approximate: false
   uncertainty:
     kind: printed
@@ -98,9 +233,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2104.0:row=12022:h=082c24ac6f3c
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -118,12 +258,36 @@ observations:
         paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000113'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2125.0:row=12022:h=56c573df6dcf
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_intermediate_range_reliable'
+      tag: value
+      value: p_partial
     species:
       formula: Al2O
       phase:
@@ -136,15 +300,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2125'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier intermediate_range_reliable does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0015908025'
     approximate: false
   uncertainty:
     kind: printed
@@ -156,9 +373,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2125.0:row=12022:h=56c573df6dcf
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -176,12 +398,36 @@ observations:
         paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000157'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2146.0:row=12022:h=5cb9e694376c
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_intermediate_range_reliable'
+      tag: value
+      value: p_partial
     species:
       formula: Al2O
       phase:
@@ -194,15 +440,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2146'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier intermediate_range_reliable does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.00226968'
     approximate: false
   uncertainty:
     kind: printed
@@ -214,9 +513,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2146.0:row=12022:h=5cb9e694376c
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -234,12 +538,36 @@ observations:
         paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000224'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2180.0:row=12022:h=23a2437cdea5
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_intermediate_range_reliable'
+      tag: value
+      value: p_partial
     species:
       formula: Al2O
       phase:
@@ -252,15 +580,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2180'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier intermediate_range_reliable does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0036983625'
     approximate: false
   uncertainty:
     kind: printed
@@ -272,9 +653,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2180.0:row=12022:h=23a2437cdea5
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -292,12 +678,36 @@ observations:
         paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000365'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2183.0:row=12022:h=9291e36c62a4
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_intermediate_range_reliable'
+      tag: value
+      value: p_partial
     species:
       formula: Al2O
       phase:
@@ -310,15 +720,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2183'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier intermediate_range_reliable does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.003870615'
     approximate: false
   uncertainty:
     kind: printed
@@ -330,9 +793,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2183.0:row=12022:h=9291e36c62a4
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -350,12 +818,36 @@ observations:
         paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000382'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2194.0:row=12022:h=e9183657af25
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_intermediate_range_reliable'
+      tag: value
+      value: p_partial
     species:
       formula: Al2O
       phase:
@@ -368,15 +860,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2194'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier intermediate_range_reliable does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0040631325'
     approximate: false
   uncertainty:
     kind: printed
@@ -388,9 +933,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2194.0:row=12022:h=e9183657af25
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -408,12 +958,36 @@ observations:
         paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000401'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2270.0:row=12022:h=d22df5526399
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_intermediate_range_reliable'
+      tag: value
+      value: p_partial
     species:
       formula: Al2O
       phase:
@@ -426,15 +1000,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2270'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier intermediate_range_reliable does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.0105378'
     approximate: false
   uncertainty:
     kind: printed
@@ -446,9 +1073,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2270.0:row=12022:h=d22df5526399
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -466,12 +1098,36 @@ observations:
         paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000104'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2290.0:row=12022:h=652951c738e1
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_intermediate_range_reliable'
+      tag: value
+      value: p_partial
     species:
       formula: Al2O
       phase:
@@ -484,15 +1140,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2290'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier intermediate_range_reliable does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.015705375'
     approximate: false
   uncertainty:
     kind: printed
@@ -504,9 +1213,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2290.0:row=12022:h=652951c738e1
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -524,12 +1238,36 @@ observations:
         paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000155'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2360.0:row=12065:h=d8a68e80408a
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_intermediate_range_reliable'
+      tag: value
+      value: p_partial
     species:
       formula: Al2O
       phase:
@@ -542,15 +1280,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2360'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier intermediate_range_reliable does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.06991425'
     approximate: false
   uncertainty:
     kind: printed
@@ -562,9 +1353,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2360.0:row=12065:h=d8a68e80408a
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -582,12 +1378,36 @@ observations:
         paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000069'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2395.0:row=12065:h=bd14c59ecc38
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_intermediate_range_reliable'
+      tag: value
+      value: p_partial
     species:
       formula: Al2O
       phase:
@@ -600,15 +1420,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2395'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier intermediate_range_reliable does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.1001091'
     approximate: false
   uncertainty:
     kind: printed
@@ -620,9 +1493,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2395.0:row=12065:h=bd14c59ecc38
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -640,12 +1518,36 @@ observations:
         paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000988'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2425.0:row=12065:h=df7ebc7b63bc
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_intermediate_range_reliable'
+      tag: value
+      value: p_partial
     species:
       formula: Al2O
       phase:
@@ -658,15 +1560,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2425'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier intermediate_range_reliable does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.1925175'
     approximate: false
   uncertainty:
     kind: printed
@@ -678,9 +1633,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2425.0:row=12065:h=df7ebc7b63bc
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -698,12 +1658,36 @@ observations:
         paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000019'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2465.0:row=12065:h=33d44acac31c
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_intermediate_range_reliable'
+      tag: value
+      value: p_partial
     species:
       formula: Al2O
       phase:
@@ -716,15 +1700,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2465'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier intermediate_range_reliable does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.34349175'
     approximate: false
   uncertainty:
     kind: printed
@@ -736,9 +1773,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2465.0:row=12065:h=33d44acac31c
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -756,12 +1798,36 @@ observations:
         paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000339'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2500.0:row=12065:h=5e3e2b6140c0
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_intermediate_range_reliable'
+      tag: value
+      value: p_partial
     species:
       formula: Al2O
       phase:
@@ -774,15 +1840,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2500'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier intermediate_range_reliable does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Al2O
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Al2O
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.47926725'
     approximate: false
   uncertainty:
     kind: printed
@@ -794,9 +1913,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_al2o_psat_table4::T=2500.0:row=12065:h=5e3e2b6140c0
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -814,6 +1938,30 @@ observations:
         paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000473'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          paragraph: Partial pressures of AlO and Al2O over samples 12022 and 12065
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_al_monatomic_figure7
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
@@ -1187,10 +2335,10 @@ observations:
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_BC_12065'
+      tag: value
+      value: p_partial
     species:
-      formula: BC
+      formula: AlO
       phase:
         tag: unknown
         reason: phase string 'Apollo_12_lunar_basalt_melt_12022_12065' is not in the closed automatic map
@@ -1201,15 +2349,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2320'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier 12065 does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: AlO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: AlO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.10639125'
     approximate: false
   uncertainty:
     kind: printed
@@ -1221,9 +2422,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_alo_psat_table4::T=2320.0:row=12065:h=63aeb0887b11
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -1239,14 +2445,36 @@ observations:
         table: '4'
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000105'
+        locator:
+          table: '4'
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_alo_psat_table4::T=2360.0:row=12065:h=fe3a730ce2a6
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_BC_12065'
+      tag: value
+      value: p_partial
     species:
-      formula: BC
+      formula: AlO
       phase:
         tag: unknown
         reason: phase string 'Apollo_12_lunar_basalt_melt_12022_12065' is not in the closed automatic map
@@ -1257,15 +2485,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2360'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier 12065 does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: AlO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: AlO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.1317225'
     approximate: false
   uncertainty:
     kind: printed
@@ -1277,9 +2558,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_alo_psat_table4::T=2360.0:row=12065:h=fe3a730ce2a6
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -1295,14 +2581,36 @@ observations:
         table: '4'
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000013'
+        locator:
+          table: '4'
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_alo_psat_table4::T=2395.0:row=12065:h=9a37333e1a70
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_BC_12065'
+      tag: value
+      value: p_partial
     species:
-      formula: BC
+      formula: AlO
       phase:
         tag: unknown
         reason: phase string 'Apollo_12_lunar_basalt_melt_12022_12065' is not in the closed automatic map
@@ -1313,15 +2621,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2395'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier 12065 does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: AlO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: AlO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.2249415'
     approximate: false
   uncertainty:
     kind: printed
@@ -1333,9 +2694,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_alo_psat_table4::T=2395.0:row=12065:h=9a37333e1a70
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -1351,14 +2717,36 @@ observations:
         table: '4'
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000222'
+        locator:
+          table: '4'
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_alo_psat_table4::T=2425.0:row=12065:h=1296021b2684
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_BC_12065'
+      tag: value
+      value: p_partial
     species:
-      formula: BC
+      formula: AlO
       phase:
         tag: unknown
         reason: phase string 'Apollo_12_lunar_basalt_melt_12022_12065' is not in the closed automatic map
@@ -1369,15 +2757,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2425'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier 12065 does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: AlO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: AlO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.38402175'
     approximate: false
   uncertainty:
     kind: printed
@@ -1389,9 +2830,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_alo_psat_table4::T=2425.0:row=12065:h=1296021b2684
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -1407,14 +2853,36 @@ observations:
         table: '4'
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000379'
+        locator:
+          table: '4'
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_alo_psat_table4::T=2465.0:row=12065:h=41883a461973
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_BC_12065'
+      tag: value
+      value: p_partial
     species:
-      formula: BC
+      formula: AlO
       phase:
         tag: unknown
         reason: phase string 'Apollo_12_lunar_basalt_melt_12022_12065' is not in the closed automatic map
@@ -1425,15 +2893,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2465'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier 12065 does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: AlO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: AlO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.693063'
     approximate: false
   uncertainty:
     kind: printed
@@ -1445,9 +2966,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_alo_psat_table4::T=2465.0:row=12065:h=41883a461973
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -1463,14 +2989,36 @@ observations:
         table: '4'
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000684'
+        locator:
+          table: '4'
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_alo_psat_table4::T=2500.0:row=12065:h=43425490e00a
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'partial_pressure_BC_12065'
+      tag: value
+      value: p_partial
     species:
-      formula: BC
+      formula: AlO
       phase:
         tag: unknown
         reason: phase string 'Apollo_12_lunar_basalt_melt_12022_12065' is not in the closed automatic map
@@ -1481,15 +3029,68 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
     temperature_K:
       tag: value
       value: '2500'
-    reference_state:
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
       tag: unknown
-      reason: qualifier 12065 does not name a reference_state
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: AlO
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: AlO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.907872'
     approximate: false
   uncertainty:
     kind: printed
@@ -1501,9 +3102,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_alo_psat_table4::T=2500.0:row=12065:h=43425490e00a
   source_id: kems-022-demaria-1971
   locator:
     table: '4'
@@ -1519,6 +3125,28 @@ observations:
         table: '4'
         line_range: 294-296
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:kems-022-demaria-1971
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000896'
+        locator:
+          table: '4'
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          table: '4'
+          line_range: 294-296
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    output_unit: Pa
 - observation_id: kems-022-demaria-1971::demaria_1971_ca_figure_only_and_measurement_difficulty
   experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
   identity:

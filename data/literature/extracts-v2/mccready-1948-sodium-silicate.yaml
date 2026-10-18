@@ -1,0 +1,1234 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/mccready-1948-sodium-silicate.yaml
+observations:
+- observation_id: mccready-1948-sodium-silicate::mccready_1948_kroger_fingas_reaction11
+  experiment_id: 10.1021/j150464a001::mccready-1948-sodium-silicate
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'equilibrium_log_pressure_relation'
+    species:
+      formula: Na6Si2O7
+      phase:
+        tag: unknown
+        reason: phase string 'reaction phases as assigned tentatively by McCready' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_log_pressure_relation'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mccready-1948-sodium-silicate
+  locator:
+    page: 4
+    published_page: 1280
+    pdf_page_index: 3
+    equation: '11'
+  read_from: pdf:mccready-1948-sodium-silicate
+  derived_from:
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1253.15:h=ec8a8e512386
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1253.15:h=24453151b3bc
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1313.15:h=273430570b81
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1381.15:h=1442b1f64759
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1363.15:h=6b0ff0e971ca
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1373.15:h=4025c47d843f
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1368.15:h=f08a6f2f4367
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1418.15:h=62936df68877
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1333.15:h=7a82d6c43d26
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1293.15:h=109497f12408
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1313.15:h=d8df114e56d5
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1410.15:h=3fd23b646149
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1418.15:h=53d605b2f47e
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1423.15:h=80d5078a80ff
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1318.15:h=d272a12775f3
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1313.15:h=6d4fd291ed4c
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1388.15:h=ec6db482709f
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1198.15:h=ba6639e90876
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1210.15:h=88de1069e8a4
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1273.15:h=85922b4f0a5a
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1328.15:h=24193103d042
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1363.15:h=ff6eb8aeffca
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1418.15:h=e62d5ba3aca8
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1353.15:h=a7dc29a643ed
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1433.15:h=0d65e0da3d90
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1353.15:h=9a650b6942bf
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1283.15:h=5645ed1685c1
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1386.15:h=93d6c3022b69
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1458.15:h=e22e05b016fe
+  derivation:
+    relation: McCready least-squares fit to the Table 5 CO2-pressure series over the overlapping 1050 to 1150°C range.
+    inputs:
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1253.15:h=ec8a8e512386
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1253.15:h=24453151b3bc
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1313.15:h=273430570b81
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1381.15:h=1442b1f64759
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1363.15:h=6b0ff0e971ca
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1373.15:h=4025c47d843f
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1368.15:h=f08a6f2f4367
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1418.15:h=62936df68877
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1333.15:h=7a82d6c43d26
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1293.15:h=109497f12408
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1313.15:h=d8df114e56d5
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1410.15:h=3fd23b646149
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1418.15:h=53d605b2f47e
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1423.15:h=80d5078a80ff
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1318.15:h=d272a12775f3
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1313.15:h=6d4fd291ed4c
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1388.15:h=ec6db482709f
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1198.15:h=ba6639e90876
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1210.15:h=88de1069e8a4
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1273.15:h=85922b4f0a5a
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1328.15:h=24193103d042
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1363.15:h=ff6eb8aeffca
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1418.15:h=e62d5ba3aca8
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1353.15:h=a7dc29a643ed
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1433.15:h=0d65e0da3d90
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1353.15:h=9a650b6942bf
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1283.15:h=5645ed1685c1
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1386.15:h=93d6c3022b69
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_naco3_table5::T=1458.15:h=e22e05b016fe
+    parameters: []
+    output_unit: as_published
+- observation_id: mccready-1948-sodium-silicate::mccready_1948_kroger_fingas_reaction3
+  experiment_id: 10.1021/j150464a001::mccready-1948-sodium-silicate
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'equilibrium_log_pressure_relation'
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: unknown
+        reason: phase string 'Na2CO3(s), SiO2(quartz), Na2SiO3(s), CO2(g)' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_log_pressure_relation'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: McCready's least-squares fit to Kröger and Fingas (1935) pressure data
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mccready-1948-sodium-silicate
+  locator:
+    page: 3
+    published_page: 1279
+    pdf_page_index: 2
+    equation: '3'
+  read_from: pdf:mccready-1948-sodium-silicate
+- observation_id: mccready-1948-sodium-silicate::mccready_1948_kroger_fingas_reaction9
+  experiment_id: 10.1021/j150464a001::mccready-1948-sodium-silicate
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'equilibrium_log_pressure_relation'
+    species:
+      formula: Na6Si2O7
+      phase:
+        tag: unknown
+        reason: phase string 'carbonate and crystalline sodium metasilicate/pyrosilicate as tentatively assigned by McCready'
+          is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_log_pressure_relation'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mccready-1948-sodium-silicate
+  locator:
+    page: 3
+    published_page: 1279
+    pdf_page_index: 2
+    equation: '9'
+  read_from: pdf:mccready-1948-sodium-silicate
+  derived_from:
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1013.15:h=b421d7b104eb
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1133.15:h=c927bd8caa7b
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1169.15:h=f018817dd75e
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1238.15:h=001f591a511a
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1288.15:h=725f29a6f6a5
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1193.15:h=8bab60dd0ab8
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1207.15:h=f3d533720c5f
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1191.15:h=7ddfd8eced5f
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1262.15:h=6836a5e4d698
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1307.15:h=3c6358c711a8
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1340.15:h=2ff77c48f14e
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1168.15:h=b39dbed9fb95
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1257.15:h=a9452a6b4df2
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1341.15:h=53748f98622a
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1367.15:h=f405afe4de64
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1327.15:h=a0db36cb2c05
+  derivation:
+    relation: McCready least-squares fit to the Table 2 continuation CO2-pressure series over the overlapping 870 to 1050°C
+      range.
+    inputs:
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1013.15:h=b421d7b104eb
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1133.15:h=c927bd8caa7b
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1169.15:h=f018817dd75e
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1238.15:h=001f591a511a
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1288.15:h=725f29a6f6a5
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1193.15:h=8bab60dd0ab8
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1207.15:h=f3d533720c5f
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1191.15:h=7ddfd8eced5f
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1262.15:h=6836a5e4d698
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1307.15:h=3c6358c711a8
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1340.15:h=2ff77c48f14e
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1168.15:h=b39dbed9fb95
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1257.15:h=a9452a6b4df2
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1341.15:h=53748f98622a
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1367.15:h=f405afe4de64
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2co3_na2sio3_table2_continuation::T=1327.15:h=a0db36cb2c05
+    parameters: []
+    output_unit: as_published
+- observation_id: mccready-1948-sodium-silicate::mccready_1948_na2o2_formation_enthalpy
+  experiment_id: 10.1021/j150464a001::mccready-1948-sodium-silicate
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2O2
+      phase:
+        tag: unknown
+        reason: phase string 'solid sodium peroxide' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-498.7328'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Bichowsky and Rossini; also cited by McCready as reference (3)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: mccready-1948-sodium-silicate::mccready_1948_na2o2_formation_enthalpy
+  source_id: mccready-1948-sodium-silicate
+  locator:
+    page: 3
+    published_page: 1279
+    pdf_page_index: 2
+    equation: '6'
+  read_from: pdf:mccready-1948-sodium-silicate
+- observation_id: mccready-1948-sodium-silicate::mccready_1948_na2si2o5_reaction10
+  experiment_id: 10.1021/j150464a001::mccready-1948-sodium-silicate
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'equilibrium_log_pressure_relation'
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: unknown
+        reason: phase string 'Na2CO3(s), Na2Si2O5(s), Na2SiO3(s), CO2(g)' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_log_pressure_relation'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mccready-1948-sodium-silicate
+  locator:
+    page: 3
+    published_page: 1279
+    pdf_page_index: 2
+    equation: '10'
+  read_from: pdf:mccready-1948-sodium-silicate
+  derived_from:
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=671.15:h=6548fe8fb691
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=706.15:h=03793508e6d3
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=743.15:h=57784f75e96e
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=788.15:h=cc2b5ae915aa
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=806.15:h=161155fbcf4f
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=846.15:h=c8c14a91cb41
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=882.15:h=13df717f6175
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=908.15:h=7f283a315d94
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=848.15:h=a9bf0a7f335b
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=846.15:h=03078f6886cd
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=923.15:h=9f4518a059f3
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=938.15:h=b0aaca430cbf
+  - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=866.15:h=34c426b3ab69
+  derivation:
+    relation: McCready least-squares fit to the Table 1 CO2-pressure series over the overlapping 450 to 600°C range.
+    inputs:
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=671.15:h=6548fe8fb691
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=706.15:h=03793508e6d3
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=743.15:h=57784f75e96e
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=788.15:h=cc2b5ae915aa
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=806.15:h=161155fbcf4f
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=846.15:h=c8c14a91cb41
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=882.15:h=13df717f6175
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=908.15:h=7f283a315d94
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=848.15:h=a9bf0a7f335b
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=846.15:h=03078f6886cd
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=923.15:h=9f4518a059f3
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=938.15:h=b0aaca430cbf
+    - kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na2si2o5_naco3_table1::T=866.15:h=34c426b3ab69
+    parameters: []
+    output_unit: as_published
+- observation_id: mccready-1948-sodium-silicate::mccready_1948_oxide_reference_CO2
+  experiment_id: 10.1021/j150464a001::mccready-1948-sodium-silicate
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: CO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-393.513568'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Reference 19, National Bureau of Standards tables
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: mccready-1948-sodium-silicate::mccready_1948_oxide_reference_CO2
+  source_id: mccready-1948-sodium-silicate
+  locator:
+    page: 6
+    published_page: 1282
+    pdf_page_index: 5
+    table: '1'
+  read_from: pdf:mccready-1948-sodium-silicate
+- observation_id: mccready-1948-sodium-silicate::mccready_1948_pyrosilicate_reaction16
+  experiment_id: 10.1021/j150464a001::mccready-1948-sodium-silicate
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy'
+    species:
+      formula: Na6Si2O7
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline sodium silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mccready-1948-sodium-silicate
+  locator:
+    page: 5
+    published_page: 1281
+    pdf_page_index: 4
+    equation: '16'
+  read_from: pdf:mccready-1948-sodium-silicate
+  derived_from:
+  - mccready-1948-sodium-silicate::mccready_1948_zintl_leverkus_reaction14
+  - mccready-1948-sodium-silicate::mccready_1948_zintl_leverkus_reaction12
+  derivation:
+    relation: Difference between McCready equations (14) and (12), evaluated with their printed logarithmic-pressure slopes.
+    inputs:
+    - mccready-1948-sodium-silicate::mccready_1948_zintl_leverkus_reaction14
+    - mccready-1948-sodium-silicate::mccready_1948_zintl_leverkus_reaction12
+    parameters: []
+    output_unit: as_published
+- observation_id: mccready-1948-sodium-silicate::mccready_1948_quartz_reference
+  experiment_id: 10.1021/j150464a001::mccready-1948-sodium-silicate
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'quartz' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-871.5272'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Troitzsch; the article says the temperature correction is smaller than the probable error.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: mccready-1948-sodium-silicate::mccready_1948_quartz_reference
+  source_id: mccready-1948-sodium-silicate
+  locator:
+    page: 2
+    published_page: 1278
+    pdf_page_index: 1
+    section: Sources of data
+  read_from: pdf:mccready-1948-sodium-silicate
+- observation_id: mccready-1948-sodium-silicate::mccready_1948_ruff_grieger_reaction6
+  experiment_id: 10.1021/j150464a001::mccready-1948-sodium-silicate
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy'
+    species:
+      formula: Na4SiO4
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline sodium orthosilicate; reaction as reassigned by McCready' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Ruff and Grieger, cited by McCready
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mccready-1948-sodium-silicate
+  locator:
+    page: 3
+    published_page: 1279
+    pdf_page_index: 2
+    equation: '6'
+  read_from: pdf:mccready-1948-sodium-silicate
+- observation_id: mccready-1948-sodium-silicate::mccready_1948_ruff_grieger_reaction7
+  experiment_id: 10.1021/j150464a001::mccready-1948-sodium-silicate
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy'
+    species:
+      formula: Na4SiO4
+      phase:
+        tag: unknown
+        reason: phase string 'solid reactants and products' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Ruff and Grieger, cited by McCready
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mccready-1948-sodium-silicate
+  locator:
+    page: 3
+    published_page: 1279
+    pdf_page_index: 2
+    equation: '7'
+  read_from: pdf:mccready-1948-sodium-silicate
+- observation_id: mccready-1948-sodium-silicate::mccready_1948_ruff_grieger_reaction8
+  experiment_id: 10.1021/j150464a001::mccready-1948-sodium-silicate
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy'
+    species:
+      formula: Na4SiO4
+      phase:
+        tag: unknown
+        reason: phase string 'solid reactants and products' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Ruff and Grieger, cited by McCready
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mccready-1948-sodium-silicate
+  locator:
+    page: 3
+    published_page: 1279
+    pdf_page_index: 2
+    equation: '8'
+  read_from: pdf:mccready-1948-sodium-silicate
+- observation_id: mccready-1948-sodium-silicate::mccready_1948_table1_Na2Si2O5
+  experiment_id: 10.1021/j150464a001::mccready-1948-sodium-silicate
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline sodium disilicate' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-2410.4024'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: mccready-1948-sodium-silicate::mccready_1948_table1_Na2Si2O5
+  source_id: mccready-1948-sodium-silicate
+  locator:
+    page: 6
+    published_page: 1282
+    pdf_page_index: 5
+    table: '1'
+  read_from: pdf:mccready-1948-sodium-silicate
+  derived_from:
+  - mccready-1948-sodium-silicate::mccready_1948_na2si2o5_reaction10
+  - mccready-1948-sodium-silicate::mccready_1948_kroger_fingas_reaction3
+  derivation:
+    relation: Reaction (10) minus reaction (3), followed by McCready's stated temperature correction and formation reaction
+      cycle.
+    inputs:
+    - mccready-1948-sodium-silicate::mccready_1948_na2si2o5_reaction10
+    - mccready-1948-sodium-silicate::mccready_1948_kroger_fingas_reaction3
+    parameters: []
+    output_unit: as_published
+- observation_id: mccready-1948-sodium-silicate::mccready_1948_table1_Na2SiO3
+  experiment_id: 10.1021/j150464a001::mccready-1948-sodium-silicate
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline sodium metasilicate' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-1525.9048'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Troitzsch; McCready describes this as the most reliable value and accepts it.
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: mccready-1948-sodium-silicate::mccready_1948_table1_Na2SiO3
+  source_id: mccready-1948-sodium-silicate
+  locator:
+    page: 6
+    published_page: 1282
+    pdf_page_index: 5
+    table: '1'
+  read_from: pdf:mccready-1948-sodium-silicate
+- observation_id: mccready-1948-sodium-silicate::mccready_1948_table1_Na4SiO4
+  experiment_id: 10.1021/j150464a001::mccready-1948-sodium-silicate
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na4SiO4
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline sodium orthosilicate' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-2082.7952'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: mccready-1948-sodium-silicate::mccready_1948_table1_Na4SiO4
+  source_id: mccready-1948-sodium-silicate
+  locator:
+    page: 6
+    published_page: 1282
+    pdf_page_index: 5
+    table: '1'
+  read_from: pdf:mccready-1948-sodium-silicate
+  derived_from:
+  - mccready-1948-sodium-silicate::mccready_1948_ruff_grieger_reaction6
+  - mccready-1948-sodium-silicate::mccready_1948_na2o2_formation_enthalpy
+  derivation:
+    relation: Reaction (6) plus the cited Na2O2 formation enthalpy; reaction result rounded to the table value.
+    inputs:
+    - mccready-1948-sodium-silicate::mccready_1948_ruff_grieger_reaction6
+    - mccready-1948-sodium-silicate::mccready_1948_na2o2_formation_enthalpy
+    parameters: []
+    output_unit: as_published
+- observation_id: mccready-1948-sodium-silicate::mccready_1948_table1_Na6Si2O7
+  experiment_id: 10.1021/j150464a001::mccready-1948-sodium-silicate
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na6Si2O7
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline sodium pyrosilicate' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-3582.7592'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: mccready-1948-sodium-silicate::mccready_1948_table1_Na6Si2O7
+  source_id: mccready-1948-sodium-silicate
+  locator:
+    page: 6
+    published_page: 1282
+    pdf_page_index: 5
+    table: '1'
+  read_from: pdf:mccready-1948-sodium-silicate
+  derived_from:
+  - mccready-1948-sodium-silicate::mccready_1948_pyrosilicate_reaction16
+  derivation:
+    relation: Calculated from reaction (16) and elemental entropies; all constituents are crystalline, so additive heat capacities
+      are assumed and the temperature correction is neglected.
+    inputs:
+    - mccready-1948-sodium-silicate::mccready_1948_pyrosilicate_reaction16
+    parameters: []
+    output_unit: as_published
+- observation_id: mccready-1948-sodium-silicate::mccready_1948_zintl_leverkus_reaction12
+  experiment_id: 10.1021/j150464a001::mccready-1948-sodium-silicate
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'equilibrium_log_pressure_relation'
+    species:
+      formula: Na6Si2O7
+      phase:
+        tag: unknown
+        reason: phase string 'reaction occurs above the melting point of sodium hydroxide' is not in the closed automatic
+          map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_log_pressure_relation'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Zintl and Leverkus, as interpreted by McCready
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mccready-1948-sodium-silicate
+  locator:
+    page: 4
+    published_page: 1280
+    pdf_page_index: 3
+    equation: '12'
+  read_from: pdf:mccready-1948-sodium-silicate
+- observation_id: mccready-1948-sodium-silicate::mccready_1948_zintl_leverkus_reaction14
+  experiment_id: 10.1021/j150464a001::mccready-1948-sodium-silicate
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'equilibrium_log_pressure_relation'
+    species:
+      formula: Na6Si2O7
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline sodium silicates' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'equilibrium_log_pressure_relation'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Zintl and Leverkus, as interpreted by McCready
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: mccready-1948-sodium-silicate
+  locator:
+    page: 4
+    published_page: 1280
+    pdf_page_index: 3
+    equation: '14'
+  read_from: pdf:mccready-1948-sodium-silicate

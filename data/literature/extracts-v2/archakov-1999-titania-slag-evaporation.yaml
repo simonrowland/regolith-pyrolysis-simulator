@@ -1,0 +1,144 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/archakov-1999-titania-slag-evaporation.yaml
+observations:
+- observation_id: archakov-1999-titania-slag-evaporation::archakov_1999_melting_point_tio2_37_60::T=1643:h=132caa56cecd
+  experiment_id: 920682a8d9ea1ef59aba899ff5d2442d0fd50468c430aed541728cdb0fd7e5b0::archakov-1999-titania-slag-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: CaTiSiO5-CaTiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: liquidus
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: No numeric total pressure is printed for the microscopy measurement.
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1643'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 15
+      note: Printed uncertainty is ±15 K; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: archakov-1999-titania-slag-evaporation
+  locator:
+    page: 3
+    published_page: 1466
+    pdf_page_index: 2
+    section: Results and discussion
+  read_from: pdf:archakov-1999-titania-slag-evaporation
+  point_conditions:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: No numeric total pressure is printed for the microscopy measurement.
+      locator:
+        page: 3
+        published_page: 1466
+        pdf_page_index: 2
+        section: Results and discussion
+    temperature_K:
+      state:
+        tag: value
+        value: '1643'
+      locator:
+        page: 3
+        published_page: 1466
+        pdf_page_index: 2
+        section: Results and discussion
+    composition:
+      state:
+        tag: unknown
+        reason: Only the TiO2 mole percentage is printed, not a complete composition.
+      locator:
+        page: 3
+        published_page: 1466
+        pdf_page_index: 2
+        section: Results and discussion
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: 37.60 mole %
+      locator:
+        page: 3
+        published_page: 1466
+        pdf_page_index: 2
+        section: Results and discussion
+    atmosphere:
+      state:
+        tag: value
+        value: air
+      locator:
+        page: 3
+        published_page: 1466
+        pdf_page_index: 2
+        section: Results and discussion
+  derivation:
+    relation: identity:K
+    inputs:
+    - pdf:archakov-1999-titania-slag-evaporation
+    parameters: []
+    output_unit: K

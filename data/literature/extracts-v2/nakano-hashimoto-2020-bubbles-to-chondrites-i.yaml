@@ -675,14 +675,14 @@ observations:
     - pdf:nakano-hashimoto-2020-bubbles-to-chondrites-i
     parameters: []
     output_unit: Pa
-- observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_mass_loss_selected_runs
+- observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_mass_loss_selected_runs::T=2450.15:row=103:h=92edb7792e6c
   experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'assembly_mass_loss_relative_to_initial_mass'
+      tag: value
+      value: mass_loss_fraction
     species:
-      formula: SiO2
+      formula: Allende
       phase:
         tag: unknown
         reason: phase string 'boiling_silicate_melt' is not in the closed automatic map
@@ -693,13 +693,56 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2450.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: value
       value: '30000'
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'assembly_mass_loss_relative_to_initial_mass';
-      refusing to pick a number
+    kind: point
+    point: '0.231'
     approximate: false
   uncertainty:
     kind: none
@@ -717,12 +760,1097 @@ observations:
     page: 6
     table: '2'
   read_from: pdf:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2450.15'
+      locator:
+        page: 6
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2177'
+            locator:
+              page: 6
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              table: '2'
+        output_unit: K
+    heating_duration_s:
+      state:
+        tag: value
+        value: '34'
+      locator:
+        page: 6
+        table: '2'
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: percent_to_fraction
     inputs:
     - pdf:nakano-hashimoto-2020-bubbles-to-chondrites-i
-    parameters: []
-    output_unit: Pa
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '23.1'
+        locator:
+          page: 6
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 6
+          table: '2'
+    output_unit: dimensionless
+  provenance:
+    printed_run_basis:
+      material: Allende
+      temperature_basis: Tmax
+      heating_duration_s: 34
+      mass_loss_basis: Mass loss includes sample, Re wire, and graphite disk; ? and >100 are retained as printed.
+- observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_mass_loss_selected_runs::T=2456.15:row=132:h=2055d939eaaa
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: Lsil
+      phase:
+        tag: unknown
+        reason: phase string 'boiling_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2456.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.974'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'laser_boiling_with_inert_gas_cooling'
+    original_method_class: laser_boiling_with_inert_gas_cooling
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nakano-hashimoto-2020-bubbles-to-chondrites-i
+  locator:
+    page: 6
+    table: '2'
+  read_from: pdf:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2456.15'
+      locator:
+        page: 6
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2183'
+            locator:
+              page: 6
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              table: '2'
+        output_unit: K
+    heating_duration_s:
+      state:
+        tag: value
+        value: '8'
+      locator:
+        page: 6
+        table: '2'
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:nakano-hashimoto-2020-bubbles-to-chondrites-i
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '97.4'
+        locator:
+          page: 6
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 6
+          table: '2'
+    output_unit: dimensionless
+  provenance:
+    printed_run_basis:
+      material: Lsil
+      temperature_basis: Tmax
+      heating_duration_s: 8
+      mass_loss_basis: Mass loss includes sample, Re wire, and graphite disk; ? and >100 are retained as printed.
+- observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_mass_loss_selected_runs::T=2832.15:row=109:h=0b8744b8f21f
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: Allende
+      phase:
+        tag: unknown
+        reason: phase string 'boiling_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2832.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.531'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'laser_boiling_with_inert_gas_cooling'
+    original_method_class: laser_boiling_with_inert_gas_cooling
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nakano-hashimoto-2020-bubbles-to-chondrites-i
+  locator:
+    page: 6
+    table: '2'
+  read_from: pdf:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2832.15'
+      locator:
+        page: 6
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2559'
+            locator:
+              page: 6
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              table: '2'
+        output_unit: K
+    heating_duration_s:
+      state:
+        tag: value
+        value: '417'
+      locator:
+        page: 6
+        table: '2'
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:nakano-hashimoto-2020-bubbles-to-chondrites-i
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '53.1'
+        locator:
+          page: 6
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 6
+          table: '2'
+    output_unit: dimensionless
+  provenance:
+    printed_run_basis:
+      material: Allende
+      temperature_basis: Tmax
+      heating_duration_s: 417
+      mass_loss_basis: Mass loss includes sample, Re wire, and graphite disk; ? and >100 are retained as printed.
+- observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_mass_loss_selected_runs::T=2876.15:row=114:h=a5977a169539
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: Lsil
+      phase:
+        tag: unknown
+        reason: phase string 'boiling_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2876.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.093'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'laser_boiling_with_inert_gas_cooling'
+    original_method_class: laser_boiling_with_inert_gas_cooling
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nakano-hashimoto-2020-bubbles-to-chondrites-i
+  locator:
+    page: 6
+    table: '2'
+  read_from: pdf:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2876.15'
+      locator:
+        page: 6
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2603'
+            locator:
+              page: 6
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              table: '2'
+        output_unit: K
+    heating_duration_s:
+      state:
+        tag: value
+        value: '14'
+      locator:
+        page: 6
+        table: '2'
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:nakano-hashimoto-2020-bubbles-to-chondrites-i
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '9.3'
+        locator:
+          page: 6
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 6
+          table: '2'
+    output_unit: dimensionless
+  provenance:
+    printed_run_basis:
+      material: Lsil
+      temperature_basis: Tmax
+      heating_duration_s: 14
+      mass_loss_basis: Mass loss includes sample, Re wire, and graphite disk; ? and >100 are retained as printed.
+- observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_mass_loss_selected_runs::T=2881.15:row=91:h=dd08badc9b5f
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: Allende
+      phase:
+        tag: unknown
+        reason: phase string 'boiling_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2881.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '1.17'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'laser_boiling_with_inert_gas_cooling'
+    original_method_class: laser_boiling_with_inert_gas_cooling
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nakano-hashimoto-2020-bubbles-to-chondrites-i
+  locator:
+    page: 6
+    table: '2'
+  read_from: pdf:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2881.15'
+      locator:
+        page: 6
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2608'
+            locator:
+              page: 6
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              table: '2'
+        output_unit: K
+    heating_duration_s:
+      state:
+        tag: value
+        value: '8'
+      locator:
+        page: 6
+        table: '2'
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:nakano-hashimoto-2020-bubbles-to-chondrites-i
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '117'
+        locator:
+          page: 6
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 6
+          table: '2'
+    output_unit: dimensionless
+  provenance:
+    printed_run_basis:
+      material: Allende
+      temperature_basis: Tmax
+      heating_duration_s: 8
+      mass_loss_basis: Mass loss includes sample, Re wire, and graphite disk; ? and >100 are retained as printed.
+- observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_mass_loss_selected_runs::T=2886.15:row=117:h=41f42b843679
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: Lsil
+      phase:
+        tag: unknown
+        reason: phase string 'boiling_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2886.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.327'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'laser_boiling_with_inert_gas_cooling'
+    original_method_class: laser_boiling_with_inert_gas_cooling
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nakano-hashimoto-2020-bubbles-to-chondrites-i
+  locator:
+    page: 6
+    table: '2'
+  read_from: pdf:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2886.15'
+      locator:
+        page: 6
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2613'
+            locator:
+              page: 6
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              table: '2'
+        output_unit: K
+    heating_duration_s:
+      state:
+        tag: value
+        value: '31'
+      locator:
+        page: 6
+        table: '2'
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:nakano-hashimoto-2020-bubbles-to-chondrites-i
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '32.7'
+        locator:
+          page: 6
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 6
+          table: '2'
+    output_unit: dimensionless
+  provenance:
+    printed_run_basis:
+      material: Lsil
+      temperature_basis: Tmax
+      heating_duration_s: 31
+      mass_loss_basis: Mass loss includes sample, Re wire, and graphite disk; ? and >100 are retained as printed.
+- observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_mass_loss_selected_runs::T=2968.15:row=123:h=a8d34fea191f
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: Lsil
+      phase:
+        tag: unknown
+        reason: phase string 'boiling_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2968.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.419'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'laser_boiling_with_inert_gas_cooling'
+    original_method_class: laser_boiling_with_inert_gas_cooling
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nakano-hashimoto-2020-bubbles-to-chondrites-i
+  locator:
+    page: 6
+    table: '2'
+  read_from: pdf:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2968.15'
+      locator:
+        page: 6
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2695'
+            locator:
+              page: 6
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              table: '2'
+        output_unit: K
+    heating_duration_s:
+      state:
+        tag: value
+        value: '140'
+      locator:
+        page: 6
+        table: '2'
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:nakano-hashimoto-2020-bubbles-to-chondrites-i
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '41.9'
+        locator:
+          page: 6
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 6
+          table: '2'
+    output_unit: dimensionless
+  provenance:
+    printed_run_basis:
+      material: Lsil
+      temperature_basis: Tmax
+      heating_duration_s: 140
+      mass_loss_basis: Mass loss includes sample, Re wire, and graphite disk; ? and >100 are retained as printed.
+- observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_mass_loss_selected_runs::T=3072.15:row=138:h=f4536906b450
+  experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: Lsil
+      phase:
+        tag: unknown
+        reason: phase string 'boiling_silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '3072.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '30000'
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '1.04'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'laser_boiling_with_inert_gas_cooling'
+    original_method_class: laser_boiling_with_inert_gas_cooling
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: nakano-hashimoto-2020-bubbles-to-chondrites-i
+  locator:
+    page: 6
+    table: '2'
+  read_from: pdf:nakano-hashimoto-2020-bubbles-to-chondrites-i
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '3072.15'
+      locator:
+        page: 6
+        table: '2'
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2799'
+            locator:
+              page: 6
+              table: '2'
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              table: '2'
+        output_unit: K
+    heating_duration_s:
+      state:
+        tag: value
+        value: '24'
+      locator:
+        page: 6
+        table: '2'
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:nakano-hashimoto-2020-bubbles-to-chondrites-i
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '104'
+        locator:
+          page: 6
+          table: '2'
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 6
+          table: '2'
+    output_unit: dimensionless
+  provenance:
+    printed_run_basis:
+      material: Lsil
+      temperature_basis: Tmax
+      heating_duration_s: 24
+      mass_loss_basis: Mass loss includes sample, Re wire, and graphite disk; ? and >100 are retained as printed.
 - observation_id: nakano-hashimoto-2020-bubbles-to-chondrites-i::nakano_2020_relative_volatility_fe
   experiment_id: 10.1186/s40645-020-00354-0::experiment::laser-boiling-series
   identity:

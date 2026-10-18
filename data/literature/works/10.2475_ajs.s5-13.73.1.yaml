@@ -9,8 +9,26 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+      value: 2a22ed1b9032e2506ac54de66c86bb1613d784ec
     files:
+    - asset_id: pdf:greig-1927-ajs-immiscibility-silicate-melts-part1
+      role: pdf
+      path: raw/greig-1927-ajs-immiscibility-silicate-melts-part1/greig-1927-ajs-immiscibility-silicate-melts-part1.pdf
+      sha256:
+        tag: value
+        value: 125554c36700f5a1053ae7a3f80eb86931cf4b5b7d28ae4499d13125ffe08d2e
+    - asset_id: pdftotext:greig-1927-ajs-immiscibility-silicate-melts-part1
+      role: pdftotext
+      path: text/greig-1927-ajs-immiscibility-silicate-melts-part1
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:greig-1927-ajs-immiscibility-silicate-melts-part1
+      role: table_csv
+      path: tables/greig-1927-ajs-immiscibility-silicate-melts-part1
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:greig-1927-ajs-immiscibility-silicate-melts-part1
       role: pdftotext
       path: unknown

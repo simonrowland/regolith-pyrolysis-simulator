@@ -272,3 +272,53 @@ observations:
     page: 1
     section: Experiments
   read_from: pdf:ta-yamanaka-1997-metsoc
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - Na2O
+            - '0.2441229153990506254637715514'
+          - - SiO2
+            - '0.7558770846009493745362284485'
+          amount_basis: mole_fraction
+      locator:
+        page: 1
+        section: Experiments
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '24.99'
+            locator:
+              page: 1
+              section: Experiments
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 1
+              section: Experiments
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '75.01'
+            locator:
+              page: 1
+              section: Experiments
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 1
+              section: Experiments
+        output_unit: mole_fraction
