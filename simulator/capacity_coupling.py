@@ -14,6 +14,12 @@ from engines.builtin.overhead_bleed import (
 )
 from simulator.physical_constants import GAS_CONSTANT
 from simulator.thermal_train import FiniteCapacity, NoColdTrain
+from simulator.transport_constants import (
+    COLLISION_DIAMETERS_M,
+    FREE_MOLECULAR_KNUDSEN_MIN,
+    N2_COLLISION_DIAMETER_M,
+    VISCOUS_KNUDSEN_MAX,
+)
 
 
 OXYGEN_SPECIES = "O2"
@@ -258,6 +264,109 @@ def _pipe1_mixture_factor(total_Pa: float, G_mol_s_Pa2: float, P_down_Pa: float)
     return G_mol_s_Pa2 * (total_Pa - P_down_Pa * P_down_Pa / total_Pa)
 
 
+def _duct_viscous_weight(knudsen_number: float) -> float:
+    # Existing Kn owner: viscous Kn < 0.01, free-molecular Kn >= 10,
+    # transitional in between (transport_constants / classify_knudsen_regime).
+    # Weight is 1 on the viscous PIPE-1 law, 0 on the long-tube Knudsen law,
+    # log-interpolated across the owner's transitional band so C2A (Kn~3e-4)
+    # stays pure PIPE-1.
+    from simulator.transport_regime import KnudsenRegime, classify_knudsen_regime
+
+    kn = float(knudsen_number)
+    if math.isnan(kn) or kn < 0.0:
+        return 1.0
+    regime = classify_knudsen_regime(kn)
+    if regime is KnudsenRegime.VISCOUS:
+        return 1.0
+    if regime is KnudsenRegime.FREE_MOLECULAR:
+        return 0.0
+    return (
+        math.log(FREE_MOLECULAR_KNUDSEN_MIN) - math.log(kn)
+    ) / (
+        math.log(FREE_MOLECULAR_KNUDSEN_MIN) - math.log(VISCOUS_KNUDSEN_MAX)
+    )
+
+
+def _knudsen_number_at_total_Pa(
+    total_Pa: float,
+    *,
+    temperature_K: float,
+    diameter_m: float,
+    carrier_gas: str,
+) -> float:
+    from simulator.transport_regime import single_species_mean_free_path_m
+
+    if diameter_m <= 0.0:
+        return math.inf
+    carrier = str(carrier_gas or "N2")
+    sigma = float(COLLISION_DIAMETERS_M.get(carrier, N2_COLLISION_DIAMETER_M))
+    mean_free_path_m = single_species_mean_free_path_m(
+        max(0.0, float(total_Pa)),
+        float(temperature_K),
+        sigma,
+    )
+    return mean_free_path_m / diameter_m
+
+
+def _long_tube_molar_conductance_mol_s_Pa(
+    *,
+    diameter_m: float,
+    length_m: float,
+    temperature_K: float,
+    molar_mass_kg_mol: float,
+) -> tuple[float, dict[str, object] | None]:
+    # Owner: transport_regime.long_tube_molecular_conductance_m3_s.
+    # Volume conductance C_v = 0.25 * A * v_bar * (4d/(3L)) [m^3/s].
+    # Molar C = C_v / (R T) [mol/(s Pa)]. Same units as Hertz-Knudsen H.
+    # C ∝ d^3 / (L sqrt(M T)). Throughput q = C * Δp.
+    from simulator.transport_regime import (
+        TransportRegimeRefusal,
+        long_tube_molecular_conductance_m3_s,
+        molecular_tube_conductance_m3_s,
+    )
+
+    if (
+        diameter_m <= 0.0
+        or length_m <= 0.0
+        or temperature_K <= 0.0
+        or molar_mass_kg_mol <= 0.0
+    ):
+        return 0.0, None
+    notice: dict[str, object] | None = None
+    try:
+        c_m3_s = long_tube_molecular_conductance_m3_s(
+            diameter_m,
+            length_m,
+            temperature_K,
+            molar_mass_kg_mol,
+            knudsen_number=math.inf,
+        )
+    except TransportRegimeRefusal as exc:
+        if exc.category != "clausing_long_tube_asymptote_out_of_range":
+            raise
+        # Same 4d/(3L) Clausing factor; L/D is below the certified floor of 10.
+        # Predict-and-flag the extension; do not abort.
+        transmission = 4.0 * diameter_m / (3.0 * length_m)
+        c_m3_s = molecular_tube_conductance_m3_s(
+            diameter_m,
+            length_m,
+            temperature_K,
+            molar_mass_kg_mol,
+            transmission_probability=min(1.0, transmission),
+            knudsen_number=math.inf,
+        )
+        notice = {
+            "reason": "clausing_long_tube_asymptote_out_of_range",
+            "status": "model_limit",
+            "length_over_diameter": length_m / diameter_m,
+            "detail": (
+                "long-tube Clausing 4d/(3L) used below L/D=10; "
+                "molecular pipe C is an extension"
+            ),
+        }
+    return c_m3_s / (GAS_CONSTANT * temperature_K), notice
+
+
 def _bracketed_root(
     residual,
     lo: float,
@@ -314,21 +423,30 @@ def mixture_surface_partials_Pa(
     P_downstream_Pa: float = 0.0,
     extra_partials_Pa: Mapping[str, float] | None = None,
     P_carrier_Pa: float = 0.0,
+    molecular_C_mol_s_Pa: Mapping[str, float] | None = None,
+    knudsen_at_total_Pa: Callable[[float], float] | None = None,
 ) -> dict[str, float]:
     # Premise: the well-mixed melt-to-train mixture is the actual boundary
     # gas, P = P_carrier + Σ p_i, not a vapour-only pipe. P_carrier is the
     # regulator/carrier fill from the atmosphere owner; extras also hold
     # retained incoming gas that exceeds a newly lowered P_eq.
-    # Algebra: PIPE-1 q_total = G*(P^2 - P_d^2). Well-mixed y_i = p_i/P
+    # Duct law follows the existing Kn owner (classify_knudsen_regime).
+    # Viscous PIPE-1: q_total = G*(P^2 - P_d^2). Well-mixed y_i = p_i/P
     # gives q_i = p_i * G * (P - P_d^2/P). Vacuum P_d=0 reduces to
-    # q_i = G*P*p_i and q_total = G*P^2. Closing H_i*(P_eq_i - p_i) = q_i
-    # yields p_i = H_i*P_eq_i / (H_i + factor(P, P_d)).
-    # Unit check: G is mol/(s Pa^2); G*P and H_i are mol/(s Pa).
-    # Limits: P_carrier → 0 recovers the vacuum vapour-only formula.
-    # P_carrier >> Σp with P_d=0 gives p_i → H_i*P_eq_i/(H_i + G*P_carrier).
-    # P_d is the atmosphere owner (0 for PN2, the command for controlled-O2),
-    # never a hardcoded vacuum. Zero-P_eq companions sit at P_d on every
-    # branch, including the single-species fast path.
+    # q_i = G*P*p_i. Closing H_i*(P_eq_i - p_i) = q_i yields
+    # p_i = H_i*P_eq_i / (H_i + factor(P, P_d)).
+    # Free-molecular long-tube Knudsen (transport_regime owner):
+    # q_i = C_i*(p_i - p_d,i) with C_i = C_v,i/(R T) [mol/(s Pa)],
+    # C_v from long_tube_molecular_conductance_m3_s. Species are
+    # independent (no common-P coupling). Closed form
+    # p_i = (H_i*P_eq_i + C_i*p_d,i) / (H_i + C_i).
+    # Limits: C→∞ gives p→p_d; H→∞ gives p→P_eq. Units: H and C both
+    # mol/(s Pa).
+    # Transitional: log-weight w_v(Kn) between PIPE-1 and Knudsen at the
+    # candidate total P, inside the same bracketed root:
+    # p_i = (H_i*P_eq_i + w_m*C_i*p_d) / (H_i + w_v*factor + w_m*C_i).
+    # w_v=1 recovers viscous; w_v=0 recovers the molecular closed form.
+    # Unit check: G is mol/(s Pa^2); G*P, H_i and C_i are mol/(s Pa).
     extra = {
         str(species): max(0.0, float(pressure))
         for species, pressure in dict(extra_partials_Pa or {}).items()
@@ -337,6 +455,11 @@ def mixture_surface_partials_Pa(
     P_carrier = max(0.0, float(P_carrier_Pa))
     P_extra = sum(extra.values()) + P_carrier
     P_down = max(0.0, float(P_downstream_Pa))
+    C_map = {
+        str(species): max(0.0, float(conductance))
+        for species, conductance in dict(molecular_C_mol_s_Pa or {}).items()
+        if float(conductance) > 0.0
+    }
 
     def companion_pressure(species: str) -> float:
         return P_down if float(P_eq_Pa.get(species, 0.0)) <= 0.0 else 0.0
@@ -357,7 +480,12 @@ def mixture_surface_partials_Pa(
             },
             **extra,
         }
-    if len(solved_species) == 1 and not extra and P_carrier <= 0.0:
+    if (
+        len(solved_species) == 1
+        and not extra
+        and P_carrier <= 0.0
+        and knudsen_at_total_Pa is None
+    ):
         species = solved_species[0]
         pressure = pipe1_surface_pressure_Pa(
             P_eq_Pa=float(P_eq_Pa[species]),
@@ -378,6 +506,11 @@ def mixture_surface_partials_Pa(
         factor = _pipe1_mixture_factor(
             total, G_mol_s_Pa2, P_down
         )
+        if knudsen_at_total_Pa is None:
+            w_v = 1.0
+        else:
+            w_v = _duct_viscous_weight(float(knudsen_at_total_Pa(total)))
+        w_m = 1.0 - w_v
         out = dict(extra)
         for species in P_eq_Pa:
             if species in extra:
@@ -387,10 +520,14 @@ def mixture_surface_partials_Pa(
             if P_eq <= 0.0 or conductance <= 0.0:
                 out[species] = companion_pressure(str(species))
                 continue
-            if factor <= 0.0:
+            C = float(C_map.get(species, 0.0))
+            denom = conductance + w_v * factor + w_m * C
+            if denom <= 0.0:
                 out[species] = P_eq
             else:
-                out[species] = conductance * P_eq / (conductance + factor)
+                out[species] = (
+                    conductance * P_eq + w_m * C * P_down
+                ) / denom
         return out
 
     def residual(P_vapour: float) -> float:
@@ -444,12 +581,21 @@ def _source_duct_residual_rel(
     G_mol_s_Pa2: float,
     P_downstream_Pa: float,
     P_carrier_Pa: float = 0.0,
+    molecular_C_mol_s_Pa: Mapping[str, float] | None = None,
+    knudsen_at_total_Pa: Callable[[float], float] | None = None,
 ) -> float:
     total_P = (
         sum(max(0.0, float(pressure)) for pressure in partials_Pa.values())
         + max(0.0, float(P_carrier_Pa))
     )
     factor = _pipe1_mixture_factor(total_P, G_mol_s_Pa2, P_downstream_Pa)
+    if knudsen_at_total_Pa is None:
+        w_v = 1.0
+    else:
+        w_v = _duct_viscous_weight(float(knudsen_at_total_Pa(total_P)))
+    w_m = 1.0 - w_v
+    C_map = dict(molecular_C_mol_s_Pa or {})
+    P_down = max(0.0, float(P_downstream_Pa))
     max_scale = 0.0
     max_delta = 0.0
     species = set(partials_Pa) | set(flux_kg_hr)
@@ -460,7 +606,9 @@ def _source_duct_residual_rel(
         q_source = max(0.0, float(flux_kg_hr.get(name, 0.0))) / mass / 3600.0
         if q_source <= 0.0:
             continue
-        q_duct = max(0.0, float(partials_Pa.get(name, 0.0))) * factor
+        p_i = max(0.0, float(partials_Pa.get(name, 0.0)))
+        C = max(0.0, float(C_map.get(name, 0.0)))
+        q_duct = w_v * p_i * factor + w_m * C * (p_i - P_down)
         max_delta = max(max_delta, abs(q_source - q_duct))
         max_scale = max(max_scale, abs(q_source), abs(q_duct))
     if max_scale <= 0.0:
@@ -481,6 +629,10 @@ def solve_source_duct_closure(
     carrier_partials_Pa: Mapping[str, float] | None = None,
     P_carrier_Pa: float = 0.0,
     head_bled_species_mol: Mapping[str, float] | None = None,
+    pipe_diameter_m: float | None = None,
+    pipe_length_m: float | None = None,
+    temperature_K: float | None = None,
+    carrier_gas: str = "N2",
 ) -> CapacityShadowResult | CapacityShadowRefusal:
     from simulator.evaporation import EvaporationFluxRefusal
 
@@ -536,17 +688,64 @@ def solve_source_duct_closure(
         )
     G = max(0.0, float(G_mol_s_Pa2))
     P_down = max(0.0, float(P_downstream_Pa))
+    molecular_C: dict[str, float] = {}
+    knudsen_at_total = None
+    diameter_m = 0.0 if pipe_diameter_m is None else float(pipe_diameter_m)
+    length_m = 0.0 if pipe_length_m is None else float(pipe_length_m)
+    T_K = 0.0 if temperature_K is None else float(temperature_K)
+    if diameter_m > 0.0 and length_m > 0.0 and T_K > 0.0:
+        ld_notice = None
+        for species, mass in dict(molar_mass_kg_mol).items():
+            C_i, notice = _long_tube_molar_conductance_mol_s_Pa(
+                diameter_m=diameter_m,
+                length_m=length_m,
+                temperature_K=T_K,
+                molar_mass_kg_mol=float(mass),
+            )
+            if C_i > 0.0:
+                molecular_C[str(species)] = C_i
+            if notice is not None and ld_notice is None:
+                ld_notice = notice
+        if ld_notice is not None:
+            notices.append(ld_notice)
+        carrier = str(carrier_gas or "N2")
+
+        def knudsen_at_total(total_Pa: float, _carrier=carrier) -> float:
+            return _knudsen_number_at_total_Pa(
+                total_Pa,
+                temperature_K=T_K,
+                diameter_m=diameter_m,
+                carrier_gas=_carrier,
+            )
+
+    mixture_kwargs = dict(
+        extra_partials_Pa=extra,
+        P_carrier_Pa=unnamed_carrier_Pa,
+        molecular_C_mol_s_Pa=molecular_C or None,
+        knudsen_at_total_Pa=knudsen_at_total,
+    )
     try:
         partials = mixture_surface_partials_Pa(
             P_eq_Pa=equilibrium,
             H_mol_s_Pa=conductance,
             G_mol_s_Pa2=G,
             P_downstream_Pa=P_down,
-            extra_partials_Pa=extra,
-            P_carrier_Pa=unnamed_carrier_Pa,
+            **mixture_kwargs,
         )
     except CapacityCouplingRefusalError as exc:
-        return exc.refusal
+        notices.append(
+            {
+                "reason": exc.refusal.reason,
+                "status": "model_limit",
+                "iterations": exc.refusal.iterations,
+                "detail": (
+                    "source/duct root did not bracket; last viscous/molecular "
+                    "extension is not installed, run continues with free-surface "
+                    "partials of 0"
+                ),
+            }
+        )
+        partials = {species: 0.0 for species in equilibrium}
     try:
         flux = {
             str(species): max(0.0, float(rate))
@@ -571,6 +770,8 @@ def solve_source_duct_closure(
             G_mol_s_Pa2=G,
             P_downstream_Pa=P_down,
             P_carrier_Pa=unnamed_carrier_Pa,
+            molecular_C_mol_s_Pa=molecular_C or None,
+            knudsen_at_total_Pa=knudsen_at_total,
         )
 
     residual_rel = residual_rel_now()
@@ -595,10 +796,19 @@ def solve_source_duct_closure(
             default=0.0,
         )
         if changed <= DEFAULT_REL_TOL * h_scale + 1.0e-18:
-            return CapacityShadowRefusal(
-                "source_duct_h_refine_non_convergence",
-                iterations,
+            notices.append(
+                {
+                    "reason": "source_duct_h_refine_non_convergence",
+                    "status": "model_limit",
+                    "iterations": iterations,
+                    "residual_rel": residual_rel,
+                    "detail": (
+                        "H-refine froze with residual above DEFAULT_REL_TOL; "
+                        "last iterate kept"
+                    ),
+                }
             )
+            break
         conductance = updated
         try:
             partials = mixture_surface_partials_Pa(
@@ -606,11 +816,18 @@ def solve_source_duct_closure(
                 H_mol_s_Pa=conductance,
                 G_mol_s_Pa2=G,
                 P_downstream_Pa=P_down,
-                extra_partials_Pa=extra,
-                P_carrier_Pa=unnamed_carrier_Pa,
+                **mixture_kwargs,
             )
         except CapacityCouplingRefusalError as exc:
-            return exc.refusal
+            notices.append(
+                {
+                    "reason": exc.refusal.reason,
+                    "status": "model_limit",
+                    "iterations": iterations,
+                    "detail": "source/duct root missed on H-refine; last iterate kept",
+                }
+            )
+            break
         try:
             flux = {
                 str(species): max(0.0, float(rate))
@@ -619,7 +836,15 @@ def solve_source_duct_closure(
         except EvaporationFluxRefusal:
             raise
         except CapacityCouplingRefusalError as exc:
-            return exc.refusal
+            notices.append(
+                {
+                    "reason": exc.refusal.reason,
+                    "status": "model_limit",
+                    "iterations": iterations,
+                    "detail": "source/duct root missed on H-refine; last iterate kept",
+                }
+            )
+            break
         except Exception as exc:
             return CapacityShadowRefusal(
                 f"evaporation_flux_refused:{type(exc).__name__}:{exc}",
@@ -630,9 +855,17 @@ def solve_source_duct_closure(
     else:
         residual_rel = residual_rel_now()
         if residual_rel > DEFAULT_REL_TOL:
-            return CapacityShadowRefusal(
-                "source_duct_h_refine_non_convergence",
-                iterations,
+            notices.append(
+                {
+                    "reason": "source_duct_h_refine_non_convergence",
+                    "status": "model_limit",
+                    "iterations": iterations,
+                    "residual_rel": residual_rel,
+                    "detail": (
+                        "H-refine exhausted SOURCE_DUCT_H_REFINE_ITERATIONS; "
+                        "last iterate kept"
+                    ),
+                }
             )
     bled = dict(head_bled_species_mol or {})
     return CapacityShadowResult(
@@ -693,6 +926,9 @@ def solve_capacity_shadow(
     incoming_partials_Pa: Mapping[str, float] | None = None,
     carrier_partials_Pa: Mapping[str, float] | None = None,
     P_carrier_Pa: float = 0.0,
+    pipe_diameter_m: float | None = None,
+    pipe_length_m: float | None = None,
+    carrier_gas: str = "N2",
 ) -> CapacityShadowResult | CapacityShadowRefusal:
     controls = {
         "cold_train_capacity": capacity,
@@ -754,6 +990,10 @@ def solve_capacity_shadow(
                 carrier_partials_Pa=carrier_partials_Pa,
                 P_carrier_Pa=P_carrier_Pa,
                 head_bled_species_mol=head_bled_species_mol,
+                pipe_diameter_m=pipe_diameter_m,
+                pipe_length_m=pipe_length_m,
+                temperature_K=temperature_K,
+                carrier_gas=carrier_gas,
             )
         oxygen = OxygenShadowPartition(0.0, 0.0, 0.0, 0.0, 0.0)
         return CapacityShadowResult(

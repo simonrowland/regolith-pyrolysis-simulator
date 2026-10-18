@@ -7239,6 +7239,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'carrier_partials_Pa': (
                         self._source_duct_carrier_partials_Pa()
                     ),
+                    'pipe_diameter_m': float(
+                        self.overhead_model.pipe_diameter_m
+                    ),
+                    'pipe_length_m': float(
+                        self.overhead_model.pipe_length_m
+                    ),
+                    'carrier_gas': str(
+                        getattr(self.melt, 'background_gas_species', '')
+                        or 'N2'
+                    ),
                 }
                 source_duct_downstream_Pa = (
                     self._headspace_downstream_pressure_bar() * 100000.0
