@@ -83,6 +83,13 @@ def test_context_only_extract_preserves_printed_fits_conditions_and_figures() ->
         "0.97980",
         "0.98797",
     ]
+    ideal_fit, experimental_fit = fits["fits"]
+    assert "ideal inverse-square-root mass relation" in ideal_fit["name"]
+    assert ideal_fit["evidence_class"] == "model_derived"
+    assert "experimental-data fit" in experimental_fit["name"]
+    assert experimental_fit["evidence_class"] == "quoted_attributed"
+    assert "present-work and earlier measurements [2]" in experimental_fit["attribution"]
+    assert "not assigned to one subset" in experimental_fit["attribution"]
     assert fits["fits"][1]["uncertainty_as_printed"] == "± 0.00022"
 
     pressure = next(

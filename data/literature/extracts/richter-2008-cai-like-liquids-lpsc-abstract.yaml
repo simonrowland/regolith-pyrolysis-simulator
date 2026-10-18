@@ -93,14 +93,15 @@ species:
           schema_gap: No existing quantity enum represents the kinetic isotope fractionation factor α.
           definition_as_printed: Ratio of the isotopic composition of the evaporation flux divided by the isotopic composition of the condensed phase.
           fits:
-            - name: present work
+            - name: ideal inverse-square-root mass relation (inferred from Figure 3 and discussion)
               value_as_printed: '0.97980'
               evidence_class: model_derived
-            - name: Richter et al. [2] (2002)
+            - name: experimental-data fit; source subset not distinguished
               value_as_printed: '0.98797'
               uncertainty_as_printed: '± 0.00022'
               confidence_level: not stated
               evidence_class: quoted_attributed
+              attribution: Figure 2 experimental data include present-work and earlier measurements [2]; the fit is not assigned to one subset.
       - observation_id: richter_2008_text_hydrogen_pressure_dependence
         type: textual_fact
         locator: {page: 1, published_page: '1385.pdf', pdf_page_index: 0, section: 'Elemental Fractionations'}
