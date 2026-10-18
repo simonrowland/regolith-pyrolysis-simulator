@@ -18,16 +18,48 @@ extraction:
     Table 4 appearance potentials, and Figure 1 (p. 368). The six tables' full
     rows are retained below. Figure 1 is deferred without numeric points.
     Table 3 and the prose report measured ion-current ratios. Those values are
-    retained pending a controller ruling on the existing ion_intensity_ratio
-    identity subtype, which the extract migrator does not read from source
-    fields. No schema or migrator change is made here.
+    stored as measured ion_intensity_ratio observations following the existing
+    KEMS extraction pattern. The printed ion-pair subtype remains unmapped by
+    the current migrator and is tracked under t-1329; no schema or migrator
+    change is made here.
   date: '2026-10-18'
   worker: fam2-1018
   provenance_path: text/shornikov-2000-silica-gas-equilibria/pdftotext-layout.txt
 review_status: draft
 species:
   SiO2:
-    observations: []
+    observations:
+    - observation_id: shornikov_2000_table3_ratio_sio2_sio
+      type: rate_series
+      locator:
+        table: '3'
+        published_page: 363
+        pdf_page_index: 3
+        note: Table 3, Mo cell, SiO2 system, 1950 K
+      T_range_K:
+      - 1950.0
+      - 1950.0
+      phase: gas
+      standard_state: I((SiO2)+)/I((SiO)+), relative ion current as printed
+      regime: kems_effusion
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: '1950'}
+          locator: {table: '3', published_page: 363, pdf_page_index: 3}
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        ion_pair: I((SiO2)+)/I((SiO)+)
+        ion_intensity_ratio: 1.13e-3
+        T_K: 1950.0
+        system_as_printed: SiO2
+        cell_material_as_printed: Mo
+        ionizing_energy_eV: 20
+        method: Knudsen mass-spectrometric effusion
+        note: t-1329; ion-pair subtype is not mapped by the current identity migrator.
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
     context:
     - observation_id: shornikov_2000_table1_reaction_1
       type: tabulation
@@ -396,13 +428,13 @@ species:
       values:
         quantity: ion_intensity_ratio
         method_class: quoted_attributed
-        schema_gap: >-
-          The extract migration profile requires identity.subtype for
-          ion_intensity_ratio, but the migrator does not map the printed ion
-          pair to that axis. Table 3's this-work row is retained in context
-          until that mapping is ruled.
+        note: t-1329 tracks the unmapped ion-pair identity subtype for this-work rows.
         source_row_count: 10
-        this_work_row_observation_id: shornikov_2000_table3_this_work_ratios
+        this_work_observation_ids:
+        - shornikov_2000_table3_ratio_si_sio
+        - shornikov_2000_table3_ratio_sio_sio
+        - shornikov_2000_table3_ratio_sio2_sio
+        - shornikov_2000_table3_ratio_si2o2_sio
         columns_as_printed: [Cell material, System, T (K), (Si)+, (SiO)+, (SiO2)+, (Si2O2)+, References]
         rows:
         - cell_material: Al2O3
@@ -745,60 +777,6 @@ species:
           delta_rH_T_as_printed: '687.2'
           attribution: '[7]'
           method_class: quoted_attributed
-    - observation_id: shornikov_2000_table3_this_work_ratios
-      type: ion_current_ratio
-      locator:
-        table: '3'
-        published_page: 363
-        pdf_page_index: 3
-      phase: gas
-      units: ion intensity ratio (dimensionless)
-      values:
-        quantity: ion_intensity_ratio
-        method_class: measured_direct
-        admission_status: typed_refusal
-        refusal_reason: unresolved_ion_intensity_ratio_subtype
-        cell_material_as_printed: Mo
-        system_as_printed: SiO2
-        T_K: 1950
-        ionizing_energy_eV: 20
-        method: Knudsen mass-spectrometric effusion
-        rows:
-        - ion_pair: I((Si)+)/I((SiO)+)
-          ion_intensity_ratio: 3.03e-2
-        - ion_pair: I((SiO)+)/I((SiO)+)
-          ion_intensity_ratio: 1.00
-        - ion_pair: I((SiO2)+)/I((SiO)+)
-          ion_intensity_ratio: 1.13e-3
-        - ion_pair: I((Si2O2)+)/I((SiO)+)
-          ion_intensity_ratio: 1.39e-2
-        uncertainty:
-          note: No uncertainty is printed for the ion intensity ratios.
-    - observation_id: shornikov_2000_mo_oxide_ion_current_ratios
-      type: ion_current_ratio
-      locator:
-        published_page: 363
-        pdf_page_index: 3
-        paragraph: Table 3 discussion
-      phase: gas
-      units: ion intensity ratio (dimensionless)
-      values:
-        quantity: ion_intensity_ratio
-        method_class: measured_direct
-        system_as_printed: SiO2
-        cell_material_as_printed: Mo
-        T_K: 1950
-        ionizing_energy_eV: 20
-        ratio_as_printed: 'I(MoO)+ : I(MoO2)+ : I(MoO3)+ = 0.04 : 1.00 : 0.58'
-        rows:
-        - ion_pair: I(MoO+)/I(MoO2+)
-          ion_intensity_ratio: 0.04
-        - ion_pair: I(MoO2+)/I(MoO2+)
-          ion_intensity_ratio: 1.00
-        - ion_pair: I(MoO3+)/I(MoO2+)
-          ion_intensity_ratio: 0.58
-        uncertainty:
-          note: No uncertainty is printed for the ion intensity ratios.
     - observation_id: shornikov_2000_text_mo_oxide_concentration
       type: concentration_ratio
       locator:
@@ -977,3 +955,231 @@ species:
         cell_material_as_printed: molybdenum
         evaporation_surface_to_effusion_orifice_area_ratio: no less than 650
         note: The paper's abstract gives the studied temperature range as 1610–1980 K.
+  Si:
+    observations:
+    - observation_id: shornikov_2000_table3_ratio_si_sio
+      type: rate_series
+      locator:
+        table: '3'
+        published_page: 363
+        pdf_page_index: 3
+        note: Table 3, Mo cell, SiO2 system, 1950 K
+      T_range_K:
+      - 1950.0
+      - 1950.0
+      phase: gas
+      standard_state: I((Si)+)/I((SiO)+), relative ion current as printed
+      regime: kems_effusion
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1950'
+          locator:
+            table: '3'
+            published_page: 363
+            pdf_page_index: 3
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        ion_pair: I((Si)+)/I((SiO)+)
+        ion_intensity_ratio: 3.03e-2
+        T_K: 1950.0
+        system_as_printed: SiO2
+        cell_material_as_printed: Mo
+        ionizing_energy_eV: 20
+        method: Knudsen mass-spectrometric effusion
+        note: t-1329; ion-pair subtype is not mapped by the current identity migrator.
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+  SiO:
+    observations:
+    - observation_id: shornikov_2000_table3_ratio_sio_sio
+      type: rate_series
+      locator:
+        table: '3'
+        published_page: 363
+        pdf_page_index: 3
+        note: Table 3, Mo cell, SiO2 system, 1950 K
+      T_range_K:
+      - 1950.0
+      - 1950.0
+      phase: gas
+      standard_state: I((SiO)+)/I((SiO)+), relative ion current as printed
+      regime: kems_effusion
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1950'
+          locator:
+            table: '3'
+            published_page: 363
+            pdf_page_index: 3
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        ion_pair: I((SiO)+)/I((SiO)+)
+        ion_intensity_ratio: 1.0
+        T_K: 1950.0
+        system_as_printed: SiO2
+        cell_material_as_printed: Mo
+        ionizing_energy_eV: 20
+        method: Knudsen mass-spectrometric effusion
+        note: t-1329; ion-pair subtype is not mapped by the current identity migrator.
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+  Si2O2:
+    observations:
+    - observation_id: shornikov_2000_table3_ratio_si2o2_sio
+      type: rate_series
+      locator:
+        table: '3'
+        published_page: 363
+        pdf_page_index: 3
+        note: Table 3, Mo cell, SiO2 system, 1950 K
+      T_range_K:
+      - 1950.0
+      - 1950.0
+      phase: gas
+      standard_state: I((Si2O2)+)/I((SiO)+), relative ion current as printed
+      regime: kems_effusion
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1950'
+          locator:
+            table: '3'
+            published_page: 363
+            pdf_page_index: 3
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        ion_pair: I((Si2O2)+)/I((SiO)+)
+        ion_intensity_ratio: 1.39e-2
+        T_K: 1950.0
+        system_as_printed: SiO2
+        cell_material_as_printed: Mo
+        ionizing_energy_eV: 20
+        method: Knudsen mass-spectrometric effusion
+        note: t-1329; ion-pair subtype is not mapped by the current identity migrator.
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+  MoO:
+    observations:
+    - observation_id: shornikov_2000_text_ratio_moo_moo2
+      type: rate_series
+      locator:
+        published_page: 363
+        pdf_page_index: 3
+        section: mass spectra discussion
+        paragraph: ion-current ratios for molybdenum oxide species
+      T_range_K:
+      - 1950.0
+      - 1950.0
+      phase: gas
+      standard_state: I(MoO+)/I(MoO2+), relative ion current as printed
+      regime: kems_effusion
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1950'
+          locator:
+            published_page: 363
+            pdf_page_index: 3
+            section: mass spectra discussion
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        ion_pair: I(MoO+)/I(MoO2+)
+        ion_intensity_ratio: 0.04
+        T_K: 1950.0
+        system_as_printed: SiO2
+        cell_material_as_printed: Mo
+        ionizing_energy_eV: 20
+        method: Knudsen mass-spectrometric effusion
+        note: t-1329; ion-pair subtype is not mapped by the current identity migrator.
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+  MoO2:
+    observations:
+    - observation_id: shornikov_2000_text_ratio_moo2_moo2
+      type: rate_series
+      locator:
+        published_page: 363
+        pdf_page_index: 3
+        section: mass spectra discussion
+        paragraph: ion-current ratios for molybdenum oxide species
+      T_range_K:
+      - 1950.0
+      - 1950.0
+      phase: gas
+      standard_state: I(MoO2+)/I(MoO2+), relative ion current as printed
+      regime: kems_effusion
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1950'
+          locator:
+            published_page: 363
+            pdf_page_index: 3
+            section: mass spectra discussion
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        ion_pair: I(MoO2+)/I(MoO2+)
+        ion_intensity_ratio: 1.0
+        T_K: 1950.0
+        system_as_printed: SiO2
+        cell_material_as_printed: Mo
+        ionizing_energy_eV: 20
+        method: Knudsen mass-spectrometric effusion
+        note: t-1329; ion-pair subtype is not mapped by the current identity migrator.
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
+  MoO3:
+    observations:
+    - observation_id: shornikov_2000_text_ratio_moo3_moo2
+      type: rate_series
+      locator:
+        published_page: 363
+        pdf_page_index: 3
+        section: mass spectra discussion
+        paragraph: ion-current ratios for molybdenum oxide species
+      T_range_K:
+      - 1950.0
+      - 1950.0
+      phase: gas
+      standard_state: I(MoO3+)/I(MoO2+), relative ion current as printed
+      regime: kems_effusion
+      units: ion intensity ratio (dimensionless)
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1950'
+          locator:
+            published_page: 363
+            pdf_page_index: 3
+            section: mass spectra discussion
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        ion_pair: I(MoO3+)/I(MoO2+)
+        ion_intensity_ratio: 0.58
+        T_K: 1950.0
+        system_as_printed: SiO2
+        cell_material_as_printed: Mo
+        ionizing_energy_eV: 20
+        method: Knudsen mass-spectrometric effusion
+        note: t-1329; ion-pair subtype is not mapped by the current identity migrator.
+      uncertainty:
+        note: No uncertainty is printed for the ion intensity ratio.
