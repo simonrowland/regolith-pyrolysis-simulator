@@ -1,0 +1,2723 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2019-mgo-titania-melts
+source:
+  citation: Shornikov, S. I. (2019). Thermodynamic properties of the MgO–TiO2 melts. Experiment in Geosciences,
+    25(1), 85–88.
+  year: 2019
+  corpus_asset: raw/shornikov-2019-mgo-titania-melts/shornikov-2019-mgo-titania-melts.pdf
+extraction:
+  method: MinerU table_draft emit for the point-temperature Table 1 cells and Table 2; Table 1 cells printed
+    with ± and interval temperatures were normalized by hand.
+  date: '2026-10-18'
+  worker: trial-lmax-1018
+review_status: draft
+skipped_empty_or_dash:
+  total: 48
+  tables:
+  - page: 2
+    table_index: 1
+    count: 10
+  - page: 2
+    table_index: 1
+    count: 12
+  - page: 2
+    table_index: 1
+    count: 10
+  - page: 3
+    table_index: 2
+    count: 16
+species:
+  Mg2TiO4:
+    observations:
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r02_c04
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: Mg2TiO4 at 298 K
+        column_header: ΔS_T, J/(mol×K)
+        note: MinerU CSV row 2; row/column placement checked against the 600 dpi page 2 render.
+      units: J/(mol×K)
+      mineru_flags: []
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '298'
+        value: '-0.26'
+        attribution: Todd, 1952
+        admission_status: typed_refusal
+        reason: The current schema has no formation-entropy quantity token for ΔS from simple oxides.
+        value_as_published: -0.26±0.21
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±0.21
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: Mg2TiO4 at 298 K
+            column_header: ΔS_T, J/(mol×K)
+            note: MinerU CSV row 2; row/column placement checked against the 600 dpi page 2 render.
+      uncertainty: -0.26±0.21
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r03_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: Mg2TiO4 at 298 K
+        column_header: ΔH_T, kJ/mol
+        note: MinerU CSV row 3; row/column placement checked against the 600 dpi page 2 render.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '298'
+        value: '-5.69'
+        attribution: Kelley et al., 1954
+        admission_status: typed_refusal
+        reason: The source defines formation from simple oxides; the scalar delta_fH token does not retain
+          that reaction basis, so this value is typed-refused.
+        value_as_published: -5.69±0.33
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±0.33
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: Mg2TiO4 at 298 K
+            column_header: ΔH_T, kJ/mol
+            note: MinerU CSV row 3; row/column placement checked against the 600 dpi page 2 render.
+      uncertainty: -5.69±0.33
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r04_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: Mg2TiO4 at 973 K
+        column_header: ΔH_T, kJ/mol
+        note: MinerU CSV row 4; row/column placement checked against the 600 dpi page 2 render.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '973'
+        value: '-1.40'
+        attribution: Wechsler and Navrotsky, 1984
+        admission_status: typed_refusal
+        reason: The source defines formation from simple oxides; the scalar delta_fH token does not retain
+          that reaction basis, so this value is typed-refused.
+        value_as_published: -1.40±0.73
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±0.73
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '973'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: Mg2TiO4 at 973 K
+            column_header: ΔH_T, kJ/mol
+            note: MinerU CSV row 4; row/column placement checked against the 600 dpi page 2 render.
+      uncertainty: -1.40±0.73
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r05_c05
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: Mg2TiO4 at 1573 K
+        column_header: ΔG_T, kJ/mol
+        note: MinerU CSV row 5; row/column placement checked against the 600 dpi page 2 render.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1573'
+        value: '-7.11'
+        attribution: Brezny and Muan, 1971
+        admission_status: typed_refusal
+        reason: The source defines formation from simple oxides; the scalar delta_fG token does not retain
+          that reaction basis, so this value is typed-refused.
+        value_as_published: -7.11±0.70
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±0.70
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: Mg2TiO4 at 1573 K
+            column_header: ΔG_T, kJ/mol
+            note: MinerU CSV row 5; row/column placement checked against the 600 dpi page 2 render.
+      uncertainty: -7.11±0.70
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r06_c05
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: Mg2TiO4 at 1673 K
+        column_header: ΔG_T, kJ/mol
+        note: MinerU CSV row 6; row/column placement checked against the 600 dpi page 2 render.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1673'
+        value: '-8.09'
+        attribution: Evans and Muan, 1971
+        admission_status: typed_refusal
+        reason: The source defines formation from simple oxides; the scalar delta_fG token does not retain
+          that reaction basis, so this value is typed-refused.
+        value_as_published: -8.09±1.26
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±1.26
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: Mg2TiO4 at 1673 K
+            column_header: ΔG_T, kJ/mol
+            note: MinerU CSV row 6; row/column placement checked against the 600 dpi page 2 render.
+      uncertainty: -8.09±1.26
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r07_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: Mg2TiO4 at 1700-2030 K
+        column_header: ΔH_T, kJ/mol
+        note: MinerU CSV row 7; row/column placement checked against the 600 dpi page 2 render.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: The source defines formation from simple oxides; the scalar delta_fH token does not retain
+          that reaction basis, so this value is typed-refused.
+        value: '-0.68'
+        value_as_published: -0.68±0.09
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±0.09
+        attribution: Bale et al., 2016
+      uncertainty: -0.68±0.09
+      T_range_K:
+      - 1700
+      - 2030
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1700'
+              interval_high: '2030'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: Mg2TiO4 at 1700-2030 K
+            column_header: ΔH_T, kJ/mol
+            note: MinerU CSV row 7; row/column placement checked against the 600 dpi page 2 render.
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r07_c04
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: Mg2TiO4 at 1700-2030 K
+        column_header: ΔS_T, J/(mol×K)
+        note: MinerU CSV row 7; row/column placement checked against the 600 dpi page 2 render.
+      units: J/(mol×K)
+      mineru_flags: []
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: The current schema has no formation-entropy quantity token for ΔS from simple oxides.
+        value: '5.34'
+        value_as_published: 5.34±0.05
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±0.05
+        attribution: Bale et al., 2016
+      uncertainty: 5.34±0.05
+      T_range_K:
+      - 1700
+      - 2030
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1700'
+              interval_high: '2030'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: Mg2TiO4 at 1700-2030 K
+            column_header: ΔS_T, J/(mol×K)
+            note: MinerU CSV row 7; row/column placement checked against the 600 dpi page 2 render.
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r04_c02
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: $Mg_{2}TiO_{4}$
+        column_header: Condensed phases  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '-1300.488'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: cr
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator: &id004
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            column_header: ΔG°2173, kJ/mol
+            note: The table caption gives the calculation temperature as 2173 K.
+  MgTiO3:
+    observations:
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r08_c04
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: MgTiO3 at 298 K
+        column_header: ΔS_T, J/(mol×K)
+        note: MinerU CSV row 8; row/column placement checked against the 600 dpi page 2 render.
+      units: J/(mol×K)
+      mineru_flags: []
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '298'
+        value: '-2.30'
+        attribution: Shomate, 1946
+        admission_status: typed_refusal
+        reason: The current schema has no formation-entropy quantity token for ΔS from simple oxides.
+        value_as_published: -2.30±0.21
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±0.21
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: MgTiO3 at 298 K
+            column_header: ΔS_T, J/(mol×K)
+            note: MinerU CSV row 8; row/column placement checked against the 600 dpi page 2 render.
+      uncertainty: -2.30±0.21
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r09_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: MgTiO3 at 298 K
+        column_header: ΔH_T, kJ/mol
+        note: MinerU CSV row 9; row/column placement checked against the 600 dpi page 2 render.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '298'
+        value: '-13.26'
+        attribution: Kelley et al., 1954
+        admission_status: typed_refusal
+        reason: The source defines formation from simple oxides; the scalar delta_fH token does not retain
+          that reaction basis, so this value is typed-refused.
+        value_as_published: -13.26±0.46
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±0.46
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: MgTiO3 at 298 K
+            column_header: ΔH_T, kJ/mol
+            note: MinerU CSV row 9; row/column placement checked against the 600 dpi page 2 render.
+      uncertainty: -13.26±0.46
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r10_c04
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: MgTiO3 at 298 K
+        column_header: ΔS_T, J/(mol×K)
+        note: MinerU CSV row 10; row/column placement checked against the 600 dpi page 2 render.
+      units: J/(mol×K)
+      mineru_flags: []
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '298'
+        value: '-1.39'
+        attribution: Robie et al., 1989
+        admission_status: typed_refusal
+        reason: The current schema has no formation-entropy quantity token for ΔS from simple oxides.
+        value_as_published: -1.39±0.15
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±0.15
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: MgTiO3 at 298 K
+            column_header: ΔS_T, J/(mol×K)
+            note: MinerU CSV row 10; row/column placement checked against the 600 dpi page 2 render.
+      uncertainty: -1.39±0.15
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r11_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: MgTiO3 at 973 K
+        column_header: ΔH_T, kJ/mol
+        note: MinerU CSV row 11; row/column placement checked against the 600 dpi page 2 render.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '973'
+        value: '-10.55'
+        attribution: Wechsler and Navrotsky, 1984
+        admission_status: typed_refusal
+        reason: The source defines formation from simple oxides; the scalar delta_fH token does not retain
+          that reaction basis, so this value is typed-refused.
+        value_as_published: -10.55±0.65
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±0.65
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '973'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: MgTiO3 at 973 K
+            column_header: ΔH_T, kJ/mol
+            note: MinerU CSV row 11; row/column placement checked against the 600 dpi page 2 render.
+      uncertainty: -10.55±0.65
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r12_c05
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: MgTiO3 at 1573 K
+        column_header: ΔG_T, kJ/mol
+        note: MinerU CSV row 12; row/column placement checked against the 600 dpi page 2 render.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1573'
+        value: '-10.04'
+        attribution: Brezny and Muan, 1971
+        admission_status: typed_refusal
+        reason: The source defines formation from simple oxides; the scalar delta_fG token does not retain
+          that reaction basis, so this value is typed-refused.
+        value_as_published: -10.04±2.09
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±2.09
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: MgTiO3 at 1573 K
+            column_header: ΔG_T, kJ/mol
+            note: MinerU CSV row 12; row/column placement checked against the 600 dpi page 2 render.
+      uncertainty: -10.04±2.09
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r13_c05
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: MgTiO3 at 1673 K
+        column_header: ΔG_T, kJ/mol
+        note: MinerU CSV row 13; row/column placement checked against the 600 dpi page 2 render.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1673'
+        value: '-10.67'
+        attribution: Evans and Muan, 1971
+        admission_status: typed_refusal
+        reason: The source defines formation from simple oxides; the scalar delta_fG token does not retain
+          that reaction basis, so this value is typed-refused.
+        value_as_published: -10.67±1.05
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±1.05
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: MgTiO3 at 1673 K
+            column_header: ΔG_T, kJ/mol
+            note: MinerU CSV row 13; row/column placement checked against the 600 dpi page 2 render.
+      uncertainty: -10.67±1.05
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r14_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: MgTiO3 at 1700-1903 K
+        column_header: ΔH_T, kJ/mol
+        note: MinerU CSV row 14; row/column placement checked against the 600 dpi page 2 render.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: The source defines formation from simple oxides; the scalar delta_fH token does not retain
+          that reaction basis, so this value is typed-refused.
+        value: '-10.26'
+        value_as_published: -10.26±0.06
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±0.06
+        attribution: Bale et al., 2016
+      uncertainty: -10.26±0.06
+      T_range_K:
+      - 1700
+      - 1903
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1700'
+              interval_high: '1903'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: MgTiO3 at 1700-1903 K
+            column_header: ΔH_T, kJ/mol
+            note: MinerU CSV row 14; row/column placement checked against the 600 dpi page 2 render.
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r14_c04
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: MgTiO3 at 1700-1903 K
+        column_header: ΔS_T, J/(mol×K)
+        note: MinerU CSV row 14; row/column placement checked against the 600 dpi page 2 render.
+      units: J/(mol×K)
+      mineru_flags: []
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: The current schema has no formation-entropy quantity token for ΔS from simple oxides.
+        value: '0.91'
+        value_as_published: 0.91±0.03
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±0.03
+        attribution: Bale et al., 2016
+      uncertainty: 0.91±0.03
+      T_range_K:
+      - 1700
+      - 1903
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1700'
+              interval_high: '1903'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: MgTiO3 at 1700-1903 K
+            column_header: ΔS_T, J/(mol×K)
+            note: MinerU CSV row 14; row/column placement checked against the 600 dpi page 2 render.
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r05_c02
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: $MgTiO_{3}$
+        column_header: Condensed phases  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '-932.105'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: cr
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator: &id003
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            column_header: ΔG°2173, kJ/mol
+            note: The table caption gives the calculation temperature as 2173 K.
+    - observation_id: shornikov_2019_mgo_titania_melts_prose_mgtio3_delta_fh298_estimate
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        section: Abstract
+        note: The sentence prints an approximate formation enthalpy for MgTiO3 without an explicit source
+          attribution.
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            section: Abstract
+            note: The sentence prints an approximate formation enthalpy for MgTiO3 without an explicit
+              source attribution.
+      values:
+        quantity: delta_fH
+        method_class: author_estimate
+        admission_status: admitted
+        value: '-856'
+        approximate: true
+        T_K: '298'
+        as_printed: ≈−856 kJ/mol
+        attribution_note: The sentence does not explicitly assign this estimate to a cited work.
+    - observation_id: shornikov_2019_mgo_titania_melts_prose_mgtio3_relative_vapour_amount_limit
+      type: gas_speciation
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        section: Abstract
+        note: The text estimates these species at not more than 0.1% of the Mg amount over 2100–2400 K.
+      T_range_K:
+      - 2100
+      - 2400
+      phase: g
+      units: '% of Mg amount as published'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '2100'
+              interval_high: '2400'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            section: Abstract
+            note: The text estimates these species at not more than 0.1% of the Mg amount over 2100–2400
+              K.
+      values:
+        quantity: relative_gas_species_amount
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: The schema has no quantity token for a species amount relative to Mg; the source prints
+          an upper limit, not a point.
+        bound_operator: <=
+        bound_value: '0.1'
+        bound_units_as_published: '% of Mg amount'
+        gas_species_as_printed: MgTiO3
+        reference_species_as_published: Mg
+        value_as_published: not more than 0.1% of the Mg amount
+        attribution: Lopatin and Semenov (2001)
+  MgTi2O5:
+    observations:
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r15_c04
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: MgTi2O5 at 298 K
+        column_header: ΔS_T, J/(mol×K)
+        note: MinerU CSV row 15; row/column placement checked against the 600 dpi page 2 render.
+      units: J/(mol×K)
+      mineru_flags: []
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        T_K: '298'
+        value: '-0.23'
+        attribution: Todd, 1952
+        admission_status: typed_refusal
+        reason: The current schema has no formation-entropy quantity token for ΔS from simple oxides.
+        value_as_published: -0.23±0.28
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±0.28
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: MgTi2O5 at 298 K
+            column_header: ΔS_T, J/(mol×K)
+            note: MinerU CSV row 15; row/column placement checked against the 600 dpi page 2 render.
+      uncertainty: -0.23±0.28
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r16_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: MgTi2O5 at 298 K
+        column_header: ΔH_T, kJ/mol
+        note: MinerU CSV row 16; row/column placement checked against the 600 dpi page 2 render.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '298'
+        value: '-6.22'
+        attribution: Kelley et al., 1954
+        admission_status: typed_refusal
+        reason: The source defines formation from simple oxides; the scalar delta_fH token does not retain
+          that reaction basis, so this value is typed-refused.
+        value_as_published: -6.22±0.60
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±0.60
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '298'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: MgTi2O5 at 298 K
+            column_header: ΔH_T, kJ/mol
+            note: MinerU CSV row 16; row/column placement checked against the 600 dpi page 2 render.
+      uncertainty: -6.22±0.60
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r17_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: MgTi2O5 at 973 K
+        column_header: ΔH_T, kJ/mol
+        note: MinerU CSV row 17; row/column placement checked against the 600 dpi page 2 render.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        T_K: '973'
+        value: '-4.67'
+        attribution: Wechsler and Navrotsky, 1984
+        admission_status: typed_refusal
+        reason: The source defines formation from simple oxides; the scalar delta_fH token does not retain
+          that reaction basis, so this value is typed-refused.
+        value_as_published: -4.67±0.57
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±0.57
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '973'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: MgTi2O5 at 973 K
+            column_header: ΔH_T, kJ/mol
+            note: MinerU CSV row 17; row/column placement checked against the 600 dpi page 2 render.
+      uncertainty: -4.67±0.57
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r18_c05
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: MgTi2O5 at 1573 K
+        column_header: ΔG_T, kJ/mol
+        note: MinerU CSV row 18; row/column placement checked against the 600 dpi page 2 render.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1573'
+        value: '-9.48'
+        attribution: Brezny and Muan, 1971
+        admission_status: typed_refusal
+        reason: The source defines formation from simple oxides; the scalar delta_fG token does not retain
+          that reaction basis, so this value is typed-refused.
+        value_as_published: -9.48±1.39
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±1.39
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1573'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: MgTi2O5 at 1573 K
+            column_header: ΔG_T, kJ/mol
+            note: MinerU CSV row 18; row/column placement checked against the 600 dpi page 2 render.
+      uncertainty: -9.48±1.39
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r19_c05
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: MgTi2O5 at 1673 K
+        column_header: ΔG_T, kJ/mol
+        note: MinerU CSV row 19; row/column placement checked against the 600 dpi page 2 render.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '1673'
+        value: '-10.18'
+        attribution: Evans and Muan, 1971
+        admission_status: typed_refusal
+        reason: The source defines formation from simple oxides; the scalar delta_fG token does not retain
+          that reaction basis, so this value is typed-refused.
+        value_as_published: -10.18±1.12
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±1.12
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: MgTi2O5 at 1673 K
+            column_header: ΔG_T, kJ/mol
+            note: MinerU CSV row 19; row/column placement checked against the 600 dpi page 2 render.
+      uncertainty: -10.18±1.12
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r20_c03
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: MgTi2O5 at 1700-1930 K
+        column_header: ΔH_T, kJ/mol
+        note: MinerU CSV row 20; row/column placement checked against the 600 dpi page 2 render.
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fH
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: The source defines formation from simple oxides; the scalar delta_fH token does not retain
+          that reaction basis, so this value is typed-refused.
+        value: '-3.27'
+        value_as_published: -3.27±0.05
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±0.05
+        attribution: Bale et al., 2016
+      uncertainty: -3.27±0.05
+      T_range_K:
+      - 1700
+      - 1930
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1700'
+              interval_high: '1930'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: MgTi2O5 at 1700-1930 K
+            column_header: ΔH_T, kJ/mol
+            note: MinerU CSV row 20; row/column placement checked against the 600 dpi page 2 render.
+    - observation_id: shornikov_2019_mgo_titania_melts_p002_t01_r20_c04
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        table: '1'
+        row_label: MgTi2O5 at 1700-1930 K
+        column_header: ΔS_T, J/(mol×K)
+        note: MinerU CSV row 20; row/column placement checked against the 600 dpi page 2 render.
+      units: J/(mol×K)
+      mineru_flags: []
+      values:
+        quantity: delta_fS
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: The current schema has no formation-entropy quantity token for ΔS from simple oxides.
+        value: '4.24'
+        value_as_published: 4.24±0.03
+        formation_basis_as_published: from the simple oxides, per 1 mol compound
+        uncertainty_as_published: ±0.03
+        attribution: Bale et al., 2016
+      uncertainty: 4.24±0.03
+      T_range_K:
+      - 1700
+      - 1930
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1700'
+              interval_high: '1930'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            table: '1'
+            row_label: MgTi2O5 at 1700-1930 K
+            column_header: ΔS_T, J/(mol×K)
+            note: MinerU CSV row 20; row/column placement checked against the 600 dpi page 2 render.
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r06_c02
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: $MgTi_{2}O_{5}$
+        column_header: Condensed phases  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '-1496.736'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: cr
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator: &id001
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            column_header: ΔG°2173, kJ/mol
+            note: The table caption gives the calculation temperature as 2173 K.
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r06_c04
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: $MgTi_{2}O_{5}$
+        column_header: Condensed phases  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '-1511.848'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: l
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator: *id001
+    - observation_id: shornikov_2019_mgo_titania_melts_prose_mgti2o5_heat_of_fusion_bale_2016
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        section: Abstract
+        note: Bale et al. estimated the melting enthalpy of MgTi2O5 at 1930 K as 54.343 kJ/mol.
+      phase: cr
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1930'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            section: Abstract
+            note: Bale et al. estimated the melting enthalpy of MgTi2O5 at 1930 K as 54.343 kJ/mol.
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        admission_status: admitted
+        delta_H_fus_kJ_mol-1: '54.343'
+        T_fus_K: '1930'
+        attribution: Bale et al. (2016)
+        as_printed: 54.343 kJ/mol at 1930 K
+  MgO:
+    observations:
+    - observation_id: shornikov_2019_mgo_titania_melts_fig2_panel_a_curve_1
+      type: activity_coefficient
+      experiment: eriksson-pelton-1993-model
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 87
+        figure: '2'
+        curve: '1'
+        note: Caption identifies this series as a calculation; model curve retained without sampled values.
+        panel: a
+      phase: l
+      units: dimensionless activity; TiO2 mol% as plotted
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1973'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            figure: '2'
+            curve: '1'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+            panel: a
+        composition:
+          state:
+            tag: unknown
+            reason: The curve spans the TiO2 composition axis; no point composition is selected.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            figure: '2'
+            curve: '1'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+            panel: a
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: The caption identifies a model calculation; the figure rule excludes numeric reads from
+          model curves.
+        system_as_published: MgO–TiO2 melt
+        curve_number: '1'
+        attribution: Eriksson and Pelton (1993)
+        T_K: '1973'
+        component: MgO
+        activity_basis_as_published: a(MgO)
+        model_temperature_range_as_published: 1973–2373 K
+    - observation_id: shornikov_2019_mgo_titania_melts_fig2_panel_a_curve_3
+      type: activity_coefficient
+      experiment: shornikov-2019-present-study-model
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 87
+        figure: '2'
+        curve: '3'
+        note: Caption identifies this series as a calculation; model curve retained without sampled values.
+        panel: a
+      phase: l
+      units: dimensionless activity; TiO2 mol% as plotted
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1973'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            figure: '2'
+            curve: '3'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+            panel: a
+        composition:
+          state:
+            tag: unknown
+            reason: The curve spans the TiO2 composition axis; no point composition is selected.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            figure: '2'
+            curve: '3'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+            panel: a
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: The caption identifies a model calculation; the figure rule excludes numeric reads from
+          model curves.
+        system_as_published: MgO–TiO2 melt
+        curve_number: '3'
+        attribution: the present study
+        T_K: '1973'
+        component: MgO
+        activity_basis_as_published: a(MgO)
+        model_temperature_range_as_published: 1800–2500 K
+    - observation_id: shornikov_2019_mgo_titania_melts_fig2_panel_b_curve_1
+      type: activity_coefficient
+      experiment: eriksson-pelton-1993-model
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 87
+        figure: '2'
+        curve: '1'
+        note: Caption identifies this series as a calculation; model curve retained without sampled values.
+        panel: b
+      phase: l
+      units: dimensionless activity; TiO2 mol% as plotted
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            figure: '2'
+            curve: '1'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+            panel: b
+        composition:
+          state:
+            tag: unknown
+            reason: The curve spans the TiO2 composition axis; no point composition is selected.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            figure: '2'
+            curve: '1'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+            panel: b
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: The caption identifies a model calculation; the figure rule excludes numeric reads from
+          model curves.
+        system_as_published: MgO–TiO2 melt
+        curve_number: '1'
+        attribution: Eriksson and Pelton (1993)
+        T_K: '2173'
+        component: MgO
+        activity_basis_as_published: a(MgO)
+        model_temperature_range_as_published: 1973–2373 K
+    - observation_id: shornikov_2019_mgo_titania_melts_fig2_panel_b_curve_3
+      type: activity_coefficient
+      experiment: shornikov-2019-present-study-model
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 87
+        figure: '2'
+        curve: '3'
+        note: Caption identifies this series as a calculation; model curve retained without sampled values.
+        panel: b
+      phase: l
+      units: dimensionless activity; TiO2 mol% as plotted
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            figure: '2'
+            curve: '3'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+            panel: b
+        composition:
+          state:
+            tag: unknown
+            reason: The curve spans the TiO2 composition axis; no point composition is selected.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            figure: '2'
+            curve: '3'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+            panel: b
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: The caption identifies a model calculation; the figure rule excludes numeric reads from
+          model curves.
+        system_as_published: MgO–TiO2 melt
+        curve_number: '3'
+        attribution: the present study
+        T_K: '2173'
+        component: MgO
+        activity_basis_as_published: a(MgO)
+        model_temperature_range_as_published: 1800–2500 K
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r03_c02
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: MgO
+        column_header: Condensed phases  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '-355.987'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: cr
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator: &id002
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            column_header: ΔG°2173, kJ/mol
+            note: The table caption gives the calculation temperature as 2173 K.
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r03_c04
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: MgO
+        column_header: Condensed phases  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '-329.234'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: l
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator: *id002
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r05_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: MgO
+        column_header: Gas phase  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '-120.207'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: g
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator: *id003
+    - observation_id: shornikov_2019_mgo_titania_melts_prose_mgo_relative_vapour_amount_limit
+      type: gas_speciation
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 86
+        section: Abstract
+        note: The text estimates these species at not more than 0.1% of the Mg amount over 2100–2400 K.
+      T_range_K:
+      - 2100
+      - 2400
+      phase: g
+      units: '% of Mg amount as published'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '2100'
+              interval_high: '2400'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 86
+            section: Abstract
+            note: The text estimates these species at not more than 0.1% of the Mg amount over 2100–2400
+              K.
+      values:
+        quantity: relative_gas_species_amount
+        method_class: quoted_attributed
+        admission_status: typed_refusal
+        reason: The schema has no quantity token for a species amount relative to Mg; the source prints
+          an upper limit, not a point.
+        bound_operator: <=
+        bound_value: '0.1'
+        bound_units_as_published: '% of Mg amount'
+        gas_species_as_printed: MgO
+        reference_species_as_published: Mg
+        value_as_published: not more than 0.1% of the Mg amount
+        attribution: Lopatin and Semenov (2001)
+  Mg:
+    observations:
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r03_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: Mg
+        column_header: Gas phase  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '-72.400'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: g
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator: *id002
+  Mg2:
+    observations:
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r04_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: Mg2
+        column_header: Gas phase  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '20.659'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: g
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator: *id004
+  Ti:
+    observations:
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r06_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: Ti
+        column_header: Gas phase  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '170.472'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: g
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator: *id001
+  TiO2:
+    observations:
+    - observation_id: shornikov_2019_mgo_titania_melts_fig2_panel_a_curve_2
+      type: activity_coefficient
+      experiment: eriksson-pelton-1993-model
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 87
+        figure: '2'
+        curve: '2'
+        note: Caption identifies this series as a calculation; model curve retained without sampled values.
+        panel: a
+      phase: l
+      units: dimensionless activity; TiO2 mol% as plotted
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1973'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            figure: '2'
+            curve: '2'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+            panel: a
+        composition:
+          state:
+            tag: unknown
+            reason: The curve spans the TiO2 composition axis; no point composition is selected.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            figure: '2'
+            curve: '2'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+            panel: a
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: The caption identifies a model calculation; the figure rule excludes numeric reads from
+          model curves.
+        system_as_published: MgO–TiO2 melt
+        curve_number: '2'
+        attribution: Eriksson and Pelton (1993)
+        T_K: '1973'
+        component: TiO2
+        activity_basis_as_published: a(TiO2)
+        model_temperature_range_as_published: 1973–2373 K
+    - observation_id: shornikov_2019_mgo_titania_melts_fig2_panel_a_curve_4
+      type: activity_coefficient
+      experiment: shornikov-2019-present-study-model
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 87
+        figure: '2'
+        curve: '4'
+        note: Caption identifies this series as a calculation; model curve retained without sampled values.
+        panel: a
+      phase: l
+      units: dimensionless activity; TiO2 mol% as plotted
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1973'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            figure: '2'
+            curve: '4'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+            panel: a
+        composition:
+          state:
+            tag: unknown
+            reason: The curve spans the TiO2 composition axis; no point composition is selected.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            figure: '2'
+            curve: '4'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+            panel: a
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: The caption identifies a model calculation; the figure rule excludes numeric reads from
+          model curves.
+        system_as_published: MgO–TiO2 melt
+        curve_number: '4'
+        attribution: the present study
+        T_K: '1973'
+        component: TiO2
+        activity_basis_as_published: a(TiO2)
+        model_temperature_range_as_published: 1800–2500 K
+    - observation_id: shornikov_2019_mgo_titania_melts_fig2_panel_b_curve_2
+      type: activity_coefficient
+      experiment: eriksson-pelton-1993-model
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 87
+        figure: '2'
+        curve: '2'
+        note: Caption identifies this series as a calculation; model curve retained without sampled values.
+        panel: b
+      phase: l
+      units: dimensionless activity; TiO2 mol% as plotted
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            figure: '2'
+            curve: '2'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+            panel: b
+        composition:
+          state:
+            tag: unknown
+            reason: The curve spans the TiO2 composition axis; no point composition is selected.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            figure: '2'
+            curve: '2'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+            panel: b
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: The caption identifies a model calculation; the figure rule excludes numeric reads from
+          model curves.
+        system_as_published: MgO–TiO2 melt
+        curve_number: '2'
+        attribution: Eriksson and Pelton (1993)
+        T_K: '2173'
+        component: TiO2
+        activity_basis_as_published: a(TiO2)
+        model_temperature_range_as_published: 1973–2373 K
+    - observation_id: shornikov_2019_mgo_titania_melts_fig2_panel_b_curve_4
+      type: activity_coefficient
+      experiment: shornikov-2019-present-study-model
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 87
+        figure: '2'
+        curve: '4'
+        note: Caption identifies this series as a calculation; model curve retained without sampled values.
+        panel: b
+      phase: l
+      units: dimensionless activity; TiO2 mol% as plotted
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            figure: '2'
+            curve: '4'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+            panel: b
+        composition:
+          state:
+            tag: unknown
+            reason: The curve spans the TiO2 composition axis; no point composition is selected.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            figure: '2'
+            curve: '4'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+            panel: b
+      values:
+        quantity: activity
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: The caption identifies a model calculation; the figure rule excludes numeric reads from
+          model curves.
+        system_as_published: MgO–TiO2 melt
+        curve_number: '4'
+        attribution: the present study
+        T_K: '2173'
+        component: TiO2
+        activity_basis_as_published: a(TiO2)
+        model_temperature_range_as_published: 1800–2500 K
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r07_c02
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: $TiO_{2}$
+        column_header: Condensed phases  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '-551.661'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: cr
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator: &id005
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            column_header: ΔG°2173, kJ/mol
+            note: The table caption gives the calculation temperature as 2173 K.
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r07_c04
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: $TiO_{2}$
+        column_header: Condensed phases  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '-551.278'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: l
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator: *id005
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r08_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: $TiO_{2}$
+        column_header: Gas phase  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '-334.779'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: g
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            column_header: ΔG°2173, kJ/mol
+            note: The table caption gives the calculation temperature as 2173 K.
+  TiO:
+    observations:
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r07_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: TiO
+        column_header: Gas phase  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '-136.688'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: g
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator: *id005
+  Ti2O3:
+    observations:
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r09_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: $Ti_{2}O_{3}$
+        column_header: Gas phase  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '-641.289'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: g
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            column_header: ΔG°2173, kJ/mol
+            note: The table caption gives the calculation temperature as 2173 K.
+  Ti2O4:
+    observations:
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r10_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: $Ti_{2}O_{4}$
+        column_header: Gas phase  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '-794.803'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: g
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            column_header: ΔG°2173, kJ/mol
+            note: The table caption gives the calculation temperature as 2173 K.
+  O:
+    observations:
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r11_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: O
+        column_header: Gas phase  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '110.091'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: g
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            column_header: ΔG°2173, kJ/mol
+            note: The table caption gives the calculation temperature as 2173 K.
+  O2:
+    observations:
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r12_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: $O_{2}$
+        column_header: Gas phase  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '0.000'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: g
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            column_header: ΔG°2173, kJ/mol
+            note: The table caption gives the calculation temperature as 2173 K.
+  O3:
+    observations:
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r13_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: $O_{3}$
+        column_header: Gas phase  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '283.608'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: g
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            column_header: ΔG°2173, kJ/mol
+            note: The table caption gives the calculation temperature as 2173 K.
+  O4:
+    observations:
+    - observation_id: shornikov_2019_mgo_titania_melts_p003_t02_r14_c06
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '2'
+        row_label: $O_{4}$
+        column_header: Gas phase  $\Delta G^{\circ}_{2173}$ , kJ/mol
+        published_page: 87
+      units: kJ/mol
+      mineru_flags: []
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        T_K: '2173'
+        value: '209.765'
+        attribution: 'Table 2 caption: calculated in the present study; per-species input lineage is not
+          printed.'
+      phase: g
+      per: mol_species
+      experiment: shornikov-2019-present-study-model
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            table: '2'
+            column_header: ΔG°2173, kJ/mol
+            note: The table caption gives the calculation temperature as 2173 K.
+  MgO-TiO2:
+    observations:
+    - observation_id: shornikov_2019_mgo_titania_melts_fig3_curve_1
+      type: gibbs_table
+      experiment: eriksson-pelton-1993-model
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 88
+        figure: '3'
+        curve: '1'
+        note: Caption identifies this series as a calculation; model curve retained without sampled values.
+      phase: l
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1973'
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 88
+            figure: '3'
+            curve: '1'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+        composition:
+          state:
+            tag: unknown
+            reason: The curve spans the TiO2 composition axis; no point composition is selected.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 88
+            figure: '3'
+            curve: '1'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+      values:
+        quantity: mixing_energy
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: The caption identifies a model calculation; the figure rule excludes numeric reads from
+          model curves.
+        system_as_published: MgO–TiO2 melt
+        curve_number: '1'
+        attribution: Eriksson and Pelton (1993)
+        T_K: '1973'
+        mixing_energy_basis_as_published: ΔGm
+        model_temperature_range_as_published: 1973–2373 K
+    - observation_id: shornikov_2019_mgo_titania_melts_fig3_curve_2
+      type: gibbs_table
+      experiment: shornikov-2019-present-study-model
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 88
+        figure: '3'
+        curve: '2'
+        note: Caption identifies this series as a calculation; model curve retained without sampled values.
+      phase: l
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1973'
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 88
+            figure: '3'
+            curve: '2'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+        composition:
+          state:
+            tag: unknown
+            reason: The curve spans the TiO2 composition axis; no point composition is selected.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 88
+            figure: '3'
+            curve: '2'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+      values:
+        quantity: mixing_energy
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: The caption identifies a model calculation; the figure rule excludes numeric reads from
+          model curves.
+        system_as_published: MgO–TiO2 melt
+        curve_number: '2'
+        attribution: the present study
+        T_K: '1973'
+        mixing_energy_basis_as_published: ΔGm
+        model_temperature_range_as_published: 1800–2500 K
+    - observation_id: shornikov_2019_mgo_titania_melts_fig3_curve_3
+      type: gibbs_table
+      experiment: eriksson-pelton-1993-model
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 88
+        figure: '3'
+        curve: '3'
+        note: Caption identifies this series as a calculation; model curve retained without sampled values.
+      phase: l
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 88
+            figure: '3'
+            curve: '3'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+        composition:
+          state:
+            tag: unknown
+            reason: The curve spans the TiO2 composition axis; no point composition is selected.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 88
+            figure: '3'
+            curve: '3'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+      values:
+        quantity: mixing_energy
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: The caption identifies a model calculation; the figure rule excludes numeric reads from
+          model curves.
+        system_as_published: MgO–TiO2 melt
+        curve_number: '3'
+        attribution: Eriksson and Pelton (1993)
+        T_K: '2173'
+        mixing_energy_basis_as_published: ΔGm
+        model_temperature_range_as_published: 1973–2373 K
+    - observation_id: shornikov_2019_mgo_titania_melts_fig3_curve_4
+      type: gibbs_table
+      experiment: shornikov-2019-present-study-model
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 88
+        figure: '3'
+        curve: '4'
+        note: Caption identifies this series as a calculation; model curve retained without sampled values.
+      phase: l
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2173'
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 88
+            figure: '3'
+            curve: '4'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+        composition:
+          state:
+            tag: unknown
+            reason: The curve spans the TiO2 composition axis; no point composition is selected.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 88
+            figure: '3'
+            curve: '4'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+      values:
+        quantity: mixing_energy
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: The caption identifies a model calculation; the figure rule excludes numeric reads from
+          model curves.
+        system_as_published: MgO–TiO2 melt
+        curve_number: '4'
+        attribution: the present study
+        T_K: '2173'
+        mixing_energy_basis_as_published: ΔGm
+        model_temperature_range_as_published: 1800–2500 K
+    - observation_id: shornikov_2019_mgo_titania_melts_fig4_curve_4
+      type: gibbs_table
+      experiment: shornikov-2019-present-study-model
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 88
+        figure: '4'
+        curve: '4'
+        note: Caption identifies this series as a calculation; model curve retained without sampled values.
+      phase: l
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2300'
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 88
+            figure: '4'
+            curve: '4'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+        composition:
+          state:
+            tag: unknown
+            reason: The curve spans the TiO2 composition axis; no point composition is selected.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 88
+            figure: '4'
+            curve: '4'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+      values:
+        quantity: mixing_energy
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: The caption identifies a model calculation; the figure rule excludes numeric reads from
+          model curves.
+        system_as_published: MgO–TiO2 melt
+        curve_number: '4'
+        attribution: the present study
+        T_K: '2300'
+        mixing_energy_basis_as_published: ΔGm
+    - observation_id: shornikov_2019_mgo_titania_melts_prose_mixing_energy_difference_near_mgtio3
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 87
+        section: Results and discussion
+        note: The text reports a difference in ΔGm values of more than 10 kJ/mol near MgTiO3 concentration.
+      phase: l
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The statement does not identify which of the two Figure 3 temperatures applies.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: Results and discussion
+            note: The text reports a difference in ΔGm values of more than 10 kJ/mol near MgTiO3 concentration.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper says concentrations close to MgTiO3 but gives no numeric composition.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 87
+            section: Results and discussion
+            note: The text reports a difference in ΔGm values of more than 10 kJ/mol near MgTiO3 concentration.
+      values:
+        quantity: mixing_energy_difference
+        method_class: author_estimate
+        admission_status: typed_refusal
+        reason: No closed schema quantity represents a difference between model Gibbs energies of mixing.
+        semantics: bound_not_point_ordering
+        bound_operator: '>'
+        bound_value: '10'
+        system_as_published: MgO–TiO2 melts
+        composition_as_published: concentrations close to MgTiO3
+        value_as_published: more than 10 kJ/mol
+  CaO-SiO2:
+    observations:
+    - observation_id: shornikov_2019_mgo_titania_melts_fig4_curve_1
+      type: gibbs_table
+      experiment: shornikov-archakov-2000-model
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 88
+        figure: '4'
+        curve: '1'
+        note: Caption identifies this series as a calculation; model curve retained without sampled values.
+      phase: l
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2300'
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 88
+            figure: '4'
+            curve: '1'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+        composition:
+          state:
+            tag: unknown
+            reason: The curve spans the TiO2 composition axis; no point composition is selected.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 88
+            figure: '4'
+            curve: '1'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+      values:
+        quantity: mixing_energy
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: The caption identifies a model calculation; the figure rule excludes numeric reads from
+          model curves.
+        system_as_published: CaO–SiO2 melt
+        curve_number: '1'
+        attribution: Shornikov and Archakov (2000)
+        T_K: '2300'
+        mixing_energy_basis_as_published: ΔGm
+  MgO-SiO2:
+    observations:
+    - observation_id: shornikov_2019_mgo_titania_melts_fig4_curve_2
+      type: gibbs_table
+      experiment: shornikov-2006-model
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 88
+        figure: '4'
+        curve: '2'
+        note: Caption identifies this series as a calculation; model curve retained without sampled values.
+      phase: l
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2300'
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 88
+            figure: '4'
+            curve: '2'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+        composition:
+          state:
+            tag: unknown
+            reason: The curve spans the TiO2 composition axis; no point composition is selected.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 88
+            figure: '4'
+            curve: '2'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+      values:
+        quantity: mixing_energy
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: The caption identifies a model calculation; the figure rule excludes numeric reads from
+          model curves.
+        system_as_published: MgO–SiO2 melt
+        curve_number: '2'
+        attribution: Shornikov (2006)
+        T_K: '2300'
+        mixing_energy_basis_as_published: ΔGm
+  CaO-TiO2:
+    observations:
+    - observation_id: shornikov_2019_mgo_titania_melts_fig4_curve_3
+      type: gibbs_table
+      experiment: shornikov-2019-cao-tio2-model
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 88
+        figure: '4'
+        curve: '3'
+        note: Caption identifies this series as a calculation; model curve retained without sampled values.
+      phase: l
+      units: kJ/mol
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2300'
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 88
+            figure: '4'
+            curve: '3'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+        composition:
+          state:
+            tag: unknown
+            reason: The curve spans the TiO2 composition axis; no point composition is selected.
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 88
+            figure: '4'
+            curve: '3'
+            note: Caption identifies this series as a calculation; model curve retained without sampled
+              values.
+      values:
+        quantity: mixing_energy
+        method_class: figure_only
+        admission_status: typed_refusal
+        reason: The caption identifies a model calculation; the figure rule excludes numeric reads from
+          model curves.
+        system_as_published: CaO–TiO2 melt
+        curve_number: '3'
+        attribution: Shornikov (2019)
+        T_K: '2300'
+        mixing_energy_basis_as_published: ΔGm
+fidelity_samples:
+- path: species.Mg2TiO4.observations[shornikov_2019_mgo_titania_melts_p002_t01_r03_c03].values.value
+  value: '-5.69'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 86
+    table: '1'
+    note: Table 1, row Mg2TiO4 at 298 K, enthalpy column.
+- path: species.MgTiO3.observations[shornikov_2019_mgo_titania_melts_p002_t01_r08_c04].values.value
+  value: '-2.30'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 86
+    table: '1'
+    note: Table 1, row MgTiO3 at 298 K, entropy column.
+- path: species.MgO.observations[shornikov_2019_mgo_titania_melts_p003_t02_r03_c02].values.value
+  value: '-355.987'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 87
+    table: '2'
+    note: Table 2, MgO solid column.
+- path: species.O2.observations[shornikov_2019_mgo_titania_melts_p003_t02_r12_c06].values.value
+  value: '0.000'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 87
+    table: '2'
+    note: Table 2, O2 gas-species column.
+experiments:
+- experiment_id: eriksson-pelton-1993-model
+  kind: thermodynamic_model
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 87
+    figure: '2'
+  citation: Eriksson and Pelton (1993), as attributed in Figures 2 and 3.
+  method: Earlier thermodynamic-model calculations reproduced as activity and mixing-energy curves.
+- experiment_id: shornikov-2019-present-study-model
+  kind: thermodynamic_model
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 87
+    figure: '2'
+  method: Present-study ideal-associated-solution calculations; per-curve inputs are not printed.
+- experiment_id: shornikov-archakov-2000-model
+  kind: literature
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 88
+    figure: '4'
+    curve: '1'
+  citation: Shornikov and Archakov (2000), as attributed in the Figure 4 caption.
+  method: Earlier CaO–SiO2 mixing-energy series reproduced in Figure 4.
+- experiment_id: shornikov-2006-model
+  kind: literature
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 88
+    figure: '4'
+    curve: '2'
+  citation: Shornikov (2006), as attributed in the Figure 4 caption.
+  method: Earlier MgO–SiO2 mixing-energy series reproduced in Figure 4.
+- experiment_id: shornikov-2019-cao-tio2-model
+  kind: literature
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 88
+    figure: '4'
+    curve: '3'
+  citation: Shornikov (2019), as attributed in the Figure 4 caption.
+  method: Earlier CaO–TiO2 mixing-energy series reproduced in Figure 4.
