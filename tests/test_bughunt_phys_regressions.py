@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import ast
 import copy
 import gc
 import inspect
 import math
 import pickle
+import subprocess
 from collections import deque
+from pathlib import Path
 from types import MappingProxyType, SimpleNamespace
 
 import pytest
@@ -865,45 +868,7 @@ def test_successful_step_structurally_shares_committed_history(monkeypatch) -> N
     assert isinstance(direct_snapshot.value.__cause__, AssertionError)
 
 
-def test_yield_table_unwritten_on_refusal(monkeypatch) -> None:
-    class WriteTrackingDict(dict):
-        def __init__(self, *args, **kwargs) -> None:
-            super().__init__(*args, **kwargs)
-            self.write_operations = 0
-
-        def __setitem__(self, key, value) -> None:
-            self.write_operations += 1
-            super().__setitem__(key, value)
-
-        def __delitem__(self, key) -> None:
-            self.write_operations += 1
-            super().__delitem__(key)
-
-        def clear(self) -> None:
-            self.write_operations += 1
-            super().clear()
-
-        def pop(self, key, *args):
-            self.write_operations += 1
-            return super().pop(key, *args)
-
-        def popitem(self):
-            self.write_operations += 1
-            return super().popitem()
-
-        def setdefault(self, key, default=None):
-            if key not in self:
-                self.write_operations += 1
-            return super().setdefault(key, default)
-
-        def update(self, *args, **kwargs) -> None:
-            self.write_operations += 1
-            super().update(*args, **kwargs)
-
-        def __ior__(self, other):
-            self.write_operations += 1
-            return super().__ior__(other)
-
+def test_terminal_refusal_materializes_detached_committed_history() -> None:
     class FakeLedger:
         def __init__(self) -> None:
             self._balances = {}
@@ -916,39 +881,6 @@ def test_yield_table_unwritten_on_refusal(monkeypatch) -> None:
         def transitions(self):
             return self._transitions
 
-        def mol_by_account(self):
-            return {}
-
-        def origin_atom_moles_by_account(self):
-            return {}
-
-        def unresolved_origin_atom_moles_by_account(self):
-            return {}
-
-        def origin_attribution_methods_by_account(self):
-            return {}
-
-        def gross_account_flows(self):
-            return {"inputs": {}, "withdrawals": {}}
-
-        def gross_account_flow_events(self):
-            return []
-
-    from simulator import runner as runner_module
-    from simulator.accounting import yield_disposition as yield_disposition_module
-
-    capture_calls = []
-    original_capture = yield_disposition_module.capture_ledger_snapshot
-
-    def capture_spy(*args, **kwargs):
-        capture_calls.append((args, kwargs))
-        return original_capture(*args, **kwargs)
-
-    monkeypatch.setattr(
-        yield_disposition_module, "capture_ledger_snapshot", capture_spy,
-    )
-    monkeypatch.setattr(runner_module, "capture_ledger_snapshot", capture_spy)
-
     refusal = EvaporationFluxRefusal("terminal", {"reason": "test"})
     committed = HourSnapshot(
         hour=3,
@@ -960,10 +892,7 @@ def test_yield_table_unwritten_on_refusal(monkeypatch) -> None:
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=37)
     sim.record = BatchRecord(snapshots=[committed])
-    yield_disposition_history = WriteTrackingDict(
-        {"committed": {"hour": 37}},
-    )
-    yield_disposition_contents = copy.deepcopy(yield_disposition_history)
+    yield_disposition_history = {"committed": {"hour": 37}}
     sim._yield_disposition_ledger_snapshots = yield_disposition_history
     operating_prefix = {"pressures": {"Na": 1.0}}
     operating_tail = {"pressures": {"Na": 2.0}}
@@ -1000,9 +929,6 @@ def test_yield_table_unwritten_on_refusal(monkeypatch) -> None:
     assert raised.value is refusal
     assert sim.runtime_state["nested"] == {"temperature_C": 25.0}
     assert sim._yield_disposition_ledger_snapshots is yield_disposition_history
-    assert sim._yield_disposition_ledger_snapshots == yield_disposition_contents
-    assert yield_disposition_history.write_operations == 0
-    assert capture_calls == []
     cold_spot_history = sim._condensation_model.cold_spot_history
     assert cold_spot_history == [cold_spot_prefix]
     assert cold_spot_history[0] is not cold_spot_prefix
@@ -1019,6 +945,208 @@ def test_yield_table_unwritten_on_refusal(monkeypatch) -> None:
     assert sim.record.snapshots[0].composition_wt_pct is not (
         committed.composition_wt_pct
     )
+
+
+def test_real_refusal_guard(monkeypatch) -> None:
+    from simulator.runner import PyrolysisRun
+
+    class WriteTrackingDict(dict):
+        def __init__(self, *args, **kwargs) -> None:
+            super().__init__(*args, **kwargs)
+            self.writes = []
+
+        def __setitem__(self, key, value) -> None:
+            self.writes.append("__setitem__")
+            super().__setitem__(key, value)
+
+        def update(self, *args, **kwargs) -> None:
+            self.writes.append("update")
+            super().update(*args, **kwargs)
+
+        def pop(self, key, *args):
+            self.writes.append("pop")
+            return super().pop(key, *args)
+
+        def clear(self) -> None:
+            self.writes.append("clear")
+            super().clear()
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        hours=1,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+    sim = session.simulator
+    assert sim._step_one_hour.__func__ is PyrolysisSimulator._step_one_hour
+
+    yield_disposition_history = WriteTrackingDict(
+        {"committed": {"hour": sim.melt.hour}},
+    )
+    yield_disposition_contents = copy.deepcopy(yield_disposition_history)
+    sim._yield_disposition_ledger_snapshots = yield_disposition_history
+
+    refusal = EvaporationFluxRefusal(
+        "forced terminal refusal at equilibrium backend",
+        {"reason": "test_terminal_refusal"},
+    )
+    backend_calls = []
+
+    def refuse_equilibrium(**_kwargs):
+        backend_calls.append(None)
+        raise refusal
+
+    monkeypatch.setattr(sim.backend, "is_available", lambda: True)
+    monkeypatch.setattr(sim.backend, "equilibrate", refuse_equilibrium)
+
+    with pytest.raises(EvaporationFluxRefusal) as raised:
+        sim.step()
+
+    assert raised.value is refusal
+    assert backend_calls == [None]
+    assert sim._yield_disposition_ledger_snapshots is yield_disposition_history
+    assert dict(sim._yield_disposition_ledger_snapshots) == yield_disposition_contents
+    assert yield_disposition_history.writes == []
+
+
+def test_yield_writer_guard() -> None:
+    invariant = (
+        "terminal-refusal snapshots retain the yield-disposition table by "
+        "identity, so _step_one_hour must not call its writer or mutate it"
+    )
+    repository_root = Path(__file__).resolve().parents[1]
+    tracked_sources = subprocess.run(
+        [
+            "git", "ls-files", "-z", "--cached", "--others",
+            "--exclude-standard", "--", "simulator", "engines",
+        ],
+        cwd=repository_root,
+        check=True,
+        capture_output=True,
+    ).stdout.split(b"\0")
+    capture_call_sites = []
+    table_assignment_sites = []
+    table_attribute_setter_sites = []
+    cli_snapshot_sites = []
+    table_name = "_yield_disposition_ledger_snapshots"
+
+    class SiteScan(ast.NodeVisitor):
+        def __init__(self, relative_path: str) -> None:
+            self.relative_path = relative_path
+            self.functions = []
+
+        def visit_FunctionDef(self, node) -> None:
+            self.functions.append(node.name)
+            self.generic_visit(node)
+            self.functions.pop()
+
+        visit_AsyncFunctionDef = visit_FunctionDef
+
+        def visit_Call(self, node) -> None:
+            function = node.func.id if isinstance(node.func, ast.Name) else (
+                node.func.attr if isinstance(node.func, ast.Attribute) else ""
+            )
+            site = (self.relative_path, self.functions[-1] if self.functions else "")
+            if function == "capture_ledger_snapshot":
+                capture_call_sites.append(site)
+            if (
+                function == "setattr"
+                and len(node.args) >= 2
+                and isinstance(node.args[1], ast.Constant)
+                and node.args[1].value == table_name
+            ):
+                table_attribute_setter_sites.append(site)
+            if (
+                self.relative_path == "simulator/session_cli.py"
+                and function == "build_per_hour_summary"
+                and site[1] == "_snapshot"
+            ):
+                cli_snapshot_sites.append(site)
+            if (
+                isinstance(node.func, ast.Attribute)
+                and node.func.attr in {
+                    "__delitem__",
+                    "__ior__",
+                    "__setitem__",
+                    "clear",
+                    "pop",
+                    "popitem",
+                    "setdefault",
+                    "update",
+                }
+                and self.targets_table(node.func.value)
+            ):
+                table_assignment_sites.append(site)
+            if (
+                isinstance(node.func, ast.Attribute)
+                and node.func.attr in {"__delitem__", "__setitem__"}
+                and node.args
+                and self.targets_table(node.args[0])
+            ):
+                table_assignment_sites.append(site)
+            self.generic_visit(node)
+
+        def visit_Assign(self, node) -> None:
+            if any(self.targets_table(target) for target in node.targets):
+                table_assignment_sites.append(
+                    (self.relative_path, self.functions[-1] if self.functions else "")
+                )
+            self.generic_visit(node)
+
+        def visit_AnnAssign(self, node) -> None:
+            if self.targets_table(node.target):
+                table_assignment_sites.append(
+                    (self.relative_path, self.functions[-1] if self.functions else "")
+                )
+            self.generic_visit(node)
+
+        def visit_AugAssign(self, node) -> None:
+            if self.targets_table(node.target):
+                table_assignment_sites.append(
+                    (self.relative_path, self.functions[-1] if self.functions else "")
+                )
+            self.generic_visit(node)
+
+        def visit_Delete(self, node) -> None:
+            if any(self.targets_table(target) for target in node.targets):
+                table_assignment_sites.append(
+                    (self.relative_path, self.functions[-1] if self.functions else "")
+                )
+            self.generic_visit(node)
+
+        @staticmethod
+        def targets_table(node) -> bool:
+            return any(
+                isinstance(candidate, ast.Attribute)
+                and candidate.attr == table_name
+                for candidate in ast.walk(node)
+            )
+
+    for encoded_path in tracked_sources:
+        if not encoded_path:
+            continue
+        relative_path = encoded_path.decode()
+        if not relative_path.endswith(".py"):
+            continue
+        source = (repository_root / relative_path).read_text(encoding="utf-8")
+        SiteScan(relative_path).visit(ast.parse(source, filename=relative_path))
+
+    assert capture_call_sites == [
+        ("simulator/runner/__init__.py", "build_per_hour_summary"),
+    ], f"{invariant}; unexpected capture_ledger_snapshot callers: {capture_call_sites}"
+    assert table_assignment_sites == [
+        ("simulator/core.py", "load_batch"),
+    ], f"{invariant}; unexpected table assignments: {table_assignment_sites}"
+    assert table_attribute_setter_sites == [
+        ("simulator/accounting/yield_disposition.py", "capture_ledger_snapshot"),
+    ], (
+        f"{invariant}; unexpected table attribute setters: "
+        f"{table_attribute_setter_sites}"
+    )
+    assert cli_snapshot_sites == [
+        ("simulator/session_cli.py", "_snapshot"),
+    ], f"{invariant}; unexpected session snapshot routes: {cli_snapshot_sites}"
 
 
 def test_unsupported_refusal_snapshot_graph_raises_typed_error() -> None:
