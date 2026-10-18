@@ -24,7 +24,11 @@ Table keys:
 
 - ``page`` and ``table_index`` select ``pPPP-tNN`` (1-based PDF page and the
   draft table index)
-- ``type``, ``quantity``, ``unit`` — observation type, quantity token, printed unit
+- ``type``, ``quantity``, ``unit`` — observation type, quantity token, printed unit.
+  ``activity`` is stored as ``values.activity``. ``activity_coefficient`` is
+  stored as ``values.gamma``. ``partial_pressure`` accepts ``atm``, ``bar``,
+  or ``Pa`` only; any other unit raises ``ValueError`` naming that unit.
+  ``delta_fG`` stays on ``values.value``
 - ``evidence_class`` — stored as ``values.method_class``; a value column may override it
 - ``phase``, ``per``, ``experiment``, ``regime``, ``condensed_form`` — copied when set
 - ``rows`` — ``all`` (default) or a list of 1-based CSV row numbers (header rows included
@@ -50,6 +54,9 @@ Table keys:
 - ``attribution`` — copied to ``values.attribution`` (required by the migrator
   for ``quoted_attributed``)
 - ``published_page`` — copied onto locators when the worker knows it
+- ``render_verified`` — ``{row, column, text}`` for a trapped cell. ``row`` and
+  ``column`` are the 1-based CSV coordinates. ``text`` is the spelling the
+  worker read on the page render; that spelling is stored
 
 Cell text is stored verbatim after stripping surrounding whitespace. Units are
 not converted. Empty cells and cells whose text is only
@@ -57,11 +64,13 @@ not converted. Empty cells and cells whose text is only
 ``skipped_empty_or_dash``. They are never written as zero. A cell whose draft
 flags include ``comma_decimal_suspect`` or ``ambiguous_comma_separator``, or
 that this command marks as ``fused_superscript``, ``run_together``,
-``letter_for_digit``, ``stacked_values``, or ``dropped_plusminus``, is still
-emitted and carries ``needs_render_check``. ``dropped_plusminus`` is marked
-only when a pdftotext page confirms the ``±`` (``--pdftotext``,
-``<draft>/pdftotext-layout.txt``, or index ``pdftotext_layout``). Traps are
-read on the measured value cell, not on species labels.
+``letter_for_digit``, ``stacked_values``, or ``dropped_plusminus``, is a
+``needs_render_check`` cell. ``emit`` raises ``ValueError`` naming those traps
+unless ``render_verified`` supplies a spelling for that cell. The marker is not
+written onto the row. ``dropped_plusminus`` is marked only when a pdftotext
+page confirms the ``±`` (``--pdftotext``, ``<draft>/pdftotext-layout.txt``, or
+index ``pdftotext_layout``). Traps are read on the measured value cell, not on
+species labels.
 
 ``emit`` refuses a mapped table whose only source is pdftotext-layout, or whose
 CSV has no MinerU ``flags`` column. Transcribe that table, or request MinerU.
@@ -841,11 +850,12 @@ def compare_extract_to_draft(
     return results
 
 
-# Per-cell render traps. mineru_table_qa keeps its own copies of the
-# letter-for-digit regex, the run-together regex, and the dropped-plus-minus
-# page confirmation: those score a table only after two hits, and this module
-# cannot import QA (QA imports this module). Changing that gate must not
-# decide whether one emitted cell is marked. Comma traps reuse this module's
+# Per-cell render traps. mineru_table_qa imports _LETTER_FOR_DIGIT,
+# _DROPPED_PM_VALUE, _RUN_TOGETHER, and confirm_dropped_plusminus. QA still
+# scores a table only after two hits (_MINIMUM_SIGNAL_HITS); that gate stays
+# in QA, and this module does not import QA. Stacked-values stays here: QA's
+# multiple-quantity predicate also exempts range headers and requires a
+# numeric column, so it is not this check. Comma traps reuse this module's
 # cell flags rather than a second detector.
 _LETTER_FOR_DIGIT = re.compile(
     r"(?<![A-Za-z0-9])[IlO](?:\.\d+|\d+)\s*(?:×|\\times|x)"
@@ -902,6 +912,7 @@ _TABLE_KEYS = frozenset(
         "published_page",
         "regime",
         "condensed_form",
+        "render_verified",
     }
 )
 _VALUE_KEYS = frozenset(
@@ -1088,17 +1099,29 @@ def _stacked_values(text: str) -> bool:
     return gap.strip() == "" and bool(re.search(r"\s", gap))
 
 
-def _dropped_plusminus(text: str, page_text: str | None) -> bool:
+def confirm_dropped_plusminus(text: str, page_text: str | None) -> str | None:
+    """Return the pdftotext span that shows a plus-minus the cell dropped.
+
+    ``None`` when the cell does not match ``_DROPPED_PM_VALUE`` or the page
+    text does not confirm ``±`` between those parts. QA records the span;
+    emit treats it as a yes or no.
+    """
+
     if not page_text:
-        return False
+        return None
     match = _DROPPED_PM_VALUE.search(text)
     if match is None:
-        return False
+        return None
     pattern = re.compile(
         rf"(?<!\d){re.escape(match.group(1))}\s*(?:±|\uf0b1|\+\s*/\s*[-−])\s*"
         rf"{re.escape(match.group(2))}(?!\d)"
     )
-    return pattern.search(page_text) is not None
+    found = pattern.search(page_text)
+    return found.group() if found else None
+
+
+def _dropped_plusminus(text: str, page_text: str | None) -> bool:
+    return confirm_dropped_plusminus(text, page_text) is not None
 
 
 def _render_traps(cell: Mapping[str, Any], page_text: str | None) -> list[str]:
@@ -1153,7 +1176,18 @@ def _page_text_for(pages: list[str] | None, pdf_page: int) -> str | None:
 
 
 def _value_field(quantity: str, unit: str) -> str:
-    return _PRESSURE_FIELDS.get((quantity, unit), "value")
+    if quantity == "partial_pressure":
+        field = _PRESSURE_FIELDS.get((quantity, unit))
+        if field is None:
+            raise ValueError(
+                f"partial_pressure unit {unit!r} is not atm, bar, or Pa"
+            )
+        return field
+    if quantity == "activity":
+        return "activity"
+    if quantity == "activity_coefficient":
+        return "gamma"
+    return "value"
 
 
 def _uncertainty_for(table: Mapping[str, Any], column: int) -> dict[str, Any] | None:
@@ -1299,6 +1333,27 @@ def _copy_conditions(table: Mapping[str, Any]) -> dict[str, Any]:
     return copied
 
 
+def _render_verified_spellings(table: Mapping[str, Any]) -> dict[tuple[int, int], str]:
+    raw = table.get("render_verified") or []
+    if not isinstance(raw, list):
+        raise ValueError("render_verified must be a list")
+    verified: dict[tuple[int, int], str] = {}
+    for index, item in enumerate(raw):
+        entry = _require_mapping(item, f"render_verified[{index}]")
+        _unknown_keys(
+            entry,
+            frozenset({"row", "column", "text"}),
+            f"render_verified[{index}]",
+        )
+        if "row" not in entry or "column" not in entry or "text" not in entry:
+            raise ValueError(f"render_verified[{index}] needs row, column, and text")
+        key = (int(entry["row"]), int(entry["column"]))
+        if key in verified:
+            raise ValueError(f"repeated render_verified cell {key}")
+        verified[key] = str(entry["text"])
+    return verified
+
+
 def _measurement_columns(table: Mapping[str, Any]) -> list[dict[str, Any]]:
     values = table.get("values")
     pairs = table.get("value_pairs")
@@ -1337,7 +1392,7 @@ def _emit_table(
     cells: list[dict[str, Any]],
     source_id: str,
     page_text: str | None,
-) -> tuple[list[tuple[str, str, dict[str, Any]]], int]:
+) -> tuple[list[tuple[str, dict[str, Any]]], int]:
     _unknown_keys(spec, _TABLE_KEYS, f"table p{spec.get('page')}-t{spec.get('table_index')}")
     for key in ("page", "table_index", "type", "quantity", "unit"):
         if spec.get(key) in (None, ""):
@@ -1362,6 +1417,8 @@ def _emit_table(
     rows = _selected_body_rows(spec, cells)
     point_conditions = _copy_conditions(spec)
     published_page = spec.get("published_page")
+    verified_spellings = _render_verified_spellings(spec)
+    used_verified: set[tuple[int, int]] = set()
     emitted: list[tuple[str, dict[str, Any]]] = []
     skipped = 0
     for row in rows:
@@ -1492,8 +1549,19 @@ def _emit_table(
                 observation["uncertainty"] = uncertainty
             traps = _render_traps(cell, page_text)
             if traps:
-                observation["needs_render_check"] = traps
+                spelling = verified_spellings.get((row, column))
+                if spelling is None:
+                    raise ValueError(
+                        f"emit refuses p{page:03d}-t{table_index:02d} "
+                        f"row {row} column {column}: needs_render_check {traps}; "
+                        "supply render_verified text for that cell"
+                    )
+                observation["values"][value_field] = _printed(spelling)
+                used_verified.add((row, column))
             emitted.append((species, observation))
+    unused = sorted(set(verified_spellings) - used_verified)
+    if unused:
+        raise ValueError(f"render_verified cells are not trapped: {unused}")
     return emitted, skipped
 
 

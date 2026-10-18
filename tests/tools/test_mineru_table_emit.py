@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 from collections import Counter
 from decimal import Decimal
 from pathlib import Path
@@ -14,7 +15,9 @@ from tools import validate_literature_extracts as validator
 
 
 FIXTURES = Path(__file__).parent / "fixtures" / "mineru-table-emit"
-CORPUS_TEXT = Path("/Users/simonrowland/Repos/regolith-corpus/text")
+# The corpus checkout to compare against. REGOLITH_CORPUS_ROOT lets a gate point at a
+# specific clone (the controller's, or a CI-provisioned one) instead of the default path.
+CORPUS_ROOT = Path(os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"))
 EXTRACTS = (
     Path(__file__).resolve().parents[2] / "data" / "literature" / "extracts"
 )
@@ -272,17 +275,22 @@ def test_value_pairs_unwrap_printed_formulas_and_ignore_species_glyphs(
         ("<tr><td>1851</td><td>1.2<br>3.4</td></tr>", "stacked_values"),
     ],
 )
-def test_each_value_cell_trap_is_marked_and_the_text_stays_verbatim(
+def test_each_value_cell_trap_is_refused_without_a_verified_spelling(
     tmp_path: Path, html: str, flag: str
 ) -> None:
     draft_dir = _convert_html(
         tmp_path,
         "<table><tr><th>T, K</th><th>p</th></tr>" + html + "</table>",
     )
-    document = _emit(tmp_path, draft_dir, _base_mapping(_pressure_table()))
+    with pytest.raises(ValueError, match=rf"needs_render_check \['{flag}'\]"):
+        _emit(tmp_path / "bare", draft_dir, _base_mapping(_pressure_table()))
+    verified = _pressure_table(
+        render_verified=[{"row": 2, "column": 2, "text": "verified-spelling"}]
+    )
+    document = _emit(tmp_path / "verified", draft_dir, _base_mapping(verified))
     row = _observations(document)[0]
-    assert row["needs_render_check"] == [flag]
-    assert row["values"]["pressure_atm"].strip() not in _DASHES | {""}
+    assert "needs_render_check" not in row
+    assert row["values"]["pressure_atm"] == "verified-spelling"
 
 
 def test_dropped_plusminus_needs_a_confirming_pdftotext_page(tmp_path: Path) -> None:
@@ -293,17 +301,28 @@ def test_dropped_plusminus_needs_a_confirming_pdftotext_page(tmp_path: Path) -> 
     )
     plain = _emit(tmp_path / "plain", draft_dir, _base_mapping(_pressure_table()))
     assert "needs_render_check" not in _observations(plain)[0]
+    assert _observations(plain)[0]["values"]["pressure_atm"] == "1851.02"
     pdftotext = tmp_path / "layout.txt"
     pdftotext.write_text("header\n1851 ± 02\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="needs_render_check \\['dropped_plusminus'\\]"):
+        _emit(
+            tmp_path / "bare",
+            draft_dir,
+            _base_mapping(_pressure_table()),
+            pdftotext=pdftotext,
+        )
+    verified = _pressure_table(
+        render_verified=[{"row": 2, "column": 2, "text": "1851±02"}]
+    )
     marked = _emit(
         tmp_path / "marked",
         draft_dir,
-        _base_mapping(_pressure_table()),
+        _base_mapping(verified),
         pdftotext=pdftotext,
     )
     row = _observations(marked)[0]
-    assert row["needs_render_check"] == ["dropped_plusminus"]
-    assert row["values"]["pressure_atm"] == "1851.02"
+    assert "needs_render_check" not in row
+    assert row["values"]["pressure_atm"] == "1851±02"
 
 
 def test_emit_refuses_a_pdftotext_only_table_and_a_csv_without_flags(
@@ -362,7 +381,9 @@ def test_emit_refuses_a_pdftotext_only_table_and_a_csv_without_flags(
 
 
 def _mineru_dir(source_id: str) -> Path:
-    root = CORPUS_TEXT / source_id / "mineru"
+    if not CORPUS_ROOT.is_dir():
+        pytest.skip(f"regolith-corpus checkout is absent: {CORPUS_ROOT}")
+    root = CORPUS_ROOT / "text" / source_id / "mineru"
     if not root.is_dir():
         pytest.skip(f"MinerU draft source is not on disk: {root}")
     return root
@@ -401,6 +422,71 @@ def _csv_row_column(observation_id: str) -> tuple[str, str]:
     tail = observation_id.rsplit("_r", 1)[1]
     row, column = tail.split("_c", 1)
     return str(int(row)), str(int(column))
+
+
+def test_activity_cell_is_a_point_and_other_pressure_units_are_refused(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import Quantity, ValueKind
+    from simulator.battery.migrate import select_declared_source
+
+    draft_dir = _convert_html(
+        tmp_path,
+        "<table><tr><th>T, K</th><th>a</th></tr>"
+        "<tr><td>1566</td><td>0.21</td></tr></table>",
+    )
+    activity = _emit(
+        tmp_path / "activity",
+        draft_dir,
+        _base_mapping(
+            _pressure_table(
+                type="activity",
+                quantity="activity",
+                unit="dimensionless",
+            )
+        ),
+    )
+    activity_row = _observations(activity)[0]
+    assert activity_row["values"]["activity"] == "0.21"
+    assert "value" not in activity_row["values"]
+    selected = select_declared_source(
+        Quantity.ACTIVITY,
+        "dimensionless",
+        activity_row["values"],
+    )
+    assert selected.value.kind is ValueKind.POINT
+    assert selected.field_name == "activity"
+    assert selected.value.point == Decimal("0.21")
+
+    coefficient = _emit(
+        tmp_path / "gamma",
+        draft_dir,
+        _base_mapping(
+            _pressure_table(
+                type="activity_coefficient",
+                quantity="activity_coefficient",
+                unit="dimensionless",
+            )
+        ),
+    )
+    coefficient_row = _observations(coefficient)[0]
+    assert coefficient_row["values"]["gamma"] == "0.21"
+    assert "value" not in coefficient_row["values"]
+    selected_gamma = select_declared_source(
+        Quantity.ACTIVITY_COEFFICIENT,
+        "dimensionless",
+        coefficient_row["values"],
+    )
+    assert selected_gamma.value.kind is ValueKind.POINT
+    assert selected_gamma.field_name == "gamma"
+    assert selected_gamma.value.point == Decimal("0.21")
+
+    with pytest.raises(ValueError, match="partial_pressure unit 'Torr' is not atm, bar, or Pa"):
+        _emit(
+            tmp_path / "torr",
+            draft_dir,
+            _base_mapping(_pressure_table(unit="Torr")),
+        )
 
 
 def test_shornikov_2017_emit_matches_cells_and_explains_stored_twins(

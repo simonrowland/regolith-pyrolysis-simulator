@@ -37,11 +37,6 @@ _NUMBER_TOKEN = re.compile(
     r"(?:\(\d+\))?(?:[eE][+\-−–—]?\d+)?"
 )
 _CHUNK_PAGE_START = re.compile(r"(?:^|[-_])p(\d+)(?:[-_]|$)")
-_LETTER_FOR_DIGIT = re.compile(
-    r"(?<![A-Za-z0-9])[IlO](?:\.\d+|\d+)\s*(?:×|\\times|x)"
-    r"|(?<![A-Za-z0-9])\d+\.[IlO]\s*(?:×|\\times|x)",
-    re.IGNORECASE,
-)
 _NUMBER_ATOM = (
     r"[+\-−–—]?(?:\d+(?:[.,]\d+)?|\.\d+)"
     r"(?:\(\d+\))?(?:[eE][+\-−–—]?\d+)?"
@@ -49,7 +44,6 @@ _NUMBER_ATOM = (
 _NUMERIC_EXPRESSION = re.compile(
     rf"{_NUMBER_ATOM}(?:\s*(?:±|\+\s*/\s*[-−])\s*{_NUMBER_ATOM})?\s*%?"
 )
-_DROPPED_PM_VALUE = re.compile(r"(?<!\d)(\d{4})\.(\d{2})(?!\d)")
 _LATEX = re.compile(r"\\[A-Za-z]+|[$]")
 _LATEX_EXPONENT = re.compile(r"\^\s*(?:\{\s*[+\-−]?\s*\d+\s*\}|[+\-−]?\s*\d+)")
 _LATEX_MULTIPLY = re.compile(r"\\(?:times|cdot)\b")
@@ -254,10 +248,10 @@ def _letter_for_digit_cells(
         ]
         numeric_like = [
             text for text in cells
-            if _number_tokens(text) or _LETTER_FOR_DIGIT.search(text)
+            if _number_tokens(text) or draft._LETTER_FOR_DIGIT.search(text)
         ]
         if len(numeric_like) >= 2 and len(numeric_like) / len(cells) >= 0.5:
-            hits += sum(bool(_LETTER_FOR_DIGIT.search(text)) for text in numeric_like)
+            hits += sum(bool(draft._LETTER_FOR_DIGIT.search(text)) for text in numeric_like)
     return hits
 
 
@@ -314,20 +308,6 @@ def _evidence_rate(hits: int, population: int) -> float:
     if hits < _MINIMUM_SIGNAL_HITS or population <= 0:
         return 0.0
     return hits / population
-
-
-def _pdftotext_at_dropped_value(
-    value_match: re.Match[str], page_text: str | None
-) -> str | None:
-    if page_text is None:
-        return None
-    pattern = re.compile(
-        rf"(?<!\d){re.escape(value_match.group(1))}\s*"
-        rf"(?:±|\uf0b1|\+\s*/\s*[-−])\s*"
-        rf"{re.escape(value_match.group(2))}(?!\d)"
-    )
-    match = pattern.search(page_text)
-    return match.group() if match else None
 
 
 def _page_texts(corpus_root: Path, sid: str) -> list[str] | None:
@@ -438,7 +418,7 @@ def _table_row(
             header_text = header_texts[column] if column < len(header_texts) else ""
             if is_numeric and _has_multiple_independent_quantities(text, header_text):
                 flags["multiple_numbers"] += 1
-            if is_numeric and re.search(r"\d+\.\d+\.\d", text):
+            if is_numeric and draft._RUN_TOGETHER.search(text):
                 run_together_count += 1
 
             if is_numeric and page_text is not None:
@@ -448,13 +428,8 @@ def _table_row(
                     flags["comma_dot_decimal"] += 1
 
             if is_numeric:
-                dropped_pm = _DROPPED_PM_VALUE.search(text)
-                pdf_text = (
-                    _pdftotext_at_dropped_value(dropped_pm, page_text)
-                    if dropped_pm
-                    else None
-                )
-                if dropped_pm and pdf_text:
+                pdf_text = draft.confirm_dropped_plusminus(text, page_text)
+                if pdf_text:
                     flags["dropped_plusminus"] += 1
                     dropped_plusminus_hits.append(
                         {
