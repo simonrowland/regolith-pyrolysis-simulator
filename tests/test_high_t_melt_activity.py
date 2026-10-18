@@ -351,11 +351,11 @@ def _history_request(composition, temperature_K, hour, previous=None):
 
 def test_successful_openimcc_physics_is_bit_identical() -> None:
     result = _provider().dispatch(_history_request(BASE_MELT_MOL, 2400.65, 61))
-    # Pin captured on green e912e472f with the requested e975edd export,
-    # before adding continuation. JSON round-trips preserve float bits.
+    # Re-measured after merging green a822c275f: d-173 moves the engine pin
+    # from e975edd to e1423d8. JSON round-trips preserve float bits.
     assert hashlib.sha256(
         json.dumps(_physics(result), sort_keys=True).encode()
-    ).hexdigest() == "7a8024a3a3235a06fbf1dd3bd20385c804a3098ac1d1b0b717cdd93b7cf57ad0"
+    ).hexdigest() == "0dbdc3673e0d640898dad7b848278f93322c0b48898050618b21811bd63c7e78"
 
 
 @pytest.mark.parametrize("gap_K, hour_gap", [
@@ -687,8 +687,8 @@ def _reference_regular_solution_gamma(
     )
 
 
-def test_refused_calls_use_same_composition_temperature_bridge() -> None:
-    """e975edd calls 62 and 65 refuse; the bridge is the primary gamma.
+def test_refused_calls_use_same_composition_temperature_bridge(monkeypatch) -> None:
+    """Force historical e975edd refusals; the bridge is the primary gamma.
 
     Call 62 has the same composition in the solved c2b7b4e log, so that
     log is the truth. Call 65's trajectories have diverged, and c2b7b4e
@@ -699,6 +699,21 @@ def test_refused_calls_use_same_composition_temperature_bridge() -> None:
     provider = _provider()
     certified = _certify_lunar_calls_60_61(provider)
     refused_62 = _call_record("e975edd", 62)
+    refused_65 = _call_record("e975edd", 65)
+    target_temperatures = {refused_62["T_K"], refused_65["T_K"]}
+    evaluate = openimcc_bridge_module.evaluate
+    refused_temperatures = []
+
+    def refuse_targets(**kwargs):
+        temperature_K = kwargs["temperature_K"]
+        if temperature_K in target_temperatures:
+            refused_temperatures.append(temperature_K)
+            raise ImccNonconvergenceError("forced historical target refusal", {})
+        return evaluate(**kwargs)
+
+    # Solver improvements may recover the targets. Force only their refusal;
+    # nearby probes still solve the same composition with the live engine.
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", refuse_targets)
     solved_62 = _call_record("c2b7b4e", 62)
     assert refused_62["ok"] is False
     assert solved_62["composition"] == refused_62["composition"]
@@ -706,6 +721,7 @@ def test_refused_calls_use_same_composition_temperature_bridge() -> None:
         refused_62["composition"], refused_62["T_K"], 62, certified,
     ))
     authority = result_62.diagnostic["high_t_melt_activity"]
+    assert authority["fallback_reason"]["code"] == "imcc_nonconvergence"
     bridge_parents = _ONE_STEP_PARENTS + ("Na2O",)
     errors = {}
     solved_activity = dict(zip(
@@ -744,12 +760,13 @@ def test_refused_calls_use_same_composition_temperature_bridge() -> None:
         == "same_composition_T_bridge"
     )
 
-    refused_65 = _call_record("e975edd", 65)
     assert refused_65["ok"] is False
     result_65 = provider.dispatch(_history_request(
         refused_65["composition"], refused_65["T_K"], 65,
     ))
     authority_65 = result_65.diagnostic["high_t_melt_activity"]
+    assert authority_65["fallback_reason"]["code"] == "imcc_nonconvergence"
+    assert refused_temperatures == [refused_62["T_K"], refused_65["T_K"]]
     silica = next(
         n for n in authority_65["notices"] if n.get("parent") == "SiO2"
     )
@@ -776,6 +793,36 @@ def test_refused_calls_use_same_composition_temperature_bridge() -> None:
     assert activity_65.activity != melt_oxide_activity(
         "SiO2", refused_65["composition"],
     ).activity
+
+
+@pytest.mark.parametrize("call_index", [62, 65])
+def test_recovered_historical_call_uses_direct_live_solve(call_index) -> None:
+    """Successful numerical recovery must not enter continuation."""
+
+    record = _call_record("e975edd", call_index)
+    try:
+        direct = evaluate_cleaned_melt(record["composition"], record["T_K"])
+    except ImccNonconvergenceError:
+        pytest.skip("installed engine still refuses this historical target")
+
+    provider = _provider()
+    certified = _certify_lunar_calls_60_61(provider)
+    result = provider.dispatch(_history_request(
+        record["composition"], record["T_K"], call_index, certified,
+    ))
+    authority = result.diagnostic["high_t_melt_activity"]
+    assert authority["provider"] == "openimcc"
+    assert authority["openimcc_activities_by_oxide"] == dict(direct.single_cation_activities)
+    for oxide in _ONE_STEP_PARENTS + ("Na2O",):
+        assert authority["activities_by_oxide"][oxide] == direct.single_cation_activities[oxide]
+    assert authority["fallback"] is False
+    assert "fallback_reason" not in authority
+    assert "temperature_bridge" not in authority
+    assert not authority.get("held_effective_gamma_by_parent")
+    assert not any(
+        notice.get("code") == "hold_last_certified_effective_gamma"
+        for notice in authority["notices"]
+    )
 
 
 @pytest.mark.parametrize("silica_factor", [1.0, 0.99])
