@@ -465,6 +465,103 @@ def test_plante_glass_initials_use_analyzed_printed_map_by_name(
     _assert_plante_observations_use_analyzed_composition(migrator.result, expected)
 
 
+@pytest.mark.parametrize(
+    "experiment_id",
+    ("kms-vacuum-glass-series", "tms-n2-glass-series"),
+)
+def test_round8_plante_initial_is_independent_of_selection_prose(
+    experiment_id: str,
+) -> None:
+    path = REPO_ROOT / "data/literature/extracts/kems-027-plante-hastie-1983.yaml"
+    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    _, expected = _plante_analytical_composition(doc)
+    experiment = next(
+        item for item in doc["experiments"] if item["experiment_id"] == experiment_id
+    )
+    sample_payload = experiment["sample"]
+    initial = sample_payload["initial_composition"]
+    assert initial["state"]["tag"] == "value"
+    original = _sample_from_plain(sample_payload, experiment_id=experiment_id)
+
+    inputs = initial["inference"]["inputs"]
+    selection_note = next(
+        index for index, value in enumerate(inputs) if "column selected" in value
+    )
+    inputs[selection_note] = "No nominal column selected; analytical is not a selector"
+    changed_prose = _sample_from_plain(sample_payload, experiment_id=experiment_id)
+
+    expected_components = to_plain(expected)["components"]
+    original_components = to_plain(original.initial_composition)["state"]["value"][
+        "components"
+    ]
+    changed_components = to_plain(changed_prose.initial_composition)["state"][
+        "value"
+    ]["components"]
+    assert original_components == expected_components
+    assert changed_components == expected_components
+    assert original_components == changed_components
+
+
+def test_round8_existing_typed_initial_beats_printed_column_and_prose() -> None:
+    sample = _sample_from_plain(
+        {
+            "initial_composition": {
+                "state": {
+                    "tag": "value",
+                    "value": {
+                        "basis": "printed_oxides",
+                        "amount_basis": "mole_fraction",
+                        "components": [["SiO2", "0.6"], ["MgO", "0.4"]],
+                    },
+                },
+                "inference": {
+                    "relation": "identity",
+                    "inputs": ["analytical column selected as the start"],
+                    "output_unit": "mole_fraction",
+                },
+            },
+            "printed_composition": {
+                "state": {
+                    "tag": "value",
+                    "value": {
+                        "analytical": {"SiO2": "20", "MgO": "80"},
+                        "nominal": {"SiO2": "80", "MgO": "20"},
+                    },
+                }
+            },
+        }
+    )
+
+    assert sample.initial_composition is not None
+    assert to_plain(sample.initial_composition)["state"]["value"]["components"] == [
+        ["SiO2", "0.6"],
+        ["MgO", "0.4"],
+    ]
+
+
+def test_round8_multiple_printed_columns_without_typed_initial_refuse() -> None:
+    sample = _sample_from_plain(
+        {
+            "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
+            "printed_composition": {
+                "state": {
+                    "tag": "value",
+                    "value": {
+                        "analytical": {"SiO2": "20", "MgO": "80"},
+                        "nominal": {"SiO2": "80", "MgO": "20"},
+                    },
+                }
+            },
+        }
+    )
+
+    assert sample.initial_composition is not None
+    assert not sample.initial_composition.state.is_value
+    assert sample.initial_composition.state.reason == (
+        "printed composition has multiple columns and no typed selection"
+    )
+
+
 def test_plante_fig19_points_keep_pooled_sample_unknown_and_gas_phase() -> None:
     path = REPO_ROOT / "data/literature/extracts/kems-027-plante-hastie-1983.yaml"
     doc = yaml.safe_load(path.read_text(encoding="utf-8"))
