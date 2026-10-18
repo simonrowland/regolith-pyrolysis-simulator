@@ -6269,6 +6269,50 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
             return None
         # Beyer RI 8410 Table 1 prints Cp in thermochemical calories per degree-mole.
         return amount * as_decimal("4.184")
+    if q_token == "S":
+        amount = next(
+            (
+                parsed
+                for key in (
+                    "entropy",
+                    "entropy_recommended",
+                    "entropy_third_law",
+                    "entropy_spectrographic_or_molecular_constants",
+                    "entropy_other_sources",
+                    "value",
+                )
+                if (parsed := _num(item.get(key))) is not None
+            ),
+            None,
+        )
+        if amount is None:
+            return None
+        unit = (
+            "".join(str(units or "").lower().split())
+            .replace("·", "")
+            .replace(".", "")
+            .replace("deg-", "deg")
+            .replace("_", "")
+        )
+        if unit in {
+            "cal/mol/k",
+            "cal/molk",
+            "cal/degmole",
+            "calmol^-1k^-1",
+            "caldeg^-1gfw^-1",
+            "caldeg-1gfw-1",
+        }:
+            # Beyer RI 8410 Tables 2-4 print S in thermochemical calories per degree-mole.
+            return amount * as_decimal("4.184")
+        if unit in {
+            "j/mol/k",
+            "j/molk",
+            "j/degmole",
+            "jk^-1mol^-1",
+            "jmol^-1k^-1",
+        }:
+            return amount
+        return None
     if q_token == "activity_coefficient":
         if "gamma" in item:
             return _num(item.get("gamma"))
