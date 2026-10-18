@@ -1240,6 +1240,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_partial_melt_offgassing_diagnostic: Dict[str, Any] = {}
         # b-149 silent-zero class: typed zero_because notes (diagnostic only).
         self._silent_zero_notes: list = []
+        self._source_duct_closure_diagnostic: Dict[str, Any] = {}
         # VR-11 instrumentation: exact-key batch + flux overlay report.
         self._last_vapour_batch: Any = None
         self._last_vapour_batch_report: Dict[str, Any] | None = None
@@ -4051,18 +4052,85 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if float(pressure_Pa) > 0.0
         }
 
+    def _source_duct_convergence(self, capacity_result):
+        from simulator.capacity_coupling import SourceDuctConvergence
+
+        raw = getattr(
+            capacity_result,
+            'convergence',
+            SourceDuctConvergence.CONVERGED,
+        )
+        if isinstance(raw, SourceDuctConvergence):
+            return raw
+        try:
+            return SourceDuctConvergence(str(raw))
+        except ValueError:
+            return SourceDuctConvergence.CONVERGED
+
+    def _record_source_duct_closure(self, capacity_result) -> None:
+        from simulator.capacity_coupling import SourceDuctConvergence
+        from simulator.silent_zero import (
+            CATEGORY_MARK,
+            ZeroBecause,
+            record_on_host,
+        )
+
+        residual = float(
+            getattr(capacity_result, 'source_duct_residual_rel', 0.0) or 0.0
+        )
+        convergence = self._source_duct_convergence(capacity_result)
+        notices = tuple(getattr(capacity_result, 'closure_notices', ()) or ())
+        self._source_duct_closure_diagnostic = {
+            'convergence': convergence.value,
+            'source_duct_residual_rel': residual,
+            'notices': [dict(notice) for notice in notices],
+        }
+        if (
+            convergence is SourceDuctConvergence.CONVERGED
+            and not notices
+        ):
+            return
+        for notice in notices:
+            reason = str(notice.get('reason') or 'source_duct_closure')
+            notice_residual = notice.get('residual_rel', residual)
+            record_on_host(
+                self,
+                ZeroBecause.OUT_OF_DOMAIN_MARKED,
+                site='capacity_coupling.source_duct_closure',
+                species=str(notice.get('species') or ''),
+                field=reason,
+                detail=(
+                    f"{notice.get('detail') or reason}; "
+                    f"residual_rel={notice_residual}; "
+                    f"convergence={convergence.value}"
+                ),
+                doctrine_category=CATEGORY_MARK,
+            )
+
     def _install_source_duct_surface(self, capacity_result) -> None:
+        from simulator.capacity_coupling import SourceDuctConvergence
         from simulator.thermal_train import NoColdTrain
 
         if not isinstance(getattr(capacity_result, 'capacity', None), NoColdTrain):
             return
-        partials = dict(capacity_result.partial_pressures_Pa)
-        if partials:
-            self._install_upstream_projection({
-                str(species): float(pressure_Pa) / 100.0
-                for species, pressure_Pa in partials.items()
-                if float(pressure_Pa) > 0.0
-            })
+        convergence = self._source_duct_convergence(capacity_result)
+        positives = {
+            str(species): float(pressure_Pa) / 100.0
+            for species, pressure_Pa in dict(
+                capacity_result.partial_pressures_Pa
+            ).items()
+            if float(pressure_Pa) > 0.0
+        }
+        if convergence is SourceDuctConvergence.MODEL_LIMIT:
+            if positives:
+                self._install_upstream_projection(positives)
+            else:
+                self._install_upstream_projection(
+                    self._carrier_only_boundary_mbar()
+                )
+            return
+        if positives:
+            self._install_upstream_projection(positives)
             return
         self._install_upstream_projection(self._carrier_only_boundary_mbar())
 
@@ -4874,7 +4942,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         from simulator.silent_zero import silent_zero_diagnostic
 
-        return silent_zero_diagnostic(self)
+        payload = dict(silent_zero_diagnostic(self))
+        diagnostic = getattr(self, '_source_duct_closure_diagnostic', None)
+        if diagnostic:
+            payload['source_duct_closure'] = dict(diagnostic)
+        return payload
 
     @staticmethod
     def _melt_redox_gate_authority_provenance(
@@ -13884,6 +13956,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._last_partial_melt_offgassing_diagnostic = {}
         self._stream_source_pressures_Pa = {}
         self._silent_zero_notes = []
+        self._source_duct_closure_diagnostic = {}
         self._last_extraction_completeness_diagnostic = {}
         self._last_target_inventory_diagnostic = {}
         self._last_overlap_evaporation_diagnostic = {}
@@ -14017,24 +14090,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 from simulator.thermal_train import NoColdTrain as _NoColdTrain
 
                 if isinstance(capacity_result.capacity, _NoColdTrain):
+                    self._record_source_duct_closure(capacity_result)
                     self._install_source_duct_surface(capacity_result)
                     self._reprice_native_fe_residual_at_installed_surface()
-                    for notice in capacity_result.closure_notices:
-                        from simulator.silent_zero import (
-                            CATEGORY_MARK,
-                            ZeroBecause,
-                            record_on_host,
-                        )
-
-                        record_on_host(
-                            self,
-                            ZeroBecause.OUT_OF_DOMAIN_MARKED,
-                            site='evaporation.retained_gas_exceeds_equilibrium',
-                            species=str(notice.get('species') or ''),
-                            field='incoming_partial_Pa',
-                            detail=str(notice.get('detail') or ''),
-                            doctrine_category=CATEGORY_MARK,
-                        )
                 live_raw_flux = self._calculate_evaporation(
                     equilibrium,
                     overhead_partials_override_Pa=(

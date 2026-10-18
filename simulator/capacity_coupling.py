@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
+from enum import Enum
 from types import MappingProxyType
 
 from engines.builtin.overhead_bleed import (
@@ -29,6 +30,18 @@ DEFAULT_MAX_ITERATIONS = 50
 SOURCE_DUCT_MAX_ITERATIONS = 80
 SOURCE_DUCT_H_REFINE_ITERATIONS = 80
 SOURCE_DUCT_ABS_TOL_PA = 1.0e-12
+SOURCE_DUCT_LIMIT_REASONS = frozenset(
+    {
+        "source_duct_bracket_missed",
+        "source_duct_root_non_convergence",
+        "source_duct_h_refine_non_convergence",
+    }
+)
+
+
+class SourceDuctConvergence(str, Enum):
+    CONVERGED = "converged"
+    MODEL_LIMIT = "model_limit"
 
 
 @dataclass(frozen=True)
@@ -72,6 +85,7 @@ class CapacityShadowResult:
     authoritative: bool = False
     source_duct_residual_rel: float = 0.0
     closure_notices: tuple[Mapping[str, object], ...] = ()
+    convergence: SourceDuctConvergence = SourceDuctConvergence.CONVERGED
 
     def __post_init__(self) -> None:
         for name in (
@@ -308,20 +322,20 @@ def _knudsen_number_at_total_Pa(
     return mean_free_path_m / diameter_m
 
 
-def _long_tube_molar_conductance_mol_s_Pa(
+def _molecular_pipe_conductance_mol_s_Pa(
     *,
     diameter_m: float,
     length_m: float,
     temperature_K: float,
     molar_mass_kg_mol: float,
-) -> tuple[float, dict[str, object] | None]:
-    # Owner: transport_regime.long_tube_molecular_conductance_m3_s.
-    # Volume conductance C_v = 0.25 * A * v_bar * (4d/(3L)) [m^3/s].
+) -> float:
+    # Owner: transport_regime.finite_tube_clausing_transmission (Santeler
+    # 1986). Volume conductance C_v = 0.25 * A * v_bar * W [m^3/s].
     # Molar C = C_v / (R T) [mol/(s Pa)]. Same units as Hertz-Knudsen H.
-    # C ∝ d^3 / (L sqrt(M T)). Throughput q = C * Δp.
+    # Throughput q = C * Δp. The long-tube 4d/(3L) asymptote is the L/D → ∞
+    # limit of that owner, not a second formula here.
     from simulator.transport_regime import (
-        TransportRegimeRefusal,
-        long_tube_molecular_conductance_m3_s,
+        finite_tube_clausing_transmission,
         molecular_tube_conductance_m3_s,
     )
 
@@ -331,40 +345,17 @@ def _long_tube_molar_conductance_mol_s_Pa(
         or temperature_K <= 0.0
         or molar_mass_kg_mol <= 0.0
     ):
-        return 0.0, None
-    notice: dict[str, object] | None = None
-    try:
-        c_m3_s = long_tube_molecular_conductance_m3_s(
-            diameter_m,
-            length_m,
-            temperature_K,
-            molar_mass_kg_mol,
-            knudsen_number=math.inf,
-        )
-    except TransportRegimeRefusal as exc:
-        if exc.category != "clausing_long_tube_asymptote_out_of_range":
-            raise
-        # Same 4d/(3L) Clausing factor; L/D is below the certified floor of 10.
-        # Predict-and-flag the extension; do not abort.
-        transmission = 4.0 * diameter_m / (3.0 * length_m)
-        c_m3_s = molecular_tube_conductance_m3_s(
-            diameter_m,
-            length_m,
-            temperature_K,
-            molar_mass_kg_mol,
-            transmission_probability=min(1.0, transmission),
-            knudsen_number=math.inf,
-        )
-        notice = {
-            "reason": "clausing_long_tube_asymptote_out_of_range",
-            "status": "model_limit",
-            "length_over_diameter": length_m / diameter_m,
-            "detail": (
-                "long-tube Clausing 4d/(3L) used below L/D=10; "
-                "molecular pipe C is an extension"
-            ),
-        }
-    return c_m3_s / (GAS_CONSTANT * temperature_K), notice
+        return 0.0
+    transmission = finite_tube_clausing_transmission(diameter_m, length_m)
+    c_m3_s = molecular_tube_conductance_m3_s(
+        diameter_m,
+        length_m,
+        temperature_K,
+        molar_mass_kg_mol,
+        transmission_probability=transmission,
+        knudsen_number=math.inf,
+    )
+    return c_m3_s / (GAS_CONSTANT * temperature_K)
 
 
 def _bracketed_root(
@@ -435,10 +426,11 @@ def mixture_surface_partials_Pa(
     # gives q_i = p_i * G * (P - P_d^2/P). Vacuum P_d=0 reduces to
     # q_i = G*P*p_i. Closing H_i*(P_eq_i - p_i) = q_i yields
     # p_i = H_i*P_eq_i / (H_i + factor(P, P_d)).
-    # Free-molecular long-tube Knudsen (transport_regime owner):
+    # Free-molecular finite-tube Knudsen (transport_regime owner):
     # q_i = C_i*(p_i - p_d,i) with C_i = C_v,i/(R T) [mol/(s Pa)],
-    # C_v from long_tube_molecular_conductance_m3_s. Species are
-    # independent (no common-P coupling). Closed form
+    # W from finite_tube_clausing_transmission, C_v from
+    # molecular_tube_conductance_m3_s. Species are independent (no
+    # common-P coupling). Closed form
     # p_i = (H_i*P_eq_i + C_i*p_d,i) / (H_i + C_i).
     # Limits: C→∞ gives p→p_d; H→∞ gives p→P_eq. Units: H and C both
     # mol/(s Pa).
@@ -694,9 +686,8 @@ def solve_source_duct_closure(
     length_m = 0.0 if pipe_length_m is None else float(pipe_length_m)
     T_K = 0.0 if temperature_K is None else float(temperature_K)
     if diameter_m > 0.0 and length_m > 0.0 and T_K > 0.0:
-        ld_notice = None
         for species, mass in dict(molar_mass_kg_mol).items():
-            C_i, notice = _long_tube_molar_conductance_mol_s_Pa(
+            C_i = _molecular_pipe_conductance_mol_s_Pa(
                 diameter_m=diameter_m,
                 length_m=length_m,
                 temperature_K=T_K,
@@ -704,10 +695,6 @@ def solve_source_duct_closure(
             )
             if C_i > 0.0:
                 molecular_C[str(species)] = C_i
-            if notice is not None and ld_notice is None:
-                ld_notice = notice
-        if ld_notice is not None:
-            notices.append(ld_notice)
         carrier = str(carrier_gas or "N2")
 
         def knudsen_at_total(total_Pa: float, _carrier=carrier) -> float:
@@ -739,13 +726,17 @@ def solve_source_duct_closure(
                 "status": "model_limit",
                 "iterations": exc.refusal.iterations,
                 "detail": (
-                    "source/duct root did not bracket; last viscous/molecular "
-                    "extension is not installed, run continues with free-surface "
-                    "partials of 0"
+                    "source/duct root did not bracket; carrier boundary and "
+                    "last valid iterate kept"
                 ),
             }
         )
-        partials = {species: 0.0 for species in equilibrium}
+        partials = {
+            str(species): 0.0
+            for species in equilibrium
+            if str(species) not in extra
+        }
+        partials.update(extra)
     try:
         flux = {
             str(species): max(0.0, float(rate))
@@ -868,6 +859,23 @@ def solve_source_duct_closure(
                 }
             )
     bled = dict(head_bled_species_mol or {})
+    stamped: list[dict[str, object]] = []
+    for notice in notices:
+        item = dict(notice)
+        if str(item.get("reason") or "") in SOURCE_DUCT_LIMIT_REASONS:
+            item["residual_rel"] = residual_rel
+            item["status"] = "model_limit"
+        stamped.append(item)
+    if (
+        residual_rel > DEFAULT_REL_TOL
+        or any(
+            str(item.get("reason") or "") in SOURCE_DUCT_LIMIT_REASONS
+            for item in stamped
+        )
+    ):
+        convergence = SourceDuctConvergence.MODEL_LIMIT
+    else:
+        convergence = SourceDuctConvergence.CONVERGED
     return CapacityShadowResult(
         capacity=capacity,
         partial_pressures_Pa=partials,
@@ -888,7 +896,8 @@ def solve_source_duct_closure(
         max_delta_history_Pa=(),
         mass_closure_error_pct=0.0,
         source_duct_residual_rel=residual_rel,
-        closure_notices=tuple(notices),
+        closure_notices=tuple(stamped),
+        convergence=convergence,
     )
 
 

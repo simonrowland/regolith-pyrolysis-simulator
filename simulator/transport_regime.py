@@ -664,6 +664,38 @@ def long_tube_clausing_transmission(
     return 4.0 * diameter_m / (3.0 * length_m)
 
 
+def finite_tube_clausing_transmission(
+    diameter_m: float,
+    length_m: float,
+) -> float:
+    # Santeler 1986, J. Vac. Sci. Technol. A 4, 338–342.
+    # Tube transmission for any L/D from the equivalent-length fit to Cole's
+    # integral-equation Clausing factors:
+    #   x  = L/D
+    #   x' = x (1 + 1 / (3 + (6/7) x))
+    #   W  = 1 / (1 + (3/4) x')
+    # Cole anchors (review): L/D 1 → 0.5142, L/D 5 → 0.1909, L/D 10 → 0.1093.
+    # Santeler at those points: 0.514286, 0.189944, 0.109312.
+    # Running pipe L/D = 8.33 → W = 0.127126 (long-tube 4d/(3L) = 0.160).
+    # L/D → ∞: x' → x and W → 4/(4 + 3x) → 4d/(3L), the long-tube asymptote
+    # kept by long_tube_clausing_transmission for L/D ≥ 10.
+    diameter_m = _require_positive(
+        diameter_m,
+        name="diameter_m",
+        category="invalid_geometry",
+    )
+    length_m = _require_positive(
+        length_m,
+        name="length_m",
+        category="invalid_geometry",
+    )
+    length_over_diameter = length_m / diameter_m
+    equivalent_length_over_diameter = length_over_diameter * (
+        1.0 + 1.0 / (3.0 + (6.0 / 7.0) * length_over_diameter)
+    )
+    return 1.0 / (1.0 + 0.75 * equivalent_length_over_diameter)
+
+
 def molecular_tube_conductance_m3_s(
     diameter_m: float,
     length_m: float,
