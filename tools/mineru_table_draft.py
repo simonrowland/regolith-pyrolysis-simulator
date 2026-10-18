@@ -701,30 +701,84 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
     for species_name, species_data in species.items():
         for observation in species_data.get("observations") or []:
             values = observation.get("values") or {}
-            for point_index, point in enumerate(values.get("points") or []):
-                value_field = "value"
-                value = point.get(value_field)
-                if value is None and "pressure_atm" in point:
-                    value_field = "pressure_atm"
-                    value = point.get(value_field)
+            value_fields = (
+                "value",
+                "pressure_atm",
+                "pressure_bar",
+                "pressure_Pa",
+                "activity",
+                "gamma",
+            )
+            stored_points = values.get("points") or []
+            if stored_points:
+                entries = [
+                    (point_index, point, True)
+                    for point_index, point in enumerate(stored_points)
+                ]
+            else:
+                scalar_field = next(
+                    (
+                        field
+                        for field in value_fields
+                        if values.get(field) is not None
+                    ),
+                    None,
+                )
+                entries = (
+                    [(None, {scalar_field: values[scalar_field]}, False)]
+                    if scalar_field is not None
+                    else []
+                )
+            for point_index, point, is_point in entries:
+                value_field = next(
+                    (
+                        field
+                        for field in value_fields
+                        if point.get(field) is not None
+                    ),
+                    None,
+                )
+                if value_field is None:
+                    continue
+                value = point[value_field]
                 if isinstance(value, bool) or value is None:
                     continue
                 number = _number_decimal(str(value))
                 if number is None:
                     continue
                 locator = point.get("locator") or observation.get("locator") or {}
+                observation_id = observation.get("observation_id", "")
+                cell_coordinates = re.search(
+                    r"_p\d+_t\d+_r(?P<row>\d+)_c(?P<column>\d+)$",
+                    str(observation_id),
+                )
                 pdf_page = locator.get("pdf_page")
                 if pdf_page is None and locator.get("pdf_page_index") is not None:
                     pdf_page = int(locator["pdf_page_index"]) + 1
+                table_row_number = point.get(
+                    "table_row_number",
+                    locator.get("table_row_number", observation.get("table_row_number")),
+                )
+                if table_row_number is None and cell_coordinates:
+                    table_row_number = int(cell_coordinates.group("row"))
+                table_column_number = point.get(
+                    "table_column_number",
+                    locator.get(
+                        "table_column_number", observation.get("table_column_number")
+                    ),
+                )
+                if table_column_number is None and cell_coordinates:
+                    table_column_number = int(cell_coordinates.group("column"))
                 points.append(
                     {
                         "species": species_name,
-                        "observation_id": observation.get("observation_id", ""),
+                        "observation_id": observation_id,
                         "point_index": point_index,
-                        "path": (
-                            f"species.{species_name}.observations"
-                            f"[{observation.get('observation_id', '')}]"
+                        "path": f"species.{species_name}.observations[{observation_id}]"
+                        + (
                             f".values.points[{point_index}].{value_field}"
+                            if is_point
+                            else f".values.{value_field}"
                         ),
                         "pdf_page": pdf_page,
                         "table_number": (
@@ -736,12 +790,8 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
                         "phase": point.get(
                             "phase", locator.get("phase", observation.get("phase"))
                         ),
-                        "table_row_number": point.get(
-                            "table_row_number",
-                            locator.get(
-                                "table_row_number", observation.get("table_row_number")
-                            ),
-                        ),
+                        "table_row_number": table_row_number,
+                        "table_column_number": table_column_number,
                         "table_phase_column": point.get(
                             "table_phase_column",
                             locator.get(
@@ -824,7 +874,13 @@ def compare_extract_to_draft(
         point_value = Decimal(str(point["value"]))
         has_location = any(
             point.get(key) is not None
-            for key in ("table_number", "table_row_number", "phase", "table_phase_column")
+            for key in (
+                "table_number",
+                "table_row_number",
+                "table_column_number",
+                "phase",
+                "table_phase_column",
+            )
         )
         matching_candidates = [
             (index, candidate)
@@ -838,6 +894,10 @@ def compare_extract_to_draft(
             and (
                 point.get("table_phase_column") is None
                 or candidate["column"] == int(point["table_phase_column"])
+            )
+            and (
+                point.get("table_column_number") is None
+                or candidate["column"] == int(point["table_column_number"])
             )
             and _phase_matches_column(point.get("phase"), candidate["column_header"])
         ]
