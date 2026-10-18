@@ -6263,6 +6263,12 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
 
     if q_token is None:
         return None
+    if q_token == "cp":
+        amount = _num(item.get("cp"))
+        if amount is None or str(units or "").strip().lower() != "cal/deg-mole":
+            return None
+        # Beyer RI 8410 Table 1 prints Cp in thermochemical calories per degree-mole.
+        return amount * as_decimal("4.184")
     if q_token == "activity_coefficient":
         if "gamma" in item:
             return _num(item.get("gamma"))
