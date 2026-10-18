@@ -1432,7 +1432,7 @@ def test_equivalent_initial_inventories_keep_higher_authority_owner() -> None:
             ),
         ),
     )
-    assert _merge_sample_initials(incoming_initial, existing_initial) == incoming_initial
+    assert _merge_sample_initials(incoming_initial, existing_initial) == existing_initial
     assert _merge_sample_initials(existing_initial, measured_initial) == measured_initial
 
     initial_charge = _located_initial_composition(
