@@ -10749,6 +10749,25 @@ def _initial_compositions_conflict(
         return False
     old_value = old.state.value
     new_value = new.state.value
+    old_components = old_value.as_map()
+    new_components = new_value.as_map()
+    if old_components.keys() != new_components.keys():
+        return True
+
+    if (
+        old_value.amount_basis is AmountBasis.MOL_INVENTORY
+        and new_value.amount_basis is AmountBasis.MOL_INVENTORY
+    ):
+        # Twelve significant serialized digits have a half-ulp relative
+        # precision of 5e-13. Apply that relative tolerance to each absolute
+        # amount; these values do not pass through a basis converter here.
+        relative_tolerance = Decimal("5e-13")
+        for oxide, old_amount in old_components.items():
+            new_amount = new_components[oxide]
+            tolerance = max(abs(old_amount), abs(new_amount)) * relative_tolerance
+            if abs(old_amount - new_amount) > tolerance:
+                return True
+        return False
 
     def mole_fraction_map(value: Composition) -> dict[str, Decimal] | None:
         components = value.as_map()
@@ -10766,9 +10785,13 @@ def _initial_compositions_conflict(
             return {oxide: amount / total for oxide, amount in components.items()}
         return None
 
-    old_components = mole_fraction_map(old_value)
-    new_components = mole_fraction_map(new_value)
-    if old_components is None or new_components is None:
+    old_fractions = mole_fraction_map(old_value)
+    new_fractions = mole_fraction_map(new_value)
+    if (
+        old_fractions is None
+        or new_fractions is None
+        or old_fractions.keys() != new_fractions.keys()
+    ):
         return True
 
     # A 12-decimal serialized mole fraction can differ from its source by at
@@ -10776,14 +10799,43 @@ def _initial_compositions_conflict(
     # sum add less than 1e-26 absolute error for normalized components; include
     # that rounding margin in the component-wise comparison.
     tolerance = Decimal("5e-13") + Decimal("1e-26")
-    for oxide in old_components.keys() | new_components.keys():
-        difference = abs(
-            old_components.get(oxide, Decimal("0"))
-            - new_components.get(oxide, Decimal("0"))
-        )
+    for oxide in old_fractions:
+        difference = abs(old_fractions[oxide] - new_fractions[oxide])
         if difference > tolerance:
             return True
     return False
+
+
+def _initial_composition_authority(initial: Located[Composition]) -> int:
+    """Return the ordered authority of an equivalent typed starting value."""
+
+    composition = initial.state.value
+    # Higher values win: explicit measured starting analyses (4), source-typed
+    # starts including initial charges (3), catalogue selections (2), then
+    # other proxies (1). When an unflagged value has no measured/nominal
+    # selection metadata, the record cannot distinguish those roles; they tie
+    # at the source-typed level so the existing candidate stays selected.
+    if composition.proxy_flag == "composition_from_sample_catalog":
+        return 2
+    if composition.proxy_flag not in (None, INITIAL_CHARGE_ONLY_PROXY_FLAG):
+        return 1
+    provenance = " ".join(
+        (
+            composition.analysis_selection_rule or "",
+            " ".join(initial.inference.inputs)
+            if initial.inference is not None
+            else "",
+            initial.locator.note or "" if initial.locator is not None else "",
+        )
+    ).casefold()
+    explicitly_measured = (
+        re.search(r"\b(?:measured|analytical|epma)\b", provenance) is not None
+        and re.search(r"\b(?:starting|initial|sample assay)\b", provenance)
+        is not None
+    )
+    if explicitly_measured:
+        return 4
+    return 3
 
 
 def _merge_experiment_lab_params(
@@ -10807,26 +10859,23 @@ def _merge_experiment_lab_params(
         and existing_initial.state.is_value
         and incoming_initial.state.is_value
     ):
-        def provenance_richness(initial: Located[Composition]) -> int:
-            value = initial.state.value
-            return sum(
-                item is not None
-                for item in (
-                    initial.locator,
-                    initial.inference,
-                    value.proxy_flag,
-                    value.proxy_source,
-                    value.analysis_selection_rule,
-                )
-            )
-
-        existing_provenance = provenance_richness(existing_initial)
-        incoming_provenance = provenance_richness(incoming_initial)
-        initial_composition = (
-            incoming_initial
-            if incoming_provenance > existing_provenance
-            else existing_initial
+        existing_is_absolute = (
+            existing_initial.state.value.amount_basis is AmountBasis.MOL_INVENTORY
         )
+        incoming_is_absolute = (
+            incoming_initial.state.value.amount_basis is AmountBasis.MOL_INVENTORY
+        )
+        if existing_is_absolute != incoming_is_absolute:
+            initial_composition = (
+                existing_initial if existing_is_absolute else incoming_initial
+            )
+        else:
+            initial_composition = (
+                incoming_initial
+                if _initial_composition_authority(incoming_initial)
+                > _initial_composition_authority(existing_initial)
+                else existing_initial
+            )
     else:
         initial_composition = _prefer_located(existing_initial, incoming_initial)
     merged_sample = Sample(
