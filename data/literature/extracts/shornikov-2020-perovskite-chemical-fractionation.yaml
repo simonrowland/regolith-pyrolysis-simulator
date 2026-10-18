@@ -5,7 +5,7 @@ source:
   doi: null
   year: 2020
   corpus_asset: raw/shornikov-2020-perovskite-chemical-fractionation/shornikov-2020-perovskite-chemical-fractionation.pdf
-  corpus_sha256: b9ca58eb22562ad6e3004abf4f6237ec65a13e4e19fc72c9ed98d62b7fa454d20
+  corpus_sha256: b9ca58eb22562ad6e3004ab4f6237ec65a13e4e19fc72c9ed98d62b7fa454d20
 extraction:
   method: >-
     MinerU table draft and pdftotext-layout were compared; both fragments of Table 1 were checked against 600-dpi page renders. Its 12 reaction equilibrium constants have no quantity token in the extract schema, so the emitter's refusal-only staging rows were moved to context refusals with their printed reactions, expressions, values, and locators retained. Text observations and deferred figure records were transcribed from the target paper pages only.
@@ -44,6 +44,15 @@ fidelity_samples:
     observation_id: shornikov_2020_fractionation_zhang_atomic_oxygen_pressure_2278k
     field: pressure_atm_as_printed
     value: 8.53×10⁻⁸
+    locator:
+      page: 3
+      published_page: 38
+      pdf_page_index: 2
+      section: Results and discussion
+  - species: CaTiO3
+    observation_id: shornikov_2020_fractionation_zhang_residual_melt_tio2
+    field: value
+    value: 68.30
     locator:
       page: 3
       published_page: 38
@@ -95,7 +104,7 @@ species:
               reaction_as_printed: '[CaO] = (CaO)'
               expression_as_printed: 'K12 = pCaO / aCaO'
               value_as_printed: 1.225×10⁻⁷
-              locator: {page: 2, published_page: 37, pdf_page_index: 1, table: '1', row: 10}
+              locator: {page: 2, published_page: 37, pdf_page_index: 1, table: '1', row: 11}
   TiO2:
     observations:
       - observation_id: shornikov_2020_fractionation_tio2_vapor_pressure_2278k
@@ -121,34 +130,6 @@ species:
           calculation_as_printed: calculated from thermochemical data
           pressure_atm: 2.702e-5
           pressure_atm_as_printed: 2.702×10⁻⁵
-      - observation_id: shornikov_2020_fractionation_zhang_residual_melt_tio2
-        type: concentration_series
-        locator:
-          page: 3
-          published_page: 38
-          pdf_page_index: 2
-          section: Results and discussion
-          note: Text reports the residual-melt TiO2 concentration after 83.40 wt% weight loss.
-        T_range_K: [2278, 2278]
-        phase: l
-        units: mol % TiO2 in residual melt, as printed
-        point_conditions:
-          temperature_K:
-            state: {tag: value, value: 2278}
-            locator: {page: 3, published_page: 38, pdf_page_index: 2, section: Results and discussion}
-          composition:
-            state: {tag: unknown, reason: Only the residual-melt TiO2 percentage is printed; a complete melt composition is not given.}
-            locator: {page: 3, published_page: 38, pdf_page_index: 2, section: Results and discussion}
-          printed_composition:
-            state: {tag: value, value: {TiO2: '68.30 mol %'}}
-            locator: {page: 3, published_page: 38, pdf_page_index: 2, section: Results and discussion}
-        values:
-          quantity: residual_melt_tio2_concentration
-          method_class: quoted_attributed
-          evidence_class: quoted_attributed
-          attribution: Zhang et al. (2014)
-          TiO2_mol_percent: 68.30
-          TiO2_mol_percent_as_printed: 68.30 mol % TiO2
     context:
       - observation_id: shornikov_2020_fractionation_table1_tio2_reactions_refusal
         type: refusal
@@ -225,6 +206,32 @@ species:
           disposition: cross_reference_only
   CaTiO3:
     observations:
+      - observation_id: shornikov_2020_fractionation_zhang_residual_melt_tio2
+        type: equilibrium_phase_composition
+        locator:
+          page: 3
+          published_page: 38
+          pdf_page_index: 2
+          section: Results and discussion
+          note: Text reports the residual-melt TiO2 concentration after 83.40 wt% weight loss.
+        T_range_K: [2278, 2278]
+        phase: l
+        units: mol % TiO2 in residual melt, as printed
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: 2278}
+            locator: {page: 3, published_page: 38, pdf_page_index: 2, section: Results and discussion}
+          composition:
+            state: {tag: unknown, reason: Only the residual-melt TiO2 percentage is printed; a complete melt composition is not given.}
+            locator: {page: 3, published_page: 38, pdf_page_index: 2, section: Results and discussion}
+        values:
+          quantity: equilibrium_phase_composition
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Zhang et al. (2014)
+          value: 68.30
+          basis_as_published: 'mol % TiO2 in the residual perovskite melt, as printed'
+          T_K: 2278
       - observation_id: shornikov_2020_fractionation_zhang_weight_loss
         type: mass_loss
         locator:
@@ -283,8 +290,7 @@ species:
             - item: Congruent-evaporation criterion in equation (2)
               reason: schema_gap_no_quantity_for_molecular_weight_scaled_pressure
               value_as_printed: 2.263 × 10⁻⁷ atm×(g/mol)^−½
-              criterion_as_printed: >-
-                xCaO γCaO pCaO / √MCaO = xTiO2 γTiO2 pTiO2 / √MTiO2
+              criterion_as_printed: 'xCaO γCaO p°CaO / √MCaO = xTiO2 γTiO2 p°TiO2 / √MTiO2'
               locator: {page: 2, published_page: 37, pdf_page_index: 1, equation: '2'}
       - observation_id: shornikov_2020_fractionation_model_endpoints
         type: model_result
@@ -322,7 +328,7 @@ species:
           temperature_K: 2278
           x_Ca_as_printed: 0.548
           x_TiO2_as_printed: 0.839
-          equation_as_printed: 'p = pi / xi'
+          equation_as_printed: 'p° = p_i / x_i'
           note: >-
             These two mole fractions are inputs to equation (15); the paper does not publish a complete gas-phase composition.
       - observation_id: shornikov_2020_fractionation_omitted_gas_species_method

@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from decimal import Decimal
 from pathlib import Path
 import sys
 
 import yaml
 
+from simulator.battery.enums import ValueKind
 from simulator.battery.migrate import Migrator
 
 
@@ -57,6 +59,46 @@ def test_table_constants_and_text_values_are_render_pinned_and_mutation_sensitiv
     }
     assert {item["item"]: item["value_as_printed"] for item in refusals} == expected_constants
 
+    table_cells = {
+        item["item"]: item["locator"]
+        for row in _context_rows(document)
+        if row["type"] == "refusal"
+        for item in row["values"].get("refused", [])
+        if item.get("reason") == "schema_gap_reaction_equilibrium_constant"
+    }
+    eq12 = table_cells["Equation (12), reaction equilibrium constant"]
+    assert (eq12["page"], eq12["table"], eq12["row"]) == (2, "1", 11)
+
+    equation2 = next(
+        item
+        for row in _context_rows(document)
+        for item in row.get("values", {}).get("refused", [])
+        if item.get("item") == "Congruent-evaporation criterion in equation (2)"
+    )
+    assert "p°CaO" in equation2["criterion_as_printed"]
+    assert "p°TiO2" in equation2["criterion_as_printed"]
+    equation15 = next(
+        row for row in _context_rows(document)
+        if row["observation_id"] == "shornikov_2020_fractionation_gas_mole_fractions_method"
+    )
+    assert equation15["values"]["equation_as_printed"] == "p° = p_i / x_i"
+
+    residual_doc = document["species"]["CaTiO3"]["observations"][0]
+    assert residual_doc["observation_id"] == "shornikov_2020_fractionation_zhang_residual_melt_tio2"
+    assert residual_doc["type"] == "equilibrium_phase_composition"
+    assert residual_doc["values"]["quantity"] == "equilibrium_phase_composition"
+    assert residual_doc["values"]["value"] == 68.30
+    assert residual_doc["values"]["basis_as_published"] == (
+        "mol % TiO2 in the residual perovskite melt, as printed"
+    )
+    assert all(
+        row["observation_id"] != "shornikov_2020_fractionation_zhang_residual_melt_tio2"
+        for row in document["species"]["TiO2"]["observations"]
+    )
+    assert document["source"]["corpus_sha256"] == (
+        "b9ca58eb22562ad6e3004ab4f6237ec65a13e4e19fc72c9ed98d62b7fa454d20"
+    )
+
     figure_rows = [
         row for row in _context_rows(document) if row["type"] == "figure_record"
     ]
@@ -101,6 +143,20 @@ def test_text_observations_migrate_with_located_temperature_and_incomplete_compo
         "shornikov_2020_fractionation_zhang_weight_loss",
     }
     assert set(rows) == expected_ids
+    expected_points = {
+        "shornikov_2020_fractionation_cao_vapor_pressure_2278k": Decimal("1.53406050"),
+        "shornikov_2020_fractionation_tio2_vapor_pressure_2278k": Decimal("2.73780150"),
+        "shornikov_2020_fractionation_zhang_atomic_oxygen_pressure_2278k": Decimal("0.0086430225"),
+        "shornikov_2020_fractionation_zhang_weight_loss": Decimal("0.834"),
+        "shornikov_2020_fractionation_zhang_residual_melt_tio2": Decimal("68.3"),
+    }
+    for observation_id, expected in expected_points.items():
+        assert rows[observation_id].value.kind is ValueKind.POINT
+        assert rows[observation_id].value.point == expected
+    residual = rows["shornikov_2020_fractionation_zhang_residual_melt_tio2"]
+    assert residual.identity.quantity.value.value == "equilibrium_phase_composition"
+    assert residual.identity.species.phase.value.value == "l"
+    assert residual.identity.temperature_K.value == Decimal("2278")
     for row in rows.values():
         assert row.identity.temperature_K.is_value
         temperature = row.point_conditions["temperature_K"]
