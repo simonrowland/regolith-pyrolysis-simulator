@@ -29,6 +29,12 @@ fidelity_samples:
       units: kJ/mol
       as_printed: '−25.38'
     locator: {page: 5, published_page: 1554, pdf_page_index: 4, table: 'VI'}
+  - path: species.SiO2.observations[morishita_2004_table_iii_na2o_1465k].values.points[9].partial_molar_enthalpy_as_printed
+    value:
+      value: -8.69
+      units: kJ/mol
+      as_printed: '−8.69'
+    locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', row: 10}
 species:
   SiO2:
     observations:
@@ -52,59 +58,58 @@ species:
           T_K: 1465
           points:
             - average_sio2_mol_percent_as_printed: 67.3
-              composition_mol: {SiO2: '0.673', Na2O: '0.327', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -17.06, units: kJ/mol, as_printed: '−17.06'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 1'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.673'], [Na2O, '0.327']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 1 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 1 average composition'}}
             - average_sio2_mol_percent_as_printed: 67.3
-              composition_mol: {SiO2: '0.673', Na2O: '0.327', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -16.98, units: kJ/mol, as_printed: '−16.98'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 2'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.673'], [Na2O, '0.327']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 2 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 2 average composition'}}
             - average_sio2_mol_percent_as_printed: 67.7
-              composition_mol: {SiO2: '0.677', Na2O: '0.323', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -10.97, units: kJ/mol, as_printed: '−10.97'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 3'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.677'], [Na2O, '0.323']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 3 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 3 average composition'}}
             - average_sio2_mol_percent_as_printed: 67.8
-              composition_mol: {SiO2: '0.678', Na2O: '0.322', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -11.99, units: kJ/mol, as_printed: '−11.99'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 4'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.678'], [Na2O, '0.322']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 4 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 4 average composition'}}
             - average_sio2_mol_percent_as_printed: 68.0
-              composition_mol: {SiO2: '0.680', Na2O: '0.320', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -14.56, units: kJ/mol, as_printed: '−14.56'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 5'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.680'], [Na2O, '0.320']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 5 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 5 average composition'}}
             - average_sio2_mol_percent_as_printed: 68.1
-              composition_mol: {SiO2: '0.681', Na2O: '0.319', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -10.27, units: kJ/mol, as_printed: '−10.27'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 6'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.681'], [Na2O, '0.319']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 6 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 6 average composition'}}
             - average_sio2_mol_percent_as_printed: 68.4
-              composition_mol: {SiO2: '0.684', Na2O: '0.316', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -11.49, units: kJ/mol, as_printed: '−11.49'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 7'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.684'], [Na2O, '0.316']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 7 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 7 average composition'}}
             - average_sio2_mol_percent_as_printed: 68.6
-              composition_mol: {SiO2: '0.686', Na2O: '0.314', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -16.07, units: kJ/mol, as_printed: '−16.07'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 8'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.686'], [Na2O, '0.314']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 8 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 8 average composition'}}
             - average_sio2_mol_percent_as_printed: 68.6
-              composition_mol: {SiO2: '0.686', Na2O: '0.314', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -13.71, units: kJ/mol, as_printed: '−13.71'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 9'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.686'], [Na2O, '0.314']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 9 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 9 average composition'}}
+            - average_sio2_mol_percent_as_printed: 69.0
+              initial_sio2_mol_percent_as_printed: 68.6
+              final_sio2_mol_percent_as_printed: 69.3
+              drop_solution_enthalpy_as_printed: {value: 76.51, units: kJ/mol}
+              partial_molar_enthalpy_as_printed: {value: -8.69, units: kJ/mol, as_printed: '−8.69'}
+              locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 10'}
+              point_conditions:
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Na2O row 10 average composition'}}
       - observation_id: morishita_2004_table_iii_k2o_1465k
         type: gibbs_table
         locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O binary melt series'}
@@ -125,83 +130,70 @@ species:
           T_K: 1465
           points:
             - average_sio2_mol_percent_as_printed: 75.2
-              composition_mol: {SiO2: '0.752', K2O: '0.248', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -13.32, units: kJ/mol, as_printed: '−13.32'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 1'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.752'], [K2O, '0.248']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 1 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 1 average composition'}}
             - average_sio2_mol_percent_as_printed: 75.2
-              composition_mol: {SiO2: '0.752', K2O: '0.248', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -10.28, units: kJ/mol, as_printed: '−10.28'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 2'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.752'], [K2O, '0.248']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 2 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 2 average composition'}}
             - average_sio2_mol_percent_as_printed: 75.3
-              composition_mol: {SiO2: '0.753', K2O: '0.247', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -13.83, units: kJ/mol, as_printed: '−13.83'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 3'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.753'], [K2O, '0.247']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 3 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 3 average composition'}}
             - average_sio2_mol_percent_as_printed: 75.5
-              composition_mol: {SiO2: '0.755', K2O: '0.245', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -11.92, units: kJ/mol, as_printed: '−11.92'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 4'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.755'], [K2O, '0.245']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 4 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 4 average composition'}}
             - average_sio2_mol_percent_as_printed: 75.5
-              composition_mol: {SiO2: '0.755', K2O: '0.245', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -9.48, units: kJ/mol, as_printed: '−9.48'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 5'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.755'], [K2O, '0.245']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 5 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 5 average composition'}}
             - average_sio2_mol_percent_as_printed: 75.8
-              composition_mol: {SiO2: '0.758', K2O: '0.242', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -9.13, units: kJ/mol, as_printed: '−9.13'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 6'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.758'], [K2O, '0.242']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 6 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 6 average composition'}}
             - average_sio2_mol_percent_as_printed: 75.9
-              composition_mol: {SiO2: '0.759', K2O: '0.241', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -12.20, units: kJ/mol, as_printed: '−12.20'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 7'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.759'], [K2O, '0.241']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 7 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 7 average composition'}}
             - average_sio2_mol_percent_as_printed: 76.2
-              composition_mol: {SiO2: '0.762', K2O: '0.238', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -6.19, units: kJ/mol, as_printed: '−6.19'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 8'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.762'], [K2O, '0.238']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 8 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 8 average composition'}}
             - average_sio2_mol_percent_as_printed: 76.3
-              composition_mol: {SiO2: '0.763', K2O: '0.237', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -11.36, units: kJ/mol, as_printed: '−11.36'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 9'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.763'], [K2O, '0.237']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 9 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 9 average composition'}}
             - average_sio2_mol_percent_as_printed: 76.8
-              composition_mol: {SiO2: '0.768', K2O: '0.232', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -6.68, units: kJ/mol, as_printed: '−6.68'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 10'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.768'], [K2O, '0.232']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 10 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 10 average composition'}}
             - average_sio2_mol_percent_as_printed: 77.0
-              composition_mol: {SiO2: '0.770', K2O: '0.230', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -10.80, units: kJ/mol, as_printed: '−10.80'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 11'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.770'], [K2O, '0.230']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 11 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 11 average composition'}}
             - average_sio2_mol_percent_as_printed: 77.6
-              composition_mol: {SiO2: '0.776', K2O: '0.224', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -10.74, units: kJ/mol, as_printed: '−10.74'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 12'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.776'], [K2O, '0.224']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 12 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 12 average composition'}}
             - average_sio2_mol_percent_as_printed: 78.1
-              composition_mol: {SiO2: '0.781', K2O: '0.219', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -6.80, units: kJ/mol, as_printed: '−6.80'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 13; final SiO2 cell is 21.9 as printed'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.781'], [K2O, '0.219']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 13 printed average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-K2O row 13 printed average composition'}}
       - observation_id: morishita_2004_table_iii_cs2o_1465k
         type: gibbs_table
         locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O binary melt series'}
@@ -222,47 +214,40 @@ species:
           T_K: 1465
           points:
             - average_sio2_mol_percent_as_printed: 75.5
-              composition_mol: {SiO2: '0.755', Cs2O: '0.245', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -16.48, units: kJ/mol, as_printed: '−16.48'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 1'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.755'], [Cs2O, '0.245']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 1 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 1 average composition'}}
             - average_sio2_mol_percent_as_printed: 76.5
-              composition_mol: {SiO2: '0.765', Cs2O: '0.235', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -14.79, units: kJ/mol, as_printed: '−14.79'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 2'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.765'], [Cs2O, '0.235']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 2 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 2 average composition'}}
             - average_sio2_mol_percent_as_printed: 76.7
-              composition_mol: {SiO2: '0.767', Cs2O: '0.233', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -15.99, units: kJ/mol, as_printed: '−15.99'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 3'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.767'], [Cs2O, '0.233']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 3 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 3 average composition'}}
             - average_sio2_mol_percent_as_printed: 77.2
-              composition_mol: {SiO2: '0.772', Cs2O: '0.228', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -13.90, units: kJ/mol, as_printed: '−13.90'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 4'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.772'], [Cs2O, '0.228']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 4 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 4 average composition'}}
             - average_sio2_mol_percent_as_printed: 77.3
-              composition_mol: {SiO2: '0.773', Cs2O: '0.227', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -14.14, units: kJ/mol, as_printed: '−14.14'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 5'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.773'], [Cs2O, '0.227']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 5 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 5 average composition'}}
             - average_sio2_mol_percent_as_printed: 77.8
-              composition_mol: {SiO2: '0.778', Cs2O: '0.222', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -12.96, units: kJ/mol, as_printed: '−12.96'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 6'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.778'], [Cs2O, '0.222']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 6 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 6 average composition'}}
             - average_sio2_mol_percent_as_printed: 78.3
-              composition_mol: {SiO2: '0.783', Cs2O: '0.217', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -14.97, units: kJ/mol, as_printed: '−14.97'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 7'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.783'], [Cs2O, '0.217']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 7 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'III', note: 'SiO2-Cs2O row 7 average composition'}}
       - observation_id: morishita_2004_table_iv_li2o_1663k
         type: gibbs_table
         locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O binary melt series'}
@@ -283,71 +268,60 @@ species:
           T_K: 1663
           points:
             - average_sio2_mol_percent_as_printed: 62.3
-              composition_mol: {SiO2: '0.623', Li2O: '0.377', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -4.61, units: kJ/mol, as_printed: '−4.61'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 1'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.623'], [Li2O, '0.377']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 1 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 1 average composition'}}
             - average_sio2_mol_percent_as_printed: 62.5
-              composition_mol: {SiO2: '0.625', Li2O: '0.375', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -2.83, units: kJ/mol, as_printed: '−2.83'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 2'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.625'], [Li2O, '0.375']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 2 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 2 average composition'}}
             - average_sio2_mol_percent_as_printed: 62.8
-              composition_mol: {SiO2: '0.628', Li2O: '0.372', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -0.60, units: kJ/mol, as_printed: '−0.60'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 3'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.628'], [Li2O, '0.372']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 3 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 3 average composition'}}
             - average_sio2_mol_percent_as_printed: 62.9
-              composition_mol: {SiO2: '0.629', Li2O: '0.371', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -2.05, units: kJ/mol, as_printed: '−2.05'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 4'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.629'], [Li2O, '0.371']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 4 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 4 average composition'}}
             - average_sio2_mol_percent_as_printed: 62.9
-              composition_mol: {SiO2: '0.629', Li2O: '0.371', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: 2.05, units: kJ/mol, as_printed: '2.05'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 5'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.629'], [Li2O, '0.371']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 5 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 5 average composition'}}
             - average_sio2_mol_percent_as_printed: 63.4
-              composition_mol: {SiO2: '0.634', Li2O: '0.366', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: -0.19, units: kJ/mol, as_printed: '−0.19'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 6'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.634'], [Li2O, '0.366']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 6 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 6 average composition'}}
             - average_sio2_mol_percent_as_printed: 63.5
-              composition_mol: {SiO2: '0.635', Li2O: '0.365', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: 2.50, units: kJ/mol, as_printed: '2.50'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 7'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.635'], [Li2O, '0.365']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 7 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 7 average composition'}}
             - average_sio2_mol_percent_as_printed: 63.9
-              composition_mol: {SiO2: '0.639', Li2O: '0.361', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: 0.61, units: kJ/mol, as_printed: '0.61'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 8'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.639'], [Li2O, '0.361']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 8 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 8 average composition'}}
             - average_sio2_mol_percent_as_printed: 66.9
-              composition_mol: {SiO2: '0.669', Li2O: '0.331', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: 3.16, units: kJ/mol, as_printed: '3.16'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 9'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.669'], [Li2O, '0.331']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 9 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 9 average composition'}}
             - average_sio2_mol_percent_as_printed: 67.4
-              composition_mol: {SiO2: '0.674', Li2O: '0.326', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: 2.50, units: kJ/mol, as_printed: '2.50'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 10'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.674'], [Li2O, '0.326']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 10 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 10 average composition'}}
             - average_sio2_mol_percent_as_printed: 67.9
-              composition_mol: {SiO2: '0.679', Li2O: '0.321', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: 4.17, units: kJ/mol, as_printed: '4.17'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 11'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.679'], [Li2O, '0.321']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 11 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Li2O row 11 average composition'}}
       - observation_id: morishita_2004_table_iv_na2o_1663k
         type: gibbs_table
         locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O binary melt series'}
@@ -368,41 +342,35 @@ species:
           T_K: 1663
           points:
             - average_sio2_mol_percent_as_printed: 75.2
-              composition_mol: {SiO2: '0.752', Na2O: '0.248', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: 2.61, units: kJ/mol, as_printed: '2.61'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 1'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.752'], [Na2O, '0.248']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 1 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 1 average composition'}}
             - average_sio2_mol_percent_as_printed: 75.8
-              composition_mol: {SiO2: '0.758', Na2O: '0.242', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: 2.63, units: kJ/mol, as_printed: '2.63'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 2'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.758'], [Na2O, '0.242']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 2 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 2 average composition'}}
             - average_sio2_mol_percent_as_printed: 76.2
-              composition_mol: {SiO2: '0.762', Na2O: '0.238', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: 1.98, units: kJ/mol, as_printed: '1.98'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 3'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.762'], [Na2O, '0.238']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 3 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 3 average composition'}}
             - average_sio2_mol_percent_as_printed: 76.6
-              composition_mol: {SiO2: '0.766', Na2O: '0.234', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: 1.00, units: kJ/mol, as_printed: '1.00'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 4'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.766'], [Na2O, '0.234']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 4 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 4 average composition'}}
             - average_sio2_mol_percent_as_printed: 76.9
-              composition_mol: {SiO2: '0.769', Na2O: '0.231', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: 3.03, units: kJ/mol, as_printed: '3.03'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 5'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.769'], [Na2O, '0.231']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 5 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 5 average composition'}}
             - average_sio2_mol_percent_as_printed: 77.2
-              composition_mol: {SiO2: '0.772', Na2O: '0.228', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: 1.57, units: kJ/mol, as_printed: '1.57'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 6'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.772'], [Na2O, '0.228']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 6 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-Na2O row 6 average composition'}}
       - observation_id: morishita_2004_table_iv_k2o_1663k
         type: gibbs_table
         locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O binary melt series'}
@@ -423,47 +391,40 @@ species:
           T_K: 1663
           points:
             - average_sio2_mol_percent_as_printed: 85.2
-              composition_mol: {SiO2: '0.852', K2O: '0.148', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: 0.87, units: kJ/mol, as_printed: '0.87'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 1'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.852'], [K2O, '0.148']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 1 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 1 average composition'}}
             - average_sio2_mol_percent_as_printed: 85.2
-              composition_mol: {SiO2: '0.852', K2O: '0.148', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: 1.51, units: kJ/mol, as_printed: '1.51'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 2'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.852'], [K2O, '0.148']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 2 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 2 average composition'}}
             - average_sio2_mol_percent_as_printed: 85.2
-              composition_mol: {SiO2: '0.852', K2O: '0.148', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: 0.06, units: kJ/mol, as_printed: '0.06'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 3'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.852'], [K2O, '0.148']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 3 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 3 average composition'}}
             - average_sio2_mol_percent_as_printed: 85.4
-              composition_mol: {SiO2: '0.854', K2O: '0.146', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: 2.68, units: kJ/mol, as_printed: '2.68'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 4'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.854'], [K2O, '0.146']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 4 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 4 average composition'}}
             - average_sio2_mol_percent_as_printed: 85.6
-              composition_mol: {SiO2: '0.856', K2O: '0.144', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: 2.29, units: kJ/mol, as_printed: '2.29'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 5'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.856'], [K2O, '0.144']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 5 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 5 average composition'}}
             - average_sio2_mol_percent_as_printed: 85.6
-              composition_mol: {SiO2: '0.856', K2O: '0.144', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: 1.46, units: kJ/mol, as_printed: '1.46'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 6'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.856'], [K2O, '0.144']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 6 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 6 average composition'}}
             - average_sio2_mol_percent_as_printed: 85.9
-              composition_mol: {SiO2: '0.859', K2O: '0.141', basis: printed_mole_fraction}
               partial_molar_enthalpy_as_printed: {value: 3.06, units: kJ/mol, as_printed: '3.06'}
               locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 7'}
               point_conditions:
-                composition: {state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[SiO2, '0.859'], [K2O, '0.141']]}}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 7 average composition'}}
+                composition: {state: {tag: unknown, reason: alkali_oxide_mole_fraction_not_printed}, locator: {page: 3, published_page: 1552, pdf_page_index: 2, table: 'IV', note: 'SiO2-K2O row 7 average composition'}}
       - observation_id: morishita_2004_table_vi_cas_1663k
         type: gibbs_table
         locator: {page: 5, published_page: 1554, pdf_page_index: 4, table: 'VI', note: 'SiO2-CaO-Al2O3 ternary melt along the printed SiO2-E join'}
@@ -600,6 +561,7 @@ species:
             - {system_as_printed: SiO2-Na2O, initial_sio2_mol_percent: 68.2, final_sio2_mol_percent: 68.6, drop_solution_enthalpy: 73.71}
             - {system_as_printed: SiO2-Na2O, initial_sio2_mol_percent: 68.3, final_sio2_mol_percent: 68.9, drop_solution_enthalpy: 69.13}
             - {system_as_printed: SiO2-Na2O, initial_sio2_mol_percent: 68.3, final_sio2_mol_percent: 68.9, drop_solution_enthalpy: 71.49}
+            - {system_as_printed: SiO2-Na2O, initial_sio2_mol_percent: 68.6, final_sio2_mol_percent: 69.3, drop_solution_enthalpy: 76.51}
             - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 75.0, final_sio2_mol_percent: 75.4, drop_solution_enthalpy: 71.88}
             - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 75.0, final_sio2_mol_percent: 75.3, drop_solution_enthalpy: 74.92}
             - {system_as_printed: SiO2-K2O, initial_sio2_mol_percent: 75.0, final_sio2_mol_percent: 75.5, drop_solution_enthalpy: 71.37}

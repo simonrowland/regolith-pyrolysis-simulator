@@ -56,7 +56,7 @@ def test_tables_migrate_with_located_temperature_and_composition() -> None:
     migrator.finalize()
 
     records = list(migrator.result.observations.values())
-    assert len(records) == 60
+    assert len(records) == 61
     assert not migrator.result.validation.hard_issues
     assert not migrator.result.registry_issues
     assert all(
@@ -81,7 +81,9 @@ def test_tables_migrate_with_located_temperature_and_composition() -> None:
         assert temperature.locator.pdf_page_index is not None
         assert composition.locator is not None
         assert composition.locator.pdf_page_index is not None
+        assert composition.state.is_unknown
         assert record.identity.composition is not None
+        assert record.identity.composition.is_unknown
         assert record.identity.composition.tag is composition.state.tag
         assert record.uncertainty.verbatim["sigma"] > 0
 
@@ -102,7 +104,7 @@ def test_tables_migrate_with_located_temperature_and_composition() -> None:
         for record in records
     )
     assert counts == {
-        "morishita_2004_table_iii_na2o_1465k": 9,
+        "morishita_2004_table_iii_na2o_1465k": 10,
         "morishita_2004_table_iii_k2o_1465k": 13,
         "morishita_2004_table_iii_cs2o_1465k": 7,
         "morishita_2004_table_iv_li2o_1663k": 11,
@@ -136,6 +138,30 @@ def test_tables_migrate_with_located_temperature_and_composition() -> None:
         "morishita_2004_table_vi_cas_1663k"
     ].identity.composition.is_unknown
 
+    na2o = _table_observation(document, "morishita_2004_table_iii_na2o_1465k")[
+        "values"
+    ]["points"]
+    final_na_row = na2o[-1]
+    assert final_na_row["average_sio2_mol_percent_as_printed"] == 69.0
+    assert final_na_row["initial_sio2_mol_percent_as_printed"] == 68.6
+    assert final_na_row["final_sio2_mol_percent_as_printed"] == 69.3
+    assert final_na_row["drop_solution_enthalpy_as_printed"]["value"] == 76.51
+    assert final_na_row["partial_molar_enthalpy_as_printed"]["as_printed"] == "−8.69"
+    assert "composition_mol" not in final_na_row
+
+    drop_solution = next(
+        item
+        for item in document["species"]["SiO2"]["context"]
+        if item["observation_id"] == "morishita_2004_table_iii_drop_solution_heat"
+    )
+    final_drop_row = drop_solution["values"]["rows"][9]
+    assert final_drop_row == {
+        "system_as_printed": "SiO2-Na2O",
+        "initial_sio2_mol_percent": 68.6,
+        "final_sio2_mol_percent": 69.3,
+        "drop_solution_enthalpy": 76.51,
+    }
+
     figures = [
         item
         for item in document["species"]["SiO2"]["context"]
@@ -157,11 +183,20 @@ def test_printed_table_iii_k2o_composition_anomaly_is_retained() -> None:
     )["values"]["points"][-1]
     assert k2o["average_sio2_mol_percent_as_printed"] == 78.1
     assert k2o["partial_molar_enthalpy_as_printed"]["as_printed"] == "−6.80"
-    assert k2o["composition_mol"]["SiO2"] == "0.781"
+    assert "composition_mol" not in k2o
 
     drop_solution = next(
         item
         for item in document["species"]["SiO2"]["context"]
         if item["observation_id"] == "morishita_2004_table_iii_drop_solution_heat"
     )
-    assert drop_solution["values"]["rows"][21]["final_sio2_mol_percent"] == 21.9
+    k2o_anomaly = next(
+        point
+        for point in _table_observation(
+            document, "morishita_2004_table_iii_k2o_1465k"
+        )["values"]["points"]
+        if point["average_sio2_mol_percent_as_printed"] == 78.1
+    )
+    assert k2o_anomaly["partial_molar_enthalpy_as_printed"]["as_printed"] == "−6.80"
+    assert "composition_mol" not in k2o_anomaly
+    assert drop_solution["values"]["rows"][22]["final_sio2_mol_percent"] == 21.9
