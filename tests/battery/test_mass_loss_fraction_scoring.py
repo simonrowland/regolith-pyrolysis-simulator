@@ -19,12 +19,14 @@ from simulator.battery.migrate import (
     Migrator,
     load_migrated_store,
     load_yaml,
+    sample_from_equipment,
     select_declared_source,
 )
 from simulator.battery.records import (
     Apparatus,
     ApparatusGeometry,
     Located,
+    Locator,
     State,
     Value,
 )
@@ -39,6 +41,15 @@ from simulator.battery.score import (
 )
 
 pytestmark = pytest.mark.usefixtures("_close_openimcc_worker_between_tests")
+
+
+@pytest.fixture(scope="module")
+def fresh_mass_loss_extracts():
+    richter = Migrator()
+    richter._migrate_extract(LITERATURE / "extracts" / "kems-010-richter-2007.yaml")
+    markova = Migrator()
+    markova._migrate_extract(LITERATURE / "extracts" / "kems-026-markova-1984.yaml")
+    return richter.result, markova.result
 
 
 @pytest.fixture(scope="module")
@@ -116,15 +127,18 @@ def _extract_mass_loss_selection(source_id: str, observation_id: str):
     raise AssertionError(f"source observation not found: {source_id}/{observation_id}")
 
 
-def test_pyrolysis_yield_mass_loss_uses_bulk_dispatch(mass_loss_rows) -> None:
-    (
-        _richter,
-        _richter_experiment,
-        markova,
-        markova_experiment,
-        _r14,
-        _r14_experiment,
-    ) = mass_loss_rows
+def test_pyrolysis_yield_mass_loss_uses_bulk_dispatch(
+    fresh_mass_loss_extracts
+) -> None:
+    _richter_result, markova_result = fresh_mass_loss_extracts
+    markova = next(
+        row
+        for row in markova_result.observations.values()
+        if row.experiment_id.endswith("::VI")
+        and quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
+        and row.value.point == 0
+    )
+    markova_experiment = markova_result.experiments[markova.experiment_id]
 
     prediction = predict_with_engine(
         Engine.OPENIMCC,
@@ -133,11 +147,91 @@ def test_pyrolysis_yield_mass_loss_uses_bulk_dispatch(mass_loss_rows) -> None:
     )
 
     assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert "residual melts" in (
-        markova_experiment.sample.initial_composition.locator.note.lower()
+    assert prediction.refusal_detail["reason"] == "duration_not_stated"
+    assert prediction.refusal_detail["missing_input"] == "thermal_schedule.total_duration_s"
+    assert _initial_oxide_wt_percent(markova_experiment.sample) == pytest.approx(
+        {"SiO2": 44.02, "Al2O3": 4.56, "FeO": 8.04, "MgO": 36.44, "CaO": 6.95},
+        abs=0.01,
+    )
+
+
+@pytest.mark.parametrize(
+    ("sample_id", "expected"),
+    (
+        (
+            "VI",
+            {"SiO2": 44.02, "Al2O3": 4.56, "FeO": 8.04, "MgO": 36.44, "CaO": 6.95},
+        ),
+        (
+            "V",
+            {"SiO2": 52.32, "Al2O3": 19.13, "FeO": 9.37, "MgO": 6.25, "CaO": 12.93},
+        ),
+    ),
+)
+def test_markova_printed_t0_charge_is_accepted_as_initial(
+    fresh_mass_loss_extracts, sample_id, expected
+) -> None:
+    _richter_result, markova_result = fresh_mass_loss_extracts
+    row = next(
+        row
+        for row in markova_result.observations.values()
+        if row.experiment_id.endswith(f"::{sample_id}")
+        and quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
+        and row.value.point == 0
+    )
+    experiment = markova_result.experiments[row.experiment_id]
+
+    assert _initial_oxide_wt_percent(experiment.sample) == pytest.approx(
+        expected, abs=0.01
+    )
+    prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
+    assert prediction.refusal_detail["reason"] == "duration_not_stated"
+
+
+def test_untyped_richter_final_map_never_becomes_initial(mass_loss_rows) -> None:
+    _richter, _experiment, _markova, _markova_experiment, r14, r14_experiment = (
+        mass_loss_rows
+    )
+    printed = r14_experiment.sample.printed_composition
+    assert printed is not None and printed.state.is_value
+    final_map = printed.state.value
+    untyped_sample = sample_from_equipment(
+        {},
+        values={"composition_wt_pct": final_map},
+        locator=Locator(
+            table="1",
+            paragraph="R-14 final-state composition",
+            note="post-run after evaporation",
+        ),
+    )
+
+    assert untyped_sample.initial_composition is None
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        r14,
+        experiment=replace(r14_experiment, sample=untyped_sample),
     )
     assert prediction.refusal_detail["reason"] == "initial_composition_not_stated"
-    assert prediction.refusal_detail["missing_input"] == "sample.initial_composition"
+
+
+@pytest.mark.parametrize(("sample_id", "expected"), (("R-11", 0.5503), ("R-14", 0.5469)))
+def test_richter_predictions_keep_the_declared_starting_glass(
+    fresh_mass_loss_extracts, sample_id, expected
+) -> None:
+    richter_result, _markova_result = fresh_mass_loss_extracts
+    row = next(
+        row
+        for row in richter_result.observations.values()
+        if quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
+        and f"row={sample_id.lower()}" in row.observation_id
+    )
+    experiment = richter_result.experiments[row.experiment_id]
+
+    prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
+
+    assert prediction.refusal_reason is None, prediction.refusal_detail
+    assert prediction.value is not None
+    assert abs(prediction.value - Decimal(str(expected))) <= Decimal("0.0001")
 
 
 def test_richter_r14_mass_loss_uses_source_declared_initial_glass_not_final_residue(

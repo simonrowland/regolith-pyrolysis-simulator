@@ -36,7 +36,7 @@ from simulator.battery.migrate import (
     wt_pct_to_mole_fraction,
     wt_pct_to_mole_fraction_derivation,
 )
-from simulator.battery.records import as_decimal
+from simulator.battery.records import INITIAL_CHARGE_ONLY_PROXY_FLAG, as_decimal
 from tests.battery.test_migrate import _migrate_real_extract, _write_min_tree
 from tests.battery.factories import tabulation_experiment
 
@@ -158,6 +158,7 @@ def test_sample_from_equipment_withholds_unsupported_numeric_component() -> None
     sample = sample_from_equipment(
         {},
         values={
+            "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
             "locator": {"table": "1"},
             "composition_wt_pct": {
                 "SiO2": Decimal("50"),
@@ -184,6 +185,7 @@ def test_sample_without_composition_locator_keeps_unsupported_key_reason() -> No
     sample = sample_from_equipment(
         {},
         values={
+            "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
             "composition_wt_pct": {
                 "SiO2": Decimal("50"),
                 "MgO": Decimal("40"),
@@ -1030,6 +1032,7 @@ def test_mass_percent_composition_keeps_printed_map_and_derives_moles() -> None:
 def test_printed_wt_percent_replaces_a_stale_pretyped_initial_composition() -> None:
     printed = {"SiO2": "50", "FeOT": "30", "SO3": "20"}
     raw = {
+        "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
         "printed_composition": {
             "state": {"tag": "value", "value": printed},
             "locator": {"note": "Printed starting material composition"},
@@ -1059,6 +1062,7 @@ def test_duplicate_mass_percent_pairs_are_refused_without_collapsing(
 ) -> None:
     sample = _sample_from_plain(
         {
+            "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
             "printed_composition": {
                 "locator": {"note": "Printed starting material composition"},
                 "state": {
@@ -1177,7 +1181,7 @@ def test_swept_source_maps_refused_to_converted_and_populate_identity() -> None:
             assert feot_derivations == expected_count
 
 
-def test_typed_printed_composition_is_readable_and_gets_canonical_sibling() -> None:
+def test_untyped_printed_composition_note_does_not_create_initial_composition() -> None:
     raw = {
         "printed_composition": {
             "locator": {
@@ -1200,10 +1204,7 @@ def test_typed_printed_composition_is_readable_and_gets_canonical_sibling() -> N
 
     assert sample.printed_composition is not None
     assert sample.printed_composition.state.value == {"SiO2": "60", "MgO": "40"}
-    assert sample.initial_composition is not None
-    assert sample.initial_composition.state.is_value
-    assert sample.initial_composition.inference is not None
-    assert sample.initial_composition.inference.relation == "wt_pct_to_mole_fraction"
+    assert sample.initial_composition is None
 
 
 def test_sample_catalogue_composition_is_typed_proxy_not_printed() -> None:
