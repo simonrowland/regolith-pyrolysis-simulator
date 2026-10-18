@@ -20,70 +20,6 @@ skipped_empty_or_dash:
 species:
   CaAl2O4:
     observations:
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r02_c02
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: CA
-        column_header: $\Delta H_{T}$ , kJ/mole
-      units: kJ/mole
-      values:
-        quantity: delta_fH
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '-8.91'
-        basis_as_published: ΔH_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r02_c03
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: CA
-        column_header: $\Delta S_{T}$ , J/(mole·K)
-      units: J/mol K
-      values:
-        quantity: S
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '11.10'
-        basis_as_published: ΔS_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
     - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r02_c04
       type: transition_point
       locator:
@@ -141,6 +77,101 @@ species:
             note: Table 1 T_melt cell for calcium aluminate; heat of fusion is associated with the liquid-phase
               temperature where the cell has two entries.
     context:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_oxide_formation_parameters
+      type: oxide_component_formation_thermodynamic_parameters
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 ΔH_T and ΔS_T columns; the equation explaining these terms is Eq. (4).
+      units: ΔH_T in kJ/mole; ΔS_T in J/(mole·K) as printed
+      values:
+        quantity: delta_GT_parameters_for_oxide_component_formation
+        species_scope_as_printed: all twelve minerals in Table 1
+        method_class: quoted_attributed
+        attribution_as_printed: '[11–17]'
+        phase_as_printed: crystalline state
+        temperature_dependence_as_printed: ΔG_T = ΔH_T – T ΔS_T
+        reaction_as_printed: ΔG° = ∑ n_i ΔG°_i + ΔG_T ∑ n_i
+        reaction_terms_as_printed: >-
+          ΔG°_i is the standard Gibbs energy of formation of the i-th oxide;
+          n_i are the oxide mole numbers in the mineral.
+        assumption_as_printed: >-
+          ΔH_T and ΔS_T are assumed constant over a limited temperature
+          interval; numeric bounds are not printed.
+        rows:
+          - row_label: CA
+            mineral: calcium aluminate
+            formula: CaAl2O4
+            delta_H_T_kJ_per_mole: '-8.91'
+            delta_S_T_J_per_mole_K: '11.10'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: CA}
+          - row_label: CA2
+            mineral: grossite
+            formula: CaAl4O7
+            delta_H_T_kJ_per_mole: '-6.34'
+            delta_S_T_J_per_mole_K: '9.94'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: CA2}
+          - row_label: CA6
+            mineral: hibonite
+            formula: CaAl12O19
+            delta_H_T_kJ_per_mole: '-2.88'
+            delta_S_T_J_per_mole_K: '5.00'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: CA6}
+          - row_label: CT
+            mineral: perovskite
+            formula: CaTiO3
+            delta_H_T_kJ_per_mole: '-39.51'
+            delta_S_T_J_per_mole_K: '2.87'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: CT}
+          - row_label: MA
+            mineral: magnesium spinel
+            formula: MgAl2O4
+            delta_H_T_kJ_per_mole: '-13.29'
+            delta_S_T_J_per_mole_K: '4.38'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: MA}
+          - row_label: MS
+            mineral: enstatite
+            formula: MgSiO3
+            delta_H_T_kJ_per_mole: '-10.28'
+            delta_S_T_J_per_mole_K: '-0.07'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: MS}
+          - row_label: M2S
+            mineral: forsterite
+            formula: Mg2SiO4
+            delta_H_T_kJ_per_mole: '-21.76'
+            delta_S_T_J_per_mole_K: '-0.92'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: M2S}
+          - row_label: CMS2
+            mineral: diopside
+            formula: CaMgSi2O6
+            delta_H_T_kJ_per_mole: '-36.55'
+            delta_S_T_J_per_mole_K: '-3.15'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: CMS2}
+          - row_label: C2MS2
+            mineral: akermanite
+            formula: Ca2MgSi2O7
+            delta_H_T_kJ_per_mole: '-36.43'
+            delta_S_T_J_per_mole_K: '-2.41'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: C2MS2}
+          - row_label: C2AS
+            mineral: gehlenite
+            formula: Ca2Al2SiO7
+            delta_H_T_kJ_per_mole: '-37.33'
+            delta_S_T_J_per_mole_K: '2.11'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: C2AS}
+          - row_label: CAS2
+            mineral: anorthite
+            formula: CaAl2Si2O8
+            delta_H_T_kJ_per_mole: '-26.70'
+            delta_S_T_J_per_mole_K: '-1.10'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: CAS2}
+          - row_label: C3AS3
+            mineral: grossular
+            formula: Ca3Al2Si3O12
+            delta_H_T_kJ_per_mole: '-47.70'
+            delta_S_T_J_per_mole_K: '-10.98'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: C3AS3}
     - observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_01_context
       type: thermodynamic_example
       locator:
@@ -211,70 +242,6 @@ species:
         digitisation: deferred to a figure pass
   CaAl4O7:
     observations:
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r03_c02
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: $CA_{2}$
-        column_header: $\Delta H_{T}$ , kJ/mole
-      units: kJ/mole
-      values:
-        quantity: delta_fH
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '-6.34'
-        basis_as_published: ΔH_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r03_c03
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: $CA_{2}$
-        column_header: $\Delta S_{T}$ , J/(mole·K)
-      units: J/mol K
-      values:
-        quantity: S
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '9.94'
-        basis_as_published: ΔS_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
     - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r03_c04
       type: transition_point
       locator:
@@ -378,70 +345,6 @@ species:
         digitisation: deferred to a figure pass
   CaAl12O19:
     observations:
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r04_c02
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: $CA_{6}$
-        column_header: $\Delta H_{T}$ , kJ/mole
-      units: kJ/mole
-      values:
-        quantity: delta_fH
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '-2.88'
-        basis_as_published: ΔH_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r04_c03
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: $CA_{6}$
-        column_header: $\Delta S_{T}$ , J/(mole·K)
-      units: J/mol K
-      values:
-        quantity: S
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '5.00'
-        basis_as_published: ΔS_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
     - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r04_c04_dissociation
       type: transition_point
       locator:
@@ -497,7 +400,7 @@ species:
         method_class: quoted_attributed
         attribution: '[11–17]'
         T_m_K: '2148'
-        property_kind: melting_point
+        property_kind: liquid_phase_temperature
         temperature_marker_as_printed: '**'
         property_kind_as_printed: liquid phase temperature
     - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r04_c05
@@ -575,70 +478,6 @@ species:
         digitisation: deferred to a figure pass
   CaTiO3:
     observations:
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r05_c02
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: CT
-        column_header: $\Delta H_{T}$ , kJ/mole
-      units: kJ/mole
-      values:
-        quantity: delta_fH
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '-39.51'
-        basis_as_published: ΔH_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r05_c03
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: CT
-        column_header: $\Delta S_{T}$ , J/(mole·K)
-      units: J/mol K
-      values:
-        quantity: S
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '2.87'
-        basis_as_published: ΔS_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
     - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r05_c04
       type: transition_point
       locator:
@@ -742,70 +581,6 @@ species:
         digitisation: deferred to a figure pass
   MgAl2O4:
     observations:
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r06_c02
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: MA
-        column_header: $\Delta H_{T}$ , kJ/mole
-      units: kJ/mole
-      values:
-        quantity: delta_fH
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '-13.29'
-        basis_as_published: ΔH_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r06_c03
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: MA
-        column_header: $\Delta S_{T}$ , J/(mole·K)
-      units: J/mol K
-      values:
-        quantity: S
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '4.38'
-        basis_as_published: ΔS_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
     - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r06_c04
       type: transition_point
       locator:
@@ -909,70 +684,6 @@ species:
         digitisation: deferred to a figure pass
   MgSiO3:
     observations:
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r07_c02
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: MS
-        column_header: $\Delta H_{T}$ , kJ/mole
-      units: kJ/mole
-      values:
-        quantity: delta_fH
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '-10.28'
-        basis_as_published: ΔH_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r07_c03
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: MS
-        column_header: $\Delta S_{T}$ , J/(mole·K)
-      units: J/mol K
-      values:
-        quantity: S
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '-0.07'
-        basis_as_published: ΔS_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
     - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r07_c04_dissociation
       type: transition_point
       locator:
@@ -1028,7 +739,7 @@ species:
         method_class: quoted_attributed
         attribution: '[11–17]'
         T_m_K: '1850'
-        property_kind: melting_point
+        property_kind: liquid_phase_temperature
         temperature_marker_as_printed: '**'
         property_kind_as_printed: liquid phase temperature
     - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r07_c05
@@ -1106,70 +817,6 @@ species:
         digitisation: deferred to a figure pass
   Mg2SiO4:
     observations:
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r08_c02
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: $M_{2}S$
-        column_header: $\Delta H_{T}$ , kJ/mole
-      units: kJ/mole
-      values:
-        quantity: delta_fH
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '-21.76'
-        basis_as_published: ΔH_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r08_c03
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: $M_{2}S$
-        column_header: $\Delta S_{T}$ , J/(mole·K)
-      units: J/mol K
-      values:
-        quantity: S
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '-0.92'
-        basis_as_published: ΔS_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
     - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r08_c04
       type: transition_point
       locator:
@@ -1273,70 +920,6 @@ species:
         digitisation: deferred to a figure pass
   CaMgSi2O6:
     observations:
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r09_c02
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: $CMS_{2}$
-        column_header: $\Delta H_{T}$ , kJ/mole
-      units: kJ/mole
-      values:
-        quantity: delta_fH
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '-36.55'
-        basis_as_published: ΔH_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r09_c03
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: $CMS_{2}$
-        column_header: $\Delta S_{T}$ , J/(mole·K)
-      units: J/mol K
-      values:
-        quantity: S
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '-3.15'
-        basis_as_published: ΔS_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
     - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r09_c04
       type: transition_point
       locator:
@@ -1440,70 +1023,6 @@ species:
         digitisation: deferred to a figure pass
   Ca2MgSi2O7:
     observations:
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r10_c02
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: $C_{2}MS_{2}$
-        column_header: $\Delta H_{T}$ , kJ/mole
-      units: kJ/mole
-      values:
-        quantity: delta_fH
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '-36.43'
-        basis_as_published: ΔH_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r10_c03
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: $C_{2}MS_{2}$
-        column_header: $\Delta S_{T}$ , J/(mole·K)
-      units: J/mol K
-      values:
-        quantity: S
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '-2.41'
-        basis_as_published: ΔS_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
     - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r10_c04
       type: transition_point
       locator:
@@ -1607,70 +1126,6 @@ species:
         digitisation: deferred to a figure pass
   Ca2Al2SiO7:
     observations:
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r11_c02
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: $C_{2}AS$
-        column_header: $\Delta H_{T}$ , kJ/mole
-      units: kJ/mole
-      values:
-        quantity: delta_fH
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '-37.33'
-        basis_as_published: ΔH_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r11_c03
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: $C_{2}AS$
-        column_header: $\Delta S_{T}$ , J/(mole·K)
-      units: J/mol K
-      values:
-        quantity: S
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '2.11'
-        basis_as_published: ΔS_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
     - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r11_c04
       type: transition_point
       locator:
@@ -1774,70 +1229,6 @@ species:
         digitisation: deferred to a figure pass
   CaAl2Si2O8:
     observations:
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r12_c02
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: $CAS_{2}$
-        column_header: $\Delta H_{T}$ , kJ/mole
-      units: kJ/mole
-      values:
-        quantity: delta_fH
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '-26.70'
-        basis_as_published: ΔH_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r12_c03
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: $CAS_{2}$
-        column_header: $\Delta S_{T}$ , J/(mole·K)
-      units: J/mol K
-      values:
-        quantity: S
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '-1.10'
-        basis_as_published: ΔS_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
     - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r12_c04
       type: transition_point
       locator:
@@ -1941,70 +1332,6 @@ species:
         digitisation: deferred to a figure pass
   Ca3Al2Si3O12:
     observations:
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r13_c02
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: $C_{3}AS_{3}$
-        column_header: $\Delta H_{T}$ , kJ/mole
-      units: kJ/mole
-      values:
-        quantity: delta_fH
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '-47.70'
-        basis_as_published: ΔH_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
-    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r13_c03
-      type: gibbs_table
-      locator:
-        page: 2
-        pdf_page_index: 1
-        table: '1'
-        row_label: $C_{3}AS_{3}$
-        column_header: $\Delta S_{T}$ , J/(mole·K)
-      units: J/mol K
-      values:
-        quantity: S
-        method_class: quoted_attributed
-        attribution: '[11–17]'
-        value: '-10.98'
-        basis_as_published: ΔS_T parameter of ΔG_T for the crystalline mineral; the source defines ΔG_T relative
-          to oxide components in Eqs. (3)–(4).
-        method_as_published: Calculated from ΔG_T = ΔH_T − TΔS_T assuming constancy over a limited temperature interval;
-          numeric bounds are not printed.
-      phase: cr
-      point_conditions:
-        temperature_K:
-          state:
-            tag: value
-            value:
-              kind: bound
-              bound_operator: ">"
-              bound_value: "1000"
-          locator:
-            page: 1
-            pdf_page_index: 0
-            section: Introduction
-            note: The text describes the high-temperature dataset as above 1000 K. It gives no numeric bounds for the limited interval used for these parameters.
     - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r13_c04_dissociation
       type: transition_point
       locator:
@@ -2060,7 +1387,7 @@ species:
         method_class: quoted_attributed
         attribution: '[11–17]'
         T_m_K: '1673'
-        property_kind: melting_point
+        property_kind: liquid_phase_temperature
         temperature_marker_as_printed: '**'
         property_kind_as_printed: liquid phase temperature
     - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r13_c05
@@ -2137,22 +1464,6 @@ species:
           1).
         digitisation: deferred to a figure pass
 fidelity_samples:
-- species: CaAl2O4
-  observable: gibbs_table
-  observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r02_c02
-  field: value
-  value: '-8.91'
-  locator:
-    page: 2
-    table: '1'
-- species: Mg2SiO4
-  observable: gibbs_table
-  observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r08_c03
-  field: value
-  value: '-0.92'
-  locator:
-    page: 2
-    table: '1'
 - species: CaAl12O19
   observable: transition_point
   observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r04_c04_dissociation

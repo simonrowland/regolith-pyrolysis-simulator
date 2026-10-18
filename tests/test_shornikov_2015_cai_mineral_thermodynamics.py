@@ -39,9 +39,8 @@ def test_shornikov_2015_cai_table_and_deferred_figure_records() -> None:
         for record in species.values()
         for observation in record["observations"]
     }
-    assert len(observations) == 51
+    assert len(observations) == 27
     assert Counter(row["type"] for row in observations.values()) == {
-        "gibbs_table": 24,
         "transition_point": 15,
         "heat_capacity_and_heat_content_series": 12,
     }
@@ -58,18 +57,34 @@ def test_shornikov_2015_cai_table_and_deferred_figure_records() -> None:
         if kind == "bound":
             assert state["value"]["bound_operator"] == ">"
             assert state["value"]["bound_value"] == "1000"
-    assert temperature_kinds == {"point": 27, "bound": 24}
+    assert temperature_kinds == {"point": 27}
 
     table_values = {
         observation_id: observation["values"]
         for observation_id, observation in observations.items()
     }
-    assert table_values[
-        "shornikov_2015_cai_mineral_thermodynamics_p002_t01_r02_c02"
-    ]["value"] == "-8.91"
-    assert table_values[
-        "shornikov_2015_cai_mineral_thermodynamics_p002_t01_r08_c03"
-    ]["value"] == "-0.92"
+    parameter_context = next(
+        context
+        for context in species["CaAl2O4"]["context"]
+        if context["type"] == "oxide_component_formation_thermodynamic_parameters"
+    )
+    parameter_rows = parameter_context["values"]["rows"]
+    assert len(parameter_rows) == 12
+    assert {row["formula"] for row in parameter_rows} == expected_formulas
+    assert parameter_context["values"]["phase_as_printed"] == "crystalline state"
+    assert parameter_context["values"]["method_class"] == "quoted_attributed"
+    assert parameter_context["values"]["attribution_as_printed"] == "[11–17]"
+    assert parameter_context["values"]["reaction_as_printed"] == (
+        "ΔG° = ∑ n_i ΔG°_i + ΔG_T ∑ n_i"
+    )
+    assert parameter_rows[0]["delta_H_T_kJ_per_mole"] == "-8.91"
+    assert parameter_rows[6]["delta_S_T_J_per_mole_K"] == "-0.92"
+    assert parameter_rows[11]["delta_S_T_J_per_mole_K"] == "-10.98"
+    assert parameter_rows[0]["locator"]["page"] == 2
+    assert all(
+        observation["values"]["quantity"] not in {"delta_fH", "S"}
+        for observation in observations.values()
+    )
     assert table_values[
         "shornikov_2015_cai_mineral_thermodynamics_p002_t01_r04_c04_dissociation"
     ]["T_m_K"] == "2123"
@@ -83,24 +98,43 @@ def test_shornikov_2015_cai_table_and_deferred_figure_records() -> None:
         "shornikov_2015_cai_mineral_thermodynamics_p002_t01_r04_c04_liquid_phase"
     ]["phase"] == "l"
     assert table_values[
+        "shornikov_2015_cai_mineral_thermodynamics_p002_t01_r04_c04_liquid_phase"
+    ]["property_kind"] == "liquid_phase_temperature"
+    assert table_values[
+        "shornikov_2015_cai_mineral_thermodynamics_p002_t01_r04_c04_liquid_phase"
+    ]["property_kind_as_printed"] == "liquid phase temperature"
+    assert table_values[
         "shornikov_2015_cai_mineral_thermodynamics_p002_t01_r07_c04_dissociation"
     ]["T_m_K"] == "1836"
     assert table_values[
         "shornikov_2015_cai_mineral_thermodynamics_p002_t01_r07_c04_liquid_phase"
     ]["T_m_K"] == "1850"
     assert table_values[
+        "shornikov_2015_cai_mineral_thermodynamics_p002_t01_r07_c04_liquid_phase"
+    ]["property_kind"] == "liquid_phase_temperature"
+    assert table_values[
         "shornikov_2015_cai_mineral_thermodynamics_p002_t01_r13_c04_dissociation"
     ]["T_m_K"] == "1373"
     assert table_values[
         "shornikov_2015_cai_mineral_thermodynamics_p002_t01_r13_c04_liquid_phase"
     ]["T_m_K"] == "1673"
+    assert table_values[
+        "shornikov_2015_cai_mineral_thermodynamics_p002_t01_r13_c04_liquid_phase"
+    ]["property_kind"] == "liquid_phase_temperature"
 
     figure_records = [
         context
         for record in species.values()
         for context in record["context"]
+        if context["type"] == "thermodynamic_example"
     ]
     assert len(figure_records) == 12
+    all_contexts = [
+        context
+        for record in species.values()
+        for context in record["context"]
+    ]
+    assert len(all_contexts) == 13
     for figure in figure_records:
         values = figure["values"]
         assert values["quantity"] == "delta_fG"
