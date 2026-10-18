@@ -1,7 +1,7 @@
 schema_version: literature_extract.v1
 source_id: chen-2022-mgo-sio2-tio2-phase-equilibria
 source:
-  citation: Chen, G., Wan, Q., Shi, J., Taskinen, P., and Jokilaakso, A. (2022). Experimental Study on the Phase Relations
+  citation: Chen, Min, Wan, Xingbang, Shi, Junjie, Taskinen, Pekka, and Jokilaakso, Ari (2022). Experimental Study on the Phase Relations
     of the SiO2-MgO-TiO2 System in Air at 1500 C. JOM 74(2), 676–688.
   doi: 10.1007/s11837-021-04870-0
   year: 2022
@@ -9,11 +9,11 @@ source:
   corpus_sha256: 41452738c9566556ae995ec2d076b067df41a4a97056faff0219ffbe21e9e399
 extraction:
   method: Table II was manually transcribed from the exact born-digital pdftotext layout. The MinerU table converter found
-    no table blocks for these pages. All 392 Table II body cells were checked against the 600 dpi PDF renders. Figures are
+    no table blocks for these pages. All 294 Table II body cells (96 initial and 198 equilibrium) were checked against the
+    600 dpi PDF renders. Figures are
     recorded without digitised points.
   date: '2026-10-18'
   worker: w9-1018
-  review_status: draft
 review_status: draft
 fidelity_samples:
 - species: SiO2
@@ -809,7 +809,7 @@ species:
         table: II
         row: C1, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -884,7 +884,7 @@ species:
         table: II
         row: C1, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -945,7 +945,7 @@ species:
         table: II
         row: C1, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -1006,7 +1006,7 @@ species:
         table: II
         row: C68, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -1081,7 +1081,7 @@ species:
         table: II
         row: C68, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -1142,7 +1142,7 @@ species:
         table: II
         row: C68, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -1203,7 +1203,7 @@ species:
         table: II
         row: C69, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -1278,7 +1278,7 @@ species:
         table: II
         row: C69, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -1339,7 +1339,7 @@ species:
         table: II
         row: C69, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -1400,7 +1400,7 @@ species:
         table: II
         row: C70, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -1475,7 +1475,7 @@ species:
         table: II
         row: C70, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -1536,7 +1536,7 @@ species:
         table: II
         row: C70, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -1597,7 +1597,7 @@ species:
         table: II
         row: C71, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -1672,7 +1672,7 @@ species:
         table: II
         row: C71, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -1733,7 +1733,7 @@ species:
         table: II
         row: C71, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -1794,7 +1794,7 @@ species:
         table: II
         row: C75, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -1869,7 +1869,7 @@ species:
         table: II
         row: C75, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -1930,7 +1930,7 @@ species:
         table: II
         row: C75, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -1991,7 +1991,7 @@ species:
         table: II
         row: C46, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -2066,7 +2066,7 @@ species:
         table: II
         row: C46, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -2127,7 +2127,7 @@ species:
         table: II
         row: C46, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -2188,7 +2188,9 @@ species:
         table: II
         row: C46, Cristobalite
         column: TiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -2256,7 +2258,9 @@ species:
         table: II
         row: C46, Cristobalite
         column: SiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -2317,7 +2321,9 @@ species:
         table: II
         row: C46, Cristobalite
         column: MgO equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -2378,7 +2384,7 @@ species:
         table: II
         row: C47, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -2453,7 +2459,7 @@ species:
         table: II
         row: C47, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -2514,7 +2520,7 @@ species:
         table: II
         row: C47, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -2575,7 +2581,9 @@ species:
         table: II
         row: C47, Cristobalite
         column: TiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -2643,7 +2651,9 @@ species:
         table: II
         row: C47, Cristobalite
         column: SiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -2704,7 +2714,9 @@ species:
         table: II
         row: C47, Cristobalite
         column: MgO equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -2765,7 +2777,7 @@ species:
         table: II
         row: C48, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -2840,7 +2852,7 @@ species:
         table: II
         row: C48, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -2901,7 +2913,7 @@ species:
         table: II
         row: C48, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -2962,7 +2974,9 @@ species:
         table: II
         row: C48, Cristobalite
         column: TiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -3030,7 +3044,9 @@ species:
         table: II
         row: C48, Cristobalite
         column: SiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -3091,7 +3107,9 @@ species:
         table: II
         row: C48, Cristobalite
         column: MgO equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -3152,7 +3170,7 @@ species:
         table: II
         row: C49, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -3227,7 +3245,7 @@ species:
         table: II
         row: C49, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -3288,7 +3306,7 @@ species:
         table: II
         row: C49, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -3349,7 +3367,9 @@ species:
         table: II
         row: C49, Cristobalite
         column: TiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -3417,7 +3437,9 @@ species:
         table: II
         row: C49, Cristobalite
         column: SiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -3478,7 +3500,9 @@ species:
         table: II
         row: C49, Cristobalite
         column: MgO equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -3539,7 +3563,7 @@ species:
         table: II
         row: C50, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -3614,7 +3638,7 @@ species:
         table: II
         row: C50, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -3675,7 +3699,7 @@ species:
         table: II
         row: C50, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -3736,7 +3760,9 @@ species:
         table: II
         row: C50, Cristobalite
         column: TiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -3804,7 +3830,9 @@ species:
         table: II
         row: C50, Cristobalite
         column: SiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -3865,7 +3893,9 @@ species:
         table: II
         row: C50, Cristobalite
         column: MgO equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -3926,7 +3956,7 @@ species:
         table: II
         row: C51, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -4001,7 +4031,7 @@ species:
         table: II
         row: C51, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -4062,7 +4092,7 @@ species:
         table: II
         row: C51, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -4123,7 +4153,9 @@ species:
         table: II
         row: C51, Cristobalite
         column: TiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -4191,7 +4223,9 @@ species:
         table: II
         row: C51, Cristobalite
         column: SiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -4252,7 +4286,9 @@ species:
         table: II
         row: C51, Cristobalite
         column: MgO equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -4313,7 +4349,7 @@ species:
         table: II
         row: C53, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -4388,7 +4424,7 @@ species:
         table: II
         row: C53, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -4449,7 +4485,7 @@ species:
         table: II
         row: C53, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -4510,7 +4546,9 @@ species:
         table: II
         row: C53, Cristobalite
         column: TiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -4578,7 +4616,9 @@ species:
         table: II
         row: C53, Cristobalite
         column: SiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -4639,7 +4679,9 @@ species:
         table: II
         row: C53, Cristobalite
         column: MgO equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -4700,7 +4742,7 @@ species:
         table: II
         row: C7, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -4775,7 +4817,7 @@ species:
         table: II
         row: C7, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -4836,7 +4878,7 @@ species:
         table: II
         row: C7, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -4897,7 +4939,7 @@ species:
         table: II
         row: C11, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -4972,7 +5014,7 @@ species:
         table: II
         row: C11, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -5033,7 +5075,7 @@ species:
         table: II
         row: C11, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -5094,7 +5136,7 @@ species:
         table: II
         row: C52, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -5169,7 +5211,7 @@ species:
         table: II
         row: C52, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -5230,7 +5272,7 @@ species:
         table: II
         row: C52, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -5291,7 +5333,9 @@ species:
         table: II
         row: C52, Cristobalite
         column: TiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -5359,7 +5403,9 @@ species:
         table: II
         row: C52, Cristobalite
         column: SiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -5420,7 +5466,9 @@ species:
         table: II
         row: C52, Cristobalite
         column: MgO equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -5481,7 +5529,7 @@ species:
         table: II
         row: C54, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -5556,7 +5604,7 @@ species:
         table: II
         row: C54, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -5617,7 +5665,7 @@ species:
         table: II
         row: C54, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -5678,7 +5726,9 @@ species:
         table: II
         row: C54, Cristobalite
         column: TiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -5746,7 +5796,9 @@ species:
         table: II
         row: C54, Cristobalite
         column: SiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -5807,7 +5859,9 @@ species:
         table: II
         row: C54, Cristobalite
         column: MgO equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -5868,7 +5922,7 @@ species:
         table: II
         row: C55, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -5943,7 +5997,7 @@ species:
         table: II
         row: C55, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -6004,7 +6058,7 @@ species:
         table: II
         row: C55, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -6065,7 +6119,9 @@ species:
         table: II
         row: C55, Cristobalite
         column: TiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -6133,7 +6189,9 @@ species:
         table: II
         row: C55, Cristobalite
         column: SiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -6194,7 +6252,9 @@ species:
         table: II
         row: C55, Cristobalite
         column: MgO equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -6255,7 +6315,7 @@ species:
         table: II
         row: C45, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -6330,7 +6390,7 @@ species:
         table: II
         row: C45, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -6391,7 +6451,7 @@ species:
         table: II
         row: C45, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -6452,7 +6512,9 @@ species:
         table: II
         row: C45, Cristobalite
         column: TiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -6520,7 +6582,9 @@ species:
         table: II
         row: C45, Cristobalite
         column: SiO2 equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -6581,7 +6645,9 @@ species:
         table: II
         row: C45, Cristobalite
         column: MgO equilibrium wt.%
-      phase: Cristobalite
+      phase: cr
+      condensed_form:
+        polymorph: Cristobalite
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -6642,7 +6708,7 @@ species:
         table: II
         row: C57, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -6717,7 +6783,7 @@ species:
         table: II
         row: C57, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -6778,7 +6844,7 @@ species:
         table: II
         row: C57, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -6839,7 +6905,7 @@ species:
         table: II
         row: C72, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -6914,7 +6980,7 @@ species:
         table: II
         row: C72, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -6975,7 +7041,7 @@ species:
         table: II
         row: C72, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -7050,6 +7116,41 @@ species:
           Ti-Kα, and pure metals Mg for Mg-Kα. XRD used Cu Kα radiation, 40 kV, 40 mA, over 10° to 90° (2θ).'
         T_C: 1500
         attribution: This work
+        log10_P_O2_atm_as_published: -0.6778
+        log10_P_O2_locator:
+          published_page: 679
+          pdf_page_index: 3
+          section: Experimental
+          note: At 1500 °C in air
+        total_pressure_atm_as_published: 1
+        total_pressure_text_as_published: P = 1 atm
+        total_pressure_locator:
+          published_page: 685
+          pdf_page_index: 9
+          section: Gibbs phase rule
+    - observation_id: chen22_table_i_reagent_purities
+      type: method
+      locator:
+        published_page: 677
+        pdf_page_index: 1
+        table: I
+      units: wt.% as printed
+      values:
+        quantity: experimental_materials_as_published
+        method_class: method_only
+        materials:
+        - oxide: SiO2
+          purity: 99.995
+          supplier: Alfa Aesar
+          location: Kandel
+        - oxide: MgO
+          purity: 99.95
+          supplier: Alfa Aesar
+          location: Karlsruhe
+        - oxide: TiO2
+          purity: 99.8
+          supplier: Sigma-Aldrich
+          location: Steinheim
     - observation_id: chen22_table_ii_printed_parenthetical_values_and_c53_cell
       type: schema_gap
       locator:
@@ -7329,7 +7430,7 @@ species:
         table: II
         row: C73, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -7404,7 +7505,7 @@ species:
         table: II
         row: C73, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -7465,7 +7566,7 @@ species:
         table: II
         row: C73, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -7526,7 +7627,9 @@ species:
         table: II
         row: C73, MgO·SiO2
         column: TiO2 equilibrium wt.%
-      phase: MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -7594,7 +7697,9 @@ species:
         table: II
         row: C73, MgO·SiO2
         column: SiO2 equilibrium wt.%
-      phase: MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -7655,7 +7760,9 @@ species:
         table: II
         row: C73, MgO·SiO2
         column: MgO equilibrium wt.%
-      phase: MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -7716,7 +7823,7 @@ species:
         table: II
         row: C58, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -7791,7 +7898,7 @@ species:
         table: II
         row: C58, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -7852,7 +7959,7 @@ species:
         table: II
         row: C58, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -7913,7 +8020,9 @@ species:
         table: II
         row: C58, 2MgO·SiO2
         column: TiO2 equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -7981,7 +8090,9 @@ species:
         table: II
         row: C58, 2MgO·SiO2
         column: SiO2 equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -8042,7 +8153,9 @@ species:
         table: II
         row: C58, 2MgO·SiO2
         column: MgO equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -8103,7 +8216,7 @@ species:
         table: II
         row: C59, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -8178,7 +8291,7 @@ species:
         table: II
         row: C59, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -8239,7 +8352,7 @@ species:
         table: II
         row: C59, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -8300,7 +8413,9 @@ species:
         table: II
         row: C59, 2MgO·SiO2
         column: TiO2 equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -8368,7 +8483,9 @@ species:
         table: II
         row: C59, 2MgO·SiO2
         column: SiO2 equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -8429,7 +8546,9 @@ species:
         table: II
         row: C59, 2MgO·SiO2
         column: MgO equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -8490,7 +8609,7 @@ species:
         table: II
         row: C60, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -8565,7 +8684,7 @@ species:
         table: II
         row: C60, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -8626,7 +8745,7 @@ species:
         table: II
         row: C60, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -8687,7 +8806,9 @@ species:
         table: II
         row: C60, 2MgO·SiO2
         column: TiO2 equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -8755,7 +8876,9 @@ species:
         table: II
         row: C60, 2MgO·SiO2
         column: SiO2 equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -8816,7 +8939,9 @@ species:
         table: II
         row: C60, 2MgO·SiO2
         column: MgO equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -8877,7 +9002,7 @@ species:
         table: II
         row: C61, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -8952,7 +9077,7 @@ species:
         table: II
         row: C61, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -9013,7 +9138,7 @@ species:
         table: II
         row: C61, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -9074,7 +9199,9 @@ species:
         table: II
         row: C61, 2MgO·SiO2
         column: TiO2 equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -9142,7 +9269,9 @@ species:
         table: II
         row: C61, 2MgO·SiO2
         column: SiO2 equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -9203,7 +9332,9 @@ species:
         table: II
         row: C61, 2MgO·SiO2
         column: MgO equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -9264,7 +9395,7 @@ species:
         table: II
         row: C78, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -9339,7 +9470,7 @@ species:
         table: II
         row: C78, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -9400,7 +9531,7 @@ species:
         table: II
         row: C78, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -9461,7 +9592,9 @@ species:
         table: II
         row: C78, 2MgO·SiO2
         column: TiO2 equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -9529,7 +9662,9 @@ species:
         table: II
         row: C78, 2MgO·SiO2
         column: SiO2 equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -9590,7 +9725,9 @@ species:
         table: II
         row: C78, 2MgO·SiO2
         column: MgO equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -9651,7 +9788,9 @@ species:
         table: II
         row: C52, MgO·SiO2
         column: TiO2 equilibrium wt.%
-      phase: MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -9719,7 +9858,9 @@ species:
         table: II
         row: C52, MgO·SiO2
         column: SiO2 equilibrium wt.%
-      phase: MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -9780,7 +9921,9 @@ species:
         table: II
         row: C52, MgO·SiO2
         column: MgO equilibrium wt.%
-      phase: MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -9841,7 +9984,9 @@ species:
         table: II
         row: C54, MgO·SiO2
         column: TiO2 equilibrium wt.%
-      phase: MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -9909,7 +10054,9 @@ species:
         table: II
         row: C54, MgO·SiO2
         column: SiO2 equilibrium wt.%
-      phase: MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -9970,7 +10117,9 @@ species:
         table: II
         row: C54, MgO·SiO2
         column: MgO equilibrium wt.%
-      phase: MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -10031,7 +10180,9 @@ species:
         table: II
         row: C55, MgO·SiO2
         column: TiO2 equilibrium wt.%
-      phase: MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -10099,7 +10250,9 @@ species:
         table: II
         row: C55, MgO·SiO2
         column: SiO2 equilibrium wt.%
-      phase: MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -10160,7 +10313,9 @@ species:
         table: II
         row: C55, MgO·SiO2
         column: MgO equilibrium wt.%
-      phase: MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -10221,7 +10376,9 @@ species:
         table: II
         row: C57, MgO·SiO2
         column: TiO2 equilibrium wt.%
-      phase: MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -10289,7 +10446,9 @@ species:
         table: II
         row: C57, MgO·SiO2
         column: SiO2 equilibrium wt.%
-      phase: MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -10350,7 +10509,9 @@ species:
         table: II
         row: C57, MgO·SiO2
         column: MgO equilibrium wt.%
-      phase: MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -10411,7 +10572,9 @@ species:
         table: II
         row: C57, 2MgO·SiO2
         column: TiO2 equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -10479,7 +10642,9 @@ species:
         table: II
         row: C57, 2MgO·SiO2
         column: SiO2 equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -10540,7 +10705,9 @@ species:
         table: II
         row: C57, 2MgO·SiO2
         column: MgO equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -10601,7 +10768,9 @@ species:
         table: II
         row: C72, 2MgO·SiO2
         column: TiO2 equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -10669,7 +10838,9 @@ species:
         table: II
         row: C72, 2MgO·SiO2
         column: SiO2 equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -10730,7 +10901,9 @@ species:
         table: II
         row: C72, 2MgO·SiO2
         column: MgO equilibrium wt.%
-      phase: 2MgO·SiO2
+      phase: cr
+      condensed_form:
+        polymorph: 2MgO·SiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -10794,7 +10967,7 @@ species:
         table: II
         row: C5, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -10869,7 +11042,7 @@ species:
         table: II
         row: C5, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -10930,7 +11103,7 @@ species:
         table: II
         row: C5, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -10991,7 +11164,9 @@ species:
         table: II
         row: C5, TiO2
         column: TiO2 equilibrium wt.%
-      phase: TiO2
+      phase: cr
+      condensed_form:
+        polymorph: TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -11059,7 +11234,9 @@ species:
         table: II
         row: C5, TiO2
         column: SiO2 equilibrium wt.%
-      phase: TiO2
+      phase: cr
+      condensed_form:
+        polymorph: TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -11120,7 +11297,9 @@ species:
         table: II
         row: C5, TiO2
         column: MgO equilibrium wt.%
-      phase: TiO2
+      phase: cr
+      condensed_form:
+        polymorph: TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -11181,7 +11360,7 @@ species:
         table: II
         row: C43, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -11256,7 +11435,7 @@ species:
         table: II
         row: C43, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -11317,7 +11496,7 @@ species:
         table: II
         row: C43, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -11378,7 +11557,9 @@ species:
         table: II
         row: C43, TiO2
         column: TiO2 equilibrium wt.%
-      phase: TiO2
+      phase: cr
+      condensed_form:
+        polymorph: TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -11446,7 +11627,9 @@ species:
         table: II
         row: C43, TiO2
         column: SiO2 equilibrium wt.%
-      phase: TiO2
+      phase: cr
+      condensed_form:
+        polymorph: TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -11507,7 +11690,9 @@ species:
         table: II
         row: C43, TiO2
         column: MgO equilibrium wt.%
-      phase: TiO2
+      phase: cr
+      condensed_form:
+        polymorph: TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -11568,7 +11753,7 @@ species:
         table: II
         row: C44, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -11643,7 +11828,7 @@ species:
         table: II
         row: C44, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -11704,7 +11889,7 @@ species:
         table: II
         row: C44, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -11765,7 +11950,9 @@ species:
         table: II
         row: C44, TiO2
         column: TiO2 equilibrium wt.%
-      phase: TiO2
+      phase: cr
+      condensed_form:
+        polymorph: TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -11833,7 +12020,9 @@ species:
         table: II
         row: C44, TiO2
         column: SiO2 equilibrium wt.%
-      phase: TiO2
+      phase: cr
+      condensed_form:
+        polymorph: TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -11894,7 +12083,9 @@ species:
         table: II
         row: C44, TiO2
         column: MgO equilibrium wt.%
-      phase: TiO2
+      phase: cr
+      condensed_form:
+        polymorph: TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -11955,7 +12146,7 @@ species:
         table: II
         row: C65, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -12030,7 +12221,7 @@ species:
         table: II
         row: C65, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -12091,7 +12282,7 @@ species:
         table: II
         row: C65, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -12152,7 +12343,9 @@ species:
         table: II
         row: C65, MgO·2TiO2
         column: TiO2 equilibrium wt.%
-      phase: MgO·2TiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·2TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -12220,7 +12413,9 @@ species:
         table: II
         row: C65, MgO·2TiO2
         column: SiO2 equilibrium wt.%
-      phase: MgO·2TiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·2TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -12281,7 +12476,9 @@ species:
         table: II
         row: C65, MgO·2TiO2
         column: MgO equilibrium wt.%
-      phase: MgO·2TiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·2TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -12342,7 +12539,7 @@ species:
         table: II
         row: C66, Liquid
         column: TiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -12417,7 +12614,7 @@ species:
         table: II
         row: C66, Liquid
         column: SiO2 equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -12478,7 +12675,7 @@ species:
         table: II
         row: C66, Liquid
         column: MgO equilibrium wt.%
-      phase: Liquid
+      phase: l
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -12539,7 +12736,9 @@ species:
         table: II
         row: C66, MgO·2TiO2
         column: TiO2 equilibrium wt.%
-      phase: MgO·2TiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·2TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -12607,7 +12806,9 @@ species:
         table: II
         row: C66, MgO·2TiO2
         column: SiO2 equilibrium wt.%
-      phase: MgO·2TiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·2TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -12668,7 +12869,9 @@ species:
         table: II
         row: C66, MgO·2TiO2
         column: MgO equilibrium wt.%
-      phase: MgO·2TiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·2TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -12729,7 +12932,9 @@ species:
         table: II
         row: C7, TiO2
         column: TiO2 equilibrium wt.%
-      phase: TiO2
+      phase: cr
+      condensed_form:
+        polymorph: TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -12797,7 +13002,9 @@ species:
         table: II
         row: C7, TiO2
         column: SiO2 equilibrium wt.%
-      phase: TiO2
+      phase: cr
+      condensed_form:
+        polymorph: TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -12858,7 +13065,9 @@ species:
         table: II
         row: C7, TiO2
         column: MgO equilibrium wt.%
-      phase: TiO2
+      phase: cr
+      condensed_form:
+        polymorph: TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -12919,7 +13128,9 @@ species:
         table: II
         row: C7, MgO·2TiO2
         column: TiO2 equilibrium wt.%
-      phase: MgO·2TiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·2TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -12987,7 +13198,9 @@ species:
         table: II
         row: C7, MgO·2TiO2
         column: SiO2 equilibrium wt.%
-      phase: MgO·2TiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·2TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -13048,7 +13261,9 @@ species:
         table: II
         row: C7, MgO·2TiO2
         column: MgO equilibrium wt.%
-      phase: MgO·2TiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·2TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -13109,7 +13324,9 @@ species:
         table: II
         row: C11, TiO2
         column: TiO2 equilibrium wt.%
-      phase: TiO2
+      phase: cr
+      condensed_form:
+        polymorph: TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -13177,7 +13394,9 @@ species:
         table: II
         row: C11, TiO2
         column: SiO2 equilibrium wt.%
-      phase: TiO2
+      phase: cr
+      condensed_form:
+        polymorph: TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -13238,7 +13457,9 @@ species:
         table: II
         row: C11, TiO2
         column: MgO equilibrium wt.%
-      phase: TiO2
+      phase: cr
+      condensed_form:
+        polymorph: TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -13299,7 +13520,9 @@ species:
         table: II
         row: C11, MgO·2TiO2
         column: TiO2 equilibrium wt.%
-      phase: MgO·2TiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·2TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -13367,7 +13590,9 @@ species:
         table: II
         row: C11, MgO·2TiO2
         column: SiO2 equilibrium wt.%
-      phase: MgO·2TiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·2TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -13428,7 +13653,9 @@ species:
         table: II
         row: C11, MgO·2TiO2
         column: MgO equilibrium wt.%
-      phase: MgO·2TiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·2TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -13489,7 +13716,9 @@ species:
         table: II
         row: C45, TiO2
         column: TiO2 equilibrium wt.%
-      phase: TiO2
+      phase: cr
+      condensed_form:
+        polymorph: TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -13557,7 +13786,9 @@ species:
         table: II
         row: C45, TiO2
         column: SiO2 equilibrium wt.%
-      phase: TiO2
+      phase: cr
+      condensed_form:
+        polymorph: TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -13618,7 +13849,9 @@ species:
         table: II
         row: C45, TiO2
         column: MgO equilibrium wt.%
-      phase: TiO2
+      phase: cr
+      condensed_form:
+        polymorph: TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -13679,7 +13912,9 @@ species:
         table: II
         row: C72, MgO·2TiO2
         column: TiO2 equilibrium wt.%
-      phase: MgO·2TiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·2TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -13747,7 +13982,9 @@ species:
         table: II
         row: C72, MgO·2TiO2
         column: SiO2 equilibrium wt.%
-      phase: MgO·2TiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·2TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed
@@ -13808,7 +14045,9 @@ species:
         table: II
         row: C72, MgO·2TiO2
         column: MgO equilibrium wt.%
-      phase: MgO·2TiO2
+      phase: cr
+      condensed_form:
+        polymorph: MgO·2TiO2
       units: wt.% as printed
       uncertainty:
         reported_status: printed

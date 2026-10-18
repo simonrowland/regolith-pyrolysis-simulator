@@ -7,6 +7,7 @@ from pathlib import Path
 
 import yaml
 
+from simulator.battery.enums import Phase
 from tests.battery.test_migrate import _migrate_real_extract
 
 
@@ -26,6 +27,12 @@ def _observations_by_id(document: dict) -> dict[str, dict]:
 def test_table_ii_render_pins_and_complete_row_migration(tmp_path: Path) -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     rows = _observations_by_id(document)
+    extract_text = EXTRACT.read_text(encoding="utf-8")
+    assert extract_text.count("review_status: draft") == 1
+    assert document["review_status"] == "draft"
+    assert document["source"]["citation"].startswith(
+        "Chen, Min, Wan, Xingbang, Shi, Junjie, Taskinen, Pekka, and Jokilaakso, Ari"
+    )
 
     # Table II, 600 dpi renders: pp. 678-679 (PDF pages 3-4; indexes 2-3).
     pins = {
@@ -42,6 +49,30 @@ def test_table_ii_render_pins_and_complete_row_migration(tmp_path: Path) -> None
         assert observation["locator"]["row"] == row
 
     assert sum(len(species["observations"]) for species in document["species"].values()) == 198
+    assert all(
+        row["phase"] in {"l", "cr"}
+        for species in document["species"].values()
+        for row in species["observations"]
+    )
+    solid_names = {
+        "Cristobalite",
+        "TiO2",
+        "MgO·SiO2",
+        "2MgO·SiO2",
+        "MgO·2TiO2",
+    }
+    assert {
+        row["condensed_form"]["polymorph"]
+        for species in document["species"].values()
+        for row in species["observations"]
+        if row["phase"] == "cr"
+    } == solid_names
+    assert all(
+        "condensed_form" not in row
+        for species in document["species"].values()
+        for row in species["observations"]
+        if row["phase"] == "l"
+    )
     assert {container: len(block["observations"]) for container, block in document["species"].items()} == {
         "SiO2": 96,
         "MgO": 54,
@@ -98,6 +129,9 @@ def test_table_ii_render_pins_and_complete_row_migration(tmp_path: Path) -> None
     assemblages_by_sample: dict[str, set[str]] = {}
     for observation_id, migrated in result.observations.items():
         source_observation_id = observation_id.split("::", 1)[-1]
+        source_phase = rows[source_observation_id]["phase"]
+        expected_phase = Phase.L if source_phase == "l" else Phase.CR
+        assert migrated.identity.species.phase.value is expected_phase
         conditions = migrated.point_conditions or {}
         assert migrated.identity.species.formula == migrated_containers[source_observation_id]
         temperature = conditions["temperature_K"]
@@ -132,3 +166,31 @@ def test_table_ii_render_pins_and_complete_row_migration(tmp_path: Path) -> None
         }
     assert len(assemblages_by_sample) == 32
     assert all(len(assemblage_ids) == 1 for assemblage_ids in assemblages_by_sample.values())
+
+    method = next(
+        row
+        for row in document["species"]["SiO2"]["context"]
+        if row["observation_id"] == "chen22_table_ii_experimental_method"
+    )
+    method_values = method["values"]
+    assert method_values["log10_P_O2_atm_as_published"] == -0.6778
+    assert method_values["log10_P_O2_locator"]["pdf_page_index"] == 3
+    assert method_values["total_pressure_atm_as_published"] == 1
+    assert method_values["total_pressure_text_as_published"] == "P = 1 atm"
+    assert method_values["total_pressure_locator"]["pdf_page_index"] == 9
+
+    table_i = next(
+        row
+        for row in document["species"]["SiO2"]["context"]
+        if row["observation_id"] == "chen22_table_i_reagent_purities"
+    )
+    assert table_i["locator"]["published_page"] == 677
+    assert table_i["locator"]["pdf_page_index"] == 1
+    assert [
+        (row["oxide"], row["purity"], row["supplier"], row["location"])
+        for row in table_i["values"]["materials"]
+    ] == [
+        ("SiO2", 99.995, "Alfa Aesar", "Kandel"),
+        ("MgO", 99.95, "Alfa Aesar", "Karlsruhe"),
+        ("TiO2", 99.8, "Sigma-Aldrich", "Steinheim"),
+    ]
