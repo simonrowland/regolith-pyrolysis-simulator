@@ -3131,7 +3131,11 @@ def test_live_paths_do_not_call_intrinsic_heuristic(
     register_synthetic_gate_curve_producer(sim)
     sim._freeze_gate_liquid_fraction_cache = {
         "key": key,
-        **write_gate_curve_memo_record(sim, curve),
+        **write_gate_curve_memo_record(
+            sim,
+            curve,
+            provider_outcome="produced",
+        ),
     }
 
     assert sim._freeze_gate_curve()["source"] == curve_source

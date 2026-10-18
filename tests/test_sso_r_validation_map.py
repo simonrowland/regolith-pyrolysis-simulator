@@ -412,7 +412,11 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
                 'liquidus_T_C': 1700.0,
                 'path': ((1000.0, 0.0), (1700.0, 1.0)),
             }
-            return write_gate_curve_memo_record(self, curve)
+            return write_gate_curve_memo_record(
+                self,
+                curve,
+                provider_outcome="produced",
+            )
         curve_calls += 1
         if curve_calls == 1:
             raise ProviderUnavailableError('validation row pin failure')
@@ -422,7 +426,11 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
             'liquidus_T_C': 1700.0,
             'path': ((1000.0, 0.0), (1700.0, 1.0)),
         }
-        return write_gate_curve_memo_record(self, curve)
+        return write_gate_curve_memo_record(
+            self,
+            curve,
+            provider_outcome="produced",
+        )
 
     def record_establish(self):
         nonlocal pin_window
