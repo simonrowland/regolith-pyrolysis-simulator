@@ -1,0 +1,402 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2018-spinel-solid-solutions-eg
+source:
+  citation: >-
+    Shornikov, S. I. (2018), “Investigation of thermodynamic properties of spinel
+    solid solutions by Knudsen effusion mass-spectrometric method,” Experiment
+    in Geosciences, 24(1), 120–123.
+  year: 2018
+  corpus_asset: raw/shornikov-2018-spinel-solid-solutions-eg/shornikov-2018-spinel-solid-solutions-eg.pdf
+  corpus_sha256: 9545178cd03865e60c947714568601c2b92f90669940933cc41e588a495565bf
+extraction:
+  method: >-
+    Compared against the overlapping RJPC 2018 extract and retained only the EG
+    version's unshared printed thermodynamic context. The sole MinerU table is
+    the preceding amphibole abstract on PDF page 1 and is outside this article;
+    the EG article itself has no tables. Figures are metadata-only and were not
+    digitised. Shared findings point to the RJPC observation ids.
+  date: '2026-10-18'
+  worker: w4c-1018
+review_status: draft
+experiments: []
+species:
+  MgAl2O4:
+    observations: []
+    context:
+      - observation_id: shornikov_2018_eg_prior_spinel_evaporation_range
+        type: literature_context
+        locator:
+          page: 121
+          published_page: 121
+          pdf_page_index: 1
+          section: Introduction
+        units: as printed
+        values:
+          quantity: prior_spinel_evaporation_temperature_range
+          method_class: quoted_attributed
+          admission_status: context_only
+          temperature_range_as_printed: 1850–2250 K
+          phase_as_printed: MgAl2O4 spinel
+          statement_as_printed: >-
+            Earlier, the evaporation of MgAl2O4 spinel was studied by Knudsen
+            mass spectrometry effusion method at 1850–2250 K. In addition to
+            the listed components of the gas phase, a complex MgAlO gaseous
+            oxide was found in a small amount (Shornikov, 2017a).
+          attribution: Shornikov, 2017a
+      - observation_id: shornikov_2018_eg_prior_stoichiometric_spinel_thermodynamics
+        type: thermodynamic_example
+        locator:
+          page: 121
+          published_page: 121
+          pdf_page_index: 1
+          section: Introduction
+        units: as printed
+        values:
+          quantity: prior_stoichiometric_spinel_thermodynamic_context
+          method_class: quoted_unattributed
+          admission_status: context_only
+          phase_as_printed: MgAl2O4 stoichiometric spinel
+          temperature_range_as_printed: 1851–2298 K
+          statement_as_printed: >-
+            The values of the oxide activities and the Gibbs energy of MgAl2O4
+            stoichiometric spinel were determined at 1851–2298 K. The sentence
+            does not identify an attribution for the following formation
+            enthalpy and entropy values.
+      - observation_id: shornikov_2018_eg_spinel_formation_from_oxides_context
+        type: thermodynamic_example
+        locator:
+          page: 121
+          published_page: 121
+          pdf_page_index: 1
+          section: Introduction
+        units: as printed
+        values:
+          quantity: spinel_formation_from_simple_oxides_context
+          method_class: quoted_unattributed
+          admission_status: context_only
+          reaction_as_printed: spinel formation (from simple oxides)
+          balanced_reaction_as_printed: unavailable
+          balanced_reaction_unavailable_reason: >-
+            The prose names formation from simple oxides but prints no balanced
+            formation equation with these two values.
+          phase_as_printed: MgAl2O4 stoichiometric spinel
+          enthalpy_as_printed: –12.02±1.14 kJ/mole
+          entropy_as_printed: 5.03±0.56 J/(mole·K)
+          statement_as_printed: >-
+            The enthalpy and entropy of spinel formation (from simple oxides)
+            were equal to –12.02±1.14 kJ/mole and 5.03±0.56 J/(mole·K),
+            respectively.
+      - observation_id: shornikov_2018_eg_spinel_melting_enthalpy_context
+        type: thermodynamic_example
+        locator:
+          page: 121
+          published_page: 121
+          pdf_page_index: 1
+          section: Introduction
+        units: as printed
+        values:
+          quantity: spinel_melting_enthalpy_context
+          method_class: quoted_attributed
+          admission_status: context_only
+          phase_as_printed: MgAl2O4 spinel
+          enthalpy_as_printed: 55.81±4.62 kJ/mole
+          attribution: Shornikov, 2017b
+          statement_as_printed: >-
+            The melting enthalpy of spinel was equal to 55.81±4.62 kJ/mole
+            (Shornikov, 2017b).
+      - observation_id: shornikov_2018_eg_shared_findings_rjpc_cross_reference
+        type: literature_context
+        locator:
+          page: 121
+          published_page: 121
+          pdf_page_index: 1
+          section: Experimental
+        units: as printed
+        values:
+          quantity: overlapping_publication_cross_reference
+          method_class: quoted_unattributed
+          admission_status: context_only
+          related_source_id: shornikov-2018-spinel-solid-solutions
+          referenced_observation_ids:
+            - shornikov_2018_phase_boundary_points
+            - shornikov_2018_discussion_qualifications
+            - shornikov_2018_t1_p_mg
+            - shornikov_2018_t1_p_mgo
+            - shornikov_2018_t1_p_al
+            - shornikov_2018_t1_p_alo
+            - shornikov_2018_t1_p_al2o
+            - shornikov_2018_t1_p_o
+            - shornikov_2018_t1_p_o2
+            - shornikov_2018_t1_p_mgalo
+            - shornikov_2018_t3_amgo_eq27
+            - shornikov_2018_t3_amgo_eq41
+            - shornikov_2018_t3_aal2o3_eq28
+            - shornikov_2018_t3_aal2o3_eq29
+            - shornikov_2018_t3_aal2o3_eq42
+            - shornikov_2018_figure1_only
+            - shornikov_2018_instrument_temperature_capacity
+          shared_findings_as_printed:
+            - >-
+              The three boundary compositions in the EG text match the values
+              already stored in shornikov_2018_phase_boundary_points.
+            - >-
+              Figure 2's 2100 K pressure series and Figure 3's 2100 K activity
+              series overlap the RJPC table observations listed above.
+            - >-
+              The qualitative report of a slight negative deviation from
+              ideality is already represented by
+              shornikov_2018_discussion_qualifications.
+            - >-
+              The earlier Navrotsky activity discussion and the ion-source
+              temperature capability are already represented in the
+              referenced RJPC contexts.
+          discrepancy: none found in the shared boundary values or findings checked
+      - observation_id: shornikov_2018_eg_fig1_phase_diagram
+        type: thermodynamic_example
+        locator:
+          page: 120
+          published_page: 120
+          pdf_page_index: 0
+          section: Figure 1 caption
+        units: as printed
+        values:
+          quantity: phase_diagram_as_plotted
+          method_class: figure_only
+          digitised: false
+          digitisation: deferred to a figure pass
+          identity:
+            species_as_printed: MgO, Al2O3, MgAl2O4, liquid
+            phase_and_temperature_as_printed: >-
+              MgO–Al2O3 system; solid and liquid fields; temperature axis
+              1200–3200 K
+          axes_as_printed:
+            x: Al2O3, mole %
+            y: T, K
+          panels:
+            - panel: main
+              phase: MgO–Al2O3 phase diagram
+              temperature_as_printed: 1200–3200 K axis
+              species:
+                - {series: '1', identity: MgO (solid solution) field, marker_count: 0}
+                - {series: '2', identity: MgO + liquid field, marker_count: 0}
+                - {series: '3', identity: MgO (solid solution) + MgAl2O4 field, marker_count: 0}
+                - {series: '4', identity: MgAl2O4 (solid solution) field, marker_count: 0}
+                - {series: '5', identity: MgAl2O4 + liquid field, marker_count: 0}
+                - {series: '6', identity: MgAl2O4 + liquid field, marker_count: 0}
+                - {series: '7', identity: MgAl2O4 + Al2O3 field, marker_count: 0}
+                - {series: '8', identity: Al2O3 + liquid field, marker_count: 0}
+                - {series: '9', identity: liquid field, marker_count: 0}
+                - series: present-study boundary symbols
+                  identity: phase 4 and 7 boundary positions
+                  marker_count: 5
+                  marker_count_note: estimated from the 600 dpi render
+          attribution_as_printed: >-
+            MgO–Al2O3 phase diagram adopted from Berezhnoi (1970) and Ronchi &
+            Sheindlin (2001); boundary symbols defined in the present study.
+          caption_as_printed: >-
+            Fig. 1. The phase diagram of the MgO–Al2O3 system: 1 – MgO (solid
+            solution); 2 – MgO + liquid; 3 – MgO (solid solution) + MgAl2O4; 4
+            – MgAl2O4 (solid solution); 5 и 6 – MgAl2O4 + liquid; 7 – MgAl2O4
+            + Al2O3; 8 – Al2O3 + liquid; 9 – liquid. The symbol positions on
+            the boundary of phases of 4 and 7 were defined by the Knudsen
+            effusion mass-spectrometric method at present study.
+      - observation_id: shornikov_2018_eg_fig2_partial_pressures
+        type: thermodynamic_example
+        locator:
+          page: 121
+          published_page: 121
+          pdf_page_index: 1
+          section: Figure 2 caption
+        units: as printed
+        values:
+          quantity: partial_pressures_as_plotted
+          method_class: figure_only
+          digitised: false
+          digitisation: deferred to a figure pass
+          identity:
+            species_as_printed: Mg, MgO, Al, AlO, Al2O, O, O2, MgAlO
+            phase_and_temperature_as_printed: gas over spinel solid solutions at 2100 K
+          axes_as_printed:
+            x: Al2O3, mole %
+            y: log p_i, atm
+          panels:
+            - panel: main
+              phase: gas
+              temperature_as_printed: 2100 K
+              species:
+                - {series: '1', identity: Mg, marker_count: 12}
+                - {series: '2', identity: MgO, marker_count: 12}
+                - {series: '3', identity: Al, marker_count: 12}
+                - {series: '4', identity: AlO, marker_count: 12}
+                - {series: '5', identity: Al2O, marker_count: 12}
+                - {series: '6', identity: O, marker_count: 12}
+                - {series: '7', identity: O2, marker_count: 12}
+                - {series: '8', identity: MgAlO, marker_count: 12}
+          marker_count_note: counted from the 600 dpi render
+          attribution_as_printed: Shornikov (2018), this paper
+          caption_as_printed: >-
+            Fig. 2. The partial pressure values of vapor species over spinel
+            solid solutions at 2100 K. Table of symbols: 1 – Mg; 2 – MgO; 3 –
+            Al; 4 – AlO; 5 – Al2O; 6 – O; 7 – O2; 8 – MgAlO.
+      - observation_id: shornikov_2018_eg_fig3_activities
+        type: thermodynamic_example
+        locator:
+          page: 122
+          published_page: 122
+          pdf_page_index: 2
+          section: Figure 3 caption
+        units: as printed
+        values:
+          quantity: oxide_activities_as_plotted
+          method_class: figure_only
+          digitised: false
+          digitisation: deferred to a figure pass
+          identity:
+            species_as_printed: MgO and Al2O3
+            phase_and_temperature_as_printed: >-
+              spinel solid solutions; temperatures listed by series in caption
+          axes_as_printed:
+            x: Al2O3, mole %
+            y_panel_a: a_MgO
+            y_panel_b: a_Al2O3
+          marker_count_note: >-
+            Estimated from the 600 dpi render; overlapping symbols may merge.
+          panels:
+            - panel: a
+              phase: spinel solid solutions
+              species:
+                - series: '1'
+                  identity: Fujii et al. (2000), 1800 K, filled downward triangle
+                  marker_count: 8
+                - series: '2'
+                  identity: Fujii et al. (2000), 1877 K, open upward triangle
+                  marker_count: 7
+                - series: '3'
+                  identity: Sasamoto et al. (1981), 2073 K, filled left triangle
+                  marker_count: 3
+                - series: '4'
+                  identity: Sasamoto et al. (1981), 2173 K, open right triangle
+                  marker_count: 3
+                - series: '5'
+                  identity: present study, 2000 K
+                  marker_count: 7
+                - series: '6'
+                  identity: present study, 2100 K
+                  marker_count: 13
+                - series: '7'
+                  identity: present study, 2200 K
+                  marker_count: 15
+            - panel: b
+              phase: spinel solid solutions
+              species:
+                - series: '1'
+                  identity: Fujii et al. (2000), 1800 K, filled downward triangle
+                  marker_count: 6
+                - series: '2'
+                  identity: Fujii et al. (2000), 1877 K, open upward triangle
+                  marker_count: 5
+                - series: '3'
+                  identity: Sasamoto et al. (1981), 2073 K, filled left triangle
+                  marker_count: 3
+                - series: '4'
+                  identity: Sasamoto et al. (1981), 2173 K, open right triangle
+                  marker_count: 3
+                - series: '5'
+                  identity: present study, 2000 K
+                  marker_count: 9
+                - series: '6'
+                  identity: present study, 2100 K
+                  marker_count: 11
+                - series: '7'
+                  identity: present study, 2200 K
+                  marker_count: 14
+                - series: '8'
+                  identity: Navrotsky et al. (1986), 1723 K
+                  marker_count: 1
+                - series: '9'
+                  identity: Navrotsky et al. (1986), 1750 K
+                  marker_count: 1
+                - series: '10'
+                  identity: Navrotsky et al. (1986), 1800 K
+                  marker_count: 1
+                - series: '11'
+                  identity: Navrotsky et al. (1986), 1850 K
+                  marker_count: 1
+                - series: '12'
+                  identity: Navrotsky et al. (1986), 1900 K
+                  marker_count: 1
+                - series: '13'
+                  identity: Navrotsky et al. (1986), 1923 K
+                  marker_count: 1
+                - series: '14'
+                  identity: Navrotsky et al. (1986), 2073 K
+                  marker_count: 1
+                - series: '15'
+                  identity: Navrotsky et al. (1986), 2173 K
+                  marker_count: 1
+          attribution_as_printed: >-
+            Fujii et al. (2000); Sasamoto et al. (1981); Navrotsky et al.
+            (1986); present study.
+          caption_as_printed: >-
+            Fig. 3. Activities of MgO (a) and Al2O3 (b) in the spinel solid
+            solutions determined: 1 and 2 – in the heterogeneous equilibrium
+            study at 1800 and 1877 K (Fujii et al., 2000); 3–7 – by the
+            Knudsen effusion mass-spectrometric method at 2073 and 2173 K
+            (Sasamoto et al., 1981), as well as at 2000, 2100 and 2200 K at
+            present study, respectively; 8–15 – calculated by Navrotsky et al.
+            (Navrotsky et al., 1986) at 1723, 1750, 1800, 1850, 1900, 1923,
+            2073 and 2173 K, respectively.
+      - observation_id: shornikov_2018_eg_fig4_thermodynamic_functions
+        type: thermodynamic_example
+        locator:
+          page: 123
+          published_page: 123
+          pdf_page_index: 3
+          section: Figure 4 caption
+        units: as printed
+        values:
+          quantity: thermodynamic_functions_as_plotted
+          method_class: figure_only
+          digitised: false
+          digitisation: deferred to a figure pass
+          identity:
+            species_as_printed: MgO, Al2O3, integral thermodynamic characteristics
+            phase_and_temperature_as_printed: spinel solid solutions at 2100 K
+          axes_as_printed:
+            x: Al2O3, mole %
+            y_panel_a: Δμ_i, ΔG_2100°, kJ/mole
+            y_panel_b: ΔH_i, ΔH_T, 2100°, kJ/mole
+            y_panel_c: ΔS_i, ΔS_T, 2100°, J/(mole·K)
+          panels:
+            - panel: a
+              phase: spinel solid solutions
+              temperature_as_printed: 2100 K
+              species:
+                - {series: '1', identity: MgO, marker_count: 12}
+                - {series: '2', identity: Al2O3, marker_count: 12}
+                - {series: '3', identity: integral Gibbs energy of formation, marker_count: 12}
+            - panel: b
+              phase: spinel solid solutions
+              temperature_as_printed: 2100 K
+              species:
+                - {series: '1', identity: MgO, marker_count: 12}
+                - {series: '2', identity: Al2O3, marker_count: 12}
+                - {series: '3', identity: integral enthalpy of formation, marker_count: 12}
+            - panel: c
+              phase: spinel solid solutions
+              temperature_as_printed: 2100 K
+              species:
+                - {series: '1', identity: MgO, marker_count: 12}
+                - {series: '2', identity: Al2O3, marker_count: 12}
+                - {series: '3', identity: integral entropy of formation, marker_count: 12}
+          marker_count_note: counted from the 600 dpi render
+          attribution_as_printed: Shornikov (2018), this paper
+          caption_as_printed: >-
+            Fig. 4. The oxide chemical potentials and the Gibbs energy (a), the
+            oxide partial enthalpies and the enthalpy of melt formation (b)
+            and the oxide partial entropies and the entropy of melt formation
+            (c) of spinel solid solutions at 2100 K. Table of symbols: 1 –
+            MgO, 2 – Al2O3, 3 – integral thermodynamic characteristics (Gibbs
+            energy, enthalpy and entropy of formation of spinel solid
+            solutions, respectively). The vertical dashed lines indicate the
+            boundaries of the spinel solid solutions.
