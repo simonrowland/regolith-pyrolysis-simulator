@@ -346,6 +346,29 @@ species:
                     row: '6'
                     note: Total pressure during the activity measurement is not reported.
     context:
+      - observation_id: arutyunyan_2005_sample_preparation_vacuum
+        type: sample_preparation
+        locator:
+          published_page: 389
+          pdf_page_index: 0
+          section: Experimental Procedure
+        units: Pa
+        values:
+          quantity_as_printed: vacuum during melting in closed molybdenum crucibles
+          sample_preparation_pressure_Pa:
+            state:
+              tag: value
+              value:
+                kind: bound
+                bound_operator: '<='
+                bound_value: '0.0001'
+            locator:
+              published_page: 389
+              pdf_page_index: 0
+              section: Experimental Procedure
+          vacuum_as_printed: not worse than 10^-4 Pa
+          crucible_as_printed: closed molybdenum crucibles
+          note: Sample synthesis condition; not the KEMS measurement pressure.
       - observation_id: arutyunyan_2005_table1_ion_ratio_fits
         type: thermodynamic_example
         locator:

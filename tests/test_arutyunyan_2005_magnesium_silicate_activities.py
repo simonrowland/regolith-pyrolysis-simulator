@@ -60,6 +60,18 @@ def test_arutyunyan_2005_table_values_match_600_dpi_render_pins() -> None:
         "4.680 ± 0.040",
         "5.164 ± 0.040",
     ]
+    preparation = next(
+        row
+        for row in document["species"]["MgO"]["context"]
+        if row["observation_id"] == "arutyunyan_2005_sample_preparation_vacuum"
+    )
+    preparation_pressure = preparation["values"]["sample_preparation_pressure_Pa"]
+    assert preparation_pressure["state"]["value"] == {
+        "kind": "bound",
+        "bound_operator": "<=",
+        "bound_value": "0.0001",
+    }
+    assert preparation["values"]["vacuum_as_printed"] == "not worse than 10^-4 Pa"
     repeatability = next(
         row
         for row in document["species"]["MgO"]["context"]
@@ -86,6 +98,8 @@ def test_arutyunyan_2005_migration_preserves_each_activity_condition() -> None:
             assert conditions[key].locator is not None
             assert conditions[key].locator.published_page == 391
             assert conditions[key].locator.table == "2"
+        assert conditions["total_pressure_Pa"].state.is_unknown
+        assert conditions["total_pressure_Pa"].state.reason == "not_published"
         temperature = conditions["temperature_K"]
         assert temperature.state.is_value
         assert temperature.state.value == Decimal("1873")
