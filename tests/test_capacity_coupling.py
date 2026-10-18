@@ -1999,3 +1999,110 @@ def test_overhead_model_leaves_provider_partition_mirrors_unset(
     assert gas.O2_vented_kg_hr == 0.0
     assert gas.turbine_flow_kg_hr == 0.0
     assert gas.melt_offgas_O2_mol_hr == pytest.approx(1.0 / M_O2)
+
+
+def test_mixture_zero_peq_companion_uses_downstream_partial():
+    P_down = 50.0
+    fast = mixture_surface_partials_Pa(
+        P_eq_Pa={"Fe": 10.0, "Na": 0.0},
+        H_mol_s_Pa={"Fe": 0.001, "Na": 0.002},
+        G_mol_s_Pa2=0.002,
+        P_downstream_Pa=P_down,
+    )
+    coupled = mixture_surface_partials_Pa(
+        P_eq_Pa={"Fe": 10.0, "Na": 0.0, "SiO": 1.2},
+        H_mol_s_Pa={"Fe": 0.001, "Na": 0.002, "SiO": 0.0008},
+        G_mol_s_Pa2=0.002,
+        P_downstream_Pa=P_down,
+    )
+    assert fast["Na"] == pytest.approx(P_down)
+    assert coupled["Na"] == pytest.approx(P_down)
+
+
+def test_mixture_carrier_limits_recover_vacuum_and_dilute_fill():
+    P_eq = {"Fe": 9.0, "Na": 25.0}
+    H = {"Fe": 0.001, "Na": 0.002}
+    G = 0.002
+    vacuum = mixture_surface_partials_Pa(
+        P_eq_Pa=P_eq, H_mol_s_Pa=H, G_mol_s_Pa2=G,
+    )
+    recovered = mixture_surface_partials_Pa(
+        P_eq_Pa=P_eq,
+        H_mol_s_Pa=H,
+        G_mol_s_Pa2=G,
+        extra_partials_Pa={"N2": 0.0},
+        P_carrier_Pa=0.0,
+    )
+    assert recovered == pytest.approx(vacuum, rel=1.0e-8, abs=1.0e-10)
+
+    P_carrier = 1.0e6
+    dilute = mixture_surface_partials_Pa(
+        P_eq_Pa=P_eq,
+        H_mol_s_Pa=H,
+        G_mol_s_Pa2=G,
+        extra_partials_Pa={"N2": P_carrier},
+    )
+    for species in P_eq:
+        expected = H[species] * P_eq[species] / (
+            H[species] + G * P_carrier
+        )
+        assert dilute[species] == pytest.approx(expected, rel=1.0e-4)
+        assert dilute[species] < vacuum[species]
+
+
+def test_bracketed_root_missed_bracket_is_typed_refusal():
+    with pytest.raises(CapacityCouplingRefusalError) as caught:
+        capacity_coupling._bracketed_root(
+            lambda _pressure: 1.0,
+            0.0,
+            1.0,
+            1.0,
+            1.0,
+            rel_tol=1.0e-9,
+            abs_tol=1.0e-12,
+            max_iterations=80,
+        )
+    assert caught.value.refusal.reason == "source_duct_bracket_missed"
+    assert caught.value.refusal.authoritative is False
+
+
+def test_bracketed_root_iteration_cap_is_typed_refusal():
+    calls = {"n": 0}
+
+    def residual(pressure):
+        calls["n"] += 1
+        return -1.0 if pressure < 0.5 else 1.0
+
+    with pytest.raises(CapacityCouplingRefusalError) as caught:
+        capacity_coupling._bracketed_root(
+            residual,
+            0.0,
+            1.0,
+            residual(0.0),
+            residual(1.0),
+            rel_tol=0.0,
+            abs_tol=0.0,
+            max_iterations=4,
+        )
+    assert caught.value.refusal.reason == "source_duct_root_non_convergence"
+    assert caught.value.refusal.iterations == 4
+
+
+def test_source_duct_h_refine_exhaustion_is_typed_refusal():
+    P_eq = 10.0
+    mass = 0.055845
+
+    def flux_at_partials(partials):
+        pressure = float(partials.get("Fe", 0.0))
+        return {"Fe": 1.0 + 10.0 * pressure}
+
+    result = solve_source_duct_closure(
+        P_eq_Pa={"Fe": P_eq},
+        flux_kg_hr_at_partials=flux_at_partials,
+        molar_mass_kg_mol={"Fe": mass},
+        G_mol_s_Pa2=0.002,
+        capacity=NoColdTrain(),
+    )
+    assert isinstance(result, CapacityShadowRefusal)
+    assert result.reason == "source_duct_h_refine_non_convergence"
+    assert result.authoritative is False

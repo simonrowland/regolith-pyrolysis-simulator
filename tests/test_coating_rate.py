@@ -13,6 +13,7 @@ def test_wall_lifespan_uses_net_signed_substrate_deposition():
 import copy
 import hashlib
 import json
+import math
 
 import pytest
 
@@ -753,6 +754,15 @@ def _capture_live_evaporation_controls(simulator):
                     "molar_mass_kg_mol": dict(
                         control_inputs.get("molar_mass_kg_mol") or {}
                     ),
+                    "overhead_pressure_pa": float(
+                        control_inputs.get("overhead_pressure_pa") or 0.0
+                    ),
+                    "commanded_pressure_pa": float(
+                        control_inputs.get("commanded_pressure_pa") or 0.0
+                    ),
+                    "carrier_gas": str(
+                        control_inputs.get("carrier_gas") or ""
+                    ),
                 }
             )
         return result
@@ -787,6 +797,9 @@ def test_c2a_1600c_six_hour_source_duct_closure_is_same_tick() -> None:
             "P_eq_Pa": {},
             "P_bulk_Pa": {},
             "molar_mass_kg_mol": {},
+            "overhead_pressure_pa": 0.0,
+            "commanded_pressure_pa": 0.0,
+            "carrier_gas": "",
         }
         hours.append(
             {
@@ -794,6 +807,14 @@ def test_c2a_1600c_six_hour_source_duct_closure_is_same_tick() -> None:
                 "P_eq_Pa": live["P_eq_Pa"],
                 "P_bulk_Pa": live["P_bulk_Pa"],
                 "molar_mass_kg_mol": live["molar_mass_kg_mol"],
+                "overhead_pressure_pa": float(live.get("overhead_pressure_pa") or 0.0),
+                "commanded_pressure_pa": float(
+                    live.get("commanded_pressure_pa") or 0.0
+                ),
+                "carrier_gas": str(live.get("carrier_gas") or ""),
+                "P_down_Pa": (
+                    simulator._headspace_downstream_pressure_bar() * 1.0e5
+                ),
                 "silent_zero_notes": list(
                     getattr(simulator, "_silent_zero_notes", []) or []
                 ),
@@ -811,16 +832,27 @@ def test_c2a_1600c_six_hour_source_duct_closure_is_same_tick() -> None:
                 f"but committed flux is {flux_kg_hr} kg/h"
             )
 
+    hour1_total = float(hour1["overhead_pressure_pa"])
+    hour1_command = float(hour1["commanded_pressure_pa"])
+    hour1_vapour = sum(
+        max(0.0, float(hour1["P_bulk_Pa"].get(species, 0.0)))
+        for species in hour1["P_eq_Pa"]
+        if float(hour1["P_eq_Pa"].get(species, 0.0)) > 0.0
+    )
+    assert hour1_command > 0.0
+    assert hour1_total >= 0.5 * hour1_command, (
+        f"hour-1 film total {hour1_total} Pa dropped the regulator fill "
+        f"(command {hour1_command} Pa, vapour sum {hour1_vapour} Pa)"
+    )
+    assert hour1_total >= hour1_vapour - 1.0e-9
+
+    from simulator.condensation import _knudsen_number
+    from simulator.transport_regime import classify_knudsen_regime
+
     G = _pipe_molar_G_mol_s_Pa2(simulator)
-    configured_downstream = simulator._overhead_headspace_config.get(
-        "downstream_pressure_bar"
-    )
-    P_down_Pa = (
-        0.0
-        if configured_downstream is None
-        else max(0.0, float(configured_downstream) * 1.0e5)
-    )
     registry = simulator.species_formula_registry
+    pipe_diameter_m = float(simulator.overhead_model.pipe_diameter_m)
+    temperature_K = float(simulator.melt.temperature_C) + 273.15
 
     for hour_index, hour in enumerate(hours, start=1):
         priced = [
@@ -838,6 +870,17 @@ def test_c2a_1600c_six_hour_source_duct_closure_is_same_tick() -> None:
             }
             and note.get("species")
         }
+        P_down_Pa = float(hour["P_down_Pa"])
+        total_P = float(hour["overhead_pressure_pa"])
+        kn = _knudsen_number(
+            total_P,
+            temperature_K,
+            pipe_diameter_m,
+            carrier_gas=hour["carrier_gas"] or "N2",
+        )
+        hour["knudsen_number"] = kn
+        hour["knudsen_regime"] = classify_knudsen_regime(kn).value
+        assert math.isfinite(kn) and kn >= 0.0
         for species in priced:
             P_eq = float(hour["P_eq_Pa"][species])
             p_surface = float(hour["P_bulk_Pa"].get(species, 0.0))
@@ -866,10 +909,6 @@ def test_c2a_1600c_six_hour_source_duct_closure_is_same_tick() -> None:
                     species, registry
                 ).molar_mass_kg_per_mol()
             q_source = flux_kg_hr / float(molar_mass) / 3600.0
-            total_P = sum(
-                max(0.0, float(hour["P_bulk_Pa"].get(name, 0.0)))
-                for name in priced
-            )
             if total_P <= 0.0:
                 q_duct = 0.0
             elif P_down_Pa <= 0.0:
@@ -884,7 +923,8 @@ def test_c2a_1600c_six_hour_source_duct_closure_is_same_tick() -> None:
                 SOURCE_DUCT_FLUX_REL_TOL * scale,
             ), (
                 f"hour {hour_index} {species}: q_source={q_source} mol/s "
-                f"q_duct={q_duct} mol/s p={p_surface} Pa P_eq={P_eq} Pa"
+                f"q_duct={q_duct} mol/s p={p_surface} Pa P_eq={P_eq} Pa "
+                f"P={total_P} Pa P_down={P_down_Pa} Pa Kn={kn}"
             )
 
     for species in _PRICED_PROBE_SPECIES:
@@ -921,6 +961,39 @@ def test_c2a_1600c_six_hour_source_duct_closure_is_same_tick() -> None:
                 f"{species} flux alternates {fluxes} kg/h while P_eq stays "
                 f"{equilibria} Pa"
             )
+
+
+def test_empty_source_duct_map_installs_carrier_only_not_inversion() -> None:
+    from simulator.capacity_coupling import (
+        CapacityShadowResult,
+        OxygenShadowPartition,
+        SaturationShadow,
+    )
+    from simulator.thermal_train import NoColdTrain
+
+    run = _c2a_1600_live_run()
+    session = run._start_session()
+    simulator = session.simulator
+    run._apply_sio_pre_run_controls(simulator)
+    empty = CapacityShadowResult(
+        capacity=NoColdTrain(),
+        partial_pressures_Pa={},
+        evaporation_flux_kg_hr={},
+        bled_species_mol={},
+        terminal_offgas_mol={},
+        oxygen=OxygenShadowPartition(0.0, 0.0, 0.0, 0.0, 0.0),
+        saturation=SaturationShadow(0.0, None, 0.0, "pipe"),
+        iterations=0,
+        max_delta_history_Pa=(),
+        mass_closure_error_pct=0.0,
+    )
+    simulator._install_source_duct_surface(empty)
+    installed = dict(simulator._melt_headspace_composition_mbar or {})
+    assert installed
+    assert "Fe" not in installed
+    assert sum(installed.values()) == pytest.approx(
+        float(simulator.melt.p_total_mbar), rel=1.0e-6, abs=1.0e-9
+    )
 
 
 def test_evaporation_flux_overhead_pressure_is_projection_not_command() -> None:
