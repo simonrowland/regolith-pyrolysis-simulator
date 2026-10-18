@@ -1,0 +1,2372 @@
+schema_version: literature_extract.v1
+source_id: cottrell-2009-iron-xanes
+source:
+  citation: Cottrell, E., Kelley, K. A., Lanzirotti, A., and Fischer, R. A. (2009). High-precision determination of iron oxidation state in silicate glasses using XANES. Chemical Geology 268, 167-179.
+  doi: 10.1016/j.chemgeo.2009.08.008
+  url: https://doi.org/10.1016/j.chemgeo.2009.08.008
+  version: null
+  year: 2009
+extraction:
+  method: Manual transcription of Tables 1-3 from rendered publisher PDF pages, with table-row locators and numeric cells checked against the page renders.
+  date: '2026-10-16'
+  worker: rdxw2b-fe09
+  provenance_path: data/literature/extracts/cottrell-2009-iron-xanes.yaml
+review_status: draft
+fidelity_samples:
+  - species: Fe
+    observation_id: cottrell_2009_basalt_mossbauer
+    field: Fe3_over_FeT
+    index: 3
+    value: '0.088'
+    locator:
+      page: 6
+      table: '2'
+      published_page: '172'
+      row: 'LW_− 20'
+  - species: Fe
+    observation_id: cottrell_2009_basalt_mossbauer
+    field: cross_session_drift_corrected_centroid_eV
+    index: 3
+    value: '7112.112'
+    locator:
+      page: 6
+      table: '2'
+      published_page: '172'
+      row: 'LW_− 20'
+  - path: species.Fe.observations[cottrell_2009_basalt_centroid_calibration].values.fit.centroid_a_as_published
+    value: '22.99081'
+    locator:
+      page: 9
+      table: '3'
+      published_page: '175'
+      row: Basalt centroid fit
+source_material_compositions:
+  LW:
+    source_as_published: 'Hawaiite LW-QL2'
+    values_as_published:
+      SiO2: '49.42'
+      TiO2: '1.94'
+      Al2O3: '17.21'
+      FeOTOT: '10.17'
+      MgO: '6.13'
+      CaO: '8.78'
+      Na2O: '3.17'
+      K2O: '1.50'
+      P2O5: '1.12'
+    composition_condition: &composition_LW
+      state:
+        tag: value
+        value:
+          SiO2: '49.42'
+          TiO2: '1.94'
+          Al2O3: '17.21'
+          FeOTOT: '10.17'
+          MgO: '6.13'
+          CaO: '8.78'
+          Na2O: '3.17'
+          K2O: '1.50'
+          P2O5: '1.12'
+      locator: &table1_LW
+        page: 2
+        table: '1'
+        published_page: '168'
+        column: 'LW'
+        note: Table 1 chemical composition in oxide weight percent.
+    uncertainty_as_published:
+      SiO2: '0.69'
+      TiO2: '0.07'
+      Al2O3: '0.49'
+      FeOTOT: '0.50'
+      MgO: '0.19'
+      CaO: '0.07'
+      Na2O: '0.02'
+      K2O: '0.04'
+      P2O5: '0.19'
+    composition_uncertainty_condition: &uncertainty_LW
+      state:
+        tag: value
+        value:
+          SiO2: '0.69'
+          TiO2: '0.07'
+          Al2O3: '0.49'
+          FeOTOT: '0.50'
+          MgO: '0.19'
+          CaO: '0.07'
+          Na2O: '0.02'
+          K2O: '0.04'
+          P2O5: '0.19'
+      locator: *table1_LW
+    total_wt_pct_as_published: '99.35'
+    total_sigma_as_published: '0.61'
+    total_condition: &total_LW
+      state:
+        tag: value
+        value: '99.35'
+      locator: *table1_LW
+  AII:
+    source_as_published: 'MORB AII-92-29-1'
+    values_as_published:
+      SiO2: '50.81'
+      TiO2: '1.73'
+      Al2O3: '16.14'
+      FeOTOT: '9.53'
+      MgO: '7.40'
+      CaO: '11.20'
+      Na2O: '2.75'
+      K2O: '0.15'
+      P2O5: '0.14'
+    composition_condition: &composition_AII
+      state:
+        tag: value
+        value:
+          SiO2: '50.81'
+          TiO2: '1.73'
+          Al2O3: '16.14'
+          FeOTOT: '9.53'
+          MgO: '7.40'
+          CaO: '11.20'
+          Na2O: '2.75'
+          K2O: '0.15'
+          P2O5: '0.14'
+      locator: &table1_AII
+        page: 2
+        table: '1'
+        published_page: '168'
+        column: 'AII'
+        note: Table 1 chemical composition in oxide weight percent.
+    uncertainty_as_published:
+      SiO2: '0.60'
+      TiO2: '0.02'
+      Al2O3: '0.11'
+      FeOTOT: '0.60'
+      MgO: '0.06'
+      CaO: '0.12'
+      Na2O: '0.19'
+      K2O: '0.01'
+      P2O5: '0.02'
+    composition_uncertainty_condition: &uncertainty_AII
+      state:
+        tag: value
+        value:
+          SiO2: '0.60'
+          TiO2: '0.02'
+          Al2O3: '0.11'
+          FeOTOT: '0.60'
+          MgO: '0.06'
+          CaO: '0.12'
+          Na2O: '0.19'
+          K2O: '0.01'
+          P2O5: '0.02'
+      locator: *table1_AII
+    total_wt_pct_as_published: '100.05'
+    total_sigma_as_published: '0.51'
+    total_condition: &total_AII
+      state:
+        tag: value
+        value: '100.05'
+      locator: *table1_AII
+  VG568:
+    source_as_published: 'VG568'
+    values_as_published:
+      SiO2: '77.51'
+      TiO2: '0.07'
+      Al2O3: '12.52'
+      FeOTOT: '1.31'
+      MgO: '0.03'
+      CaO: '0.5'
+      Na2O: '3.11'
+      K2O: '4.57'
+      P2O5: '<0.01'
+    composition_condition: &composition_VG568
+      state:
+        tag: value
+        value:
+          SiO2: '77.51'
+          TiO2: '0.07'
+          Al2O3: '12.52'
+          FeOTOT: '1.31'
+          MgO: '0.03'
+          CaO: '0.5'
+          Na2O: '3.11'
+          K2O: '4.57'
+          P2O5: '<0.01'
+      locator: &table1_VG568
+        page: 2
+        table: '1'
+        published_page: '168'
+        column: 'VG568'
+        note: Table 1 chemical composition in oxide weight percent.
+    uncertainty_as_published:
+      SiO2: '0.63'
+      TiO2: '0.02'
+      Al2O3: '0.93'
+      FeOTOT: '0.13'
+      MgO: '0.01'
+      CaO: '0.05'
+      Na2O: '0.15'
+      K2O: '0.12'
+    composition_uncertainty_condition: &uncertainty_VG568
+      state:
+        tag: value
+        value:
+          SiO2: '0.63'
+          TiO2: '0.02'
+          Al2O3: '0.93'
+          FeOTOT: '0.13'
+          MgO: '0.01'
+          CaO: '0.05'
+          Na2O: '0.15'
+          K2O: '0.12'
+      locator: *table1_VG568
+    total_wt_pct_as_published: '99.65'
+    total_sigma_as_published: '0.72'
+    total_condition: &total_VG568
+      state:
+        tag: value
+        value: '99.65'
+      locator: *table1_VG568
+  DT_46:
+    source_as_published: 'NZC-4 DT_46'
+    values_as_published:
+      SiO2: '74.40'
+      TiO2: '0.25'
+      Al2O3: '10.10'
+      Fe2O3: '3.58'
+      FeO: '2.44'
+      MgO: '0.01'
+      CaO: '0.24'
+      Na2O: '4.57'
+      K2O: '4.48'
+    composition_condition: &composition_DT_46
+      state:
+        tag: value
+        value:
+          SiO2: '74.40'
+          TiO2: '0.25'
+          Al2O3: '10.10'
+          Fe2O3: '3.58'
+          FeO: '2.44'
+          MgO: '0.01'
+          CaO: '0.24'
+          Na2O: '4.57'
+          K2O: '4.48'
+      locator: &table1_DT_46
+        page: 2
+        table: '1'
+        published_page: '168'
+        column: 'DT_46'
+        note: Table 1 chemical composition in oxide weight percent.
+    total_wt_pct_as_published: '100.10'
+    total_condition: &total_DT_46
+      state:
+        tag: value
+        value: '100.10'
+      locator: *table1_DT_46
+  DT_39:
+    source_as_published: 'NZC-4 DT_39'
+    values_as_published:
+      SiO2: '73.10'
+      TiO2: '0.26'
+      Al2O3: '9.90'
+      Fe2O3: '1.99'
+      FeO: '3.89'
+      MgO: '0.01'
+      CaO: '0.24'
+      Na2O: '5.01'
+      K2O: '4.36'
+    composition_condition: &composition_DT_39
+      state:
+        tag: value
+        value:
+          SiO2: '73.10'
+          TiO2: '0.26'
+          Al2O3: '9.90'
+          Fe2O3: '1.99'
+          FeO: '3.89'
+          MgO: '0.01'
+          CaO: '0.24'
+          Na2O: '5.01'
+          K2O: '4.36'
+      locator: &table1_DT_39
+        page: 2
+        table: '1'
+        published_page: '168'
+        column: 'DT_39'
+        note: Table 1 chemical composition in oxide weight percent.
+    total_wt_pct_as_published: '98.72'
+    total_condition: &total_DT_39
+      state:
+        tag: value
+        value: '98.72'
+      locator: *table1_DT_39
+  H2O_63:
+    source_as_published: 'NZC-4 H2O_63'
+    values_as_published:
+      SiO2: '70.40'
+      TiO2: '0.23'
+      Al2O3: '9.50'
+      Fe2O3: '3.46'
+      FeO: '2.11'
+      MgO: '0.02'
+      CaO: '0.24'
+      Na2O: '5.22'
+      K2O: '4.26'
+    composition_condition: &composition_H2O_63
+      state:
+        tag: value
+        value:
+          SiO2: '70.40'
+          TiO2: '0.23'
+          Al2O3: '9.50'
+          Fe2O3: '3.46'
+          FeO: '2.11'
+          MgO: '0.02'
+          CaO: '0.24'
+          Na2O: '5.22'
+          K2O: '4.26'
+      locator: &table1_H2O_63
+        page: 2
+        table: '1'
+        published_page: '168'
+        column: 'H2O_63'
+        note: Table 1 chemical composition in oxide weight percent.
+    total_wt_pct_as_published: '95.44'
+    total_condition: &total_H2O_63
+      state:
+        tag: value
+        value: '95.44'
+      locator: *table1_H2O_63
+  DT_31:
+    source_as_published: 'NZC-4 DT_31'
+    values_as_published:
+      SiO2: '77.30'
+      TiO2: '0.25'
+      Al2O3: '10.50'
+      Fe2O3: '3.01'
+      FeO: '1.59'
+      MgO: '0.03'
+      CaO: '0.23'
+      Na2O: '3.29'
+      K2O: '3.33'
+    composition_condition: &composition_DT_31
+      state:
+        tag: value
+        value:
+          SiO2: '77.30'
+          TiO2: '0.25'
+          Al2O3: '10.50'
+          Fe2O3: '3.01'
+          FeO: '1.59'
+          MgO: '0.03'
+          CaO: '0.23'
+          Na2O: '3.29'
+          K2O: '3.33'
+      locator: &table1_DT_31
+        page: 2
+        table: '1'
+        published_page: '168'
+        column: 'DT_31'
+        note: Table 1 chemical composition in oxide weight percent.
+    total_wt_pct_as_published: '99.56'
+    total_condition: &total_DT_31
+      state:
+        tag: value
+        value: '99.56'
+      locator: *table1_DT_31
+  DT_18:
+    source_as_published: 'NZC-4 DT_18'
+    values_as_published:
+      SiO2: '72.60'
+      TiO2: '0.25'
+      Al2O3: '9.90'
+      Fe2O3: '3.89'
+      FeO: '1.80'
+      MgO: '0.01'
+      CaO: '0.19'
+      Na2O: '4.76'
+      K2O: '4.31'
+    composition_condition: &composition_DT_18
+      state:
+        tag: value
+        value:
+          SiO2: '72.60'
+          TiO2: '0.25'
+          Al2O3: '9.90'
+          Fe2O3: '3.89'
+          FeO: '1.80'
+          MgO: '0.01'
+          CaO: '0.19'
+          Na2O: '4.76'
+          K2O: '4.31'
+      locator: &table1_DT_18
+        page: 2
+        table: '1'
+        published_page: '168'
+        column: 'DT_18'
+        note: Table 1 chemical composition in oxide weight percent.
+    total_wt_pct_as_published: '97.81'
+    total_condition: &total_DT_18
+      state:
+        tag: value
+        value: '97.81'
+      locator: *table1_DT_18
+conditions_source_locators:
+  basalt_pressure: &basalt_pressure_locator
+    page: 2
+    published_page: '169'
+    section: '2.2 High temperature experiments'
+    note: Basalts equilibrated at 1 atm.
+  basalt_gases: &basalt_gas_locator
+    page: 2
+    published_page: '169'
+    section: '2.2 High temperature experiments'
+    note: CO/CO2 except AII_45, equilibrated in CO2/O2; gas flow ratios are not printed.
+  568_temperature: &568_temperature_locator
+    page: 2
+    published_page: '169'
+    section: '2.2 High temperature experiments'
+    note: VG568 chip held at 1550 °C for 72 h.
+  rhyolite_conditions: &rhyolite_conditions_locator
+    page: 2
+    published_page: '169'
+    section: '2.2 High temperature experiments'
+    note: NZC-4 glasses equilibrated as described by Moore et al. (1995); individual run temperature, pressure, absolute fO2, and gas mix are not stated here.
+table2_row_locators:
+  AII_minus_35: &row_AII_minus_35
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'AII_− 35'
+    note: "At 1623.15 K, the printed log fO2 of -10.19 is 0.0066 dex below IW (-10.1834)."
+  LW_minus_30: &row_LW_minus_30
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'LW_− 30'
+  AII_minus_25: &row_AII_minus_25
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'AII_− 25'
+  LW_minus_20: &row_LW_minus_20
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'LW_− 20'
+  AII_minus_15: &row_AII_minus_15
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'AII_− 15'
+  LW_minus_10: &row_LW_minus_10
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'LW_− 10'
+  AII_minus_05: &row_AII_minus_05
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'AII_− 05'
+  LW_0: &row_LW_0
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'LW_0'
+  AII_0: &row_AII_0
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'AII_0'
+  AII_05: &row_AII_05
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'AII_05'
+  LW_10: &row_LW_10
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'LW_10'
+  AII_15: &row_AII_15
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'AII_15'
+  LW_20: &row_LW_20
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'LW_20'
+  AII_25: &row_AII_25
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'AII_25'
+  AII_35: &row_AII_35
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'AII_35'
+  AII_45: &row_AII_45
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'AII_45'
+  568_2: &row_568_2
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: '568_2'
+  DT_46: &row_DT_46
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'DT_46'
+  DT_39: &row_DT_39
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'DT_39'
+  H2O_63: &row_H2O_63
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'H2O_63'
+  DT_29: &row_DT_29
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'DT_29'
+  DT_31: &row_DT_31
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'DT_31'
+  DT_18: &row_DT_18
+    page: 6
+    table: '2'
+    published_page: '172'
+    row: 'DT_18'
+species:
+  Fe:
+    observations:
+      - observation_id: cottrell_2009_basalt_mossbauer
+        type: concentration_series
+        locator:
+          page: 3
+          published_page: '170'
+          section: '3.1 Mössbauer spectroscopy'
+          note: Fe3+/SumFe is the fitted ferric doublet area divided by the full resonant absorption envelope; no recoil-free-fraction correction is applied.
+        phase: quenched silicate glass
+        units: fraction (Fe3+/SumFe)
+        uncertainty:
+          confidence_level: one_sigma
+        derivation:
+          relation: Fe3+/SumFe from fitted Fe3+ doublet area divided by the total resonant absorption envelope, without recoil-free-fraction correction.
+          output_unit: fraction
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              published_page: '170'
+              section: '3.1 Mössbauer spectroscopy'
+              note: Fitted spectrum areas are not tabulated as numeric cells.
+        values:
+          method_class: measured_reduced
+          quantity: fe3_fe2_ratio
+          series:
+            - sample: 'AII_-35'
+              locator: *row_AII_minus_35
+              T_C: 1350
+              log_fO2_as_published: '-10.19'
+              delta_QFM_as_published: '-3.47'
+              single_session_drift_corrected_centroid_eV: '7112.074'
+              single_session_centroid_sigma_eV: '0.005'
+              cross_session_drift_corrected_centroid_eV: '7112.079'
+              cross_session_centroid_sigma_eV: '0.009'
+              Fe3_over_FeT: 'b.d. (below detection)'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_minus_35
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-10.19'
+                  locator: *row_AII_minus_35
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '-3.47'
+                  locator: *row_AII_minus_35
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'LW_-30'
+              locator: *row_LW_minus_30
+              T_C: 1350
+              log_fO2_as_published: '-9.86'
+              delta_QFM_as_published: '-3.14'
+              single_session_drift_corrected_centroid_eV: '7112.079'
+              single_session_centroid_sigma_eV: '0.011'
+              cross_session_drift_corrected_centroid_eV: '7112.091'
+              cross_session_centroid_sigma_eV: '0.011'
+              Fe3_over_FeT: 'b.d. (below detection)'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_LW_minus_30
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-9.86'
+                  locator: *row_LW_minus_30
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '-3.14'
+                  locator: *row_LW_minus_30
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_LW
+                composition_total_wt_pct: *total_LW
+                composition_uncertainty: *uncertainty_LW
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'AII_-25'
+              locator: *row_AII_minus_25
+              T_C: 1350
+              log_fO2_as_published: '-9.31'
+              delta_QFM_as_published: '-2.59'
+              single_session_drift_corrected_centroid_eV: '7112.098'
+              single_session_centroid_sigma_eV: '0.001'
+              cross_session_drift_corrected_centroid_eV: '7112.098'
+              cross_session_centroid_sigma_eV: '0.006'
+              Fe3_over_FeT: 'b.d. (below detection)'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_minus_25
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-9.31'
+                  locator: *row_AII_minus_25
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '-2.59'
+                  locator: *row_AII_minus_25
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'LW_-20'
+              locator: *row_LW_minus_20
+              T_C: 1350
+              log_fO2_as_published: '-8.72'
+              delta_QFM_as_published: '-2.00'
+              single_session_drift_corrected_centroid_eV: '7112.108'
+              single_session_centroid_sigma_eV: '0.003'
+              cross_session_drift_corrected_centroid_eV: '7112.112'
+              cross_session_centroid_sigma_eV: '0.003'
+              Fe3_over_FeT: '0.088'
+              sigma: '0.0053'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_LW_minus_20
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-8.72'
+                  locator: *row_LW_minus_20
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '-2.00'
+                  locator: *row_LW_minus_20
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_LW
+                composition_total_wt_pct: *total_LW
+                composition_uncertainty: *uncertainty_LW
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'AII_-15'
+              locator: *row_AII_minus_15
+              T_C: 1350
+              log_fO2_as_published: '-8.22'
+              delta_QFM_as_published: '-1.50'
+              single_session_drift_corrected_centroid_eV: '7112.138'
+              single_session_centroid_sigma_eV: '0.009'
+              cross_session_drift_corrected_centroid_eV: '7112.144'
+              cross_session_centroid_sigma_eV: '0.010'
+              Fe3_over_FeT: '0.093'
+              sigma: '0.0060'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_minus_15
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-8.22'
+                  locator: *row_AII_minus_15
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '-1.50'
+                  locator: *row_AII_minus_15
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'LW_-10'
+              locator: *row_LW_minus_10
+              T_C: 1350
+              log_fO2_as_published: '-7.72'
+              delta_QFM_as_published: '-1.00'
+              single_session_drift_corrected_centroid_eV: '7112.156'
+              single_session_centroid_sigma_eV: '0.006'
+              cross_session_drift_corrected_centroid_eV: '7112.156'
+              cross_session_centroid_sigma_eV: '0.002'
+              Fe3_over_FeT: '0.130'
+              sigma: '0.0058'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_LW_minus_10
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-7.72'
+                  locator: *row_LW_minus_10
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '-1.00'
+                  locator: *row_LW_minus_10
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_LW
+                composition_total_wt_pct: *total_LW
+                composition_uncertainty: *uncertainty_LW
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'AII_-05'
+              locator: *row_AII_minus_05
+              T_C: 1350
+              log_fO2_as_published: '-7.20'
+              delta_QFM_as_published: '-0.48'
+              single_session_drift_corrected_centroid_eV: '7112.211'
+              single_session_centroid_sigma_eV: '0.009'
+              cross_session_drift_corrected_centroid_eV: '7112.217'
+              cross_session_centroid_sigma_eV: '0.011'
+              Fe3_over_FeT: '0.138'
+              sigma: '0.0050'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_minus_05
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-7.20'
+                  locator: *row_AII_minus_05
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '-0.48'
+                  locator: *row_AII_minus_05
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'LW_0'
+              locator: *row_LW_0
+              T_C: 1350
+              log_fO2_as_published: '-6.68'
+              delta_QFM_as_published: '0.01'
+              single_session_drift_corrected_centroid_eV: '7112.299'
+              single_session_centroid_sigma_eV: '0.001'
+              cross_session_drift_corrected_centroid_eV: '7112.299'
+              cross_session_centroid_sigma_eV: '0.002'
+              Fe3_over_FeT: '0.162'
+              sigma: '0.0055'
+              LW_0_centroid_note_as_published: 'LW_0 analyzed as unknown; otherwise its centroid is 7112.3 eV'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_LW_0
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-6.68'
+                  locator: *row_LW_0
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '0.01'
+                  locator: *row_LW_0
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_LW
+                composition_total_wt_pct: *total_LW
+                composition_uncertainty: *uncertainty_LW
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'AII_0'
+              locator: *row_AII_0
+              T_C: 1350
+              log_fO2_as_published: '-6.71'
+              delta_QFM_as_published: '0.02'
+              single_session_drift_corrected_centroid_eV: '7112.276'
+              single_session_centroid_sigma_eV: '0.002'
+              cross_session_drift_corrected_centroid_eV: '7112.279'
+              cross_session_centroid_sigma_eV: '0.006'
+              Fe3_over_FeT: '0.147'
+              sigma: '0.0038'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_0
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-6.71'
+                  locator: *row_AII_0
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '0.02'
+                  locator: *row_AII_0
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'AII_05'
+              locator: *row_AII_05
+              T_C: 1350
+              log_fO2_as_published: '-6.24'
+              delta_QFM_as_published: '0.48'
+              single_session_drift_corrected_centroid_eV: '7112.366'
+              single_session_centroid_sigma_eV: '0.007'
+              cross_session_drift_corrected_centroid_eV: '7112.355'
+              cross_session_centroid_sigma_eV: '0.011'
+              Fe3_over_FeT: '0.194'
+              sigma: '0.0063'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_05
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-6.24'
+                  locator: *row_AII_05
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '0.48'
+                  locator: *row_AII_05
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'LW_10'
+              locator: *row_LW_10
+              T_C: 1350
+              log_fO2_as_published: '-5.72'
+              delta_QFM_as_published: '1.00'
+              single_session_drift_corrected_centroid_eV: '7112.438'
+              single_session_centroid_sigma_eV: '.001'
+              cross_session_drift_corrected_centroid_eV: '7112.439'
+              cross_session_centroid_sigma_eV: '0.002'
+              Fe3_over_FeT: '0.235'
+              sigma: '0.0053'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_LW_10
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-5.72'
+                  locator: *row_LW_10
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '1.00'
+                  locator: *row_LW_10
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_LW
+                composition_total_wt_pct: *total_LW
+                composition_uncertainty: *uncertainty_LW
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'AII_15'
+              locator: *row_AII_15
+              T_C: 1350
+              log_fO2_as_published: '-5.24'
+              delta_QFM_as_published: '1.48'
+              single_session_drift_corrected_centroid_eV: '7112.518'
+              single_session_centroid_sigma_eV: '0.010'
+              cross_session_drift_corrected_centroid_eV: '7112.511'
+              cross_session_centroid_sigma_eV: '0.009'
+              Fe3_over_FeT: '0.247'
+              sigma: '0.0044'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_15
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-5.24'
+                  locator: *row_AII_15
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '1.48'
+                  locator: *row_AII_15
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'LW_20'
+              locator: *row_LW_20
+              T_C: 1350
+              log_fO2_as_published: '-4.73'
+              delta_QFM_as_published: '2.00'
+              single_session_drift_corrected_centroid_eV: '7112.608'
+              single_session_centroid_sigma_eV: '0.005'
+              cross_session_drift_corrected_centroid_eV: '7112.611'
+              cross_session_centroid_sigma_eV: '0.008'
+              Fe3_over_FeT: '0.303'
+              sigma: '0.0140'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_LW_20
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-4.73'
+                  locator: *row_LW_20
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '2.00'
+                  locator: *row_LW_20
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_LW
+                composition_total_wt_pct: *total_LW
+                composition_uncertainty: *uncertainty_LW
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'AII_25'
+              locator: *row_AII_25
+              T_C: 1350
+              log_fO2_as_published: '-4.25'
+              delta_QFM_as_published: '2.47'
+              single_session_drift_corrected_centroid_eV: '7112.730'
+              single_session_centroid_sigma_eV: '0.010'
+              cross_session_drift_corrected_centroid_eV: '7112.740'
+              cross_session_centroid_sigma_eV: '0.009'
+              Fe3_over_FeT: '0.356'
+              sigma: '0.0038'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_25
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-4.25'
+                  locator: *row_AII_25
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '2.47'
+                  locator: *row_AII_25
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'AII_35'
+              locator: *row_AII_35
+              T_C: 1350
+              log_fO2_as_published: '-3.22'
+              delta_QFM_as_published: '3.50'
+              single_session_drift_corrected_centroid_eV: '7112.941'
+              single_session_centroid_sigma_eV: '0.003'
+              cross_session_drift_corrected_centroid_eV: '7112.937'
+              cross_session_centroid_sigma_eV: '0.014'
+              Fe3_over_FeT: '0.484'
+              sigma: '0.0040'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_35
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-3.22'
+                  locator: *row_AII_35
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '3.50'
+                  locator: *row_AII_35
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'AII_45'
+              locator: *row_AII_45
+              T_C: 1350
+              log_fO2_as_published: '-2.20'
+              delta_QFM_as_published: '4.52'
+              single_session_drift_corrected_centroid_eV: '7113.168'
+              single_session_centroid_sigma_eV: '0.004'
+              cross_session_drift_corrected_centroid_eV: '7113.163'
+              cross_session_centroid_sigma_eV: '0.019'
+              Fe3_over_FeT: '0.611'
+              sigma: '0.0026'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_45
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-2.20'
+                  locator: *row_AII_45
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '4.52'
+                  locator: *row_AII_45
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO2/O2; flow ratio not published'
+                  locator: *basalt_gas_locator
+      - observation_id: cottrell_2009_basalt_kress_predictions
+        type: concentration_series
+        locator:
+          page: 6
+          table: '2'
+          published_page: '172'
+          note: Kress and Carmichael (1991) predictions are printed in the Fe3+/SumFe predicted column.
+        phase: quenched silicate glass
+        units: fraction (Fe3+/SumFe)
+        values:
+          method_class: quoted_attributed
+          attribution: Kress and Carmichael (1991)
+          quantity: fe3_fe2_ratio
+          series:
+            - sample: 'AII_-35'
+              locator: *row_AII_minus_35
+              T_C: 1350
+              log_fO2_as_published: '-10.19'
+              delta_QFM_as_published: '-3.47'
+              Fe3_over_FeT: '0.035'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_minus_35
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-10.19'
+                  locator: *row_AII_minus_35
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '-3.47'
+                  locator: *row_AII_minus_35
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'LW_-30'
+              locator: *row_LW_minus_30
+              T_C: 1350
+              log_fO2_as_published: '-9.86'
+              delta_QFM_as_published: '-3.14'
+              Fe3_over_FeT: '0.040'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_LW_minus_30
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-9.86'
+                  locator: *row_LW_minus_30
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '-3.14'
+                  locator: *row_LW_minus_30
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_LW
+                composition_total_wt_pct: *total_LW
+                composition_uncertainty: *uncertainty_LW
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'AII_-25'
+              locator: *row_AII_minus_25
+              T_C: 1350
+              log_fO2_as_published: '-9.31'
+              delta_QFM_as_published: '-2.59'
+              Fe3_over_FeT: '0.051'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_minus_25
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-9.31'
+                  locator: *row_AII_minus_25
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '-2.59'
+                  locator: *row_AII_minus_25
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'LW_-20'
+              locator: *row_LW_minus_20
+              T_C: 1350
+              log_fO2_as_published: '-8.72'
+              delta_QFM_as_published: '-2.00'
+              Fe3_over_FeT: '0.066'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_LW_minus_20
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-8.72'
+                  locator: *row_LW_minus_20
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '-2.00'
+                  locator: *row_LW_minus_20
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_LW
+                composition_total_wt_pct: *total_LW
+                composition_uncertainty: *uncertainty_LW
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'AII_-15'
+              locator: *row_AII_minus_15
+              T_C: 1350
+              log_fO2_as_published: '-8.22'
+              delta_QFM_as_published: '-1.50'
+              Fe3_over_FeT: '0.081'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_minus_15
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-8.22'
+                  locator: *row_AII_minus_15
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '-1.50'
+                  locator: *row_AII_minus_15
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'LW_-10'
+              locator: *row_LW_minus_10
+              T_C: 1350
+              log_fO2_as_published: '-7.72'
+              delta_QFM_as_published: '-1.00'
+              Fe3_over_FeT: '0.099'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_LW_minus_10
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-7.72'
+                  locator: *row_LW_minus_10
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '-1.00'
+                  locator: *row_LW_minus_10
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_LW
+                composition_total_wt_pct: *total_LW
+                composition_uncertainty: *uncertainty_LW
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'AII_-05'
+              locator: *row_AII_minus_05
+              T_C: 1350
+              log_fO2_as_published: '-7.20'
+              delta_QFM_as_published: '-0.48'
+              Fe3_over_FeT: '0.123'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_minus_05
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-7.20'
+                  locator: *row_AII_minus_05
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '-0.48'
+                  locator: *row_AII_minus_05
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'LW_0'
+              locator: *row_LW_0
+              T_C: 1350
+              log_fO2_as_published: '-6.68'
+              delta_QFM_as_published: '0.01'
+              Fe3_over_FeT: '0.149'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_LW_0
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-6.68'
+                  locator: *row_LW_0
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '0.01'
+                  locator: *row_LW_0
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_LW
+                composition_total_wt_pct: *total_LW
+                composition_uncertainty: *uncertainty_LW
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'AII_0'
+              locator: *row_AII_0
+              T_C: 1350
+              log_fO2_as_published: '-6.71'
+              delta_QFM_as_published: '0.02'
+              Fe3_over_FeT: '0.150'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_0
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-6.71'
+                  locator: *row_AII_0
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '0.02'
+                  locator: *row_AII_0
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'AII_05'
+              locator: *row_AII_05
+              T_C: 1350
+              log_fO2_as_published: '-6.24'
+              delta_QFM_as_published: '0.48'
+              Fe3_over_FeT: '0.181'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_05
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-6.24'
+                  locator: *row_AII_05
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '0.48'
+                  locator: *row_AII_05
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'LW_10'
+              locator: *row_LW_10
+              T_C: 1350
+              log_fO2_as_published: '-5.72'
+              delta_QFM_as_published: '1.00'
+              Fe3_over_FeT: '0.211'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_LW_10
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-5.72'
+                  locator: *row_LW_10
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '1.00'
+                  locator: *row_LW_10
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_LW
+                composition_total_wt_pct: *total_LW
+                composition_uncertainty: *uncertainty_LW
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'AII_15'
+              locator: *row_AII_15
+              T_C: 1350
+              log_fO2_as_published: '-5.24'
+              delta_QFM_as_published: '1.48'
+              Fe3_over_FeT: '0.257'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_15
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-5.24'
+                  locator: *row_AII_15
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '1.48'
+                  locator: *row_AII_15
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'LW_20'
+              locator: *row_LW_20
+              T_C: 1350
+              log_fO2_as_published: '-4.73'
+              delta_QFM_as_published: '2.00'
+              Fe3_over_FeT: '0.295'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_LW_20
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-4.73'
+                  locator: *row_LW_20
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '2.00'
+                  locator: *row_LW_20
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_LW
+                composition_total_wt_pct: *total_LW
+                composition_uncertainty: *uncertainty_LW
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'AII_25'
+              locator: *row_AII_25
+              T_C: 1350
+              log_fO2_as_published: '-4.25'
+              delta_QFM_as_published: '2.47'
+              Fe3_over_FeT: '0.350'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_25
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-4.25'
+                  locator: *row_AII_25
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '2.47'
+                  locator: *row_AII_25
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'AII_35'
+              locator: *row_AII_35
+              T_C: 1350
+              log_fO2_as_published: '-3.22'
+              delta_QFM_as_published: '3.50'
+              Fe3_over_FeT: '0.462'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_35
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-3.22'
+                  locator: *row_AII_35
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '3.50'
+                  locator: *row_AII_35
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO/CO2; flow ratio not published'
+                  locator: *basalt_gas_locator
+            - sample: 'AII_45'
+              locator: *row_AII_45
+              T_C: 1350
+              log_fO2_as_published: '-2.20'
+              delta_QFM_as_published: '4.52'
+              Fe3_over_FeT: '0.575'
+              pressure_as_published: '1 atm'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1350
+                  locator: *row_AII_45
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-2.20'
+                  locator: *row_AII_45
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '4.52'
+                  locator: *row_AII_45
+                total_pressure_Pa:
+                  state:
+                    tag: value
+                    value: '101325'
+                  locator: *basalt_pressure_locator
+                composition: *composition_AII
+                composition_total_wt_pct: *total_AII
+                composition_uncertainty: *uncertainty_AII
+                fO2_control:
+                  state:
+                    tag: value
+                    value: 'CO2/O2; flow ratio not published'
+                  locator: *basalt_gas_locator
+      - observation_id: cottrell_2009_rhyolite_mossbauer
+        type: concentration_series
+        locator:
+          page: 3
+          published_page: '170'
+          section: '3.1 Mössbauer spectroscopy'
+          note: Mössbauer measurements for VG568_2, DT_46, and DT_39.
+        phase: quenched silicate glass
+        units: fraction (Fe3+/SumFe)
+        uncertainty:
+          confidence_level: one_sigma
+        derivation:
+          relation: Fe3+/SumFe from fitted Fe3+ doublet area divided by the total resonant absorption envelope, without recoil-free-fraction correction.
+          output_unit: fraction
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              published_page: '170'
+              section: '3.1 Mössbauer spectroscopy'
+              note: Fitted spectrum areas are not tabulated as numeric cells.
+        values:
+          method_class: measured_reduced
+          quantity: fe3_fe2_ratio
+          series:
+            - sample: '568_2'
+              locator: *row_568_2
+              T_C: 1550
+              log_fO2_as_published: '-3.09'
+              delta_QFM_as_published: '1.93'
+              single_session_drift_corrected_centroid_eV: '7112.709'
+              single_session_centroid_sigma_eV: '0.010'
+              cross_session_drift_corrected_centroid_as_published: n.d.
+              Fe3_over_FeT: '0.238'
+              sigma: '0.0210'
+              Kress_Fe3_over_FeT_predicted_as_published: n.d.
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: value
+                    value: 1550
+                  locator: *row_568_2
+                fO2_log:
+                  state:
+                    tag: value
+                    value: '-3.09'
+                  locator: *row_568_2
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '1.93'
+                  locator: *row_568_2
+                total_pressure_Pa:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *568_temperature_locator
+                composition: *composition_VG568
+                composition_total_wt_pct: *total_VG568
+                composition_uncertainty: *uncertainty_VG568
+                fO2_control:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *568_temperature_locator
+            - sample: 'DT_46'
+              locator: *row_DT_46
+              delta_QFM_as_published: '3.67'
+              single_session_drift_corrected_centroid_eV: '7113.244'
+              single_session_centroid_sigma_eV: '0.010'
+              cross_session_drift_corrected_centroid_as_published: n.d.
+              Fe3_over_FeT: '0.600'
+              sigma: '0.0146'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *row_DT_46
+                fO2_log:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *row_DT_46
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '3.67'
+                  locator: *row_DT_46
+                total_pressure_Pa:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *rhyolite_conditions_locator
+                composition: *composition_DT_46
+                composition_total_wt_pct: *total_DT_46
+                fO2_control:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *rhyolite_conditions_locator
+            - sample: 'DT_39'
+              locator: *row_DT_39
+              delta_QFM_as_published: '0.85'
+              single_session_drift_corrected_centroid_eV: '7112.858'
+              single_session_centroid_sigma_eV: '0.041'
+              cross_session_drift_corrected_centroid_as_published: n.d.
+              Fe3_over_FeT: '0.320'
+              sigma: '0.0250'
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *row_DT_39
+                fO2_log:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *row_DT_39
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '0.85'
+                  locator: *row_DT_39
+                total_pressure_Pa:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *rhyolite_conditions_locator
+                composition: *composition_DT_39
+                composition_total_wt_pct: *total_DT_39
+                fO2_control:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *rhyolite_conditions_locator
+      - observation_id: cottrell_2009_moore_wet_chemistry_quotes
+        type: concentration_series
+        locator:
+          page: 6
+          table: '2'
+          published_page: '172'
+          note: Footnote f attributes the printed ferric fractions to wet chemistry in Moore et al. (1995).
+        phase: quenched silicate glass
+        units: fraction (Fe3+/SumFe)
+        uncertainty:
+          confidence_level: one_sigma
+        values:
+          method_class: quoted_attributed
+          attribution: Moore et al. (1995)
+          quantity: fe3_fe2_ratio
+          series:
+            - sample: 'DT_46'
+              locator: *row_DT_46
+              delta_QFM_as_published: '3.67'
+              Fe3_over_FeT: '0.569'
+              sigma: '0.06'
+              sigma_locator:
+                page: 6
+                published_page: '172'
+                section: '4.1 Fe3+/SumFe of the reference glasses'
+                note: The paragraph reports the rounded Moore et al. values as 0.57 ± 0.06 and 0.31 ± 0.08.
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *row_DT_46
+                fO2_log:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *row_DT_46
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '3.67'
+                  locator: *row_DT_46
+                total_pressure_Pa:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *rhyolite_conditions_locator
+                composition: *composition_DT_46
+                composition_total_wt_pct: *total_DT_46
+                fO2_control:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *rhyolite_conditions_locator
+            - sample: 'DT_39'
+              locator: *row_DT_39
+              delta_QFM_as_published: '0.85'
+              Fe3_over_FeT: '0.315'
+              sigma: '0.08'
+              sigma_locator:
+                page: 6
+                published_page: '172'
+                section: '4.1 Fe3+/SumFe of the reference glasses'
+                note: The paragraph reports the rounded Moore et al. values as 0.57 ± 0.06 and 0.31 ± 0.08.
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *row_DT_39
+                fO2_log:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *row_DT_39
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '0.85'
+                  locator: *row_DT_39
+                total_pressure_Pa:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *rhyolite_conditions_locator
+                composition: *composition_DT_39
+                composition_total_wt_pct: *total_DT_39
+                fO2_control:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *rhyolite_conditions_locator
+            - sample: 'H2O_63'
+              locator: *row_H2O_63
+              delta_QFM_as_published: '2.48'
+              single_session_drift_corrected_centroid_eV: '7113.298'
+              single_session_centroid_sigma_eV: '0.005'
+              cross_session_drift_corrected_centroid_as_published: n.d.
+              Fe3_over_FeT: '0.596'
+              Mossbauer_Fe3_over_FeT_as_published: n.d.
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *row_H2O_63
+                fO2_log:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *row_H2O_63
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '2.48'
+                  locator: *row_H2O_63
+                total_pressure_Pa:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *rhyolite_conditions_locator
+                composition: *composition_H2O_63
+                composition_total_wt_pct: *total_H2O_63
+                fO2_control:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *rhyolite_conditions_locator
+            - sample: 'DT_29'
+              locator: *row_DT_29
+              delta_QFM_as_published: '6.03'
+              single_session_drift_corrected_centroid_eV: '7113.454'
+              single_session_centroid_sigma_eV: '0.011'
+              cross_session_drift_corrected_centroid_as_published: n.d.
+              Fe3_over_FeT: '0.806'
+              Mossbauer_Fe3_over_FeT_as_published: n.d.
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *row_DT_29
+                fO2_log:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *row_DT_29
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '6.03'
+                  locator: *row_DT_29
+                total_pressure_Pa:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *rhyolite_conditions_locator
+                composition:
+                  state:
+                    tag: unknown
+                    reason: no DT_29 composition column is printed in Table 1
+                  locator:
+                    page: 2
+                    table: '1'
+                    published_page: '168'
+                    note: Table 1 has no DT_29 column.
+                fO2_control:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *rhyolite_conditions_locator
+            - sample: 'DT_31'
+              locator: *row_DT_31
+              delta_QFM_as_published: '5.13'
+              single_session_drift_corrected_centroid_eV: '7113.282'
+              single_session_centroid_sigma_eV: '0.011'
+              cross_session_drift_corrected_centroid_as_published: n.d.
+              Fe3_over_FeT: '0.630'
+              Mossbauer_Fe3_over_FeT_as_published: n.d.
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *row_DT_31
+                fO2_log:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *row_DT_31
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '5.13'
+                  locator: *row_DT_31
+                total_pressure_Pa:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *rhyolite_conditions_locator
+                composition: *composition_DT_31
+                composition_total_wt_pct: *total_DT_31
+                fO2_control:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *rhyolite_conditions_locator
+            - sample: 'DT_18'
+              locator: *row_DT_18
+              delta_QFM_as_published: '4.74'
+              single_session_drift_corrected_centroid_eV: '7113.355'
+              single_session_centroid_sigma_eV: '0.005'
+              cross_session_drift_corrected_centroid_as_published: n.d.
+              Fe3_over_FeT: '0.660'
+              Mossbauer_Fe3_over_FeT_as_published: n.d.
+              point_conditions:
+                temperature_C:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *row_DT_18
+                fO2_log:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *row_DT_18
+                fO2_delta_QFM:
+                  state:
+                    tag: value
+                    value: '4.74'
+                  locator: *row_DT_18
+                total_pressure_Pa:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *rhyolite_conditions_locator
+                composition: *composition_DT_18
+                composition_total_wt_pct: *total_DT_18
+                fO2_control:
+                  state:
+                    tag: unknown
+                    reason: not_published
+                  locator: *rhyolite_conditions_locator
+      - observation_id: cottrell_2009_basalt_centroid_calibration
+        type: recalculation_table
+        locator:
+          page: 9
+          table: '3'
+          published_page: '175'
+          row: Basalt centroid fit
+        phase: quenched silicate glass
+        units: calibration coefficients as printed
+        point_conditions:
+          temperature_C:
+            state:
+              tag: unknown
+              reason: calibration fit spans reference runs at different temperatures
+            locator:
+              page: 9
+              table: '3'
+              published_page: '175'
+          log_fO2:
+            state:
+              tag: unknown
+              reason: calibration fit spans multiple oxygen fugacity conditions
+            locator:
+              page: 9
+              table: '3'
+              published_page: '175'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: calibration fit spans reference runs
+            locator:
+              page: 9
+              table: '3'
+              published_page: '175'
+          composition:
+            state:
+              tag: unknown
+              reason: baseline basalt fit spans LW and AII reference glass compositions
+            locator:
+              page: 9
+              table: '3'
+              published_page: '175'
+        values:
+          method_class: model_derived
+          quantity: xanes_centroid_fe3_sumfe_calibration_as_published
+          admission_status: typed_refusal
+          d-126_reason: No closed schema quantity represents this composition-specific calibration polynomial; coefficients and equation are preserved as printed.
+          fit:
+            x_as_published: cross-session drift-corrected centroid energy (eV)
+            mu_eV_as_published: '7112.45876'
+            centroid_a_as_published: '22.99081'
+            centroid_b_as_published: '43.91273'
+            centroid_c_as_published: '14.68104'
+            centroid_a_sigma_1sigma_as_published: '0.4075'
+            centroid_b_sigma_1sigma_as_published: '1.3163'
+            centroid_c_sigma_1sigma_as_published: '2.6737'
+            average_1sigma_Fe3_sumFe_times_100_as_published: '0.45'
+            equation_as_published: 'Fe3+/SumFe = a + b(x − μ) + c(x − μ)^2'
+        derived_from:
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-05:h=25ca8cba6d87
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-15:h=634b0f866442
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_05:h=8acb242e3506
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_0:h=ec8697b4e4d5
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_15:h=e2f77398a2aa
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_25:h=c66a125e779f
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_35:h=db49b9c419c5
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_45:h=ccdb150debcf
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-10:h=565ed18459d2
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-20:h=9f18ca169a46
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_0:h=6ac0441f22fa
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_10:h=e6105b216809
+          - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_20:h=6447401d415b
+        derivation:
+          relation: Least-squares SVD second-order fit of the stored Mössbauer Fe3+/SumFe fractions against the stored cross-session centroid energies.
+          inputs:
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-05:h=25ca8cba6d87
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_-15:h=634b0f866442
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_05:h=8acb242e3506
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_0:h=ec8697b4e4d5
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_15:h=e2f77398a2aa
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_25:h=c66a125e779f
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_35:h=db49b9c419c5
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=aii_45:h=ccdb150debcf
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-10:h=565ed18459d2
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_-20:h=9f18ca169a46
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_0:h=6ac0441f22fa
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_10:h=e6105b216809
+            - cottrell-2009-iron-xanes::cottrell_2009_basalt_mossbauer::T=1623.15:row=lw_20:h=6447401d415b
+          output_unit: as_published
+      - observation_id: cottrell_2009_rhyolite_centroid_calibration
+        type: recalculation_table
+        locator:
+          page: 9
+          table: '3'
+          published_page: '175'
+          row: Rhyolite centroid fit
+        phase: quenched silicate glass
+        units: calibration coefficients as printed
+        point_conditions:
+          temperature_C:
+            state:
+              tag: unknown
+              reason: calibration fit spans multiple temperatures and external rhyolite experiments
+            locator:
+              page: 9
+              table: '3'
+              published_page: '175'
+          log_fO2:
+            state:
+              tag: unknown
+              reason: calibration fit spans multiple oxygen fugacity conditions
+            locator:
+              page: 9
+              table: '3'
+              published_page: '175'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: calibration fit spans reference runs with unreported pressures
+            locator:
+              page: 9
+              table: '3'
+              published_page: '175'
+          composition:
+            state:
+              tag: unknown
+              reason: composition-specific rhyolite fit spans VG568 and NZC-4 compositions
+            locator:
+              page: 9
+              table: '3'
+              published_page: '175'
+        values:
+          method_class: model_derived
+          quantity: xanes_centroid_fe3_sumfe_calibration_as_published
+          admission_status: typed_refusal
+          d-126_reason: No closed schema quantity represents this composition-specific calibration polynomial; coefficients and equation are preserved as printed.
+          fit:
+            x_as_published: single-session drift-corrected centroid energy (eV) for the rhyolites
+            mu_eV_as_published: '7113.17147'
+            centroid_a_as_published: '50.17519'
+            centroid_b_as_published: '86.65910'
+            centroid_c_as_published: '72.29489'
+            centroid_a_sigma_1sigma_as_published: '1.7320'
+            centroid_b_sigma_1sigma_as_published: '5.0297'
+            centroid_c_sigma_1sigma_as_published: '19.9389'
+            average_1sigma_Fe3_sumFe_times_100_as_published: '1.89'
+            equation_as_published: 'Fe3+/SumFe = a + b(x − μ) + c(x − μ)^2'
+        derived_from:
+          - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=59a4f4d57725
+          - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:0
+          - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:1
+          - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:2
+          - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:3
+          - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:4
+          - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:5
+        derivation:
+          relation: Weighted least-squares second-order fit of the seven Table 2 rhyolite glasses; y is footnote-f wet chemistry for the six Moore glasses and the Mössbauer Fe3_over_FeT value for 568_2.
+          inputs:
+            - cottrell-2009-iron-xanes::cottrell_2009_rhyolite_mossbauer::T=1823.15:row=568_2:h=59a4f4d57725
+            - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:0
+            - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:1
+            - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:2
+            - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:3
+            - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:4
+            - cottrell-2009-iron-xanes::cottrell_2009_moore_wet_chemistry_quotes::point:5
+          output_unit: as_published

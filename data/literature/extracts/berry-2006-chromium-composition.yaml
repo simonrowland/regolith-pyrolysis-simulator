@@ -1,0 +1,4369 @@
+schema_version: literature_extract.v1
+source_id: berry-2006-chromium-composition
+source:
+  citation: Berry, A.J., O'Neill, H.St.C., Scott, D.R., Foran, G.J. & Shelley, J.M.G. (2006), The effect of composition
+    on Cr2+/Cr3+ in silicate melts, American Mineralogist 91:1901-1908.
+  doi: 10.2138/am.2006.2097
+  year: 2006
+extraction:
+  method: Table 1 was transcribed from a 300 dpi pdftoppm render of PDF page 2 (published page 1902); pdftotext
+    -layout was used only to locate the table. All three printed log fO2 columns are included. The 27 printed composition
+    rows yield 81 author-measured cells, of which 74 are numeric and 7 are source omissions. The 15 italicized ratio
+    cells for rows 1-5 are earlier Berry and O'Neill (2004) results and are stored separately as quoted_attributed.
+    Composition means and one-standard-deviation values in parentheses are retained per composition row. The table
+    excludes approximately 0.5 wt% Cr2O3 from its host-glass composition columns. Table 1 reports sigma(log fO2)
+    = ±0.03 and sigma(Cr2+/ΣCr) = ±0.03, both one standard deviation. The paper does not state total pressure, so
+    P is explicitly not_published. The paper states the Fe-free quenched glasses preserve the high-temperature Cr
+    oxidation-state ratio; rows are Phase.L. Sossi 2018's quoted 0.32 and 0.91 do not match any Table 1 row and
+    remain its separately attributed quoted values.
+  figure_read_candidates:
+  - 'Figure 2a-b: Cr2+/ΣCr values at log fO2 = -16.13 shown in figures, not digitized.'
+  - 'Figure 3: log[Cr2+/Cr3+] versus optical basicity at log fO2 = -9, not digitized.'
+  - 'Figure 2c: in-situ MORB Cr2+/ΣCr versus fO2 at 1400 °C, not digitized.'
+  date: '2026-10-16'
+  worker: rdxw-cr06-1016
+review_status: draft
+fidelity_samples:
+- path: species.Cr.observations[berry_2006_table1_row_01_quoted_berry_oneill_2004].values.points[2].value
+  value: 0.709
+  locator:
+    published_page: 1902
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 row 1 AD, italicized Berry and O'Neill (2004) value at log fO2 = -9
+- path: species.Cr.observations[berry_2006_table1_row_01_measured].values.composition_wt_pct.SiO2
+  value: 50.6
+  locator:
+    published_page: 1902
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 row 1 AD, SiO2 composition in wt%
+species:
+  Cr:
+    observations:
+    - observation_id: berry_2006_table1_row_01_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 1 AD
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 50.6
+          Al2O3: 15.1
+          MgO: 10.3
+          CaO: 24.0
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.6
+          Al2O3: 0.3
+          MgO: 0.2
+          CaO: 0.7
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: AD
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id001
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 1 AD
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id001
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id001
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.038
+        - sample: AD
+          T_C: 1400
+          log_fO2: -7.5
+          locator: &id002
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 1 AD
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id002
+            fO2_log:
+              state:
+                tag: value
+                value: -7.5
+              locator: *id002
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.475
+        - sample: AD
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id003
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 1 AD
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id003
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id003
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.688
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_01_quoted_berry_oneill_2004
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 1 AD
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: quoted_attributed
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 50.6
+          Al2O3: 15.1
+          MgO: 10.3
+          CaO: 24.0
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.6
+          Al2O3: 0.3
+          MgO: 0.2
+          CaO: 0.7
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: AD
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id004
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 1 AD
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id004
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id004
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.094
+        - sample: AD
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id005
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 1 AD
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id005
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id005
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.507
+        - sample: AD
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id006
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 1 AD
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id006
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id006
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.709
+        attribution: Berry and O'Neill (2004)
+    - observation_id: berry_2006_table1_row_02_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 2 AD+Fo
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 49.4
+          Al2O3: 13.0
+          MgO: 17.1
+          CaO: 20.5
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.3
+          Al2O3: 0.2
+          MgO: 0.2
+          CaO: 0.5
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: AD+Fo
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id007
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 2 AD+Fo
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id007
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id007
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.04
+        - sample: AD+Fo
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id008
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 2 AD+Fo
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id008
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id008
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.341
+        - sample: AD+Fo
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id009
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 2 AD+Fo
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id009
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id009
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.676
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_02_quoted_berry_oneill_2004
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 2 AD+Fo
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: quoted_attributed
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 49.4
+          Al2O3: 13.0
+          MgO: 17.1
+          CaO: 20.5
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.3
+          Al2O3: 0.2
+          MgO: 0.2
+          CaO: 0.5
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: AD+Fo
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id010
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 2 AD+Fo
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id010
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id010
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.075
+        - sample: AD+Fo
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id011
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 2 AD+Fo
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id011
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id011
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.368
+        - sample: AD+Fo
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id012
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 2 AD+Fo
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id012
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id012
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.697
+        attribution: Berry and O'Neill (2004)
+    - observation_id: berry_2006_table1_row_03_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 3 AD+Wo
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 51.5
+          Al2O3: 6.2
+          MgO: 4.0
+          CaO: 38.3
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 1.2
+          Al2O3: 0.2
+          MgO: 0.2
+          CaO: 1.2
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: AD+Wo
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id013
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 3 AD+Wo
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id013
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id013
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.027
+        - sample: AD+Wo
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id014
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 3 AD+Wo
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id014
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id014
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.298
+        - sample: AD+Wo
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id015
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 3 AD+Wo
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id015
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id015
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.59
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_03_quoted_berry_oneill_2004
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 3 AD+Wo
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: quoted_attributed
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 51.5
+          Al2O3: 6.2
+          MgO: 4.0
+          CaO: 38.3
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 1.2
+          Al2O3: 0.2
+          MgO: 0.2
+          CaO: 1.2
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: AD+Wo
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id016
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 3 AD+Wo
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id016
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id016
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.063
+        - sample: AD+Wo
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id017
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 3 AD+Wo
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id017
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id017
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.325
+        - sample: AD+Wo
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id018
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 3 AD+Wo
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id018
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id018
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.606
+        attribution: Berry and O'Neill (2004)
+    - observation_id: berry_2006_table1_row_04_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 4 AD+En
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 54.6
+          Al2O3: 9.3
+          MgO: 21.3
+          CaO: 14.8
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.3
+          Al2O3: 0.2
+          MgO: 0.5
+          CaO: 0.4
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: AD+En
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id019
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 4 AD+En
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id019
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id019
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.045
+        - sample: AD+En
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id020
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 4 AD+En
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id020
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id020
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.42
+        - sample: AD+En
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id021
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 4 AD+En
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id021
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id021
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.726
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_04_quoted_berry_oneill_2004
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 4 AD+En
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: quoted_attributed
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 54.6
+          Al2O3: 9.3
+          MgO: 21.3
+          CaO: 14.8
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.3
+          Al2O3: 0.2
+          MgO: 0.5
+          CaO: 0.4
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: AD+En
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id022
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 4 AD+En
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id022
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id022
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.065
+        - sample: AD+En
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id023
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 4 AD+En
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id023
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id023
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.434
+        - sample: AD+En
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id024
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 4 AD+En
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id024
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id024
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.736
+        attribution: Berry and O'Neill (2004)
+    - observation_id: berry_2006_table1_row_05_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 5 AD+Qz
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 67.8
+          Al2O3: 9.9
+          MgO: 6.7
+          CaO: 15.6
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 1.0
+          Al2O3: 0.2
+          MgO: 0.2
+          CaO: 0.7
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: AD+Qz
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id025
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 5 AD+Qz
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id025
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id025
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.06
+        - sample: AD+Qz
+          T_C: 1400
+          log_fO2: -7.5
+          locator: &id026
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 5 AD+Qz
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id026
+            fO2_log:
+              state:
+                tag: value
+                value: -7.5
+              locator: *id026
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.597
+        - sample: AD+Qz
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id027
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 5 AD+Qz
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id027
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id027
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.786
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_05_quoted_berry_oneill_2004
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 5 AD+Qz
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: quoted_attributed
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 67.8
+          Al2O3: 9.9
+          MgO: 6.7
+          CaO: 15.6
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 1.0
+          Al2O3: 0.2
+          MgO: 0.2
+          CaO: 0.7
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: AD+Qz
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id028
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 5 AD+Qz
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id028
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id028
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.096
+        - sample: AD+Qz
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id029
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 5 AD+Qz
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id029
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id029
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.614
+        - sample: AD+Qz
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id030
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 5 AD+Qz
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id030
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id030
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.798
+        attribution: Berry and O'Neill (2004)
+    - observation_id: berry_2006_table1_row_06_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 6 Longhi1
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 63.5
+          Al2O3: 7.2
+          MgO: 13.3
+          CaO: 16.0
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.2
+          Al2O3: 0.1
+          MgO: 0.1
+          CaO: 0.1
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: Longhi1
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id031
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 6 Longhi1
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id031
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id031
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.062
+        - sample: Longhi1
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id032
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 6 Longhi1
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id032
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id032
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.533
+        - sample: Longhi1
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id033
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 6 Longhi1
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id033
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id033
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.795
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_07_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 7 Longhi2
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 49.9
+          Al2O3: 13.4
+          MgO: 5.2
+          CaO: 31.5
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.2
+          Al2O3: 0.1
+          MgO: 0.1
+          CaO: 0.2
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: Longhi2
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id034
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 7 Longhi2
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id034
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id034
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.033
+        - sample: Longhi2
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id035
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 7 Longhi2
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id035
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id035
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.368
+        - sample: Longhi2
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id036
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 7 Longhi2
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id036
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id036
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.654
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_08_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 8 Longhi3
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 63.6
+          Al2O3: 17.4
+          MgO: 9.0
+          CaO: 10.0
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.1
+          Al2O3: 0.1
+          MgO: 0.1
+          CaO: 0.1
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: Longhi3
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id037
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 8 Longhi3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id037
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id037
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.1
+        - sample: Longhi3
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id038
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 8 Longhi3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id038
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id038
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.656
+        - sample: Longhi3
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id039
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 8 Longhi3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id039
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id039
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.871
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_09_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 9 Longhi4
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 63.4
+          Al2O3: 14.2
+          MgO: 4.7
+          CaO: 17.7
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.2
+          Al2O3: 0.1
+          MgO: 0.1
+          CaO: 0.1
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: Longhi4
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id040
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 9 Longhi4
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id040
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id040
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.07
+        - sample: Longhi4
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id041
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 9 Longhi4
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id041
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id041
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.567
+        - sample: Longhi4
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id042
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 9 Longhi4
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id042
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id042
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.813
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_10_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 10 Longhi5
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 69.9
+          Al2O3: 16.3
+          MgO: 8.5
+          CaO: 5.3
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.7
+          Al2O3: 0.4
+          MgO: 0.2
+          CaO: 0.1
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: Longhi5
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id043
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 10 Longhi5
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id043
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id043
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.103
+        - sample: Longhi5
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id044
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 10 Longhi5
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id044
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id044
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value:
+            kind: unavailable
+            unavailable_reason: source_omission
+          value_as_printed: †
+          omission_as_printed: Sample contains a Cr3+ crystalline phase, typically spinel; values omitted for spinel-rich
+            samples.
+        - sample: Longhi5
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id045
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 10 Longhi5
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id045
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id045
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.866
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_11_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 11 Longhi6
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 63.1
+          Al2O3: 14.6
+          MgO: 8.2
+          CaO: 14.1
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.1
+          Al2O3: 0.1
+          MgO: 0.1
+          CaO: 0.1
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: Longhi6
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id046
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 11 Longhi6
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id046
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id046
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.079
+        - sample: Longhi6
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id047
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 11 Longhi6
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id047
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id047
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.603
+        - sample: Longhi6
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id048
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 11 Longhi6
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id048
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id048
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.83
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_12_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 12 Osborn1
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 47.1
+          Al2O3: 9.7
+          MgO: 8.5
+          CaO: 34.7
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.2
+          Al2O3: 0.1
+          MgO: 0.1
+          CaO: 0.1
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: Osborn1
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id049
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 12 Osborn1
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id049
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id049
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.021
+        - sample: Osborn1
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id050
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 12 Osborn1
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id050
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id050
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.309
+        - sample: Osborn1
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id051
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 12 Osborn1
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id051
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id051
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.57
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_13_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 13 Osborn2
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 51.2
+          Al2O3: 14.6
+          MgO: 3.6
+          CaO: 30.6
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.2
+          Al2O3: 0.1
+          MgO: 0.1
+          CaO: 0.2
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: Osborn2
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id052
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 13 Osborn2
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id052
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id052
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.035
+        - sample: Osborn2
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id053
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 13 Osborn2
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id053
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id053
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.402
+        - sample: Osborn2
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id054
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 13 Osborn2
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id054
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id054
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.673
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_14_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 14 Osborn3
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 48.4
+          Al2O3: 14.6
+          MgO: 13.4
+          CaO: 23.6
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.1
+          Al2O3: 0.1
+          MgO: 0.1
+          CaO: 0.1
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: Osborn3
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id055
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 14 Osborn3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id055
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id055
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.035
+        - sample: Osborn3
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id056
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 14 Osborn3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id056
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id056
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value:
+            kind: unavailable
+            unavailable_reason: source_omission
+          value_as_printed: †
+          omission_as_printed: Sample contains a Cr3+ crystalline phase, typically spinel; values omitted for spinel-rich
+            samples.
+        - sample: Osborn3
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id057
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 14 Osborn3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id057
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id057
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.673
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_15_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 15 Osborn4
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 45.5
+          Al2O3: 14.5
+          MgO: 10.5
+          CaO: 29.5
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.1
+          Al2O3: 0.1
+          MgO: 0.1
+          CaO: 0.1
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: Osborn4
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id058
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 15 Osborn4
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id058
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id058
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.027
+        - sample: Osborn4
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id059
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 15 Osborn4
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id059
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id059
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value:
+            kind: unavailable
+            unavailable_reason: source_omission
+          value_as_printed: †
+          omission_as_printed: Sample contains a Cr3+ crystalline phase, typically spinel; values omitted for spinel-rich
+            samples.
+        - sample: Osborn4
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id060
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 15 Osborn4
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id060
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id060
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.607
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_16_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 16 Osborn5
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 42.4
+          Al2O3: 19.4
+          MgO: 8.5
+          CaO: 29.7
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.2
+          Al2O3: 0.1
+          MgO: 0.1
+          CaO: 0.1
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: Osborn5
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id061
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 16 Osborn5
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id061
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id061
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.019
+        - sample: Osborn5
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id062
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 16 Osborn5
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id062
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id062
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value:
+            kind: unavailable
+            unavailable_reason: source_omission
+          value_as_printed: †
+          omission_as_printed: Sample contains a Cr3+ crystalline phase, typically spinel; values omitted for spinel-rich
+            samples.
+        - sample: Osborn5
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id063
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 16 Osborn5
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id063
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id063
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.525
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_17_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 17 Osborn6
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 50.6
+          Al2O3: 19.5
+          MgO: 14.4
+          CaO: 15.5
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.2
+          Al2O3: 0.1
+          MgO: 0.1
+          CaO: 0.1
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: Osborn6
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id064
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 17 Osborn6
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id064
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id064
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.052
+        - sample: Osborn6
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id065
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 17 Osborn6
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id065
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id065
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value:
+            kind: unavailable
+            unavailable_reason: source_omission
+          value_as_printed: †
+          omission_as_printed: Sample contains a Cr3+ crystalline phase, typically spinel; values omitted for spinel-rich
+            samples.
+        - sample: Osborn6
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id066
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 17 Osborn6
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id066
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id066
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.756
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_18_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 18 CMAS–A
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 56.1
+          Al2O3: 15.7
+          MgO: 12.1
+          CaO: 16.1
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.5
+          Al2O3: 0.5
+          MgO: 0.2
+          CaO: 0.1
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: CMAS–A
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id067
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 18 CMAS–A
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id067
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id067
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.064
+        - sample: CMAS–A
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id068
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 18 CMAS–A
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id068
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id068
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.545
+        - sample: CMAS–A
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id069
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 18 CMAS–A
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id069
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id069
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.796
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_19_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 19 CMAS–B
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 57.0
+          Al2O3: 14.2
+          MgO: 20.1
+          CaO: 8.7
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.9
+          Al2O3: 0.4
+          MgO: 0.5
+          CaO: 0.1
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: CMAS–B
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id070
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 19 CMAS–B
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id070
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id070
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.078
+        - sample: CMAS–B
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id071
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 19 CMAS–B
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id071
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id071
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.566
+        - sample: CMAS–B
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id072
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 19 CMAS–B
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id072
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id072
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.859
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_20_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 20 CMAS–C
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 57.5
+          Al2O3: 6.6
+          MgO: 19.5
+          CaO: 16.4
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.7
+          Al2O3: 0.3
+          MgO: 0.4
+          CaO: 0.2
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: CMAS–C
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id073
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 20 CMAS–C
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id073
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id073
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.05
+        - sample: CMAS–C
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id074
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 20 CMAS–C
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id074
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id074
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.481
+        - sample: CMAS–C
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id075
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 20 CMAS–C
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id075
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id075
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.75
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_21_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 21 CMAS–E
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 49.3
+          Al2O3: 10.3
+          MgO: 19.0
+          CaO: 21.4
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.6
+          Al2O3: 0.4
+          MgO: 0.3
+          CaO: 0.1
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: CMAS–E
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id076
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 21 CMAS–E
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id076
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id076
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.036
+        - sample: CMAS–E
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id077
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 21 CMAS–E
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id077
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id077
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.339
+        - sample: CMAS–E
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id078
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 21 CMAS–E
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id078
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id078
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.654
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_22_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 22 CMAS–F
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 61.9
+          Al2O3: 6.1
+          MgO: 13.5
+          CaO: 18.5
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.8
+          Al2O3: 0.2
+          MgO: 0.4
+          CaO: 0.1
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: CMAS–F
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id079
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 22 CMAS–F
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id079
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id079
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.083
+        - sample: CMAS–F
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id080
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 22 CMAS–F
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id080
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id080
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.582
+        - sample: CMAS–F
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id081
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 22 CMAS–F
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id081
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id081
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.871
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_23_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 23 CMAS–G
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 59.3
+          Al2O3: 12.6
+          MgO: 2.2
+          CaO: 25.9
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.9
+          Al2O3: 0.6
+          MgO: 0.2
+          CaO: 0.2
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: CMAS–G
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id082
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 23 CMAS–G
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id082
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id082
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.049
+        - sample: CMAS–G
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id083
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 23 CMAS–G
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id083
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id083
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.471
+        - sample: CMAS–G
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id084
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 23 CMAS–G
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id084
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id084
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.742
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_24_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 24 CAS–2
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 40.9
+          Al2O3: 12.1
+          MgO: 0.0
+          CaO: 47.0
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.4
+          Al2O3: 0.3
+          MgO: 0.0
+          CaO: 0.3
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: CAS–2
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id085
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 24 CAS–2
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id085
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id085
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.012
+        - sample: CAS–2
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id086
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 24 CAS–2
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id086
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id086
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.237
+        - sample: CAS–2
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id087
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 24 CAS–2
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id087
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id087
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.474
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_25_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 25 CAS–3
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 69.0
+          Al2O3: 20.5
+          MgO: 0.0
+          CaO: 10.5
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.4
+          Al2O3: 0.2
+          MgO: 0.0
+          CaO: 0.1
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: CAS–3
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id088
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 25 CAS–3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id088
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id088
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.09
+        - sample: CAS–3
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id089
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 25 CAS–3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id089
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id089
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value:
+            kind: unavailable
+            unavailable_reason: source_omission
+          value_as_printed: †
+          omission_as_printed: Sample contains a Cr3+ crystalline phase, typically spinel; values omitted for spinel-rich
+            samples.
+        - sample: CAS–3
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id090
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 25 CAS–3
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id090
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id090
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.847
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_26_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 26 CAS–4
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 53.2
+          Al2O3: 12.7
+          MgO: 0.0
+          CaO: 34.1
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.5
+          Al2O3: 0.1
+          MgO: 0.0
+          CaO: 0.4
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: CAS–4
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id091
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 26 CAS–4
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id091
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id091
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.034
+        - sample: CAS–4
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id092
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 26 CAS–4
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id092
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id092
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.396
+        - sample: CAS–4
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id093
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 26 CAS–4
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id093
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id093
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.669
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.
+    - observation_id: berry_2006_table1_row_27_measured
+      type: gibbs_table
+      locator:
+        published_page: 1902
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 row 27 MAS–1
+      phase: l
+      standard_state: Cr2+/ΣCr fraction as printed for quenched Fe-free CMAS melt
+      regime: Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench
+      units: dimensionless fraction as printed
+      uncertainty:
+        value: 0.03
+        basis: fraction
+        as_printed: ±0.03
+        confidence_level: one_sigma
+        scope: each point in this Table 1 column series
+        note: one standard deviation
+      values:
+        quantity: Cr2plus_over_total_Cr
+        method_class: measured_reduced
+        admission_status: admitted
+        composition_wt_pct:
+          SiO2: 61.5
+          Al2O3: 18.2
+          MgO: 20.3
+          CaO: 0.0
+        composition_uncertainty_sd_wt_pct:
+          SiO2: 0.4
+          Al2O3: 0.2
+          MgO: 0.2
+          CaO: 0.0
+        composition_uncertainty_note: Parenthetical values in Table 1 are one-standard-deviation uncertainties.
+        conditions_uncertainty_as_printed:
+          log_fO2: ±0.03 (one standard deviation)
+        points:
+        - sample: MAS–1
+          T_C: 1400
+          log_fO2: -2.0
+          locator: &id094
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 27 MAS–1
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id094
+            fO2_log:
+              state:
+                tag: value
+                value: -2.0
+              locator: *id094
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.118
+        - sample: MAS–1
+          T_C: 1400
+          log_fO2: -7.0
+          locator: &id095
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 27 MAS–1
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id095
+            fO2_log:
+              state:
+                tag: value
+                value: -7.0
+              locator: *id095
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value: 0.704
+        - sample: MAS–1
+          T_C: 1400
+          log_fO2: -9.0
+          locator: &id096
+            published_page: 1902
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 row 27 MAS–1
+          point_conditions:
+            T_C:
+              state:
+                tag: value
+                value: 1400
+              locator: *id096
+            fO2_log:
+              state:
+                tag: value
+                value: -9.0
+              locator: *id096
+            P_bar:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                published_page: 1902
+                pdf_page_index: 1
+                paragraph: Experimental Methods
+                note: Total pressure is not reported in this paper.
+          value:
+            kind: unavailable
+            unavailable_reason: source_omission
+          value_as_printed: –
+          omission_as_printed: Em dash in Table 1.
+      derivation:
+        relation: Cr2+/ΣCr reduced from the Cr K-edge XANES 1s to 4s derivative peak area using the printed calibration
+          and fit.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            published_page: 1902
+            pdf_page_index: 1
+            paragraph: XANES Analysis
+            note: The underlying XANES spectra are not printed; Table 1 gives intermediate peak areas and corresponding
+              ratios.

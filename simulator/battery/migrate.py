@@ -833,6 +833,37 @@ def _comparison_method_cancellation_notice_reason(
         "Knudsen-cell constant"
     )
 
+
+def _hold_reason_notice(
+    reason: str,
+    *,
+    quantity: Quantity | None,
+    origin: str,
+    band: object = None,
+    include_misprint: bool = True,
+) -> Notice | None:
+    if not isinstance(quantity, Quantity) or not reason:
+        return None
+    lowered = reason.lower()
+    if include_misprint and lowered.startswith("probable source misprint"):
+        kind = NoticeKind.PROBABLE_SOURCE_MISPRINT
+    elif lowered.startswith("out_of_certified_band:"):
+        kind = NoticeKind.OUT_OF_CERTIFIED_BAND
+    elif _is_source_internally_inconsistent(
+        NoticeKind.SOURCE_DISAGREEMENT, reason
+    ):
+        kind = NoticeKind.SOURCE_DISAGREEMENT
+    else:
+        return None
+    return Notice(
+        kind=kind,
+        affected_quantities=(quantity,),
+        reason=reason,
+        origin=origin,
+        band=str(band) if kind is NoticeKind.OUT_OF_CERTIFIED_BAND and band else None,
+    )
+
+
 def _temperature_number(value: object) -> Decimal | None:
     if isinstance(value, Value) and value.kind is ValueKind.POINT:
         return value.point
@@ -2936,6 +2967,8 @@ def convert_pressure_to_pa(
     if lowered in {"gpa"}:
         # Premise: 1 GPa = 1e9 Pa exactly (SI).
         return amount * Decimal("1000000000"), "GPa_to_Pa"
+    if lowered == "mpa":
+        return amount * _CONVERSION_META["MPa_to_Pa"][0], "MPa_to_Pa"
     if lowered in {"bar"}:
         return bar_to_pa(amount), "bar_to_Pa"
     if lowered in {"atm", "atmosphere", "atmospheres"}:
@@ -3177,6 +3210,12 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
         "kJ_per_declared_mol_basis",
         "kcal/mol",
     ),
+    "thermochemical_cal_to_kJ_exact": (
+        Decimal("0.004184"),
+        "H_kJ_per_declared_mol_basis = H_cal_per_mol × 0.004184",
+        "kJ_per_declared_mol_basis",
+        "cal/mol",
+    ),
     "J_to_kJ_exact": (
         Decimal("1000"),
         "H_kJ_per_declared_mol_basis = H_J_per_mol / 1000",
@@ -3250,6 +3289,7 @@ _COMPOSITION_COMPONENTS: dict[str, tuple[str, str, bool]] = {
     "CaF2": ("CaF2", "CaF2", False),
     "MoO2": ("MoO2", "MoO2", False),
     "Rb2O": ("Rb2O", "Rb2O", False),
+    "Ce2O3": ("Ce2O3", "Ce2O3", False),
     "SO3": ("SO3", "SO3", False),
     "SO2": ("SO2", "SO2", False),
     "S": ("S", "S", False),
@@ -3867,7 +3907,22 @@ def _mole_fraction_composition_from_values(
                     omitted.append(token)
                     continue
                 components.append((component, parsed))
+    basis = _declared_composition_mol_basis(values, raw) or _DEFAULT_COMPOSITION_MOL_BASIS
     if len(components) < 2:
+        if (
+            len(components) == 1
+            and basis == "pure_oxide_system"
+            and components[0][1] == Decimal("1")
+            and not omitted
+        ):
+            return (
+                Composition(
+                    basis=basis,
+                    components=tuple(components),
+                    amount_basis=AmountBasis.MOLE_FRACTION,
+                ),
+                (),
+            )
         for key in ("X_Na2O_as_published", "X_Na2O"):
             fraction = _as_dec_or_none(values.get(key))
             if fraction is None or not Decimal("0") <= fraction <= Decimal("1"):
@@ -3878,9 +3933,6 @@ def _mole_fraction_composition_from_values(
         return None, tuple(omitted)
     if omitted:
         return None, tuple(omitted)
-    basis = (
-        _declared_composition_mol_basis(values, raw) or _DEFAULT_COMPOSITION_MOL_BASIS
-    )
     return (
         Composition(
             basis=basis,
@@ -8498,6 +8550,8 @@ def _convert_compilation_amount(
             "kcalgfw-1",
         }:
             return amount * Decimal("4.184"), "thermochemical_kcal_to_kJ_exact"
+        if energy and token in {"cal/mol", "cal/mole", "calgfw^-1", "calgfw-1"}:
+            return amount * Decimal("0.004184"), "thermochemical_cal_to_kJ_exact"
         if energy and token in {"j/mol", "j/mole"}:
             return amount / Decimal("1000"), "J_to_kJ_exact"
         if energy and token in {
@@ -9307,6 +9361,7 @@ def _selection_from_named_field(
             Quantity.MASS_LOSS_FRACTION_VS_T,
             Quantity.YIELD_FRACTION,
             Quantity.O2_YIELD,
+            Quantity.VALENCE_RATIO,
         } and _percent_named_fraction_field(key, units):
             amount = amount / Decimal("100")
             trail = "percent_to_fraction"
@@ -9356,6 +9411,7 @@ def _selection_from_named_field(
             Quantity.MASS_LOSS_FRACTION_VS_T,
             Quantity.YIELD_FRACTION,
             Quantity.O2_YIELD,
+            Quantity.VALENCE_RATIO,
         } and _percent_named_fraction_field(key, units):
             amount /= Decimal("100")
             trail = "percent_to_fraction"
@@ -15661,32 +15717,14 @@ class Migrator:
                     source=composition.proxy_source,
                 )
             )
-        if (
-            isinstance(q_token, Quantity)
-            and hold_reason.lower().startswith("probable source misprint")
-        ):
-            observation_notices.append(
-                Notice(
-                    kind=NoticeKind.PROBABLE_SOURCE_MISPRINT,
-                    affected_quantities=(q_token,),
-                    reason=hold_reason,
-                    origin=obs_id,
-                )
-            )
-        elif (
-            isinstance(q_token, Quantity)
-            and _is_source_internally_inconsistent(
-                NoticeKind.SOURCE_DISAGREEMENT, hold_reason
-            )
-        ):
-            observation_notices.append(
-                Notice(
-                    kind=NoticeKind.SOURCE_DISAGREEMENT,
-                    affected_quantities=(q_token,),
-                    reason=hold_reason,
-                    origin=obs_id,
-                )
-            )
+        hold_reason_notice = _hold_reason_notice(
+            hold_reason,
+            quantity=q_token,
+            origin=obs_id,
+            band=values.get("band"),
+        )
+        if hold_reason_notice is not None:
+            observation_notices.append(hold_reason_notice)
         bulk_fence = _bulk_composition_pressure_fence(values)
         if bulk_fence:
             observation_notices.append(
@@ -16106,6 +16144,7 @@ class Migrator:
         point_map_declared = False
         point_composition_refusal: list[str] = []
         point_composition_located: Located[Composition] | None = None
+        point_printed_composition: Located[Mapping[str, Any]] | None = None
         point_catalogue: Located[Composition] | None = None
         malformed_composition_amount: str | None = None
         if isinstance(raw_item, Mapping):
@@ -16248,6 +16287,14 @@ class Migrator:
                 if point_composition is None
                 else Located(State.of(point_composition), locator=point_locator)
             )
+            if (
+                q_for_species is Quantity.FE3_FE2_RATIO
+                and point_oxide_map is not None
+                and point_composition_located is None
+            ):
+                point_printed_composition, point_composition_located = (
+                    _located_printed_and_initial(point_oxide_map, point_locator)
+                )
             point_catalogue = _catalogue_composition_located_from_values(
                 raw_item, point_locator
             )
@@ -16696,9 +16743,13 @@ class Migrator:
             fallback=(parent_values,) if isinstance(parent_values, Mapping) else (),
         )
         if point_oxide_map:
-            printed, residual = _located_printed_and_initial(
-                point_oxide_map, point_locator
-            )
+            if point_printed_composition is None:
+                printed, residual = _located_printed_and_initial(
+                    point_oxide_map, point_locator
+                )
+            else:
+                printed = point_printed_composition
+                residual = point_composition_located
             role, role_refusal = _declared_composition_role(raw_item, parent_values)
             if role_refusal is not None:
                 self.result.add_queue(
@@ -17197,6 +17248,45 @@ class Migrator:
                     locator=point_locator,
                 ),
             }
+        if q_token_point is Quantity.VALENCE_RATIO and (
+            identity.composition is None or not identity.composition.is_value
+        ):
+            located_composition = (point_conditions or {}).get("composition")
+            if (
+                isinstance(located_composition, Located)
+                and located_composition.state.is_value
+            ):
+                raw_composition = located_composition.state.value
+                converted_composition = (
+                    Located(State.of(raw_composition))
+                    if isinstance(raw_composition, Composition)
+                    else _composition_located_from_plain(
+                        {
+                            "amount_basis": AmountBasis.MASS_PERCENT.value,
+                            "components": raw_composition,
+                        }
+                    )
+                )
+                if converted_composition.state.is_value:
+                    identity = replace(
+                        identity, composition=converted_composition.state
+                    )
+        if q_token_point is Quantity.VALENCE_RATIO and (
+            identity.total_pressure_Pa is None
+            or not identity.total_pressure_Pa.is_value
+        ):
+            pressure_condition = (point_conditions or {}).get("pressure_MPa")
+            if (
+                isinstance(pressure_condition, Located)
+                and pressure_condition.state.is_value
+            ):
+                pressure, _trail = convert_pressure_to_pa(
+                    pressure_condition.state.value, "MPa"
+                )
+                if pressure is not None:
+                    identity = replace(
+                        identity, total_pressure_Pa=State.of(pressure)
+                    )
         if printed_phase_kind is not None and (
             identity.composition is None or not identity.composition.is_value
         ):
@@ -17207,17 +17297,15 @@ class Migrator:
             ):
                 identity = replace(identity, composition=located_composition.state)
         child_notices = list(notices)
-        if _is_source_internally_inconsistent(
-            NoticeKind.SOURCE_DISAGREEMENT, parent_reason
-        ) and isinstance(q_token_point, Quantity):
-            child_notices.append(
-                Notice(
-                    kind=NoticeKind.SOURCE_DISAGREEMENT,
-                    affected_quantities=(q_token_point,),
-                    reason=parent_reason,
-                    origin=point_id,
-                )
-            )
+        parent_hold_notice = _hold_reason_notice(
+            parent_reason,
+            quantity=q_token_point,
+            origin=point_id,
+            band=(parent_values or {}).get("band"),
+            include_misprint=False,
+        )
+        if parent_hold_notice is not None:
+            child_notices.append(parent_hold_notice)
         from simulator.battery.validity import comparison_method_cell_constant_cancels
 
         if (

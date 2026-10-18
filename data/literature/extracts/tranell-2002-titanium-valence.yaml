@@ -1,0 +1,4121 @@
+schema_version: literature_extract.v1
+source_id: tranell-2002-titanium-valence
+source:
+  citation: Tranell, G., Ostrovski, O. & Jahanshahi, S. (2002), The equilibrium partitioning of titanium between
+    Ti3+ and Ti4+ valency states in CaO-SiO2-TiOx slags, Metallurgical and Materials Transactions B 33B:61-67.
+  year: 2002
+  corpus_asset: raw/tranell-2002-titanium-valence/tranell-2002-titanium-valence.pdf
+extraction:
+  method: Table I values transcribed from a 400 dpi render of PDF page 3 (published page 63); pdftotext -layout
+    used only as a table locator. All 57 rows and every numeric cell were checked against the render.
+  date: '2026-10-16'
+  worker: rdxw-ti02-1016
+review_status: draft
+corrections: []
+species:
+  Ti:
+    observations:
+    - observation_id: tranell_2002_t1_cst1_1843k_pO2m8
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id001
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 1, slag CST1
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST1
+          value: '0.023'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-8
+            units: atm
+          slag_as_printed: CST1
+          TiOx_mass_pct_as_printed: '7.2'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.25'
+          CaO_mass_pct_as_printed: '51.6'
+          SiO2_mass_pct_as_printed: '41.2'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id001
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-8 atm; Ar-CO-CO2 atmosphere
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id001
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '7.2'
+                  - - CaO
+                    - '51.6'
+                  - - SiO2
+                    - '41.2'
+              locator: *id001
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.25'
+              locator: *id001
+          locator: *id001
+    - observation_id: tranell_2002_t1_cst1_1843k_pO2m9
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id002
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 2, slag CST1
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST1
+          value: '0.030'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-9
+            units: atm
+          slag_as_printed: CST1
+          TiOx_mass_pct_as_printed: '7.2'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.25'
+          CaO_mass_pct_as_printed: '51.6'
+          SiO2_mass_pct_as_printed: '41.2'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id002
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-9 atm; Ar-CO-CO2 atmosphere
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id002
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id002
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '7.2'
+                  - - CaO
+                    - '51.6'
+                  - - SiO2
+                    - '41.2'
+              locator: *id002
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.25'
+              locator: *id002
+          locator: *id002
+    - observation_id: tranell_2002_t1_cst1_1873k_pO2m12
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id003
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 3, slag CST1
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST1
+          value: '0.190'
+          T_K: '1873'
+          oxygen_partial_pressure:
+            value: 10^-12
+            units: atm
+          slag_as_printed: CST1
+          TiOx_mass_pct_as_printed: '7.2'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.25'
+          CaO_mass_pct_as_printed: '51.6'
+          SiO2_mass_pct_as_printed: '41.2'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1873'
+              locator: *id003
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-12 atm; Ar-CO-CO2 atmosphere
+              locator: *id003
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id003
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id003
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '7.2'
+                  - - CaO
+                    - '51.6'
+                  - - SiO2
+                    - '41.2'
+              locator: *id003
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.25'
+              locator: *id003
+          locator: *id003
+    - observation_id: tranell_2002_t1_cst2_1843k_pO2m8
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id004
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 4, slag CST2
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST2
+          value: '0.029'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-8
+            units: atm
+          slag_as_printed: CST2
+          TiOx_mass_pct_as_printed: '7.5'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.99'
+          CaO_mass_pct_as_printed: '46.0'
+          SiO2_mass_pct_as_printed: '46.5'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id004
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-8 atm; Ar-CO-CO2 atmosphere
+              locator: *id004
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id004
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id004
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '7.5'
+                  - - CaO
+                    - '46.0'
+                  - - SiO2
+                    - '46.5'
+              locator: *id004
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.99'
+              locator: *id004
+          locator: *id004
+    - observation_id: tranell_2002_t1_cst2_1843k_pO2m9
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id005
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 5, slag CST2
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST2
+          value: '0.057'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-9
+            units: atm
+          slag_as_printed: CST2
+          TiOx_mass_pct_as_printed: '7.5'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.99'
+          CaO_mass_pct_as_printed: '46.0'
+          SiO2_mass_pct_as_printed: '46.5'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id005
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-9 atm; Ar-CO-CO2 atmosphere
+              locator: *id005
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id005
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id005
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '7.5'
+                  - - CaO
+                    - '46.0'
+                  - - SiO2
+                    - '46.5'
+              locator: *id005
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.99'
+              locator: *id005
+          locator: *id005
+    - observation_id: tranell_2002_t1_cst2_1873k_pO2m12
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id006
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 6, slag CST2
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST2
+          value: '0.272'
+          T_K: '1873'
+          oxygen_partial_pressure:
+            value: 10^-12
+            units: atm
+          slag_as_printed: CST2
+          TiOx_mass_pct_as_printed: '7.5'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.99'
+          CaO_mass_pct_as_printed: '46.0'
+          SiO2_mass_pct_as_printed: '46.5'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1873'
+              locator: *id006
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-12 atm; Ar-CO-CO2 atmosphere
+              locator: *id006
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id006
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id006
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '7.5'
+                  - - CaO
+                    - '46.0'
+                  - - SiO2
+                    - '46.5'
+              locator: *id006
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.99'
+              locator: *id006
+          locator: *id006
+    - observation_id: tranell_2002_t1_cst3_1843k_pO2m8
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id007
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 7, slag CST3
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST3
+          value: '0.047'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-8
+            units: atm
+          slag_as_printed: CST3
+          TiOx_mass_pct_as_printed: '7.8'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.77'
+          CaO_mass_pct_as_printed: '40.1'
+          SiO2_mass_pct_as_printed: '52.1'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id007
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-8 atm; Ar-CO-CO2 atmosphere
+              locator: *id007
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id007
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id007
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '7.8'
+                  - - CaO
+                    - '40.1'
+                  - - SiO2
+                    - '52.1'
+              locator: *id007
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.77'
+              locator: *id007
+          locator: *id007
+    - observation_id: tranell_2002_t1_cst3_1843k_pO2m9
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id008
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 8, slag CST3
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST3
+          value: '0.063'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-9
+            units: atm
+          slag_as_printed: CST3
+          TiOx_mass_pct_as_printed: '7.8'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.77'
+          CaO_mass_pct_as_printed: '40.1'
+          SiO2_mass_pct_as_printed: '52.1'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id008
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-9 atm; Ar-CO-CO2 atmosphere
+              locator: *id008
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id008
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id008
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '7.8'
+                  - - CaO
+                    - '40.1'
+                  - - SiO2
+                    - '52.1'
+              locator: *id008
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.77'
+              locator: *id008
+          locator: *id008
+    - observation_id: tranell_2002_t1_cst3_1873k_pO2m12
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id009
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 9, slag CST3
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST3
+          value: '0.455'
+          T_K: '1873'
+          oxygen_partial_pressure:
+            value: 10^-12
+            units: atm
+          slag_as_printed: CST3
+          TiOx_mass_pct_as_printed: '7.8'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.77'
+          CaO_mass_pct_as_printed: '40.1'
+          SiO2_mass_pct_as_printed: '52.1'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1873'
+              locator: *id009
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-12 atm; Ar-CO-CO2 atmosphere
+              locator: *id009
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id009
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id009
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '7.8'
+                  - - CaO
+                    - '40.1'
+                  - - SiO2
+                    - '52.1'
+              locator: *id009
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.77'
+              locator: *id009
+          locator: *id009
+    - observation_id: tranell_2002_t1_cst4_1843k_pO2m8
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id010
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 10, slag CST4
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST4
+          value: '0.069'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-8
+            units: atm
+          slag_as_printed: CST4
+          TiOx_mass_pct_as_printed: '7.3'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.53'
+          CaO_mass_pct_as_printed: '32.1'
+          SiO2_mass_pct_as_printed: '60.6'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id010
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-8 atm; Ar-CO-CO2 atmosphere
+              locator: *id010
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id010
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id010
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '7.3'
+                  - - CaO
+                    - '32.1'
+                  - - SiO2
+                    - '60.6'
+              locator: *id010
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.53'
+              locator: *id010
+          locator: *id010
+    - observation_id: tranell_2002_t1_cst4_1843k_pO2m9
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id011
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 11, slag CST4
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST4
+          value: '0.100'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-9
+            units: atm
+          slag_as_printed: CST4
+          TiOx_mass_pct_as_printed: '7.3'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.53'
+          CaO_mass_pct_as_printed: '32.1'
+          SiO2_mass_pct_as_printed: '60.6'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id011
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-9 atm; Ar-CO-CO2 atmosphere
+              locator: *id011
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id011
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id011
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '7.3'
+                  - - CaO
+                    - '32.1'
+                  - - SiO2
+                    - '60.6'
+              locator: *id011
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.53'
+              locator: *id011
+          locator: *id011
+    - observation_id: tranell_2002_t1_cst4_1873k_pO2m12
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id012
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 12, slag CST4
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST4
+          value: '0.632'
+          T_K: '1873'
+          oxygen_partial_pressure:
+            value: 10^-12
+            units: atm
+          slag_as_printed: CST4
+          TiOx_mass_pct_as_printed: '7.3'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.53'
+          CaO_mass_pct_as_printed: '32.1'
+          SiO2_mass_pct_as_printed: '60.6'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1873'
+              locator: *id012
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-12 atm; Ar-CO-CO2 atmosphere
+              locator: *id012
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id012
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id012
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '7.3'
+                  - - CaO
+                    - '32.1'
+                  - - SiO2
+                    - '60.6'
+              locator: *id012
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.53'
+              locator: *id012
+          locator: *id012
+    - observation_id: tranell_2002_t1_cst5_1843k_pO2m7
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id013
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 13, slag CST5
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST5
+          value: '0.011'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-7
+            units: atm
+          slag_as_printed: CST5
+          TiOx_mass_pct_as_printed: '14.6'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.21'
+          CaO_mass_pct_as_printed: '46.8'
+          SiO2_mass_pct_as_printed: '38.6'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id013
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-7 atm; Ar-CO-CO2 atmosphere
+              locator: *id013
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id013
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id013
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.6'
+                  - - CaO
+                    - '46.8'
+                  - - SiO2
+                    - '38.6'
+              locator: *id013
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.21'
+              locator: *id013
+          locator: *id013
+    - observation_id: tranell_2002_t1_cst5_1843k_pO2m8
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id014
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 14, slag CST5
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST5
+          value: '0.018'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-8
+            units: atm
+          slag_as_printed: CST5
+          TiOx_mass_pct_as_printed: '14.6'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.21'
+          CaO_mass_pct_as_printed: '46.8'
+          SiO2_mass_pct_as_printed: '38.6'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id014
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-8 atm; Ar-CO-CO2 atmosphere
+              locator: *id014
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id014
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id014
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.6'
+                  - - CaO
+                    - '46.8'
+                  - - SiO2
+                    - '38.6'
+              locator: *id014
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.21'
+              locator: *id014
+          locator: *id014
+    - observation_id: tranell_2002_t1_cst5_1783k_pO2m8
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id015
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 15, slag CST5
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST5
+          value: '0.011'
+          T_K: '1783'
+          oxygen_partial_pressure:
+            value: 10^-8
+            units: atm
+          slag_as_printed: CST5
+          TiOx_mass_pct_as_printed: '14.6'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.21'
+          CaO_mass_pct_as_printed: '46.8'
+          SiO2_mass_pct_as_printed: '38.6'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1783'
+              locator: *id015
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-8 atm; Ar-CO-CO2 atmosphere
+              locator: *id015
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id015
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id015
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.6'
+                  - - CaO
+                    - '46.8'
+                  - - SiO2
+                    - '38.6'
+              locator: *id015
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.21'
+              locator: *id015
+          locator: *id015
+    - observation_id: tranell_2002_t1_cst5_1843k_pO2m9
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id016
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 16, slag CST5
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST5
+          value: '0.027'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-9
+            units: atm
+          slag_as_printed: CST5
+          TiOx_mass_pct_as_printed: '14.6'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.21'
+          CaO_mass_pct_as_printed: '46.8'
+          SiO2_mass_pct_as_printed: '38.6'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id016
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-9 atm; Ar-CO-CO2 atmosphere
+              locator: *id016
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id016
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id016
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.6'
+                  - - CaO
+                    - '46.8'
+                  - - SiO2
+                    - '38.6'
+              locator: *id016
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.21'
+              locator: *id016
+          locator: *id016
+    - observation_id: tranell_2002_t1_cst5_1843k_pO2m10
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id017
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 17, slag CST5
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST5
+          value: '0.047'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-10
+            units: atm
+          slag_as_printed: CST5
+          TiOx_mass_pct_as_printed: '14.6'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.21'
+          CaO_mass_pct_as_printed: '46.8'
+          SiO2_mass_pct_as_printed: '38.6'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id017
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-10 atm; Ar-CO-CO2 atmosphere
+              locator: *id017
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id017
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id017
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.6'
+                  - - CaO
+                    - '46.8'
+                  - - SiO2
+                    - '38.6'
+              locator: *id017
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.21'
+              locator: *id017
+          locator: *id017
+    - observation_id: tranell_2002_t1_cst5_1843k_pO2m12
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id018
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 18, slag CST5
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST5
+          value: '0.160'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-12
+            units: atm
+          slag_as_printed: CST5
+          TiOx_mass_pct_as_printed: '14.6'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.21'
+          CaO_mass_pct_as_printed: '46.8'
+          SiO2_mass_pct_as_printed: '38.6'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id018
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-12 atm; Ar-CO-CO2 atmosphere
+              locator: *id018
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id018
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id018
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.6'
+                  - - CaO
+                    - '46.8'
+                  - - SiO2
+                    - '38.6'
+              locator: *id018
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.21'
+              locator: *id018
+          locator: *id018
+    - observation_id: tranell_2002_t1_cst6_1843k_pO2m7
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id019
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 19, slag CST6
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST6
+          value: '0.017'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-7
+            units: atm
+          slag_as_printed: CST6
+          TiOx_mass_pct_as_printed: '14.2'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.00'
+          CaO_mass_pct_as_printed: '42.9'
+          SiO2_mass_pct_as_printed: '42.9'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id019
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-7 atm; Ar-CO-CO2 atmosphere
+              locator: *id019
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id019
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id019
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.2'
+                  - - CaO
+                    - '42.9'
+                  - - SiO2
+                    - '42.9'
+              locator: *id019
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.00'
+              locator: *id019
+          locator: *id019
+    - observation_id: tranell_2002_t1_cst6_1843k_pO2m8
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id020
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 20, slag CST6
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST6
+          value: '0.026'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-8
+            units: atm
+          slag_as_printed: CST6
+          TiOx_mass_pct_as_printed: '14.2'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.00'
+          CaO_mass_pct_as_printed: '42.9'
+          SiO2_mass_pct_as_printed: '42.9'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id020
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-8 atm; Ar-CO-CO2 atmosphere
+              locator: *id020
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id020
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id020
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.2'
+                  - - CaO
+                    - '42.9'
+                  - - SiO2
+                    - '42.9'
+              locator: *id020
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.00'
+              locator: *id020
+          locator: *id020
+    - observation_id: tranell_2002_t1_cst6_1843k_pO2m9
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id021
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 21, slag CST6
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST6
+          value: '0.038'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-9
+            units: atm
+          slag_as_printed: CST6
+          TiOx_mass_pct_as_printed: '14.2'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.00'
+          CaO_mass_pct_as_printed: '42.9'
+          SiO2_mass_pct_as_printed: '42.9'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id021
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-9 atm; Ar-CO-CO2 atmosphere
+              locator: *id021
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id021
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id021
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.2'
+                  - - CaO
+                    - '42.9'
+                  - - SiO2
+                    - '42.9'
+              locator: *id021
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.00'
+              locator: *id021
+          locator: *id021
+    - observation_id: tranell_2002_t1_cst6_1843k_pO2m10
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id022
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 22, slag CST6
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST6
+          value: '0.069'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-10
+            units: atm
+          slag_as_printed: CST6
+          TiOx_mass_pct_as_printed: '14.2'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.00'
+          CaO_mass_pct_as_printed: '42.9'
+          SiO2_mass_pct_as_printed: '42.9'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id022
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-10 atm; Ar-CO-CO2 atmosphere
+              locator: *id022
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id022
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id022
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.2'
+                  - - CaO
+                    - '42.9'
+                  - - SiO2
+                    - '42.9'
+              locator: *id022
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.00'
+              locator: *id022
+          locator: *id022
+    - observation_id: tranell_2002_t1_cst6_1873k_pO2m12
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id023
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 23, slag CST6
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST6
+          value: '0.220'
+          T_K: '1873'
+          oxygen_partial_pressure:
+            value: 10^-12
+            units: atm
+          slag_as_printed: CST6
+          TiOx_mass_pct_as_printed: '14.2'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.00'
+          CaO_mass_pct_as_printed: '42.9'
+          SiO2_mass_pct_as_printed: '42.9'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1873'
+              locator: *id023
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-12 atm; Ar-CO-CO2 atmosphere
+              locator: *id023
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id023
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id023
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.2'
+                  - - CaO
+                    - '42.9'
+                  - - SiO2
+                    - '42.9'
+              locator: *id023
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.00'
+              locator: *id023
+          locator: *id023
+    - observation_id: tranell_2002_t1_cst7_1843k_pO2m7
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id024
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 24, slag CST7
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST7
+          value: '0.034'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-7
+            units: atm
+          slag_as_printed: CST7
+          TiOx_mass_pct_as_printed: '14.6'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.70'
+          CaO_mass_pct_as_printed: '35.2'
+          SiO2_mass_pct_as_printed: '50.2'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id024
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-7 atm; Ar-CO-CO2 atmosphere
+              locator: *id024
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id024
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id024
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.6'
+                  - - CaO
+                    - '35.2'
+                  - - SiO2
+                    - '50.2'
+              locator: *id024
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.70'
+              locator: *id024
+          locator: *id024
+    - observation_id: tranell_2002_t1_cst7_1843k_pO2m8
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id025
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 25, slag CST7
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST7
+          value: '0.050'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-8
+            units: atm
+          slag_as_printed: CST7
+          TiOx_mass_pct_as_printed: '14.6'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.70'
+          CaO_mass_pct_as_printed: '35.2'
+          SiO2_mass_pct_as_printed: '50.2'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id025
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-8 atm; Ar-CO-CO2 atmosphere
+              locator: *id025
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id025
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id025
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.6'
+                  - - CaO
+                    - '35.2'
+                  - - SiO2
+                    - '50.2'
+              locator: *id025
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.70'
+              locator: *id025
+          locator: *id025
+    - observation_id: tranell_2002_t1_cst7_1783k_pO2m8
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id026
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 26, slag CST7
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST7
+          value: '0.034'
+          T_K: '1783'
+          oxygen_partial_pressure:
+            value: 10^-8
+            units: atm
+          slag_as_printed: CST7
+          TiOx_mass_pct_as_printed: '14.6'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.70'
+          CaO_mass_pct_as_printed: '35.2'
+          SiO2_mass_pct_as_printed: '50.2'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1783'
+              locator: *id026
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-8 atm; Ar-CO-CO2 atmosphere
+              locator: *id026
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id026
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id026
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.6'
+                  - - CaO
+                    - '35.2'
+                  - - SiO2
+                    - '50.2'
+              locator: *id026
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.70'
+              locator: *id026
+          locator: *id026
+    - observation_id: tranell_2002_t1_cst7_1903k_pO2m8
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id027
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 27, slag CST7
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST7
+          value: '0.068'
+          T_K: '1903'
+          oxygen_partial_pressure:
+            value: 10^-8
+            units: atm
+          slag_as_printed: CST7
+          TiOx_mass_pct_as_printed: '14.6'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.70'
+          CaO_mass_pct_as_printed: '35.2'
+          SiO2_mass_pct_as_printed: '50.2'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1903'
+              locator: *id027
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-8 atm; Ar-CO-CO2 atmosphere
+              locator: *id027
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id027
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id027
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.6'
+                  - - CaO
+                    - '35.2'
+                  - - SiO2
+                    - '50.2'
+              locator: *id027
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.70'
+              locator: *id027
+          locator: *id027
+    - observation_id: tranell_2002_t1_cst7_1843k_pO2m9
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id028
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 28, slag CST7
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST7
+          value: '0.076'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-9
+            units: atm
+          slag_as_printed: CST7
+          TiOx_mass_pct_as_printed: '14.6'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.70'
+          CaO_mass_pct_as_printed: '35.2'
+          SiO2_mass_pct_as_printed: '50.2'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id028
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-9 atm; Ar-CO-CO2 atmosphere
+              locator: *id028
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id028
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id028
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.6'
+                  - - CaO
+                    - '35.2'
+                  - - SiO2
+                    - '50.2'
+              locator: *id028
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.70'
+              locator: *id028
+          locator: *id028
+    - observation_id: tranell_2002_t1_cst7_1843k_pO2m10
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id029
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 29, slag CST7
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST7
+          value: '0.123'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-10
+            units: atm
+          slag_as_printed: CST7
+          TiOx_mass_pct_as_printed: '14.6'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.70'
+          CaO_mass_pct_as_printed: '35.2'
+          SiO2_mass_pct_as_printed: '50.2'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id029
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-10 atm; Ar-CO-CO2 atmosphere
+              locator: *id029
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id029
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id029
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.6'
+                  - - CaO
+                    - '35.2'
+                  - - SiO2
+                    - '50.2'
+              locator: *id029
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.70'
+              locator: *id029
+          locator: *id029
+    - observation_id: tranell_2002_t1_cst7_1873k_pO2m12
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id030
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 30, slag CST7
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST7
+          value: '0.399'
+          T_K: '1873'
+          oxygen_partial_pressure:
+            value: 10^-12
+            units: atm
+          slag_as_printed: CST7
+          TiOx_mass_pct_as_printed: '14.6'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.70'
+          CaO_mass_pct_as_printed: '35.2'
+          SiO2_mass_pct_as_printed: '50.2'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1873'
+              locator: *id030
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-12 atm; Ar-CO-CO2 atmosphere
+              locator: *id030
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id030
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id030
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.6'
+                  - - CaO
+                    - '35.2'
+                  - - SiO2
+                    - '50.2'
+              locator: *id030
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.70'
+              locator: *id030
+          locator: *id030
+    - observation_id: tranell_2002_t1_cst8_1843k_pO2m7
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id031
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 31, slag CST8
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST8
+          value: '0.039'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-7
+            units: atm
+          slag_as_printed: CST8
+          TiOx_mass_pct_as_printed: '14.8'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.56'
+          CaO_mass_pct_as_printed: '30.6'
+          SiO2_mass_pct_as_printed: '54.6'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id031
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-7 atm; Ar-CO-CO2 atmosphere
+              locator: *id031
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id031
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id031
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.8'
+                  - - CaO
+                    - '30.6'
+                  - - SiO2
+                    - '54.6'
+              locator: *id031
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.56'
+              locator: *id031
+          locator: *id031
+    - observation_id: tranell_2002_t1_cst8_1843k_pO2m8
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id032
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 32, slag CST8
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST8
+          value: '0.061'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-8
+            units: atm
+          slag_as_printed: CST8
+          TiOx_mass_pct_as_printed: '14.8'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.56'
+          CaO_mass_pct_as_printed: '30.6'
+          SiO2_mass_pct_as_printed: '54.6'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id032
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-8 atm; Ar-CO-CO2 atmosphere
+              locator: *id032
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id032
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id032
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.8'
+                  - - CaO
+                    - '30.6'
+                  - - SiO2
+                    - '54.6'
+              locator: *id032
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.56'
+              locator: *id032
+          locator: *id032
+    - observation_id: tranell_2002_t1_cst8_1843k_pO2m9
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id033
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 33, slag CST8
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST8
+          value: '0.088'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-9
+            units: atm
+          slag_as_printed: CST8
+          TiOx_mass_pct_as_printed: '14.8'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.56'
+          CaO_mass_pct_as_printed: '30.6'
+          SiO2_mass_pct_as_printed: '54.6'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id033
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-9 atm; Ar-CO-CO2 atmosphere
+              locator: *id033
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id033
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id033
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.8'
+                  - - CaO
+                    - '30.6'
+                  - - SiO2
+                    - '54.6'
+              locator: *id033
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.56'
+              locator: *id033
+          locator: *id033
+    - observation_id: tranell_2002_t1_cst8_1843k_pO2m10
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id034
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 34, slag CST8
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST8
+          value: '0.162'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-10
+            units: atm
+          slag_as_printed: CST8
+          TiOx_mass_pct_as_printed: '14.8'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.56'
+          CaO_mass_pct_as_printed: '30.6'
+          SiO2_mass_pct_as_printed: '54.6'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id034
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-10 atm; Ar-CO-CO2 atmosphere
+              locator: *id034
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id034
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id034
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.8'
+                  - - CaO
+                    - '30.6'
+                  - - SiO2
+                    - '54.6'
+              locator: *id034
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.56'
+              locator: *id034
+          locator: *id034
+    - observation_id: tranell_2002_t1_cst8_1873k_pO2m12
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id035
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 35, slag CST8
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST8
+          value: '0.469'
+          T_K: '1873'
+          oxygen_partial_pressure:
+            value: 10^-12
+            units: atm
+          slag_as_printed: CST8
+          TiOx_mass_pct_as_printed: '14.8'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.56'
+          CaO_mass_pct_as_printed: '30.6'
+          SiO2_mass_pct_as_printed: '54.6'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1873'
+              locator: *id035
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-12 atm; Ar-CO-CO2 atmosphere
+              locator: *id035
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id035
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id035
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '14.8'
+                  - - CaO
+                    - '30.6'
+                  - - SiO2
+                    - '54.6'
+              locator: *id035
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.56'
+              locator: *id035
+          locator: *id035
+    - observation_id: tranell_2002_t1_cst9_1843k_pO2m8
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id036
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 36, slag CST9
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST9
+          value: '0.024'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-8
+            units: atm
+          slag_as_printed: CST9
+          TiOx_mass_pct_as_printed: '20.8'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.21'
+          CaO_mass_pct_as_printed: '43.4'
+          SiO2_mass_pct_as_printed: '35.8'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id036
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-8 atm; Ar-CO-CO2 atmosphere
+              locator: *id036
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id036
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id036
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '20.8'
+                  - - CaO
+                    - '43.4'
+                  - - SiO2
+                    - '35.8'
+              locator: *id036
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.21'
+              locator: *id036
+          locator: *id036
+    - observation_id: tranell_2002_t1_cst9_1843k_pO2m9
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id037
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 37, slag CST9
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST9
+          value: '0.029'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-9
+            units: atm
+          slag_as_printed: CST9
+          TiOx_mass_pct_as_printed: '20.8'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.21'
+          CaO_mass_pct_as_printed: '43.4'
+          SiO2_mass_pct_as_printed: '35.8'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id037
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-9 atm; Ar-CO-CO2 atmosphere
+              locator: *id037
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id037
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id037
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '20.8'
+                  - - CaO
+                    - '43.4'
+                  - - SiO2
+                    - '35.8'
+              locator: *id037
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.21'
+              locator: *id037
+          locator: *id037
+    - observation_id: tranell_2002_t1_cst9_1873k_pO2m12
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id038
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 38, slag CST9
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST9
+          value: '0.189'
+          T_K: '1873'
+          oxygen_partial_pressure:
+            value: 10^-12
+            units: atm
+          slag_as_printed: CST9
+          TiOx_mass_pct_as_printed: '20.8'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.21'
+          CaO_mass_pct_as_printed: '43.4'
+          SiO2_mass_pct_as_printed: '35.8'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1873'
+              locator: *id038
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-12 atm; Ar-CO-CO2 atmosphere
+              locator: *id038
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id038
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id038
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '20.8'
+                  - - CaO
+                    - '43.4'
+                  - - SiO2
+                    - '35.8'
+              locator: *id038
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.21'
+              locator: *id038
+          locator: *id038
+    - observation_id: tranell_2002_t1_cst10_1843k_pO2m8
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id039
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 39, slag CST10
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST10
+          value: '0.029'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-8
+            units: atm
+          slag_as_printed: CST10
+          TiOx_mass_pct_as_printed: '22.0'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.00'
+          CaO_mass_pct_as_printed: '39.0'
+          SiO2_mass_pct_as_printed: '39.0'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id039
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-8 atm; Ar-CO-CO2 atmosphere
+              locator: *id039
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id039
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id039
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '22.0'
+                  - - CaO
+                    - '39.0'
+                  - - SiO2
+                    - '39.0'
+              locator: *id039
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.00'
+              locator: *id039
+          locator: *id039
+    - observation_id: tranell_2002_t1_cst10_1843k_pO2m9
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id040
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 40, slag CST10
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST10
+          value: '0.054'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-9
+            units: atm
+          slag_as_printed: CST10
+          TiOx_mass_pct_as_printed: '22.0'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.00'
+          CaO_mass_pct_as_printed: '39.0'
+          SiO2_mass_pct_as_printed: '39.0'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id040
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-9 atm; Ar-CO-CO2 atmosphere
+              locator: *id040
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id040
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id040
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '22.0'
+                  - - CaO
+                    - '39.0'
+                  - - SiO2
+                    - '39.0'
+              locator: *id040
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.00'
+              locator: *id040
+          locator: *id040
+    - observation_id: tranell_2002_t1_cst10_1873k_pO2m12
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id041
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 41, slag CST10
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST10
+          value: '0.242'
+          T_K: '1873'
+          oxygen_partial_pressure:
+            value: 10^-12
+            units: atm
+          slag_as_printed: CST10
+          TiOx_mass_pct_as_printed: '22.0'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.00'
+          CaO_mass_pct_as_printed: '39.0'
+          SiO2_mass_pct_as_printed: '39.0'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1873'
+              locator: *id041
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-12 atm; Ar-CO-CO2 atmosphere
+              locator: *id041
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id041
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id041
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '22.0'
+                  - - CaO
+                    - '39.0'
+                  - - SiO2
+                    - '39.0'
+              locator: *id041
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.00'
+              locator: *id041
+          locator: *id041
+    - observation_id: tranell_2002_t1_cst11_1843k_pO2m8
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id042
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 42, slag CST11
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST11
+          value: '0.045'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-8
+            units: atm
+          slag_as_printed: CST11
+          TiOx_mass_pct_as_printed: '22.2'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.75'
+          CaO_mass_pct_as_printed: '33.3'
+          SiO2_mass_pct_as_printed: '44.5'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id042
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-8 atm; Ar-CO-CO2 atmosphere
+              locator: *id042
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id042
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id042
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '22.2'
+                  - - CaO
+                    - '33.3'
+                  - - SiO2
+                    - '44.5'
+              locator: *id042
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.75'
+              locator: *id042
+          locator: *id042
+    - observation_id: tranell_2002_t1_cst11_1843k_pO2m9
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id043
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 43, slag CST11
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST11
+          value: '0.076'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-9
+            units: atm
+          slag_as_printed: CST11
+          TiOx_mass_pct_as_printed: '22.2'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.75'
+          CaO_mass_pct_as_printed: '33.3'
+          SiO2_mass_pct_as_printed: '44.5'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id043
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-9 atm; Ar-CO-CO2 atmosphere
+              locator: *id043
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id043
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id043
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '22.2'
+                  - - CaO
+                    - '33.3'
+                  - - SiO2
+                    - '44.5'
+              locator: *id043
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.75'
+              locator: *id043
+          locator: *id043
+    - observation_id: tranell_2002_t1_cst11_1873k_pO2m12
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id044
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 44, slag CST11
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST11
+          value: '0.413'
+          T_K: '1873'
+          oxygen_partial_pressure:
+            value: 10^-12
+            units: atm
+          slag_as_printed: CST11
+          TiOx_mass_pct_as_printed: '22.2'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.75'
+          CaO_mass_pct_as_printed: '33.3'
+          SiO2_mass_pct_as_printed: '44.5'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1873'
+              locator: *id044
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-12 atm; Ar-CO-CO2 atmosphere
+              locator: *id044
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id044
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id044
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '22.2'
+                  - - CaO
+                    - '33.3'
+                  - - SiO2
+                    - '44.5'
+              locator: *id044
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.75'
+              locator: *id044
+          locator: *id044
+    - observation_id: tranell_2002_t1_cst12_1843k_pO2m8
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id045
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 45, slag CST12
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST12
+          value: '0.060'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-8
+            units: atm
+          slag_as_printed: CST12
+          TiOx_mass_pct_as_printed: '21.7'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.56'
+          CaO_mass_pct_as_printed: '28.1'
+          SiO2_mass_pct_as_printed: '50.2'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id045
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-8 atm; Ar-CO-CO2 atmosphere
+              locator: *id045
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id045
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id045
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '21.7'
+                  - - CaO
+                    - '28.1'
+                  - - SiO2
+                    - '50.2'
+              locator: *id045
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.56'
+              locator: *id045
+          locator: *id045
+    - observation_id: tranell_2002_t1_cst12_1843k_pO2m9
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id046
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 46, slag CST12
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST12
+          value: '0.088'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-9
+            units: atm
+          slag_as_printed: CST12
+          TiOx_mass_pct_as_printed: '21.7'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.56'
+          CaO_mass_pct_as_printed: '28.1'
+          SiO2_mass_pct_as_printed: '50.2'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id046
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-9 atm; Ar-CO-CO2 atmosphere
+              locator: *id046
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id046
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id046
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '21.7'
+                  - - CaO
+                    - '28.1'
+                  - - SiO2
+                    - '50.2'
+              locator: *id046
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.56'
+              locator: *id046
+          locator: *id046
+    - observation_id: tranell_2002_t1_cst12_1873k_pO2m12
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id047
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 47, slag CST12
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST12
+          value: '0.516'
+          T_K: '1873'
+          oxygen_partial_pressure:
+            value: 10^-12
+            units: atm
+          slag_as_printed: CST12
+          TiOx_mass_pct_as_printed: '21.7'
+          CaO_SiO2_mass_pct_ratio_as_printed: '0.56'
+          CaO_mass_pct_as_printed: '28.1'
+          SiO2_mass_pct_as_printed: '50.2'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1873'
+              locator: *id047
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-12 atm; Ar-CO-CO2 atmosphere
+              locator: *id047
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id047
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id047
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '21.7'
+                  - - CaO
+                    - '28.1'
+                  - - SiO2
+                    - '50.2'
+              locator: *id047
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '0.56'
+              locator: *id047
+          locator: *id047
+    - observation_id: tranell_2002_t1_cst13_1873k_pO2m8
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id048
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 48, slag CST13
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST13
+          value: '0.030'
+          T_K: '1873'
+          oxygen_partial_pressure:
+            value: 10^-8
+            units: atm
+          slag_as_printed: CST13
+          TiOx_mass_pct_as_printed: '52.3'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.35'
+          CaO_mass_pct_as_printed: '27.4'
+          SiO2_mass_pct_as_printed: '20.3'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1873'
+              locator: *id048
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-8 atm; Ar-CO-CO2 atmosphere
+              locator: *id048
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id048
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id048
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '52.3'
+                  - - CaO
+                    - '27.4'
+                  - - SiO2
+                    - '20.3'
+              locator: *id048
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.35'
+              locator: *id048
+          locator: *id048
+    - observation_id: tranell_2002_t1_cst13_1843k_pO2m9
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id049
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 49, slag CST13
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST13
+          value: '0.045'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-9
+            units: atm
+          slag_as_printed: CST13
+          TiOx_mass_pct_as_printed: '52.3'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.35'
+          CaO_mass_pct_as_printed: '27.4'
+          SiO2_mass_pct_as_printed: '20.3'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id049
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-9 atm; Ar-CO-CO2 atmosphere
+              locator: *id049
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id049
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id049
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '52.3'
+                  - - CaO
+                    - '27.4'
+                  - - SiO2
+                    - '20.3'
+              locator: *id049
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.35'
+              locator: *id049
+          locator: *id049
+    - observation_id: tranell_2002_t1_cst13_1873k_pO2m9
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id050
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 50, slag CST13
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST13
+          value: '0.059'
+          T_K: '1873'
+          oxygen_partial_pressure:
+            value: 10^-9
+            units: atm
+          slag_as_printed: CST13
+          TiOx_mass_pct_as_printed: '52.3'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.35'
+          CaO_mass_pct_as_printed: '27.4'
+          SiO2_mass_pct_as_printed: '20.3'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1873'
+              locator: *id050
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-9 atm; Ar-CO-CO2 atmosphere
+              locator: *id050
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id050
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id050
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '52.3'
+                  - - CaO
+                    - '27.4'
+                  - - SiO2
+                    - '20.3'
+              locator: *id050
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.35'
+              locator: *id050
+          locator: *id050
+    - observation_id: tranell_2002_t1_cst13_1903k_pO2m9
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id051
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 51, slag CST13
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST13
+          value: '0.064'
+          T_K: '1903'
+          oxygen_partial_pressure:
+            value: 10^-9
+            units: atm
+          slag_as_printed: CST13
+          TiOx_mass_pct_as_printed: '52.3'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.35'
+          CaO_mass_pct_as_printed: '27.4'
+          SiO2_mass_pct_as_printed: '20.3'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1903'
+              locator: *id051
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-9 atm; Ar-CO-CO2 atmosphere
+              locator: *id051
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id051
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id051
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '52.3'
+                  - - CaO
+                    - '27.4'
+                  - - SiO2
+                    - '20.3'
+              locator: *id051
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.35'
+              locator: *id051
+          locator: *id051
+    - observation_id: tranell_2002_t1_cst13_1873k_pO2m12
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id052
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 52, slag CST13
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST13
+          value: '0.303'
+          T_K: '1873'
+          oxygen_partial_pressure:
+            value: 10^-12
+            units: atm
+          slag_as_printed: CST13
+          TiOx_mass_pct_as_printed: '52.3'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.35'
+          CaO_mass_pct_as_printed: '27.4'
+          SiO2_mass_pct_as_printed: '20.3'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1873'
+              locator: *id052
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-12 atm; Ar-CO-CO2 atmosphere
+              locator: *id052
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id052
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id052
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '52.3'
+                  - - CaO
+                    - '27.4'
+                  - - SiO2
+                    - '20.3'
+              locator: *id052
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.35'
+              locator: *id052
+          locator: *id052
+    - observation_id: tranell_2002_t1_cst14_1873k_pO2m8
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id053
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 53, slag CST14
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST14
+          value: '0.051'
+          T_K: '1873'
+          oxygen_partial_pressure:
+            value: 10^-8
+            units: atm
+          slag_as_printed: CST14
+          TiOx_mass_pct_as_printed: '51.1'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.00'
+          CaO_mass_pct_as_printed: '24.5'
+          SiO2_mass_pct_as_printed: '24.5'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1873'
+              locator: *id053
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-8 atm; Ar-CO-CO2 atmosphere
+              locator: *id053
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id053
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id053
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '51.1'
+                  - - CaO
+                    - '24.5'
+                  - - SiO2
+                    - '24.5'
+              locator: *id053
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.00'
+              locator: *id053
+          locator: *id053
+    - observation_id: tranell_2002_t1_cst14_1843k_pO2m9
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id054
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 54, slag CST14
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST14
+          value: '0.081'
+          T_K: '1843'
+          oxygen_partial_pressure:
+            value: 10^-9
+            units: atm
+          slag_as_printed: CST14
+          TiOx_mass_pct_as_printed: '51.1'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.00'
+          CaO_mass_pct_as_printed: '24.5'
+          SiO2_mass_pct_as_printed: '24.5'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1843'
+              locator: *id054
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-9 atm; Ar-CO-CO2 atmosphere
+              locator: *id054
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id054
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id054
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '51.1'
+                  - - CaO
+                    - '24.5'
+                  - - SiO2
+                    - '24.5'
+              locator: *id054
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.00'
+              locator: *id054
+          locator: *id054
+    - observation_id: tranell_2002_t1_cst14_1873k_pO2m9
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id055
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 55, slag CST14
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST14
+          value: '0.090'
+          T_K: '1873'
+          oxygen_partial_pressure:
+            value: 10^-9
+            units: atm
+          slag_as_printed: CST14
+          TiOx_mass_pct_as_printed: '51.1'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.00'
+          CaO_mass_pct_as_printed: '24.5'
+          SiO2_mass_pct_as_printed: '24.5'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1873'
+              locator: *id055
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-9 atm; Ar-CO-CO2 atmosphere
+              locator: *id055
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id055
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id055
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '51.1'
+                  - - CaO
+                    - '24.5'
+                  - - SiO2
+                    - '24.5'
+              locator: *id055
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.00'
+              locator: *id055
+          locator: *id055
+    - observation_id: tranell_2002_t1_cst14_1903k_pO2m9
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id056
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 56, slag CST14
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST14
+          value: '0.123'
+          T_K: '1903'
+          oxygen_partial_pressure:
+            value: 10^-9
+            units: atm
+          slag_as_printed: CST14
+          TiOx_mass_pct_as_printed: '51.1'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.00'
+          CaO_mass_pct_as_printed: '24.5'
+          SiO2_mass_pct_as_printed: '24.5'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1903'
+              locator: *id056
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-9 atm; Ar-CO-CO2 atmosphere
+              locator: *id056
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id056
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id056
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '51.1'
+                  - - CaO
+                    - '24.5'
+                  - - SiO2
+                    - '24.5'
+              locator: *id056
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.00'
+              locator: *id056
+          locator: *id056
+    - observation_id: tranell_2002_t1_cst14_1873k_pO2m12
+      type: valence_ratio
+      regime: melt_equilibration_quench
+      locator: &id057
+        published_page: 63
+        pdf_page_index: 2
+        table: I
+        note: Table I row 57, slag CST14
+      phase: l
+      units: dimensionless ratio as printed
+      uncertainty:
+        note: The method reports an absolute error of ±5 pct of the detected reduced Ti amount; confidence level
+          not stated. No row-specific uncertainty is printed for the Ti3+/Ti4+ ratio.
+      values:
+        quantity: Ti3plus_over_Ti4plus
+        method_class: measured_direct
+        admission_status: admitted
+        method: Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti
+        points:
+        - sample: CST14
+          value: '0.452'
+          T_K: '1873'
+          oxygen_partial_pressure:
+            value: 10^-12
+            units: atm
+          slag_as_printed: CST14
+          TiOx_mass_pct_as_printed: '51.1'
+          CaO_SiO2_mass_pct_ratio_as_printed: '1.00'
+          CaO_mass_pct_as_printed: '24.5'
+          SiO2_mass_pct_as_printed: '24.5'
+          composition_note: CaO and SiO2 values are starred estimates from measured TiOx and the master-slag CaO/SiO2
+            ratio.
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1873'
+              locator: *id057
+            fO2_control:
+              state:
+                tag: value
+                value: pO2=10^-12 atm; Ar-CO-CO2 atmosphere
+              locator: *id057
+            atmosphere:
+              state:
+                tag: value
+                value: Ar-CO-CO2; point-specific CO/CO2 ratio not reported
+              locator: *id057
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: Total pressure is not stated for the Table I runs.
+              locator: *id057
+            printed_composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components:
+                  - - TiOx
+                    - '51.1'
+                  - - CaO
+                    - '24.5'
+                  - - SiO2
+                    - '24.5'
+              locator: *id057
+            CaO_SiO2_mass_pct_ratio:
+              state:
+                tag: value
+                value: '1.00'
+              locator: *id057
+          locator: *id057

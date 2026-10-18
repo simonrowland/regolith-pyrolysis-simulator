@@ -41,7 +41,9 @@ from simulator.battery.migrate import (
     fe3_fe2_ratio_from_ferric_fraction,
     map_quantity,
     observation_from_plain,
+    oxide_molar_mass,
     to_plain,
+    wt_pct_to_mole_fraction,
 )
 from simulator.battery.records import (
     Composition,
@@ -63,12 +65,17 @@ from simulator.battery.score import (
     render_score_report,
     residual_to_plain,
     render_score_report_from_payloads,
+    selected_lineage_level,
     score_store,
 )
 
 
 ROOT = Path(__file__).resolve().parents[2]
 SOSSI_CR = ROOT / "data/literature/extracts/kems-045-sossi-2018-pnas-cr.yaml"
+TRANELL_TI = ROOT / "data/literature/extracts/tranell-2002-titanium-valence.yaml"
+BERRY_CR = ROOT / "data/literature/extracts/berry-oneill-2004-chromium-xanes.yaml"
+JUGO_S = ROOT / "data/literature/extracts/jugo-2010-sulfur-xanes.yaml"
+JAYASURIYA_FE = ROOT / "data/literature/extracts/jayasuriya-2004-iron-mossbauer.yaml"
 
 
 def _identity(basis: ValenceBasis) -> Identity:
@@ -242,6 +249,109 @@ def test_sulfur_valence_forms_are_recognized_and_migrated_as_printed(tmp_path: P
     )
 
 
+def test_jugo_2010_table4_values_and_conditions_match_render():
+    extract = yaml.safe_load(JUGO_S.read_text(encoding="utf-8"))
+    table4 = next(
+        observation
+        for observation in extract["species"]["S"]["observations"]
+        if observation["observation_id"] == "jugo_2010_table4_xanes_s6_fraction"
+    )
+    assert table4["units"] == "percent"
+    assert (
+        Decimal(str(table4["values"]["points"][0]["value"]))
+        == Decimal("100.83")
+    )
+    assert table4["locator"]["pdf_page_index"] == 7
+    raw_inputs_note = table4["derivation"]["raw_inputs"]["locator"][
+        "note"
+    ]
+    assert raw_inputs_note.startswith(
+        "Only the underlying spectra are not digitised"
+    )
+    eq10 = next(
+        observation
+        for observation in extract["species"]["S"]["observations"]
+        if observation["observation_id"]
+        == "jugo_2010_eq10_sulfate_fraction_vs_delta_fmq_fit"
+    )
+    assert eq10["units"] == "fraction; ΔFMQ"
+    assert eq10["derivation"]["output_unit"] == "fraction"
+
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(JUGO_S)
+    migrator.finalize()
+    rows = [
+        row
+        for row in migrator.result.observations.values()
+        if "jugo_2010_table4_xanes_s6_fraction" in row.observation_id
+    ]
+
+    expected = {
+        "SB-5": Decimal("1.0083"),
+        "SB-15": Decimal("0.9444"),
+        "SB-19": Decimal("0.9133"),
+        "SB-35": Decimal("0.7187"),
+        "SB-6": Decimal("0.4041"),
+        "SB-36": Decimal("0.0019"),
+        "SB-41": Decimal("-0.0024"),
+    }
+    assert len(rows) == 7  # Table 4, PDF index 7 (published page 5933)
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in rows) == 0
+    assert {row.value.point for row in rows} == set(expected.values())
+    assert migrator.result.validation is not None
+    assert not migrator.result.validation.hard_issues
+    sb5 = next(
+        row
+        for row in rows
+        if row.point_conditions["composition"].state.value["SiO2"]
+        == Decimal("47.48")
+    )
+    sb41 = next(
+        row
+        for row in rows
+        if row.point_conditions["composition"].state.value["S"]
+        == Decimal("0.07")
+    )
+    assert sb5.value.point == expected["SB-5"]
+    assert sb5.point_conditions["fO2_control"].state.value == "FMQ+2.7"
+    assert sb5.point_conditions["pressure_MPa"].state.value == Decimal("200")
+    assert sb5.point_conditions["composition"].state.value["SiO2"] == Decimal("47.48")
+    assert sb41.value.point == expected["SB-41"]
+    assert all(
+        row.identity.quantity.value is Quantity.VALENCE_RATIO
+        and row.admission.status is AdmissionStatus.ADMITTED
+        and row.identity.temperature_K.value == Decimal("1323.15")
+        and row.identity.composition is not None
+        and row.identity.composition.is_value
+        and row.identity.composition.value
+        == wt_pct_to_mole_fraction(
+            row.point_conditions["composition"].state.value
+        )
+        and row.identity.total_pressure_Pa is not None
+        and row.identity.total_pressure_Pa.is_value
+        and row.identity.total_pressure_Pa.value == Decimal("200000000")
+        and row.identity.fO2_Pa is not None
+        and row.identity.fO2_Pa.is_unknown
+        and row.identity.fO2_Pa.reason.startswith("buffer-relative fO2 (")
+        and row.point_conditions["temperature_K"].state.value == Decimal("1323.15")
+        and row.point_conditions["temperature_K"].locator.pdf_page_index == 7
+        and row.point_conditions["pressure_MPa"].state.value == Decimal("200")
+        and row.point_conditions["fO2_control"].locator.published_page == 5928
+        and row.point_conditions["composition"].locator.published_page == 5928
+        for row in rows
+    )
+    fit = migrator.result.observations[
+        "jugo-2010-sulfur-xanes::jugo_2010_eq10_sulfate_fraction_vs_delta_fmq_fit"
+    ]
+    assert fit.value.kind is ValueKind.UNAVAILABLE
+    assert fit.admission.status is AdmissionStatus.REJECTED
+    assert set(fit.derived_from) == {row.observation_id for row in rows}
+    assert sum(
+        row.value.kind is ValueKind.UNAVAILABLE
+        for row in migrator.result.observations.values()
+    ) == 1
+
+
 def test_fe_plus_spelling_stays_on_existing_fe_ratio_quantity():
     quantity, reason = map_quantity(
         "ratio", {"quantity": "Fe3plus_over_Fe2plus"}
@@ -298,6 +408,193 @@ def _migrate_sossi_cr():
     return migrator.result
 
 
+def _migrate_berry_cr():
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(BERRY_CR)
+    migrator.finalize()
+    return migrator.result
+
+
+def test_berry_oneill_2004_table3_valence_fractions_and_render_pins():
+    result = _migrate_berry_cr()
+    rows = list(result.observations.values())
+    fractions = [
+        row
+        for row in rows
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.VALENCE_RATIO
+        and row.identity.valence_basis.is_value
+        and row.identity.valence_basis.value.value_form is ValenceValueForm.FRACTION
+    ]
+    log_ratios = [
+        row
+        for row in rows
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.VALENCE_RATIO
+        and row.identity.valence_basis.is_value
+        and row.identity.valence_basis.value.value_form is ValenceValueForm.LOG10_RATIO
+    ]
+
+    # Table 3 has 133 numeric Cr2+/SumCr cells; these values were checked on
+    # the 400 dpi render of printed p. 794 (PDF page 5).
+    assert len(rows) == 145
+    assert len(fractions) == 133
+    assert len(log_ratios) == 7
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+
+    by_local_id = {
+        row.observation_id.split("::", 1)[1].split("::", 1)[0]: row
+        for row in rows
+    }
+    render_pins = {
+        "berry_2004_table3_ad_r01": Decimal("0.050"),
+        "berry_2004_table3_ad_wo_r13": Decimal("0.453"),
+        "berry_2004_table3_ad_rt20_r24": Decimal("0.951"),
+        "berry_2004_table3_ad_r21": Decimal("0.936"),
+        "berry_2004_table3_ad_fo_r21": Decimal("0.919"),
+    }
+    for local_id, expected in render_pins.items():
+        row = by_local_id[local_id]
+        assert row.value.kind is ValueKind.POINT
+        assert row.value.point == expected
+        assert row.locator.published_page == 794
+
+    duplicate_author_row = {
+        local_id: by_local_id[local_id]
+        for local_id in (
+            "berry_2004_table3_ad_r21",
+            "berry_2004_table3_ad_fo_r21",
+        )
+    }
+    assert {
+        local_id: row.value.point for local_id, row in duplicate_author_row.items()
+    } == {
+        "berry_2004_table3_ad_r21": Decimal("0.936"),
+        "berry_2004_table3_ad_fo_r21": Decimal("0.919"),
+    }
+    assert duplicate_author_row["berry_2004_table3_ad_r21"].locator.record.endswith(
+        "AD column; Cr2+/SumCr cell"
+    )
+    assert duplicate_author_row[
+        "berry_2004_table3_ad_fo_r21"
+    ].locator.record.endswith("AD + Fo column; Cr2+/SumCr cell")
+
+    assert all(row.identity.species.formula == "Cr" for row in fractions)
+    assert all(row.identity.species.phase.value is Phase.L for row in fractions)
+    assert all(row.evidence.class_.value is EvidenceClass.MEASURED_REDUCED for row in fractions)
+    assert all(
+        row.identity.valence_basis.value.numerator_oxidation_states == (2,)
+        and row.identity.valence_basis.value.denominator_kind
+        is ValenceDenominatorKind.TOTAL_ELEMENT
+        for row in fractions
+    )
+    required_conditions = (
+        "temperature_K",
+        "fO2_log",
+        "fO2_control",
+        "total_pressure_Pa",
+        "composition",
+    )
+    assert all(row.identity.temperature_K.is_value for row in rows)
+    assert all(
+        all(
+            key in row.point_conditions
+            and row.point_conditions[key].state is not None
+            and row.point_conditions[key].locator is not None
+            for key in required_conditions
+        )
+        for row in rows
+    )
+
+    pressure_cells = {
+        "berry_2004_table3_ad_r25",
+        "berry_2004_table3_ad_fo_r25",
+        "berry_2004_table3_ad_wo_r25",
+        "berry_2004_table3_ad_en_r25",
+        "berry_2004_table3_ad_qz_r25",
+    }
+    assert {
+        local_id
+        for local_id, row in by_local_id.items()
+        if row.identity.total_pressure_Pa is not None
+        and row.identity.total_pressure_Pa.is_value
+    } == pressure_cells
+    for local_id in pressure_cells:
+        row = by_local_id[local_id]
+        pressure = row.identity.total_pressure_Pa
+        point_pressure = row.point_conditions["total_pressure_Pa"]
+        assert pressure is not None and pressure.is_value
+        assert pressure.value == Decimal("100000")
+        assert point_pressure.state.is_value
+        assert point_pressure.state.value == Decimal("100000")
+
+    for row in fractions:
+        assert row.derivation is not None
+        assert len(row.derivation.parameters) == 1
+        name, area = row.derivation.parameters[0]
+        assert name == "A(1s/4s)"
+        assert area.state.is_value
+        assert area.locator is not None
+        assert area.locator.published_page == 794
+        assert "A(1s/4s)" in area.locator.record
+        assert not row.derived_from
+        assert not row.derivation.inputs
+        assert row.derivation.raw_inputs is not None
+        assert row.derivation.raw_inputs.state.value == "not_printed"
+        assert row.derivation.raw_inputs.locator is not None
+        assert row.derivation.raw_inputs.locator.table is None
+        assert row.derivation.raw_inputs.locator.section == "Experimental methods"
+        assert "Raw XANES spectra" in row.derivation.raw_inputs.locator.record
+        assert selected_lineage_level(row, set(result.observations))
+
+    area_pins = {
+        "berry_2004_table3_ad_r01": Decimal("0.005"),
+        "berry_2004_table3_ad_wo_r13": Decimal("0.174"),
+        "berry_2004_table3_ad_rt20_r24": Decimal("0.382"),
+    }
+    for local_id, expected in area_pins.items():
+        assert by_local_id[local_id].derivation.parameters[0][1].state.value == expected
+
+    slope_rows = [row for row in rows if "slope" in row.observation_id]
+    assert len(slope_rows) == 5
+    table4_rows = [*log_ratios, *slope_rows]
+    assert len(table4_rows) == 12
+    for row in table4_rows:
+        assert row.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        assert row.evidence.attribution == "Berry and O'Neill (2004), Table 4"
+        assert not row.derived_from
+        pressure = row.identity.total_pressure_Pa
+        point_pressure = row.point_conditions["total_pressure_Pa"]
+        if row in log_ratios:
+            assert pressure is not None and pressure.is_unknown
+        else:
+            assert pressure is None or pressure.is_unknown
+        assert point_pressure.state.is_unknown
+    for row in slope_rows:
+        control = row.point_conditions["fO2_control"]
+        assert control.state.is_unknown
+        assert control.locator == row.locator
+        assert row.point_conditions["fO2_log"].locator == row.locator
+        assert row.point_conditions["total_pressure_Pa"].locator == row.locator
+    assert {
+        row.value.point for row in log_ratios
+    } == {
+        Decimal("1.871"),
+        Decimal("1.921"),
+        Decimal("2.056"),
+        Decimal("1.844"),
+        Decimal("1.650"),
+        Decimal("2.274"),
+        Decimal("2.371"),
+    }
+    unavailable = [row for row in rows if row.value.kind is ValueKind.UNAVAILABLE]
+    assert len(unavailable) == 5
+    assert {row.observation_id for row in unavailable} == {
+        row.observation_id for row in slope_rows
+    }
+
+
 def test_refused_printed_valence_forms_do_not_select_scalar(tmp_path: Path):
     doc = yaml.safe_load(SOSSI_CR.read_text(encoding="utf-8"))
     template = doc["species"]["Cr"]["observations"][0]
@@ -341,7 +638,6 @@ def test_refused_printed_valence_forms_do_not_select_scalar(tmp_path: Path):
         "fixture_refused_valence_1",
     }
     assert all(row.value.kind is ValueKind.UNAVAILABLE for row in rows.values())
-
 
 def test_sossi_2018_quoted_cr_rows_migrate_as_numeric_valence_fractions():
     result = _migrate_sossi_cr()
@@ -573,6 +869,213 @@ def test_negative_ratio_valence_value_remains_a_typed_refusal(tmp_path: Path):
         predict=_numeric_quench_predictor(calls),
     )
     assert calls == []
+def test_tranell_2002_table_i_rows_migrate_with_render_pinned_values_and_conditions():
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(TRANELL_TI)
+    migrator.finalize()
+    result = migrator.result
+    rows = [
+        row
+        for row in result.observations.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.VALENCE_RATIO
+    ]
+
+    assert len(rows) == 57
+    by_locator = {row.locator.note: row for row in rows}
+    rendered_pins = {
+        "Table I row 1, slag CST1": ("0.023", "1843", "-8"),
+        "Table I row 27, slag CST7": ("0.068", "1903", "-8"),
+        "Table I row 57, slag CST14": ("0.452", "1873", "-12"),
+    }
+    for locator_note, (value, temperature, oxygen_exponent) in rendered_pins.items():
+        row = by_locator[locator_note]
+        assert row.value.kind is ValueKind.POINT
+        assert row.value.point == Decimal(value)
+        assert row.locator.published_page == 63
+        assert row.locator.pdf_page_index == 2
+        assert row.identity.species.formula == "Ti"
+        assert row.identity.species.phase.value is Phase.L
+        assert row.identity.valence_basis.value == ValenceBasis(
+            numerator_oxidation_states=(3,),
+            denominator_kind=ValenceDenominatorKind.OXIDATION_STATE,
+            denominator_oxidation_state=4,
+            value_form=ValenceValueForm.RATIO,
+        )
+        assert row.identity.temperature_K.value == Decimal(temperature)
+        assert row.point_conditions["fO2_Pa"].state.value.point == (
+            Decimal("101325") * (Decimal(10) ** Decimal(oxygen_exponent))
+        )
+
+    assert all(row.value.kind is ValueKind.POINT for row in rows)
+    assert not result.validation.hard_issues
+    assert not result.queue
+    assert all(
+        row.admission.status is AdmissionStatus.ADMITTED
+        and row.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+        and row.identity.temperature_K.is_value
+        for row in rows
+    )
+    for row in rows:
+        conditions = row.point_conditions
+        assert conditions is not None
+        for key in (
+            "temperature_K",
+            "fO2_Pa",
+            "fO2_control",
+            "atmosphere",
+            "total_pressure_Pa",
+            "printed_composition",
+            "CaO_SiO2_mass_pct_ratio",
+        ):
+            condition = conditions[key]
+            assert condition.locator.published_page == 63
+        assert conditions["temperature_K"].state.value == row.identity.temperature_K.value
+        assert conditions["fO2_Pa"].state.value.kind is ValueKind.POINT
+        assert conditions["total_pressure_Pa"].state.is_unknown
+        assert conditions["printed_composition"].state.is_value
+        assert conditions["CaO_SiO2_mass_pct_ratio"].state.is_value
+def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
+    doc = yaml.safe_load(JAYASURIYA_FE.read_text(encoding="utf-8"))
+    observations = doc["species"]["Fe"]["observations"]
+    assert sum(len(obs["values"]["points"]) for obs in observations) == 38
+    assert [
+        point["gas_mix_as_printed"]
+        for obs in observations[:2]
+        for point in obs["values"]["points"]
+        if point["sample_as_published"] == "FeV9"
+    ] == ["O2 100.0 × 200 SCCM", "O2 100.0 × 200 SCCM"]
+    rt_fractions = [
+        observations[0]["values"]["points"][i]["Fe3_over_sum_Fe"] for i in (1, 15)
+    ]
+    assert rt_fractions == [
+        0.025,
+        0.851,
+    ]
+    high_fe_fractions = [
+        observations[2]["values"]["points"][i]["Fe3_over_sum_Fe"] for i in (0, 14)
+    ]
+    assert high_fe_fractions == [
+        0.846,
+        0.218,
+    ]
+    assert [
+        observations[0]["locator"]["published_page"],
+        observations[2]["locator"]["published_page"],
+    ] == [1602, 1603]
+
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(JAYASURIYA_FE)
+    migrator.finalize()
+    rows = [
+        row
+        for row in migrator.result.observations.values()
+        if "jayasuriya_2004" in row.observation_id
+    ]
+    assert len(rows) == 38
+    assert migrator.result.registry_issues == []
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.hard_issues == ()
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in rows) == 3
+    assert all(
+        row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.FE3_FE2_RATIO
+        and row.identity.temperature_K.is_value
+        and row.identity.fO2_Pa.is_value
+        and row.identity.composition.is_value
+        and isinstance(row.identity.composition.value, Composition)
+        and row.point_conditions["temperature_K"].state.is_value
+        and row.point_conditions["fO2_log"].state.is_value
+        for row in rows
+    )
+    fe_free_analysis = {
+        "SiO2": Decimal("50.47"),
+        "Al2O3": Decimal("15.12"),
+        "MgO": Decimal("10.46"),
+        "CaO": Decimal("23.94"),
+    }
+    table4 = [
+        (Decimal("1.75"), Decimal("0.0134"), Decimal("0.0002")),
+        (Decimal("3.67"), Decimal("0.0282"), Decimal("0.0006")),
+        (Decimal("6.44"), Decimal("0.0494"), Decimal("0.0010")),
+        (Decimal("9.81"), Decimal("0.0766"), Decimal("0.0005")),
+        (Decimal("18.75"), Decimal("0.1498"), Decimal("0.0011")),
+        (Decimal("27.06"), Decimal("0.2201"), Decimal("0.0009")),
+        (Decimal("1.49"), Decimal("0.0114"), Decimal("0.0004")),
+        (Decimal("2.79"), Decimal("0.0214"), Decimal("0.0007")),
+        (Decimal("5.36"), Decimal("0.0414"), Decimal("0.0007")),
+        (Decimal("7.96"), Decimal("0.0620"), Decimal("0.0010")),
+        (Decimal("16.36"), Decimal("0.1298"), Decimal("0.0009")),
+        (Decimal("3.52"), Decimal("0.0271"), Decimal("0.0008")),
+        (Decimal("5.83"), Decimal("0.0451"), Decimal("0.0006")),
+        (Decimal("7.96"), Decimal("0.0619"), Decimal("0.0007")),
+        (Decimal("26.82"), Decimal("0.2186"), Decimal("0.0011")),
+    ]
+    high_fe_source_points = observations[2]["values"]["points"]
+    assert len(high_fe_source_points) == len(table4)
+    high_fe_rows = [
+        row
+        for row in rows
+        if "jayasuriya_2004_rt_high_fe" in row.observation_id
+    ]
+    assert len(high_fe_rows) == len(table4)
+    for source_point, migrated_row, table_entry in zip(
+        high_fe_source_points, high_fe_rows, table4, strict=True
+    ):
+        feot, printed_x, printed_x_uncertainty = table_entry
+        closed = {
+            oxide: weight * (Decimal(100) - feot) / Decimal(100)
+            for oxide, weight in fe_free_analysis.items()
+        }
+        closed["FeO"] = feot
+        assert Decimal(str(source_point["FeOT_wt_percent"])) == feot
+        assert source_point["composition_wt_pct"] == {
+            **{oxide: float(weight) for oxide, weight in closed.items() if oxide != "FeO"},
+            "FeOT": float(feot),
+        }
+        composition = migrated_row.identity.composition.value
+        assert composition == wt_pct_to_mole_fraction(closed)
+        mole_amounts = {
+            oxide: fraction * oxide_molar_mass(oxide)
+            for oxide, fraction in composition.components
+        }
+        recovered_feo = Decimal(100) * mole_amounts["FeO"] / sum(mole_amounts.values())
+        assert abs(recovered_feo - feot) <= Decimal("0.002")
+        mole_fractions = composition.as_map()
+        single_cation_x = mole_fractions["FeO"] / (
+            mole_fractions["SiO2"]
+            + Decimal(2) * mole_fractions["Al2O3"]
+            + mole_fractions["MgO"]
+            + mole_fractions["CaO"]
+            + mole_fractions["FeO"]
+        )
+        assert abs(single_cation_x - printed_x) <= printed_x_uncertainty
+    low_fe = next(
+        row
+        for row in rows
+        if "jayasuriya_2004_rt_1pct" in row.observation_id
+    )
+    assert low_fe.identity.composition.value == wt_pct_to_mole_fraction(
+        {
+            "SiO2": Decimal("50.47"),
+            "Al2O3": Decimal("15.12"),
+            "MgO": Decimal("10.46"),
+            "CaO": Decimal("23.94"),
+            "Fe2O3": Decimal("1.0"),
+        }
+    )
+    d60 = [
+        row
+        for row in rows
+        if row.point_conditions.get("total_pressure_Pa") is not None
+    ]
+    assert len(d60) == 2
+    assert all(
+        row.identity.total_pressure_Pa.is_unknown
+        and row.point_conditions["total_pressure_Pa"].state.value.point
+        == Decimal("1100000000")
+        for row in d60
+    )
 
 
 def test_valence_ratio_scores_redox_and_counts_each_engine_refusal():
