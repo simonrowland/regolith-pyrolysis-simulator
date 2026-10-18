@@ -32,7 +32,8 @@ Table keys:
 - ``evidence_class`` — stored as ``values.method_class``; a value column may override it
 - ``phase``, ``per``, ``experiment``, ``regime``, ``condensed_form`` — copied when set
 - ``rows`` — ``all`` (default) or a list of 1-based CSV row numbers (header rows included
-  in the numbering, but only body rows emit)
+  in the numbering; numeric mapped cells in header rows are also selected and require
+  ``render_verified``)
 - ``row_predicate`` — ``{column, equals}`` or ``{column, matches}`` on that row's cell.
   Do not combine it with a ``rows`` list
 - ``temperature`` — ``{column, unit}`` where ``unit`` is ``K`` or ``C`` / ``°C``,
@@ -43,7 +44,13 @@ Table keys:
 - the locator row label is the temperature cell, or the species cell of a value
   pair, otherwise the CSV row number
 - ``values`` — ``{column, species}`` plus optional ``phase``, ``evidence_class``,
-  ``unit``, ``quantity``, ``uncertainty``, ``attribution``
+  ``unit``, ``quantity``, ``uncertainty``, ``attribution``, and ``scale_factor``.
+  ``scale_factor`` is ``{header, exponent, direction}`` for a printed power-of-ten
+  column factor. ``header`` is the exact MinerU header cell and ``exponent`` is the
+  signed integer in its single ``10^n`` factor. ``direction`` is either
+  ``quantity_times_factor_equals_cell`` or ``cell_times_factor_equals_quantity``.
+  This scales the one stored quantity with exact decimal arithmetic; it does not
+  convert units or emit a converted twin
 - ``value_pairs`` — ``{species_column, value_column, phase}`` for a species cell
   beside each value. ``species_form: printed_formula`` strips ``$``, ``\\mathrm``
   / ``\\text``, and ``{ } _ ^ \\`` spaces. Do not set both ``values`` and ``value_pairs``
@@ -56,17 +63,19 @@ Table keys:
 - ``published_page`` — copied onto locators when the worker knows it
 - ``render_verified`` — ``{row, column, text}`` for a trapped cell. ``row`` and
   ``column`` are the 1-based CSV coordinates. ``text`` is the spelling the
-  worker read on the page render; that spelling is stored
+  worker read on the page render; that spelling is stored. Numeric cells in
+  MinerU header rows also require render verification before emission
 
 Cell text is stored verbatim after stripping surrounding whitespace. Units are
 not converted. Empty cells and cells whose text is only
 ``-``, ``–``, ``—``, or ``−`` are skipped and counted under
-``skipped_empty_or_dash``. They are never written as zero. A cell whose draft
-flags include ``comma_decimal_suspect`` or ``ambiguous_comma_separator``, or
-that this command marks as ``fused_superscript``, ``run_together``,
-``letter_for_digit``, ``stacked_values``, or ``dropped_plusminus``, is a
-``needs_render_check`` cell. ``emit`` raises ``ValueError`` naming those traps
-unless ``render_verified`` supplies a spelling for that cell. The marker is not
+``skipped_empty_or_dash``. They are never written as zero. A cell is
+``needs_render_check`` if its draft flags include ``comma_decimal_suspect`` or
+``ambiguous_comma_separator``, if this command marks it as
+``fused_superscript``, ``run_together``, ``letter_for_digit``,
+``stacked_values``, or ``dropped_plusminus``, or if it is numeric in a header
+row. ``emit`` raises ``ValueError`` naming those traps unless
+``render_verified`` supplies a spelling for that cell. The marker is not
 written onto the row. ``dropped_plusminus`` is marked only when a pdftotext
 page confirms the ``±`` (``--pdftotext``, ``<draft>/pdftotext-layout.txt``, or
 index ``pdftotext_layout``). Traps are read on the measured value cell, not on
@@ -137,6 +146,7 @@ _LATEX_SCIENTIFIC = re.compile(
     r"^([+\-−–—]?(?:\d+(?:\.\d+)?|\.\d+))\s*\\times\s*"
     r"10\^\{?([+\-−–—]?\d+)\}?$"
 )
+_HEADER_POWER_OF_TEN = re.compile(r"10\s*\^\s*\{?\s*([+\-−]?\d+)\s*\}?")
 _COMMA_DECIMAL = re.compile(
     r"(?<![\d.,])(?:\d{1,3}\.\d{3},\d+|\d+,\d{1,2})(?!\d)"
 )
@@ -691,30 +701,84 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
     for species_name, species_data in species.items():
         for observation in species_data.get("observations") or []:
             values = observation.get("values") or {}
-            for point_index, point in enumerate(values.get("points") or []):
-                value_field = "value"
-                value = point.get(value_field)
-                if value is None and "pressure_atm" in point:
-                    value_field = "pressure_atm"
-                    value = point.get(value_field)
+            value_fields = (
+                "value",
+                "pressure_atm",
+                "pressure_bar",
+                "pressure_Pa",
+                "activity",
+                "gamma",
+            )
+            stored_points = values.get("points") or []
+            if stored_points:
+                entries = [
+                    (point_index, point, True)
+                    for point_index, point in enumerate(stored_points)
+                ]
+            else:
+                scalar_field = next(
+                    (
+                        field
+                        for field in value_fields
+                        if values.get(field) is not None
+                    ),
+                    None,
+                )
+                entries = (
+                    [(None, {scalar_field: values[scalar_field]}, False)]
+                    if scalar_field is not None
+                    else []
+                )
+            for point_index, point, is_point in entries:
+                value_field = next(
+                    (
+                        field
+                        for field in value_fields
+                        if point.get(field) is not None
+                    ),
+                    None,
+                )
+                if value_field is None:
+                    continue
+                value = point[value_field]
                 if isinstance(value, bool) or value is None:
                     continue
                 number = _number_decimal(str(value))
                 if number is None:
                     continue
                 locator = point.get("locator") or observation.get("locator") or {}
+                observation_id = observation.get("observation_id", "")
+                cell_coordinates = re.search(
+                    r"_p\d+_t\d+_r(?P<row>\d+)_c(?P<column>\d+)$",
+                    str(observation_id),
+                )
                 pdf_page = locator.get("pdf_page")
                 if pdf_page is None and locator.get("pdf_page_index") is not None:
                     pdf_page = int(locator["pdf_page_index"]) + 1
+                table_row_number = point.get(
+                    "table_row_number",
+                    locator.get("table_row_number", observation.get("table_row_number")),
+                )
+                if table_row_number is None and cell_coordinates:
+                    table_row_number = int(cell_coordinates.group("row"))
+                table_column_number = point.get(
+                    "table_column_number",
+                    locator.get(
+                        "table_column_number", observation.get("table_column_number")
+                    ),
+                )
+                if table_column_number is None and cell_coordinates:
+                    table_column_number = int(cell_coordinates.group("column"))
                 points.append(
                     {
                         "species": species_name,
-                        "observation_id": observation.get("observation_id", ""),
+                        "observation_id": observation_id,
                         "point_index": point_index,
-                        "path": (
-                            f"species.{species_name}.observations"
-                            f"[{observation.get('observation_id', '')}]"
+                        "path": f"species.{species_name}.observations[{observation_id}]"
+                        + (
                             f".values.points[{point_index}].{value_field}"
+                            if is_point
+                            else f".values.{value_field}"
                         ),
                         "pdf_page": pdf_page,
                         "table_number": (
@@ -726,12 +790,8 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
                         "phase": point.get(
                             "phase", locator.get("phase", observation.get("phase"))
                         ),
-                        "table_row_number": point.get(
-                            "table_row_number",
-                            locator.get(
-                                "table_row_number", observation.get("table_row_number")
-                            ),
-                        ),
+                        "table_row_number": table_row_number,
+                        "table_column_number": table_column_number,
                         "table_phase_column": point.get(
                             "table_phase_column",
                             locator.get(
@@ -814,7 +874,13 @@ def compare_extract_to_draft(
         point_value = Decimal(str(point["value"]))
         has_location = any(
             point.get(key) is not None
-            for key in ("table_number", "table_row_number", "phase", "table_phase_column")
+            for key in (
+                "table_number",
+                "table_row_number",
+                "table_column_number",
+                "phase",
+                "table_phase_column",
+            )
         )
         matching_candidates = [
             (index, candidate)
@@ -828,6 +894,10 @@ def compare_extract_to_draft(
             and (
                 point.get("table_phase_column") is None
                 or candidate["column"] == int(point["table_phase_column"])
+            )
+            and (
+                point.get("table_column_number") is None
+                or candidate["column"] == int(point["table_column_number"])
             )
             and _phase_matches_column(point.get("phase"), candidate["column_header"])
         ]
@@ -850,7 +920,7 @@ def compare_extract_to_draft(
     return results
 
 
-# Per-cell render traps. mineru_table_qa imports _LETTER_FOR_DIGIT,
+# Per-cell render traps. mineru_table_qa imports _has_letter_for_digit,
 # _DROPPED_PM_VALUE, _RUN_TOGETHER, and confirm_dropped_plusminus. QA still
 # scores a table only after two hits (_MINIMUM_SIGNAL_HITS); that gate stays
 # in QA, and this module does not import QA. Stacked-values stays here: QA's
@@ -858,11 +928,13 @@ def compare_extract_to_draft(
 # numeric column, so it is not this check. Comma traps reuse this module's
 # cell flags rather than a second detector.
 _LETTER_FOR_DIGIT = re.compile(
-    r"(?<![A-Za-z0-9])[IlO](?:\.\d+|\d+)\s*(?:×|\\times|x)"
-    r"|(?<![A-Za-z0-9])\d+\.[IlO]\s*(?:×|\\times|x)",
-    re.IGNORECASE,
+    r"(?<![A-Za-z0-9])"
+    r"(?P<mantissa>[+\-−]?[0-9IlOS]+(?:\.[0-9IlOS]+)?)"
+    r"\s*(?:×|\\times|x)\s*"
+    r"(?P<scale>[0-9IlOS]+(?:\s*\^\s*\{?[+\-−]?[0-9IlOS]+\}?)?)"
 )
 _RUN_TOGETHER = re.compile(r"\d+\.\d+\.\d")
+_FUSED_SUPERSCRIPT_EXPONENT = re.compile(r"(?<![A-Za-z0-9])10[-−]\d+(?!\w)")
 _NUMBER_TOKEN = re.compile(
     r"(?<![A-Za-z0-9])[+\-−–—]?(?:\d+(?:[.,]\d+)?|\.\d+)"
 )
@@ -878,6 +950,7 @@ _TRAP_ORDER = (
     "letter_for_digit",
     "stacked_values",
     "dropped_plusminus",
+    "numeric_header_row",
 )
 _DOCUMENT_KEYS = frozenset(
     {
@@ -925,6 +998,7 @@ _VALUE_KEYS = frozenset(
         "quantity",
         "uncertainty",
         "attribution",
+        "scale_factor",
     }
 )
 _PAIR_KEYS = frozenset(
@@ -1088,6 +1162,9 @@ def printed_formula(text: str) -> str:
 def _stacked_values(text: str) -> bool:
     if _LATEX_OR_CARET.search(text) or _UNCERTAINTY_MARK.search(text):
         return False
+    # A long bare integer can contain stacked values if MinerU lost a line break.
+    if re.fullmatch(r"\d{7,}", text.strip()):
+        return True
     if "\n" in text:
         numbered = [part for part in text.split("\n") if _NUMBER_TOKEN.search(part)]
         if len(numbered) >= 2:
@@ -1097,6 +1174,17 @@ def _stacked_values(text: str) -> bool:
         return False
     gap = text[matches[0].end() : matches[1].start()]
     return gap.strip() == "" and bool(re.search(r"\s", gap))
+
+
+def _has_letter_for_digit(text: str) -> bool:
+    return any(
+        any(
+            char in "IiLlOoSs"
+            for group in ("mantissa", "scale")
+            for char in match.group(group)
+        )
+        for match in _LETTER_FOR_DIGIT.finditer(text)
+    )
 
 
 def confirm_dropped_plusminus(text: str, page_text: str | None) -> str | None:
@@ -1129,18 +1217,26 @@ def _render_traps(cell: Mapping[str, Any], page_text: str | None) -> list[str]:
     value_text = str(cell.get("value_text") or "")
     flags = set(cell.get("flags") or [])
     found: list[str] = []
-    if "^" in value_text and "^" not in text:
+    if (
+        ("^" in value_text and "^" not in text)
+        or _FUSED_SUPERSCRIPT_EXPONENT.search(text)
+    ):
         found.append("fused_superscript")
     if _RUN_TOGETHER.search(text):
         found.append("run_together")
     if flags.intersection({"comma_decimal_suspect", "ambiguous_comma_separator"}):
         found.append("comma_decimal_ambiguous")
-    if _LETTER_FOR_DIGIT.search(text):
+    if _has_letter_for_digit(text):
         found.append("letter_for_digit")
     if _stacked_values(text):
         found.append("stacked_values")
     if _dropped_plusminus(text, page_text):
         found.append("dropped_plusminus")
+    if (
+        cell.get("row_type") == "header"
+        and _number_decimal(value_text or text) is not None
+    ):
+        found.append("numeric_header_row")
     return [name for name in _TRAP_ORDER if name in found]
 
 
@@ -1413,8 +1509,92 @@ def _emit_table(
         if _is_origin(cell)
     }
     measurements = _measurement_columns(spec)
+    scale_factors: dict[int, tuple[str, int]] = {}
+    for measurement in measurements:
+        raw_scale = measurement.get("scale_factor")
+        if raw_scale is None:
+            continue
+        column = int(
+            measurement["column"]
+            if measurement["kind"] == "fixed"
+            else measurement["value_column"]
+        )
+        scale = _require_mapping(raw_scale, f"scale_factor for column {column}")
+        _unknown_keys(
+            scale,
+            frozenset({"header", "exponent", "direction"}),
+            f"scale_factor for column {column}",
+        )
+        if not {"header", "exponent", "direction"}.issubset(scale):
+            raise ValueError(
+                f"scale_factor for column {column} needs header, exponent, and direction"
+            )
+        header = scale["header"]
+        exponent = scale["exponent"]
+        direction = str(scale["direction"])
+        if not isinstance(header, str) or not header:
+            raise ValueError(f"scale_factor.header for column {column} must be a string")
+        if isinstance(exponent, bool) or not isinstance(exponent, int):
+            raise ValueError(f"scale_factor.exponent for column {column} must be an integer")
+        header_cells = [
+            str(row[column - 1])
+            for row in draft_table.get("header_rows") or []
+            if column <= len(row)
+        ]
+        if header not in header_cells:
+            raise ValueError(
+                f"scale_factor.header for column {column} is not an exact MinerU header cell"
+            )
+        printed_powers = [
+            int(match.group(1).replace("−", "-"))
+            for match in _HEADER_POWER_OF_TEN.finditer(header)
+        ]
+        if len(printed_powers) != 1:
+            raise ValueError(
+                f"scale_factor.header for column {column} must contain exactly one "
+                "parseable power of ten"
+            )
+        if printed_powers[0] != exponent:
+            raise ValueError(
+                f"scale_factor.exponent {exponent} does not match printed header "
+                f"power {printed_powers[0]} in column {column}"
+            )
+        if direction == "quantity_times_factor_equals_cell":
+            stored_exponent = -exponent
+        elif direction == "cell_times_factor_equals_quantity":
+            stored_exponent = exponent
+        else:
+            raise ValueError(
+                f"scale_factor.direction for column {column} must be "
+                "quantity_times_factor_equals_cell or cell_times_factor_equals_quantity"
+            )
+        scale_factors[column] = (header, stored_exponent)
     temperature = _temperature_spec(spec)
     rows = _selected_body_rows(spec, cells)
+    measurement_columns = {
+        int(measurement["column"])
+        if measurement["kind"] == "fixed"
+        else int(measurement["value_column"])
+        for measurement in measurements
+    }
+    numeric_header_rows = sorted(
+        {
+            int(cell["row"])
+            for cell in cells
+            if cell["row_type"] == "header"
+            and int(cell["column"]) in measurement_columns
+            and _is_origin(cell)
+            and _number_decimal(str(cell.get("value_text") or cell["text"]))
+            is not None
+        }
+    )
+    if numeric_header_rows:
+        if spec.get("rows", "all") != "all":
+            raise ValueError(
+                f"numeric header rows contain mapped values and cannot be skipped: "
+                f"{numeric_header_rows}"
+            )
+        rows = sorted(set(rows) | set(numeric_header_rows))
     point_conditions = _copy_conditions(spec)
     published_page = spec.get("published_page")
     verified_spellings = _render_verified_spellings(spec)
@@ -1472,6 +1652,16 @@ def _emit_table(
             if cell is None or _blank_or_dash(str(cell["text"])):
                 skipped += 1
                 continue
+            if (
+                row in numeric_header_rows
+                and cell["row_type"] == "header"
+                and _number_decimal(str(cell.get("value_text") or cell["text"]))
+                is None
+            ):
+                raise ValueError(
+                    f"numeric header row {row} has nonnumeric mapped value "
+                    f"in column {column}"
+                )
             if measurement["kind"] == "pair" and not species:
                 raise ValueError(f"row {row} column {column} has an empty species cell")
             quantity = str(measurement.get("quantity") or spec["quantity"])
@@ -1558,6 +1748,23 @@ def _emit_table(
                     )
                 observation["values"][value_field] = _printed(spelling)
                 used_verified.add((row, column))
+            scale = scale_factors.get(column)
+            if scale is not None:
+                # Printed header form: ` $p_{Ca}, \cdot 10^{7}$ ` means p_Ca × 10^7 = cell.
+                # Algebra: p_Ca = cell × 10^-7.
+                # Stolyarova 1996 cell `0.75` under that header stores `0.000000075 atm`.
+                # Unit check: 10^-7 is dimensionless, so the table's atm unit remains atm.
+                printed_cell = str(observation["values"][value_field]).strip()
+                number = _number_decimal(printed_cell)
+                if number is None:
+                    raise ValueError(
+                        f"scale_factor for row {row} column {column} needs a numeric cell"
+                    )
+                observation["values"][value_field] = _printed(
+                    format(number.scaleb(scale[1]), "f")
+                )
+                locator["printed_cell"] = _printed(printed_cell)
+                locator["scale_factor_header"] = _printed(scale[0])
             emitted.append((species, observation))
     unused = sorted(set(verified_spellings) - used_verified)
     if unused:
@@ -1736,7 +1943,17 @@ def main(argv: list[str] | None = None) -> int:
     compare.add_argument("extract", help="extract YAML path")
     compare.add_argument("draft_index", help="tables/<source-id>/index.yaml")
     compare.set_defaults(run=_compare_command)
-    emit = commands.add_parser("emit", help="emit extract rows from a draft mapping")
+    emit = commands.add_parser(
+        "emit",
+        help="emit extract rows from a draft mapping",
+        epilog=(
+            "A value column may declare scale_factor: {header, exponent, direction}. "
+            "header must be the exact MinerU header cell with one matching 10^n; "
+            "exponent is that signed integer. direction is "
+            "quantity_times_factor_equals_cell or cell_times_factor_equals_quantity. "
+            "Scaling uses exact decimal arithmetic and does not convert units."
+        ),
+    )
     emit.add_argument("draft_dir", help="draft directory containing index.yaml, or its parent")
     emit.add_argument("mapping", help="per-source table mapping YAML")
     emit.add_argument("--out", required=True, help="extract fragment path")

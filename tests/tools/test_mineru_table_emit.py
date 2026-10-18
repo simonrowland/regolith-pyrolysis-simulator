@@ -109,6 +109,128 @@ def test_module_docstring_documents_the_mapping() -> None:
     assert "needs_render_check" in text
     assert "pdftotext-layout" in text
     assert "printed_formula" in text
+    assert "scale_factor" in text
+
+
+def test_emit_help_documents_printed_scale_factors(capsys: pytest.CaptureFixture[str]) -> None:
+    with pytest.raises(SystemExit) as exit_info:
+        draft.main(["emit", "--help"])
+    assert exit_info.value.code == 0
+    assert "scale_factor" in capsys.readouterr().out
+
+
+def test_printed_scale_factor_scales_exactly_and_keeps_both_spellings(
+    tmp_path: Path,
+) -> None:
+    header = "p Mg x 10^5, atm"
+    draft_dir = _convert_html(
+        tmp_path,
+        f"<table><tr><th>T, K</th><th>{header}</th></tr>"
+        "<tr><td>1851</td><td>12.34</td></tr></table>",
+    )
+    table = _pressure_table(
+        values=[
+            {
+                "column": 2,
+                "species": "Mg",
+                "scale_factor": {
+                    "header": header,
+                    "exponent": 5,
+                    "direction": "quantity_times_factor_equals_cell",
+                },
+            }
+        ]
+    )
+    document = _emit(tmp_path, draft_dir, _base_mapping(table))
+    row = _observations(document)[0]
+    assert row["values"]["pressure_atm"] == "0.0001234"
+    assert "pressure_atm_as_printed" not in row["values"]
+    assert row["locator"]["printed_cell"] == "12.34"
+    assert row["locator"]["scale_factor_header"] == header
+    assert row["locator"]["column_header"] == header
+
+
+def test_printed_scale_factor_refuses_missing_direction_bad_power_and_mismatch(
+    tmp_path: Path,
+) -> None:
+    header = "p Mg x 10^5, atm"
+    cases = [
+        (
+            {"header": header, "exponent": 5},
+            "needs header, exponent, and direction",
+            header,
+        ),
+        (
+            {
+                "header": header,
+                "exponent": 6,
+                "direction": "quantity_times_factor_equals_cell",
+            },
+            "does not match printed header power",
+            header,
+        ),
+        (
+            {
+                "header": "p Mg, atm",
+                "exponent": 5,
+                "direction": "quantity_times_factor_equals_cell",
+            },
+            "exactly one parseable power of ten",
+            "p Mg, atm",
+        ),
+    ]
+    for index, (scale_factor, error, header_cell) in enumerate(cases):
+        case_root = tmp_path / str(index)
+        draft_dir = _convert_html(
+            case_root,
+            f"<table><tr><th>T, K</th><th>{header_cell}</th></tr>"
+            "<tr><td>1851</td><td>12.34</td></tr></table>",
+        )
+        table = _pressure_table(
+            values=[
+                {"column": 2, "species": "Mg", "scale_factor": scale_factor}
+            ]
+        )
+        with pytest.raises(ValueError, match=error):
+            _emit(
+                case_root,
+                draft_dir,
+                _base_mapping(table),
+            )
+
+
+def test_compare_matches_every_scalar_row_written_by_emit(tmp_path: Path) -> None:
+    draft_dir = _convert_html(
+        tmp_path,
+        "<table><tr><th>Sample</th><th>Fe ppm</th></tr>"
+        "<tr><td>Fe</td><td>1.5</td></tr>"
+        "<tr><td>Fe</td><td>2.5</td></tr>"
+        "<tr><td>Fe</td><td>3.5</td></tr></table>",
+    )
+    table = {
+        "page": 1,
+        "table_index": 1,
+        "type": "concentration_series",
+        "quantity": "elemental_abundance",
+        "evidence_class": "measured_direct",
+        "unit": "ppm",
+        "rows": "all",
+        "values": [{"column": 2, "species": "Fe"}],
+    }
+    emitted = _emit(tmp_path, draft_dir, _base_mapping(table))
+
+    compared = draft.compare_extract_to_draft(emitted, draft_dir / "index.yaml")
+
+    assert len(compared) == 3
+    assert [row["status"] for row in compared] == ["matched"] * 3
+    assert [row["value"] for row in compared] == [
+        Decimal("1.5"),
+        Decimal("2.5"),
+        Decimal("3.5"),
+    ]
+    assert all(row["path"].endswith(".values.value") for row in compared)
+    assert [row["matched_cell"]["row"] for row in compared] == [2, 3, 4]
+    assert all(row["matched_cell"]["column"] == 2 for row in compared)
 
 
 def test_happy_path_keeps_verbatim_text_and_skips_dashes(tmp_path: Path) -> None:
@@ -267,10 +389,17 @@ def test_value_pairs_unwrap_printed_formulas_and_ignore_species_glyphs(
     ("html", "flag"),
     [
         ("<tr><td>1851</td><td>1.23<sup>4</sup></td></tr>", "fused_superscript"),
+        ("<tr><td>1851</td><td>113.70.2</td></tr>", "run_together"),
         ("<tr><td>1851</td><td>1.23.45</td></tr>", "run_together"),
+        ("<tr><td>1851</td><td>3251400</td></tr>", "stacked_values"),
         ("<tr><td>1851</td><td>1,23</td></tr>", "comma_decimal_ambiguous"),
         ("<tr><td>1851</td><td>25,540</td></tr>", "comma_decimal_ambiguous"),
         ("<tr><td>1851</td><td>I.23 × 10</td></tr>", "letter_for_digit"),
+        ("<tr><td>1851</td><td>1O.23 × 10</td></tr>", "letter_for_digit"),
+        ("<tr><td>1851</td><td>l.23 × 10</td></tr>", "letter_for_digit"),
+        ("<tr><td>1851</td><td>1.2S × 10</td></tr>", "letter_for_digit"),
+        ("<tr><td>1851</td><td>1.23 × 1O^-5</td></tr>", "letter_for_digit"),
+        ("<tr><td>1851</td><td>10-7</td></tr>", "fused_superscript"),
         ("<tr><td>1851</td><td>1.2 3.4</td></tr>", "stacked_values"),
         ("<tr><td>1851</td><td>1.2<br>3.4</td></tr>", "stacked_values"),
     ],
@@ -297,13 +426,13 @@ def test_dropped_plusminus_needs_a_confirming_pdftotext_page(tmp_path: Path) -> 
     draft_dir = _convert_html(
         tmp_path,
         "<table><tr><th>T, K</th><th>p</th></tr>"
-        "<tr><td>1800</td><td>1851.02</td></tr></table>",
+        "<tr><td>1800</td><td>1643.15</td></tr></table>",
     )
     plain = _emit(tmp_path / "plain", draft_dir, _base_mapping(_pressure_table()))
     assert "needs_render_check" not in _observations(plain)[0]
-    assert _observations(plain)[0]["values"]["pressure_atm"] == "1851.02"
+    assert _observations(plain)[0]["values"]["pressure_atm"] == "1643.15"
     pdftotext = tmp_path / "layout.txt"
-    pdftotext.write_text("header\n1851 ± 02\n", encoding="utf-8")
+    pdftotext.write_text("header\n1643 ± 15\n", encoding="utf-8")
     with pytest.raises(ValueError, match="needs_render_check \\['dropped_plusminus'\\]"):
         _emit(
             tmp_path / "bare",
@@ -312,7 +441,7 @@ def test_dropped_plusminus_needs_a_confirming_pdftotext_page(tmp_path: Path) -> 
             pdftotext=pdftotext,
         )
     verified = _pressure_table(
-        render_verified=[{"row": 2, "column": 2, "text": "1851±02"}]
+        render_verified=[{"row": 2, "column": 2, "text": "1643±15"}]
     )
     marked = _emit(
         tmp_path / "marked",
@@ -322,7 +451,47 @@ def test_dropped_plusminus_needs_a_confirming_pdftotext_page(tmp_path: Path) -> 
     )
     row = _observations(marked)[0]
     assert "needs_render_check" not in row
-    assert row["values"]["pressure_atm"] == "1851±02"
+    assert row["values"]["pressure_atm"] == "1643±15"
+
+
+def test_numeric_header_row_requires_render_verification_and_is_emitted(
+    tmp_path: Path,
+) -> None:
+    draft_dir = _convert_html(
+        tmp_path,
+        "<table><tr><th>Temperature during experiment (°C)</th>"
+        "<th>Extractive loss (mg)</th><th>Gravimetric loss (mg)</th></tr>"
+        "<tr><td>1416</td><td>112</td><td>125</td></tr>"
+        "<tr><td>1437</td><td>146</td><td>153</td></tr></table>",
+    )
+    table = {
+        "page": 1,
+        "table_index": 1,
+        "type": "rate_series",
+        "quantity": "sodium_disilicate_total_weight_loss",
+        "evidence_class": "measured_direct",
+        "unit": "mg",
+        "rows": "all",
+        "temperature": {"column": 1, "unit": "C"},
+        "values": [
+            {"column": 2, "species": "Na"},
+            {"column": 3, "species": "Na"},
+        ],
+    }
+    with pytest.raises(
+        ValueError,
+        match=r"row 2 column 2: needs_render_check \['numeric_header_row'\]",
+    ):
+        _emit(tmp_path / "bare", draft_dir, _base_mapping(table))
+
+    table["render_verified"] = [
+        {"row": 2, "column": 2, "text": "112"},
+        {"row": 2, "column": 3, "text": "125"},
+    ]
+    document = _emit(tmp_path / "verified", draft_dir, _base_mapping(table))
+    rows = _observations(document)
+    assert [row["values"]["value"] for row in rows] == ["112", "125", "146", "153"]
+    assert [row["locator"]["row_label"] for row in rows[:2]] == ["1416", "1416"]
 
 
 def test_emit_refuses_a_pdftotext_only_table_and_a_csv_without_flags(
