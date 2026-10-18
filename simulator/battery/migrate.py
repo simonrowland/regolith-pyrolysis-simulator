@@ -8806,6 +8806,42 @@ def _unavailable_selection(
     )
 
 
+_SOURCE_APPROXIMATE_QUALIFIERS = frozenset(
+    {"about", "approximate", "approximate_as_printed", "approximately"}
+)
+
+
+def _source_value_is_approximate(
+    payload: Mapping[str, Any], field_name: str
+) -> bool:
+    """Preserve explicit approximation markers attached to a selected value."""
+    if bool(payload.get("approximate")) or payload.get("status") == "approximate":
+        return True
+
+    selected = payload.get(field_name)
+    scoped_payloads = (payload, selected) if isinstance(selected, Mapping) else (payload,)
+    qualifier_keys = {"qualifier", "qualifier_as_printed", f"{field_name}_qualifier"}
+    printed_keys = {"as_printed", f"{field_name}_as_printed"}
+    if field_name == "evaporation_rate":
+        printed_keys.add("rate_as_printed")
+    for source in scoped_payloads:
+        if bool(source.get("approximate")) or source.get("status") == "approximate":
+            return True
+        if any(
+            str(source.get(key) or "").strip().casefold()
+            in _SOURCE_APPROXIMATE_QUALIFIERS
+            for key in qualifier_keys
+        ):
+            return True
+        if any(
+            isinstance(source.get(key), str)
+            and re.match(r"^\s*[~≈∼]", source[key])
+            for key in printed_keys
+        ):
+            return True
+    return False
+
+
 def _point_selection(
     amount: Decimal,
     field_name: str,
@@ -8817,7 +8853,7 @@ def _point_selection(
         value=Value(
             ValueKind.POINT,
             point=amount,
-            approximate=bool(payload.get("approximate")),
+            approximate=_source_value_is_approximate(payload, field_name),
         ),
         field_name=field_name,
         unit_trail=unit_trail,
@@ -8840,7 +8876,7 @@ def _interval_selection(
             ValueKind.INTERVAL,
             interval_low=lo,
             interval_high=hi,
-            approximate=bool(payload.get("approximate")),
+            approximate=_source_value_is_approximate(payload, field_name),
         ),
         field_name=field_name,
         unit_trail="as_published",

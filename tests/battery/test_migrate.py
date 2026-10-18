@@ -5800,6 +5800,40 @@ def test_point_selection_preserves_approximate_flag(tmp_path: Path) -> None:
     assert obs.identity.temperature_K.value == 1200
 
 
+@pytest.mark.parametrize(
+    ("value_field", "activity_as_printed", "expected_approximate"),
+    (
+        ("activity_approx", None, False),
+        ("activity", "∼0.125", True),
+    ),
+)
+def test_selected_activity_field_approximation_markers_migrate_correctly(
+    tmp_path: Path,
+    value_field: str,
+    activity_as_printed: str | None,
+    expected_approximate: bool,
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    row = extract["species"]["Na"]["observations"][0]
+    row.update({"type": "activity", "units": "dimensionless"})
+    values = {
+        "quantity": "activity",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        value_field: 0.125,
+    }
+    if activity_as_printed is not None:
+        values["activity_as_printed"] = activity_as_printed
+    row["values"] = values
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = result.observations["fixture-source::na_psat"]
+
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == Decimal("0.125")
+    assert observation.value.approximate is expected_approximate
+
+
 def test_h01_blank_sample_area_units_queued_and_sample_transferred(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     extract["species"]["Na"]["observations"][0]["equipment"] = {
@@ -9213,6 +9247,33 @@ def test_demaria_partial_alkalis_do_not_become_a_complete_composition(
     assert "does not print a bulk composition" in sample_12065["values"][
         "composition_source_gap"
     ]
+
+
+def test_demaria_1973_na_approximate_cell_preserves_printed_pressure(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-023-demaria-1973.yaml")
+    prefix = (
+        "kems-023-demaria-1973::"
+        "demaria_1973_na_psat_table1_quoted_demaria_1971::T=1300.0:row="
+    )
+    approximate = next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(prefix + "12065")
+    )
+    exact_neighbor = next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(prefix + "12022")
+    )
+
+    assert approximate.value.kind is ValueKind.POINT
+    assert approximate.value.approximate is True
+    assert approximate.value.point == Decimal("0.000405300")
+    assert exact_neighbor.value.kind is ValueKind.POINT
+    assert exact_neighbor.value.approximate is False
+    assert exact_neighbor.value.point == Decimal("0.0008612625")
 
 
 def test_demaria_undigitized_pressure_figures_are_unavailable_not_points(
