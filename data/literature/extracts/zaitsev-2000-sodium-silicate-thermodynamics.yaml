@@ -1,0 +1,68 @@
+schema_version: literature_extract.v1
+source_id: zaitsev-2000-sodium-silicate-thermodynamics
+source:
+  citation: >-
+    Zaitsev, A. I., Shelkova, N. E., and Mogutnov, B. M. (2000).
+    Thermodynamics of Na2O-SiO2 Melts. Inorganic Materials 36(6), 529–543.
+  doi: 10.1007/BF02757949
+  year: 2000
+extraction:
+  method: >-
+    Born-digital pdftotext-layout transcription with MinerU table drafts;
+    table cells checked against 600 dpi page renders.
+  date: '2026-10-18'
+  worker: fam1-1018
+review_status: draft
+species:
+  SiO2:
+    observations: []
+    context:
+      - observation_id: zaitsev_2000_table3_standard_thermodynamic_functions
+        type: standard_thermodynamic_functions
+        locator: {page: 5, published_page: 533, pdf_page_index: 4, table: '3'}
+        units: mixed as printed; see per-column units
+        values:
+          quantity: standard thermodynamic functions
+          admission_status: typed_unavailable
+          reason: >-
+            Table 3 compares calculated standard thermodynamic functions with
+            values cited from [22]; this context record preserves the printed
+            comparison without treating calculated or attributed values as
+            measurements from this paper.
+          rows:
+            - formula_as_printed: NS2
+              source_as_printed: This work
+              S_standard_at_298_15_K_J_per_mol_K: '165.4 ± 4.0'
+              minus_delta_fH_from_oxides_kJ_per_mol: '227.4 ± 5'
+              delta_fS_from_oxides_J_per_mol_K: '7.3 ± 3.0'
+              delta_fH_from_elements_kJ_per_mol: '2464.2'
+            - formula_as_printed: NS2
+              source_as_printed: '[22]'
+              S_standard_at_298_15_K_J_per_mol_K: '164.055'
+              minus_delta_fH_from_oxides_kJ_per_mol: '230.54'
+              delta_fS_from_oxides_J_per_mol_K: '6.03'
+              delta_fH_from_elements_kJ_per_mol: '2467.3'
+            - formula_as_printed: NS
+              source_as_printed: This work
+              S_standard_at_298_15_K_J_per_mol_K: '114.8 ± 3.0'
+              minus_delta_fH_from_oxides_kJ_per_mol: '228.1 ± 5'
+              delta_fS_from_oxides_J_per_mol_K: '−1.7 ± 2.0'
+              delta_fH_from_elements_kJ_per_mol: '1554.0'
+            - formula_as_printed: NS
+              source_as_printed: '[22]'
+              S_standard_at_298_15_K_J_per_mol_K: '113.805'
+              minus_delta_fH_from_oxides_kJ_per_mol: '230.120'
+              delta_fS_from_oxides_J_per_mol_K: '−2.76'
+              delta_fH_from_elements_kJ_per_mol: '1556.03'
+            - formula_as_printed: N2S
+              source_as_printed: This work
+              S_standard_at_298_15_K_J_per_mol_K: '194.1 ± 5.0'
+              minus_delta_fH_from_oxides_kJ_per_mol: '363.0 ± 8'
+              delta_fS_from_oxides_J_per_mol_K: '2.4 ± 4.0'
+              delta_fH_from_elements_kJ_per_mol: '2104.0'
+            - formula_as_printed: N2S
+              source_as_printed: '[22]'
+              S_standard_at_298_15_K_J_per_mol_K: '195.811'
+              minus_delta_fH_from_oxides_kJ_per_mol: '359.8'
+              delta_fS_from_oxides_J_per_mol_K: '4.15'
+              delta_fH_from_elements_kJ_per_mol: '2100.8'
