@@ -633,6 +633,47 @@ def test_van_limpt_extract_column_swap_fails_by_row_and_header(
         _assert_duplicate_columns_match_sources(mapping, swapped_extract, document)
 
 
+def test_van_limpt_numeric_header_values_compare_to_their_cells(
+    tmp_path: Path,
+) -> None:
+    mapping_path = FIXTURES / "kems-046-van-limpt-2007.mapping.yaml"
+    mapping = yaml.safe_load(mapping_path.read_text(encoding="utf-8"))
+    corpus_root, raw_root = _corpus_roots()
+    source_id = mapping["source_id"]
+    source = _source_dir(corpus_root, raw_root, source_id)
+    if not source.is_dir():
+        pytest.skip(f"MinerU source directory is absent for {source_id}: {source}")
+    draft_dir = _convert_source(source, source_id, tmp_path, raw_root)
+    extract = {"species": {"Na": {"observations": [
+        {
+            "observation_id": f"van_limpt_{source_id}_p158_t11_r02_c{column:02d}",
+            "locator": {"pdf_page_index": 157, "table": "11"},
+            "values": {"value": value},
+        }
+        for column, value in ((2, 112), (3, 125))
+    ]}}}
+    compared = draft.compare_extract_to_draft(
+        extract, draft.resolve_draft_index(draft_dir, source_id), mapping
+    )
+    first_row = {
+        int(match.group("column")): row
+        for row in compared
+        if (
+            match := re.search(
+                r"_p158_t11_r02_c(?P<column>\d+)$",
+                str(row["observation_id"]),
+            )
+        )
+    }
+
+    assert {column: row["value"] for column, row in first_row.items()} == {
+        2: 112.0,
+        3: 125.0,
+    }
+    assert all(row["status"] == "matched" for row in first_row.values())
+    assert all(row["matched_cell"]["row"] == 2 for row in first_row.values())
+
+
 def test_backtest_rejects_extra_cells_and_same_key_column_swaps(
     tmp_path: Path,
 ) -> None:

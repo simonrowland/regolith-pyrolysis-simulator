@@ -851,15 +851,51 @@ def _phase_matches_column(phase: Any, column_header: str) -> bool:
 
 
 def compare_extract_to_draft(
-    extract: Mapping[str, Any], draft_index_path: str | Path
+    extract: Mapping[str, Any],
+    draft_index_path: str | Path,
+    mapping: Mapping[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
+    """Compare stored numeric points to draft cells, applying mapped scale factors."""
     index_path = Path(draft_index_path)
     index = yaml.safe_load(index_path.read_text(encoding="utf-8")) or {}
-    draft_by_page: dict[int, list[tuple[dict[str, Any], Decimal]]] = defaultdict(list)
-    draft_by_table: dict[
-        tuple[int, str], list[tuple[dict[str, Any], Decimal]]
+    tables = index.get("tables") or []
+    indexed_tables = {
+        (
+            int(table["pdf_page"]),
+            str(int(table["table_key"].rsplit("-t", 1)[1])),
+        ): table
+        for table in tables
+    }
+    scale_factors: dict[tuple[int, str, int], int] = {}
+    if mapping is not None:
+        mapping = _require_mapping(mapping, "mapping")
+        _unknown_keys(mapping, _DOCUMENT_KEYS, "mapping")
+        for mapped_table in mapping.get("tables") or []:
+            page = int(mapped_table["page"])
+            table_number = str(int(mapped_table["table_index"]))
+            draft_table = indexed_tables.get((page, table_number))
+            if draft_table is None:
+                continue
+            for measurement in _measurement_columns(mapped_table):
+                raw_scale = measurement.get("scale_factor")
+                if raw_scale is None:
+                    continue
+                column = int(measurement["column"])
+                header_cells = [
+                    str(row[column - 1])
+                    for row in draft_table.get("header_rows") or []
+                    if column <= len(row)
+                ]
+                _, exponent = _scale_factor_spec(raw_scale, column, header_cells)
+                scale_factors[(page, table_number, column)] = exponent
+
+    draft_by_page: dict[
+        int, list[tuple[dict[str, Any], Decimal, int]]
     ] = defaultdict(list)
-    for table in index.get("tables") or []:
+    draft_by_table: dict[
+        tuple[int, str], list[tuple[dict[str, Any], Decimal, int]]
+    ] = defaultdict(list)
+    for table in tables:
         page = int(table["pdf_page"])
         table_number = str(int(table["table_key"].rsplit("-t", 1)[1]))
         column_headers = {
@@ -869,8 +905,6 @@ def compare_extract_to_draft(
         csv_path = index_path.parent / table["csv"]
         with csv_path.open(encoding="utf-8", newline="") as stream:
             for cell in csv.DictReader(stream):
-                if cell["row_type"] != "body":
-                    continue
                 if (
                     not cell["origin_row"]
                     or not cell["origin_column"]
@@ -880,17 +914,23 @@ def compare_extract_to_draft(
                     continue
                 number = _number_decimal(cell["value_text"])
                 if number is not None:
+                    column = int(cell["column"])
                     candidate = {
                         "value": float(number),
                         "text": cell["text"],
                         "table_key": table["table_key"],
                         "row": int(cell["row"]),
-                        "column": int(cell["column"]),
-                        "column_header": column_headers.get(int(cell["column"]), ""),
+                        "column": column,
+                        "column_header": column_headers.get(column, ""),
                         "flags": json.loads(cell["flags"] or "[]"),
                     }
-                    draft_by_page[page].append((candidate, number))
-                    draft_by_table[(page, table_number)].append((candidate, number))
+                    scale_exponent = scale_factors.get(
+                        (page, table_number, column), 0
+                    )
+                    draft_by_page[page].append((candidate, number, scale_exponent))
+                    draft_by_table[(page, table_number)].append(
+                        (candidate, number, scale_exponent)
+                    )
 
     results: list[dict[str, Any]] = []
     consumed: dict[tuple[int | None, str | None], set[int]] = defaultdict(set)
@@ -915,11 +955,10 @@ def compare_extract_to_draft(
                 "table_phase_column",
             )
         )
-        matching_candidates = [
-            (index, candidate)
-            for index, (candidate, value) in enumerate(indexed_candidates)
+        located_candidates = [
+            (index, candidate, value, exponent)
+            for index, (candidate, value, exponent) in enumerate(indexed_candidates)
             if index not in consumed[location]
-            and point_value == value
             and (
                 point.get("table_row_number") is None
                 or candidate["row"] == int(point["table_row_number"])
@@ -934,8 +973,22 @@ def compare_extract_to_draft(
             )
             and _phase_matches_column(point.get("phase"), candidate["column_header"])
         ]
-        matched_index, matched = matching_candidates[0] if matching_candidates else (None, None)
-        if matched is not None:
+        needs_mapping = mapping is None and any(
+            _HEADER_POWER_OF_TEN.search(candidate["column_header"])
+            for _, candidate, _, _ in located_candidates
+        )
+        matching_candidates = [
+            (index, candidate)
+            for index, candidate, value, exponent in located_candidates
+            if point_value == value.scaleb(exponent)
+        ]
+        matched_index, matched = (
+            matching_candidates[0] if matching_candidates else (None, None)
+        )
+        if needs_mapping:
+            status = "needs_mapping"
+            matched = None
+        elif matched is not None:
             consumed[location].add(matched_index)
             status = "matched" if has_location else "presence-only"
         elif indexed_candidates:
@@ -1096,6 +1149,56 @@ def _require_mapping(payload: Any, label: str) -> Mapping[str, Any]:
     if not isinstance(payload, Mapping):
         raise ValueError(f"{label} must be a mapping")
     return payload
+
+
+def _scale_factor_spec(
+    raw_scale: Any, column: int, header_cells: list[str]
+) -> tuple[str, int]:
+    scale = _require_mapping(raw_scale, f"scale_factor for column {column}")
+    _unknown_keys(
+        scale,
+        frozenset({"header", "exponent", "direction"}),
+        f"scale_factor for column {column}",
+    )
+    if not {"header", "exponent", "direction"}.issubset(scale):
+        raise ValueError(
+            f"scale_factor for column {column} needs header, exponent, and direction"
+        )
+    header = scale["header"]
+    exponent = scale["exponent"]
+    direction = str(scale["direction"])
+    if not isinstance(header, str) or not header:
+        raise ValueError(f"scale_factor.header for column {column} must be a string")
+    if isinstance(exponent, bool) or not isinstance(exponent, int):
+        raise ValueError(f"scale_factor.exponent for column {column} must be an integer")
+    if header not in header_cells:
+        raise ValueError(
+            f"scale_factor.header for column {column} is not an exact MinerU header cell"
+        )
+    printed_powers = [
+        int(match.group(1).replace("−", "-"))
+        for match in _HEADER_POWER_OF_TEN.finditer(header)
+    ]
+    if len(printed_powers) != 1:
+        raise ValueError(
+            f"scale_factor.header for column {column} must contain exactly one "
+            "parseable power of ten"
+        )
+    if printed_powers[0] != exponent:
+        raise ValueError(
+            f"scale_factor.exponent {exponent} does not match printed header "
+            f"power {printed_powers[0]} in column {column}"
+        )
+    if direction == "quantity_times_factor_equals_cell":
+        stored_exponent = -exponent
+    elif direction == "cell_times_factor_equals_quantity":
+        stored_exponent = exponent
+    else:
+        raise ValueError(
+            f"scale_factor.direction for column {column} must be "
+            "quantity_times_factor_equals_cell or cell_times_factor_equals_quantity"
+        )
+    return header, stored_exponent
 
 
 def resolve_draft_index(draft_dir: str | Path, source_id: str | None) -> Path:
@@ -1554,56 +1657,14 @@ def _emit_table(
             if measurement["kind"] == "fixed"
             else measurement["value_column"]
         )
-        scale = _require_mapping(raw_scale, f"scale_factor for column {column}")
-        _unknown_keys(
-            scale,
-            frozenset({"header", "exponent", "direction"}),
-            f"scale_factor for column {column}",
-        )
-        if not {"header", "exponent", "direction"}.issubset(scale):
-            raise ValueError(
-                f"scale_factor for column {column} needs header, exponent, and direction"
-            )
-        header = scale["header"]
-        exponent = scale["exponent"]
-        direction = str(scale["direction"])
-        if not isinstance(header, str) or not header:
-            raise ValueError(f"scale_factor.header for column {column} must be a string")
-        if isinstance(exponent, bool) or not isinstance(exponent, int):
-            raise ValueError(f"scale_factor.exponent for column {column} must be an integer")
         header_cells = [
             str(row[column - 1])
             for row in draft_table.get("header_rows") or []
             if column <= len(row)
         ]
-        if header not in header_cells:
-            raise ValueError(
-                f"scale_factor.header for column {column} is not an exact MinerU header cell"
-            )
-        printed_powers = [
-            int(match.group(1).replace("−", "-"))
-            for match in _HEADER_POWER_OF_TEN.finditer(header)
-        ]
-        if len(printed_powers) != 1:
-            raise ValueError(
-                f"scale_factor.header for column {column} must contain exactly one "
-                "parseable power of ten"
-            )
-        if printed_powers[0] != exponent:
-            raise ValueError(
-                f"scale_factor.exponent {exponent} does not match printed header "
-                f"power {printed_powers[0]} in column {column}"
-            )
-        if direction == "quantity_times_factor_equals_cell":
-            stored_exponent = -exponent
-        elif direction == "cell_times_factor_equals_quantity":
-            stored_exponent = exponent
-        else:
-            raise ValueError(
-                f"scale_factor.direction for column {column} must be "
-                "quantity_times_factor_equals_cell or cell_times_factor_equals_quantity"
-            )
-        scale_factors[column] = (header, stored_exponent)
+        scale_factors[column] = _scale_factor_spec(
+            raw_scale, column, header_cells
+        )
     temperature = _temperature_spec(spec)
     rows = _selected_body_rows(spec, cells)
     measurement_columns = {
@@ -1927,7 +1988,13 @@ def _convert_command(args: argparse.Namespace) -> int:
 
 def _compare_command(args: argparse.Namespace) -> int:
     extract = yaml.safe_load(Path(args.extract).read_text(encoding="utf-8"))
-    results = compare_extract_to_draft(extract, args.draft_index)
+    mapping_path = getattr(args, "mapping", None)
+    mapping = (
+        yaml.safe_load(Path(mapping_path).read_text(encoding="utf-8"))
+        if mapping_path
+        else None
+    )
+    results = compare_extract_to_draft(extract, args.draft_index, mapping)
     fields = (
         "species",
         "observation_id",
@@ -1956,6 +2023,7 @@ def _compare_command(args: argparse.Namespace) -> int:
     print(
         f"compare: matched={counts['matched']} no-match={counts['no-match']} "
         f"mismatch={counts['mismatch']} presence-only={counts['presence-only']} "
+        f"needs_mapping={counts['needs_mapping']} "
         f"total={len(results)}",
         file=sys.stderr,
     )
@@ -1977,6 +2045,13 @@ def main(argv: list[str] | None = None) -> int:
     compare = commands.add_parser("compare", help="compare stored extract points to draft")
     compare.add_argument("extract", help="extract YAML path")
     compare.add_argument("draft_index", help="tables/<source-id>/index.yaml")
+    compare.add_argument(
+        "--mapping",
+        help=(
+            "mapping YAML for scale_factor columns; without it, cells under "
+            "power-of-ten headers report needs_mapping"
+        ),
+    )
     compare.set_defaults(run=_compare_command)
     emit = commands.add_parser(
         "emit",

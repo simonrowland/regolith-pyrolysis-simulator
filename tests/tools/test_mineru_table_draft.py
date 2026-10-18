@@ -493,6 +493,79 @@ def test_compare_reads_partial_pressure_atm_strings(tmp_path: Path) -> None:
     assert result[0]["matched_cell"]["text"] == "$1.25 \\times 10^{-6}$"
 
 
+def test_compare_applies_mapped_scale_and_requires_mapping_for_scale_headers(
+    tmp_path: Path,
+) -> None:
+    csv_path = tmp_path / "p001-t01.csv"
+    header = r"p_O, \\cdot 10^{3}"
+    with csv_path.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=draft._CSV_FIELDS)
+        writer.writeheader()
+        writer.writerow({
+            "row": 1, "column": 1, "row_type": "header", "text": "T, K",
+            "value_text": "T, K", "mark": "", "numeric_column": 0,
+            "origin_row": 1, "origin_column": 1, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+        writer.writerow({
+            "row": 1, "column": 2, "row_type": "header", "text": header,
+            "value_text": header, "mark": "", "numeric_column": 1,
+            "origin_row": 1, "origin_column": 2, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+        writer.writerow({
+            "row": 2, "column": 1, "row_type": "body", "text": "1416",
+            "value_text": "1416", "mark": "", "numeric_column": 0,
+            "origin_row": 2, "origin_column": 1, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+        writer.writerow({
+            "row": 2, "column": 2, "row_type": "body", "text": "100",
+            "value_text": "100", "mark": "", "numeric_column": 1,
+            "origin_row": 2, "origin_column": 2, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+    index_path = tmp_path / "index.yaml"
+    index_path.write_text(yaml.safe_dump({"tables": [{
+        "table_key": "p001-t01", "pdf_page": 1, "csv": csv_path.name,
+        "header_rows": [["T, K", header]],
+        "columns": [{"column": 2, "header": header}],
+    }]}), encoding="utf-8")
+    mapping = {"tables": [{
+        "page": 1, "table_index": 1, "quantity": "partial_pressure",
+        "values": [{
+            "column": 2, "species": "O",
+            "scale_factor": {
+                "header": header, "exponent": 3,
+                "direction": "quantity_times_factor_equals_cell",
+            },
+        }],
+    }]}
+
+    def extract(value: str) -> dict:
+        return {"species": {"O": {"observations": [{
+            "observation_id": "scaled-point",
+            "locator": {"pdf_page": 1, "table": "1"},
+            "values": {"points": [{
+                "value": value, "table_row_number": 2, "table_column_number": 2,
+            }]},
+        }]}}}
+
+    correct = draft.compare_extract_to_draft(extract("0.1"), index_path, mapping)[0]
+    unscaled = draft.compare_extract_to_draft(extract("100"), index_path, mapping)[0]
+    unmapped_correct = draft.compare_extract_to_draft(extract("0.1"), index_path)[0]
+    unmapped_raw = draft.compare_extract_to_draft(extract("100"), index_path)[0]
+
+    assert correct["status"] == "matched"
+    assert correct["matched_cell"]["value"] == 100.0
+    assert unscaled["status"] == "mismatch"
+    assert unscaled["matched_cell"] is None
+    assert unmapped_correct["status"] == "needs_mapping"
+    assert unmapped_correct["matched_cell"] is None
+    assert unmapped_raw["status"] == "needs_mapping"
+    assert unmapped_raw["matched_cell"] is None
+
+
 def test_compare_carries_flags_for_matched_cells(tmp_path: Path) -> None:
     chunk_dir = tmp_path / "raw" / "flagged-values" / "ocr-mineru" / "p001-p010"
     chunk_dir.mkdir(parents=True)
@@ -752,4 +825,17 @@ def test_compare_summary_prints_presence_only_count(tmp_path: Path, capsys) -> N
         argparse.Namespace(extract=str(extract_path), draft_index=str(index_path))
     )
 
-    assert "presence-only=1" in capsys.readouterr().err
+    summary = capsys.readouterr().err
+    assert "presence-only=1" in summary
+    assert "needs_mapping=0" in summary
+
+
+def test_compare_help_documents_scale_mapping(capsys) -> None:
+    with pytest.raises(SystemExit) as exc:
+        draft.main(["compare", "--help"])
+
+    assert exc.value.code == 0
+    help_text = capsys.readouterr().out
+    assert "--mapping MAPPING" in help_text
+    assert "power-of-ten headers" in help_text
+    assert "needs_mapping" in help_text
