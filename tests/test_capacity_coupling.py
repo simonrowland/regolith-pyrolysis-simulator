@@ -20,6 +20,7 @@ from simulator.capacity_coupling import (
     CapacityCouplingRefusalError,
     CapacityShadowRefusal,
     CapacityShadowResult,
+    SourceDuctConvergence,
     combined_saturation,
     hertz_knudsen_molar_conductance_mol_s_Pa,
     mixture_surface_partials_Pa,
@@ -1519,6 +1520,7 @@ def test_source_duct_closure_matches_linear_hk_and_pipe1_quadratic():
         capacity=NoColdTrain(),
     )
     assert isinstance(result, CapacityShadowResult)
+    assert result.convergence is SourceDuctConvergence.CONVERGED
     expected = pipe1_surface_pressure_Pa(
         P_eq_Pa=P_eq, H_mol_s_Pa=H, G_mol_s_Pa2=G,
     )
@@ -2105,10 +2107,19 @@ def test_source_duct_h_refine_exhaustion_is_predict_and_flag():
     )
     assert isinstance(result, CapacityShadowResult)
     assert result.authoritative is False
+    assert result.convergence is SourceDuctConvergence.MODEL_LIMIT
     reasons = [notice.get("reason") for notice in result.closure_notices]
     assert "source_duct_h_refine_non_convergence" in reasons
-    assert all(notice.get("status") == "model_limit" for notice in result.closure_notices
-               if notice.get("reason") == "source_duct_h_refine_non_convergence")
+    limit_notices = [
+        notice for notice in result.closure_notices
+        if notice.get("reason") == "source_duct_h_refine_non_convergence"
+    ]
+    assert all(notice.get("status") == "model_limit" for notice in limit_notices)
+    assert all(
+        notice.get("residual_rel") == pytest.approx(result.source_duct_residual_rel)
+        for notice in limit_notices
+    )
+    assert result.source_duct_residual_rel > capacity_coupling.DEFAULT_REL_TOL
 
 
 def test_mixture_free_molecular_closed_form_is_independent_and_limits():
@@ -2211,30 +2222,87 @@ def test_mixture_transitional_weights_viscous_and_molecular_at_candidate_P():
     assert partials["Fe"] == pytest.approx(expected, rel=1.0e-9)
 
 
-def test_long_tube_molar_C_matches_owner_and_units():
+def test_molecular_pipe_C_matches_finite_tube_owner_and_units():
     from simulator.physical_constants import GAS_CONSTANT
-    from simulator.transport_regime import long_tube_molecular_conductance_m3_s
+    from simulator.transport_regime import (
+        finite_tube_clausing_transmission,
+        molecular_tube_conductance_m3_s,
+    )
 
     diameter_m = 0.12
-    length_m = 1.2
-    temperature_K = 300.0
+    length_m = 1.0
+    temperature_K = 1873.15
     mass = 0.0280134
-    c_m3 = long_tube_molecular_conductance_m3_s(
+    transmission = finite_tube_clausing_transmission(diameter_m, length_m)
+    assert transmission == pytest.approx(0.127126230976, rel=1.0e-9)
+    c_m3 = molecular_tube_conductance_m3_s(
         diameter_m,
         length_m,
         temperature_K,
         mass,
+        transmission_probability=transmission,
         knudsen_number=math.inf,
     )
-    c_mol, notice = capacity_coupling._long_tube_molar_conductance_mol_s_Pa(
+    c_mol = capacity_coupling._molecular_pipe_conductance_mol_s_Pa(
         diameter_m=diameter_m,
         length_m=length_m,
         temperature_K=temperature_K,
         molar_mass_kg_mol=mass,
     )
-    assert notice is None
     assert c_mol == pytest.approx(c_m3 / (GAS_CONSTANT * temperature_K), rel=1.0e-12)
-    # H and C share mol/(s Pa).
     H = 0.001
     p = H * 9.0 / (H + c_mol)
     assert H * (9.0 - p) == pytest.approx(c_mol * p, rel=1.0e-12)
+
+
+def test_source_duct_first_bracket_miss_keeps_carrier(monkeypatch):
+    def boom(*_args, **_kwargs):
+        raise CapacityCouplingRefusalError(
+            CapacityShadowRefusal("source_duct_bracket_missed", 0)
+        )
+
+    monkeypatch.setattr(capacity_coupling, "mixture_surface_partials_Pa", boom)
+    result = solve_source_duct_closure(
+        P_eq_Pa={"Fe": 9.0},
+        flux_kg_hr_at_partials=lambda _partials: {"Fe": 0.0},
+        molar_mass_kg_mol={"Fe": 0.055845, "N2": 0.0280134},
+        G_mol_s_Pa2=0.002,
+        capacity=NoColdTrain(),
+        carrier_partials_Pa={"N2": 1000.0},
+    )
+    assert isinstance(result, CapacityShadowResult)
+    assert result.convergence is SourceDuctConvergence.MODEL_LIMIT
+    assert result.partial_pressures_Pa["N2"] == pytest.approx(1000.0)
+    assert result.partial_pressures_Pa.get("Fe", 0.0) == pytest.approx(0.0)
+    reasons = [notice.get("reason") for notice in result.closure_notices]
+    assert "source_duct_bracket_missed" in reasons
+    miss = next(
+        notice for notice in result.closure_notices
+        if notice.get("reason") == "source_duct_bracket_missed"
+    )
+    assert miss.get("status") == "model_limit"
+    assert miss.get("residual_rel") == pytest.approx(result.source_duct_residual_rel)
+
+
+def test_pipe_ld_833_has_no_clausing_model_limit_notice():
+    mass = 0.055845
+
+    def flux_at_partials(partials):
+        drive = max(0.0, 10.0 - float(partials.get("Fe", 0.0)))
+        return {"Fe": 0.001 * drive * mass * 3600.0}
+
+    result = solve_source_duct_closure(
+        P_eq_Pa={"Fe": 10.0},
+        flux_kg_hr_at_partials=flux_at_partials,
+        molar_mass_kg_mol={"Fe": mass},
+        G_mol_s_Pa2=0.002,
+        capacity=NoColdTrain(),
+        H_mol_s_Pa={"Fe": 0.001},
+        pipe_diameter_m=0.12,
+        pipe_length_m=1.0,
+        temperature_K=1873.15,
+        carrier_gas="N2",
+    )
+    assert isinstance(result, CapacityShadowResult)
+    reasons = [notice.get("reason") for notice in result.closure_notices]
+    assert "clausing_long_tube_asymptote_out_of_range" not in reasons

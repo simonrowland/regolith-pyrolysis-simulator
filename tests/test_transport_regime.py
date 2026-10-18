@@ -112,6 +112,11 @@ def test_free_molecular_tube_clausing_fixtures_t1_t2_t3(
         LENGTH_M,
     ) == pytest.approx(0.1333333333)
 
+    assert tr.finite_tube_clausing_transmission(
+        DIAMETER_M,
+        LENGTH_M,
+    ) == pytest.approx(0.10931174, rel=1.0e-6)
+
     conductance_m3_s = tr.long_tube_molecular_conductance_m3_s(
         DIAMETER_M,
         LENGTH_M,
@@ -146,6 +151,28 @@ def test_room_temperature_tube_shortcut_cross_check_t3():
     assert abs(si_l_s - rounded_vacuum_engineering_shortcut_l_s) / si_l_s == (
         pytest.approx(0.018099330818490134, rel=1e-9)
     )
+
+
+def test_finite_tube_clausing_matches_cole_anchors_and_long_tube_limit():
+    diameter_m = 0.12
+    cole = {
+        1.0: 0.5142,
+        5.0: 0.1909,
+        10.0: 0.1093,
+    }
+    cole_rel = {1.0: 2.0e-4, 5.0: 6.0e-3, 10.0: 2.0e-4}
+    for length_over_diameter, expected in cole.items():
+        transmission = tr.finite_tube_clausing_transmission(
+            diameter_m,
+            diameter_m * length_over_diameter,
+        )
+        assert transmission == pytest.approx(expected, rel=cole_rel[length_over_diameter])
+    running = tr.finite_tube_clausing_transmission(0.12, 1.0)
+    assert running == pytest.approx(0.127126230976, rel=1.0e-9)
+    long_length_m = diameter_m * 1000.0
+    finite_long = tr.finite_tube_clausing_transmission(diameter_m, long_length_m)
+    asymptote = tr.long_tube_clausing_transmission(diameter_m, long_length_m)
+    assert finite_long == pytest.approx(asymptote, rel=5.0e-3)
 
 
 @pytest.mark.parametrize(

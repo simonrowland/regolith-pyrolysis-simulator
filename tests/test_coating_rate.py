@@ -996,6 +996,95 @@ def test_empty_source_duct_map_installs_carrier_only_not_inversion() -> None:
     )
 
 
+def test_source_duct_model_limit_keeps_carrier_and_records_residual() -> None:
+    from simulator.capacity_coupling import (
+        CapacityShadowResult,
+        OxygenShadowPartition,
+        SaturationShadow,
+        SourceDuctConvergence,
+    )
+    from simulator.thermal_train import NoColdTrain
+
+    run = _c2a_1600_live_run()
+    session = run._start_session()
+    simulator = session.simulator
+    run._apply_sio_pre_run_controls(simulator)
+    limited = CapacityShadowResult(
+        capacity=NoColdTrain(),
+        partial_pressures_Pa={"Fe": 0.0, "N2": 1000.0},
+        evaporation_flux_kg_hr={},
+        bled_species_mol={},
+        terminal_offgas_mol={},
+        oxygen=OxygenShadowPartition(0.0, 0.0, 0.0, 0.0, 0.0),
+        saturation=SaturationShadow(0.0, None, 0.0, "pipe"),
+        iterations=1,
+        max_delta_history_Pa=(),
+        mass_closure_error_pct=0.0,
+        source_duct_residual_rel=0.42,
+        closure_notices=(
+            {
+                "reason": "source_duct_bracket_missed",
+                "status": "model_limit",
+                "residual_rel": 0.42,
+                "detail": "source/duct root did not bracket",
+            },
+        ),
+        convergence=SourceDuctConvergence.MODEL_LIMIT,
+    )
+    simulator._record_source_duct_closure(limited)
+    simulator._install_source_duct_surface(limited)
+    installed = dict(simulator._melt_headspace_composition_mbar or {})
+    assert installed.get("N2") == pytest.approx(10.0)
+    assert "Fe" not in installed
+    diagnostic = dict(simulator._source_duct_closure_diagnostic)
+    assert diagnostic["convergence"] == SourceDuctConvergence.MODEL_LIMIT.value
+    assert diagnostic["source_duct_residual_rel"] == pytest.approx(0.42)
+    notes = list(getattr(simulator, "_silent_zero_notes", []) or [])
+    assert notes
+    assert all(
+        note.get("site") == "capacity_coupling.source_duct_closure"
+        for note in notes
+    )
+    assert any(
+        note.get("field") == "source_duct_bracket_missed"
+        and "residual_rel=0.42" in str(note.get("detail") or "")
+        for note in notes
+    )
+    payload = simulator._silent_zero_diagnostic_payload()
+    assert payload["source_duct_closure"]["source_duct_residual_rel"] == pytest.approx(
+        0.42
+    )
+
+    zeros = CapacityShadowResult(
+        capacity=NoColdTrain(),
+        partial_pressures_Pa={"Fe": 0.0, "SiO": 0.0},
+        evaporation_flux_kg_hr={},
+        bled_species_mol={},
+        terminal_offgas_mol={},
+        oxygen=OxygenShadowPartition(0.0, 0.0, 0.0, 0.0, 0.0),
+        saturation=SaturationShadow(0.0, None, 0.0, "pipe"),
+        iterations=1,
+        max_delta_history_Pa=(),
+        mass_closure_error_pct=0.0,
+        source_duct_residual_rel=1.0,
+        closure_notices=(
+            {
+                "reason": "source_duct_bracket_missed",
+                "status": "model_limit",
+                "residual_rel": 1.0,
+            },
+        ),
+        convergence=SourceDuctConvergence.MODEL_LIMIT,
+    )
+    simulator._install_source_duct_surface(zeros)
+    fallback = dict(simulator._melt_headspace_composition_mbar or {})
+    assert fallback
+    assert "Fe" not in fallback
+    assert sum(fallback.values()) == pytest.approx(
+        float(simulator.melt.p_total_mbar), rel=1.0e-6, abs=1.0e-9
+    )
+
+
 def test_evaporation_flux_overhead_pressure_is_projection_not_command() -> None:
     from simulator.chemistry.kernel.capabilities import ChemistryIntent
 
