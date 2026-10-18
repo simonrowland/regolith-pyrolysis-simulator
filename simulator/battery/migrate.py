@@ -15970,7 +15970,9 @@ class Migrator:
                     class_=State.of(EvidenceClass.MEASURED_REDUCED),
                     original_method_class="measured_direct",
                 )
-            value = Value.point_of(ratio)
+            value = _value_from_plain(
+                {"kind": ValueKind.POINT.value, "point": ratio}
+            )
             derived_from = cell_ids
             first_state = basis.numerator_oxidation_states[0]
             numerator_label = f"{formula}{abs(first_state)}{'+' if first_state > 0 else '-'}"
@@ -16022,7 +16024,12 @@ class Migrator:
             )
         else:
             evidence = Evidence(class_=State.unknown(refusal_reason))
-            value = Value(ValueKind.UNAVAILABLE, unavailable_reason=refusal_reason)
+            value = _value_from_plain(
+                {
+                    "kind": ValueKind.UNAVAILABLE.value,
+                    "unavailable_reason": refusal_reason,
+                }
+            )
             admission = Admission(
                 status=AdmissionStatus.REJECTED,
                 reason=refusal_reason,
