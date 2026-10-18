@@ -98,6 +98,7 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # 7cc5144f6f9e90caa10e106e4227673954c7b3091d1affddf659fd836c4b8104 ->
         # c7270296d76d8b94b21e0efa87d87f0ed77fc580d1da73311427877db05b92ce
         "ledger_sha256": "c7270296d76d8b94b21e0efa87d87f0ed77fc580d1da73311427877db05b92ce",
+        "cost_rollup_sha256": "1a7e4b35990ff7a22b4a5909f4633babb03f32957458b670edc5c835f062785f",
     },
     "mars_basalt_C2A_12h": {
         "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",
@@ -105,6 +106,7 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # 3cef2f00197f17daeaebfc535f79ae2bed243fca379203c2fd65b92ab3c1b25d ->
         # 16d1322a8e97739dfc118cf598d684b52a5cb4df022a623d072bee31d12763a8
         "ledger_sha256": "16d1322a8e97739dfc118cf598d684b52a5cb4df022a623d072bee31d12763a8",
+        "cost_rollup_sha256": "64e92e5eb746454863fe75789610bb314ea14813eebbe38554549ccb26dc39ac",
     },
     "ci_carbonaceous_chondrite_C2B_12h": {
         "flux_maps_sha256": "d827049039f82a8b65a9b0f52e637cf3bc5d1e0dec7d6198edf901a5e3dcae7d",
@@ -112,6 +114,7 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # fe7c19dbc6195a7f115e8cac385d539f84cf0a3670c35415ee058a5f41a56348 ->
         # f69e328d3019a763ecb7092df1a0c17a46615dcf6eb3c19d76d894259121d1bb
         "ledger_sha256": "f69e328d3019a763ecb7092df1a0c17a46615dcf6eb3c19d76d894259121d1bb",
+        "cost_rollup_sha256": "7432e5047d2c39ccd601fedc0dc4c532702188e018cb052816fdbb9c75b29639",
     },
 }
 
@@ -1632,9 +1635,15 @@ def test_runner_golden_fixture_matches(scenario, isolated_engine_config, monkeyp
         ],
         "final_state": actual["final_state"],
     }
+    cost_rollup = {
+        key: value
+        for key, value in actual["run_metadata"]["cost_rollup_diagnostic"].items()
+        if key != "warnings"
+    }
     assert {
         "flux_maps_sha256": hashlib.sha256(canonical_json(flux_maps)).hexdigest(),
         "ledger_sha256": hashlib.sha256(canonical_json(ledger_output)).hexdigest(),
+        "cost_rollup_sha256": hashlib.sha256(canonical_json(cost_rollup)).hexdigest(),
     } == SCENARIO_FLUX_LEDGER_PINS[scenario["name"]]
 
 

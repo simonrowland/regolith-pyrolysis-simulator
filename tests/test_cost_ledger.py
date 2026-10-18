@@ -125,6 +125,36 @@ def test_sub_tolerance_reagent_debit_is_below_cost_input_floor():
     assert f"floor_kg={VECTOR_TOLERANCE:.1e}" in warnings[0]
 
 
+def test_sub_tolerance_beneficiary_credit_is_silent_before_fix():
+    tiny_kg = 3.226e-13
+    ledger = CostLedger()
+    ledger.seed_external_material(
+        account="process.reagent_inventory",
+        species="Mg",
+        quantity_kg=1.0,
+        cost=CostVector(thermal_flux_h=2.0),
+    )
+    transition = LedgerTransition(
+        "tiny_beneficiary_credit",
+        debits=(MaterialLot("process.reagent_inventory", {"Mg": 1.0}),),
+        credits=(
+            MaterialLot("terminal.product", {"Al": 1.0, "Si": tiny_kg}),
+        ),
+    )
+
+    result = ledger.observe_transition(
+        intent=ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
+        transition=transition,
+        strict=True,
+    )
+
+    assert result is not None
+    summary = ledger.summary()
+    assert summary["warnings"] == []
+    assert "terminal.product:Al" in summary["product_costs"]
+    assert "terminal.product:Si" not in summary["product_costs"]
+
+
 def test_cost_ledger_mass_allocates_normal_coproducts_by_product_mass():
     ledger = CostLedger()
 
