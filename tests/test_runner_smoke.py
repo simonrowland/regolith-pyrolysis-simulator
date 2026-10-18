@@ -22,6 +22,7 @@ without spinning up a child process.
 from __future__ import annotations
 
 from collections import defaultdict
+import hashlib
 import json
 import subprocess
 import sys
@@ -1556,6 +1557,56 @@ def test_runner_golden_fixture_matches(scenario, isolated_engine_config):
         "regenerate all canonical scenarios via "
         "`python3 scripts/regenerate_runner_goldens.py` if the change is "
         "intentional; the bare simulator.runner CLI omits scenario inputs."
+    )
+
+
+@pytest.mark.nightly
+@pytest.mark.timeout(7200)
+def test_lunar_mare_low_ti_full_run_ledger_pin(
+    monkeypatch,
+    isolated_engine_config,
+) -> None:
+    """Pin the normal runner's complete lunar run ledgers and final state."""
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        hours=500,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+        run_metadata_overrides={
+            "started_at_utc": "2026-05-15T00:00:00Z",
+            "kernel_commit_sha": "b924-ledger-pin",
+        },
+    )
+    session = run._start_session()
+    hourly_ledgers = {}
+    advance = session.advance
+
+    def capture_ledger_after_advance():
+        result = advance()
+        hour = result.per_hour_summary.get("hour")
+        if hour is not None:
+            hourly_ledgers[str(hour)] = (
+                session.simulator.atom_ledger.mol_by_account()
+            )
+        return result
+
+    monkeypatch.setattr(session, "advance", capture_ledger_after_advance)
+    payload = run._run_session(session)
+    ledger_bytes = json.dumps(
+        {
+            "hourly_ledgers": hourly_ledgers,
+            "final_state": payload["final_state"],
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    ).encode()
+    digest = hashlib.sha256(ledger_bytes).hexdigest()
+    assert session.is_complete()
+    assert len(hourly_ledgers) == 212
+    assert len(ledger_bytes) == 775401
+    assert digest == (
+        "88b2f7df0273052111b2688283d9aed852fea13aa4f6c31996a51a21f9b252d8"
     )
 
 

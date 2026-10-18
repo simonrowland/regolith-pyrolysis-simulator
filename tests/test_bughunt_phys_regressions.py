@@ -466,7 +466,7 @@ def test_terminal_refusal_restores_copied_roots_byte_identically() -> None:
     sim = object.__new__(PyrolysisSimulator)
     sim._poisoned_hour = None
     sim._pending_shuttle_bakeout_cycle_increment = ""
-    sim.melt = SimpleNamespace(hour=4)
+    sim.melt = SimpleNamespace(hour=37)
     sim.overhead = SimpleNamespace(pressure_mbar=2.0)
     sim.record = SimpleNamespace(snapshots=[])
     sim._condensation_model = SimpleNamespace(
@@ -499,10 +499,12 @@ def test_terminal_refusal_restores_copied_roots_byte_identically() -> None:
 
     def refuse_after_mutating_every_copied_root() -> None:
         sim.atom_ledger._transitions.append(object())
-        sim.melt.hour = 5
+        sim.melt.hour = 38
         sim.overhead.pressure_mbar = 99.0
         sim.record.snapshots.append(object())
         sim._condensation_model.operating_history.append(object())
+        # This nested root is the under-copy guard: skipping it from a narrowed
+        # snapshot leaves post-refusal state behind.
         sim.runtime_state["plain"]["value"] = 9
         backing["nested"][0]["value"] = 9
         sim.runtime_state["slotted"].payload["value"] = 9
@@ -874,14 +876,16 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
         hour=3,
         composition_wt_pct={"FeO": 80.0, "SiO2": 20.0},
     )
+    cold_spot_prefix = {"warnings": ["committed"]}
     sim = object.__new__(PyrolysisSimulator)
     sim._poisoned_hour = None
     sim._pending_shuttle_bakeout_cycle_increment = ""
-    sim.melt = SimpleNamespace(hour=4)
+    sim.melt = SimpleNamespace(hour=37)
     sim.record = BatchRecord(snapshots=[committed])
     operating_prefix = {"pressures": {"Na": 1.0}}
     operating_tail = {"pressures": {"Na": 2.0}}
     sim._condensation_model = SimpleNamespace(
+        cold_spot_history=[cold_spot_prefix],
         operating_history=[operating_prefix, operating_tail],
         last_sticking_alpha_provenance_notice={},
     )
@@ -894,12 +898,15 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
 
     def refuse_after_mutation() -> None:
         sim.runtime_state["nested"]["temperature_C"] = 900.0
-        sim.record.snapshots.append(HourSnapshot(hour=4))
+        sim.record.snapshots.append(HourSnapshot(hour=38))
         with pytest.raises(TypeError):
             sim._condensation_model.operating_history[0]["pressures"]["Na"] = 777.0
         operating_prefix["pressures"]["Na"] = 888.0
         sim._condensation_model.operating_history[-1]["pressures"]["Na"] = 999.0
         sim._condensation_model.operating_history.append({"pressures": {"Na": 3.0}})
+        sim._condensation_model.cold_spot_history.append(
+            {"warnings": ["refused-hour"]}
+        )
         raise refusal
 
     sim._step_one_hour = refuse_after_mutation
@@ -909,6 +916,9 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
 
     assert raised.value is refusal
     assert sim.runtime_state["nested"] == {"temperature_C": 25.0}
+    cold_spot_history = sim._condensation_model.cold_spot_history
+    assert cold_spot_history == [cold_spot_prefix]
+    assert cold_spot_history[0] is not cold_spot_prefix
     history = sim._condensation_model.operating_history
     assert isinstance(history, list)
     assert history == [{"pressures": {"Na": 1.0}}, {"pressures": {"Na": 2.0}}]
