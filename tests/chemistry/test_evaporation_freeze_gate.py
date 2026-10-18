@@ -889,6 +889,7 @@ def _install_freeze_gate_curve(
         sim,
         curve,
     )
+    record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
         **record,
@@ -4627,7 +4628,17 @@ def test_invalid_redox_gate_curve_does_not_poison_valid_retry(
                 'solidus_T_C': 1000.0,
                 'liquidus_T_C': 1700.0,
             }
-        return gate_curve_memo_record(curve, None, (), 'live')
+        return gate_curve_memo_record(
+            curve,
+            None,
+            (),
+            'live',
+            provider_outcome=(
+                GateCurveProviderOutcome.FAILED
+                if curve_calls == 1
+                else GateCurveProviderOutcome.PRODUCED
+            ),
+        )
 
     monkeypatch.setattr(
         sim,
@@ -5212,7 +5223,7 @@ def test_core_gate_curve_memo_reuses_local_slot_refused_curve(
 
 
 @pytest.mark.parametrize('veto', ['uncacheable-status', 'sticky-disposition'])
-def test_core_gate_curve_memo_keeps_r15_vetoed_live_curve(
+def test_core_gate_curve_memo_does_not_keep_r15_vetoed_live_curve(
     veto,
     tmp_path,
     vapor_pressure_data,
@@ -5269,16 +5280,27 @@ def test_core_gate_curve_memo_keeps_r15_vetoed_live_curve(
     assert first == curve
     assert sim._freeze_gate_liquid_fraction_cache is None
     assert shared_cache == {}
-    assert sim._freeze_gate_liquid_fraction_curve_memo[key]['curve'] == curve
+    assert key not in sim._freeze_gate_liquid_fraction_curve_memo
     assert store.capture_sequence == []
 
     second = sim._melt_redox_liquidus_gate_curve()
 
     assert second == first
-    assert len(provider_calls) == 1
+    assert len(provider_calls) == 2
     assert sim._freeze_gate_liquid_fraction_cache is None
     assert shared_cache == {}
+    assert key not in sim._freeze_gate_liquid_fraction_curve_memo
     assert store.capture_sequence == []
+
+
+def test_missing_gate_provider_outcome_is_not_reusable():
+    from simulator.reduced_real_determinism import (
+        gate_curve_memo_record_is_reusable,
+        gate_curve_provider_outcome_is_reusable,
+    )
+
+    assert not gate_curve_provider_outcome_is_reusable(None)
+    assert not gate_curve_memo_record_is_reusable({})
 
 
 def test_core_gate_curve_memo_hit_skips_install_provenance(
@@ -5382,6 +5404,7 @@ def test_core_gate_curve_local_slot_reads_match_green_provenance_count(
         sim,
         curve,
     )
+    record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
         **record,
@@ -5444,6 +5467,7 @@ def test_gate_memo_origin_reuses_live_binding_provenance_per_read(
         sim,
         curve,
     )
+    record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
         **record,
@@ -5629,6 +5653,7 @@ def test_gate_memo_origin_rejects_install_fingerprint_change(
         'liquidus_T_C': 1300.0,
     }
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
+    record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
         **record,
@@ -5885,6 +5910,7 @@ def test_gate_memo_reuses_live_curve_without_metadata_receipt_digests(
         'liquidus_T_C': 1300.0,
     }
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
+    record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
         **record,
@@ -6189,7 +6215,7 @@ def test_per_tick_gate_authority_rejects_foreign_pid_or_configuration(
     ] == os.getpid()
 
 
-def test_core_gate_curve_memo_reuses_fallback_curve_after_provider_unavailable(
+def test_core_gate_curve_memo_does_not_reuse_fallback_after_provider_unavailable(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -6236,7 +6262,7 @@ def test_core_gate_curve_memo_reuses_fallback_curve_after_provider_unavailable(
                 sim,
                 fallback_curve,
             )
-            record['provider_outcome'] = GateCurveProviderOutcome.NO_PROVIDER
+            record['provider_outcome'] = GateCurveProviderOutcome.FAILED
             return record
 
     monkeypatch.setattr(
@@ -6248,13 +6274,11 @@ def test_core_gate_curve_memo_reuses_fallback_curve_after_provider_unavailable(
     first = sim._melt_redox_liquidus_gate_curve()
     second = sim._melt_redox_liquidus_gate_curve()
 
-    # Stable provider absence remains reusable through the keyed core memo.
-    assert len(provider_calls) == 1
+    # A dispatch-time unavailable result cannot become a reusable fallback.
+    assert len(provider_calls) == 2
     assert second == first
     key = _freeze_gate_key_for_current_state(sim)
-    assert sim._freeze_gate_liquid_fraction_curve_memo[key][
-        'provider_outcome'
-    ] is GateCurveProviderOutcome.NO_PROVIDER
+    assert key not in sim._freeze_gate_liquid_fraction_curve_memo
 
 
 def test_core_gate_curve_memo_recomputes_after_transient_provider_failure(
@@ -7040,11 +7064,32 @@ def test_freeze_gate_backend_fallback_receives_redox_state(
     assert calls[0]['fO2_log'] == pytest.approx(reference_value)
 
 
-def test_ok_invalid_gate_provider_fallback_does_not_enter_any_memo(
+@pytest.mark.parametrize(
+    ('initial_status', 'initial_diagnostic'),
+    [
+        pytest.param(
+            'ok',
+            {
+                'backend_status': 'ok',
+                'solidus_T_C': 1300.0,
+                'liquidus_T_C': 1200.0,
+            },
+            id='invalid-bounds',
+        ),
+        pytest.param(
+            'unavailable',
+            {'backend_status': 'unavailable'},
+            id='initialization-failure',
+        ),
+    ],
+)
+def test_failed_gate_provider_fallback_does_not_enter_any_memo(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    initial_status,
+    initial_diagnostic,
 ):
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
@@ -7054,7 +7099,15 @@ def test_ok_invalid_gate_provider_fallback_does_not_enter_any_memo(
     )
     provider_calls = []
     shared_cache = {}
+    captures = []
     sim._freeze_gate_shared_curve_cache = shared_cache
+    capture_store = SimpleNamespace(
+        capture_enabled=True,
+        capture_gate_curve=lambda *args, **kwargs: captures.append(
+            (args, kwargs)
+        ),
+    )
+    monkeypatch.setattr(sim, '_pt0_store', lambda: capture_store)
 
     def injected_provider_result(intent, *args, **kwargs):
         assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
@@ -7062,13 +7115,9 @@ def test_ok_invalid_gate_provider_fallback_does_not_enter_any_memo(
         if len(provider_calls) == 1:
             return IntentResult(
                 intent=intent,
-                status='ok',
+                status=initial_status,
                 transition=None,
-                diagnostic={
-                    'backend_status': 'ok',
-                    'solidus_T_C': 1300.0,
-                    'liquidus_T_C': 1200.0,
-                },
+                diagnostic=initial_diagnostic,
             )
         return IntentResult(
             intent=intent,
@@ -7087,11 +7136,13 @@ def test_ok_invalid_gate_provider_fallback_does_not_enter_any_memo(
 
     monkeypatch.setattr(sim, '_dispatch_only', injected_provider_result)
 
-    def successful_backend_fallback(reasons, **_kwargs):
+    backend_calls = []
+    def healthy_backend_fallback(_reasons, **_kwargs):
         from simulator.reduced_real_determinism import (
             record_gate_curve_provider_outcome,
         )
 
+        backend_calls.append(True)
         record_gate_curve_provider_outcome(
             sim,
             GateCurveProviderOutcome.PRODUCED,
@@ -7105,7 +7156,7 @@ def test_ok_invalid_gate_provider_fallback_does_not_enter_any_memo(
     monkeypatch.setattr(
         sim,
         '_freeze_gate_curve_from_backend_liquidus',
-        successful_backend_fallback,
+        healthy_backend_fallback,
     )
 
     first = sim._melt_redox_liquidus_gate_curve()
@@ -7114,7 +7165,9 @@ def test_ok_invalid_gate_provider_fallback_does_not_enter_any_memo(
     assert first['source'] == 'liquidus_solidus:backend'
     assert sim._freeze_gate_liquid_fraction_cache is None
     assert shared_cache == {}
+    assert captures == []
     assert key not in sim._freeze_gate_liquid_fraction_curve_memo
+    assert len(backend_calls) == 1
 
     second = sim._melt_redox_liquidus_gate_curve()
 

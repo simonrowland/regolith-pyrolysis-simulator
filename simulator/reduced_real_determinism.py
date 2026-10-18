@@ -2634,24 +2634,14 @@ class GateCurveProviderOutcome(str, Enum):
     FAILED = "failed"
 
 
-_GATE_CURVE_NO_PROVIDER_STATUSES = frozenset({
-    "unavailable",
-    "out_of_domain",
-    "unsupported",
-    "refused",
-})
-
-
 def gate_curve_provider_outcome_for_status(
     status: str,
 ) -> GateCurveProviderOutcome:
-    """Separate stable applicability refusals from provider failures."""
+    """Treat only a produced provider result as reusable evidence."""
 
     normalized_status = str(status).strip().lower()
     if normalized_status == "ok":
         return GateCurveProviderOutcome.PRODUCED
-    if normalized_status in _GATE_CURVE_NO_PROVIDER_STATUSES:
-        return GateCurveProviderOutcome.NO_PROVIDER
     return GateCurveProviderOutcome.FAILED
 
 
@@ -2679,7 +2669,7 @@ def gate_curve_provider_outcome_is_reusable(
     outcome: GateCurveProviderOutcome | str | None,
 ) -> bool:
     if outcome is None:
-        return True
+        return False
     try:
         typed_outcome = GateCurveProviderOutcome(outcome)
     except (TypeError, ValueError):
@@ -2714,6 +2704,25 @@ def gate_curve_memo_record_is_reusable(record: Mapping[str, Any]) -> bool:
     return gate_curve_provider_outcome_is_reusable(
         record.get("provider_outcome")
     )
+
+
+def gate_curve_memo_is_cacheable(
+    sim: Any,
+    curve: Mapping[str, Any],
+    provider_outcome: GateCurveProviderOutcome | str | None,
+    *,
+    disposition: str = "live",
+) -> bool:
+    """Apply the shared admission rule before writing any gate-curve memo."""
+
+    if (
+        disposition == "replay"
+        or uncacheable_replay_disposition(sim)
+        or not gate_curve_provider_outcome_is_reusable(provider_outcome)
+        or not isinstance(curve, Mapping)
+    ):
+        return False
+    return _is_cacheable_gate_curve(curve)
 
 
 def uncacheable_replay_disposition(sim: Any) -> bool:

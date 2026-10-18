@@ -2102,9 +2102,7 @@ class EvaporationMixin:
         from simulator.reduced_real_determinism import (
             GateCurveProviderOutcome,
             gate_curve_memo_record,
-            gate_curve_memo_record_is_reusable,
-            gate_curve_provider_outcome_is_reusable,
-            _is_cacheable_gate_curve,
+            gate_curve_memo_is_cacheable,
             record_repair_notice,
             uncacheable_replay_disposition,
         )
@@ -2157,9 +2155,13 @@ class EvaporationMixin:
             cache
             and cache.get('key') == key
             and cache.get('disposition') in {'live', 'memo-hit'}
-            and gate_curve_memo_record_is_reusable(cache)
+            and gate_curve_memo_is_cacheable(
+                self,
+                cached_curve,
+                cache.get('provider_outcome'),
+                disposition=cache.get('disposition', 'live'),
+            )
             and isinstance(cached_curve, Mapping)
-            and _is_cacheable_gate_curve(cached_curve)
             and isinstance(cached_notices, list)
             and gate_curve_memo_origin_matches(
                 self,
@@ -2174,13 +2176,19 @@ class EvaporationMixin:
                 record_repair_notice(self, notice)
             self._record_composition_projected_liquidus_notice_from_curve(curve)
             if store is not None and getattr(store, 'capture_enabled', False):
-                store.capture_gate_curve(
+                if gate_curve_memo_is_cacheable(
                     self,
-                    fO2_log=fO2_log,
-                    curve=curve,
-                    repair_notices=cached_notices,
-                    **redox_state_kwargs,
-                )
+                    curve,
+                    cache.get('provider_outcome'),
+                    disposition=cache.get('disposition', 'live'),
+                ):
+                    store.capture_gate_curve(
+                        self,
+                        fO2_log=fO2_log,
+                        curve=curve,
+                        repair_notices=cached_notices,
+                        **redox_state_kwargs,
+                    )
             return gate_curve_memo_record(
                 curve,
                 cache.get('origin'),
@@ -2210,9 +2218,13 @@ class EvaporationMixin:
             if (
                 isinstance(process_cached, Mapping)
                 and process_cached.get('disposition') in {'live', 'memo-hit'}
-                and gate_curve_memo_record_is_reusable(process_cached)
+                and gate_curve_memo_is_cacheable(
+                    self,
+                    shared_value,
+                    process_cached.get('provider_outcome'),
+                    disposition=process_cached.get('disposition', 'live'),
+                )
                 and isinstance(shared_value, Mapping)
-                and _is_cacheable_gate_curve(shared_value)
                 and isinstance(shared_notices, list)
                 and gate_curve_memo_origin_matches(
                     self,
@@ -2237,7 +2249,16 @@ class EvaporationMixin:
                     **record,
                     'key': key,
                 }
-                if store is not None and getattr(store, 'capture_enabled', False):
+                if (
+                    store is not None
+                    and getattr(store, 'capture_enabled', False)
+                    and gate_curve_memo_is_cacheable(
+                        self,
+                        curve,
+                        record.get('provider_outcome'),
+                        disposition=record.get('disposition', 'live'),
+                    )
+                ):
                     store.capture_gate_curve(
                         self,
                         fO2_log=fO2_log,
@@ -2381,13 +2402,10 @@ class EvaporationMixin:
                 )
 
             self._record_composition_projected_liquidus_notice_from_curve(curve)
-            sticky = uncacheable_replay_disposition(self)
-            cache_eligible = (
-                not sticky
-                and gate_curve_provider_outcome_is_reusable(
-                    self._freeze_gate_provider_outcome
-                )
-                and _is_cacheable_gate_curve(curve)
+            cache_eligible = gate_curve_memo_is_cacheable(
+                self,
+                curve,
+                self._freeze_gate_provider_outcome,
             )
             from simulator.engine_binding_admission import (
                 gate_curve_memo_evidence,
@@ -2435,9 +2453,11 @@ class EvaporationMixin:
         if (
             store is not None
             and getattr(store, 'capture_enabled', False)
-            and not uncacheable_replay_disposition(self)
-            and gate_curve_provider_outcome_is_reusable(
-                self._freeze_gate_provider_outcome
+            and gate_curve_memo_is_cacheable(
+                self,
+                curve,
+                record.get('provider_outcome'),
+                disposition=record.get('disposition', 'live'),
             )
         ):
             store.capture_gate_curve(
@@ -2653,7 +2673,7 @@ class EvaporationMixin:
         except ProviderUnavailableError as exc:
             record_gate_curve_provider_outcome(
                 self,
-                GateCurveProviderOutcome.NO_PROVIDER,
+                GateCurveProviderOutcome.FAILED,
             )
             mark_uncacheable_replay_disposition(
                 self,
@@ -2778,7 +2798,7 @@ class EvaporationMixin:
         except ProviderUnavailableError as exc:
             record_gate_curve_provider_outcome(
                 self,
-                GateCurveProviderOutcome.NO_PROVIDER,
+                GateCurveProviderOutcome.FAILED,
             )
             mark_uncacheable_replay_disposition(
                 self,
@@ -2869,7 +2889,7 @@ class EvaporationMixin:
         except ProviderUnavailableError as exc:
             record_gate_curve_provider_outcome(
                 self,
-                GateCurveProviderOutcome.NO_PROVIDER,
+                GateCurveProviderOutcome.FAILED,
             )
             mark_uncacheable_replay_disposition(
                 self,

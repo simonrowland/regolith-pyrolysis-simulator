@@ -4897,11 +4897,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gate_curve_memo_origin_matches,
         )
         from simulator.reduced_real_determinism import (
-            _is_cacheable_gate_curve,
             gate_curve_memo_record,
-            gate_curve_memo_record_is_reusable,
+            gate_curve_memo_is_cacheable,
             record_repair_notice,
-            uncacheable_replay_disposition,
         )
 
         self._last_reduced_real_replay_notices = None
@@ -4928,9 +4926,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             isinstance(cache, dict)
             and cache.get('key') == key
             and cache.get('disposition') in {'live', 'memo-hit'}
-            and gate_curve_memo_record_is_reusable(cache)
             and isinstance(curve, Mapping)
-            and _is_cacheable_gate_curve(curve)
+            and gate_curve_memo_is_cacheable(
+                self,
+                curve,
+                cache.get('provider_outcome'),
+                disposition=cache.get('disposition', 'live'),
+            )
             and isinstance(cache_notices, list)
             and gate_curve_memo_origin_matches(
                 self,
@@ -4963,7 +4965,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 isinstance(memoized_record, Mapping)
                 and isinstance(memoized_record.get('curve'), Mapping)
                 and memoized_record.get('disposition') in {'live', 'memo-hit'}
-                and gate_curve_memo_record_is_reusable(memoized_record)
+                and gate_curve_memo_is_cacheable(
+                    self,
+                    memoized_record['curve'],
+                    memoized_record.get('provider_outcome'),
+                    disposition=memoized_record.get('disposition', 'live'),
+                )
                 and gate_curve_memo_origin_matches(
                     self,
                     memoized_record['curve'],
@@ -5085,7 +5092,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 liquidus_status='invalid',
             )
 
-        reusable_curve = not uncacheable_replay_disposition(self)
         normalized_curve = dict(curve)
         normalized_curve['solidus_T_C'] = solidus_T_C
         normalized_curve['liquidus_T_C'] = liquidus_T_C
@@ -5102,10 +5108,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 record_repair_notice(self, notice)
         cache_eligible = (
             not core_memo_hit
-            and normalized_record.get('disposition') != 'replay'
-            and reusable_curve
-            and gate_curve_memo_record_is_reusable(normalized_record)
-            and _is_cacheable_gate_curve(normalized_curve)
+            and gate_curve_memo_is_cacheable(
+                self,
+                normalized_curve,
+                normalized_record.get('provider_outcome'),
+                disposition=normalized_record.get('disposition', 'live'),
+            )
         )
         validated_curve = (
             validated_cache.get('curve')
@@ -5140,8 +5148,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
         if (
             isinstance(memo, dict)
-            and normalized_record.get('disposition') != 'replay'
-            and gate_curve_memo_record_is_reusable(normalized_record)
+            and gate_curve_memo_is_cacheable(
+                self,
+                normalized_curve,
+                normalized_record.get('provider_outcome'),
+                disposition=normalized_record.get('disposition', 'live'),
+            )
         ):
             memo[key] = gate_curve_memo_record(
                 normalized_curve,
