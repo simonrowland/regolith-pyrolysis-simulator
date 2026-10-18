@@ -3246,7 +3246,7 @@ def test_imposed_vapor_request_retains_exact_serialized_result(vapor_pressure_da
     # Behavior-preserving pin recorded at 76581ad1d before the closed-ledger
     # discriminator. Absent discriminator retains imposed-condition semantics.
     assert hashlib.sha256(serialized).hexdigest() == (
-        '14399bf211cc94825554be19e6b78bcdf43e1f7199038be932514571d75c73ad')
+        '72f00005265099b2d7946f94f40b5e5bc61044b5dcc93081ac20771ce21ffd0a')
 
 
 # ---------------------------------------------------------------------------
