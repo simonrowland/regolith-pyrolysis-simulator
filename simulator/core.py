@@ -2863,7 +2863,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         transition: LedgerTransition,
         *,
         side: str,
-        account: str,
+        account: str | None,
         species: str,
     ) -> float:
         if side not in {'debits', 'credits'}:
@@ -2872,7 +2872,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         formula = resolve_species_formula(species, self.species_formula_registry)
         mol = 0.0
         for lot in lots:
-            if lot.account != account:
+            if account is not None and lot.account != account:
                 continue
             kg = float(lot.species_kg.get(species, 0.0) or 0.0)
             if kg <= 0.0:
@@ -3050,6 +3050,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         else:
             self._apply_fe_redox_respeciation()
 
+    @staticmethod
+    def _o2_equivalent_residual_is_roundoff(
+        o2_equiv_mol: float,
+        gross_o2_traffic_mol: float,
+    ) -> bool:
+        # The kg<->mol round trip on two balanced traffic legs accumulates
+        # error proportional to gross traffic. A 1e-12 relative band is about
+        # 4.5e3 binary64 epsilons, covering the conversions and subtraction
+        # while remaining 1e-10% of gross; retain the absolute floor for tiny
+        # traffic where a relative comparison alone has no useful scale.
+        return abs(o2_equiv_mol) <= max(
+            OXYGEN_RESERVOIR_NOOP_MOL,
+            1e-12 * gross_o2_traffic_mol,
+        )
+
     def _c6_back_reduction_redox_source_terms_from_transition(
         self,
         transition: LedgerTransition,
@@ -3079,18 +3094,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         o2_equiv_mol = al_oxidation_o2 - si_reduction_o2
         # The 4 Al : 3 Si back-reduction is stoichiometrically net-zero in
-        # O2-equivalent; the kg<->mol round trip leaves a float residual
-        # that GROWS with dose and can exceed the absolute NOOP floor at
-        # production-scale thermite (grok ch2b review: ~1.4e-14 mol at
-        # 50-100 kg Mg), leaking a spurious back-reduction label + fO2
-        # nudge. Snap to zero when the net is float noise RELATIVE to the
-        # gross O2 traffic of the transition — this preserves the
-        # nets-to-zero contract at any dose without masking a real
-        # stoichiometric imbalance (which scales with gross, not eps).
+        # O2-equivalent; its kg<->mol residual grows with dose (about
+        # 1.4e-14 mol at 50-100 kg Mg), so an absolute cutoff is insufficient.
         gross_o2_mol = abs(al_oxidation_o2) + abs(si_reduction_o2)
-        if abs(o2_equiv_mol) <= max(
-            OXYGEN_RESERVOIR_NOOP_MOL,
-            1e-12 * gross_o2_mol,
+        if self._o2_equivalent_residual_is_roundoff(
+            o2_equiv_mol,
+            gross_o2_mol,
         ):
             return {}
         return {str(label): o2_equiv_mol}
@@ -3127,10 +3136,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         if ca_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
             return {}
-        in_situ_al_mol = self._transition_species_mol(
+        al_mol = self._transition_species_mol(
             transition,
             side='debits',
-            account='process.metal_phase',
+            account=None,
             species='Al',
         )
         al2o3 = resolve_species_formula('Al2O3', self.species_formula_registry)
@@ -3138,10 +3147,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             0.5
             * float(al2o3.elements.get('O', 0.0) or 0.0)
             / float(al2o3.elements.get('Al', 1.0) or 1.0)
-            * in_situ_al_mol
+            * al_mol
         )
-        o2_equiv_mol = al_oxidation_o2 - (0.5 * ca_mol)
-        if abs(o2_equiv_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
+        # 2 Al + 3 CaO -> Al2O3 + 3 Ca: oxidizing 2 mol Al consumes
+        # 3 O atoms (1.5 mol O2-equivalent), while releasing 3 mol Ca
+        # frees those same 3 O atoms (1.5 mol O2-equivalent). The O-atom
+        # balance is 3 = 3, so the net melt-reservoir term is zero regardless
+        # of which ledger account supplied the Al.
+        ca_release_o2_mol = 0.5 * ca_mol
+        o2_equiv_mol = al_oxidation_o2 - ca_release_o2_mol
+        gross_o2_traffic_mol = abs(al_oxidation_o2) + abs(ca_release_o2_mol)
+        if self._o2_equivalent_residual_is_roundoff(
+            o2_equiv_mol,
+            gross_o2_traffic_mol,
+        ):
             return {}
         return {str(label): o2_equiv_mol}
 

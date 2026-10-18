@@ -965,6 +965,24 @@ def test_magemin_subprocess_parser_rejects_nonunit_mode_vector():
     assert raised.value.exception_type == 'MAGEMinOutputError'
 
 
+def test_magemin_duplicate_liquid_modes_are_summed_from_captured_output():
+    from simulator.melt_backend.base import EquilibriumResult
+
+    stdout = (
+        Path(__file__).parent
+        / 'fixtures'
+        / 'magemin'
+        / 'lfdrop-diag-1-1700-phase-mode.stdout'
+    ).read_text()
+    parsed = MAGEMinBackend._parse_subprocess_stdout(stdout)
+    result = EquilibriumResult(liquid_fraction=0.0)
+    MAGEMinBackend()._populate_result(result, {'phases': parsed})
+
+    # The captured Mode vector prints 0.71766 liquid and 0.99999 total mass;
+    # the production resolver divides these because MAGEMin rounds to 5 places.
+    assert result.liquid_fraction == pytest.approx(0.7176672, abs=1e-7)
+
+
 def test_magemin_plante_mode_deficit_is_typed_out_of_domain(monkeypatch):
     calls = []
 
