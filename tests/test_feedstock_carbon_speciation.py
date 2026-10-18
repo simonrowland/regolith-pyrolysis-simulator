@@ -90,7 +90,8 @@ def test_cm_bulk_carbon_matches_murchison_anchor(feedstocks):
     assert bulk_c_wt_pct == pytest.approx(2.25, abs=5e-5)
     assert provenance["implied_bulk_c_wt_pct"] == pytest.approx(2.25)
     assert runtime_bulk_c_wt_pct == pytest.approx(
-        bulk_c_wt_pct * 100.0 / entry["sum_check"]
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        2.421282379204878
     )
     assert runtime_bulk_c_wt_pct != pytest.approx(
         provenance["implied_bulk_c_wt_pct"]

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
+from enum import Enum
 import math
 from typing import Any
 
@@ -15,6 +16,8 @@ from simulator.accounting.formulas import (
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
+# Fe2O3 contains two Fe atoms: its FeOt mass is 2*M_FeO/M_Fe2O3
+# times its reported mass (dimensionless, about 0.8998).
 FEOT_FROM_FE2O3 = 2.0 * 71.844 / 159.687
 OXYGEN_IN_FEO = 15.999 / 71.844
 DEFAULT_FEO_TO_FE2O3_EQUIVALENT_FACTOR = 1.1113
@@ -22,6 +25,12 @@ FE_REPORTING_CONVENTION_TOTAL_AS_FEO = "total Fe as FeO"
 UNKNOWN_FERRIC_UPPER_BOUND_REASON = (
     "no stated maximum Fe3+/ΣFe for this body"
 )
+
+
+class IronSeedAuthority(str, Enum):
+    MEASURED = 'measured'
+    LITERATURE_TYPICAL = 'literature_typical'
+    MODEL_ASSUMED = 'model_assumed'
 
 
 @dataclass(frozen=True)
@@ -60,6 +69,7 @@ def resolve_feedstock_composition(
     feedstock: Mapping[str, Any],
 ) -> ResolvedFeedstockComposition:
     """Validate and resolve feedstock oxide values with iron provenance."""
+    validate_iron_speciation(feedstock)
     composition = feedstock.get("composition_wt_pct", {}) or {}
     if not isinstance(composition, Mapping):
         raise ValueError("composition_wt_pct must be a mapping")
@@ -147,6 +157,66 @@ def resolve_feedstock_composition(
         fe_metal=metal,
         split_known=not flag,
     )
+
+
+def validate_iron_speciation(feedstock: Mapping[str, Any]) -> None:
+    """Validate optional cited observations without converting the raw data."""
+    spec = feedstock.get('iron_speciation')
+    if spec is None:
+        return
+    fields = {'fe0_metal_wt_pct', 'fe3_over_sum_fe', 'feo_wt_pct',
+              'fe2o3_wt_pct', 'is_over_feo'}
+    methods = {'mossbauer', 'xanes', 'wet_chemistry_titration', 'fmr_is_feo',
+               'vsm_saturation_magnetization', 'sato_zirconia_cell', 'literature_typical'}
+    if not isinstance(spec, Mapping) or not spec or set(spec) - fields:
+        raise ValueError('iron_speciation must contain supported observation fields')
+    if 'fe3_over_sum_fe' in spec and 'fe2o3_wt_pct' in spec:
+        raise ValueError('iron_speciation requires a ferric ratio OR printed oxide pair')
+    if 'fe2o3_wt_pct' in spec and 'feo_wt_pct' not in spec:
+        raise ValueError('iron_speciation printed Fe2O3 requires FeO')
+    if 'is_over_feo' in spec and ('feo_wt_pct' not in spec or 'fe0_metal_wt_pct' in spec):
+        raise ValueError('iron_speciation Is/FeO requires raw FeO and cannot duplicate Fe0')
+    if 'feo_wt_pct' in spec and not {'is_over_feo', 'fe2o3_wt_pct'} & set(spec):
+        raise ValueError('iron_speciation FeO requires Is/FeO or printed Fe2O3')
+    for field, observation in spec.items():
+        prefix = f'iron_speciation.{field}'
+        if not isinstance(observation, Mapping):
+            raise ValueError(f'{prefix} must be an observation')
+        source = observation.get('source')
+        if (not isinstance(source, Mapping)
+                or not isinstance(source.get('reference'), str) or not source['reference'].strip()
+                or not isinstance(source.get('page'), (str, int)) or isinstance(source.get('page'), bool)
+                or not str(source.get('page', '')).strip()):
+            raise ValueError(f'{prefix} requires source.reference and source.page')
+        if observation.get('method') not in methods:
+            raise ValueError(f'{prefix} has an unsupported method')
+        try:
+            IronSeedAuthority(observation.get('authority'))
+        except (ValueError, TypeError) as exc:
+            raise ValueError(f'{prefix} has an unsupported authority') from exc
+        value = observation.get('value')
+        interval = observation.get('interval')
+        numbers = [value, *(interval if isinstance(interval, (list, tuple)) else [])]
+        if (not isinstance(interval, (list, tuple)) or len(interval) != 2
+                or any(not is_declared_real_scalar(n) or not isinstance(n, (int, float))
+                       or not math.isfinite(n) or n < 0.0 for n in numbers)
+                or not interval[0] <= value <= interval[1]
+                or (field == 'fe3_over_sum_fe' and interval[1] > 1.0)
+                or (field.endswith('wt_pct') and interval[1] > 100.0)):
+            raise ValueError(f'{prefix} requires a finite value within its ordered interval')
+        if field == 'fe0_metal_wt_pct':
+            if observation.get('form') not in {'nanophase', 'meteoritic_fe_ni', 'native'}:
+                raise ValueError(f'{prefix} requires a supported metal form')
+            alloy = observation.get('metal_composition_wt_pct', {})
+            if (not isinstance(alloy, Mapping) or set(alloy) - {'Ni', 'Co'}
+                    or any(not is_declared_real_scalar(v) or not isinstance(v, (int, float))
+                           or not math.isfinite(v) or v < 0 for v in alloy.values())
+                    or sum(alloy.values()) >= 100):
+                raise ValueError(f'{prefix} invalid optional Ni/Co metal composition')
+    if 'fe2o3_wt_pct' in spec and (
+        spec['fe2o3_wt_pct']['authority'] != spec['feo_wt_pct']['authority']
+    ):
+        raise ValueError('iron_speciation printed oxide pair must share an authority')
 
 
 def total_fe(feedstock_or_composition: Mapping[str, Any]) -> float:
@@ -285,6 +355,13 @@ def normalized_feedstock_component_masses_kg(
     mass_kg: float,
 ) -> dict[str, float]:
     """Return ledger-normalized raw feedstock component masses."""
+    # Use the same single iron-preparation owner as load_batch before applying
+    # the complete-feed normalization. fe_redox calls this helper while
+    # reporting the prepared scale; that already-split input is an idempotent
+    # no-op for initialize_feedstock_iron.
+    from simulator.fe_redox import initialize_feedstock_iron
+
+    feedstock, _ = initialize_feedstock_iron(feedstock)
     batch_mass_kg = float(mass_kg)
     raw_masses: dict[str, float] = {}
     composition = feedstock.get("composition_wt_pct", {}) or {}

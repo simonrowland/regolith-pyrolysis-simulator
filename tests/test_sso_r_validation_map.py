@@ -85,26 +85,65 @@ def _owner_recipe_row(payload):
     return next(row for row in payload["rows"] if _is_owner_recipe_row(row))
 
 
-def test_manual_fO2_anchors_match_native_fe_design_window():
+def test_imposed_fO2_seed_below_iw_precipitates(monkeypatch):
+    original_build = validation_map._build_sim
+    sims = []
+
+    def capture_sim(*args, **kwargs):
+        sim = original_build(*args, **kwargs)
+        sims.append(sim)
+        return sim
+
+    monkeypatch.setattr(validation_map, '_build_sim', capture_sim)
+    anchor = next(
+        row for row in validation_map.manual_fO2_anchors()
+        if row['mode'] == 'melt_seeded' and row['fO2_log'] == -9.5
+    )
+    assert anchor['saturation_status'] == 'BELOW'
+    assert anchor['native_fe_frac'] > 0.0
+    assert anchor['band_lower_dex'] == anchor['band_upper_dex'] == 0.0
+    sim = sims[2]  # The -9.5 melt-seeded row precedes its gas-boundary row.
+    sim._current_melt_redox_fO2_log()
+    assert sim._last_intrinsic_redox_state['saturation_status'] == 'BELOW'
+    assert sim._last_intrinsic_redox_state['band_lower_dex'] == 0.0
+    assert sim._compute_native_fe_saturation_extent()[
+        'native_fe_state'
+    ]['saturation_status'] == 'BELOW'
+
+
+def test_manual_fO2_anchors_match_seeded_and_gas_boundary_contracts():
     anchors = {
-        anchor["fO2_log"]: anchor
+        (anchor["mode"], anchor["fO2_log"]): anchor
         for anchor in validation_map.manual_fO2_anchors()
     }
-
-    assert anchors[-9.0]["reference_source"].startswith("docs-private/research/")
-    assert anchors[-9.5]["reference_source"].startswith("docs-private/research/")
-    assert anchors[-9.0]["native_fe_frac"] == pytest.approx(
-        anchors[-9.0]["reference_native_fe_frac"],
-        rel=0.0,
-        abs=anchors[-9.0]["reference_abs_tolerance"],
+    assert len(anchors) == 4
+    for fO2_log in (-9.0, -9.5):
+        seeded = anchors['melt_seeded', fO2_log]
+        gas = anchors['gas_boundary', fO2_log]
+        assert seeded['seed_authority'] == 'measured'
+        assert seeded['seed_method'] == 'imposed_fO2'
+        # The existing initializer seeds at its vacuum pressure; the inverse
+        # below reports that same inventory at the diagnostic's 0.01 bar.
+        assert seeded['melt_inventory_fO2_log'] == pytest.approx(fO2_log, abs=1e-5)
+        assert seeded['melt_inventory_fO2_log'] != gas['melt_inventory_fO2_log']
+        for anchor in (seeded, gas):
+            assert anchor['reference_source'].startswith('docs-private/research/')
+            assert anchor['native_fe_frac'] == pytest.approx(
+                anchor['reference_native_fe_frac'], rel=0.0,
+                abs=anchor['reference_abs_tolerance'],
+            )
+            assert anchor['diagnostic_only'] is True
+        assert seeded['band_lower_dex'] == seeded['band_upper_dex'] == 0.0
+        assert seeded['saturation_status'] == ('ABOVE' if fO2_log == -9.0 else 'BELOW')
+        if fO2_log == -9.0:
+            assert seeded['native_fe_frac'] == 0.0
+        else:
+            assert seeded['native_fe_frac'] > 0.0
+        assert gas['native_fe_frac'] == 0.0
+        assert gas['saturation_status'] == 'INDETERMINATE'
+    assert anchors['gas_boundary', -9.0]['melt_inventory_fO2_log'] == (
+        anchors['gas_boundary', -9.5]['melt_inventory_fO2_log']
     )
-    assert anchors[-9.5]["native_fe_frac"] == pytest.approx(
-        anchors[-9.5]["reference_native_fe_frac"],
-        rel=0.0,
-        abs=anchors[-9.5]["reference_abs_tolerance"],
-    )
-    assert anchors[-9.0]["diagnostic_only"] is True
-    assert anchors[-9.5]["diagnostic_only"] is True
 
 
 def test_grid_count_assertion_uses_requested_grid_size(smoke_payload):
@@ -293,12 +332,20 @@ def test_exact_full_dose_oxidizing_pn2_row_refuses_absent_melt_redox_capacity():
     assert math.isfinite(row["post_exchange_fO2_log_diagnostic"])
     assert math.isfinite(row["redox_source_delta_ln_fO2"])
     assert row["redox_source_skip_reason"] == "no_melt_redox_capacity"
-    assert row["redox_source_skipped_terms_mol_o2_equiv_by_label"][
-        "redox_source:evaporative_metal_loss"
-    ] > 0.0
+    # A finite ferric ledger has capacity even when the earlier, cold Na
+    # operation was gated. The hot evaporative labels describe committed
+    # chemistry; they do not integrate a second scalar potential.
+    label = 'redox_source:evaporative_metal_loss'
+    assert row['redox_source_terms_mol_o2_equiv_by_label'][label] > 0.0
+    assert row['redox_source_applied_terms_mol_o2_equiv_by_label'][label] == (
+        row['redox_source_terms_mol_o2_equiv_by_label'][label])
+    assert label not in row['redox_source_skipped_terms_mol_o2_equiv_by_label']
     assert row["redox_source_skipped_reasons_by_label"][
-        "redox_source:evaporative_metal_loss"
+        "redox_source:c3_na_shuttle_reduction"
     ] == "no_melt_redox_capacity"
+    assert row['redox_source_delta_ln_fO2'] == 0.0
+    assert row['ferric_divergence_material'] is False
+    assert row['mass_balance_error_pct'] == pytest.approx(0.0, abs=5e-12)
     assert row["redox_source_refusal_context"] == {}
 
 
@@ -495,29 +542,35 @@ def test_owner_pn2_anchor_reports_current_certification_state(smoke_payload):
     assertions = {a["name"]: a for a in smoke_payload["assertions"]}
 
     assert owner["native_fe_pool_mol"] == pytest.approx(
-        1576.0114767733974, rel=0.0, abs=1.0e-9
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        785.5636564861113, rel=0.0, abs=1.0e-9
     )
     assert owner["native_fe_tap_mol"] == pytest.approx(
-        1573.8956138175351, rel=0.0, abs=1.0e-9
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        783.4682654076919, rel=0.0, abs=1.0e-9
     )
     assert owner["native_fe_vapor_mol"] == pytest.approx(
-        2.1158629558621413, rel=0.0, abs=1.0e-12
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        2.095391078419451, rel=0.0, abs=1.0e-12
     )
     assert owner["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        0.00134254286028043, rel=0.0, abs=1.0e-15
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        0.0026673727343654134, rel=0.0, abs=1.0e-15
     )
     # t-523 restores nonzero OOD inventory debits while retaining the
     # equilibrium-backend pressure seam. That changes the downstream stage-3
     # composition denominator; the native Fe pool/tap/vapour pins above remain
     # unchanged, so this is not a redox-authority or value-source cutover.
     assert owner["stage_3_Fe_wt_pct"] == pytest.approx(
-        0.0121860033141556, rel=0.0, abs=1.0e-15
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        34.36736221703737, rel=0.0, abs=1.0e-15
     )
     assert owner["ferric_divergence_material"] is False
     assert abs(owner["mass_balance_error_pct"]) <= 5e-12
     assert owner["SiO_provider_pO2_bar"] == pytest.approx(1.0e-9)
     assert owner["SiO_flux_kg_hr"] == pytest.approx(
-        0.02824157889055116, rel=0.0, abs=1.0e-15
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        0.023174330062609043, rel=0.0, abs=1.0e-15
     )
     requested_pO2_assertion = assertions[
         "owner_pN2_recipe_point_requested_pO2_semantics"
@@ -609,7 +662,10 @@ def test_owner_live_pn2_tick_uses_sweep_floor_and_drains_o2(smoke_payload):
     terminal_delta = (
         probe["terminal_stored_o2_delta_mol"] + probe["terminal_vented_o2_delta_mol"]
     )
-    assert probe["native_split_o2_mol"] > 700.0
+    # d-156/d-166: melt above IW(a_FeO) releases no FeO-split O2;
+    # native metal is still partitioned into the metal pool.
+    assert probe["native_split_o2_mol"] == 0.0
+    assert probe["native_fe_pool_mol"] > 0.0
     assert probe["bled_o2_mol"] >= probe["native_split_o2_mol"]
     assert (
         terminal_delta
@@ -627,7 +683,8 @@ def test_grind_ready_target_window_opens_with_live_parity(smoke_payload):
     assert smoke_payload["live_owner_probe"]["native_split_observed"] is True
     assert parity["passed"] is True
     assert window["passed"] is False
-    assert "first_passing_T_C=1600.0" in window["detail"]
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    assert "first_passing_T_C=None" in window["detail"]
     assert "window under PN2 sweep transport semantics" in window["detail"]
     assert "live parity=confirmed" in window["detail"]
 

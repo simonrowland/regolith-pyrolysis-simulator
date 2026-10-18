@@ -248,10 +248,21 @@ def test_provider_declares_only_vapor_pressure_intent(vapor_pressure_data):
             assert not profile.is_authoritative(intent)
 
 
-def test_provider_declares_only_cleaned_melt_account(vapor_pressure_data):
+def test_provider_declares_exactly_melt_resident_accounts(vapor_pressure_data):
     provider = BuiltinVaporPressureProvider(vapor_pressure_data)
     profile = provider.capability_profile()
-    assert profile.declared_accounts == frozenset({"process.cleaned_melt"})
+    assert profile.declared_accounts == frozenset({
+        "process.cleaned_melt", "process.spent_reductant_residue"})
+
+
+def test_provider_declares_only_cleaned_melt_account(vapor_pressure_data):
+    """Old intent: the provider declared only process.cleaned_melt.
+
+    That claim cannot hold. The provider now uses the complete physical
+    melt basis, cleaned melt plus spent reductant residue. This name
+    asserts that basis.
+    """
+    test_provider_declares_exactly_melt_resident_accounts(vapor_pressure_data)
 
 
 def test_t622_request_and_builtin_provider_share_one_domain_policy_callable() -> None:
@@ -3108,6 +3119,45 @@ def test_fe_activity_uses_kress91_only_with_explicit_intrinsic_channel(
     assert oxidized_activity < reduced_activity
 
 
+def test_spent_oxide_provenance_does_not_change_physical_vapour_activity(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from dataclasses import replace
+    from simulator.accounting.ledger import AtomLedger
+    from simulator.chemistry.kernel.account_filters import build_provider_account_view
+
+    sim = _build_sim('lunar_mare_low_ti', vapor_pressure_data,
+                     feedstocks_data, setpoints_data)
+    registry = sim.species_formula_registry
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    request = _fe_redox_request(species_formula_registry=registry,
+                               intrinsic_fO2_log=-10.0)
+    cleaned = {'SiO2': 200.0, 'FeO': 100.0, 'Fe2O3': 1.0}
+    results = []
+    for accounts in (
+        {'process.cleaned_melt': {**cleaned, 'Na2O': 50.0}},
+        {'process.cleaned_melt': cleaned,
+         'process.spent_reductant_residue': {'Na2O': 50.0}},
+    ):
+        ledger = AtomLedger(registry)
+        for account, species_mol in accounts.items():
+            ledger.load_external_mol(
+                account, species_mol, source='fixture', material_origin='feedstock')
+        view = build_provider_account_view(
+            ledger, provider.capability_profile().declared_accounts, registry)
+        before_mol = ledger.mol_by_account()
+        result = provider.dispatch(replace(request, account_view=view))
+        assert result.transition is None
+        assert ledger.mol_by_account() == before_mol
+        results.append(result.diagnostic)
+
+    # Account provenance cannot change the chemical potential of the same
+    # physical melt. Fe/O2 inventory availability remains a separate input.
+    assert results[1]['source_reaction_composition_wt_pct'] == pytest.approx(
+        results[0]['source_reaction_composition_wt_pct'])
+    assert results[1]['activities'] == pytest.approx(results[0]['activities'])
+
+
 def test_kress91_ferrous_feo_activity_no_iron_guards() -> None:
     assert kress91_ferrous_feo_activity(
         comp_wt={},
@@ -3123,16 +3173,101 @@ def test_kress91_ferrous_feo_activity_no_iron_guards() -> None:
     ) == 0.0
 
 
+def test_closed_all_ferrous_vapor_activity_uses_ledger_split_at_iw_bound(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from simulator.fe_redox import (
+        calphad_ferrous_feo_activity_diagnostic,
+        kress91_furnace_activity_pressure_bar,
+    )
+
+    definitions = copy.deepcopy(feedstocks_data)
+    feedstock = definitions['lunar_mare_low_ti']
+    feedstock['composition_wt_pct']['Fe2O3'] = 0.0
+    feedstock['fe_redox_split_unknown'] = False
+    feedstock['intrinsic_redox']['formation_temperature_K'] = 1873.15
+    for oxide in ('FeO', 'Fe2O3'):
+        feedstock.setdefault('composition_basis', {})[oxide] = {
+            'method': 'defined all-ferrous endpoint fixture',
+            'source': 'test_closed_all_ferrous_vapor_activity_uses_ledger_split_at_iw_bound',
+        }
+    sim = _build_sim('lunar_mare_low_ti', vapor_pressure_data,
+                     definitions, setpoints_data)
+    sim.melt.temperature_C = 1600.0
+    potential = sim._current_melt_redox_fO2_log()
+    assert 'FE_FEO_SATURATION_BOUND' in sim._last_intrinsic_redox_state['flags']
+    assert sim.atom_ledger.mol_by_account('process.cleaned_melt').get('Fe2O3', 0.0) == 0.0
+    before = sim.atom_ledger.mol_by_account()
+    sim._get_equilibrium()
+    assert sim.atom_ledger.mol_by_account() == before
+
+    # A stability bound is not a finite inverse Kress solution. The closed
+    # runtime request must use the zero ferric fraction actually in its ledger.
+    expected = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=sim._melt_oxide_wt_pct(), fO2_log=potential, T_K=1873.15,
+        pressure_bar=kress91_furnace_activity_pressure_bar(
+            floor_bar=sim._vacuum_floor_bar()),
+        floor_bar=sim._vacuum_floor_bar(), fe3_over_sigma_fe=0.0,
+    )['a_FeO_authoritative']
+    assert sim._last_vapor_pressure_diagnostic['activities']['Fe'] == pytest.approx(expected)
+    assert sim._last_vapor_pressure_diagnostic['a_FeO_calphad']['kress91_split'][
+        'fe3_over_sigma_fe'] == 0.0
+    from simulator.runner import build_per_hour_summary
+
+    summary = build_per_hour_summary(sim, sim._make_snapshot())
+    notices = summary['high_t_melt_activity']['notices']
+    bound_notice, = (n for n in notices if n['code'] == 'FE_FEO_SATURATION_BOUND')
+    assert bound_notice['bound'] == 'lower'
+    assert bound_notice['fO2_log'] == potential
+    assert 'provider' not in summary['high_t_melt_activity']
+
+
+def test_closed_vapor_activity_uses_actual_ferric_inventory(vapor_pressure_data):
+    from simulator.fe_redox import calphad_ferrous_feo_activity_diagnostic
+
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
+    imposed = _fe_redox_request(species_formula_registry={}, intrinsic_fO2_log=-4.0)
+    closed = replace(imposed, control_inputs={
+        **imposed.control_inputs,
+        'melt_redox_state': {'origin': 'closed_ledger', 'bound': None, 'flags': []},
+    })
+    result = provider.dispatch(closed)
+    comp = composition_wt_pct_from_account_view(closed.account_view, 'process.cleaned_melt')
+    # The fixture contains 1 mol FeO and 0.5 mol Fe2O3: one of two mol Fe
+    # atoms is ferric. The imposed potential must not replace that inventory.
+    expected = calphad_ferrous_feo_activity_diagnostic(
+        comp_wt=comp, fO2_log=-4.0, T_K=1773.15, pressure_bar=1e-9,
+        fe3_over_sigma_fe=0.5,
+    )
+    assert result.diagnostic['activities']['Fe'] == expected['a_FeO_authoritative']
+    assert result.diagnostic['a_FeO_calphad']['kress91_split']['fe3_over_sigma_fe'] == 0.5
+    assert result.diagnostic['activities']['Fe'] != provider.dispatch(imposed).diagnostic['activities']['Fe']
+
+
+def test_imposed_vapor_request_retains_exact_serialized_result(vapor_pressure_data):
+    import hashlib
+    import json
+
+    request = _fe_redox_request(species_formula_registry={}, intrinsic_fO2_log=-4.0)
+    result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(request)
+    serialized = json.dumps({
+        'diagnostic': result.diagnostic, 'warnings': result.warnings,
+    }, sort_keys=True, default=str).encode()
+    # Behavior-preserving pin recorded at 76581ad1d before the closed-ledger
+    # discriminator. Absent discriminator retains imposed-condition semantics.
+    assert hashlib.sha256(serialized).hexdigest() == (
+        '72f00005265099b2d7946f94f40b5e5bc61044b5dcc93081ac20771ce21ffd0a')
+
+
 # ---------------------------------------------------------------------------
 # 2. Kernel filter scopes the account view
 # ---------------------------------------------------------------------------
 
 
-def test_kernel_filters_provider_to_cleaned_melt_only(
+def test_kernel_filters_provider_to_melt_resident_accounts_only(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
-    """Even when other accounts hold material, the provider must see only
-    ``process.cleaned_melt`` — the kernel account filter is the enforcer."""
+    """The kernel exposes both physical melt accounts and excludes other phases."""
 
     sim = _build_sim(
         "lunar_mare_low_ti",
@@ -3144,6 +3279,10 @@ def test_kernel_filters_provider_to_cleaned_melt_only(
     sim.atom_ledger.load_external(
         "process.metal_phase", {"Fe": 0.5}, source="test seed",
         material_origin="feedstock",
+    )
+    sim.atom_ledger.load_external_mol(
+        "process.spent_reductant_residue", {"Na2O": 1.0}, source="test seed",
+        material_origin="reagent",
     )
 
     seen_accounts: list[frozenset[str]] = []
@@ -3166,9 +3305,24 @@ def test_kernel_filters_provider_to_cleaned_melt_only(
 
     assert seen_accounts, "provider was never dispatched"
     for accounts in seen_accounts:
-        assert accounts == frozenset({"process.cleaned_melt"}), (
+        assert accounts == frozenset({
+            "process.cleaned_melt", "process.spent_reductant_residue"}), (
             "kernel filter leaked an undeclared account into the provider"
         )
+
+
+def test_kernel_filters_provider_to_cleaned_melt_only(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    """Old intent: the kernel showed the provider only process.cleaned_melt.
+
+    That claim cannot hold. The provider's declared basis is both physical
+    melt accounts, and the kernel still drops every other phase. This name
+    asserts that complete-basis filter.
+    """
+    test_kernel_filters_provider_to_melt_resident_accounts_only(
+        vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
 
 
 # ---------------------------------------------------------------------------

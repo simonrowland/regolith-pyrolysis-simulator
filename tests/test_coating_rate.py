@@ -602,7 +602,8 @@ def test_lunar_payload_preserves_extrapolated_mg_wall_pressure(
     pareto = payload["run_metadata"]["pressure_coating_pareto_diagnostic"]
     magnesium = pareto["by_species"]["Mg"]
     assert magnesium["status"] == "unavailable"
-    assert magnesium["reason"] == "species_absent_from_latest_evaporation_series_diagnostic"
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    assert magnesium["reason"] == "current_wall_deposition_quantity_unavailable"
     assert magnesium["authority_level"] == "extrapolated"
     records = magnesium["wall_saturation_pressure_extrapolations"]
     assert records
@@ -690,7 +691,7 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     # retained; this digest still excludes only the cache-sensitive block
     # above.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "a1cab1a260b1d0c2c4925cf15c4bd884a363cb82866dd90654c0954d59823900"
+        "3aba97b32339df7798456a1fdbd54afdf33f21783b344239e7a8e09feaca261f"
     )
 
 

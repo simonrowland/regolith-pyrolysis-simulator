@@ -38,6 +38,20 @@ def _load_yaml(name: str) -> dict:
     return yaml.safe_load((_DATA / name).read_text())
 
 
+@pytest.mark.parametrize('feedstock_id', [
+    'lunar_mare_low_ti', 'mars_basalt', 'ci_carbonaceous_chondrite',
+])
+def test_estimated_feedstock_anchor_is_an_explicit_certification_gap(feedstock_id):
+    from simulator.fe_redox import initialize_feedstock_iron
+
+    feedstock = _load_yaml('feedstocks.yaml')[feedstock_id]
+    assert feedstock['intrinsic_redox']['estimated']
+    _, diagnostic = initialize_feedstock_iron(feedstock)
+    assert diagnostic['condition'] == 'condition_defaulted'
+    assert 'intrinsic_delta_iw' in diagnostic['certification_gaps']
+    assert diagnostic['anchor'] == feedstock['intrinsic_redox']
+
+
 def _measured_split() -> dict:
     return {
         "composition_wt_pct": {"SiO2": 70.0, "FeO": 2.0, "Fe2O3": 1.0},
@@ -249,9 +263,12 @@ def test_engine_result_attaches_unknown_split_notice(monkeypatch) -> None:
 
     assert returned is result
     assert result.diagnostics["feedstock_iron_notice"]["code"] == (
-        "fe_redox_split_unknown"
+        "feedstock_iron_initialization"
     )
-    assert "all-ferrous" in result.diagnostics["feedstock_iron_notice"]["message"]
+    notice = result.diagnostics['feedstock_iron_notice']
+    assert notice['method'] == 'predicted_kress91_split'
+    assert 'measured_feedstock_iron_split' in notice['certification_gaps']
+    assert sim.atom_ledger.mol_by_account('process.cleaned_melt')['Fe2O3'] > 0.0
 
 
 @pytest.mark.parametrize(

@@ -20,6 +20,7 @@ from simulator.condensation_routing import target_species_for_stage_number
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.recipe_errors import MalformedRecipeError
+from simulator.feedstock_composition import IronSeedAuthority
 
 # ============================================================================
 # SECTION 1: CONSTANTS
@@ -452,6 +453,7 @@ class ProcessInventory:
 
 @dataclass
 class OxygenReservoirState:
+    # Output mirror: intrinsic redox is the AtomLedger FeO/Fe2O3 inventory.
     melt_intrinsic_fO2_log: float = -9.0
     reference_T_K: float | None = None
     headspace_ledger_pO2_bar: float = DEFAULT_VACUUM_FLOOR_BAR
@@ -511,8 +513,7 @@ class MeltState:
     pO2_mbar: float = 0.0          # Controlled oxygen partial pressure
     p_total_mbar: float = 0.0      # Total pressure above melt
     fO2_log: float = -9.0          # log₁₀(fO₂/bar) for MELTS calc
-    # SSO-R intrinsic melt redox state, log10(fO2/bar); seeded from the
-    # legacy intrinsic estimate, then advanced by the oxygen reservoir.
+    # Derived log10(fO2/bar) output mirror of the ledger's FeO/Fe2O3 split.
     melt_fO2_log: float = -9.0
     oxygen_reservoir: OxygenReservoirState = field(
         default_factory=OxygenReservoirState)
@@ -1043,6 +1044,8 @@ class HourSnapshot:
     temperature_C: float = 25.0
     melt_mass_kg: float = 0.0
     composition_wt_pct: Dict[str, float] = field(default_factory=dict)
+    seed_authority: IronSeedAuthority | None = None
+    iron_comproportionation: Dict[str, Any] = field(default_factory=dict)
     inventory: ProcessInventory = field(default_factory=ProcessInventory)
     # Historical C6 hold accounting must use the dispatch decision made on
     # that tick. Re-evaluating an old temperature against a later ramp target
@@ -1219,7 +1222,7 @@ class HourSnapshot:
     # pre-equilibrium O2 exchange.
 
     redox_source_breakdown: Dict[str, Any] = field(default_factory=dict)
-    # Per-tick mol-O2-equivalent source terms applied to the melt redox scalar.
+    # Per-tick mol-O2-equivalent labels for committed ledger source terms.
     # Diagnostic only; mass movement remains in AtomLedger transitions.
 
     # --- O2 bubbler actuator telemetry (SSO-O2 chunk A) ---
@@ -1296,6 +1299,7 @@ class BatchRecord:
     batch_id: str = ''
     feedstock_key: str = ''
     feedstock_label: str = ''
+    seed_authority: IronSeedAuthority | None = None
     batch_mass_kg: float = 0.0
     additives_kg: Dict[str, float] = field(default_factory=dict)
     initial_inventory: ProcessInventory = field(default_factory=ProcessInventory)

@@ -20,6 +20,7 @@ from simulator.battery.oxygen_balance import (
 )
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+from simulator.fe_redox import collapse_feot_composition
 
 
 _SECONDS_PER_HOUR = 3_600.0
@@ -897,6 +898,8 @@ def _hashimoto_project_oxide_wt_pct(inventory_mol: Mapping[str, float]) -> dict[
     total_mass_kg = math.fsum(oxide_mass_kg.values())
     if not math.isfinite(total_mass_kg) or total_mass_kg <= 0.0:
         raise ResidueInventoryRefusal("hashimoto_residue_mass_invalid")
+    if 'Fe2O3' in oxide_mass_kg:
+        return collapse_feot_composition(oxide_mass_kg)
     # This is the run-end liquid's bulk oxide inventory; the Hashimoto source
     # reports the same whole-spherule inventory after quenching, so score.py
     # carries the source-resolved Phase.L identity onto this prediction.

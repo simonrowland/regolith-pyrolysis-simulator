@@ -107,6 +107,12 @@ class _StopAfterFirstTick(Exception):
 @pytest.fixture()
 def producer_backed_operator_tick(monkeypatch):
     """Capture a UI payload through the same socket producer used in runtime."""
+    from copy import deepcopy
+
+    # Keep the original silicate-only DOM fixture; native Fe has its own account.
+    feedstocks = deepcopy(web_events.load_visible_feedstocks())
+    feedstocks["lunar_mare_low_ti"].pop("iron_speciation")
+    monkeypatch.setattr(web_events, "load_visible_feedstocks", lambda: feedstocks)
     captured_tasks = []
 
     def force_internal_analytical_backend(_backend_name):

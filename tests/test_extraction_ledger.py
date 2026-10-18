@@ -447,7 +447,8 @@ def test_mre_reduction_records_atom_ledger_transition():
     sim.atom_ledger.assert_balanced()
     assert sim.atom_ledger.kg_by_account("process.cleaned_melt")[
         "FeO"
-    ] == pytest.approx(999.0)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    ] == pytest.approx(993.6848637698357)
     assert sim.atom_ledger.kg_by_account("process.metal_phase")[
         "Fe"
     ] == pytest.approx(fe_kg)
