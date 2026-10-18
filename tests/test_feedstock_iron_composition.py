@@ -266,7 +266,9 @@ def test_engine_result_attaches_unknown_split_notice(monkeypatch) -> None:
         "feedstock_iron_initialization"
     )
     notice = result.diagnostics['feedstock_iron_notice']
-    assert notice['method'] == 'predicted_kress91_split'
+    # F1 / d-166: a stated DeltaIW imposes the seed even when model_assumed;
+    # provenance changes predicted_kress91_split -> imposed_fO2, not to an assay.
+    assert notice['method'] == 'imposed_fO2'
     assert 'measured_feedstock_iron_split' in notice['certification_gaps']
     assert sim.atom_ledger.mol_by_account('process.cleaned_melt')['Fe2O3'] > 0.0
 
