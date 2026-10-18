@@ -26,30 +26,30 @@ RENDERED_CELLS = (
     ("O2", "shornikov_2016_cao_mgo_silicate_p002_t02_r17_c06", "0.000", Phase.G),
 )
 
-# Figure 1 marker centres. Read 1 is the hole centroid (open squares) or the
-# disk peak (filled circles) on the embedded JPEG. Read 2 is a separate centre
-# of that symbol's own pixels. T, activity, both pixel reads, and the
-# half-difference uncertainty are literals, not a comparison with an audit file.
+# Experimental Rein–Chipman centres. Read 1 is the stored disk peak on the
+# embedded JPEG. Read 2 is the thick-interior centroid on a fresh 600 dpi page
+# crop. T, activity, both pixel reads, and the half-difference uncertainty are
+# literals, not a comparison with an audit file.
 FIGURE_READS = (
     (
         "CaO",
-        "shornikov_2016_fig1a_CaO_activity",
+        "shornikov_2016_fig1a_CaO_rein1965_activity",
         "1873",
-        "0.089",
-        [483.0, 138.0],
-        [2040.6, 4998.2],
-        [483.24, 137.78],
-        "0.001",
+        "0.0038",
+        [283.0, 300.0],
+        [1440.3, 5484.2],
+        [283.21, 300.39],
+        "0.002",
     ),
     (
         "MgO",
-        "shornikov_2016_fig1a_MgO_activity",
+        "shornikov_2016_fig1a_MgO_rein1965_activity",
         "1873",
-        "0.16",
-        [258.95, 106.95],
-        [1368.1, 4905.0],
-        [258.88, 106.99],
-        None,
+        "0.096",
+        [294.0, 134.0],
+        [1473.3, 4986.2],
+        [294.74, 134.75],
+        "0.003",
     ),
     (
         "SiO2",
@@ -58,10 +58,28 @@ FIGURE_READS = (
         "0.1",
         [930.0, 132.0],
         [3382.4, 4980.2],
-        [929.45, 131.74],
+        [929.45, 131.77],
         "0.001",
     ),
 )
+
+# The five experimental markers the first pass missed. Coordinates are the
+# measured centres, not the reviewer's approximate starting points.
+ADDED_ACTIVITY = (
+    ("SiO2", "shornikov_2016_fig1a_SiO2_rein1965_activity", "1", [126.0, 14.0]),
+    ("SiO2", "shornikov_2016_fig1b_SiO2_rein1965_activity", "1", [1288.0, 13.5]),
+    ("CaO", "shornikov_2016_fig1a_CaO_rein1965_activity", "0.042", [518.0, 176.5]),
+    ("CaO", "shornikov_2016_fig1b_CaO_rein1965_activity", "0.021", [928.0, 213.0]),
+)
+
+EXPERIMENTAL_COUNTS = {
+    "shornikov_2016_fig1a_CaO_rein1965_activity": 5,
+    "shornikov_2016_fig1b_CaO_rein1965_activity": 5,
+    "shornikov_2016_fig1a_MgO_rein1965_activity": 3,
+    "shornikov_2016_fig1b_MgO_rein1965_activity": 3,
+    "shornikov_2016_fig1a_SiO2_rein1965_activity": 13,
+    "shornikov_2016_fig1b_SiO2_rein1965_activity": 12,
+}
 
 
 def _load():
@@ -108,7 +126,37 @@ def test_table_and_figure_reads_are_pinned():
         if row["values"].get("quantity") != "activity":
             continue
         activity_points.extend(row["values"].get("points") or [])
-    assert len(activity_points) == 102
+    assert len(activity_points) == 41
+    counts = {
+        row["observation_id"]: len(row["values"].get("points") or [])
+        for _formula, row in _observations(document)
+        if "rein1965" in row["observation_id"]
+    }
+    assert counts == EXPERIMENTAL_COUNTS
+    model_rows = [
+        row
+        for _formula, row in _observations(document)
+        if row["type"] == "activity_coefficient" and "rein1965" not in row["observation_id"]
+    ]
+    assert len(model_rows) == 6
+    for row in model_rows:
+        assert not row["values"].get("points")
+        assert row["values"]["unavailable_reason"] == "model_curve_not_sampled"
+        assert row["values"]["quantity"] == "activity"
+        assert row["phase"] == "l"
+        assert row["T_K"] == "1873"
+    for formula, observation_id, activity, embedded in ADDED_ACTIVITY:
+        match = next(
+            item
+            for item in document["species"][formula]["observations"]
+            if item["observation_id"] == observation_id
+        )
+        point = next(
+            item for item in match["values"]["points"] if item["embedded_px_read_1"] == embedded
+        )
+        assert point["activity"] == activity
+        assert point["T_K"] == "1873"
+        assert point.get("read_uncertainty_dex") not in {"0", "0.0", "0.000"}
     for (
         formula,
         observation_id,
@@ -139,21 +187,47 @@ def test_table_and_figure_reads_are_pinned():
             assert point["read_uncertainty_dex"] == uncertainty
         assert point["log10_activity_ordinate"].startswith("-")
 
+    context = document["species"]["CaO-MgO-SiO2"]["context"]
     mixing = next(
         row
-        for row in document["species"]["CaO-MgO-SiO2"]["context"]
-        if row["observation_id"] == "shornikov_2016_fig2a_series1_mixing_energy"
+        for row in context
+        if row["observation_id"] == "shornikov_2016_fig2a_series4_mixing_energy"
     )
+    assert len(mixing["values"]["points"]) == 9
+    mixing_b = next(
+        row
+        for row in context
+        if row["observation_id"] == "shornikov_2016_fig2b_series4_mixing_energy"
+    )
+    assert len(mixing_b["values"]["points"]) == 8
+    for row in context:
+        if row["type"] == "figure_mixing_energy" and not row["observation_id"].endswith(
+            "series4_mixing_energy"
+        ):
+            assert row["values"]["points"] == []
     mixing_point = next(
         item
         for item in mixing["values"]["points"]
-        if item["embedded_px_read_1"] == [106.44, 57.07]
+        if item["embedded_px_read_1"] == [299.0, 264.0]
     )
     assert mixing_point["T_K"] == "1873"
-    assert mixing_point["delta_Gm_kJ_per_mole_read"] == "-12.65"
-    assert mixing_point["page_600dpi_px_read_1"] == [626.6, 638.5]
-    assert mixing_point["embedded_px_read_2"] == [106.69, 57.21]
-    assert mixing_point["read_uncertainty_kJ_per_mole"] == "0.006"
+    assert mixing_point["delta_Gm_kJ_per_mole_read"] == "-31"
+    assert mixing_point["page_600dpi_px_read_1"] == [1204.7, 1260.1]
+    assert mixing_point["embedded_px_read_2"] == [298.56, 264.64]
+    assert mixing_point["read_uncertainty_kJ_per_mole"] == "0.029"
+    added_mixing = next(
+        item
+        for item in mixing["values"]["points"]
+        if item["embedded_px_read_1"] == [502.0, 358.0]
+    )
+    assert added_mixing["delta_Gm_kJ_per_mole_read"] == "-40"
+    assert added_mixing["T_K"] == "1873"
+    for row in context:
+        for point in row["values"].get("points") or []:
+            assert point.get("read_uncertainty_kJ_per_mole") not in {"0", "0.0", "0.000"}
+    for _formula, row in _observations(document):
+        for point in row["values"].get("points") or []:
+            assert point.get("read_uncertainty_dex") not in {"0", "0.0", "0.000"}
     prose = next(
         row
         for row in document["species"]["CaO-MgO-SiO2"]["context"]
@@ -204,7 +278,7 @@ def test_isolated_migration_reaches_temperature_on_every_row():
         for row in result.observations.values()
         if row.source_id == document["source_id"]
     ]
-    assert len(migrated) == 140
+    assert len(migrated) == 85
     assert not result.registry_issues
     assert not result.validation.hard_issues
 
@@ -216,7 +290,10 @@ def test_isolated_migration_reaches_temperature_on_every_row():
         and row.value.kind is ValueKind.POINT
     ]
     assert len(gibbs) == 38
-    assert len(activities) == 102
+    assert len(activities) == 41
+    unavailable = [row for row in migrated if row.value.kind is ValueKind.UNAVAILABLE]
+    assert len(unavailable) == 6
+    assert all(row.identity.temperature_K.value == Decimal("1873") for row in unavailable)
 
     for _formula, observation_id, value, _phase in RENDERED_CELLS:
         row = next(item for item in gibbs if item.observation_id.endswith(observation_id))
@@ -232,7 +309,7 @@ def test_isolated_migration_reaches_temperature_on_every_row():
         assert row.identity.temperature_K is not None
         assert row.identity.temperature_K.is_value
 
-    sample = next(row for row in activities if "fig1a_CaO_activity" in row.observation_id)
+    sample = next(row for row in activities if "fig1a_CaO_rein1965_activity" in row.observation_id)
     assert sample.identity.temperature_K.value == Decimal("1873")
     assert sample.identity.composition.is_unknown
     assert sample.point_conditions["composition"].state.is_unknown

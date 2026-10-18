@@ -10,28 +10,42 @@ MinerU `p002-t02` and pdftotext agree on every stored digit and sign. MinerU wri
 
 `mineru_table_draft.py compare` reported `matched=0 no-match=0 mismatch=0 presence-only=0 total=0`. Emit stores the Gibbs numbers on `values.value`. The comparator reads `values.points[].value` or `pressure_atm`, so it saw no table points. The digit agreement above is the cell audit. Tool defect, not fixed on this branch.
 
+Every liquid row stores `column_header` "Gas phase  $\Delta_f G^{\circ}_{2000},$  kJ/mole" while `phase` is `l`. The value and the phase are the liquid column. Emit copies that header from the shared MinerU header mapping, and re-emission reproduces it. t-1320 fixes the emitter. These eight cells were not hand-edited and the table was not re-emitted.
+
 The caption says calculated in the present study, formation from elements at 2000 K. The text cites Glushko et al. 1978–1982, Bale et al. 2009, and Shornikov and Yakovlev 2015. Those parents are not stored, so the rows are quoted_attributed. Standard pressure, the reaction, and formation_elements are not printed and are not inferred. The prose formula "diopside CaMgSiO4" is stored as printed. CaMgSi2O6 is a separate printed row.
 
 ## Figure 1 calibration
 
-Embedded JPEG on PDF page 2, native 1353×540. Placement `cm 487.35 0 0 194.4 70.9 97.42` on a 595.32×841.92 pt page. Page pixels are that matrix times 600/72, with y measured down from the top of the page. Reads are on the native JPEG. The pinned page coordinates in the test are that conversion.
+Embedded JPEG on PDF page 2, native 1353×540. Placement `cm 487.35 0 0 194.4 70.9 97.42` on a 595.32×841.92 pt page. Page pixels are that matrix times 600/72, with y measured down from the top of the page. Read 1 is on the native JPEG. Read 2 is on a fresh 600 dpi render of the page. The pinned page coordinates are that conversion of the stored embedded pixels.
 
-The ordinate is lg a_i, which is log10(activity). Major y ticks sit at embedded y 14, 132, 250, 369 for lg a = 0, −1, −2, −3. The fit residual is at most 0.0034 dex. The x-axis is below the −3 tick and is not that tick. Panel a x ticks at 91, 203, 315, 427, 539, 651 are 0, 10, 20, 30, 40, 50 mole % CaO on the 2MgO·3SiO2–CaO join. Panel b x ticks at 768, 848, 928, 1008, 1088, 1168, 1248, 1329 are 30, 35, 40, 45, 50, 55, 60, 65 mole % SiO2 on the CaO·MgO–SiO2 join. X-fit residuals are under 0.04 mole %.
+The ordinate is lg a_i, which is log10(activity). Fitted maps, value = slope·pixel + intercept:
+
+| axis | ticks (pixel = label) | slope | intercept | max residual |
+| --- | --- | --- | --- | --- |
+| y, log10(activity) | 14 = 0, 132 = −1, 250 = −2, 369 = −3 | −0.008453049136 | 0.116645647180 | 0.0034 dex |
+| panel a x, mole % CaO | 91 = 0, 203 = 10, 315 = 20, 427 = 30, 539 = 40, 651 = 50 | 0.08928571 | −8.125000 | 0.00 mole % |
+| panel b x, mole % SiO2 | 768 = 30, 848 = 35, 928 = 40, 1008 = 45, 1088 = 50, 1168 = 55, 1248 = 60, 1329 = 65 | 0.06243483 | −17.939504 | 0.036 mole % |
+
+The x-axis is below the −3 tick and is not that tick. Panel a is the 2MgO·3SiO2–CaO join. Panel b is the CaO·MgO–SiO2 join. A half pixel on the activity axis is 0.0042 dex. No stored uncertainty uses that width: the stored half-difference is the unrounded ordinate gap, and the key is omitted when that half formats as 0.000.
 
 ## Figure 1 marker reads
 
-Open squares: read 1 is the centroid of the enclosed hole. Read 2 is the centroid of that square's stroke inside the hole box expanded by 3 px. Filled circles: read 1 is the peak of a radius-4 disk fill. Read 2 is the centroid of the same-colour pixels in a ±7 px window. Neither second read is a fixed offset of the first. `read_uncertainty_dex` is half the unrounded ordinate difference. Where the two reads coincide, the key is omitted rather than stored as zero. No pair exceeds 0.02 dex.
+Symbols 1–3 are open squares of the present study. The caption and the abstract identify them as the calculated activities. Those six series stay as unavailable activity records at 1873 K, phase liquid, with the quantity, species, caption and locator, and with no numeric points. Symbols 4–6 are filled circles from Rein and Chipman, 1965. Only those are stored as numbers.
 
-Stored once as linear activity at 1873 K, phase liquid, evidence figure_only. 102 points.
+Read 1 of a retained filled circle is the centre already stored. Read 2 is the centroid of the thick interior (page-pixel distance at least 1.6) inside a disk on the 600 dpi page crop, converted back to embedded pixels. It is not a centroid of the embedded-JPEG mask and not a fixed offset of read 1. The five markers added in review use a distance-transform peak on the embedded JPEG as read 1 and the same page-crop interior as read 2. The largest activity gap is 0.0079 dex. No pair exceeds 0.02 dex. No read uncertainty is 0.
 
-| symbol | marker | who | panel a | panel b |
-| --- | --- | --- | --- | --- |
-| 1 | black open square | present study | 8 | 12 |
-| 2 | red open square | present study | 10 | 12 |
-| 3 | blue open square | present study | 11 | 12 |
-| 4 | black filled circle | Rein and Chipman, 1965 | 4 | 4 |
-| 5 | red filled circle | Rein and Chipman, 1965 | 3 | 3 |
-| 6 | blue filled circle | Rein and Chipman, 1965 | 12 | 11 |
+Stored once as linear activity at 1873 K, phase liquid. 41 experimental points. Evidence class of the stored points is figure_only. The model records are typed refusals, `unavailable_reason: model_curve_not_sampled`.
+
+| symbol | marker | who | panel a | panel b | stored |
+| --- | --- | --- | --- | --- | --- |
+| 1 | black open square | present study, model | visible, not counted | visible, not counted | unavailable, no points |
+| 2 | red open square | present study, model | visible, not counted | visible, not counted | unavailable, no points |
+| 3 | blue open square | present study, model | visible, not counted | visible, not counted | unavailable, no points |
+| 4 | black filled circle | Rein and Chipman, 1965 | 5 | 5 | numeric |
+| 5 | red filled circle | Rein and Chipman, 1965 | 3 | 3 | numeric |
+| 6 | blue filled circle | Rein and Chipman, 1965 | 13 | 12 | numeric |
+
+Added experimental centres, embedded pixels: panel a SiO2 (126.0, 14.0) activity 1; panel b SiO2 (1288.0, 13.5) activity 1; panel a CaO (518.0, 176.5) activity 0.042; panel b CaO (928.0, 213.0) activity 0.021. The two silica markers sit on the lg a = 0 tick, so the stored activity is 1.
 
 There is no closed red square at panel a, 20 mole % CaO. That point is not invented. The connecting lines are not sampled. Raw embedded and page pixels are the `embedded_px_read_*` and `page_600dpi_px_read_*` fields on each point.
 
@@ -39,34 +53,34 @@ There is no closed red square at panel a, 20 mole % CaO. That point is not inven
 
 Embedded JPEG on PDF page 3, native 1401×546. Placement `cm 504.7 0 0 196.8 36.85 589.07` on the same page size. Page pixels are that matrix times 600/72, y down from the top of the page.
 
-The ordinate is linear ΔG^m, kJ/mole. The two panels do not share a scale.
+The ordinate is linear ΔG^m, kJ/mole. The two panels do not share a scale. Fitted maps, value = slope·pixel + intercept:
 
-| axis | labels | pixels | max residual |
-| --- | --- | --- | --- |
-| panel a x, mole % CaO | 0, 10, 20, 30, 40, 50 | 107, 221, 332, 444, 558, 673 | 0.15 mole % |
-| panel b x, mole % SiO2 | 30, 35, 40, 45, 50, 55, 60, 65 | 799, 881, 958, 1043, 1117, 1201, 1284, 1369 | 0.31 mole % |
-| panel a y, kJ/mole | −10, −20, −30, −40 | 28, 138, 249, 360 | 0.04 kJ/mole |
-| panel b y, kJ/mole | −30, −35, −40, −45 | 27, 145, 264, 381 | 0.03 kJ/mole |
+| axis | ticks (pixel = label) | slope | intercept | max residual |
+| --- | --- | --- | --- | --- |
+| panel a x, mole % CaO | 107 = 0, 221 = 10, 332 = 20, 444 = 30, 558 = 40, 673 = 50 | 0.08853746 | −9.455829 | 0.15 mole % |
+| panel b x, mole % SiO2 | 799 = 30, 881 = 35, 958 = 40, 1043 = 45, 1117 = 50, 1201 = 55, 1284 = 60, 1369 = 65 | 0.06167918 | −19.206035 | 0.31 mole % |
+| panel a y, kJ/mole | 28 = −10, 138 = −20, 249 = −30, 360 = −40 | −0.09033379 | −7.497827 | 0.036 kJ/mole |
+| panel b y, kJ/mole | 27 = −30, 145 = −35, 264 = −40, 381 = −45 | −0.04233658 | −28.852754 | 0.030 kJ/mole |
 
 ## Figure 2 marker reads
 
-Squares and triangles: read 1 is the hole centroid, without morphological closing. Read 2 is the stroke centroid (squares) or the stroke-annulus centroid (triangles). Open circles: read 1 is the peak of a ring template, because several rings are opened by the joining line. Read 2 is the centroid of the red pixels in that ring. Filled circles: disk peak, and the ink centroid in a ±6 px window. Two enclosed black holes are the counters of the printed digit 4, at about (352, 276) and (1124, 118). They are not markers. Panel b has no black square at 65 mole %. Every stored pair differs by less than 0.4 kJ/mole. The uncertainty is half that difference.
+Symbols 1–3 are the present-study model at 1873, 1973 and 2073 K. Those six context rows keep the mixing-energy schema gap and have no numeric points. Symbol 4, the black filled circle at 1873 K, is the Rein and Chipman comparison and is stored: 9 points on panel a and 8 on panel b.
 
-87 points, context only, type `figure_mixing_energy`, under species `CaO-MgO-SiO2` because the quantity is the melt on the join and not one oxide. Not stored as delta_fG.
+Read 1 of a retained filled circle stays the stored centre. Read 2 is the same page-crop thick interior used for Figure 1. The added panel a marker is embedded (502.0, 358.0), between the circles at x = 468 and x = 536, and its two-significant-figure energy is −40 kJ/mole. Stored energies use two significant figures, so a read of −31.35 is stored as −31. The uncertainty is half the unrounded kJ difference, not half the rounded values. The largest gap is 0.058 kJ/mole. Where that half formats as 0.000 the key is omitted. No read uncertainty is 0.
 
-| symbol | marker | T | panel a | panel b |
-| --- | --- | --- | --- | --- |
-| 1 | black open square | 1873 K | 11 | 12 |
-| 2 | red open circle | 1973 K | 11 | 13 |
-| 3 | blue open triangle | 2073 K | 11 | 13 |
-| 4 | black filled circle | 1873 K | 8 | 8 |
+Two enclosed black holes are the counters of the printed digit 4, at about (352, 276) and (1124, 118). They are not markers. Panel b has no black filled circle at 65 mole %.
+
+One further black open square of the 1873 K model series lies past the 65 mole % tick at x = 1369. Its ink spans embedded x 1373–1385 and y 5–17, centroid (1379.3, 10.7), about 13 by 12 px, and a stroke leaves the lower left toward the previous model point. It is not sampled.
+
+17 experimental points, context only, type `figure_mixing_energy`, under species `CaO-MgO-SiO2` because the quantity is the melt on the join and not one oxide. Not stored as delta_fG.
 
 The sentence "by on 4 kJ/mole approximately" (comparison with Shornikov et al., 1997) is one context row, value as printed. It is not a second delta_fG.
 
 ## Schema gaps
 
-- No quantity token for the mixing energy ΔG^m. The reads stay context.
+- No quantity token for the mixing energy ΔG^m. The experimental reads stay context. The model curves stay on those context rows with no numeric points.
 - The 4 kJ/mole sentence has the same gap.
 - Mole percent has no AmountBasis token. Activity and mixing-energy composition identity stays unknown. The point condition records the reason. Printed mole percents stay on the points.
 - Figure 1 does not print the activity standard state, fO2, or total pressure.
 - Gibbs formation reaction, formation elements, and standard pressure are not printed. Not inferred.
+- Symbols 1–3 are model curves. Activity has a token, and the six series are unavailable records rather than numeric samples. Mixing energy has no token, so the same refusal is an empty point list on the context row.
