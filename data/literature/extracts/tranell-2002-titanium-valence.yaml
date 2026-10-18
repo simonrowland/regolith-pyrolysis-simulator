@@ -11,12 +11,16 @@ extraction:
   date: '2026-10-16'
   worker: rdxw-ti02-1016
 review_status: draft
+fidelity_samples:
+- path: species.Ti.observations[tranell_2002_t1_cst1_1843k_pO2m8].values.points[0].value
+  value: '0.023'
+  locator: {published_page: 63, pdf_page_index: 2, table: I, note: 'Table I row 1, slag CST1'}
 corrections: []
 species:
   Ti:
     observations:
     - observation_id: tranell_2002_t1_cst1_1843k_pO2m8
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id001
         published_page: 63
@@ -88,7 +92,7 @@ species:
               locator: *id001
           locator: *id001
     - observation_id: tranell_2002_t1_cst1_1843k_pO2m9
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id002
         published_page: 63
@@ -160,7 +164,7 @@ species:
               locator: *id002
           locator: *id002
     - observation_id: tranell_2002_t1_cst1_1873k_pO2m12
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id003
         published_page: 63
@@ -232,7 +236,7 @@ species:
               locator: *id003
           locator: *id003
     - observation_id: tranell_2002_t1_cst2_1843k_pO2m8
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id004
         published_page: 63
@@ -304,7 +308,7 @@ species:
               locator: *id004
           locator: *id004
     - observation_id: tranell_2002_t1_cst2_1843k_pO2m9
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id005
         published_page: 63
@@ -376,7 +380,7 @@ species:
               locator: *id005
           locator: *id005
     - observation_id: tranell_2002_t1_cst2_1873k_pO2m12
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id006
         published_page: 63
@@ -448,7 +452,7 @@ species:
               locator: *id006
           locator: *id006
     - observation_id: tranell_2002_t1_cst3_1843k_pO2m8
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id007
         published_page: 63
@@ -520,7 +524,7 @@ species:
               locator: *id007
           locator: *id007
     - observation_id: tranell_2002_t1_cst3_1843k_pO2m9
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id008
         published_page: 63
@@ -592,7 +596,7 @@ species:
               locator: *id008
           locator: *id008
     - observation_id: tranell_2002_t1_cst3_1873k_pO2m12
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id009
         published_page: 63
@@ -664,7 +668,7 @@ species:
               locator: *id009
           locator: *id009
     - observation_id: tranell_2002_t1_cst4_1843k_pO2m8
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id010
         published_page: 63
@@ -736,7 +740,7 @@ species:
               locator: *id010
           locator: *id010
     - observation_id: tranell_2002_t1_cst4_1843k_pO2m9
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id011
         published_page: 63
@@ -808,7 +812,7 @@ species:
               locator: *id011
           locator: *id011
     - observation_id: tranell_2002_t1_cst4_1873k_pO2m12
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id012
         published_page: 63
@@ -880,7 +884,7 @@ species:
               locator: *id012
           locator: *id012
     - observation_id: tranell_2002_t1_cst5_1843k_pO2m7
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id013
         published_page: 63
@@ -952,7 +956,7 @@ species:
               locator: *id013
           locator: *id013
     - observation_id: tranell_2002_t1_cst5_1843k_pO2m8
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id014
         published_page: 63
@@ -1024,7 +1028,7 @@ species:
               locator: *id014
           locator: *id014
     - observation_id: tranell_2002_t1_cst5_1783k_pO2m8
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id015
         published_page: 63
@@ -1096,7 +1100,7 @@ species:
               locator: *id015
           locator: *id015
     - observation_id: tranell_2002_t1_cst5_1843k_pO2m9
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id016
         published_page: 63
@@ -1168,7 +1172,7 @@ species:
               locator: *id016
           locator: *id016
     - observation_id: tranell_2002_t1_cst5_1843k_pO2m10
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id017
         published_page: 63
@@ -1240,7 +1244,7 @@ species:
               locator: *id017
           locator: *id017
     - observation_id: tranell_2002_t1_cst5_1843k_pO2m12
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id018
         published_page: 63
@@ -1312,7 +1316,7 @@ species:
               locator: *id018
           locator: *id018
     - observation_id: tranell_2002_t1_cst6_1843k_pO2m7
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id019
         published_page: 63
@@ -1384,7 +1388,7 @@ species:
               locator: *id019
           locator: *id019
     - observation_id: tranell_2002_t1_cst6_1843k_pO2m8
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id020
         published_page: 63
@@ -1456,7 +1460,7 @@ species:
               locator: *id020
           locator: *id020
     - observation_id: tranell_2002_t1_cst6_1843k_pO2m9
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id021
         published_page: 63
@@ -1528,7 +1532,7 @@ species:
               locator: *id021
           locator: *id021
     - observation_id: tranell_2002_t1_cst6_1843k_pO2m10
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id022
         published_page: 63
@@ -1600,7 +1604,7 @@ species:
               locator: *id022
           locator: *id022
     - observation_id: tranell_2002_t1_cst6_1873k_pO2m12
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id023
         published_page: 63
@@ -1672,7 +1676,7 @@ species:
               locator: *id023
           locator: *id023
     - observation_id: tranell_2002_t1_cst7_1843k_pO2m7
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id024
         published_page: 63
@@ -1744,7 +1748,7 @@ species:
               locator: *id024
           locator: *id024
     - observation_id: tranell_2002_t1_cst7_1843k_pO2m8
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id025
         published_page: 63
@@ -1816,7 +1820,7 @@ species:
               locator: *id025
           locator: *id025
     - observation_id: tranell_2002_t1_cst7_1783k_pO2m8
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id026
         published_page: 63
@@ -1888,7 +1892,7 @@ species:
               locator: *id026
           locator: *id026
     - observation_id: tranell_2002_t1_cst7_1903k_pO2m8
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id027
         published_page: 63
@@ -1960,7 +1964,7 @@ species:
               locator: *id027
           locator: *id027
     - observation_id: tranell_2002_t1_cst7_1843k_pO2m9
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id028
         published_page: 63
@@ -2032,7 +2036,7 @@ species:
               locator: *id028
           locator: *id028
     - observation_id: tranell_2002_t1_cst7_1843k_pO2m10
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id029
         published_page: 63
@@ -2104,7 +2108,7 @@ species:
               locator: *id029
           locator: *id029
     - observation_id: tranell_2002_t1_cst7_1873k_pO2m12
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id030
         published_page: 63
@@ -2176,7 +2180,7 @@ species:
               locator: *id030
           locator: *id030
     - observation_id: tranell_2002_t1_cst8_1843k_pO2m7
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id031
         published_page: 63
@@ -2248,7 +2252,7 @@ species:
               locator: *id031
           locator: *id031
     - observation_id: tranell_2002_t1_cst8_1843k_pO2m8
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id032
         published_page: 63
@@ -2320,7 +2324,7 @@ species:
               locator: *id032
           locator: *id032
     - observation_id: tranell_2002_t1_cst8_1843k_pO2m9
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id033
         published_page: 63
@@ -2392,7 +2396,7 @@ species:
               locator: *id033
           locator: *id033
     - observation_id: tranell_2002_t1_cst8_1843k_pO2m10
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id034
         published_page: 63
@@ -2464,7 +2468,7 @@ species:
               locator: *id034
           locator: *id034
     - observation_id: tranell_2002_t1_cst8_1873k_pO2m12
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id035
         published_page: 63
@@ -2536,7 +2540,7 @@ species:
               locator: *id035
           locator: *id035
     - observation_id: tranell_2002_t1_cst9_1843k_pO2m8
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id036
         published_page: 63
@@ -2608,7 +2612,7 @@ species:
               locator: *id036
           locator: *id036
     - observation_id: tranell_2002_t1_cst9_1843k_pO2m9
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id037
         published_page: 63
@@ -2680,7 +2684,7 @@ species:
               locator: *id037
           locator: *id037
     - observation_id: tranell_2002_t1_cst9_1873k_pO2m12
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id038
         published_page: 63
@@ -2752,7 +2756,7 @@ species:
               locator: *id038
           locator: *id038
     - observation_id: tranell_2002_t1_cst10_1843k_pO2m8
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id039
         published_page: 63
@@ -2824,7 +2828,7 @@ species:
               locator: *id039
           locator: *id039
     - observation_id: tranell_2002_t1_cst10_1843k_pO2m9
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id040
         published_page: 63
@@ -2896,7 +2900,7 @@ species:
               locator: *id040
           locator: *id040
     - observation_id: tranell_2002_t1_cst10_1873k_pO2m12
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id041
         published_page: 63
@@ -2968,7 +2972,7 @@ species:
               locator: *id041
           locator: *id041
     - observation_id: tranell_2002_t1_cst11_1843k_pO2m8
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id042
         published_page: 63
@@ -3040,7 +3044,7 @@ species:
               locator: *id042
           locator: *id042
     - observation_id: tranell_2002_t1_cst11_1843k_pO2m9
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id043
         published_page: 63
@@ -3112,7 +3116,7 @@ species:
               locator: *id043
           locator: *id043
     - observation_id: tranell_2002_t1_cst11_1873k_pO2m12
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id044
         published_page: 63
@@ -3184,7 +3188,7 @@ species:
               locator: *id044
           locator: *id044
     - observation_id: tranell_2002_t1_cst12_1843k_pO2m8
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id045
         published_page: 63
@@ -3256,7 +3260,7 @@ species:
               locator: *id045
           locator: *id045
     - observation_id: tranell_2002_t1_cst12_1843k_pO2m9
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id046
         published_page: 63
@@ -3328,7 +3332,7 @@ species:
               locator: *id046
           locator: *id046
     - observation_id: tranell_2002_t1_cst12_1873k_pO2m12
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id047
         published_page: 63
@@ -3400,7 +3404,7 @@ species:
               locator: *id047
           locator: *id047
     - observation_id: tranell_2002_t1_cst13_1873k_pO2m8
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id048
         published_page: 63
@@ -3472,7 +3476,7 @@ species:
               locator: *id048
           locator: *id048
     - observation_id: tranell_2002_t1_cst13_1843k_pO2m9
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id049
         published_page: 63
@@ -3544,7 +3548,7 @@ species:
               locator: *id049
           locator: *id049
     - observation_id: tranell_2002_t1_cst13_1873k_pO2m9
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id050
         published_page: 63
@@ -3616,7 +3620,7 @@ species:
               locator: *id050
           locator: *id050
     - observation_id: tranell_2002_t1_cst13_1903k_pO2m9
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id051
         published_page: 63
@@ -3688,7 +3692,7 @@ species:
               locator: *id051
           locator: *id051
     - observation_id: tranell_2002_t1_cst13_1873k_pO2m12
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id052
         published_page: 63
@@ -3760,7 +3764,7 @@ species:
               locator: *id052
           locator: *id052
     - observation_id: tranell_2002_t1_cst14_1873k_pO2m8
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id053
         published_page: 63
@@ -3832,7 +3836,7 @@ species:
               locator: *id053
           locator: *id053
     - observation_id: tranell_2002_t1_cst14_1843k_pO2m9
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id054
         published_page: 63
@@ -3904,7 +3908,7 @@ species:
               locator: *id054
           locator: *id054
     - observation_id: tranell_2002_t1_cst14_1873k_pO2m9
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id055
         published_page: 63
@@ -3976,7 +3980,7 @@ species:
               locator: *id055
           locator: *id055
     - observation_id: tranell_2002_t1_cst14_1903k_pO2m9
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id056
         published_page: 63
@@ -4048,7 +4052,7 @@ species:
               locator: *id056
           locator: *id056
     - observation_id: tranell_2002_t1_cst14_1873k_pO2m12
-      type: valence_ratio
+      type: concentration_series
       regime: melt_equilibration_quench
       locator: &id057
         published_page: 63
