@@ -63,8 +63,8 @@ Table keys:
 Cell text is stored verbatim after stripping surrounding whitespace. Units are
 not converted. Empty cells and cells whose text is only
 ``-``, ``–``, ``—``, or ``−`` are skipped and counted under
-``skipped_empty_or_dash``. They are never written as zero. A cell needs a
-render check if its draft flags include ``comma_decimal_suspect`` or
+``skipped_empty_or_dash``. They are never written as zero. A cell is
+``needs_render_check`` if its draft flags include ``comma_decimal_suspect`` or
 ``ambiguous_comma_separator``, if this command marks it as
 ``fused_superscript``, ``run_together``, ``letter_for_digit``,
 ``stacked_values``, or ``dropped_plusminus``, or if it is numeric in a header
@@ -853,7 +853,7 @@ def compare_extract_to_draft(
     return results
 
 
-# Per-cell render traps. mineru_table_qa imports _LETTER_FOR_DIGIT,
+# Per-cell render traps. mineru_table_qa imports _has_letter_for_digit,
 # _DROPPED_PM_VALUE, _RUN_TOGETHER, and confirm_dropped_plusminus. QA still
 # scores a table only after two hits (_MINIMUM_SIGNAL_HITS); that gate stays
 # in QA, and this module does not import QA. Stacked-values stays here: QA's
@@ -861,11 +861,13 @@ def compare_extract_to_draft(
 # numeric column, so it is not this check. Comma traps reuse this module's
 # cell flags rather than a second detector.
 _LETTER_FOR_DIGIT = re.compile(
-    r"(?<![A-Za-z0-9])[IlO](?:\.\d+|\d+)\s*(?:×|\\times|x)"
-    r"|(?<![A-Za-z0-9])\d+\.[IlO]\s*(?:×|\\times|x)",
-    re.IGNORECASE,
+    r"(?<![A-Za-z0-9])"
+    r"(?P<mantissa>[+\-−]?[0-9IlOS]+(?:\.[0-9IlOS]+)?)"
+    r"\s*(?:×|\\times|x)\s*"
+    r"(?P<scale>[0-9IlOS]+(?:\s*\^\s*\{?[+\-−]?[0-9IlOS]+\}?)?)"
 )
 _RUN_TOGETHER = re.compile(r"\d+\.\d+\.\d")
+_FUSED_SUPERSCRIPT_EXPONENT = re.compile(r"(?<![A-Za-z0-9])10[-−]\d+(?!\w)")
 _NUMBER_TOKEN = re.compile(
     r"(?<![A-Za-z0-9])[+\-−–—]?(?:\d+(?:[.,]\d+)?|\.\d+)"
 )
@@ -1092,6 +1094,9 @@ def printed_formula(text: str) -> str:
 def _stacked_values(text: str) -> bool:
     if _LATEX_OR_CARET.search(text) or _UNCERTAINTY_MARK.search(text):
         return False
+    # A long bare integer can contain stacked values if MinerU lost a line break.
+    if re.fullmatch(r"\d{7,}", text.strip()):
+        return True
     if "\n" in text:
         numbered = [part for part in text.split("\n") if _NUMBER_TOKEN.search(part)]
         if len(numbered) >= 2:
@@ -1101,6 +1106,17 @@ def _stacked_values(text: str) -> bool:
         return False
     gap = text[matches[0].end() : matches[1].start()]
     return gap.strip() == "" and bool(re.search(r"\s", gap))
+
+
+def _has_letter_for_digit(text: str) -> bool:
+    return any(
+        any(
+            char in "IiLlOoSs"
+            for group in ("mantissa", "scale")
+            for char in match.group(group)
+        )
+        for match in _LETTER_FOR_DIGIT.finditer(text)
+    )
 
 
 def confirm_dropped_plusminus(text: str, page_text: str | None) -> str | None:
@@ -1133,13 +1149,16 @@ def _render_traps(cell: Mapping[str, Any], page_text: str | None) -> list[str]:
     value_text = str(cell.get("value_text") or "")
     flags = set(cell.get("flags") or [])
     found: list[str] = []
-    if "^" in value_text and "^" not in text:
+    if (
+        ("^" in value_text and "^" not in text)
+        or _FUSED_SUPERSCRIPT_EXPONENT.search(text)
+    ):
         found.append("fused_superscript")
     if _RUN_TOGETHER.search(text):
         found.append("run_together")
     if flags.intersection({"comma_decimal_suspect", "ambiguous_comma_separator"}):
         found.append("comma_decimal_ambiguous")
-    if _LETTER_FOR_DIGIT.search(text):
+    if _has_letter_for_digit(text):
         found.append("letter_for_digit")
     if _stacked_values(text):
         found.append("stacked_values")

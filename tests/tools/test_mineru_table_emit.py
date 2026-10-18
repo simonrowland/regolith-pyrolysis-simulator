@@ -267,10 +267,17 @@ def test_value_pairs_unwrap_printed_formulas_and_ignore_species_glyphs(
     ("html", "flag"),
     [
         ("<tr><td>1851</td><td>1.23<sup>4</sup></td></tr>", "fused_superscript"),
+        ("<tr><td>1851</td><td>113.70.2</td></tr>", "run_together"),
         ("<tr><td>1851</td><td>1.23.45</td></tr>", "run_together"),
+        ("<tr><td>1851</td><td>3251400</td></tr>", "stacked_values"),
         ("<tr><td>1851</td><td>1,23</td></tr>", "comma_decimal_ambiguous"),
         ("<tr><td>1851</td><td>25,540</td></tr>", "comma_decimal_ambiguous"),
         ("<tr><td>1851</td><td>I.23 × 10</td></tr>", "letter_for_digit"),
+        ("<tr><td>1851</td><td>1O.23 × 10</td></tr>", "letter_for_digit"),
+        ("<tr><td>1851</td><td>l.23 × 10</td></tr>", "letter_for_digit"),
+        ("<tr><td>1851</td><td>1.2S × 10</td></tr>", "letter_for_digit"),
+        ("<tr><td>1851</td><td>1.23 × 1O^-5</td></tr>", "letter_for_digit"),
+        ("<tr><td>1851</td><td>10-7</td></tr>", "fused_superscript"),
         ("<tr><td>1851</td><td>1.2 3.4</td></tr>", "stacked_values"),
         ("<tr><td>1851</td><td>1.2<br>3.4</td></tr>", "stacked_values"),
     ],
@@ -297,13 +304,13 @@ def test_dropped_plusminus_needs_a_confirming_pdftotext_page(tmp_path: Path) -> 
     draft_dir = _convert_html(
         tmp_path,
         "<table><tr><th>T, K</th><th>p</th></tr>"
-        "<tr><td>1800</td><td>1851.02</td></tr></table>",
+        "<tr><td>1800</td><td>1643.15</td></tr></table>",
     )
     plain = _emit(tmp_path / "plain", draft_dir, _base_mapping(_pressure_table()))
     assert "needs_render_check" not in _observations(plain)[0]
-    assert _observations(plain)[0]["values"]["pressure_atm"] == "1851.02"
+    assert _observations(plain)[0]["values"]["pressure_atm"] == "1643.15"
     pdftotext = tmp_path / "layout.txt"
-    pdftotext.write_text("header\n1851 ± 02\n", encoding="utf-8")
+    pdftotext.write_text("header\n1643 ± 15\n", encoding="utf-8")
     with pytest.raises(ValueError, match="needs_render_check \\['dropped_plusminus'\\]"):
         _emit(
             tmp_path / "bare",
@@ -312,7 +319,7 @@ def test_dropped_plusminus_needs_a_confirming_pdftotext_page(tmp_path: Path) -> 
             pdftotext=pdftotext,
         )
     verified = _pressure_table(
-        render_verified=[{"row": 2, "column": 2, "text": "1851±02"}]
+        render_verified=[{"row": 2, "column": 2, "text": "1643±15"}]
     )
     marked = _emit(
         tmp_path / "marked",
@@ -322,7 +329,7 @@ def test_dropped_plusminus_needs_a_confirming_pdftotext_page(tmp_path: Path) -> 
     )
     row = _observations(marked)[0]
     assert "needs_render_check" not in row
-    assert row["values"]["pressure_atm"] == "1851±02"
+    assert row["values"]["pressure_atm"] == "1643±15"
 
 
 def test_numeric_header_row_requires_render_verification_and_is_emitted(

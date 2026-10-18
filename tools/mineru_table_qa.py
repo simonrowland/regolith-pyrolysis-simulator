@@ -248,10 +248,10 @@ def _letter_for_digit_cells(
         ]
         numeric_like = [
             text for text in cells
-            if _number_tokens(text) or draft._LETTER_FOR_DIGIT.search(text)
+            if _number_tokens(text) or draft._has_letter_for_digit(text)
         ]
         if len(numeric_like) >= 2 and len(numeric_like) / len(cells) >= 0.5:
-            hits += sum(bool(draft._LETTER_FOR_DIGIT.search(text)) for text in numeric_like)
+            hits += sum(draft._has_letter_for_digit(text) for text in numeric_like)
     return hits
 
 
