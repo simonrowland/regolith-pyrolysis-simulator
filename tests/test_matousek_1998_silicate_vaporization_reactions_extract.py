@@ -71,6 +71,37 @@ def test_tables_quotes_and_deferred_figures_migrate_cleanly(
         1327,
         1378,
     ]
+    assert [sample["value"] for sample in document["fidelity_samples"]] == [
+        101.325,
+        101.325,
+    ]
+    assert [
+        sample["locator"]["pdf_page_index"]
+        for sample in document["fidelity_samples"]
+    ] == [2, 2]
+
+    other_constants = by_id["matousek_1998_other_equilibrium_constants"]
+    equation_locators = {
+        row["equation"]: row["locator"]["pdf_page_index"]
+        for row in other_constants["values"]["reactions"]
+    }
+    assert equation_locators == {"1": 0, "3": 1, "4": 1}
+    water_constants = by_id["matousek_1998_water_vapor_equilibrium_constants"]
+    assert water_constants["values"]["reactions"][-1]["locator"][
+        "pdf_page_index"
+    ] == 3
+    thresholds = by_id["matousek_1998_approximate_temperature_thresholds"][
+        "values"
+    ]["temperatures_as_printed"]
+    assert [
+        thresholds[key]["locator"]["pdf_page_index"]
+        for key in (
+            "stable_oxide_volatilization",
+            "pure_hydroxide_monomer_dimer_mixture",
+            "water_reaction_with_silica_glass",
+            "preferential_Si_OH4_formation",
+        )
+    ] == [1, 2, 3, 3]
 
     figures = [item for item in context if item["type"] == "figure_only"]
     assert [item["locator"]["figure"] for item in figures] == [
@@ -110,7 +141,7 @@ def test_tables_quotes_and_deferred_figures_migrate_cleanly(
         [6, 7],
         [5, 6],
         [5, 7, 8],
-        [6, 5],
+        [6, 3],
         [0],
     ]
 
