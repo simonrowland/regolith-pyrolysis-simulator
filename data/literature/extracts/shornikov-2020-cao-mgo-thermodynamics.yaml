@@ -1,0 +1,3164 @@
+"schema_version": "literature_extract.v1"
+"source_id": "shornikov-2020-cao-mgo-thermodynamics"
+"source":
+  "citation": "Shornikov, S. I. (2020), Thermodynamic properties of the CaO–MgO melts, Experiment in Geosciences,\
+    \ vol. 26, no. 1, pp. 77–80."
+  "year": 2020
+"extraction":
+  "method": "mineru_table_draft emit"
+  "date": "2026-10-18"
+  "worker": "trial-grok-1018"
+"review_status": "draft"
+"skipped_empty_or_dash":
+  "total": 16
+  "tables":
+  - "page": 2
+    "table_index": 1
+    "count": 0
+  - "page": 2
+    "table_index": 1
+    "count": 1
+  - "page": 3
+    "table_index": 2
+    "count": 15
+"species":
+  "CaO":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r03_c02"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "2900"
+        "column_header": "CaO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "2900"
+        "value": "52.000"
+        "attribution": "Glushko et al., 1978–1982. Table 1 melting enthalpy. The cited source is not stored\
+          \ in this extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2900"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "2900"
+            "column_header": "CaO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r05_c02"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3173"
+        "column_header": "CaO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3173"
+        "value": "59.050"
+        "attribution": "Howald, 1992. Table 1 melting enthalpy. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3173"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3173"
+            "column_header": "CaO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r06_c02"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3200"
+        "column_header": "CaO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3200"
+        "value": "79.496"
+        "attribution": "Barin, 1995. Table 1 melting enthalpy. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3200"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3200"
+            "column_header": "CaO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r07_c02"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3200"
+        "column_header": "CaO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3200"
+        "value": "79.496"
+        "attribution": "Chase, 1998. Table 1 melting enthalpy. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3200"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3200"
+            "column_header": "CaO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r09_c02"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "2845"
+        "column_header": "CaO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "2845"
+        "value": "79.496"
+        "attribution": "Bale et al., 2016. Table 1 melting enthalpy. The cited source is not stored in\
+          \ this extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2845"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "2845"
+            "column_header": "CaO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r10_c02"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3214"
+        "column_header": "CaO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3214"
+        "value": "62.881"
+        "attribution": "The present study. Table 1 melting enthalpy. The cited source is not stored in\
+          \ this extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3214"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3214"
+            "column_header": "CaO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c02"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "CaO"
+        "column_header": "Condensed phases  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-284.532"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "cr"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator": &id001
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c04"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "CaO"
+        "column_header": "Condensed phases  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-279.824"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "l"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator": *id001
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r05_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "CaO"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-111.162"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator": &id012
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r04_c02"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "-"
+        "column_header": "CaO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+        "note": "The Tm cell of this row is a dash. Temperature is not invented."
+      "units": "kJ/mol"
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "value": "68.000"
+        "attribution": "Eliezer et al., 1981. Table 1 melting enthalpy. The Tm cell is a dash, so no temperature\
+          \ is stored. The cited source is not stored in this extract."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 prints a dash for the Eliezer et al., 1981 CaO melting temperature. No\
+              \ temperature is invented."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "-"
+            "column_header": "CaO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_tm_cao_r03"
+      "type": "transition_point"
+      "locator": &id002
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "2900"
+        "column_header": "CaO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "2900"
+        "T_m_K": "2900"
+        "attribution": "Glushko et al., 1978–1982. Table 1 melting temperature. The cited source is not\
+          \ stored in this extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id002
+    - "observation_id": "shornikov_2020_tm_cao_r05"
+      "type": "transition_point"
+      "locator": &id003
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3173"
+        "column_header": "CaO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3173"
+        "T_m_K": "3173"
+        "attribution": "Howald, 1992. Table 1 melting temperature. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id003
+    - "observation_id": "shornikov_2020_tm_cao_r06"
+      "type": "transition_point"
+      "locator": &id004
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3200"
+        "column_header": "CaO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3200"
+        "T_m_K": "3200"
+        "attribution": "Barin, 1995. Table 1 melting temperature. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id004
+    - "observation_id": "shornikov_2020_tm_cao_r07"
+      "type": "transition_point"
+      "locator": &id005
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3200"
+        "column_header": "CaO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3200"
+        "T_m_K": "3200"
+        "attribution": "Chase, 1998. Table 1 melting temperature. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id005
+    - "observation_id": "shornikov_2020_tm_cao_r08"
+      "type": "transition_point"
+      "locator": &id006
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3222"
+        "column_header": "CaO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3222"
+        "T_m_K": "3222"
+        "attribution": "Manara et al., 2014. Table 1 melting temperature. The cited source is not stored\
+          \ in this extract, so the row is quoted_attributed."
+        "T_m_uncertainty_K": "25"
+        "uncertainty_note": "The table cell does not print ±. The introduction prints 3222±25 K for Manara\
+          \ et al., 2014."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id006
+    - "observation_id": "shornikov_2020_tm_cao_r09"
+      "type": "transition_point"
+      "locator": &id007
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "2845"
+        "column_header": "CaO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "2845"
+        "T_m_K": "2845"
+        "attribution": "Bale et al., 2016. Table 1 melting temperature. The cited source is not stored\
+          \ in this extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id007
+    - "observation_id": "shornikov_2020_tm_cao_r10"
+      "type": "transition_point"
+      "locator": &id008
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3214"
+        "column_header": "CaO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3214"
+        "T_m_K": "3214"
+        "attribution": "The present study. Table 1 melting temperature. The cited source is not stored\
+          \ in this extract, so the row is quoted_attributed."
+        "T_m_uncertainty_K": "12"
+        "uncertainty_note": "The table cell does not print ±. The introduction prints 3214±12 K for the\
+          \ present study."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id008
+    - "observation_id": "shornikov_2020_fig2a_line1_CaO_not_sampled"
+      "type": "activity_coefficient"
+      "locator": &id009
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "a"
+        "published_page": 79
+        "note": "Figure 2 panel a series 1 (CaO). Calculated curve. No data markers. Not sampled."
+      "phase": "l"
+      "units": "dimensionless"
+      "T_K": "2973"
+      "standard_state":
+        "state":
+          "tag": "unknown"
+          "reason": "The caption does not state the activity standard state."
+        "locator": *id009
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "published_page": 79
+            "note": "Figure 2 caption: series 1 at 2973 K."
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token,\
+              \ so the read mole percent is not stored as a mole fraction."
+          "locator": *id009
+      "values":
+        "quantity": "activity"
+        "method_class": "quoted_attributed"
+        "formula": "CaO"
+        "T_K": "2973"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "reason": "Calculated curve without data markers. The caption identifies series 1 as present study.\
+          \ No numeric points were read."
+        "attribution": "Figure 2 caption: activities calculated in the present study (1, 2, 4, 5) or by\
+          \ Wu et al. (1993) (3, 6). The minimizer inputs are not itemized, so the curve is not model_derived."
+    - "observation_id": "shornikov_2020_fig2a_line2_CaO_not_sampled"
+      "type": "activity_coefficient"
+      "locator": &id010
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "a"
+        "published_page": 79
+        "note": "Figure 2 panel a series 2 (CaO). Calculated curve. No data markers. Not sampled."
+      "phase": "l"
+      "units": "dimensionless"
+      "T_K": "3173"
+      "standard_state":
+        "state":
+          "tag": "unknown"
+          "reason": "The caption does not state the activity standard state."
+        "locator": *id010
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3173"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "published_page": 79
+            "note": "Figure 2 caption: series 2 at 3173 K."
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token,\
+              \ so the read mole percent is not stored as a mole fraction."
+          "locator": *id010
+      "values":
+        "quantity": "activity"
+        "method_class": "quoted_attributed"
+        "formula": "CaO"
+        "T_K": "3173"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "reason": "Calculated curve without data markers. The caption identifies series 2 as present study.\
+          \ No numeric points were read."
+        "attribution": "Figure 2 caption: activities calculated in the present study (1, 2, 4, 5) or by\
+          \ Wu et al. (1993) (3, 6). The minimizer inputs are not itemized, so the curve is not model_derived."
+    - "observation_id": "shornikov_2020_fig2a_line3_CaO_not_sampled"
+      "type": "activity_coefficient"
+      "locator": &id011
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "a"
+        "published_page": 79
+        "note": "Figure 2 panel a series 3 (CaO). Calculated curve. No data markers. Not sampled."
+      "phase": "l"
+      "units": "dimensionless"
+      "T_K": "2973"
+      "standard_state":
+        "state":
+          "tag": "unknown"
+          "reason": "The caption does not state the activity standard state."
+        "locator": *id011
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "published_page": 79
+            "note": "Figure 2 caption: series 3 at 2973 K."
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token,\
+              \ so the read mole percent is not stored as a mole fraction."
+          "locator": *id011
+      "values":
+        "quantity": "activity"
+        "method_class": "quoted_attributed"
+        "formula": "CaO"
+        "T_K": "2973"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "reason": "Calculated curve without data markers. The caption identifies series 3 as Wu et al.\
+          \ (1993). No numeric points were read."
+        "attribution": "Figure 2 caption: activities calculated in the present study (1, 2, 4, 5) or by\
+          \ Wu et al. (1993) (3, 6). The minimizer inputs are not itemized, so the curve is not model_derived."
+  "MgO":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r03_c05"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3100"
+        "column_header": "MgO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3100"
+        "value": "77.000"
+        "attribution": "Glushko et al., 1978–1982. Table 1 melting enthalpy. The cited source is not stored\
+          \ in this extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3100"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3100"
+            "column_header": "MgO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r04_c05"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3105"
+        "column_header": "MgO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3105"
+        "value": "57.650"
+        "attribution": "Howald & Roy, 1991. Table 1 melting enthalpy. The cited source is not stored in\
+          \ this extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3105"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3105"
+            "column_header": "MgO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r05_c05"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3105"
+        "column_header": "MgO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3105"
+        "value": "74.200"
+        "attribution": "Howald, 1992. Table 1 melting enthalpy. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3105"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3105"
+            "column_header": "MgO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r06_c05"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3105"
+        "column_header": "MgO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3105"
+        "value": "77.822"
+        "attribution": "Barin, 1995. Table 1 melting enthalpy. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3105"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3105"
+            "column_header": "MgO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r07_c05"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3105"
+        "column_header": "MgO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3105"
+        "value": "77.822"
+        "attribution": "Chase, 1998. Table 1 melting enthalpy. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3105"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3105"
+            "column_header": "MgO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r09_c05"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3098"
+        "column_header": "MgO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3098"
+        "value": "77.402"
+        "attribution": "Bale et al., 2016. Table 1 melting enthalpy. The cited source is not stored in\
+          \ this extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3098"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3098"
+            "column_header": "MgO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r10_c05"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3246"
+        "column_header": "MgO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3246"
+        "value": "63.718"
+        "attribution": "The present study. Table 1 melting enthalpy. The cited source is not stored in\
+          \ this extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3246"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3246"
+            "column_header": "MgO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r05_c02"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "MgO"
+        "column_header": "Condensed phases  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-298.386"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "cr"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator": *id012
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r05_c04"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "MgO"
+        "column_header": "Condensed phases  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-293.027"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "l"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator": *id012
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r08_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "MgO"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-172.921"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+    - "observation_id": "shornikov_2020_tm_mgo_r03"
+      "type": "transition_point"
+      "locator": &id013
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3100"
+        "column_header": "MgO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3100"
+        "T_m_K": "3100"
+        "attribution": "Glushko et al., 1978–1982. Table 1 melting temperature. The cited source is not\
+          \ stored in this extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id013
+    - "observation_id": "shornikov_2020_tm_mgo_r04"
+      "type": "transition_point"
+      "locator": &id014
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3105"
+        "column_header": "MgO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3105"
+        "T_m_K": "3105"
+        "attribution": "Howald & Roy, 1991. Table 1 melting temperature. The cited source is not stored\
+          \ in this extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id014
+    - "observation_id": "shornikov_2020_tm_mgo_r05"
+      "type": "transition_point"
+      "locator": &id015
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3105"
+        "column_header": "MgO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3105"
+        "T_m_K": "3105"
+        "attribution": "Howald, 1992. Table 1 melting temperature. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id015
+    - "observation_id": "shornikov_2020_tm_mgo_r06"
+      "type": "transition_point"
+      "locator": &id016
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3105"
+        "column_header": "MgO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3105"
+        "T_m_K": "3105"
+        "attribution": "Barin, 1995. Table 1 melting temperature. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id016
+    - "observation_id": "shornikov_2020_tm_mgo_r07"
+      "type": "transition_point"
+      "locator": &id017
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3105"
+        "column_header": "MgO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3105"
+        "T_m_K": "3105"
+        "attribution": "Chase, 1998. Table 1 melting temperature. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id017
+    - "observation_id": "shornikov_2020_tm_mgo_r08"
+      "type": "transition_point"
+      "locator": &id018
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3250"
+        "column_header": "MgO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3250"
+        "T_m_K": "3250"
+        "attribution": "Ronchi & Sheindlin, 2001. Table 1 melting temperature. The cited source is not\
+          \ stored in this extract, so the row is quoted_attributed."
+        "T_m_uncertainty_K": "20"
+        "uncertainty_note": "The table cell does not print ±. The introduction prints 3250±20 K for Ronchi\
+          \ & Sheindlin, 2001."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id018
+    - "observation_id": "shornikov_2020_tm_mgo_r09"
+      "type": "transition_point"
+      "locator": &id019
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3098"
+        "column_header": "MgO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3098"
+        "T_m_K": "3098"
+        "attribution": "Bale et al., 2016. Table 1 melting temperature. The cited source is not stored\
+          \ in this extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id019
+    - "observation_id": "shornikov_2020_tm_mgo_r10"
+      "type": "transition_point"
+      "locator": &id020
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3246"
+        "column_header": "MgO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3246"
+        "T_m_K": "3246"
+        "attribution": "The present study. Table 1 melting temperature. The cited source is not stored\
+          \ in this extract, so the row is quoted_attributed."
+        "T_m_uncertainty_K": "13"
+        "uncertainty_note": "The table cell does not print ±. The introduction prints 3246±13 K for the\
+          \ present study."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id020
+    - "observation_id": "shornikov_2020_fig2a_line4_MgO_not_sampled"
+      "type": "activity_coefficient"
+      "locator": &id021
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "a"
+        "published_page": 79
+        "note": "Figure 2 panel a series 4 (MgO). Calculated curve. No data markers. Not sampled."
+      "phase": "l"
+      "units": "dimensionless"
+      "T_K": "2973"
+      "standard_state":
+        "state":
+          "tag": "unknown"
+          "reason": "The caption does not state the activity standard state."
+        "locator": *id021
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "published_page": 79
+            "note": "Figure 2 caption: series 4 at 2973 K."
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token,\
+              \ so the read mole percent is not stored as a mole fraction."
+          "locator": *id021
+      "values":
+        "quantity": "activity"
+        "method_class": "quoted_attributed"
+        "formula": "MgO"
+        "T_K": "2973"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "reason": "Calculated curve without data markers. The caption identifies series 4 as present study.\
+          \ No numeric points were read."
+        "attribution": "Figure 2 caption: activities calculated in the present study (1, 2, 4, 5) or by\
+          \ Wu et al. (1993) (3, 6). The minimizer inputs are not itemized, so the curve is not model_derived."
+    - "observation_id": "shornikov_2020_fig2a_line5_MgO_not_sampled"
+      "type": "activity_coefficient"
+      "locator": &id022
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "a"
+        "published_page": 79
+        "note": "Figure 2 panel a series 5 (MgO). Calculated curve. No data markers. Not sampled."
+      "phase": "l"
+      "units": "dimensionless"
+      "T_K": "3173"
+      "standard_state":
+        "state":
+          "tag": "unknown"
+          "reason": "The caption does not state the activity standard state."
+        "locator": *id022
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3173"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "published_page": 79
+            "note": "Figure 2 caption: series 5 at 3173 K."
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token,\
+              \ so the read mole percent is not stored as a mole fraction."
+          "locator": *id022
+      "values":
+        "quantity": "activity"
+        "method_class": "quoted_attributed"
+        "formula": "MgO"
+        "T_K": "3173"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "reason": "Calculated curve without data markers. The caption identifies series 5 as present study.\
+          \ No numeric points were read."
+        "attribution": "Figure 2 caption: activities calculated in the present study (1, 2, 4, 5) or by\
+          \ Wu et al. (1993) (3, 6). The minimizer inputs are not itemized, so the curve is not model_derived."
+    - "observation_id": "shornikov_2020_fig2a_line6_MgO_not_sampled"
+      "type": "activity_coefficient"
+      "locator": &id023
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "a"
+        "published_page": 79
+        "note": "Figure 2 panel a series 6 (MgO). Calculated curve. No data markers. Not sampled."
+      "phase": "l"
+      "units": "dimensionless"
+      "T_K": "2973"
+      "standard_state":
+        "state":
+          "tag": "unknown"
+          "reason": "The caption does not state the activity standard state."
+        "locator": *id023
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "published_page": 79
+            "note": "Figure 2 caption: series 6 at 2973 K."
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token,\
+              \ so the read mole percent is not stored as a mole fraction."
+          "locator": *id023
+      "values":
+        "quantity": "activity"
+        "method_class": "quoted_attributed"
+        "formula": "MgO"
+        "T_K": "2973"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "reason": "Calculated curve without data markers. The caption identifies series 6 as Wu et al.\
+          \ (1993). No numeric points were read."
+        "attribution": "Figure 2 caption: activities calculated in the present study (1, 2, 4, 5) or by\
+          \ Wu et al. (1993) (3, 6). The minimizer inputs are not itemized, so the curve is not model_derived."
+  "Ca":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "Ca"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-106.479"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator": *id001
+  "CaMgO2":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r04_c02"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "$CaMgO_{2}$"
+        "column_header": "Condensed phases  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-592.680"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "cr"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator": &id024
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+  "Ca2":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r04_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "$Ca_{2}$"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-25.522"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator": *id024
+  "Mg":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r06_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "Mg"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-139.971"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+  "Mg2":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r07_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "$Mg_{2}$"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-38.102"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+  "O":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r09_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "O"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "56.337"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+  "O2":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r10_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "$O_{2}$"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "0.000"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+  "O3":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r11_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "$O_{3}$"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "320.027"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+  "O4":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r12_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "$O_{4}$"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "284.677"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+  "CaO-MgO":
+    "observations":
+    - "observation_id": "shornikov_2020_fig1_s1_01"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 1 left-half teal"
+        "note": "Figure 1 symbol 1 (left-half teal), Ruff et al., 1933. The caption year for symbol 3\
+          \ is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2960.8"
+        "T_K_read_2": "2960.6"
+        "cao_mol_pct_read": "20.01"
+        "cao_mol_pct_read_2": "19.92"
+        "embedded_px_read_1":
+        - 206.08
+        - 136.5
+        "embedded_px_read_2":
+        - 205.58
+        - 136.56
+        "page_600dpi_px_read_1":
+        - 925.9
+        - 2536.8
+        "page_600dpi_px_read_2":
+        - 924.4
+        - 2537.0
+        "read_uncertainty_K": "0.0673"
+        "read_uncertainty_mol_pct": "0.045"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": &id025
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition": &id026
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token,\
+              \ so the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s1_02"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 1 left-half teal"
+        "note": "Figure 1 symbol 1 (left-half teal), Ruff et al., 1933. The caption year for symbol 3\
+          \ is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2896.8"
+        "T_K_read_2": "2896.8"
+        "cao_mol_pct_read": "70.09"
+        "cao_mol_pct_read_2": "70.01"
+        "embedded_px_read_1":
+        - 483.97
+        - 165.49
+        "embedded_px_read_2":
+        - 483.53
+        - 165.5
+        "page_600dpi_px_read_1":
+        - 1760.4
+        - 2623.8
+        "page_600dpi_px_read_2":
+        - 1759.0
+        - 2623.9
+        "read_uncertainty_K": "0.0127"
+        "read_uncertainty_mol_pct": "0.0402"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s1_03"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 1 left-half teal"
+        "note": "Figure 1 symbol 1 (left-half teal), Ruff et al., 1933. The caption year for symbol 3\
+          \ is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2859.0"
+        "T_K_read_2": "2859.0"
+        "cao_mol_pct_read": "30.05"
+        "cao_mol_pct_read_2": "29.97"
+        "embedded_px_read_1":
+        - 261.8
+        - 182.66
+        "embedded_px_read_2":
+        - 261.35
+        - 182.65
+        "page_600dpi_px_read_1":
+        - 1093.2
+        - 2675.4
+        "page_600dpi_px_read_2":
+        - 1091.9
+        - 2675.3
+        "read_uncertainty_K": "0.0133"
+        "read_uncertainty_mol_pct": "0.0405"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s1_04"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 1 left-half teal"
+        "note": "Figure 1 symbol 1 (left-half teal), Ruff et al., 1933. The caption year for symbol 3\
+          \ is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2817.2"
+        "T_K_read_2": "2817.1"
+        "cao_mol_pct_read": "60.10"
+        "cao_mol_pct_read_2": "60.02"
+        "embedded_px_read_1":
+        - 428.55
+        - 201.6
+        "embedded_px_read_2":
+        - 428.09
+        - 201.65
+        "page_600dpi_px_read_1":
+        - 1593.9
+        - 2732.2
+        "page_600dpi_px_read_2":
+        - 1592.6
+        - 2732.4
+        "read_uncertainty_K": "0.0476"
+        "read_uncertainty_mol_pct": "0.0416"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s1_05"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 1 left-half teal"
+        "note": "Figure 1 symbol 1 (left-half teal), Ruff et al., 1933. The caption year for symbol 3\
+          \ is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2780.2"
+        "T_K_read_2": "2780.1"
+        "cao_mol_pct_read": "35.03"
+        "cao_mol_pct_read_2": "34.96"
+        "embedded_px_read_1":
+        - 289.41
+        - 218.4
+        "embedded_px_read_2":
+        - 289.03
+        - 218.41
+        "page_600dpi_px_read_1":
+        - 1176.1
+        - 2782.7
+        "page_600dpi_px_read_2":
+        - 1175.0
+        - 2782.7
+        "read_uncertainty_K": "0.0113"
+        "read_uncertainty_mol_pct": "0.0344"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s1_06"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 1 left-half teal"
+        "note": "Figure 1 symbol 1 (left-half teal), Ruff et al., 1933. The caption year for symbol 3\
+          \ is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2724.3"
+        "T_K_read_2": "2724.2"
+        "cao_mol_pct_read": "40.05"
+        "cao_mol_pct_read_2": "39.97"
+        "embedded_px_read_1":
+        - 317.29
+        - 243.75
+        "embedded_px_read_2":
+        - 316.85
+        - 243.76
+        "page_600dpi_px_read_1":
+        - 1259.9
+        - 2858.7
+        "page_600dpi_px_read_2":
+        - 1258.5
+        - 2858.8
+        "read_uncertainty_K": "0.021"
+        "read_uncertainty_mol_pct": "0.0397"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s1_07"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 1 left-half teal"
+        "note": "Figure 1 symbol 1 (left-half teal), Ruff et al., 1933. The caption year for symbol 3\
+          \ is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2634.8"
+        "T_K_read_2": "2634.7"
+        "cao_mol_pct_read": "45.10"
+        "cao_mol_pct_read_2": "44.99"
+        "embedded_px_read_1":
+        - 345.28
+        - 284.34
+        "embedded_px_read_2":
+        - 344.72
+        - 284.38
+        "page_600dpi_px_read_1":
+        - 1343.9
+        - 2980.6
+        "page_600dpi_px_read_2":
+        - 1342.2
+        - 2980.7
+        "read_uncertainty_K": "0.0546"
+        "read_uncertainty_mol_pct": "0.0509"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s2_01"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "3072.4"
+        "T_K_read_2": "3072.4"
+        "cao_mol_pct_read": "-0.05"
+        "cao_mol_pct_read_2": "-0.05"
+        "embedded_px_read_1":
+        - 94.72
+        - 85.86
+        "embedded_px_read_2":
+        - 94.71
+        - 85.88
+        "page_600dpi_px_read_1":
+        - 591.5
+        - 2384.8
+        "page_600dpi_px_read_2":
+        - 591.5
+        - 2384.9
+        "read_uncertainty_K": "0.0256"
+        "read_uncertainty_mol_pct": "0.001"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s2_02"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2998.8"
+        "T_K_read_2": "2998.7"
+        "cao_mol_pct_read": "9.98"
+        "cao_mol_pct_read_2": "9.98"
+        "embedded_px_read_1":
+        - 150.37
+        - 119.26
+        "embedded_px_read_2":
+        - 150.38
+        - 119.31
+        "page_600dpi_px_read_1":
+        - 758.6
+        - 2485.1
+        "page_600dpi_px_read_2":
+        - 758.7
+        - 2485.2
+        "read_uncertainty_K": "0.0489"
+        "read_uncertainty_mol_pct": "0.0013"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s2_03"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2901.9"
+        "T_K_read_2": "2901.9"
+        "cao_mol_pct_read": "19.94"
+        "cao_mol_pct_read_2": "19.94"
+        "embedded_px_read_1":
+        - 205.69
+        - 163.18
+        "embedded_px_read_2":
+        - 205.68
+        - 163.18
+        "page_600dpi_px_read_1":
+        - 924.7
+        - 2616.9
+        "page_600dpi_px_read_2":
+        - 924.7
+        - 2616.9
+        "read_uncertainty_K": "0.0053"
+        "read_uncertainty_mol_pct": "0.0013"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s2_04"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2843.1"
+        "T_K_read_2": "2843.2"
+        "cao_mol_pct_read": "100.06"
+        "cao_mol_pct_read_2": "100.06"
+        "embedded_px_read_1":
+        - 650.32
+        - 189.84
+        "embedded_px_read_2":
+        - 650.32
+        - 189.82
+        "page_600dpi_px_read_1":
+        - 2259.9
+        - 2696.9
+        "page_600dpi_px_read_2":
+        - 2259.9
+        - 2696.9
+        "read_uncertainty_K": "0.0157"
+        "read_uncertainty_mol_pct": "0.0004"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s2_05"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2837.1"
+        "T_K_read_2": "2837.1"
+        "cao_mol_pct_read": "90.04"
+        "cao_mol_pct_read_2": "90.05"
+        "embedded_px_read_1":
+        - 594.73
+        - 192.6
+        "embedded_px_read_2":
+        - 594.75
+        - 192.56
+        "page_600dpi_px_read_1":
+        - 2092.9
+        - 2705.2
+        "page_600dpi_px_read_2":
+        - 2093.0
+        - 2705.1
+        "read_uncertainty_K": "0.0409"
+        "read_uncertainty_mol_pct": "0.0021"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s2_06"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates. A coincident axis\
+          \ uses a half-pixel width, not a zero uncertainty."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2824.0"
+        "T_K_read_2": "2824.0"
+        "cao_mol_pct_read": "80.03"
+        "cao_mol_pct_read_2": "80.03"
+        "embedded_px_read_1":
+        - 539.18
+        - 198.5
+        "embedded_px_read_2":
+        - 539.17
+        - 198.5
+        "page_600dpi_px_read_1":
+        - 1926.2
+        - 2722.9
+        "page_600dpi_px_read_2":
+        - 1926.1
+        - 2722.9
+        "read_uncertainty_K": "1.1025"
+        "read_uncertainty_mol_pct": "0.0016"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s2_07"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2802.9"
+        "T_K_read_2": "2802.8"
+        "cao_mol_pct_read": "70.02"
+        "cao_mol_pct_read_2": "70.02"
+        "embedded_px_read_1":
+        - 483.6
+        - 208.09
+        "embedded_px_read_2":
+        - 483.62
+        - 208.12
+        "page_600dpi_px_read_1":
+        - 1759.3
+        - 2751.7
+        "page_600dpi_px_read_2":
+        - 1759.3
+        - 2751.8
+        "read_uncertainty_K": "0.0255"
+        "read_uncertainty_mol_pct": "0.0016"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s2_08"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2774.0"
+        "T_K_read_2": "2774.0"
+        "cao_mol_pct_read": "30.00"
+        "cao_mol_pct_read_2": "29.99"
+        "embedded_px_read_1":
+        - 261.48
+        - 221.2
+        "embedded_px_read_2":
+        - 261.47
+        - 221.19
+        "page_600dpi_px_read_1":
+        - 1092.3
+        - 2791.1
+        "page_600dpi_px_read_2":
+        - 1092.2
+        - 2791.0
+        "read_uncertainty_K": "0.0065"
+        "read_uncertainty_mol_pct": "0.0006"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s2_09"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2756.9"
+        "T_K_read_2": "2756.8"
+        "cao_mol_pct_read": "60.02"
+        "cao_mol_pct_read_2": "60.03"
+        "embedded_px_read_1":
+        - 428.1
+        - 228.96
+        "embedded_px_read_2":
+        - 428.18
+        - 228.97
+        "page_600dpi_px_read_1":
+        - 1592.6
+        - 2814.3
+        "page_600dpi_px_read_2":
+        - 1592.8
+        - 2814.4
+        "read_uncertainty_K": "0.0142"
+        "read_uncertainty_mol_pct": "0.0065"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s2_10"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2708.3"
+        "T_K_read_2": "2708.2"
+        "cao_mol_pct_read": "34.99"
+        "cao_mol_pct_read_2": "34.99"
+        "embedded_px_read_1":
+        - 289.21
+        - 251.01
+        "embedded_px_read_2":
+        - 289.21
+        - 251.03
+        "page_600dpi_px_read_1":
+        - 1175.5
+        - 2880.5
+        "page_600dpi_px_read_2":
+        - 1175.5
+        - 2880.6
+        "read_uncertainty_K": "0.0261"
+        "read_uncertainty_mol_pct": "0.0004"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s2_11"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2652.2"
+        "T_K_read_2": "2651.8"
+        "cao_mol_pct_read": "40.16"
+        "cao_mol_pct_read_2": "40.18"
+        "embedded_px_read_1":
+        - 317.89
+        - 276.45
+        "embedded_px_read_2":
+        - 317.97
+        - 276.61
+        "page_600dpi_px_read_1":
+        - 1261.7
+        - 2956.9
+        "page_600dpi_px_read_2":
+        - 1261.9
+        - 2957.4
+        "read_uncertainty_K": "0.1741"
+        "read_uncertainty_mol_pct": "0.0073"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s2_12"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2636.1"
+        "T_K_read_2": "2636.5"
+        "cao_mol_pct_read": "42.36"
+        "cao_mol_pct_read_2": "42.09"
+        "embedded_px_read_1":
+        - 330.11
+        - 283.75
+        "embedded_px_read_2":
+        - 328.62
+        - 283.56
+        "page_600dpi_px_read_1":
+        - 1298.4
+        - 2978.8
+        "page_600dpi_px_read_2":
+        - 1293.9
+        - 2978.3
+        "read_uncertainty_K": "0.2018"
+        "read_uncertainty_mol_pct": "0.1342"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s2_13"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2599.6"
+        "T_K_read_2": "2599.2"
+        "cao_mol_pct_read": "45.51"
+        "cao_mol_pct_read_2": "45.51"
+        "embedded_px_read_1":
+        - 347.6
+        - 300.3
+        "embedded_px_read_2":
+        - 347.57
+        - 300.47
+        "page_600dpi_px_read_1":
+        - 1350.9
+        - 3028.5
+        "page_600dpi_px_read_2":
+        - 1350.8
+        - 3029.0
+        "read_uncertainty_K": "0.1922"
+        "read_uncertainty_mol_pct": "0.0029"
+        "read_1_method": "circle_fit"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s3_01"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "3103.0"
+        "T_K_read_2": "3102.8"
+        "cao_mol_pct_read": "-0.36"
+        "cao_mol_pct_read_2": "-0.37"
+        "embedded_px_read_1":
+        - 92.99
+        - 71.99
+        "embedded_px_read_2":
+        - 92.97
+        - 72.07
+        "page_600dpi_px_read_1":
+        - 586.3
+        - 2343.2
+        "page_600dpi_px_read_2":
+        - 586.2
+        - 2343.4
+        "read_uncertainty_K": "0.0824"
+        "read_uncertainty_mol_pct": "0.0023"
+        "read_1_method": "disk_convolution_peak"
+        "read_2_method": "pixel_centroid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s3_02"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "3005.7"
+        "T_K_read_2": "3003.4"
+        "cao_mol_pct_read": "14.98"
+        "cao_mol_pct_read_2": "15.17"
+        "embedded_px_read_1":
+        - 178.12
+        - 116.12
+        "embedded_px_read_2":
+        - 179.17
+        - 117.17
+        "page_600dpi_px_read_1":
+        - 842.0
+        - 2475.7
+        "page_600dpi_px_read_2":
+        - 845.1
+        - 2478.8
+        "read_uncertainty_K": "1.1539"
+        "read_uncertainty_mol_pct": "0.0943"
+        "read_1_method": "disk_convolution_peak"
+        "read_2_method": "pixel_centroid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s3_03"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2908.8"
+        "T_K_read_2": "2907.5"
+        "cao_mol_pct_read": "3.97"
+        "cao_mol_pct_read_2": "3.87"
+        "embedded_px_read_1":
+        - 117.01
+        - 160.06
+        "embedded_px_read_2":
+        - 116.46
+        - 160.63
+        "page_600dpi_px_read_1":
+        - 658.4
+        - 2607.5
+        "page_600dpi_px_read_2":
+        - 656.8
+        - 2609.3
+        "read_uncertainty_K": "0.6292"
+        "read_uncertainty_mol_pct": "0.0495"
+        "read_1_method": "disk_convolution_peak"
+        "read_2_method": "pixel_centroid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s3_04"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2901.9"
+        "T_K_read_2": "2898.8"
+        "cao_mol_pct_read": "100.00"
+        "cao_mol_pct_read_2": "100.04"
+        "embedded_px_read_1":
+        - 650.02
+        - 163.17
+        "embedded_px_read_2":
+        - 650.23
+        - 164.59
+        "page_600dpi_px_read_1":
+        - 2259.0
+        - 2616.9
+        "page_600dpi_px_read_2":
+        - 2259.6
+        - 2621.1
+        "read_uncertainty_K": "1.5679"
+        "read_uncertainty_mol_pct": "0.0188"
+        "read_1_method": "disk_convolution_peak"
+        "read_2_method": "pixel_centroid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s3_05"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2895.4"
+        "T_K_read_2": "2892.8"
+        "cao_mol_pct_read": "32.60"
+        "cao_mol_pct_read_2": "32.46"
+        "embedded_px_read_1":
+        - 275.91
+        - 166.14
+        "embedded_px_read_2":
+        - 275.17
+        - 167.3
+        "page_600dpi_px_read_1":
+        - 1135.6
+        - 2625.8
+        "page_600dpi_px_read_2":
+        - 1133.4
+        - 2629.3
+        "read_uncertainty_K": "1.2774"
+        "read_uncertainty_mol_pct": "0.0666"
+        "read_1_method": "disk_convolution_peak"
+        "read_2_method": "pixel_centroid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s3_06"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2807.3"
+        "T_K_read_2": "2805.7"
+        "cao_mol_pct_read": "5.57"
+        "cao_mol_pct_read_2": "5.44"
+        "embedded_px_read_1":
+        - 125.9
+        - 206.09
+        "embedded_px_read_2":
+        - 125.2
+        - 206.81
+        "page_600dpi_px_read_1":
+        - 685.1
+        - 2745.7
+        "page_600dpi_px_read_2":
+        - 683.0
+        - 2747.9
+        "read_uncertainty_K": "0.8032"
+        "read_uncertainty_mol_pct": "0.0637"
+        "read_1_method": "disk_convolution_peak"
+        "read_2_method": "pixel_centroid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s3_07"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2745.5"
+        "T_K_read_2": "2743.2"
+        "cao_mol_pct_read": "74.07"
+        "cao_mol_pct_read_2": "74.21"
+        "embedded_px_read_1":
+        - 506.09
+        - 234.11
+        "embedded_px_read_2":
+        - 506.88
+        - 235.17
+        "page_600dpi_px_read_1":
+        - 1826.8
+        - 2829.8
+        "page_600dpi_px_read_2":
+        - 1829.2
+        - 2833.0
+        "read_uncertainty_K": "1.1647"
+        "read_uncertainty_mol_pct": "0.0718"
+        "read_1_method": "disk_convolution_peak"
+        "read_2_method": "pixel_centroid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s3_08"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2706.1"
+        "T_K_read_2": "2706.4"
+        "cao_mol_pct_read": "84.32"
+        "cao_mol_pct_read_2": "84.26"
+        "embedded_px_read_1":
+        - 562.98
+        - 251.99
+        "embedded_px_read_2":
+        - 562.65
+        - 251.85
+        "page_600dpi_px_read_1":
+        - 1997.6
+        - 2883.5
+        "page_600dpi_px_read_2":
+        - 1996.6
+        - 2883.1
+        "read_uncertainty_K": "0.1567"
+        "read_uncertainty_mol_pct": "0.029"
+        "read_1_method": "disk_convolution_peak"
+        "read_2_method": "pixel_centroid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s3_09"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2646.2"
+        "T_K_read_2": "2643.5"
+        "cao_mol_pct_read": "59.29"
+        "cao_mol_pct_read_2": "59.35"
+        "embedded_px_read_1":
+        - 424.04
+        - 279.14
+        "embedded_px_read_2":
+        - 424.39
+        - 280.37
+        "page_600dpi_px_read_1":
+        - 1580.4
+        - 2965.0
+        "page_600dpi_px_read_2":
+        - 1581.5
+        - 2968.7
+        "read_uncertainty_K": "1.3541"
+        "read_uncertainty_mol_pct": "0.0319"
+        "read_1_method": "disk_convolution_peak"
+        "read_2_method": "pixel_centroid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s3_10"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2609.0"
+        "T_K_read_2": "2608.4"
+        "cao_mol_pct_read": "80.71"
+        "cao_mol_pct_read_2": "80.61"
+        "embedded_px_read_1":
+        - 542.97
+        - 296.02
+        "embedded_px_read_2":
+        - 542.41
+        - 296.29
+        "page_600dpi_px_read_1":
+        - 1937.5
+        - 3015.7
+        "page_600dpi_px_read_2":
+        - 1935.8
+        - 3016.5
+        "read_uncertainty_K": "0.2963"
+        "read_uncertainty_mol_pct": "0.0506"
+        "read_1_method": "disk_convolution_peak"
+        "read_2_method": "pixel_centroid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s3_11"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol\
+          \ 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear\
+          \ T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2604.6"
+        "T_K_read_2": "2604.5"
+        "cao_mol_pct_read": "6.47"
+        "cao_mol_pct_read_2": "6.36"
+        "embedded_px_read_1":
+        - 130.92
+        - 298.0
+        "embedded_px_read_2":
+        - 130.32
+        - 298.05
+        "page_600dpi_px_read_1":
+        - 700.2
+        - 3021.6
+        "page_600dpi_px_read_2":
+        - 698.4
+        - 3021.8
+        "read_uncertainty_K": "0.0529"
+        "read_uncertainty_mol_pct": "0.054"
+        "read_1_method": "disk_convolution_peak"
+        "read_2_method": "pixel_centroid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    - "observation_id": "shornikov_2020_fig1_s4_01"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 4 half-red disk, red on the lower half"
+        "note": "Figure 1 symbol 4 (half-red disk, red on the lower half), Foex, 1968. The caption year\
+          \ for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is\
+          \ kept. Linear T (K) versus mol% CaO. Read 1 and read 2 are independent centre estimates."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "phase_diagram_temperature"
+        "T_K": "2685.8"
+        "T_K_read_2": "2686.2"
+        "cao_mol_pct_read": "50.01"
+        "cao_mol_pct_read_2": "49.99"
+        "embedded_px_read_1":
+        - 372.58
+        - 261.19
+        "embedded_px_read_2":
+        - 372.46
+        - 261.0
+        "page_600dpi_px_read_1":
+        - 1425.9
+        - 2911.1
+        "page_600dpi_px_read_2":
+        - 1425.5
+        - 2910.5
+        "read_uncertainty_K": "0.2086"
+        "read_uncertainty_mol_pct": "0.0105"
+        "read_1_method": "circle_fit_red_rim_and_fill"
+        "read_2_method": "chord_midpoints"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al.,\
+          \ 1933; Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored,\
+          \ so the marker is figure_only."
+      "point_conditions":
+        "total_pressure_Pa": *id025
+        "composition": *id026
+    "context":
+    - "observation_id": "shornikov_2020_fig2b_series1_mixing_energy"
+      "type": "figure_mixing_energy"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "published_page": 79
+        "note": "Figure 2 panel b series 1 at 2973 K, present study. Calculated curve. No data markers.\
+          \ Not sampled."
+      "units": "kJ/mol"
+      "values":
+        "quantity_as_printed": "ΔG^m, kJ/mol"
+        "method_class": "figure_only"
+        "temperature_K_as_printed": "2973"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "value_as_printed": "not sampled"
+        "schema_gap": "The ordinate is the mixing energy ΔG^m in kJ/mol. Quantity has no mixing-energy\
+          \ token, so the curve is context and is not stored as delta_fG."
+        "attribution": "Figure 2 caption: mixing energies; series 1 is present study at 2973 K. Panel\
+          \ b shows curves, not markers."
+    - "observation_id": "shornikov_2020_fig2b_series2_mixing_energy"
+      "type": "figure_mixing_energy"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "published_page": 79
+        "note": "Figure 2 panel b series 2 at 3173 K, present study. Calculated curve. No data markers.\
+          \ Not sampled."
+      "units": "kJ/mol"
+      "values":
+        "quantity_as_printed": "ΔG^m, kJ/mol"
+        "method_class": "figure_only"
+        "temperature_K_as_printed": "3173"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "value_as_printed": "not sampled"
+        "schema_gap": "The ordinate is the mixing energy ΔG^m in kJ/mol. Quantity has no mixing-energy\
+          \ token, so the curve is context and is not stored as delta_fG."
+        "attribution": "Figure 2 caption: mixing energies; series 2 is present study at 3173 K. Panel\
+          \ b shows curves, not markers."
+    - "observation_id": "shornikov_2020_fig2b_series3_mixing_energy"
+      "type": "figure_mixing_energy"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "published_page": 79
+        "note": "Figure 2 panel b series 3 at 2973 K, Wu et al. (1993). Calculated curve. No data markers.\
+          \ Not sampled."
+      "units": "kJ/mol"
+      "values":
+        "quantity_as_printed": "ΔG^m, kJ/mol"
+        "method_class": "figure_only"
+        "temperature_K_as_printed": "2973"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "value_as_printed": "not sampled"
+        "schema_gap": "The ordinate is the mixing energy ΔG^m in kJ/mol. Quantity has no mixing-energy\
+          \ token, so the curve is context and is not stored as delta_fG."
+        "attribution": "Figure 2 caption: mixing energies; series 3 is Wu et al. (1993) at 2973 K. Panel\
+          \ b shows curves, not markers."
+    - "observation_id": "shornikov_2020_fig2b_series7_mixing_energy"
+      "type": "figure_mixing_energy"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "published_page": 79
+        "note": "Figure 2 panel b series 7 at 3173 K, Wu et al. (1993). Calculated curve. No data markers.\
+          \ Not sampled."
+      "units": "kJ/mol"
+      "values":
+        "quantity_as_printed": "ΔG^m, kJ/mol"
+        "method_class": "figure_only"
+        "temperature_K_as_printed": "3173"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "value_as_printed": "not sampled"
+        "schema_gap": "The ordinate is the mixing energy ΔG^m in kJ/mol. Quantity has no mixing-energy\
+          \ token, so the curve is context and is not stored as delta_fG."
+        "attribution": "Figure 2 caption: mixing energies; series 7 is Wu et al. (1993) at 3173 K. Panel\
+          \ b shows curves, not markers."
+    - "observation_id": "shornikov_2020_prose_mixing_minimum"
+      "type": "prose_mixing_energy_comparison"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "published_page": 79
+        "note": "Prose under Figure 2. Not a sampled curve."
+      "units": "kJ/mol"
+      "values":
+        "value_as_printed": "its minimum value is in the range from –10 kJ/mol (at 2973 K) to –14 kJ/mol\
+          \ (at 3173 K). The ΔGm minimum value is in the concentration range of 50–55 mol. % CaO."
+        "schema_gap": "The ordinate is the mixing energy ΔG^m in kJ/mol. Quantity has no mixing-energy\
+          \ token, so the sentence is context and is not stored as delta_fG."
+        "attribution": "Page 79 prose. The numbers are the author's description of Figure 2b, not a table\
+          \ cell."
+"fidelity_samples":
+- "path": "species.CaO.observations[shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c02].values.value"
+  "value": "-284.532"
+  "locator":
+    "page": 3
+    "pdf_page_index": 2
+    "table": "2"
+    "note": "Solid CaO. The pinned spelling is the MinerU cell, ASCII hyphen U+002D. PDF page 3, published\
+      \ page 79."
+- "path": "species.CaO.observations[shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c04].values.value"
+  "value": "-279.824"
+  "locator":
+    "page": 3
+    "pdf_page_index": 2
+    "table": "2"
+    "note": "Liquid CaO. MinerU ASCII hyphen. PDF page 3, published page 79."
+- "path": "species.O2.observations[shornikov_2020_cao_mgo_thermodynamics_p003_t02_r10_c06].values.value"
+  "value": "0.000"
+  "locator":
+    "page": 3
+    "pdf_page_index": 2
+    "table": "2"
+    "note": "Gas O2. Printed zero, stored. PDF page 3, published page 79."
