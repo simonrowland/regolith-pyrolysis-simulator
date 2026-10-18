@@ -314,16 +314,26 @@ def test_crown_high_t_markers_keep_values_pixels_and_conditions(
     yakovlev = yaml.safe_load(
         (extract_dir / "yakovlev-2024-cai-vaporization.yaml").read_text()
     )
-    ca = yakovlev["species"]["Ca"]["observations"][0]["values"]["points"][0]
+    ca_reads = yakovlev["species"]["Ca"]["observations"][0]["values"]["points"][:3]
     cao = yakovlev["species"]["CaO"]["observations"][0]["values"]["points"][0]
     gehlenite = yakovlev["species"]["Ca2Al2SiO7"]["observations"][0]["values"]["points"][0]
-    assert ca["p_atm"] == pytest.approx(1.0e-7, rel=0.10)
-    assert "pixel=(1048, 1237)" in ca["locator"]["note"]
+    assert [point["T_K"] for point in ca_reads] == [2039.79, 2097.08, 2141.76]
+    assert [point["p_atm"] for point in ca_reads] == [1.0e-7, 3.2e-7, 5.4e-7]
+    for point, pixel in zip(
+        ca_reads,
+        ("pixel=(1048, 1237)", "pixel=(1157, 1047)", "pixel=(1242, 958)"),
+        strict=True,
+    ):
+        assert point["locator"]["pdf_page_index"] == 2
+        assert pixel in point["locator"]["note"]
+    assert "read_uncertainty_dex=0 dex" in ca_reads[0]["locator"]["note"]
+    assert "read_uncertainty_dex=0.00128 dex" in ca_reads[2]["locator"]["note"]
     assert cao["activity"] == pytest.approx(9.8e-3, rel=0.10)
     assert "pixel=(2476, 1499)" in cao["locator"]["note"]
     assert gehlenite["activity"] == pytest.approx(5.3e-2, rel=0.10)
     assert "pixel=(356, 1467)" in gehlenite["locator"]["note"]
     profile = yakovlev["extraction"]["printed_text_values"][0]["values"]
+    assert yakovlev["extraction"]["printed_text_values"][0]["locator"]["pdf_page_index"] == 1
     assert [profile[key] for key in (
         "core_akermanite_wt_pct",
         "mantle_akermanite_wt_pct",
@@ -339,6 +349,26 @@ def test_crown_high_t_markers_keep_values_pixels_and_conditions(
     assert "approximately 50 wt. %" in sample_profile
     assert "drops to 20 wt. %" in sample_profile
     assert "up to 7 wt. % in the rim zone" in sample_profile
+
+    kems = yaml.safe_load(
+        (extract_dir / "kems-029-yakovlev-shornikov-2011.yaml").read_text()
+    )
+    kems_fe = kems["species"]["Fe"]["observations"][0]["values"]["points"][0]
+    assert kems_fe["locator"]["pdf_page_index"] == 1
+    reference_gap = next(
+        gap
+        for gap in yakovlev["extraction"]["schema_gaps"]
+        if gap.get("quantity") == "pure-compound reference activities"
+    )
+    reference_reason = (
+        "cited collectively; values and per-activity mapping not printed in this paper"
+    )
+    assert reference_gap["status"] == "typed_unavailable"
+    assert reference_gap["reason"] == reference_reason
+    reference_citation = (
+        "(Shornikov et al., 1996; Bale et al., 2016; Shornikov, 2017)"
+    )
+    assert reference_citation in reference_gap["source_as_printed"]
 
     activity_lineage = {
         "yakovlev_2024_fig2b_cao_figure_only": (
@@ -369,7 +399,10 @@ def test_crown_high_t_markers_keep_values_pixels_and_conditions(
         )
         assert values["method_class"] == "measured_reduced"
         assert values["derived_from"] == [pressure_id]
-        assert "Eqs. (1)–(3)" in values["derivation"]["relation"]
+        relation = values["derivation"]["relation"]
+        assert "Eqs. (1)–(3)" in relation
+        assert reference_citation in relation
+        assert reference_reason in relation
         migrated = next(
             observation
             for observation in migrated_observations
