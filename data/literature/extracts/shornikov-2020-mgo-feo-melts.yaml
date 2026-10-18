@@ -6,9 +6,11 @@ source:
   year: 2020
   corpus_source_id: shornikov-2020-mgo-feo-melts
 extraction:
-  method: MinerU emit for the 17 Gibbs-energy cells in Table 2. The 14-row Table 1 summary of prior-study
-    methods, temperature and FeO ranges, sample counts, and references is retained as context because
-    its ranges are not point measurements. Figures 1 and 2 marker centers were digitized from 600 dpi renders with independent fresh-crop reads; unkeyed Figure 1, 2, and 4a markers are typed-refused, while Figure 3 unkeyed markers and unsupported Figure 3 and 4b curves remain in species context without point samples.
+  method: MinerU emit for the 17 Gibbs-energy cells in Table 2. The 14-row Table 1 summary and printed
+    prose ranges remain context with their numbers. Figure 1 and 2 marker centers were digitized from 600 dpi
+    renders with independent fresh-crop reads; all 110 plotted marker rows retain their printed values but are
+    typed-refused because mol % has no supported composition basis. Unkeyed Figure 3 and 4a markers and
+    unsupported Figure 3 and 4b curves remain unscored in species context.
   date: '2026-10-18'
   worker: trial-lxh-1018
   dispatch_id: trial-lxh-1018
@@ -339,6 +341,21 @@ species:
             note: Table 2 gives standard Gibbs energies at 2500 K; the text says they were calculated
               from experimental and theoretical data.
             published_page: 76
+    context:
+    - observation_id: shornikov_2020_text_mgfeo2_decomposition_bound
+      type: thermodynamic_context
+      locator:
+        page: 1
+        published_page: 74
+        pdf_page_index: 0
+        note: Text says the decomposition temperature does not exceed 1300 K and has not been determined experimentally.
+      units: K
+      values:
+        quantity: printed_prose_numeric_context
+        decomposition_temperature_upper_bound_K_as_printed: '1300'
+        decomposition_temperature_qualifier_as_printed: do not exceed
+        experimentally_determined_as_printed: not determined experimentally
+      attribution: Yamauchi et al. (2014)
   Mg2:
     observations:
     - observation_id: shornikov_2020_mgo_feo_melts_p002_t03_r04_c06
@@ -413,6 +430,21 @@ species:
             note: Table 2 gives standard Gibbs energies at 2500 K; the text says they were calculated
               from experimental and theoretical data.
             published_page: 76
+    context:
+    - observation_id: shornikov_2020_text_mgfe2o3_decomposition_bound
+      type: thermodynamic_context
+      locator:
+        page: 1
+        published_page: 74
+        pdf_page_index: 0
+        note: Text says the decomposition temperature does not exceed 1300 K and has not been determined experimentally.
+      units: K
+      values:
+        quantity: printed_prose_numeric_context
+        decomposition_temperature_upper_bound_K_as_printed: '1300'
+        decomposition_temperature_qualifier_as_printed: do not exceed
+        experimentally_determined_as_printed: not determined experimentally
+      attribution: Carter (1959)
   FeO:
     observations:
     - observation_id: shornikov_2020_mgo_feo_melts_p002_t03_r06_c02
@@ -538,15 +570,18 @@ species:
         - 2424
         note: 'Independent 600 dpi reads: original crop center [311.5, 774.5] and fresh page-crop color-mask center [161.9, 594.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '2'
         FeO_mol_pct_as_plotted: '5'
+        MgO_mol_pct_as_binary_remainder: '95'
         T_K: '1173'
         composition_component: FeO
         series: '1'
@@ -569,7 +604,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -589,9 +624,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id001_2
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00042
+        read_uncertainty_gamma_FeO: 0.05064
         read_uncertainty_FeO_mol_pct: 0.01258
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s1_marker_02
       type: activity_coefficient
       locator:
@@ -610,15 +645,18 @@ species:
         - 2458.1
         note: 'Independent 600 dpi reads: original crop center [391.5, 808.5] and fresh page-crop color-mask center [242.1, 628.1]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '2'
         FeO_mol_pct_as_plotted: '10'
+        MgO_mol_pct_as_binary_remainder: '90'
         T_K: '1173'
         composition_component: FeO
         series: '1'
@@ -641,7 +679,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -661,9 +699,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id002_2
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00033
+        read_uncertainty_gamma_FeO: 0.05064
         read_uncertainty_FeO_mol_pct: 0.01887
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s1_marker_03
       type: activity_coefficient
       locator:
@@ -682,15 +720,18 @@ species:
         - 2546.2
         note: 'Independent 600 dpi reads: original crop center [550, 896] and fresh page-crop color-mask center [400.1, 716.2]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.8'
         FeO_mol_pct_as_plotted: '20'
+        MgO_mol_pct_as_binary_remainder: '80'
         T_K: '1173'
         composition_component: FeO
         series: '1'
@@ -713,7 +754,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -733,9 +774,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id003_2
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00017
+        read_uncertainty_gamma_FeO: 0.05071
         read_uncertainty_FeO_mol_pct: 0.00314
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s1_marker_04
       type: activity_coefficient
       locator:
@@ -754,15 +795,18 @@ species:
         - 2689.1
         note: 'Independent 600 dpi reads: original crop center [709, 1039] and fresh page-crop color-mask center [559.1, 859.1]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.6'
         FeO_mol_pct_as_plotted: '30'
+        MgO_mol_pct_as_binary_remainder: '70'
         T_K: '1173'
         composition_component: FeO
         series: '1'
@@ -785,7 +829,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -805,9 +849,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id004_2
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00008
+        read_uncertainty_gamma_FeO: 0.05080
         read_uncertainty_FeO_mol_pct: 0.00314
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s1_marker_05
       type: activity_coefficient
       locator:
@@ -826,15 +870,18 @@ species:
         - 2816.8
         note: 'Independent 600 dpi reads: original crop center [868, 1168] and fresh page-crop color-mask center [718.5, 986.8]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.4'
         FeO_mol_pct_as_plotted: '40'
+        MgO_mol_pct_as_binary_remainder: '60'
         T_K: '1173'
         composition_component: FeO
         series: '1'
@@ -857,7 +904,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -877,9 +924,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id005
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.001
+        read_uncertainty_gamma_FeO: 0.05092
         read_uncertainty_FeO_mol_pct: 0.01572
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s1_marker_06
       type: activity_coefficient
       locator:
@@ -898,15 +945,18 @@ species:
         - 2978.7
         note: 'Independent 600 dpi reads: original crop center [1193.5, 1326.5] and fresh page-crop color-mask center [1045.7, 1148.7]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.1'
         FeO_mol_pct_as_plotted: '60'
+        MgO_mol_pct_as_binary_remainder: '40'
         T_K: '1173'
         composition_component: FeO
         series: '1'
@@ -929,7 +979,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -949,9 +999,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id006
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00183
+        read_uncertainty_gamma_FeO: 0.05118
         read_uncertainty_FeO_mol_pct: 0.06918
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s1_marker_07
       type: activity_coefficient
       locator:
@@ -970,15 +1020,18 @@ species:
         - 3013.5
         note: 'Independent 600 dpi reads: original crop center [1351.5, 1361] and fresh page-crop color-mask center [1203.7, 1183.5]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.1'
         FeO_mol_pct_as_plotted: '70'
+        MgO_mol_pct_as_binary_remainder: '30'
         T_K: '1173'
         composition_component: FeO
         series: '1'
@@ -1001,7 +1054,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -1021,9 +1074,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id007
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00208
+        read_uncertainty_gamma_FeO: 0.05118
         read_uncertainty_FeO_mol_pct: 0.06918
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s2_marker_01
       type: activity_coefficient
       locator:
@@ -1042,15 +1095,18 @@ species:
         - 2599
         note: 'Independent 600 dpi reads: original crop center [390.5, 949] and fresh page-crop color-mask center [240.6, 769.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.8'
         FeO_mol_pct_as_plotted: '10'
+        MgO_mol_pct_as_binary_remainder: '90'
         T_K: '1173'
         composition_component: FeO
         series: '2'
@@ -1073,7 +1129,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -1093,9 +1149,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id008
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00083
+        read_uncertainty_gamma_FeO: 0.05071
         read_uncertainty_FeO_mol_pct: 0.00314
-        note: Half the difference between independent center reads; coincident reads use a half-pixel width in axis units.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s2_marker_02
       type: activity_coefficient
       locator:
@@ -1114,15 +1170,18 @@ species:
         - 2466.8
         note: 'Independent 600 dpi reads: original crop center [470.5, 817] and fresh page-crop color-mask center [320.5, 636.8]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '2'
         FeO_mol_pct_as_plotted: '15'
+        MgO_mol_pct_as_binary_remainder: '85'
         T_K: '1173'
         composition_component: FeO
         series: '2'
@@ -1145,7 +1204,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -1165,9 +1224,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id009
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00017
+        read_uncertainty_gamma_FeO: 0.05064
         read_uncertainty_FeO_mol_pct: 0.03145
-        note: Half the difference between independent center reads; coincident reads use a half-pixel width in axis units.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s2_marker_03
       type: activity_coefficient
       locator:
@@ -1186,15 +1245,18 @@ species:
         - 2653.6
         note: 'Independent 600 dpi reads: original crop center [629.5, 1003.5] and fresh page-crop color-mask center [479.8, 823.6]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.7'
         FeO_mol_pct_as_plotted: '25'
+        MgO_mol_pct_as_binary_remainder: '75'
         T_K: '1173'
         composition_component: FeO
         series: '2'
@@ -1217,7 +1279,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -1237,9 +1299,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id010
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00008
+        read_uncertainty_gamma_FeO: 0.05076
         read_uncertainty_FeO_mol_pct: 0.00943
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s2_marker_04
       type: activity_coefficient
       locator:
@@ -1258,15 +1320,18 @@ species:
         - 2786.5
         note: 'Independent 600 dpi reads: original crop center [756.5, 1136.5] and fresh page-crop color-mask center [606.2, 956.5]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.4'
         FeO_mol_pct_as_plotted: '33'
+        MgO_mol_pct_as_binary_remainder: '67'
         T_K: '1173'
         composition_component: FeO
         series: '2'
@@ -1289,7 +1354,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -1309,9 +1374,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id011
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00083
+        read_uncertainty_gamma_FeO: 0.05092
         read_uncertainty_FeO_mol_pct: 0.00943
-        note: Half the difference between independent center reads; coincident reads use a half-pixel width in axis units.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s2_marker_05
       type: activity_coefficient
       locator:
@@ -1330,15 +1395,18 @@ species:
         - 2923.5
         note: 'Independent 600 dpi reads: original crop center [1035.5, 1269.5] and fresh page-crop color-mask center [886.9, 1093.5]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.2'
         FeO_mol_pct_as_plotted: '51'
+        MgO_mol_pct_as_binary_remainder: '49'
         T_K: '1173'
         composition_component: FeO
         series: '2'
@@ -1361,7 +1429,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -1381,9 +1449,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id012
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00333
+        read_uncertainty_gamma_FeO: 0.05108
         read_uncertainty_FeO_mol_pct: 0.04403
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s2_marker_06
       type: activity_coefficient
       locator:
@@ -1402,15 +1470,18 @@ species:
         - 3022
         note: 'Independent 600 dpi reads: original crop center [1282, 1369] and fresh page-crop color-mask center [1129.5, 1192.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.1'
         FeO_mol_pct_as_plotted: '66'
+        MgO_mol_pct_as_binary_remainder: '34'
         T_K: '1173'
         composition_component: FeO
         series: '2'
@@ -1433,7 +1504,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -1453,9 +1524,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id013
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.0025
+        read_uncertainty_gamma_FeO: 0.05118
         read_uncertainty_FeO_mol_pct: 0.07862
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s2_marker_07
       type: activity_coefficient
       locator:
@@ -1474,15 +1545,18 @@ species:
         - 3059
         note: 'Independent 600 dpi reads: original crop center [1492.5, 1407] and fresh page-crop color-mask center [1342.5, 1229.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '0.99'
         FeO_mol_pct_as_plotted: '79'
+        MgO_mol_pct_as_binary_remainder: '21'
         T_K: '1173'
         composition_component: FeO
         series: '2'
@@ -1505,7 +1579,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -1525,9 +1599,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id014
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00167
+        read_uncertainty_gamma_FeO: 0.00502
         read_uncertainty_FeO_mol_pct: 0.03145
-        note: Half the difference between independent center reads; coincident reads use a half-pixel width in axis units.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s2_marker_08
       type: activity_coefficient
       locator:
@@ -1546,15 +1620,18 @@ species:
         - 3071.1
         note: 'Independent 600 dpi reads: original crop center [1663.5, 1415] and fresh page-crop color-mask center [1514.2, 1241.1]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '0.98'
         FeO_mol_pct_as_plotted: '90'
+        MgO_mol_pct_as_binary_remainder: '10'
         T_K: '1173'
         composition_component: FeO
         series: '2'
@@ -1577,7 +1654,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -1597,9 +1674,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id015
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00508
+        read_uncertainty_gamma_FeO: 0.01022
         read_uncertainty_FeO_mol_pct: 0.02201
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s2_marker_09
       type: activity_coefficient
       locator:
@@ -1618,15 +1695,18 @@ species:
         - 3058.4
         note: 'Independent 600 dpi reads: original crop center [1741.5, 1407.5] and fresh page-crop color-mask center [1591.9, 1228.4]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '0.99'
         FeO_mol_pct_as_plotted: '95'
+        MgO_mol_pct_as_binary_remainder: '5'
         T_K: '1173'
         composition_component: FeO
         series: '2'
@@ -1649,7 +1729,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -1669,9 +1749,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id016
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00075
+        read_uncertainty_gamma_FeO: 0.00502
         read_uncertainty_FeO_mol_pct: 0.01258
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s3_marker_01
       type: activity_coefficient
       locator:
@@ -1690,15 +1770,18 @@ species:
         - 2292
         note: 'Independent 600 dpi reads: original crop center [550.5, 637.5] and fresh page-crop color-mask center [400.1, 462.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '2.3'
         FeO_mol_pct_as_plotted: '20'
+        MgO_mol_pct_as_binary_remainder: '80'
         T_K: '1173'
         composition_component: FeO
         series: '3'
@@ -1721,7 +1804,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -1741,9 +1824,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id017
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00375
+        read_uncertainty_gamma_FeO: 0.05056
         read_uncertainty_FeO_mol_pct: 0.01258
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s3_marker_02
       type: activity_coefficient
       locator:
@@ -1762,15 +1845,18 @@ species:
         - 2718.6
         note: 'Independent 600 dpi reads: original crop center [867.5, 1064] and fresh page-crop color-mask center [717.9, 888.6]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.6'
         FeO_mol_pct_as_plotted: '40'
+        MgO_mol_pct_as_binary_remainder: '60'
         T_K: '1173'
         composition_component: FeO
         series: '3'
@@ -1793,7 +1879,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -1813,9 +1899,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id018
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00383
+        read_uncertainty_gamma_FeO: 0.05080
         read_uncertainty_FeO_mol_pct: 0.01258
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s3_marker_03
       type: activity_coefficient
       locator:
@@ -1834,15 +1920,18 @@ species:
         - 2878.2
         note: 'Independent 600 dpi reads: original crop center [1185.5, 1224.5] and fresh page-crop color-mask center [1035.9, 1048.2]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.3'
         FeO_mol_pct_as_plotted: '60'
+        MgO_mol_pct_as_binary_remainder: '40'
         T_K: '1173'
         composition_component: FeO
         series: '3'
@@ -1865,7 +1954,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -1885,9 +1974,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id019
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00308
+        read_uncertainty_gamma_FeO: 0.05099
         read_uncertainty_FeO_mol_pct: 0.01258
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s3_marker_04
       type: activity_coefficient
       locator:
@@ -1906,15 +1995,18 @@ species:
         - 3000.2
         note: 'Independent 600 dpi reads: original crop center [1511, 1348] and fresh page-crop color-mask center [1361.1, 1170.2]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.1'
         FeO_mol_pct_as_plotted: '80'
+        MgO_mol_pct_as_binary_remainder: '20'
         T_K: '1173'
         composition_component: FeO
         series: '3'
@@ -1937,7 +2029,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -1957,9 +2049,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id020
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00183
+        read_uncertainty_gamma_FeO: 0.05118
         read_uncertainty_FeO_mol_pct: 0.00314
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s3_marker_05
       type: activity_coefficient
       locator:
@@ -1978,15 +2070,18 @@ species:
         - 3015
         note: 'Independent 600 dpi reads: original crop center [1664, 1363.5] and fresh page-crop color-mask center [1513.5, 1185.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.1'
         FeO_mol_pct_as_plotted: '90'
+        MgO_mol_pct_as_binary_remainder: '10'
         T_K: '1173'
         composition_component: FeO
         series: '3'
@@ -2009,7 +2104,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -2029,9 +2124,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id021
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00125
+        read_uncertainty_gamma_FeO: 0.05118
         read_uncertainty_FeO_mol_pct: 0.01572
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s5_marker_01
       type: activity_coefficient
       locator:
@@ -2050,15 +2145,18 @@ species:
         - 2741.2
         note: 'Independent 600 dpi reads: original crop center [703, 1091] and fresh page-crop color-mask center [553.3, 911.2]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.5'
         FeO_mol_pct_as_plotted: '30'
+        MgO_mol_pct_as_binary_remainder: '70'
         T_K: '1173'
         composition_component: FeO
         series: '5'
@@ -2081,7 +2179,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -2101,9 +2199,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id022
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00017
+        read_uncertainty_gamma_FeO: 0.05086
         read_uncertainty_FeO_mol_pct: 0.00943
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s5_marker_02
       type: activity_coefficient
       locator:
@@ -2122,15 +2220,18 @@ species:
         - 2848.3
         note: 'Independent 600 dpi reads: original crop center [860.5, 1200] and fresh page-crop color-mask center [710.2, 1018.3]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.3'
         FeO_mol_pct_as_plotted: '40'
+        MgO_mol_pct_as_binary_remainder: '60'
         T_K: '1173'
         composition_component: FeO
         series: '5'
@@ -2153,7 +2254,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -2173,9 +2274,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id023
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00142
+        read_uncertainty_gamma_FeO: 0.05099
         read_uncertainty_FeO_mol_pct: 0.00943
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s5_marker_03
       type: activity_coefficient
       locator:
@@ -2194,15 +2295,18 @@ species:
         - 2918.5
         note: 'Independent 600 dpi reads: original crop center [1009, 1268.5] and fresh page-crop color-mask center [859.8, 1088.5]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.2'
         FeO_mol_pct_as_plotted: '49'
+        MgO_mol_pct_as_binary_remainder: '51'
         T_K: '1173'
         composition_component: FeO
         series: '5'
@@ -2225,7 +2329,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -2245,9 +2349,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id024
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00083
+        read_uncertainty_gamma_FeO: 0.05108
         read_uncertainty_FeO_mol_pct: 0.02516
-        note: Half the difference between independent center reads; coincident reads use a half-pixel width in axis units.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s5_marker_04
       type: activity_coefficient
       locator:
@@ -2266,15 +2370,18 @@ species:
         - 2981.7
         note: 'Independent 600 dpi reads: original crop center [1170, 1330] and fresh page-crop color-mask center [1021.6, 1151.7]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.1'
         FeO_mol_pct_as_plotted: '59'
+        MgO_mol_pct_as_binary_remainder: '41'
         T_K: '1173'
         composition_component: FeO
         series: '5'
@@ -2297,7 +2404,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -2317,9 +2424,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id025
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00142
+        read_uncertainty_gamma_FeO: 0.05118
         read_uncertainty_FeO_mol_pct: 0.05031
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s5_marker_05
       type: activity_coefficient
       locator:
@@ -2338,15 +2445,18 @@ species:
         - 3014.9
         note: 'Independent 600 dpi reads: original crop center [1333, 1363] and fresh page-crop color-mask center [1183.2, 1184.9]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.1'
         FeO_mol_pct_as_plotted: '69'
+        MgO_mol_pct_as_binary_remainder: '31'
         T_K: '1173'
         composition_component: FeO
         series: '5'
@@ -2369,7 +2479,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -2389,9 +2499,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id026
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00158
+        read_uncertainty_gamma_FeO: 0.05118
         read_uncertainty_FeO_mol_pct: 0.00629
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s6_marker_01
       type: activity_coefficient
       locator:
@@ -2410,15 +2520,18 @@ species:
         - 1964
         note: 'Independent 600 dpi reads: original crop center [292.5, 313.5] and fresh page-crop color-mask center [142.3, 134.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '2.8'
         FeO_mol_pct_as_plotted: '3.8'
+        MgO_mol_pct_as_binary_remainder: '96.2'
         T_K: '1173'
         composition_component: FeO
         series: '6'
@@ -2441,7 +2554,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -2461,9 +2574,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id027
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00042
+        read_uncertainty_gamma_FeO: 0.05046
         read_uncertainty_FeO_mol_pct: 0.00629
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s6_marker_02
       type: activity_coefficient
       locator:
@@ -2482,15 +2595,18 @@ species:
         - 2138.8
         note: 'Independent 600 dpi reads: original crop center [357, 489] and fresh page-crop color-mask center [208.1, 308.8]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '2.5'
         FeO_mol_pct_as_plotted: '7.9'
+        MgO_mol_pct_as_binary_remainder: '92.1'
         T_K: '1173'
         composition_component: FeO
         series: '6'
@@ -2513,7 +2629,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -2533,9 +2649,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id028
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00017
+        read_uncertainty_gamma_FeO: 0.05051
         read_uncertainty_FeO_mol_pct: 0.03459
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s6_marker_03
       type: activity_coefficient
       locator:
@@ -2554,15 +2670,18 @@ species:
         - 2365
         note: 'Independent 600 dpi reads: original crop center [480.5, 715] and fresh page-crop color-mask center [330.2, 535.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '2.1'
         FeO_mol_pct_as_plotted: '16'
+        MgO_mol_pct_as_binary_remainder: '84'
         T_K: '1173'
         composition_component: FeO
         series: '6'
@@ -2585,7 +2704,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -2605,9 +2724,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id029
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00083
+        read_uncertainty_gamma_FeO: 0.05061
         read_uncertainty_FeO_mol_pct: 0.00943
-        note: Half the difference between independent center reads; coincident reads use a half-pixel width in axis units.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s6_marker_04
       type: activity_coefficient
       locator:
@@ -2626,15 +2745,18 @@ species:
         - 2772.5
         note: 'Independent 600 dpi reads: original crop center [882, 1124.5] and fresh page-crop color-mask center [731.5, 942.5]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.5'
         FeO_mol_pct_as_plotted: '41'
+        MgO_mol_pct_as_binary_remainder: '59'
         T_K: '1173'
         composition_component: FeO
         series: '6'
@@ -2657,7 +2779,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -2677,9 +2799,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id030
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00167
+        read_uncertainty_gamma_FeO: 0.05086
         read_uncertainty_FeO_mol_pct: 0.01572
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s6_marker_05
       type: activity_coefficient
       locator:
@@ -2698,15 +2820,18 @@ species:
         - 2886
         note: 'Independent 600 dpi reads: original crop center [1077.5, 1235.5] and fresh page-crop color-mask center [927.7, 1056.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.3'
         FeO_mol_pct_as_plotted: '53'
+        MgO_mol_pct_as_binary_remainder: '47'
         T_K: '1173'
         composition_component: FeO
         series: '6'
@@ -2729,7 +2854,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -2749,9 +2874,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id031
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00042
+        read_uncertainty_gamma_FeO: 0.05099
         read_uncertainty_FeO_mol_pct: 0.00629
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s6_marker_06
       type: activity_coefficient
       locator:
@@ -2770,15 +2895,18 @@ species:
         - 2943.3
         note: 'Independent 600 dpi reads: original crop center [1195, 1296.5] and fresh page-crop color-mask center [1044.8, 1113.3]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.2'
         FeO_mol_pct_as_plotted: '61'
+        MgO_mol_pct_as_binary_remainder: '39'
         T_K: '1173'
         composition_component: FeO
         series: '6'
@@ -2801,7 +2929,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -2821,9 +2949,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id032
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00267
+        read_uncertainty_gamma_FeO: 0.05108
         read_uncertainty_FeO_mol_pct: 0.00629
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s6_marker_07
       type: activity_coefficient
       locator:
@@ -2842,15 +2970,18 @@ species:
         - 2998.1
         note: 'Independent 600 dpi reads: original crop center [1384.5, 1348.5] and fresh page-crop color-mask center [1233.6, 1168.1]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.1'
         FeO_mol_pct_as_plotted: '72'
+        MgO_mol_pct_as_binary_remainder: '28'
         T_K: '1173'
         composition_component: FeO
         series: '6'
@@ -2873,7 +3004,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -2893,9 +3024,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id033
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00033
+        read_uncertainty_gamma_FeO: 0.05118
         read_uncertainty_FeO_mol_pct: 0.0283
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s8_marker_01
       type: activity_coefficient
       locator:
@@ -2914,15 +3045,18 @@ species:
         - 2152.8
         note: 'Independent 600 dpi reads: original crop center [395, 502] and fresh page-crop color-mask center [241.2, 322.8]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '2.5'
         FeO_mol_pct_as_plotted: '10'
+        MgO_mol_pct_as_binary_remainder: '90'
         T_K: '1173'
         composition_component: FeO
         series: '8'
@@ -2945,7 +3079,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -2965,9 +3099,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id034
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00067
+        read_uncertainty_gamma_FeO: 0.05051
         read_uncertainty_FeO_mol_pct: 0.1195
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s8_marker_02
       type: activity_coefficient
       locator:
@@ -2986,15 +3120,18 @@ species:
         - 2453.6
         note: 'Independent 600 dpi reads: original crop center [554.5, 803.5] and fresh page-crop color-mask center [400.5, 623.6]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '2'
         FeO_mol_pct_as_plotted: '20'
+        MgO_mol_pct_as_binary_remainder: '80'
         T_K: '1173'
         composition_component: FeO
         series: '8'
@@ -3017,7 +3154,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -3037,9 +3174,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id035
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00008
+        read_uncertainty_gamma_FeO: 0.05064
         read_uncertainty_FeO_mol_pct: 0.12579
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s8_marker_03
       type: activity_coefficient
       locator:
@@ -3058,15 +3195,18 @@ species:
         - 2630.7
         note: 'Independent 600 dpi reads: original crop center [713.5, 980.5] and fresh page-crop color-mask center [560.1, 800.7]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.7'
         FeO_mol_pct_as_plotted: '30'
+        MgO_mol_pct_as_binary_remainder: '70'
         T_K: '1173'
         composition_component: FeO
         series: '8'
@@ -3089,7 +3229,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -3109,9 +3249,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id036
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00017
+        read_uncertainty_gamma_FeO: 0.05076
         read_uncertainty_FeO_mol_pct: 0.10692
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s8_marker_04
       type: activity_coefficient
       locator:
@@ -3130,15 +3270,18 @@ species:
         - 2756.1
         note: 'Independent 600 dpi reads: original crop center [873.5, 1104] and fresh page-crop color-mask center [722.5, 926.1]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.5'
         FeO_mol_pct_as_plotted: '40'
+        MgO_mol_pct_as_binary_remainder: '60'
         T_K: '1173'
         composition_component: FeO
         series: '8'
@@ -3161,7 +3304,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -3181,9 +3324,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id037
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00175
+        read_uncertainty_gamma_FeO: 0.05086
         read_uncertainty_FeO_mol_pct: 0.03145
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s8_marker_05
       type: activity_coefficient
       locator:
@@ -3202,15 +3345,18 @@ species:
         - 2859.4
         note: 'Independent 600 dpi reads: original crop center [1032, 1208.5] and fresh page-crop color-mask center [878.1, 1029.4]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.3'
         FeO_mol_pct_as_plotted: '50'
+        MgO_mol_pct_as_binary_remainder: '50'
         T_K: '1173'
         composition_component: FeO
         series: '8'
@@ -3233,7 +3379,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -3253,9 +3399,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id038
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00075
+        read_uncertainty_gamma_FeO: 0.05099
         read_uncertainty_FeO_mol_pct: 0.12264
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s8_marker_06
       type: activity_coefficient
       locator:
@@ -3274,15 +3420,18 @@ species:
         - 2932.8
         note: 'Independent 600 dpi reads: original crop center [1190.5, 1282] and fresh page-crop color-mask center [1038.5, 1102.8]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.2'
         FeO_mol_pct_as_plotted: '60'
+        MgO_mol_pct_as_binary_remainder: '40'
         T_K: '1173'
         composition_component: FeO
         series: '8'
@@ -3305,7 +3454,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -3325,9 +3474,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id039
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00067
+        read_uncertainty_gamma_FeO: 0.05108
         read_uncertainty_FeO_mol_pct: 0.06289
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s8_marker_07
       type: activity_coefficient
       locator:
@@ -3346,15 +3495,18 @@ species:
         - 2985
         note: 'Independent 600 dpi reads: original crop center [1349.5, 1334.5] and fresh page-crop color-mask center [1196.9, 1155.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.1'
         FeO_mol_pct_as_plotted: '70'
+        MgO_mol_pct_as_binary_remainder: '30'
         T_K: '1173'
         composition_component: FeO
         series: '8'
@@ -3377,7 +3529,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -3397,9 +3549,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id040
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00042
+        read_uncertainty_gamma_FeO: 0.05118
         read_uncertainty_FeO_mol_pct: 0.08176
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s8_marker_08
       type: activity_coefficient
       locator:
@@ -3418,15 +3570,18 @@ species:
         - 3020.1
         note: 'Independent 600 dpi reads: original crop center [1505.5, 1366.5] and fresh page-crop color-mask center [1352.9, 1190.1]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.1'
         FeO_mol_pct_as_plotted: '80'
+        MgO_mol_pct_as_binary_remainder: '20'
         T_K: '1173'
         composition_component: FeO
         series: '8'
@@ -3449,7 +3604,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -3469,9 +3624,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id041
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.003
+        read_uncertainty_gamma_FeO: 0.05118
         read_uncertainty_FeO_mol_pct: 0.08176
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s9_marker_01
       type: activity_coefficient
       locator:
@@ -3490,15 +3645,18 @@ species:
         - 2536.6
         note: 'Independent 600 dpi reads: original crop center [703.5, 886.5] and fresh page-crop color-mask center [557.9, 706.6]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.9'
         FeO_mol_pct_as_plotted: '30'
+        MgO_mol_pct_as_binary_remainder: '70'
         T_K: '1173'
         composition_component: FeO
         series: '9'
@@ -3521,7 +3679,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -3541,9 +3699,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id042
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00008
+        read_uncertainty_gamma_FeO: 0.05067
         read_uncertainty_FeO_mol_pct: 0.13836
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s9_marker_02
       type: activity_coefficient
       locator:
@@ -3562,15 +3720,18 @@ species:
         - 3003.8
         note: 'Independent 600 dpi reads: original crop center [1293, 1354] and fresh page-crop color-mask center [1146.6, 1173.8]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.1'
         FeO_mol_pct_as_plotted: '67'
+        MgO_mol_pct_as_binary_remainder: '33'
         T_K: '1173'
         composition_component: FeO
         series: '9'
@@ -3593,7 +3754,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -3613,9 +3774,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id043
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00017
+        read_uncertainty_gamma_FeO: 0.05118
         read_uncertainty_FeO_mol_pct: 0.11321
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s9_marker_03
       type: activity_coefficient
       locator:
@@ -3634,15 +3795,18 @@ species:
         - 3044.1
         note: 'Independent 600 dpi reads: original crop center [1501, 1395] and fresh page-crop color-mask center [1352.8, 1214.1]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1'
         FeO_mol_pct_as_plotted: '80'
+        MgO_mol_pct_as_binary_remainder: '20'
         T_K: '1173'
         composition_component: FeO
         series: '9'
@@ -3665,7 +3829,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -3685,9 +3849,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id044
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00075
+        read_uncertainty_gamma_FeO: 0.05130
         read_uncertainty_FeO_mol_pct: 0.0566
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s9_marker_04
       type: activity_coefficient
       locator:
@@ -3706,15 +3870,18 @@ species:
         - 3050.2
         note: 'Independent 600 dpi reads: original crop center [1655.5, 1403] and fresh page-crop color-mask center [1508.4, 1220.2]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1'
         FeO_mol_pct_as_plotted: '90'
+        MgO_mol_pct_as_binary_remainder: '10'
         T_K: '1173'
         composition_component: FeO
         series: '9'
@@ -3737,7 +3904,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -3757,9 +3924,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id045
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00233
+        read_uncertainty_gamma_FeO: 0.05130
         read_uncertainty_FeO_mol_pct: 0.09119
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s4_marker_01
       type: activity_coefficient
       locator:
@@ -3778,15 +3945,18 @@ species:
         - 2252.3
         note: 'Independent 600 dpi reads: original crop center [2225.5, 598.5] and fresh page-crop color-mask center [2075.5, 422.3]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '2.3'
         FeO_mol_pct_as_plotted: '10'
+        MgO_mol_pct_as_binary_remainder: '90'
         T_K: '1473'
         composition_component: FeO
         series: '4'
@@ -3809,7 +3979,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -3829,9 +3999,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id046
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00317
+        read_uncertainty_gamma_FeO: 0.05056
         read_uncertainty_FeO_mol_pct: 0.03145
-        note: Half the difference between independent center reads; coincident reads use a half-pixel width in axis units.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s4_marker_02
       type: activity_coefficient
       locator:
@@ -3850,15 +4020,18 @@ species:
         - 2438.1
         note: 'Independent 600 dpi reads: original crop center [2384.5, 784.5] and fresh page-crop color-mask center [2234.6, 608.1]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '2'
         FeO_mol_pct_as_plotted: '20'
+        MgO_mol_pct_as_binary_remainder: '80'
         T_K: '1473'
         composition_component: FeO
         series: '4'
@@ -3881,7 +4054,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -3901,9 +4074,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id047
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.003
+        read_uncertainty_gamma_FeO: 0.05064
         read_uncertainty_FeO_mol_pct: 0.00315
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s4_marker_03
       type: activity_coefficient
       locator:
@@ -3922,15 +4095,18 @@ species:
         - 3022.6
         note: 'Independent 600 dpi reads: original crop center [3499, 1373] and fresh page-crop color-mask center [3348.7, 1192.6]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.1'
         FeO_mol_pct_as_plotted: '90'
+        MgO_mol_pct_as_binary_remainder: '10'
         T_K: '1473'
         composition_component: FeO
         series: '4'
@@ -3953,7 +4129,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -3973,9 +4149,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id048
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00033
+        read_uncertainty_gamma_FeO: 0.05118
         read_uncertainty_FeO_mol_pct: 0.00944
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s5_marker_01
       type: activity_coefficient
       locator:
@@ -3994,15 +4170,18 @@ species:
         - 2682.7
         note: 'Independent 600 dpi reads: original crop center [2537, 1030] and fresh page-crop color-mask center [2387.3, 852.7]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.6'
         FeO_mol_pct_as_plotted: '30'
+        MgO_mol_pct_as_binary_remainder: '70'
         T_K: '1473'
         composition_component: FeO
         series: '5'
@@ -4025,7 +4204,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -4045,9 +4224,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id049
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00225
+        read_uncertainty_gamma_FeO: 0.05080
         read_uncertainty_FeO_mol_pct: 0.00944
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s5_marker_02
       type: activity_coefficient
       locator:
@@ -4066,15 +4245,18 @@ species:
         - 2829
         note: 'Independent 600 dpi reads: original crop center [2677.5, 1178.5] and fresh page-crop color-mask center [2530.0, 999.0]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.4'
         FeO_mol_pct_as_plotted: '38'
+        MgO_mol_pct_as_binary_remainder: '62'
         T_K: '1473'
         composition_component: FeO
         series: '5'
@@ -4097,7 +4279,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -4117,9 +4299,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id050
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00042
+        read_uncertainty_gamma_FeO: 0.05092
         read_uncertainty_FeO_mol_pct: 0.07867
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s5_marker_03
       type: activity_coefficient
       locator:
@@ -4138,15 +4320,18 @@ species:
         - 2949.7
         note: 'Independent 600 dpi reads: original crop center [3007, 1302.5] and fresh page-crop color-mask center [2856.8, 1119.7]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.2'
         FeO_mol_pct_as_plotted: '59'
+        MgO_mol_pct_as_binary_remainder: '41'
         T_K: '1473'
         composition_component: FeO
         series: '5'
@@ -4169,7 +4354,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -4189,9 +4374,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id051
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00233
+        read_uncertainty_gamma_FeO: 0.05108
         read_uncertainty_FeO_mol_pct: 0.00629
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s5_marker_04
       type: activity_coefficient
       locator:
@@ -4210,15 +4395,18 @@ species:
         - 2986.9
         note: 'Independent 600 dpi reads: original crop center [3161.5, 1337.5] and fresh page-crop color-mask center [3011.7, 1156.9]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.1'
         FeO_mol_pct_as_plotted: '69'
+        MgO_mol_pct_as_binary_remainder: '31'
         T_K: '1473'
         composition_component: FeO
         series: '5'
@@ -4241,7 +4429,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -4261,9 +4449,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id052
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.0005
+        read_uncertainty_gamma_FeO: 0.05118
         read_uncertainty_FeO_mol_pct: 0.00629
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s7_marker_01
       type: activity_coefficient
       locator:
@@ -4282,15 +4470,18 @@ species:
         - 2616.6
         note: 'Independent 600 dpi reads: original crop center [2548, 963.5] and fresh page-crop color-mask center [2401.1, 786.6]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.7'
         FeO_mol_pct_as_plotted: '30'
+        MgO_mol_pct_as_binary_remainder: '70'
         T_K: '1473'
         composition_component: FeO
         series: '7'
@@ -4313,7 +4504,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -4333,9 +4524,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id053
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00258
+        read_uncertainty_gamma_FeO: 0.05076
         read_uncertainty_FeO_mol_pct: 0.09755
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s7_marker_02
       type: activity_coefficient
       locator:
@@ -4354,15 +4545,18 @@ species:
         - 2805.2
         note: 'Independent 600 dpi reads: original crop center [2861, 1146] and fresh page-crop color-mask center [2713.2, 975.2]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.4'
         FeO_mol_pct_as_plotted: '50'
+        MgO_mol_pct_as_binary_remainder: '50'
         T_K: '1473'
         composition_component: FeO
         series: '7'
@@ -4385,7 +4579,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -4405,9 +4599,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id054
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00767
+        read_uncertainty_gamma_FeO: 0.05092
         read_uncertainty_FeO_mol_pct: 0.06923
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s7_marker_03
       type: activity_coefficient
       locator:
@@ -4426,15 +4620,18 @@ species:
         - 2902.5
         note: 'Independent 600 dpi reads: original crop center [3018, 1260] and fresh page-crop color-mask center [2866.1, 1072.5]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.2'
         FeO_mol_pct_as_plotted: '60'
+        MgO_mol_pct_as_binary_remainder: '40'
         T_K: '1473'
         composition_component: FeO
         series: '7'
@@ -4457,7 +4654,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -4477,9 +4674,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id055
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00625
+        read_uncertainty_gamma_FeO: 0.05298
         read_uncertainty_FeO_mol_pct: 0.05979
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s7_marker_04
       type: activity_coefficient
       locator:
@@ -4498,15 +4695,18 @@ species:
         - 2965
         note: 'Independent 600 dpi reads: original crop center [3177.5, 1309.5] and fresh page-crop color-mask center [3024.7, 1135.0]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.2'
         FeO_mol_pct_as_plotted: '70'
+        MgO_mol_pct_as_binary_remainder: '30'
         T_K: '1473'
         composition_component: FeO
         series: '7'
@@ -4529,7 +4729,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -4549,9 +4749,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id056
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00458
+        read_uncertainty_gamma_FeO: 0.05108
         read_uncertainty_FeO_mol_pct: 0.08811
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s7_marker_05
       type: activity_coefficient
       locator:
@@ -4570,15 +4770,18 @@ species:
         - 3022.2
         note: 'Independent 600 dpi reads: original crop center [3323, 1386.5] and fresh page-crop color-mask center [3172.3, 1192.2]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1'
         FeO_mol_pct_as_plotted: '79'
+        MgO_mol_pct_as_binary_remainder: '21'
         T_K: '1473'
         composition_component: FeO
         series: '7'
@@ -4601,7 +4804,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -4621,9 +4824,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id057
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.01192
+        read_uncertainty_gamma_FeO: 0.05323
         read_uncertainty_FeO_mol_pct: 0.02203
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s7_marker_06
       type: activity_coefficient
       locator:
@@ -4642,15 +4845,18 @@ species:
         - 3051.3
         note: 'Independent 600 dpi reads: original crop center [3485, 1399.5] and fresh page-crop color-mask center [3327.0, 1221.3]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1'
         FeO_mol_pct_as_plotted: '89'
+        MgO_mol_pct_as_binary_remainder: '11'
         T_K: '1473'
         composition_component: FeO
         series: '7'
@@ -4673,7 +4879,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -4693,9 +4899,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id058
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.0015
+        read_uncertainty_gamma_FeO: 0.05130
         read_uncertainty_FeO_mol_pct: 0.25173
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s10_marker_01
       type: activity_coefficient
       locator:
@@ -4714,15 +4920,18 @@ species:
         - 2555
         note: 'Independent 600 dpi reads: original crop center [2313.5, 905] and fresh page-crop color-mask center [2163.5, 725.0]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.8'
         FeO_mol_pct_as_plotted: '16'
+        MgO_mol_pct_as_binary_remainder: '84'
         T_K: '1473'
         composition_component: FeO
         series: '10'
@@ -4745,7 +4954,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -4765,9 +4974,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id059
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00083
+        read_uncertainty_gamma_FeO: 0.05071
         read_uncertainty_FeO_mol_pct: 0.03145
-        note: Half the difference between independent center reads; coincident reads use a half-pixel width in axis units.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s10_marker_02
       type: activity_coefficient
       locator:
@@ -4786,15 +4995,18 @@ species:
         - 2692
         note: 'Independent 600 dpi reads: original crop center [2471, 1042] and fresh page-crop color-mask center [2318.0, 862.0]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.6'
         FeO_mol_pct_as_plotted: '25'
+        MgO_mol_pct_as_binary_remainder: '75'
         T_K: '1473'
         composition_component: FeO
         series: '10'
@@ -4817,7 +5029,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -4837,9 +5049,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id060
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00083
+        read_uncertainty_gamma_FeO: 0.05080
         read_uncertainty_FeO_mol_pct: 0.0944
-        note: Half the difference between independent center reads; coincident reads use a half-pixel width in axis units.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s10_marker_03
       type: activity_coefficient
       locator:
@@ -4858,15 +5070,18 @@ species:
         - 2831
         note: 'Independent 600 dpi reads: original crop center [2711.5, 1181] and fresh page-crop color-mask center [2561.5, 1001.0]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.4'
         FeO_mol_pct_as_plotted: '41'
+        MgO_mol_pct_as_binary_remainder: '59'
         T_K: '1473'
         composition_component: FeO
         series: '10'
@@ -4889,7 +5104,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -4909,9 +5124,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id061
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00083
+        read_uncertainty_gamma_FeO: 0.05092
         read_uncertainty_FeO_mol_pct: 0.03145
-        note: Half the difference between independent center reads; coincident reads use a half-pixel width in axis units.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s10_marker_04
       type: activity_coefficient
       locator:
@@ -4930,15 +5145,18 @@ species:
         - 2884
         note: 'Independent 600 dpi reads: original crop center [2822.5, 1233.5] and fresh page-crop color-mask center [2672.5, 1054.0]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.3'
         FeO_mol_pct_as_plotted: '48'
+        MgO_mol_pct_as_binary_remainder: '52'
         T_K: '1473'
         composition_component: FeO
         series: '10'
@@ -4961,7 +5179,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -4981,9 +5199,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id062
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00042
+        read_uncertainty_gamma_FeO: 0.05099
         read_uncertainty_FeO_mol_pct: 0.03145
-        note: Half the difference between independent center reads; coincident reads use a half-pixel width in axis units.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s10_marker_05
       type: activity_coefficient
       locator:
@@ -5002,15 +5220,18 @@ species:
         - 2982
         note: 'Independent 600 dpi reads: original crop center [3108, 1332.5] and fresh page-crop color-mask center [2957.5, 1152.0]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.1'
         FeO_mol_pct_as_plotted: '66'
+        MgO_mol_pct_as_binary_remainder: '34'
         T_K: '1473'
         composition_component: FeO
         series: '10'
@@ -5033,7 +5254,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -5053,9 +5274,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id063
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00042
+        read_uncertainty_gamma_FeO: 0.05118
         read_uncertainty_FeO_mol_pct: 0.01573
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s10_marker_06
       type: activity_coefficient
       locator:
@@ -5074,15 +5295,18 @@ species:
         - 3022
         note: 'Independent 600 dpi reads: original crop center [3267, 1371.5] and fresh page-crop color-mask center [3117.0, 1192.0]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.1'
         FeO_mol_pct_as_plotted: '76'
+        MgO_mol_pct_as_binary_remainder: '24'
         T_K: '1473'
         composition_component: FeO
         series: '10'
@@ -5105,7 +5329,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -5125,9 +5349,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id064
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00042
+        read_uncertainty_gamma_FeO: 0.05118
         read_uncertainty_FeO_mol_pct: 0.03145
-        note: Half the difference between independent center reads; coincident reads use a half-pixel width in axis units.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s10_marker_07
       type: activity_coefficient
       locator:
@@ -5146,15 +5370,18 @@ species:
         - 3056
         note: 'Independent 600 dpi reads: original crop center [3425, 1405.5] and fresh page-crop color-mask center [3272.0, 1226.0]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1'
         FeO_mol_pct_as_plotted: '86'
+        MgO_mol_pct_as_binary_remainder: '14'
         T_K: '1473'
         composition_component: FeO
         series: '10'
@@ -5177,7 +5404,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -5197,9 +5424,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id065
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00042
+        read_uncertainty_gamma_FeO: 0.05130
         read_uncertainty_FeO_mol_pct: 0.0944
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s11_marker_01
       type: activity_coefficient
       locator:
@@ -5218,15 +5445,18 @@ species:
         - 2022.2
         note: 'Independent 600 dpi reads: original crop center [2225.5, 371] and fresh page-crop color-mask center [2075.8, 192.2]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '2.7'
         FeO_mol_pct_as_plotted: '10'
+        MgO_mol_pct_as_binary_remainder: '90'
         T_K: '1473'
         composition_component: FeO
         series: '11'
@@ -5249,7 +5479,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -5269,9 +5499,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id066
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.001
+        read_uncertainty_gamma_FeO: 0.05047
         read_uncertainty_FeO_mol_pct: 0.00944
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s11_marker_02
       type: activity_coefficient
       locator:
@@ -5290,15 +5520,18 @@ species:
         - 2301.3
         note: 'Independent 600 dpi reads: original crop center [2384.5, 650] and fresh page-crop color-mask center [2234.2, 471.3]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '2.3'
         FeO_mol_pct_as_plotted: '20'
+        MgO_mol_pct_as_binary_remainder: '80'
         T_K: '1473'
         composition_component: FeO
         series: '11'
@@ -5321,7 +5554,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -5341,9 +5574,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id067
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00108
+        read_uncertainty_gamma_FeO: 0.05056
         read_uncertainty_FeO_mol_pct: 0.00944
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s11_marker_03
       type: activity_coefficient
       locator:
@@ -5362,15 +5595,18 @@ species:
         - 2714.2
         note: 'Independent 600 dpi reads: original crop center [2702, 1063] and fresh page-crop color-mask center [2552.0, 884.2]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.6'
         FeO_mol_pct_as_plotted: '40'
+        MgO_mol_pct_as_binary_remainder: '60'
         T_K: '1473'
         composition_component: FeO
         series: '11'
@@ -5393,7 +5629,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -5413,9 +5649,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id068
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.001
+        read_uncertainty_gamma_FeO: 0.05080
         read_uncertainty_FeO_mol_pct: 0.03145
-        note: Half the difference between independent center reads; coincident reads use a half-pixel width in axis units.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s11_marker_04
       type: activity_coefficient
       locator:
@@ -5434,15 +5670,18 @@ species:
         - 2796.3
         note: 'Independent 600 dpi reads: original crop center [2861, 1146] and fresh page-crop color-mask center [2710.5, 966.3]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.4'
         FeO_mol_pct_as_plotted: '50'
+        MgO_mol_pct_as_binary_remainder: '50'
         T_K: '1473'
         composition_component: FeO
         series: '11'
@@ -5465,7 +5704,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -5485,9 +5724,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id069
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00025
+        read_uncertainty_gamma_FeO: 0.05092
         read_uncertainty_FeO_mol_pct: 0.01573
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s11_marker_05
       type: activity_coefficient
       locator:
@@ -5506,15 +5745,18 @@ species:
         - 2911.6
         note: 'Independent 600 dpi reads: original crop center [3020, 1260] and fresh page-crop color-mask center [2869.5, 1081.6]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.2'
         FeO_mol_pct_as_plotted: '60'
+        MgO_mol_pct_as_binary_remainder: '40'
         T_K: '1473'
         composition_component: FeO
         series: '11'
@@ -5537,7 +5779,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -5557,9 +5799,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id070
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00133
+        read_uncertainty_gamma_FeO: 0.05108
         read_uncertainty_FeO_mol_pct: 0.01573
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s11_marker_06
       type: activity_coefficient
       locator:
@@ -5578,15 +5820,18 @@ species:
         - 2960.6
         note: 'Independent 600 dpi reads: original crop center [3177.5, 1309.5] and fresh page-crop color-mask center [3028.7, 1130.6]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1.2'
         FeO_mol_pct_as_plotted: '70'
+        MgO_mol_pct_as_binary_remainder: '30'
         T_K: '1473'
         composition_component: FeO
         series: '11'
@@ -5609,7 +5854,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -5629,9 +5874,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id071
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00092
+        read_uncertainty_gamma_FeO: 0.05108
         read_uncertainty_FeO_mol_pct: 0.03776
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s11_marker_07
       type: activity_coefficient
       locator:
@@ -5650,15 +5895,18 @@ species:
         - 3036.8
         note: 'Independent 600 dpi reads: original crop center [3337.5, 1384] and fresh page-crop color-mask center [3187.7, 1206.8]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1'
         FeO_mol_pct_as_plotted: '80'
+        MgO_mol_pct_as_binary_remainder: '20'
         T_K: '1473'
         composition_component: FeO
         series: '11'
@@ -5681,7 +5929,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -5701,9 +5949,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id072
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00233
+        read_uncertainty_gamma_FeO: 0.05130
         read_uncertainty_FeO_mol_pct: 0.00629
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s11_marker_08
       type: activity_coefficient
       locator:
@@ -5722,15 +5970,18 @@ species:
         - 3048.2
         note: 'Independent 600 dpi reads: original crop center [3496.5, 1396.5] and fresh page-crop color-mask center [3347.2, 1218.2]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.'
       units: dimensionless; gamma_FeO vs FeO mol %
-      phase: l
+      phase: cr
       regime: figure_comparison
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         gamma: '1'
         FeO_mol_pct_as_plotted: '90'
+        MgO_mol_pct_as_binary_remainder: '10'
         T_K: '1473'
         composition_component: FeO
         series: '11'
@@ -5753,7 +6004,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 2
             published_page: 75
@@ -5773,9 +6024,9 @@ species:
             reason: not_reported_for_figure_comparator
           locator: *id073
       uncertainty:
-        read_uncertainty_gamma_FeO: 0.00142
+        read_uncertainty_gamma_FeO: 0.05130
         read_uncertainty_FeO_mol_pct: 0.02203
-        note: Half the difference between two independent center reads on linear axes.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig4a_series5_feo_activity_curve
       type: activity_coefficient
       locator: &id001_3
@@ -6458,16 +6709,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: solidus
         T_K: '2.7e+03'
         FeO_mol_pct_as_plotted: '13'
+        MgO_mol_pct_as_binary_remainder: '87'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -6493,9 +6747,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.27264
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.00623
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_02
       type: transition_point
       locator:
@@ -6520,16 +6774,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: solidus
         T_K: '2.5e+03'
         FeO_mol_pct_as_plotted: '21'
+        MgO_mol_pct_as_binary_remainder: '79'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -6555,9 +6812,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 1.09056
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.02804
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_03
       type: transition_point
       locator:
@@ -6582,16 +6839,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: solidus
         T_K: '2.3e+03'
         FeO_mol_pct_as_plotted: '30'
+        MgO_mol_pct_as_binary_remainder: '70'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -6617,9 +6877,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.27264
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.03145
-        note: Half the difference between independent center reads; coincident reads use a half-pixel width in axis units.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_04
       type: transition_point
       locator:
@@ -6644,16 +6904,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: solidus
         T_K: '2.3e+03'
         FeO_mol_pct_as_plotted: '33'
+        MgO_mol_pct_as_binary_remainder: '67'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -6679,9 +6942,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.13632
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.00312
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_05
       type: transition_point
       locator:
@@ -6706,16 +6969,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: solidus
         T_K: '2.2e+03'
         FeO_mol_pct_as_plotted: '38'
+        MgO_mol_pct_as_binary_remainder: '62'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -6741,9 +7007,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.3408
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.00623
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_06
       type: transition_point
       locator:
@@ -6768,16 +7034,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: solidus
         T_K: '2.1e+03'
         FeO_mol_pct_as_plotted: '42'
+        MgO_mol_pct_as_binary_remainder: '58'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -6803,9 +7072,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.06816
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.02804
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_07
       type: transition_point
       locator:
@@ -6830,16 +7099,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: solidus
         T_K: '2.1e+03'
         FeO_mol_pct_as_plotted: '48'
+        MgO_mol_pct_as_binary_remainder: '52'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -6865,9 +7137,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.20448
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.00623
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_08
       type: transition_point
       locator:
@@ -6892,16 +7164,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: solidus
         T_K: 2e+03
         FeO_mol_pct_as_plotted: '52'
+        MgO_mol_pct_as_binary_remainder: '48'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -6927,9 +7202,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.13632
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.01558
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_09
       type: transition_point
       locator:
@@ -6954,16 +7229,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: solidus
         T_K: '1.9e+03'
         FeO_mol_pct_as_plotted: '59'
+        MgO_mol_pct_as_binary_remainder: '41'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -6989,9 +7267,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.3408
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.01558
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_10
       type: transition_point
       locator:
@@ -7016,16 +7294,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: solidus
         T_K: '1.9e+03'
         FeO_mol_pct_as_plotted: '66'
+        MgO_mol_pct_as_binary_remainder: '34'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -7051,9 +7332,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.27264
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.01558
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_11
       type: transition_point
       locator:
@@ -7078,16 +7359,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: solidus
         T_K: '1.8e+03'
         FeO_mol_pct_as_plotted: '73'
+        MgO_mol_pct_as_binary_remainder: '27'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -7113,9 +7397,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 1.09056
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.02492
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_12
       type: transition_point
       locator:
@@ -7140,16 +7424,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: solidus
         T_K: '1.7e+03'
         FeO_mol_pct_as_plotted: '81'
+        MgO_mol_pct_as_binary_remainder: '19'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -7175,9 +7462,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.74976
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.081
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_13
       type: transition_point
       locator:
@@ -7202,16 +7489,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: solidus
         T_K: '1.7e+03'
         FeO_mol_pct_as_plotted: '84'
+        MgO_mol_pct_as_binary_remainder: '16'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -7237,9 +7527,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.47712
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.0405
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_14
       type: transition_point
       locator:
@@ -7264,16 +7554,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: solidus
         T_K: '1.7e+03'
         FeO_mol_pct_as_plotted: '93'
+        MgO_mol_pct_as_binary_remainder: '7'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -7299,9 +7592,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.95424
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.01246
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_01
       type: transition_point
       locator:
@@ -7326,16 +7619,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '2.7e+03'
         FeO_mol_pct_as_plotted: '35'
+        MgO_mol_pct_as_binary_remainder: '65'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -7361,9 +7657,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.47712
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.02804
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_02
       type: transition_point
       locator:
@@ -7388,16 +7684,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '2.5e+03'
         FeO_mol_pct_as_plotted: '50'
+        MgO_mol_pct_as_binary_remainder: '50'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -7423,9 +7722,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.13632
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.00623
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_03
       type: transition_point
       locator:
@@ -7450,16 +7749,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '2.3e+03'
         FeO_mol_pct_as_plotted: '62'
+        MgO_mol_pct_as_binary_remainder: '38'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -7485,9 +7787,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.13632
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.03145
-        note: Half the difference between independent center reads; coincident reads use a half-pixel width in axis units.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_04
       type: transition_point
       locator:
@@ -7512,16 +7814,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '2.3e+03'
         FeO_mol_pct_as_plotted: '66'
+        MgO_mol_pct_as_binary_remainder: '34'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -7547,9 +7852,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.13632
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.00935
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_05
       type: transition_point
       locator:
@@ -7574,16 +7879,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '2.2e+03'
         FeO_mol_pct_as_plotted: '73'
+        MgO_mol_pct_as_binary_remainder: '27'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -7609,9 +7917,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.06816
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.00312
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_06
       type: transition_point
       locator:
@@ -7636,16 +7944,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '2.1e+03'
         FeO_mol_pct_as_plotted: '74'
+        MgO_mol_pct_as_binary_remainder: '26'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -7671,9 +7982,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.13632
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.00623
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_07
       type: transition_point
       locator:
@@ -7698,16 +8009,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '2.1e+03'
         FeO_mol_pct_as_plotted: '80'
+        MgO_mol_pct_as_binary_remainder: '20'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -7733,9 +8047,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.13632
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.00623
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_08
       type: transition_point
       locator:
@@ -7760,16 +8074,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: 2e+03
         FeO_mol_pct_as_plotted: '82'
+        MgO_mol_pct_as_binary_remainder: '18'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -7795,9 +8112,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.88608
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.03427
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_09
       type: transition_point
       locator:
@@ -7822,16 +8139,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '1.9e+03'
         FeO_mol_pct_as_plotted: '85'
+        MgO_mol_pct_as_binary_remainder: '15'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -7857,9 +8177,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.27264
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.00935
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_10
       type: transition_point
       locator:
@@ -7884,16 +8204,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '1.9e+03'
         FeO_mol_pct_as_plotted: '88'
+        MgO_mol_pct_as_binary_remainder: '12'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -7919,9 +8242,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.3408
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.00312
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_11
       type: transition_point
       locator:
@@ -7946,16 +8269,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '1.8e+03'
         FeO_mol_pct_as_plotted: '92'
+        MgO_mol_pct_as_binary_remainder: '8'
         attribution: Schenk & Pfaff (1961), Figure 1 series 2.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -7981,9 +8307,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.27264
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.00623
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_01
       type: transition_point
       locator:
@@ -8008,16 +8334,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '2.5e+03'
         FeO_mol_pct_as_plotted: '38'
+        MgO_mol_pct_as_binary_remainder: '62'
         attribution: Scheel (1975), Figure 1 series 3.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -8043,9 +8372,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 1.36319
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.00312
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_02
       type: transition_point
       locator:
@@ -8070,16 +8399,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '2.4e+03'
         FeO_mol_pct_as_plotted: '46'
+        MgO_mol_pct_as_binary_remainder: '54'
         attribution: Scheel (1975), Figure 1 series 3.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -8105,9 +8437,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 1.97663
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.00312
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_03
       type: transition_point
       locator:
@@ -8132,16 +8464,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '2.4e+03'
         FeO_mol_pct_as_plotted: '51'
+        MgO_mol_pct_as_binary_remainder: '49'
         attribution: Scheel (1975), Figure 1 series 3.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -8167,9 +8502,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 3.06719
+        read_uncertainty_K: 51.61
         read_uncertainty_FeO_mol_pct: 0.00312
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_04
       type: transition_point
       locator:
@@ -8194,16 +8529,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '2.3e+03'
         FeO_mol_pct_as_plotted: '58'
+        MgO_mol_pct_as_binary_remainder: '42'
         attribution: Scheel (1975), Figure 1 series 3.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -8229,9 +8567,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 2.04479
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.00935
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_05
       type: transition_point
       locator:
@@ -8256,16 +8594,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '2.3e+03'
         FeO_mol_pct_as_plotted: '61'
+        MgO_mol_pct_as_binary_remainder: '39'
         attribution: Scheel (1975), Figure 1 series 3.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -8291,9 +8632,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 1.84031
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.00312
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_06
       type: transition_point
       locator:
@@ -8318,16 +8659,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '2.2e+03'
         FeO_mol_pct_as_plotted: '66'
+        MgO_mol_pct_as_binary_remainder: '34'
         attribution: Scheel (1975), Figure 1 series 3.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -8353,9 +8697,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 1.63583
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.00623
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_07
       type: transition_point
       locator:
@@ -8380,16 +8724,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '2.2e+03'
         FeO_mol_pct_as_plotted: '70'
+        MgO_mol_pct_as_binary_remainder: '30'
         attribution: Scheel (1975), Figure 1 series 3.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -8415,9 +8762,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 1.56767
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.00623
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_08
       type: transition_point
       locator:
@@ -8442,16 +8789,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '2.1e+03'
         FeO_mol_pct_as_plotted: '76'
+        MgO_mol_pct_as_binary_remainder: '24'
         attribution: Scheel (1975), Figure 1 series 3.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -8477,9 +8827,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 1.84031
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.03145
-        note: Half the difference between independent center reads; coincident reads use a half-pixel width in axis units.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_09
       type: transition_point
       locator:
@@ -8504,16 +8854,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: 2e+03
         FeO_mol_pct_as_plotted: '83'
+        MgO_mol_pct_as_binary_remainder: '17'
         attribution: Scheel (1975), Figure 1 series 3.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -8539,9 +8892,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 1.70399
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.03427
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_10
       type: transition_point
       locator:
@@ -8566,16 +8919,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '1.9e+03'
         FeO_mol_pct_as_plotted: '88'
+        MgO_mol_pct_as_binary_remainder: '12'
         attribution: Scheel (1975), Figure 1 series 3.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -8601,9 +8957,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 1.36319
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.02492
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_11
       type: transition_point
       locator:
@@ -8628,16 +8984,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '1.8e+03'
         FeO_mol_pct_as_plotted: '92'
+        MgO_mol_pct_as_binary_remainder: '8'
         attribution: Scheel (1975), Figure 1 series 3.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -8663,9 +9022,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 0.27264
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.03145
-        note: Half the difference between independent center reads; coincident reads use a half-pixel width in axis units.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_12
       type: transition_point
       locator:
@@ -8690,16 +9049,19 @@ species:
         quantity: transition_temperature
         method_class: quoted_attributed
         evidence_class: figure_only
-        admission_status: admitted
+        admission_status: typed_refusal
+        status: typed_refusal
+        reason: 'The printed FeO mol % basis has no supported composition mapping in the current schema; values are retained but not scored.'
         property_kind: liquidus
         T_K: '1.7e+03'
         FeO_mol_pct_as_plotted: '97'
+        MgO_mol_pct_as_binary_remainder: '3'
         attribution: Scheel (1975), Figure 1 series 3.
       point_conditions:
         composition:
           state:
             tag: unknown
-            reason: incomplete_melt_composition
+            reason: mole_percent_basis_not_supported_by_schema
           locator:
             page: 1
             published_page: 74
@@ -8725,9 +9087,9 @@ species:
             pdf_page_index: 0
             figure: '1'
       uncertainty:
-        read_uncertainty_K: 2.52191
+        read_uncertainty_K: 50.00
         read_uncertainty_FeO_mol_pct: 0.00935
-        note: Half the difference between the two independent center reads.
+        note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_series1_solidus_curve
       type: transition_point
       locator: &id001_4
@@ -8916,7 +9278,7 @@ species:
         marker_count: 5
         series: '1'
         attribution: Shashkina & Gerasimov (1953)
-      phase: l
+      phase: cr
       point_conditions:
         temperature_K:
           state:
@@ -8953,7 +9315,7 @@ species:
         marker_count: 3
         series: '5'
         attribution: Gordeev et al. (1965)
-      phase: l
+      phase: cr
       point_conditions:
         temperature_K:
           state:
@@ -8990,7 +9352,7 @@ species:
         marker_count: 1
         series: '8'
         attribution: Berthet & Perrot (1970)
-      phase: l
+      phase: cr
       point_conditions:
         temperature_K:
           state:
@@ -9027,7 +9389,7 @@ species:
         marker_count: 2
         series: '9'
         attribution: Abbattista et al. (1973)
-      phase: l
+      phase: cr
       point_conditions:
         temperature_K:
           state:
@@ -9064,7 +9426,7 @@ species:
         marker_count: 3
         series: '5'
         attribution: Gordeev et al. (1965)
-      phase: l
+      phase: cr
       point_conditions:
         temperature_K:
           state:
@@ -9101,7 +9463,7 @@ species:
         marker_count: 1
         series: '10'
         attribution: Srecec et al. (1987)
-      phase: l
+      phase: cr
       point_conditions:
         temperature_K:
           state:
@@ -9115,40 +9477,22 @@ species:
             tag: unknown
             reason: incomplete_melt_composition
           locator: *id011_2
+    context:
     - observation_id: shornikov_2020_fig4a_unkeyed_black_markers
-      type: activity_coefficient
-      locator: &id020_2
+      type: thermodynamic_context
+      locator:
         page: 3
         published_page: 76
         pdf_page_index: 2
         figure: '4'
         panel: a
         marker_count: 11
-        note: Figure 4 panel a has 11 unlabeled black dots on/near the calculated activity curves; no numeric points
-          stored.
+        note: Figure 4 panel a has 11 unlabeled black dots on or near the calculated activity curves; no numeric points stored.
       units: as plotted
       values:
-        quantity: activity
-        method_class: figure_only
-        evidence_class: figure_only
-        admission_status: typed_refusal
-        status: typed_refusal
-        reason: Markers are not keyed to a component/source; the caption names panel-a activities of MgO and FeO but
-          not these black dots.
-        marker_count: 11
-      phase: MgO–FeO melt system
-      point_conditions:
-        temperature_K:
-          state:
-            tag: unknown
-            reason: not_reported_for_figure
-          locator: *id020_2
-        composition:
-          state:
-            tag: unknown
-            reason: incomplete_melt_composition
-          locator: *id020_2
-    context:
+        quantity: unscored_figure_context
+        reason: markers are not keyed to a component or source in the caption
+      attribution: not identified by the caption
     - observation_id: shornikov_2020_fig3_panel_a_unkeyed_black_markers
       type: thermodynamic_context
       locator:
@@ -9427,6 +9771,84 @@ species:
         quantity: unscored_figure_context
         reason: No mixing-energy quantity token exists in the current schema; curve retained
           without numeric samples.
+    - observation_id: shornikov_2020_text_delta_gamma_discrepancy
+      type: thermodynamic_context
+      locator:
+        page: 1
+        published_page: 74
+        pdf_page_index: 0
+        note: Text compares previous FeO activity-coefficient results and states delta gamma FeO is about 0.3 at 25 mol % FeO.
+      units: dimensionless delta gamma; FeO mol %
+      values:
+        quantity: printed_prose_numeric_context
+        delta_gamma_FeO_as_printed: '~ 0.3'
+        FeO_mol_pct_as_printed: '25'
+        statement_as_printed: δγFeO ~ 0.3 at 25 mol % FeO
+      attribution: Shornikov et al. (2020), discussion of prior measurements
+    - observation_id: shornikov_2020_text_calculation_temperature_range
+      type: thermodynamic_context
+      locator:
+        page: 1
+        published_page: 74
+        pdf_page_index: 0
+        note: Abstract states that thermodynamic-property calculations used this temperature range.
+      units: K
+      values:
+        quantity: printed_prose_numeric_context
+        calculation_temperature_range_K_as_printed: 1600–3200
+      attribution: present study
+    - observation_id: shornikov_2020_text_mixing_energy_minimum
+      type: thermodynamic_context
+      locator:
+        page: 3
+        published_page: 76
+        pdf_page_index: 2
+        note: Text reports the Fig 4b mixing-energy minimum at two temperatures.
+      units: kJ/mol
+      values:
+        quantity: printed_prose_numeric_context
+        minimum_at_2000_K_as_printed: '–10'
+        minimum_at_2773_K_as_printed: '–15'
+      attribution: present study
+    - observation_id: shornikov_2020_text_mixing_energy_comparison
+      type: thermodynamic_context
+      locator:
+        page: 3
+        published_page: 76
+        pdf_page_index: 2
+        note: Text compares the mixing energies against Merli and Wu over the concentration region.
+      units: kJ/mol; K
+      values:
+        quantity: printed_prose_numeric_context
+        Merli_comparison_temperature_K_as_printed: '2500'
+        Wu_comparison_temperature_K_as_printed: '2773'
+        maximum_difference_kJ_mol_as_printed: '2'
+        maximum_difference_qualifier_as_printed: do not exceed
+      attribution: Merli et al. (2015) and Wu et al. (1993), compared with present study
+    - observation_id: shornikov_2020_text_wu_near_ideal_range
+      type: thermodynamic_context
+      locator:
+        page: 3
+        published_page: 76
+        pdf_page_index: 2
+        note: Text reports Wu et al. assumed almost-ideal melt behavior over this temperature interval.
+      units: K
+      values:
+        quantity: printed_prose_numeric_context
+        temperature_range_K_as_printed: 2473–3073
+      attribution: Wu et al. (1993)
+    - observation_id: shornikov_2020_text_present_study_ideal_range
+      type: thermodynamic_context
+      locator:
+        page: 3
+        published_page: 76
+        pdf_page_index: 2
+        note: Text reports present-study ideal behavior over this FeO concentration interval.
+      units: mol % FeO
+      values:
+        quantity: printed_prose_numeric_context
+        FeO_concentration_range_mol_pct_as_printed: 80–100
+      attribution: present study
 notes:
 - MinerU classified the first data row of Table 1 on printed page 75 as a header; Gordeev et al. (1965)
   is restored in the context rows below.
