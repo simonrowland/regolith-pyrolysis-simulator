@@ -47,19 +47,19 @@ _Y_AXIS = {
 # species, id, panel, read A (outer-square centre), read B, value field, stored value,
 # uncertainty key, width, note ordinate
 _FRESH_READS = (
-    ("CaO", "shornikov_2011_fig1_a_allibert_marker_01", "a", ("1401.5", "3435.5"), ("1400.26", "3435.11"), "activity", "0.498", "read_uncertainty_dex", "0.000366", "0.302878"),
-    ("CaO", "shornikov_2011_fig1_a_allibert_marker_02", "a", ("1479.5", "3507.5"), ("1478.31", "3506.95"), "activity", "0.400", "read_uncertainty_dex", "0.000434", "0.398009"),
-    ("CaO", "shornikov_2011_fig1_a_allibert_marker_03", "a", ("1561.5", "3603.5"), ("1560.36", "3602.74"), "activity", "0.299", "read_uncertainty_dex", "0.001028", "0.524854"),
-    ("CaO", "shornikov_2011_fig1_a_allibert_marker_04", "a", ("1657.5", "3735.5"), ("1656.42", "3734.44"), "activity", "0.200", "read_uncertainty_dex", "0.000988", "0.699257"),
-    ("CaO", "shornikov_2011_fig1_a_allibert_marker_05", "a", ("1841.5", "3963.0"), ("1840.53", "3961.93"), "activity", "0.100", "read_uncertainty_dex", "0.000882", "1.000174"),
-    ("MgO", "shornikov_2011_fig1_b_allibert_marker_01", "b", ("1373.5", "4737.5"), ("1372.24", "4736.19"), "activity", "0.400", "read_uncertainty_dex", "0.001162", "0.398479"),
-    ("MgO", "shornikov_2011_fig1_b_allibert_marker_02", "b", ("1513.5", "4869.5"), ("1512.33", "4867.9"), "activity", "0.299", "read_uncertainty_dex", "0.001273", "0.523816"),
-    ("MgO", "shornikov_2011_fig1_b_allibert_marker_03", "b", ("1825.5", "5053.5"), ("1824.52", "5051.49"), "activity", "0.200", "read_uncertainty_dex", "0.001399", "0.698526"),
-    ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_03", "c", ("2994.5", "3599.5"), ("2993.23", "3598.75"), "activity", "0.0955", "read_uncertainty_dex", "0.000868", "1.020040"),
-    ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_04", "c", ("3130.5", "3463.5"), ("3129.31", "3463.05"), "activity", "0.190", "read_uncertainty_dex", "0.000787", "0.721539"),
-    ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_05", "c", ("3290.5", "3388.0"), ("3289.41", "3387.22"), "activity", "0.278", "read_uncertainty_dex", "0.001532", "0.555281"),
-    ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_06", "c", ("3482.5", "3332.5"), ("3481.52", "3331.35"), "activity", "0.369", "read_uncertainty_dex", "0.001313", "0.432925"),
-    ("CaO-MgO-Al2O3_melt", "shornikov_2011_fig1_d_allibert_marker_02", "d", ("2722.5", "5065.5"), ("2721.06", "5063.46"), "value", "-24.26", "read_uncertainty_kJ_mol", "0.01244", "24.257465"),
+    ("CaO", "shornikov_2011_fig1_a_allibert_marker_01", "a", ("1401.5", "3435.5"), ("1401.76", "3436.61"), "activity", "0.497", "read_uncertainty_dex", "0.000961", "0.303870"),
+    ("CaO", "shornikov_2011_fig1_a_allibert_marker_02", "a", ("1479.5", "3507.5"), ("1479.81", "3508.45"), "activity", "0.399", "read_uncertainty_dex", "0.000654", "0.399001"),
+    ("CaO", "shornikov_2011_fig1_a_allibert_marker_03", "a", ("1561.5", "3603.5"), ("1561.86", "3604.23"), "activity", "0.298", "read_uncertainty_dex", "0.000539", "0.525839"),
+    ("CaO", "shornikov_2011_fig1_a_allibert_marker_04", "a", ("1657.5", "3735.5"), ("1657.92", "3735.94"), "activity", "0.199", "read_uncertainty_dex", "0.001190", "0.700249"),
+    ("CaO", "shornikov_2011_fig1_a_allibert_marker_05", "a", ("1841.5", "3963.0"), ("1842.03", "3963.43"), "activity", "0.0997", "read_uncertainty_dex", "0.000424", "1.001166"),
+    ("MgO", "shornikov_2011_fig1_b_allibert_marker_01", "b", ("1373.5", "4737.5"), ("1373.75", "4737.69"), "activity", "0.399", "read_uncertainty_dex", "0.000256", "0.399192"),
+    ("MgO", "shornikov_2011_fig1_b_allibert_marker_02", "b", ("1513.5", "4869.5"), ("1513.83", "4869.39"), "activity", "0.299", "read_uncertainty_dex", "0.000249", "0.524525"),
+    ("MgO", "shornikov_2011_fig1_b_allibert_marker_03", "b", ("1825.5", "5053.5"), ("1826.02", "5052.98"), "activity", "0.200", "read_uncertainty_dex", "0.000512", "0.699235"),
+    ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_03", "c", ("2994.5", "3599.5"), ("2994.73", "3600.24"), "activity", "0.0951", "read_uncertainty_dex", "0.000956", "1.021677"),
+    ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_04", "c", ("3130.5", "3463.5"), ("3130.81", "3464.55"), "activity", "0.189", "read_uncertainty_dex", "0.001506", "0.723187"),
+    ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_05", "c", ("3290.5", "3388.0"), ("3290.91", "3388.72"), "activity", "0.277", "read_uncertainty_dex", "0.001383", "0.556929"),
+    ("Al2O3", "shornikov_2011_fig1_c_allibert_marker_06", "c", ("3482.5", "3332.5"), ("3483.02", "3332.84"), "activity", "0.368", "read_uncertainty_dex", "0.000783", "0.434562"),
+    ("CaO-MgO-Al2O3_melt", "shornikov_2011_fig1_d_allibert_marker_02", "d", ("2722.5", "5065.5"), ("2722.56", "5064.95"), "value", "-24.25", "read_uncertainty_kJ_mol", "0.00291", "24.250232"),
 )
 
 _UNCHANGED_MARKERS = (
@@ -127,8 +127,8 @@ def _render_pins(document: dict) -> None:
     )["values"]["value"] == "271.522"
 
     marker_pins = (
-        ("CaO", "a", "0.498", "(1401.5, 3435.5)", "(1400.26, 3435.11)", "0.302878", "0.000366"),
-        ("MgO", "b", "0.400", "(1373.5, 4737.5)", "(1372.24, 4736.19)", "0.398479", "0.001162"),
+        ("CaO", "a", "0.497", "(1401.5, 3435.5)", "(1401.76, 3436.61)", "0.303870", "0.000961"),
+        ("MgO", "b", "0.399", "(1373.5, 4737.5)", "(1373.75, 4737.69)", "0.399192", "0.000256"),
         ("Al2O3", "c", 0.010, "(2691, 4043)", "(2689, 4043)", "1.9954", None),
     )
     for species, panel, activity, first_pixel, second_pixel, log_ordinate, width in marker_pins:
@@ -288,7 +288,7 @@ def test_printed_band_rejects_a_1e_9_width() -> None:
             _assert_printed_band_contains_both_reads(
                 narrowed,
                 "a",
-                (("1401.5", "3435.5"), ("1400.26", "3435.11")),
+                (("1401.5", "3435.5"), ("1401.76", "3436.61")),
                 "1e-9",
             )
 
