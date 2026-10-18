@@ -89,3 +89,94 @@ def test_rego_1988_records_method_standard_state_and_all_deferred_figures() -> N
         figure = next(row for row in nao["context"] if row["observation_id"] == observation_id)
         assert figure["values"]["composition_state"] == "unknown"
         assert figure["values"]["composition_unknown_reason"]
+
+
+def test_rego_1988_tables_text_context_and_fig5_labels_are_pinned() -> None:
+    extract = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    species = extract["species"]
+    nao = species["Na2O"]
+
+    table_i = next(
+        row
+        for row in species["SiO2"]["context"]
+        if row["observation_id"] == "rego_1988_table_i_sio2_terminal_binary_activities"
+    )
+    assert table_i["locator"]["published_page"] == 659
+    assert table_i["locator"]["pdf_page_index"] == 4
+    assert table_i["T_C"] == 1400
+    assert table_i["standard_state"] == "pure liquid SiO2 at 1400 C"
+    assert table_i["values"]["printed_quantity"] == "log a_SiO2(l)"
+    table_i_rows = table_i["values"]["rows"]
+    assert table_i_rows[0]["log_a_SiO2(l)_CaO-(SiO2)y"] == "-0.057"
+    assert table_i_rows[0]["log_a_SiO2(l)_Na2O-(SiO2)y"] == "-0.982"
+    assert table_i_rows[3]["log_a_SiO2(l)_Na2O-(SiO2)y"] == "-0.233"
+    assert (
+        table_i["values"]["columns"]["Na2O-(SiO2)y"]["method_class"]
+        == "quoted_attributed"
+    )
+
+    table_ii = next(
+        row
+        for row in nao["context"]
+        if row["observation_id"]
+        == "rego_1988_table_ii_calculated_sodium_capacity_and_pressure"
+    )
+    assert table_ii["locator"]["published_page"] == 661
+    assert table_ii["locator"]["pdf_page_index"] == 6
+    assert table_ii["values"]["method_class"] == "model_derived"
+    assert table_ii["values"]["conditions_as_published"] == {
+        "Al2O3": "10 wt pct",
+        "basicity": "unit",
+    }
+    table_ii_rows = table_ii["values"]["rows"]
+    assert table_ii_rows[0]["values_as_published"] == ["1.6", "0.9", "0.25"]
+    assert table_ii_rows[2]["values_as_published"] == ["2.0", "2.0", "2.0"]
+    assert table_ii_rows[3]["values_as_published"] == ["0.008", "0.018", "0.037"]
+    assert table_ii_rows[3]["method_class"] == "model_derived"
+
+    fig5 = next(
+        row
+        for row in nao["context"]
+        if row["observation_id"] == "rego_1988_fig5_na2o_mgo_sio2_isoactivity"
+    )
+    assert [
+        series["activity_label_as_published"] for series in fig5["values"]["series"]
+    ] == ["-7.02", "-7.53", "-7.56", "-7.72", "-7.97"]
+
+    fig4 = next(
+        row
+        for row in species["SiO2"]["context"]
+        if row["observation_id"] == "rego_1988_fig4_sio2_isoactivity_model"
+    )
+    reference = fig4["values"]["liquidus_reference"]
+    assert reference["activity_as_published"] == 0.92
+    assert reference["locator"]["pdf_page_index"] == 4
+    assert reference["footnote_locator"]["pdf_page_index"] == 2
+
+    fig7 = next(
+        row
+        for row in nao["context"]
+        if row["observation_id"] == "rego_1988_fig7_na2o_activity_ratio_model_comparison"
+    )
+    assert all(
+        series["method_class"] == "model_derived"
+        for series in fig7["values"]["series"][:3]
+    )
+    assert all(
+        series["method_class"] == "measured_reduced"
+        for series in fig7["values"]["series"][3:]
+    )
+
+    contexts = {row["observation_id"]: row for row in nao["context"]}
+    assert contexts["rego_1988_binary_master_composition_range"]["values"][
+        "range_as_published"
+    ] == "0.21 to 0.33"
+    assert contexts["rego_1988_unstirred_reference_binary_difference"]["values"][
+        "value_as_published"
+    ] == "3 to 5 pct lower in Na2O"
+    assert contexts["rego_1988_stirred_composition_variation"]["values"][
+        "value_as_published"
+    ] == "less than 2 pct"
+    vapor = contexts["rego_1988_quoted_binary_na_vapor_pressure_range"]
+    assert vapor["values"]["range_as_published"] == "about 10^-2.5 to 10^-1.0 atm"
+    assert vapor["values"]["method_class"] == "quoted_attributed"

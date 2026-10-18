@@ -11,7 +11,9 @@ extraction:
     MinerU tables and pdftotext-layout were compared. Both printed tables were
     rendered at 600 dpi and every numeric cell was checked. The measured Na2O
     isoactivity compositions occur in figures only; figure coordinates were
-    not digitised under the figure-deferral rule.
+    not digitised under the figure-deferral rule. Table I and Table II values
+    are preserved in context, with printed logarithms unconverted and the
+    calculated Table II values kept distinct from measurements.
   date: '2026-10-18'
   worker: w9-1018
 review_status: draft
@@ -73,6 +75,61 @@ species:
             Al2O3 series. Full per-marker compositions are not tabulated.
           uncertainty_as_published: no printed uncertainty for the Na2O activity data
           attribution: This work
+      - observation_id: rego_1988_binary_master_composition_range
+        type: context
+        locator:
+          page: 656
+          published_page: 656
+          pdf_page_index: 1
+          section: Apparatus and Materials
+        units: mole fraction
+        values:
+          printed_quantity: X_Na2O
+          range_as_published: 0.21 to 0.33
+          melt_as_published: binary Na2O-SiO2 master
+          attribution: This work
+      - observation_id: rego_1988_unstirred_reference_binary_difference
+        type: context
+        locator:
+          page: 657
+          published_page: 657
+          pdf_page_index: 2
+          section: Results and Discussion
+        units: percent relative to the binary master
+        values:
+          printed_quantity: Na2O composition difference
+          value_as_published: 3 to 5 pct lower in Na2O
+          sample_as_published: unstirred reference binary melts
+          attribution: This work
+      - observation_id: rego_1988_stirred_composition_variation
+        type: context
+        locator:
+          page: 657
+          published_page: 657
+          pdf_page_index: 2
+          section: Results and Discussion
+        units: percent
+        values:
+          printed_quantity: Na2O compositional variation
+          value_as_published: less than 2 pct
+          condition_as_published: binary melt stirred during subsequent runs
+          attribution: This work
+      - observation_id: rego_1988_quoted_binary_na_vapor_pressure_range
+        type: context
+        locator:
+          page: 655
+          published_page: 655
+          pdf_page_index: 0
+          section: Introduction
+        units: atm
+        values:
+          quantity: p_partial
+          printed_quantity: Na vapor pressure
+          range_as_published: about 10^-2.5 to 10^-1.0 atm
+          approximate: true
+          condition_as_published: CO partial pressure close to 1 atm
+          method_class: quoted_attributed
+          attribution: Rego, Sigworth, and Philbrook 1985, reference [2]
       - observation_id: rego_1988_fig1_equilibration_apparatus
         type: figure_record
         locator:
@@ -332,7 +389,7 @@ species:
         values:
           quantity: activity
           printed_quantity: log((a_Na2O)_t/(a_Na2O)_b)
-          method_class: model_derived
+          method_class: figure_only
           species: Na2O
           system_as_published: Na2O-CaO-SiO2 pseudo-binaries
           axes_as_printed: X_Na2O(SiO2)y and log((a_Na2O)t/(a_Na2O)b)
@@ -343,22 +400,29 @@ species:
           series:
             - label: Case 1 model curve in each panel
               marker_count: 0
+              method_class: model_derived
             - label: Case 2 model curve in each panel
               marker_count: 0
+              method_class: model_derived
             - label: Case 3 model curve in each panel
               marker_count: 0
+              method_class: model_derived
             - label: experimental points at X_SiO2 = 0.60
               marker: filled circles
               marker_count: 4
+              method_class: measured_reduced
             - label: experimental points at X_SiO2 = 0.65
               marker: filled circles
               marker_count: 5
+              method_class: measured_reduced
             - label: experimental points at X_SiO2 = 0.70
               marker: filled circles
               marker_count: 5
+              method_class: measured_reduced
             - label: experimental points at X_SiO2 = 0.75
               marker: filled circles
               marker_count: 2
+              method_class: measured_reduced
           schema_gap: >-
             The plotted observable is a logarithm of an activity ratio; no
             matching quantity form exists. Figure curves and points are not
@@ -402,6 +466,45 @@ species:
           attribution: This work; sodium capacity calculated by equation [6].
           digitisation: deferred to a figure pass
           numeric_points: none
+      - observation_id: rego_1988_table_ii_calculated_sodium_capacity_and_pressure
+        type: context
+        locator:
+          page: 661
+          published_page: 661
+          pdf_page_index: 6
+          table: 'II'
+        units: as printed in each table row
+        values:
+          method_class: model_derived
+          table_title_as_published: >-
+            Calculation of P_Na for a 10 Wt Pct Al2O3 Blast Furnace Type Slag
+            with Unit Basicity
+          calculation_basis: >-
+            Calculated from the paper's equations; these tabulated values are
+            not measurements.
+          conditions_as_published:
+            Al2O3: 10 wt pct
+            basicity: unit
+          temperature_columns_C: ['1400', '1500', '1600']
+          rows:
+            - printed_quantity: log C_Na
+              quantity: sodium_capacity_C_Na
+              values_as_published: ['1.6', '0.9', '0.25']
+              schema_gap: >-
+                The store has no sodium-capacity quantity. The logarithms stay
+                as printed, matching the gap recorded for Figure 8.
+            - printed_quantity: X_Na2O
+              units: mole fraction
+              values_as_published: ['0.005', '0.005', '0.005']
+            - printed_quantity: p_CO
+              units: atm
+              values_as_published: ['2.0', '2.0', '2.0']
+            - printed_quantity: p_Na
+              quantity: p_partial
+              units: atm
+              method_class: model_derived
+              values_as_published: ['0.008', '0.018', '0.037']
+          attribution: This work; calculated values from the paper's equations.
   SiO2:
     observations: []
     context:
@@ -426,6 +529,22 @@ species:
             Iso-activity data for SiO2 in the Na2O-CaO-SiO2 system at 1400 C by
             Gibbs-Duhem integration.
           panel: single ternary diagram
+          liquidus_reference:
+            activity_as_published: 0.92
+            phase: liquid in equilibrium with solid cristobalite
+            standard_state: pure liquid SiO2 at 1400 C
+            locator:
+              page: 659
+              published_page: 659
+              pdf_page_index: 4
+            footnote_as_published: >-
+              To express silica activity with reference to pure solid silica at
+              1400 C as standard state, divide the given activity values by 0.92.
+            footnote_locator:
+              page: 657
+              published_page: 657
+              pdf_page_index: 2
+            note: The divided values are not stored.
           series:
             - activity_label_as_published: '0.8'
               marker_count: 0
@@ -440,3 +559,48 @@ species:
           attribution: This work; Gibbs-Duhem integration
           digitisation: deferred to a figure pass
           numeric_points: none
+      - observation_id: rego_1988_table_i_sio2_terminal_binary_activities
+        type: context
+        locator:
+          page: 659
+          published_page: 659
+          pdf_page_index: 4
+          table: 'I'
+        phase: l
+        T_C: 1400
+        units: mole fraction; log10 activity as printed
+        standard_state: pure liquid SiO2 at 1400 C
+        values:
+          printed_quantity: log a_SiO2(l)
+          schema_gap: >-
+            No log-activity value form exists in the quantity schema. The
+            printed logarithms remain strings; no linear activities are inferred.
+          columns:
+            CaO-(SiO2)y:
+              method_class: model_derived
+              attribution: >-
+                Authors' extrapolation of Rein and Chipman, Trans. TMS-AIME,
+                1965, vol. 233, pp. 415-25, shifted with JANAF.
+            Na2O-(SiO2)y:
+              method_class: quoted_attributed
+              attribution: >-
+                Rego, Sigworth, and Philbrook, Metall. Trans. B, 1985,
+                vol. 16B, pp. 313-23, reference [2].
+          rows:
+            - X_SiO2: '0.60'
+              y: '1.50'
+              log_a_SiO2(l)_CaO-(SiO2)y: '-0.057'
+              log_a_SiO2(l)_Na2O-(SiO2)y: '-0.982'
+            - X_SiO2: '0.65'
+              y: '1.86'
+              log_a_SiO2(l)_CaO-(SiO2)y: '0.023'
+              log_a_SiO2(l)_Na2O-(SiO2)y: '-0.644'
+            - X_SiO2: '0.70'
+              y: '2.33'
+              log_a_SiO2(l)_CaO-(SiO2)y: '0.050'
+              log_a_SiO2(l)_Na2O-(SiO2)y: '-0.401'
+            - X_SiO2: '0.75'
+              y: '3.00'
+              log_a_SiO2(l)_CaO-(SiO2)y: '0.072'
+              log_a_SiO2(l)_Na2O-(SiO2)y: '-0.233'
+          attribution: This work; Table I values have the column-specific provenance above.
