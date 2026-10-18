@@ -1189,6 +1189,9 @@ class EvaporationMixin:
                     if overhead_partials_override_Pa is not None
                     else self._melt_headspace_total_pressure_bar() * 1.0e5
                 ),
+                # Override is the actual boundary mixture (regulator/carrier
+                # fill plus vapour partials). Summing it keeps the series film
+                # at that total; a vapour-only override would drop the carrier.
                 vapour_batch_flux_pressures_Pa=vapor_pressures,
                 vapour_batch_report=batch_report,
                 vapour_batch_flux_overlay=flux_overlay_report,

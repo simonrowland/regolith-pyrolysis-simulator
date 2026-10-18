@@ -3954,6 +3954,133 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         return 0.0
 
+    def _source_duct_carrier_partials_Pa(self) -> Dict[str, float]:
+        # Regulator/carrier fill from the existing stream owner, not a
+        # vapour-only remainder. CONTROLLED_O2 holds the command-scale total
+        # even when the stream carrier key is empty (pO2=0).
+        command_total_mbar, command_partials_mbar = (
+            self.overhead_model._pressure_commands(self.melt)
+        )
+        atmosphere_name = str(getattr(self.melt.atmosphere, 'name', '') or '')
+        carrier = str(getattr(self.melt, 'background_gas_species', '') or '')
+        if atmosphere_name in {'PN2_SWEEP', 'ARGON_FLOW', 'CO2_BACKPRESSURE'}:
+            carrier = carrier or {
+                'PN2_SWEEP': 'N2',
+                'ARGON_FLOW': 'Ar',
+                'CO2_BACKPRESSURE': 'CO2',
+            }[atmosphere_name]
+        elif atmosphere_name in {
+            'CONTROLLED_O2',
+            'CONTROLLED_O2_FLOW',
+            'O2_BACKPRESSURE',
+        }:
+            carrier = (
+                carrier
+                if carrier in command_partials_mbar
+                else (
+                    'O2'
+                    if float(getattr(self.melt, 'pO2_mbar', 0.0) or 0.0) > 0.0
+                    else ''
+                )
+            )
+        else:
+            carrier = ''
+        partials_Pa = {
+            str(species): max(0.0, float(pressure_mbar)) * 100.0
+            for species, pressure_mbar in dict(command_partials_mbar).items()
+            if float(pressure_mbar) > 0.0
+        }
+        command_Pa = (
+            max(0.0, float(command_total_mbar)) * 100.0
+            if command_total_mbar is not None
+            else 0.0
+        )
+        if carrier:
+            others = sum(
+                pressure
+                for species, pressure in partials_Pa.items()
+                if species != carrier
+            )
+            fill_Pa = (
+                max(0.0, command_Pa - others)
+                if command_Pa > 0.0
+                else partials_Pa.get(carrier, 0.0)
+            )
+            if fill_Pa > 0.0:
+                partials_Pa[carrier] = max(
+                    partials_Pa.get(carrier, 0.0), fill_Pa
+                )
+            return partials_Pa
+        if partials_Pa:
+            return partials_Pa
+        if command_Pa <= 0.0:
+            return {}
+        installed = dict(
+            getattr(self, '_melt_headspace_composition_mbar', {}) or {}
+        )
+        known_carriers = {'N2', 'Ar', 'CO2', 'He'}
+        background = str(
+            getattr(self.melt, 'background_gas_species', '') or ''
+        ).strip()
+        if background and background.upper() != 'O2':
+            known_carriers = known_carriers | {background}
+        remainder = {
+            str(species): max(0.0, float(pressure_mbar)) * 100.0
+            for species, pressure_mbar in installed.items()
+            if str(species) in known_carriers and float(pressure_mbar) > 0.0
+        }
+        if remainder:
+            total = sum(remainder.values())
+            if total > 0.0:
+                scale = command_Pa / total
+                return {
+                    species: pressure * scale
+                    for species, pressure in remainder.items()
+                }
+            return remainder
+        if background and background.upper() != 'O2':
+            return {background: command_Pa}
+        return {'N2': command_Pa}
+
+    def _carrier_only_boundary_mbar(self) -> Dict[str, float]:
+        return {
+            str(species): float(pressure_Pa) / 100.0
+            for species, pressure_Pa in (
+                self._source_duct_carrier_partials_Pa().items()
+            )
+            if float(pressure_Pa) > 0.0
+        }
+
+    def _install_source_duct_surface(self, capacity_result) -> None:
+        from simulator.thermal_train import NoColdTrain
+
+        if not isinstance(getattr(capacity_result, 'capacity', None), NoColdTrain):
+            return
+        partials = dict(capacity_result.partial_pressures_Pa)
+        if partials:
+            self._install_upstream_projection({
+                str(species): float(pressure_Pa) / 100.0
+                for species, pressure_Pa in partials.items()
+                if float(pressure_Pa) > 0.0
+            })
+            return
+        self._install_upstream_projection(self._carrier_only_boundary_mbar())
+
+    def _reprice_native_fe_residual_at_installed_surface(self) -> None:
+        if self._native_fe_vapor_residual_capacity_mol_this_hr is None:
+            return
+        last = dict(self._last_native_fe_partition_diagnostic or {})
+        pool_mol = max(0.0, float(last.get('native_fe_pool_mol', 0.0) or 0.0))
+        committed_vapor_mol = max(
+            0.0, float(last.get('native_fe_vapor_mol', 0.0) or 0.0)
+        )
+        diagnostic = self._native_fe_partition_diagnostic(pool_mol)
+        self._native_fe_vapor_residual_capacity_mol_this_hr = max(
+            0.0,
+            float(diagnostic.get('native_fe_vapor_capacity_mol_hr', 0.0) or 0.0)
+            - committed_vapor_mol,
+        )
+
     def _headspace_bleed_conductance_kg_s(
         self,
         *,
@@ -6969,8 +7096,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             iteration_controls = dict(controls)
             iteration_controls['overhead_partials_Pa'] = dict(partials_Pa)
             # Finite-holdup Picard keeps the installed owner total for the
-            # Kn/gas-resistance gate. The source/duct closure prices against
-            # the candidate mixture total in the same tick.
+            # Kn/gas-resistance gate. The source/duct closure prices the
+            # series film at the actual mixture total (carrier fill plus
+            # vapour partials) in the same tick.
             if finite_capacity:
                 iteration_controls['overhead_pressure_pa'] = (
                     self._melt_headspace_total_pressure_bar() * 1.0e5
@@ -7010,6 +7138,40 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 None,
             )
             if residual_fe_mol is not None and 'Fe' in rates:
+                previous_projection = getattr(
+                    self, '_melt_headspace_composition_mbar', None
+                )
+                last_native = dict(
+                    getattr(
+                        self, '_last_native_fe_partition_diagnostic', {}
+                    ) or {}
+                )
+                committed_vapor_mol = max(
+                    0.0,
+                    float(last_native.get('native_fe_vapor_mol', 0.0) or 0.0),
+                )
+                pool_mol = max(
+                    0.0,
+                    float(last_native.get('native_fe_pool_mol', 0.0) or 0.0),
+                )
+                self._install_upstream_projection({
+                    str(species): float(pressure) / 100.0
+                    for species, pressure in dict(partials_Pa).items()
+                    if float(pressure) > 0.0
+                })
+                try:
+                    diagnostic = self._native_fe_partition_diagnostic(pool_mol)
+                    residual_fe_mol = max(
+                        0.0,
+                        float(
+                            diagnostic.get(
+                                'native_fe_vapor_capacity_mol_hr', 0.0
+                            ) or 0.0
+                        )
+                        - committed_vapor_mol,
+                    )
+                finally:
+                    self._install_upstream_projection(previous_projection)
                 rates['Fe'] = min(
                     rates['Fe'],
                     max(0.0, float(residual_fe_mol))
@@ -7044,10 +7206,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ).molar_mass_kg_per_mol()
                 # F = G M (P^2 - P_d^2). Evaluate at 1000 Pa against vacuum
                 # so G = F/(M P^2) [mol/(s Pa^2)] uses the live PIPE-1 owner
-                # rather than a copied geometry formula. C2A's commanded
-                # 10 mbar is a supply target, not the duct outlet; the
-                # melt-to-train PIPE-1 bound is vacuum unless an explicit
-                # downstream_pressure_bar is configured.
+                # rather than a copied geometry formula. Downstream is the
+                # atmosphere owner (_resolve_downstream_pressure): 0 for PN2,
+                # the command for controlled-O2. Do not hard-code vacuum.
                 reference_Pa = 1000.0
                 pipe_mass_kg_s = self.overhead_model._pipe_conductance(
                     reference_Pa,
@@ -7065,15 +7226,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                             * temperature_K
                             / volume_m3
                         )
-                configured_downstream = self._overhead_headspace_config.get(
-                    'downstream_pressure_bar'
-                )
-                if configured_downstream is None:
-                    duct_downstream_Pa = 0.0
-                else:
-                    duct_downstream_Pa = max(
-                        0.0, float(configured_downstream) * 100000.0
-                    )
                 source_duct_kwargs = {
                     'equilibrium_pressures_Pa': dict(batch_flux_pressures),
                     'pipe_molar_G_mol_s_Pa2': (
@@ -7084,8 +7236,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         else 0.0
                     ),
                     'incoming_partials_Pa': incoming,
+                    'carrier_partials_Pa': (
+                        self._source_duct_carrier_partials_Pa()
+                    ),
                 }
-                source_duct_downstream_Pa = duct_downstream_Pa
+                source_duct_downstream_Pa = (
+                    self._headspace_downstream_pressure_bar() * 100000.0
+                )
             else:
                 source_duct_downstream_Pa = (
                     self._headspace_downstream_pressure_bar() * 100000.0
@@ -13849,17 +14006,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if capacity_result is not None:
                 from simulator.thermal_train import NoColdTrain as _NoColdTrain
 
-                if (
-                    isinstance(capacity_result.capacity, _NoColdTrain)
-                    and dict(capacity_result.partial_pressures_Pa)
-                ):
-                    self._install_upstream_projection({
-                        str(species): float(pressure_Pa) / 100.0
-                        for species, pressure_Pa in (
-                            capacity_result.partial_pressures_Pa.items()
-                        )
-                        if float(pressure_Pa) > 0.0
-                    })
+                if isinstance(capacity_result.capacity, _NoColdTrain):
+                    self._install_source_duct_surface(capacity_result)
+                    self._reprice_native_fe_residual_at_installed_surface()
                     for notice in capacity_result.closure_notices:
                         from simulator.silent_zero import (
                             CATEGORY_MARK,
@@ -14061,19 +14210,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             evap_flux, upstream_transport,
             holdup_mol=self._stream_inlet_holdup_this_tick,
         )
-        if (
-            capacity_result is not None
-            and dict(capacity_result.partial_pressures_Pa)
+        if capacity_result is not None and isinstance(
+            capacity_result.capacity, _NoColdTrain
         ):
             # Next tick's HKL backpressure is this tick's converged surface
-            # pressure, never an after-the-fact inversion of this tick's flux.
-            self._install_upstream_projection({
-                str(species): float(pressure_Pa) / 100.0
-                for species, pressure_Pa in (
-                    capacity_result.partial_pressures_Pa.items()
-                )
-                if float(pressure_Pa) > 0.0
-            })
+            # (carrier fill plus vapour partials). An empty converged map
+            # installs the carrier-only boundary, never a flux inversion.
+            self._install_source_duct_surface(capacity_result)
         else:
             self._install_upstream_projection(
                 self.overhead_model._melt_surface_partial_pressures(
