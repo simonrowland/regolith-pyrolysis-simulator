@@ -34,7 +34,7 @@ species:
         type: model_parameter_table
         locator:
           published_page: 429
-          pdf_page_index: 6
+          pdf_page_index: 5
           table: '1'
         units: as printed
         values:
@@ -64,7 +64,7 @@ species:
         type: model_parameter_table
         locator:
           published_page: 437
-          pdf_page_index: 14
+          pdf_page_index: 13
           table: '2'
         units: as printed
         values:
@@ -114,7 +114,7 @@ species:
             - coefficient: 'gX2ss'
               equivalent_parameter: '2(ΔḠ2*Dis + ΔW12 + 3/4 Δ²W12^ss)'
             - coefficient: 'gX2tt'
-              equivalent_parameter: '2(ΔW14 − ΔW2′4 + 1/4(Δ²W12^tt + Δ²W24^tt))'
+              equivalent_parameter: '2(ΔW14 − ΔW24′ + 1/4(Δ²W12^tt + Δ²W24^tt))'
             - coefficient: 'gX3ss'
               equivalent_parameter: '2(ΔW12 − ΔW23 + 1/4(Δ²W13^ss + Δ²W23^ss))'
             - coefficient: 'gX3tt'
@@ -147,7 +147,7 @@ species:
         type: model_parameter_table
         locator:
           published_page: 442
-          pdf_page_index: 19
+          pdf_page_index: 18
           table: '3'
         units: as printed
         values:
@@ -161,7 +161,7 @@ species:
             - coefficient: 'g0'
               equivalent_parameter: 'Ḡ1°'
             - coefficient: 'gX2'
-              equivalent_parameter: 'Ḡ2′° + ΔḠ2*Dis − Ḡ1° + W12'
+              equivalent_parameter: 'Ḡ2* − Ḡ1° + W12'
             - coefficient: 'gX3'
               equivalent_parameter: 'Ḡ3° − Ḡ1° + W13'
             - coefficient: 'gX4'
@@ -207,12 +207,11 @@ species:
         type: model_input_table
         locator:
           published_page: 446
-          pdf_page_index: 23
+          pdf_page_index: 22
           table: '4'
         units: as printed
         values:
           title: Adopted thermodynamic properties of endmember solids and CO2 gas
-          method_class: model_derived
           enthalpy_entropy_volume_header_as_printed:
             - ΔHf°298.15 (J)
             - S°298.15 (J/K)
@@ -352,7 +351,7 @@ species:
         type: model_summary
         locator:
           published_page: 432
-          pdf_page_index: 9
+          pdf_page_index: 8
           section: Results and discussion
         units: as printed
         values:
@@ -376,6 +375,67 @@ species:
             - name: predicted T2 Al-Si disordering critical temperature
               value: '1443.41'
               units: K
+          model_derived_values:
+            - name: minimum disordered ordering enthalpy
+              quantity_as_printed: ΔH2*Dis
+              value_as_printed: '> 8.0642'
+              units: kJ/gfw
+              method_class: model_derived
+              locator:
+                published_page: 431
+                pdf_page_index: 7
+                section: Results and discussion
+            - name: partial Al-Si ordering composition window
+              value_as_printed: '0.19 < X2 < 0.89'
+              temperature_as_printed: 1573 K
+              method_class: model_derived
+              locator:
+                published_page: 431
+                pdf_page_index: 7
+                section: Results and discussion
+            - name: gehlenite configurational heat-capacity parameter
+              symbol_as_printed: l2
+              value_as_printed: '1.4170035×10^-4'
+              units: '(J/gfw)K^-1'
+              method_class: model_derived
+              locator:
+                published_page: 449
+                pdf_page_index: 25
+                section: Results and discussion
+            - name: assumed gehlenite ordering enthalpy at the lambda transition
+              symbol_as_printed: ΔHλ
+              value_as_printed: '12'
+              units: kJ/gfw
+              method_class: model_derived
+              locator:
+                published_page: 449
+                pdf_page_index: 25
+                section: Results and discussion
+            - name: complete T2 Al-Si disordering entropy
+              expression_as_printed: 2R ln(2)
+              value_as_printed: '11.525'
+              units: '(J/gfw)K^-1'
+              method_class: model_derived
+              locator:
+                published_page: 449
+                pdf_page_index: 25
+                section: Results and discussion
+            - name: temperatures of assumed vibrational heat-capacity estimates
+              values_as_printed: ['1555', '1656.5']
+              units: K
+              method_class: model_derived
+              locator:
+                published_page: 448
+                pdf_page_index: 24
+                section: Results and discussion
+            - name: calculated reaction (32) temperature at 1 kbar
+              value_as_printed: '918.49'
+              units: °C
+              method_class: model_derived
+              locator:
+                published_page: 450
+                pdf_page_index: 26
+                section: Results and discussion
           approximate_values:
             - name: possible upward uncertainty in critical temperature
               value:
@@ -410,12 +470,75 @@ species:
             their printed quoted_attributed classifications. This paper reports
             no raw calorimetric or phase-equilibrium data table; those marker
             datasets appear in the deferred figures below.
+      - observation_id: sack_2021_berman_1988_akermanite_enthalpy_baseline
+        type: quoted_attributed_value
+        locator:
+          published_page: 445
+          pdf_page_index: 21
+          section: Standard Enthalpy of Formation of Akermanite
+          note: Berman's value used as the akermanite comparison baseline
+        units: kJ/gfw
+        values:
+          quantity: delta_fH
+          quantity_as_printed: ΔHf°298.15
+          method_class: quoted_attributed
+          attribution: Berman (1988)
+          phase_as_printed: akermanite
+          value_as_printed: '− 3,860.441'
+      - observation_id: sack_2021_berman_1988_gehlenite_enthalpy_baseline
+        type: quoted_attributed_value
+        locator:
+          published_page: 446
+          pdf_page_index: 22
+          section: Standard Enthalpy of Formation of Akermanite
+          note: Berman's value used as the gehlenite comparison baseline
+        units: kJ/gfw
+        values:
+          quantity: delta_fH
+          quantity_as_printed: ΔHf°298.15
+          method_class: quoted_attributed
+          attribution: Berman (1988)
+          phase_as_printed: gehlenite
+          value_as_printed: '− 3,988.158'
+      - observation_id: sack_2021_sack_ghiorso_2017_diopside_entropy_revision
+        type: quoted_attributed_statement
+        locator:
+          published_page: 446
+          pdf_page_index: 22
+          section: Standard Enthalpy of Formation of Akermanite
+          note: Sentence explaining the akermanite enthalpy change through diopside entropy
+        units: '(J/gfw)K^-1'
+        values:
+          quantity: S
+          quantity_as_printed: S°298.15
+          method_class: quoted_attributed
+          attribution: Sack and Ghiorso (2017)
+          phase_as_printed: diopside
+          change_as_printed: '0.9 downward'
+      - observation_id: sack_2021_ogorodova_2018_melilite_enthalpy_estimates
+        type: quoted_attributed_values
+        locator:
+          published_page: 450
+          pdf_page_index: 26
+          section: Standard Enthalpy of Formation of Akermanite
+          note: Quoted most recent estimates from Ogorodova and others (2018)
+        units: kJ/gfw
+        values:
+          quantity: delta_fH
+          quantity_as_printed: ΔHf°298.15
+          method_class: quoted_attributed
+          attribution: Ogorodova and others (2018)
+          quoted_values:
+            - phase_as_printed: akermanite
+              value_as_printed: '−3,853.9 ± 4.3'
+            - phase_as_printed: gehlenite
+              value_as_printed: '−3,982.4 ± 3.9'
       - observation_id: sack_2021_fig1_excess_mixing_enthalpy
         type: figure_record
         locator:
           figure: '1'
           published_page: 427
-          pdf_page_index: 4
+          pdf_page_index: 3
         units: kJ/gfw
         values:
           quantity_as_printed: 970 K excess mixing enthalpy ΔHmix
@@ -432,7 +555,8 @@ species:
             equation (11) at 970, 1273 and 1573 K. Starting melilites were
             prepared by solid-state sintering of component oxides (triangles) or
             crystallization from glasses (circles) at 1573 K, then annealed for
-            3 hours at 970 K before calorimetric measurement.
+            3 hours at 970 K before calorimetric measurement. Purple curves use
+            ΔW12 = +1 kJ/gfw, rather than −1 kJ/gfw.
           panel: single panel
           series:
             - label: solid-state-sintered samples
@@ -445,6 +569,12 @@ species:
               marker_count: 3
             - label: present-study model curves
               attribution: this study
+              method_class: model_derived
+              marker_as_printed: none; curves
+              marker_count: 0
+            - label: present-study purple comparison curves with ΔW12 = +1 kJ/gfw
+              attribution: this study
+              method_class: model_derived
               marker_as_printed: none; curves
               marker_count: 0
           digitisation: deferred to a figure pass
@@ -453,7 +583,7 @@ species:
         locator:
           figure: '2'
           published_page: 432
-          pdf_page_index: 9
+          pdf_page_index: 8
         units: order variable as plotted; configurational entropy J/gfw/K
         values:
           quantity_as_printed: order variable s and configurational entropy S^IC
@@ -493,7 +623,7 @@ species:
         locator:
           figure: '3'
           published_page: 433
-          pdf_page_index: 10
+          pdf_page_index: 9
         units: dimensionless c/a
         values:
           quantity_as_printed: axial ratio c/a
@@ -538,7 +668,7 @@ species:
         locator:
           figure: '4'
           published_page: 434
-          pdf_page_index: 11
+          pdf_page_index: 10
         units: dimensionless activity
         values:
           quantity_as_printed: endmember activity–composition relations
@@ -578,7 +708,7 @@ species:
         locator:
           figure: '5'
           published_page: 440
-          pdf_page_index: 17
+          pdf_page_index: 16
         units: dimensionless composition-ordering coordinates
         values:
           quantity_as_printed: composition-ordering square and reciprocal site-population ratio
@@ -610,7 +740,7 @@ species:
         locator:
           figure: '6'
           published_page: 441
-          pdf_page_index: 18
+          pdf_page_index: 17
         units: dimensionless order variable and component mole fraction
         values:
           quantity_as_printed: non-convergent order variable r and akermanite mole fraction X1
@@ -647,7 +777,7 @@ species:
         locator:
           figure: '7'
           published_page: 445
-          pdf_page_index: 22
+          pdf_page_index: 21
         units: °C; pressure in bars
         values:
           quantity: transition_temperature
@@ -714,7 +844,7 @@ species:
         locator:
           figure: '8'
           published_page: 448
-          pdf_page_index: 25
+          pdf_page_index: 24
         units: J/gfw/K
         values:
           quantity: cp
@@ -728,32 +858,44 @@ species:
           caption: >-
             Configurational heat capacity of Al-Si disorder on T2a and T2b sites
             in gehlenite as predicted by Berman (1988), this study’s
-            thermodynamic model, and four comparison functions. l1 = −l2(Tref)
-            and Tref = 305 K.
+            thermodynamic model, and four comparison functions. Their printed
+            l2 parameters are 5.62585×10^-4, 1.77858×10^-5, 1.4170035×10^-4,
+            and l2^2 = 7.84211×10^-7 (J/gfw)K^-1. l1 = −l2(Tref) and
+            Tref = 305 K.
           panel: single panel
           series:
             - label: Berman (1988)
               attribution: Berman (1988)
+              method_class: quoted_attributed
               marker_as_printed: none; curve
               marker_count: 0
             - label: this-study thermodynamic model
               attribution: this study
+              method_class: model_derived
               marker_as_printed: none; curve
               marker_count: 0
             - label: T^0.5(l1 + l2T)
               attribution: comparison function
+              method_class: model_derived
+              parameter_as_printed: 'l2 = 5.62585×10^-4 (J/gfw)K^-1'
               marker_as_printed: none; curve
               marker_count: 0
             - label: T(l1 + l2T)
               attribution: comparison function
+              method_class: model_derived
+              parameter_as_printed: 'l2 = 1.77858×10^-5 (J/gfw)K^-1'
               marker_as_printed: none; curve
               marker_count: 0
             - label: T^0.7(l1 + l2T)
               attribution: comparison function
+              method_class: model_derived
+              parameter_as_printed: 'l2 = 1.4170035×10^-4 (J/gfw)K^-1'
               marker_as_printed: none; curve
               marker_count: 0
             - label: T^0.5(l1 + l2T)^2
               attribution: comparison function
+              method_class: model_derived
+              parameter_as_printed: 'l2^2 = 7.84211×10^-7 (J/gfw)K^-1'
               marker_as_printed: none; curve
               marker_count: 0
           digitisation: deferred to a figure pass
@@ -762,7 +904,7 @@ species:
         locator:
           figure: '9'
           published_page: 449
-          pdf_page_index: 26
+          pdf_page_index: 25
         units: J/gfw/K
         values:
           quantity: cp

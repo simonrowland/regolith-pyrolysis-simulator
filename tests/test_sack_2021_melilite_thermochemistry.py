@@ -41,6 +41,22 @@ def test_sack_2021_tables_match_600_dpi_render_pins() -> None:
     assert len(table1["values"]["rows_as_printed"]) == 6
     assert len(table2["values"]["rows_as_printed"]) == 26
     assert len(table3["values"]["rows_as_printed"]) == 21
+    table2_rows = table2["values"]["rows_as_printed"]
+    table3_rows = table3["values"]["rows_as_printed"]
+    gX2tt = next(
+        row["equivalent_parameter"]
+        for row in table2_rows
+        if row["coefficient"] == "gX2tt"
+    )
+    assert gX2tt == (
+        "2(ΔW14 − ΔW24′ + 1/4(Δ²W12^tt + Δ²W24^tt))"
+    )
+    gX2 = next(
+        row["equivalent_parameter"]
+        for row in table3_rows
+        if row["coefficient"] == "gX2"
+    )
+    assert gX2 == "Ḡ2* − Ḡ1° + W12"
     assert table2["values"]["additional_quartic_parameter_families_as_printed"][
         "count"
     ] == 30
@@ -50,6 +66,11 @@ def test_sack_2021_tables_match_600_dpi_render_pins() -> None:
 
     thermo_rows = table4["values"]["enthalpy_entropy_volume_rows_as_printed"]
     cp_rows = table4["values"]["heat_capacity_rows_as_printed"]
+    assert "method_class" not in table4["values"]
+    assert {row["method_class"] for row in (*thermo_rows, *cp_rows)} == {
+        "quoted_attributed",
+        "model_derived",
+    }
     assert len(thermo_rows) == 8
     assert len(cp_rows) == 8
 
