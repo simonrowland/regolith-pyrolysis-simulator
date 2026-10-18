@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import json
+import math
 from dataclasses import replace
 from pathlib import Path
 import subprocess
@@ -99,6 +100,81 @@ def _openimcc_or_skip():
             "checkout's src/ directory on PYTHONPATH before running the parity check"
         ),
     )
+
+
+def _oracle_activity_log_bounds(row, pack, result) -> dict[str, float]:
+    """Estimate each frozen-oracle activity's log-space parity allowance."""
+    import numpy as np
+    from openimcc.kernel import active_residual_jacobian
+
+    kernel = pack.kernel_datapack
+    parent_x = np.asarray(result.parent_x, dtype=float)
+    active_parent = parent_x > 0.0
+    active_complex = ~np.any(
+        (kernel.nu > 0.0) & (~active_parent[:, None]), axis=0
+    )
+    nu = kernel.nu[active_parent, :][:, active_complex]
+    x_target = parent_x[active_parent]
+    stoichiometric_totals = nu.sum(axis=0)
+    ln_k = math.log(10.0) * (
+        kernel.A[active_complex]
+        + kernel.B[active_complex] / float(row["temperature_K"])
+    )
+    names = [
+        name
+        for name, is_active in zip(result.parent_oxides, active_parent, strict=True)
+        if is_active
+    ]
+    oracle = row["activities_hex"]
+    y_oracle = np.log(np.asarray([float.fromhex(oracle[name]) for name in names]))
+    y_certified = np.log(np.asarray(result.parent_x_star, dtype=float)[active_parent])
+
+    residual_old, _, _, _ = active_residual_jacobian(
+        y_oracle, x_target, nu, ln_k, stoichiometric_totals
+    )
+    _, _, _, jacobian = active_residual_jacobian(
+        y_certified, x_target, nu, ln_k, stoichiometric_totals
+    )
+
+    # The kernel solves F(y)=0 for y=ln(free-parent fraction), and activity is
+    # exp(y). Evaluating the frozen oracle gives r_old=F(y_oracle); linearizing
+    # at the certified root gives Delta y=-J(y*)^-1 r_old. Thus each first-order
+    # |Delta ln(a_i)| is |(J^-1 r_old)_i|. Bound the Taylor remainder with the
+    # exponential Hessian over a box of radius 2*|Delta y|+32 eps, then add
+    # 32 eps in log space for residual/Jacobian, solve, exp, and log rounding.
+    first_order = -np.linalg.solve(jacobian, residual_old)
+    eps = np.finfo(float).eps
+    roundoff = 32.0 * eps
+    radius = 2.0 * np.abs(first_order) + roundoff
+    actual_delta = y_certified - y_oracle
+    assert np.all(np.abs(actual_delta) <= radius), (
+        "certified root escaped the first-order Taylor radius: "
+        f"composition={row['composition']} T={row['temperature_K']}"
+    )
+
+    jacobian_inverse = np.linalg.solve(jacobian, np.eye(jacobian.shape[0]))
+    upper_complex = np.exp(
+        ln_k + nu.T @ y_certified + np.abs(nu).T @ radius
+    )
+    second_order_residual = np.empty(len(names), dtype=float)
+    for parent_index in range(len(names)):
+        hessian_abs = np.zeros((len(names), len(names)), dtype=float)
+        hessian_abs[parent_index, parent_index] = math.exp(
+            y_certified[parent_index] + radius[parent_index]
+        )
+        coefficient = np.abs(
+            nu[parent_index]
+            - x_target[parent_index] * (stoichiometric_totals - 1.0)
+        ) * upper_complex
+        hessian_abs += (nu * coefficient[None, :]) @ nu.T
+        second_order_residual[parent_index] = 0.5 * np.sum(
+            hessian_abs * radius[:, None] * radius[None, :]
+        )
+    second_order = np.abs(jacobian_inverse) @ second_order_residual
+    return {
+        name: float(abs(first_order[index]) + second_order[index] + roundoff)
+        for index, name in enumerate(names)
+    }
 
 
 @pytest.mark.parametrize(
@@ -415,7 +491,7 @@ def test_bridge_maps_mol_kg_and_returns_labels() -> None:
 
 @pytest.mark.parametrize("pack_name", PACKS)
 def test_openimcc_parent_activity_parity(pack_name: str) -> None:
-    _openimcc_or_skip()
+    package = _openimcc_or_skip()
     fixture = json.loads("\n".join(
         line for line in GREEN_ACTIVITY_FIXTURE.read_text().splitlines()
         if not line.startswith("#")
@@ -428,8 +504,16 @@ def test_openimcc_parent_activity_parity(pack_name: str) -> None:
     assert len(rows) >= 20
     assert len({row["composition"] for row in rows}) >= 5
     assert len({row["temperature_K"] for row in rows}) >= 4
+    pack = _load_pack(pack_name)
     for row in rows:
         composition, basis_type = COMPOSITIONS[row["composition"]]
+        kernel_kwargs = {"basis_type": basis_type}
+        if pack_name == "published-ext":
+            kernel_kwargs["enable_sp_extension"] = True
+        kernel_result = package.evaluate(
+            composition, row["temperature_K"], pack, **kernel_kwargs
+        )
+        log_bounds = _oracle_activity_log_bounds(row, pack, kernel_result)
         bridge_kwargs = {"temperature_K": row["temperature_K"], "pack": pack_name}
         bridge_kwargs["composition_kg" if basis_type == "wt" else "composition_mol"] = composition
         bridge_result = bridge_evaluate(**bridge_kwargs)
@@ -438,7 +522,17 @@ def test_openimcc_parent_activity_parity(pack_name: str) -> None:
             "SiO2", "MgO", "FeO", "CaO", "Al2O3", "TiO2", "Na2O", "K2O"
         ) + (("S", "P2O5") if pack_name == "published-ext" else ())
         assert tuple(bridge_result.parent_oxides) == expected_parent_oxides
-        assert {name: float(value).hex() for name, value in actual.items()} == row["activities_hex"]
+        for name, value in actual.items():
+            expected = float.fromhex(row["activities_hex"][name])
+            if expected == 0.0:
+                assert float(value) == expected, f"{row['composition']} {name}"
+                continue
+            observed = abs(math.log(float(value) / expected))
+            assert observed <= log_bounds[name], (
+                f"{row['composition']} {row['temperature_K']} K {name}: "
+                f"observed |delta ln(activity)|={observed:.6g}, "
+                f"oracle-residual bound={log_bounds[name]:.6g}"
+            )
         expected_labels = row["labels_legacy"]
         labels = bridge_result.labels
         assert dict(labels.coverage) == expected_labels["coverage"]
@@ -455,7 +549,6 @@ def test_openimcc_parent_activity_parity(pack_name: str) -> None:
 
 def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
     _openimcc_or_skip()
-    from dataclasses import replace
     import openimcc
     from openimcc import label_research_datapack
 
@@ -470,11 +563,16 @@ def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
     baseline = openimcc.evaluate(
         composition, row["temperature_K"], pack, basis_type=basis_type
     )
-    baseline_hex = {
-        str(name): float(value).hex()
-        for name, value in zip(baseline.parent_oxides, baseline.parent_activity, strict=True)
-    }
-    assert baseline_hex == row["activities_hex"]
+    log_bounds = _oracle_activity_log_bounds(row, pack, baseline)
+    baseline_activities = dict(
+        zip(baseline.parent_oxides, baseline.parent_activity, strict=True)
+    )
+    for name, bound in log_bounds.items():
+        expected = float.fromhex(row["activities_hex"][name])
+        observed = abs(math.log(float(baseline_activities[name]) / expected))
+        assert observed <= bound, (
+            f"baseline {name}: observed={observed:.6g}, bound={bound:.6g}"
+        )
     kernel = replace(pack.kernel_datapack, A=pack.kernel_datapack.A.copy())
     kernel.A[0] += 0.01
     mutated_pack = label_research_datapack(
@@ -483,11 +581,22 @@ def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
     mutated = openimcc.evaluate(
         composition, row["temperature_K"], mutated_pack, basis_type=basis_type
     )
-    mutated_hex = {
-        str(name): float(value).hex()
-        for name, value in zip(mutated.parent_oxides, mutated.parent_activity, strict=True)
+    mutated_activities = dict(
+        zip(mutated.parent_oxides, mutated.parent_activity, strict=True)
+    )
+    mutation_ratios = {
+        name: abs(
+            math.log(
+                float(mutated_activities[name])
+                / float.fromhex(row["activities_hex"][name])
+            )
+        ) / bound
+        for name, bound in log_bounds.items()
     }
-    assert mutated_hex != row["activities_hex"]
+    assert max(mutation_ratios.values()) > 1.0e6, (
+        "in-memory coefficient mutation stayed inside the frozen-oracle "
+        f"parity bounds: {mutation_ratios}"
+    )
 
 
 def test_pack_digest_preserves_the_published_binding_value() -> None:
