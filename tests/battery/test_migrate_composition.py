@@ -40,6 +40,7 @@ from simulator.battery.migrate import (
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
     Composition,
+    Locator,
     as_decimal,
 )
 from tests.battery.test_migrate import _migrate_real_extract, _write_min_tree
@@ -1433,7 +1434,7 @@ def test_equivalent_initial_inventories_keep_higher_authority_owner() -> None:
         ),
     )
     assert _merge_sample_initials(incoming_initial, existing_initial) == existing_initial
-    assert _merge_sample_initials(existing_initial, measured_initial) == measured_initial
+    assert _merge_sample_initials(existing_initial, measured_initial) == existing_initial
 
     initial_charge = _located_initial_composition(
         {"SiO2": "0.5015472170832676561113000772", "MgO": "0.4984527829167323438886999228"},
@@ -1461,6 +1462,82 @@ def test_equivalent_initial_inventories_keep_higher_authority_owner() -> None:
         ),
     )
     assert _merge_sample_initials(existing_initial, tied_initial) == existing_initial
+
+
+@pytest.mark.parametrize(
+    "prose_location",
+    ("analysis_selection_rule", "derivation_input", "locator_note"),
+)
+def test_prose_does_not_promote_equivalent_incoming_start(
+    prose_location: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    note = "NOT measured starting material; no EPMA was performed"
+    typed_start_values = {
+        "composition_material_state": "starting_glass",
+        "composition_wt_pct": {"SiO2": "60", "MgO": "40"},
+    }
+    existing_initial = sample_from_equipment({}, values=typed_start_values).initial_composition
+    assert existing_initial is not None and existing_initial.state.is_value
+
+    experiment = tabulation_experiment(f"prose-authority-{prose_location}")
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=existing_initial,
+        ),
+    )
+    migrator = Migrator()
+    migrator.result.experiments[experiment.experiment_id] = experiment
+
+    incoming_values = dict(typed_start_values)
+    real_sample_from_equipment = migrate_module.sample_from_equipment
+    selected_incoming = []
+
+    def sample_with_prose(equipment, **kwargs):
+        sample = real_sample_from_equipment(equipment, **kwargs)
+        if kwargs.get("values") is not incoming_values:
+            return sample
+        candidate = sample.initial_composition
+        assert candidate is not None and candidate.state.is_value
+        composition = replace(candidate.state.value, basis="nominal-recipe")
+        if prose_location == "analysis_selection_rule":
+            composition = replace(composition, analysis_selection_rule=note)
+        candidate = replace(
+            candidate,
+            state=replace(candidate.state, value=composition),
+        )
+        if prose_location == "derivation_input":
+            assert candidate.inference is not None
+            candidate = replace(
+                candidate,
+                inference=replace(
+                    candidate.inference,
+                    inputs=(*candidate.inference.inputs, note),
+                ),
+            )
+        elif prose_location == "locator_note":
+            candidate = replace(candidate, locator=Locator(note=note))
+        selected_incoming.append(candidate)
+        return replace(sample, initial_composition=candidate)
+
+    monkeypatch.setattr(migrate_module, "sample_from_equipment", sample_with_prose)
+    merged = migrator._ensure_experiment(
+        work_id=experiment.work_id,
+        experiment_id=experiment.experiment_id,
+        locator=None,
+        method=experiment.method,
+        equipment={},
+        values=incoming_values,
+    )
+
+    assert selected_incoming
+    assert merged.sample.initial_composition == existing_initial
+    assert not any(
+        "initial_composition_conflict" in issue.detail
+        for issue in migrator.result.registry_issues
+    )
 
 
 def test_absolute_mole_inventories_compare_amount_and_prefer_absolute() -> None:
