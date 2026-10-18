@@ -59,8 +59,8 @@ tables:
       - {species_column: 1, value_column: 4, unit: atm, quantity: partial_pressure}
   - page: 3
     table_index: 1
-    type: concentration_series
-    quantity: vapor_mole_fraction
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
     evidence_class: quoted_attributed
     attribution: 'Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)'
     unit: mol
@@ -72,11 +72,11 @@ tables:
       unit: K
       locator: {page: 3, pdf_page_index: 2, published_page: 33, table: '1', column_header: '1800 K'}
     value_pairs:
-      - {species_column: 1, value_column: 5, quantity: vapor_mole_fraction}
+      - {species_column: 1, value_column: 5, quantity: equilibrium_phase_composition}
   - page: 3
     table_index: 1
-    type: concentration_series
-    quantity: vapor_mole_fraction
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
     evidence_class: quoted_attributed
     attribution: 'Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)'
     unit: mol
@@ -88,11 +88,11 @@ tables:
       unit: K
       locator: {page: 3, pdf_page_index: 2, published_page: 33, table: '1', column_header: '2241 K'}
     value_pairs:
-      - {species_column: 1, value_column: 6, quantity: vapor_mole_fraction}
+      - {species_column: 1, value_column: 6, quantity: equilibrium_phase_composition}
   - page: 3
     table_index: 1
-    type: concentration_series
-    quantity: vapor_mole_fraction
+    type: equilibrium_phase_composition
+    quantity: equilibrium_phase_composition
     evidence_class: quoted_attributed
     attribution: 'Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)'
     unit: mol
@@ -104,7 +104,7 @@ tables:
       unit: K
       locator: {page: 3, pdf_page_index: 2, published_page: 33, table: '1', column_header: '2400 K'}
     value_pairs:
-      - {species_column: 1, value_column: 7, quantity: vapor_mole_fraction}
+      - {species_column: 1, value_column: 7, quantity: equilibrium_phase_composition}
   - page: 3
     table_index: 1
     type: refusal

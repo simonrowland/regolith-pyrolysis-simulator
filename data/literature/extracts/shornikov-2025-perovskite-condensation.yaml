@@ -9,8 +9,10 @@ source:
   corpus_sha256: bc04a5d1441f9a14c780d648a5cc34b7f7ddf75f3cbb7c7632584053925a188b
 extraction:
   method: MinerU Table 1 mapping emitted 56 numeric cells; MinerU and pdftotext digits agree, and row/column assignments
-    were checked against the 600-dpi render of PDF page 3. Five explicit prose pressures were transcribed from PDF
-    page 4. Figure 1 records are deferred without digitized points.
+    were checked against the 600-dpi render of PDF page 3. Printed scientific-notation pressures and mole fractions
+    are retained alongside decimal literals for migration. The method context was transcribed from PDF page 3; five
+    explicit prose pressures and the melting point were transcribed from PDF page 4. Figure 1 records are deferred
+    without digitized points.
   date: '2026-10-18'
   worker: w4b-1018
 review_status: draft
@@ -32,7 +34,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '1800'
-        pressure_atm: 6.25×10⁻¹⁰
+        pressure_atm: '6.25e-10'
+        pressure_atm_as_printed: '6.25×10⁻¹⁰'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -77,7 +80,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '2241'
-        pressure_atm: 8.38×10⁻⁷
+        pressure_atm: '8.38e-7'
+        pressure_atm_as_printed: '8.38×10⁻⁷'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -122,7 +126,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '2400'
-        pressure_atm: 5.98×10⁻⁶
+        pressure_atm: '5.98e-6'
+        pressure_atm_as_printed: '5.98×10⁻⁶'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -153,7 +158,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id003
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r03_c05
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -164,10 +169,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '1800'
-        value: 3.0×10⁻¹
+        value: '3.0e-1'
+        value_as_printed: '3.0×10⁻¹'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -198,7 +205,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id004
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r03_c06
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -209,10 +216,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '2241'
-        value: 1.5×10⁻¹
+        value: '1.5e-1'
+        value_as_printed: '1.5×10⁻¹'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -243,7 +252,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id005
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r03_c07
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -254,10 +263,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '2400'
-        value: 1.7×10⁻¹
+        value: '1.7e-1'
+        value_as_printed: '1.7×10⁻¹'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -322,7 +333,8 @@ species:
         method_class: quoted_attributed
         attribution: Shornikov (2019, 2019a, 2020)
         T_K: '2200'
-        pressure_atm: 5.05×10⁻⁷
+        pressure_atm: '5.05e-7'
+        pressure_atm_as_printed: '5.05×10⁻⁷'
     context:
     - observation_id: shornikov_2025_table1_o_xi2400_over_xi1800_refusal
       type: refusal
@@ -364,7 +376,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '1800'
-        pressure_atm: 2.64×10⁻¹¹
+        pressure_atm: '2.64e-11'
+        pressure_atm_as_printed: '2.64×10⁻¹¹'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -409,7 +422,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '2241'
-        pressure_atm: 5.84×10⁻⁸
+        pressure_atm: '5.84e-8'
+        pressure_atm_as_printed: '5.84×10⁻⁸'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -454,7 +468,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '2400'
-        pressure_atm: 4.87×10⁻⁷
+        pressure_atm: '4.87e-7'
+        pressure_atm_as_printed: '4.87×10⁻⁷'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -485,7 +500,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id011
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r04_c05
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -496,10 +511,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '1800'
-        value: 1.3×10⁻²
+        value: '1.3e-2'
+        value_as_printed: '1.3×10⁻²'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -530,7 +547,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id012
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r04_c06
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -541,10 +558,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '2241'
-        value: 1.1×10⁻²
+        value: '1.1e-2'
+        value_as_printed: '1.1×10⁻²'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -575,7 +594,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id013
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r04_c07
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -586,10 +605,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '2400'
-        value: 1.4×10⁻²
+        value: '1.4e-2'
+        value_as_printed: '1.4×10⁻²'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -660,7 +681,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '1800'
-        pressure_atm: 6.10×10⁻¹⁰
+        pressure_atm: '6.10e-10'
+        pressure_atm_as_printed: '6.10×10⁻¹⁰'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -705,7 +727,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '2241'
-        pressure_atm: 5.57×10⁻⁷
+        pressure_atm: '5.57e-7'
+        pressure_atm_as_printed: '5.57×10⁻⁷'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -750,7 +773,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '2400'
-        pressure_atm: 3.05×10⁻⁶
+        pressure_atm: '3.05e-6'
+        pressure_atm_as_printed: '3.05×10⁻⁶'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -781,7 +805,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id018
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r05_c05
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -792,10 +816,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '1800'
-        value: 2.9×10⁻¹
+        value: '2.9e-1'
+        value_as_printed: '2.9×10⁻¹'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -826,7 +852,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id019
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r05_c06
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -837,10 +863,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '2241'
-        value: 1.0×10⁻¹
+        value: '1.0e-1'
+        value_as_printed: '1.0×10⁻¹'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -871,7 +899,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id020
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r05_c07
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -882,10 +910,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '2400'
-        value: 8.6×10⁻²
+        value: '8.6e-2'
+        value_as_printed: '8.6×10⁻²'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -950,7 +980,8 @@ species:
         method_class: quoted_attributed
         attribution: Shornikov (2019, 2019a, 2020)
         T_K: '2200'
-        pressure_atm: 3.18×10⁻⁷
+        pressure_atm: '3.18e-7'
+        pressure_atm_as_printed: '3.18×10⁻⁷'
     context:
     - observation_id: shornikov_2025_table1_ca_xi2400_over_xi1800_refusal
       type: refusal
@@ -992,7 +1023,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '1800'
-        pressure_atm: 2.47×10⁻¹³
+        pressure_atm: '2.47e-13'
+        pressure_atm_as_printed: '2.47×10⁻¹³'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -1037,7 +1069,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '2241'
-        pressure_atm: 1.83×10⁻⁹
+        pressure_atm: '1.83e-9'
+        pressure_atm_as_printed: '1.83×10⁻⁹'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -1082,7 +1115,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '2400'
-        pressure_atm: 1.80×10⁻⁸
+        pressure_atm: '1.80e-8'
+        pressure_atm_as_printed: '1.80×10⁻⁸'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -1113,7 +1147,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id026
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r06_c05
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -1124,10 +1158,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '1800'
-        value: 1.2×10⁻⁴
+        value: '1.2e-4'
+        value_as_printed: '1.2×10⁻⁴'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -1158,7 +1194,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id027
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r06_c06
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -1169,10 +1205,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '2241'
-        value: 3.3×10⁻⁴
+        value: '3.3e-4'
+        value_as_printed: '3.3×10⁻⁴'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -1203,7 +1241,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id028
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r06_c07
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -1214,10 +1252,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '2400'
-        value: 5.1×10⁻⁴
+        value: '5.1e-4'
+        value_as_printed: '5.1×10⁻⁴'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -1288,7 +1328,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '1800'
-        pressure_atm: 2.25×10⁻¹⁵
+        pressure_atm: '2.25e-15'
+        pressure_atm_as_printed: '2.25×10⁻¹⁵'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -1333,7 +1374,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '2241'
-        pressure_atm: 1.67×10⁻¹⁰
+        pressure_atm: '1.67e-10'
+        pressure_atm_as_printed: '1.67×10⁻¹⁰'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -1378,7 +1420,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '2400'
-        pressure_atm: 2.12×10⁻⁹
+        pressure_atm: '2.12e-9'
+        pressure_atm_as_printed: '2.12×10⁻⁹'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -1409,7 +1452,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id033
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r07_c05
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -1420,10 +1463,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '1800'
-        value: 1.1×10⁻⁶
+        value: '1.1e-6'
+        value_as_printed: '1.1×10⁻⁶'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -1454,7 +1499,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id034
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r07_c06
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -1465,10 +1510,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '2241'
-        value: 3.0×10⁻⁵
+        value: '3.0e-5'
+        value_as_printed: '3.0×10⁻⁵'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -1499,7 +1546,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id035
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r07_c07
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -1510,10 +1557,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '2400'
-        value: 6.0×10⁻⁵
+        value: '6.0e-5'
+        value_as_printed: '6.0×10⁻⁵'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -1584,7 +1633,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '1800'
-        pressure_atm: 3.73×10⁻¹¹
+        pressure_atm: '3.73e-11'
+        pressure_atm_as_printed: '3.73×10⁻¹¹'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -1629,7 +1679,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '2241'
-        pressure_atm: 4.75×10⁻⁷
+        pressure_atm: '4.75e-7'
+        pressure_atm_as_printed: '4.75×10⁻⁷'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -1674,7 +1725,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '2400'
-        pressure_atm: 3.80×10⁻⁶
+        pressure_atm: '3.80e-6'
+        pressure_atm_as_printed: '3.80×10⁻⁶'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -1705,7 +1757,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id040
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r08_c05
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -1716,10 +1768,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '1800'
-        value: 1.8×10⁻²
+        value: '1.8e-2'
+        value_as_printed: '1.8×10⁻²'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -1750,7 +1804,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id041
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r08_c06
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -1761,10 +1815,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '2241'
-        value: 8.6×10⁻²
+        value: '8.6e-2'
+        value_as_printed: '8.6×10⁻²'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -1795,7 +1851,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id042
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r08_c07
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -1806,10 +1862,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '2400'
-        value: 1.1×10⁻¹
+        value: '1.1e-1'
+        value_as_printed: '1.1×10⁻¹'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -1874,7 +1932,8 @@ species:
         method_class: quoted_attributed
         attribution: Shornikov (2019, 2019a, 2020)
         T_K: '2200'
-        pressure_atm: 2.55×10⁻⁷
+        pressure_atm: '2.55e-7'
+        pressure_atm_as_printed: '2.55×10⁻⁷'
     context:
     - observation_id: shornikov_2025_table1_tio_xi2400_over_xi1800_refusal
       type: refusal
@@ -1916,7 +1975,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '1800'
-        pressure_atm: 8.05×10⁻¹⁰
+        pressure_atm: '8.05e-10'
+        pressure_atm_as_printed: '8.05×10⁻¹⁰'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -1961,7 +2021,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '2241'
-        pressure_atm: 3.58×10⁻⁶
+        pressure_atm: '3.58e-6'
+        pressure_atm_as_printed: '3.58×10⁻⁶'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -2006,7 +2067,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '2400'
-        pressure_atm: 2.20×10⁻⁵
+        pressure_atm: '2.20e-5'
+        pressure_atm_as_printed: '2.20×10⁻⁵'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -2037,7 +2099,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id048
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r09_c05
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -2048,10 +2110,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '1800'
-        value: 3.8×10⁻¹
+        value: '3.8e-1'
+        value_as_printed: '3.8×10⁻¹'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -2082,7 +2146,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id049
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r09_c06
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -2093,10 +2157,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '2241'
-        value: 6.5×10⁻¹
+        value: '6.5e-1'
+        value_as_printed: '6.5×10⁻¹'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -2127,7 +2193,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id050
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r09_c07
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -2138,10 +2204,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '2400'
-        value: 6.2×10⁻¹
+        value: '6.2e-1'
+        value_as_printed: '6.2×10⁻¹'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -2206,7 +2274,8 @@ species:
         method_class: quoted_attributed
         attribution: Shornikov (2019, 2019a, 2020)
         T_K: '2200'
-        pressure_atm: 2.17×10⁻⁶
+        pressure_atm: '2.17e-6'
+        pressure_atm_as_printed: '2.17×10⁻⁶'
     context:
     - observation_id: shornikov_2025_table1_tio2_xi2400_over_xi1800_refusal
       type: refusal
@@ -2248,7 +2317,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '1800'
-        pressure_atm: 4.87×10⁻¹⁵
+        pressure_atm: '4.87e-15'
+        pressure_atm_as_printed: '4.87×10⁻¹⁵'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -2293,7 +2363,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '2241'
-        pressure_atm: 3.58×10⁻⁹
+        pressure_atm: '3.58e-9'
+        pressure_atm_as_printed: '3.58×10⁻⁹'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -2338,7 +2409,8 @@ species:
         quantity: partial_pressure
         method_class: quoted_attributed
         T_K: '2400'
-        pressure_atm: 7.74×10⁻⁸
+        pressure_atm: '7.74e-8'
+        pressure_atm_as_printed: '7.74×10⁻⁸'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -2369,7 +2441,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id056
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r10_c05
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -2380,10 +2452,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '1800'
-        value: 2.3×10⁻⁶
+        value: '2.3e-6'
+        value_as_printed: '2.3×10⁻⁶'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -2414,7 +2488,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id057
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r10_c06
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -2425,10 +2499,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '2241'
-        value: 6.5×10⁻⁴
+        value: '6.5e-4'
+        value_as_printed: '6.5×10⁻⁴'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -2459,7 +2535,7 @@ species:
             reason: Total pressure is not reported.
           locator: *id058
     - observation_id: shornikov_2025_perovskite_condensation_p003_t01_r10_c07
-      type: concentration_series
+      type: equilibrium_phase_composition
       locator:
         page: 3
         pdf_page_index: 2
@@ -2470,10 +2546,12 @@ species:
       units: mol
       mineru_flags: []
       values:
-        quantity: vapor_mole_fraction
+        quantity: equilibrium_phase_composition
         method_class: quoted_attributed
         T_K: '2400'
-        value: 2.2×10⁻³
+        value: '2.2e-3'
+        value_as_printed: '2.2×10⁻³'
+        basis_as_published: 'x_i, mol'
         attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
       phase: gas
       point_conditions:
@@ -2538,8 +2616,55 @@ species:
         method_class: quoted_attributed
         attribution: Shornikov (2019, 2019a, 2020)
         T_K: '2200'
-        pressure_atm: 1.28×10⁻⁹
+        pressure_atm: '1.28e-9'
+        pressure_atm_as_printed: '1.28×10⁻⁹'
+    - observation_id: shornikov_2025_perovskite_melting_point
+      type: transition_point
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 34
+        section: Conclusions
+        note: The text states that 2200 K is slightly below the perovskite melting point.
+      phase: perovskite
+      units: K
+      values:
+        method_class: quoted_attributed
+        quantity: transition_temperature
+        property_kind: melting_point
+        temperature_K: 2241
+        temperature_K_as_printed: '2241 K'
+        attribution: Shornikov and Yakovlev (2025)
+        quote_as_printed: 'melting point of perovskite, equal to 2241 K'
     context:
+    - observation_id: shornikov_2025_perovskite_evaporation_temperature_range_context
+      type: method
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 33
+        section: Experimental methods
+      units: K
+      values:
+        quantity: perovskite_evaporation_temperature_range
+        method_class: quoted_attributed
+        attribution: Shornikov (2019, 2019a, 2020)
+        temperature_range_K: [1791, 2441]
+        quote_as_printed: 'CaTiO3 perovskite evaporation from a Knudsen effusion molybdenum cell was studied by mass spectrometry in the temperature range of 1791–2441 K (Shornikov, 2019, 2019a, 2020).'
+    - observation_id: shornikov_2025_ion_source_temperature_limit_context
+      type: method
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 33
+        section: Experimental methods
+      units: K
+      values:
+        quantity: modified_ion_source_temperature_limit
+        method_class: quoted_attributed
+        attribution: Shornikov et al. (2000)
+        ion_source_temperature_limit_K: 3000
+        quote_as_printed: 'The mass spectrometer MI-1201 was equipped with a modified ion source for high-temperature studies (up to a temperature of 3000 K). The design of the developed ion source and the methodological features of experiment were described in detail earlier (Shornikov et al., 2000).'
     - observation_id: shornikov_2025_table1_catio3_xi2400_over_xi1800_refusal
       type: refusal
       locator: &id061
@@ -2674,8 +2799,8 @@ notes:
 - The article summarizes prior Shornikov KEMS results. Table 1 values and the five prose pressures are quoted_attributed
   to the prior works named in the article; no new experiment is claimed.
 - Duplicate-value check against the 2019 TMS chapter, 2019 RJPC extract, 2020 fractionation extract and 2020 CaO–TiO2
-  melts extract found no matching species, temperature and printed-pressure tuple for these Table 1 or prose values;
-  the perovskite melting temperature at 2241 K is an axis condition, not extracted as a second transition value.
+  melts extract found no matching species, temperature and printed-pressure tuple for these Table 1 or prose values.
+  The 2241 K Table 1 column remains a temperature condition, while the separately stated melting point is recorded once.
 - The eight printed xi,2400 / xi,1800 ratios are retained as typed context refusals because they span two temperatures
   and the extract schema has no ratio-across-temperatures token; their source values and both temperatures are retained
   without recomputation.
@@ -2687,7 +2812,7 @@ fidelity_samples:
 - species: O
   observation_id: shornikov_2025_perovskite_condensation_p003_t01_r03_c02
   field: pressure_atm
-  value: 6.25×10⁻¹⁰
+  value: '6.25e-10'
   locator:
     page: 3
     published_page: 33
@@ -2696,7 +2821,7 @@ fidelity_samples:
 - species: Ca
   observation_id: shornikov_2025_perovskite_condensation_p003_t01_r05_c03
   field: pressure_atm
-  value: 5.57×10⁻⁷
+  value: '5.57e-7'
   locator:
     page: 3
     published_page: 33
@@ -2705,7 +2830,7 @@ fidelity_samples:
 - species: CaTiO3
   observation_id: shornikov_2025_perovskite_condensation_p003_t01_r10_c07
   field: value
-  value: 2.2×10⁻³
+  value: '2.2e-3'
   locator:
     page: 3
     published_page: 33
