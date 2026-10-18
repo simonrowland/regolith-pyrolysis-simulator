@@ -406,6 +406,38 @@ def test_richter_catalogue_sibling_keeps_initial_through_finalization(
     assert abs(prediction.value - Decimal("0.5469")) <= Decimal("0.002")
 
 
+def test_mendybaev_func5_keeps_serialization_equivalent_table1_start() -> None:
+    source = LITERATURE / "extracts" / (
+        "mendybaev-2017-fun-cai-lab-evaporation.yaml"
+    )
+    migrator = Migrator()
+    migrator._migrate_extract(source)
+    migrator.finalize()
+
+    row = next(
+        row
+        for row in migrator.result.observations.values()
+        if row.source_id == "mendybaev-2017-fun-cai-lab-evaporation"
+        and quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
+        and row.experiment_id.endswith("::func-5")
+    )
+    experiment = migrator.result.experiments[row.experiment_id]
+    initial = experiment.sample.initial_composition
+    assert initial is not None and initial.state.is_value
+    assert _initial_oxide_wt_percent(experiment.sample) == pytest.approx(
+        {"MgO": 37.9, "Al2O3": 11.6, "SiO2": 42.9, "CaO": 7.6},
+        abs=0.02,
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
+    assert prediction.value is not None or (
+        prediction.refusal_reason is not None
+        and prediction.refusal_detail is not None
+        and prediction.refusal_detail.get("reason")
+        != "initial_composition_not_stated"
+    )
+
+
 def test_richter_rep5_row_has_numeric_residual_and_domain_notice(mass_loss_rows) -> None:
     richter, experiment, _markova, _markova_experiment, _r14, _r14_experiment = (
         mass_loss_rows

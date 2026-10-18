@@ -1297,6 +1297,62 @@ def test_sample_catalogue_composition_is_typed_proxy_not_printed() -> None:
     )
 
 
+def test_equivalent_initial_inventories_keep_richer_owner_provenance() -> None:
+    starting_glass = {
+        "composition_material_state": "starting_glass",
+        "composition_wt_pct": {"SiO2": 60, "MgO": 40},
+    }
+    catalogue = {
+        "composition_from_sample_catalog": True,
+        "composition_source": (
+            "Lunar Sample Compendium entry 10017. "
+            "Selection rule: first complete named whole-sample analysis."
+        ),
+        "sample_oxide_composition_wt_pct": {"SiO2": 60, "MgO": 40},
+    }
+    existing_initial = sample_from_equipment(
+        {}, values=starting_glass
+    ).initial_composition
+    incoming_initial = sample_from_equipment({}, values=catalogue).initial_composition
+    assert existing_initial is not None and incoming_initial is not None
+    assert not migrate_module._initial_compositions_conflict(
+        existing_initial, incoming_initial
+    )
+
+    experiment = tabulation_experiment("equivalent-owner-initials")
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample, initial_composition=existing_initial
+        ),
+    )
+    migrator = Migrator()
+    migrator.result.experiments[experiment.experiment_id] = experiment
+
+    merged = migrator._ensure_experiment(
+        work_id=experiment.work_id,
+        experiment_id=experiment.experiment_id,
+        locator=experiment.locator,
+        method=experiment.method,
+        equipment={},
+        values=catalogue,
+    )
+
+    initial = merged.sample.initial_composition
+    assert initial is not None and initial.state.is_value
+    assert initial.state.value.proxy_flag == "composition_from_sample_catalog"
+    assert initial.state.value.proxy_source.startswith(
+        "Lunar Sample Compendium entry 10017"
+    )
+    assert initial.state.value.analysis_selection_rule == (
+        "first complete named whole-sample analysis"
+    )
+    assert not any(
+        "initial_composition_conflict" in issue.detail
+        for issue in migrator.result.registry_issues
+    )
+
+
 def test_conflicting_owner_selected_initials_are_withheld_with_migration_issue(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
