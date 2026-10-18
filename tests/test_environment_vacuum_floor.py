@@ -177,6 +177,11 @@ def test_intrinsic_melt_fo2_inverse_reports_saturation_via_owner(
         T_K=temperature_K,
         pressure_bar=pressure_bar,
         fe3_over_sigma_fe=ferric / (melt_inventory['FeO'] + ferric),
+        # F1 / d-166: this imposed-fO2 seed is not a measured iron split.
+        # Its band is [-1, +0.5] dex, formerly the propagated assay band
+        # [-2.6187427296787993, +2.159750321955471] at the liquid points.
+        # At 1000 K the narrower band changes indeterminate -> below.
+        iron_seed=sim._feedstock_iron_initialization,
     )
 
     inventory = sim.atom_ledger.mol_by_account()
