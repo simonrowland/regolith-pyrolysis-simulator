@@ -28,9 +28,9 @@ RENDERED_CELLS = (
 )
 
 # Figure 1 marker centres. Read 1 is the thick-marker centre on the embedded
-# JPEG. Read 2 is the interior centre on a fresh 600 dpi page crop. T,
-# activity, both pixel reads, and the half-difference uncertainty are
-# literals from the page, not from the audit table.
+# JPEG. Read 2 is the visual centre of the marker body (outer-edge midpoint),
+# and the page pair is that centre through read 1's image matrix. T, activity,
+# both pixel reads, and the half-difference uncertainty are literals.
 FIGURE_READS = (
     (
         "CaO",
@@ -39,8 +39,9 @@ FIGURE_READS = (
         "0.017",
         [148.0, 256.0],
         [1572.4, 2445.8],
-        [148.12, 256.79],
-        "0.006",
+        [147.5, 259.0],
+        [1570.4, 2457.8],
+        "0.023",
     ),
     (
         "TiO2",
@@ -49,8 +50,9 @@ FIGURE_READS = (
         "0.021",
         [109.0, 262.0],
         [1416.4, 2469.8],
-        [108.89, 262.04],
-        None,
+        [109.0, 261.5],
+        [1416.4, 2467.8],
+        "0.004",
     ),
     (
         "SiO2",
@@ -59,8 +61,9 @@ FIGURE_READS = (
         "0.0023",
         [421.0, 198.0],
         [2664.2, 2213.6],
-        [421.12, 198.03],
-        None,
+        [421.0, 197.3],
+        [2664.2, 2210.8],
+        "0.005",
     ),
 )
 
@@ -73,8 +76,9 @@ BOUNDARY_READS = (
         "0.026",
         [375.63, 268.24],
         [2482.8, 2494.8],
-        [375.69, 268.29],
-        None,
+        [375.5, 268.5],
+        [2482.2, 2495.9],
+        "0.002",
     ),
     (
         "TiO2",
@@ -82,7 +86,8 @@ BOUNDARY_READS = (
         "0.26",
         [375.61, 333.36],
         [2482.7, 2755.5],
-        [375.69, 333.48],
+        [376.0, 333.5],
+        [2484.2, 2756.1],
         "0.001",
     ),
 )
@@ -147,6 +152,7 @@ def test_table_and_figure_reads_are_pinned():
         embedded,
         page,
         embedded_2,
+        page_2,
         uncertainty,
     ) in FIGURE_READS:
         row = document["species"][formula]["observations"]
@@ -157,13 +163,14 @@ def test_table_and_figure_reads_are_pinned():
         assert point["embedded_px_read_1"] == embedded
         assert point["page_600dpi_px_read_1"] == page
         assert point["embedded_px_read_2"] == embedded_2
+        assert point["page_600dpi_px_read_2"] == page_2
         if uncertainty is None:
             assert "read_uncertainty_dex" not in point
         else:
             assert point["read_uncertainty_dex"] == uncertainty
         assert point.get("read_uncertainty_dex") not in {"0", "0.0", "0.000"}
 
-    for formula, observation_id, activity, embedded, page, embedded_2, uncertainty in BOUNDARY_READS:
+    for formula, observation_id, activity, embedded, page, embedded_2, page_2, uncertainty in BOUNDARY_READS:
         match = next(
             item
             for item in document["species"][formula]["observations"]
@@ -174,6 +181,7 @@ def test_table_and_figure_reads_are_pinned():
         assert point["T_K"] == "2050"
         assert point["page_600dpi_px_read_1"] == page
         assert point["embedded_px_read_2"] == embedded_2
+        assert point["page_600dpi_px_read_2"] == page_2
         assert point["locator"]["panel"] == "a"
         if uncertainty is None:
             assert "read_uncertainty_dex" not in point
@@ -201,6 +209,13 @@ def test_residue_disagreement_matches_the_stored_coordinates():
         > 0.015
     ]
     assert bad == []
+    # The stored mole disagreement is the pixel displacement divided by that
+    # point's scale. A pasted "999" does not satisfy it.
+    for point in points:
+        displacement = abs(point["embedded_px_read_1"][1] - point["embedded_px_read_2"][1])
+        expected = format(displacement / float(point["y_px_per_mole_pct"]), ".4f")
+        assert point["read_disagreement_mole_pct"] == expected
+        assert point["read_disagreement_mole_pct"] != "999"
 
 
 def test_mutating_the_consumed_gibbs_value_or_deleting_a_row_fails_the_pin():
