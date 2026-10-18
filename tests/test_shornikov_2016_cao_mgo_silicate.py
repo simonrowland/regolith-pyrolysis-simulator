@@ -27,9 +27,9 @@ RENDERED_CELLS = (
 )
 
 # Experimental Rein–Chipman centres. Read 1 is the stored disk peak on the
-# embedded JPEG. Read 2 is the thick-interior centroid on a fresh 600 dpi page
-# crop. T, activity, both pixel reads, and the half-difference uncertainty are
-# literals, not a comparison with an audit file.
+# embedded JPEG. Read 2 is a visual centre of the filled disk on a fresh
+# 600 dpi page crop. T, activity, both pixel reads, and the half-difference
+# uncertainty are literals, not a comparison with an audit file.
 FIGURE_READS = (
     (
         "CaO",
@@ -38,8 +38,9 @@ FIGURE_READS = (
         "0.0038",
         [283.0, 300.0],
         [1440.3, 5484.2],
-        [283.21, 300.39],
-        "0.002",
+        [1441.0, 5485.0],
+        [283.23, 300.28],
+        "0.001",
     ),
     (
         "MgO",
@@ -48,7 +49,8 @@ FIGURE_READS = (
         "0.096",
         [294.0, 134.0],
         [1473.3, 4986.2],
-        [294.74, 134.75],
+        [1476.0, 4988.0],
+        [294.89, 134.61],
         "0.003",
     ),
     (
@@ -58,8 +60,9 @@ FIGURE_READS = (
         "0.1",
         [930.0, 132.0],
         [3382.4, 4980.2],
-        [929.45, 131.77],
-        "0.001",
+        [3381.5, 4980.0],
+        [929.71, 131.94],
+        None,
     ),
 )
 
@@ -164,6 +167,7 @@ def test_table_and_figure_reads_are_pinned():
         activity,
         embedded,
         page,
+        page_2,
         embedded_2,
         uncertainty,
     ) in FIGURE_READS:
@@ -180,6 +184,7 @@ def test_table_and_figure_reads_are_pinned():
         assert point["T_K"] == temperature
         assert point["activity"] == activity
         assert point["page_600dpi_px_read_1"] == page
+        assert point["page_600dpi_px_read_2"] == page_2
         assert point["embedded_px_read_2"] == embedded_2
         if uncertainty is None:
             assert "read_uncertainty_dex" not in point
@@ -213,8 +218,9 @@ def test_table_and_figure_reads_are_pinned():
     assert mixing_point["T_K"] == "1873"
     assert mixing_point["delta_Gm_kJ_per_mole_read"] == "-31"
     assert mixing_point["page_600dpi_px_read_1"] == [1204.7, 1260.1]
-    assert mixing_point["embedded_px_read_2"] == [298.56, 264.64]
-    assert mixing_point["read_uncertainty_kJ_per_mole"] == "0.029"
+    assert mixing_point["page_600dpi_px_read_2"] == [1203.5, 1260.5]
+    assert mixing_point["embedded_px_read_2"] == [298.60, 264.15]
+    assert mixing_point["read_uncertainty_kJ_per_mole"] == "0.007"
     added_mixing = next(
         item
         for item in mixing["values"]["points"]
