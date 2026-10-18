@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import re
 from collections import Counter, defaultdict
 from decimal import Decimal, InvalidOperation
@@ -228,3 +229,41 @@ def test_committed_emit_mappings_reproduce_landed_decimal_cells(
         if quantity == "activity":
             assert "activity" in observation["values"]
             assert "value" not in observation["values"]
+
+
+def test_wrong_printed_scale_direction_fails_landed_value_comparison(
+    tmp_path: Path,
+) -> None:
+    mapping_path = FIXTURES / "stolyarova-1996-cao-alumina-silica-kems.mapping.yaml"
+    mapping = yaml.safe_load(mapping_path.read_text(encoding="utf-8"))
+    corpus_root, raw_root = _corpus_roots()
+    source_id = mapping["source_id"]
+    source = _source_dir(corpus_root, raw_root, source_id)
+    draft_dir = _convert_source(source, source_id, tmp_path, raw_root)
+
+    wrong_mapping = copy.deepcopy(mapping)
+    scale_factor = next(
+        value["scale_factor"]
+        for table in wrong_mapping["tables"]
+        for value in table.get("values", [])
+        if "scale_factor" in value
+    )
+    scale_factor["direction"] = "cell_times_factor_equals_quantity"
+    wrong_mapping_path = tmp_path / "wrong-direction.mapping.yaml"
+    wrong_mapping_path.write_text(
+        yaml.safe_dump(wrong_mapping, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
+    document = draft.emit_extract(
+        draft_dir, wrong_mapping_path, tmp_path / "wrong-direction.yaml"
+    )
+
+    extract = yaml.safe_load(
+        (EXTRACTS / f"{source_id}.yaml").read_text(encoding="utf-8")
+    )
+    expected = _extract_targets(mapping, extract)
+    emitted = _emitted_cells(document)
+    assert any(
+        counts - emitted.get(key, Counter())
+        for key, counts in expected.items()
+    ), "the wrong direction unexpectedly reproduces landed values"

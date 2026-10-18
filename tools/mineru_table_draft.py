@@ -44,7 +44,13 @@ Table keys:
 - the locator row label is the temperature cell, or the species cell of a value
   pair, otherwise the CSV row number
 - ``values`` — ``{column, species}`` plus optional ``phase``, ``evidence_class``,
-  ``unit``, ``quantity``, ``uncertainty``, ``attribution``
+  ``unit``, ``quantity``, ``uncertainty``, ``attribution``, and ``scale_factor``.
+  ``scale_factor`` is ``{header, exponent, direction}`` for a printed power-of-ten
+  column factor. ``header`` is the exact MinerU header cell and ``exponent`` is the
+  signed integer in its single ``10^n`` factor. ``direction`` is either
+  ``quantity_times_factor_equals_cell`` or ``cell_times_factor_equals_quantity``.
+  This scales the one stored quantity with exact decimal arithmetic; it does not
+  convert units or emit a converted twin
 - ``value_pairs`` — ``{species_column, value_column, phase}`` for a species cell
   beside each value. ``species_form: printed_formula`` strips ``$``, ``\\mathrm``
   / ``\\text``, and ``{ } _ ^ \\`` spaces. Do not set both ``values`` and ``value_pairs``
@@ -140,6 +146,7 @@ _LATEX_SCIENTIFIC = re.compile(
     r"^([+\-−–—]?(?:\d+(?:\.\d+)?|\.\d+))\s*\\times\s*"
     r"10\^\{?([+\-−–—]?\d+)\}?$"
 )
+_HEADER_POWER_OF_TEN = re.compile(r"10\s*\^\s*\{?\s*([+\-−]?\d+)\s*\}?")
 _COMMA_DECIMAL = re.compile(
     r"(?<![\d.,])(?:\d{1,3}\.\d{3},\d+|\d+,\d{1,2})(?!\d)"
 )
@@ -931,6 +938,7 @@ _VALUE_KEYS = frozenset(
         "quantity",
         "uncertainty",
         "attribution",
+        "scale_factor",
     }
 )
 _PAIR_KEYS = frozenset(
@@ -1441,6 +1449,66 @@ def _emit_table(
         if _is_origin(cell)
     }
     measurements = _measurement_columns(spec)
+    scale_factors: dict[int, tuple[str, int]] = {}
+    for measurement in measurements:
+        raw_scale = measurement.get("scale_factor")
+        if raw_scale is None:
+            continue
+        column = int(
+            measurement["column"]
+            if measurement["kind"] == "fixed"
+            else measurement["value_column"]
+        )
+        scale = _require_mapping(raw_scale, f"scale_factor for column {column}")
+        _unknown_keys(
+            scale,
+            frozenset({"header", "exponent", "direction"}),
+            f"scale_factor for column {column}",
+        )
+        if not {"header", "exponent", "direction"}.issubset(scale):
+            raise ValueError(
+                f"scale_factor for column {column} needs header, exponent, and direction"
+            )
+        header = scale["header"]
+        exponent = scale["exponent"]
+        direction = str(scale["direction"])
+        if not isinstance(header, str) or not header:
+            raise ValueError(f"scale_factor.header for column {column} must be a string")
+        if isinstance(exponent, bool) or not isinstance(exponent, int):
+            raise ValueError(f"scale_factor.exponent for column {column} must be an integer")
+        header_cells = [
+            str(row[column - 1])
+            for row in draft_table.get("header_rows") or []
+            if column <= len(row)
+        ]
+        if header not in header_cells:
+            raise ValueError(
+                f"scale_factor.header for column {column} is not an exact MinerU header cell"
+            )
+        printed_powers = [
+            int(match.group(1).replace("−", "-"))
+            for match in _HEADER_POWER_OF_TEN.finditer(header)
+        ]
+        if len(printed_powers) != 1:
+            raise ValueError(
+                f"scale_factor.header for column {column} must contain exactly one "
+                "parseable power of ten"
+            )
+        if printed_powers[0] != exponent:
+            raise ValueError(
+                f"scale_factor.exponent {exponent} does not match printed header "
+                f"power {printed_powers[0]} in column {column}"
+            )
+        if direction == "quantity_times_factor_equals_cell":
+            stored_exponent = -exponent
+        elif direction == "cell_times_factor_equals_quantity":
+            stored_exponent = exponent
+        else:
+            raise ValueError(
+                f"scale_factor.direction for column {column} must be "
+                "quantity_times_factor_equals_cell or cell_times_factor_equals_quantity"
+            )
+        scale_factors[column] = (header, stored_exponent)
     temperature = _temperature_spec(spec)
     rows = _selected_body_rows(spec, cells)
     measurement_columns = {
@@ -1620,6 +1688,23 @@ def _emit_table(
                     )
                 observation["values"][value_field] = _printed(spelling)
                 used_verified.add((row, column))
+            scale = scale_factors.get(column)
+            if scale is not None:
+                # Printed header form: ` $p_{Ca}, \cdot 10^{7}$ ` means p_Ca × 10^7 = cell.
+                # Algebra: p_Ca = cell × 10^-7.
+                # Stolyarova 1996 cell `0.75` under that header stores `0.000000075 atm`.
+                # Unit check: 10^-7 is dimensionless, so the table's atm unit remains atm.
+                printed_cell = str(observation["values"][value_field]).strip()
+                number = _number_decimal(printed_cell)
+                if number is None:
+                    raise ValueError(
+                        f"scale_factor for row {row} column {column} needs a numeric cell"
+                    )
+                observation["values"][value_field] = _printed(
+                    format(number.scaleb(scale[1]), "f")
+                )
+                locator["printed_cell"] = _printed(printed_cell)
+                locator["scale_factor_header"] = _printed(scale[0])
             emitted.append((species, observation))
     unused = sorted(set(verified_spellings) - used_verified)
     if unused:
@@ -1798,7 +1883,17 @@ def main(argv: list[str] | None = None) -> int:
     compare.add_argument("extract", help="extract YAML path")
     compare.add_argument("draft_index", help="tables/<source-id>/index.yaml")
     compare.set_defaults(run=_compare_command)
-    emit = commands.add_parser("emit", help="emit extract rows from a draft mapping")
+    emit = commands.add_parser(
+        "emit",
+        help="emit extract rows from a draft mapping",
+        epilog=(
+            "A value column may declare scale_factor: {header, exponent, direction}. "
+            "header must be the exact MinerU header cell with one matching 10^n; "
+            "exponent is that signed integer. direction is "
+            "quantity_times_factor_equals_cell or cell_times_factor_equals_quantity. "
+            "Scaling uses exact decimal arithmetic and does not convert units."
+        ),
+    )
     emit.add_argument("draft_dir", help="draft directory containing index.yaml, or its parent")
     emit.add_argument("mapping", help="per-source table mapping YAML")
     emit.add_argument("--out", required=True, help="extract fragment path")

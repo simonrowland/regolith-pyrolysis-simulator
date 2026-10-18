@@ -1,7 +1,5 @@
-# Table 2 scales pressure columns by 10^9, 10^10, or 10^11. emit deliberately
-# accepts only direct atm/bar/Pa values and has no scale conversion; recording
-# these cells as unscaled atm would change their physical values. The landed
-# thermochemistry and activity rows are from figures, not MinerU tables.
+# Table 2 stores the printed partial pressures after applying each explicitly
+# stated header factor. The thermochemistry and activity values are from figures.
 source_id: stolyarova-1995-cao-alumina-kems
 source:
   citation: >-
@@ -12,4 +10,56 @@ extraction:
   date: '2026-10-18'
   worker: emitbt-1018
 review_status: draft
-tables: []
+tables:
+  - page: 2
+    table_index: 2
+    type: partial_pressure
+    quantity: partial_pressure
+    evidence_class: measured_direct
+    unit: atm
+    phase: gas
+    published_page: 687
+    rows: all
+    temperature:
+      as_printed: '1933'
+      unit: K
+    values:
+      - column: 2
+        species: Ca
+        scale_factor:
+          header: ' $p_{Ca}$ ( $\times 10^{9}$ )'
+          exponent: 9
+          direction: quantity_times_factor_equals_cell
+      - column: 3
+        species: Al
+        scale_factor:
+          header: ' $p_{Al}$ ( $\times 10^{9}$ )'
+          exponent: 9
+          direction: quantity_times_factor_equals_cell
+      - column: 4
+        species: AlO
+        scale_factor:
+          header: ' $p_{AlO}$ ( $\times 10^{10}$ )'
+          exponent: 10
+          direction: quantity_times_factor_equals_cell
+      - column: 5
+        species: O
+        evidence_class: model_derived
+        scale_factor:
+          header: ' $p_{O}$ ( $\times 10^{9}$ )'
+          exponent: 9
+          direction: quantity_times_factor_equals_cell
+      - column: 6
+        species: O
+        evidence_class: model_derived
+        scale_factor:
+          header: ' $p_{O}$ ( $\times 10^{9}$ )'
+          exponent: 9
+          direction: quantity_times_factor_equals_cell
+      - column: 7
+        species: O2
+        evidence_class: model_derived
+        scale_factor:
+          header: ' $p_{O2}$ ( $\times 10^{11}$ )'
+          exponent: 11
+          direction: quantity_times_factor_equals_cell

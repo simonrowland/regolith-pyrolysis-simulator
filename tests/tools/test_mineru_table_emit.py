@@ -109,6 +109,94 @@ def test_module_docstring_documents_the_mapping() -> None:
     assert "needs_render_check" in text
     assert "pdftotext-layout" in text
     assert "printed_formula" in text
+    assert "scale_factor" in text
+
+
+def test_emit_help_documents_printed_scale_factors(capsys: pytest.CaptureFixture[str]) -> None:
+    with pytest.raises(SystemExit) as exit_info:
+        draft.main(["emit", "--help"])
+    assert exit_info.value.code == 0
+    assert "scale_factor" in capsys.readouterr().out
+
+
+def test_printed_scale_factor_scales_exactly_and_keeps_both_spellings(
+    tmp_path: Path,
+) -> None:
+    header = "p Mg x 10^5, atm"
+    draft_dir = _convert_html(
+        tmp_path,
+        f"<table><tr><th>T, K</th><th>{header}</th></tr>"
+        "<tr><td>1851</td><td>12.34</td></tr></table>",
+    )
+    table = _pressure_table(
+        values=[
+            {
+                "column": 2,
+                "species": "Mg",
+                "scale_factor": {
+                    "header": header,
+                    "exponent": 5,
+                    "direction": "quantity_times_factor_equals_cell",
+                },
+            }
+        ]
+    )
+    document = _emit(tmp_path, draft_dir, _base_mapping(table))
+    row = _observations(document)[0]
+    assert row["values"]["pressure_atm"] == "0.0001234"
+    assert "pressure_atm_as_printed" not in row["values"]
+    assert row["locator"]["printed_cell"] == "12.34"
+    assert row["locator"]["scale_factor_header"] == header
+    assert row["locator"]["column_header"] == header
+
+
+def test_printed_scale_factor_refuses_missing_direction_bad_power_and_mismatch(
+    tmp_path: Path,
+) -> None:
+    header = "p Mg x 10^5, atm"
+    cases = [
+        (
+            {"header": header, "exponent": 5},
+            "needs header, exponent, and direction",
+            header,
+        ),
+        (
+            {
+                "header": header,
+                "exponent": 6,
+                "direction": "quantity_times_factor_equals_cell",
+            },
+            "does not match printed header power",
+            header,
+        ),
+        (
+            {
+                "header": "p Mg, atm",
+                "exponent": 5,
+                "direction": "quantity_times_factor_equals_cell",
+            },
+            "exactly one parseable power of ten",
+            "p Mg, atm",
+        ),
+    ]
+    for index, (scale_factor, error, header_cell) in enumerate(cases):
+        case_root = tmp_path / str(index)
+        draft_dir = _convert_html(
+            case_root,
+            f"<table><tr><th>T, K</th><th>{header_cell}</th></tr>"
+            "<tr><td>1851</td><td>12.34</td></tr></table>",
+        )
+        table = _pressure_table(
+            values=[
+                {"column": 2, "species": "Mg", "scale_factor": scale_factor}
+            ]
+        )
+        with pytest.raises(ValueError, match=error):
+            _emit(
+                case_root,
+                draft_dir,
+                _base_mapping(table),
+            )
 
 
 def test_happy_path_keeps_verbatim_text_and_skips_dashes(tmp_path: Path) -> None:
