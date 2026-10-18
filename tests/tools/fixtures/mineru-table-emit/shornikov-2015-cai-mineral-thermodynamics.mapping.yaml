@@ -6,35 +6,11 @@ source:
   year: 2015
   doi: null
 extraction:
-  method: mineru_table_draft emit
+  method: mineru_table_draft emit; ΔH_T and ΔS_T are retained in context
   date: '2026-10-18'
   worker: w4a2-1018
 review_status: draft
 tables:
-  - page: 2
-    table_index: 1
-    type: gibbs_table
-    quantity: delta_fH
-    unit: kJ/mole
-    evidence_class: quoted_attributed
-    attribution: '[11–17]'
-    phase: cr
-    species_form: printed_formula
-    value_pairs:
-      - species_column: 1
-        value_column: 2
-  - page: 2
-    table_index: 1
-    type: gibbs_table
-    quantity: S
-    unit: J/mol K
-    evidence_class: quoted_attributed
-    attribution: '[11–17]'
-    phase: cr
-    species_form: printed_formula
-    value_pairs:
-      - species_column: 1
-        value_column: 3
   - page: 2
     table_index: 1
     type: transition_point

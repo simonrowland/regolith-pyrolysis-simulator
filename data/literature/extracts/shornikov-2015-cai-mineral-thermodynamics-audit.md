@@ -9,9 +9,9 @@
 
 ## Table 1 transcription
 
-Table 1 is on PDF page 2. The final extract contains 51 numeric observations: 12 each for ΔH_T, ΔS_T and ΔH_melt, plus 15 transition temperatures. Values are quoted from references [11–17], as printed. The ΔH_T and ΔS_T entries are the parameters used in ΔG_T = ΔH_T − TΔS_T under the stated limited-interval constancy assumption. The source describes the underlying high-temperature data as above 1000 K; that lower bound is recorded on the 24 ΔH_T/ΔS_T rows. No upper bound for the coefficient interval is printed.
+Table 1 is on PDF page 2 and contains 51 numeric values. The final extract has 27 scored observations (15 transition temperatures and 12 ΔH_melt values). The 24 ΔH_T and ΔS_T values are retained together in one unscored context record because they parameterize the Gibbs energy of mineral formation from oxide components; they are neither formation enthalpies from elements nor absolute entropies. Those quoted values retain attribution [11–17], their crystalline phase, the printed temperature-dependence equation, and the printed oxide-component formation equation. The source says the parameters are assumed constant over a limited temperature interval but gives no numeric bounds.
 
-The printed entropy unit `J/(mole·K)` is normalized to the migrator-supported equivalent `J/mol K`; the exact printed header remains in each observation locator. Numeric values are unchanged. The table's CAI mineral shorthand is retained in `row_label`; formula keys are cross-checked against the source's Figure 1 mineral names and Shornikov's formula-based CAI extraction in `shornikov-2019-lunar-meteorite-evaporation-model.yaml`.
+The printed ΔS_T unit `J/(mole·K)` is preserved verbatim in the context record. Numeric values are unchanged. The table's CAI mineral shorthand is retained in `row_label`; formula keys are cross-checked against the source's Figure 1 mineral names and Shornikov's formula-based CAI extraction in `shornikov-2019-lunar-meteorite-evaporation-model.yaml`.
 
 | Table row | Mineral (Figure 1) | Formula key | ΔH_T (kJ/mole) | ΔS_T (J/(mole·K)) | T_melt (K) | ΔH_melt (kJ/mole) |
 |---|---|---|---:|---:|---:|---:|
@@ -28,15 +28,15 @@ The printed entropy unit `J/(mole·K)` is normalized to the migrator-supported e
 | CAS2 | anorthite | CaAl2Si2O8 | −26.70 | −1.10 | 1830 | 33.30 |
 | C3AS3 | grossular | Ca3Al2Si3O12 | −47.70 | −10.98 | 1373*; 1673** | 71.00 |
 
-`*` is the dissociation temperature and is assigned the crystal phase; `**` is the liquid-phase temperature and is assigned the liquid phase. Both values from each composite T_melt cell are separate quoted transition observations. For ΔH_melt, the liquid-phase temperature is carried as T_fus_K when the table gives two temperatures.
+`*` is the dissociation temperature and is assigned the crystal phase; `**` is the liquid-phase temperature and is assigned the liquid phase. The `**` entries retain `property_kind: liquid_phase_temperature`, not `melting_point`. Both values from each composite T_melt cell are separate quoted transition observations. For ΔH_melt, the liquid-phase temperature is carried as T_fus_K when the table gives two temperatures.
 
 ## Cell evidence and comparison
 
 The page is born-digital. For the 45 unflagged numeric cells, MinerU and pdftotext agree on the digits and signs. Their row and column assignments were checked against the full page render at 600 dpi. The remaining three T_melt cells were flagged because MinerU concatenated each pair (`2123*2148**`, `1836*1850**`, `1373*1673**`); each cell was checked against that render, which confirms all six values and footnote marks.
 
-`shornikov-2015-cai-mineral-thermodynamics-mineru-compare.csv` records 45 matched values and six mismatches. Those six compare mismatches are the two values per flagged composite cell that the draft CSV stores as one nonnumeric string; the render checks above resolve them. There are no unmatched observations.
+`shornikov-2015-cai-mineral-thermodynamics-mineru-compare.csv` records 21 matched scored values and six mismatches. The 24 ΔH_T and ΔS_T context values are intentionally outside the observation comparator. The six compare mismatches are the two values per flagged composite cell that the draft CSV stores as one nonnumeric string; the render checks above resolve them. There are no unmatched scored observations.
 
-The table mapping emitted 45 observations with zero skipped blank/dash cells. Six transition values from the three composite T_melt cells were hand-transcribed after the render checks. Render checks: 3 cells.
+The table mapping emits the nine single-cell transition temperatures and twelve ΔH_melt values (21 observations), with zero skipped blank/dash cells. Six transition values from the three composite T_melt cells were hand-transcribed after the render checks. The 24 ΔH_T and ΔS_T values are transcribed into the unscored context record. Render checks: 3 cells.
 
 ## Figure 1 context
 
@@ -44,11 +44,11 @@ Figure 1 is a single panel on PDF page 2 with twelve numbered, unmarked curves. 
 
 ## Isolated migration evidence
 
-The isolated migration admitted 51 observations and 12 context rows with zero hard issues. All 51 observations carry a located `point_conditions.temperature_K`: the 24 ΔH_T/ΔS_T records carry the printed `>1000 K` lower bound, the 15 transition records carry their reported transition temperature, and the 12 ΔH_melt records carry the corresponding liquid-phase temperature. The migration reported no unsupported units and no unmapped phase strings.
+The isolated migration admitted 27 observations and 13 context rows with zero hard issues. All 27 observations carry a located `point_conditions.temperature_K`: 15 transition records carry their reported temperature and 12 ΔH_melt records carry the corresponding printed temperature. The migration reported no unsupported units and no unmapped phase strings.
 
 | Observation | Quantity | composition | total_pressure_Pa | fO2_Pa | identity temperature_K | point temperature condition |
 |---|---|---|---|---|---|---|
-| CaAl2O4, Table 1 ΔH_T | delta_fH | not applicable | not applicable | not applicable | unknown: no single T | >1000 K, page 1 Introduction |
+| Table 1 ΔH_T / ΔS_T context | unscored context | not applicable | not applicable | not applicable | not applicable | no scored observation |
 | CaAl12O19, dissociation | transition_temperature | not applicable | unknown: no numeric pressure printed | not applicable | not applicable | 2123 K, page 2 Table 1 |
 | Ca3Al2Si3O12, ΔH_melt | heat_of_fusion | not applicable | not applicable | not applicable | 1673 K | 1673 K, page 2 Table 1 |
 
@@ -56,8 +56,8 @@ The source prints no numeric total pressure, fO2, or melt composition for these 
 
 ## Verification and expected store delta
 
-After restoring the mutation, the focused transcription, YAML flow-scalar, and table-draft suites passed: **45 passed**. A deliberate mutation from `-8.91` to `-8.92` made the focused transcription test fail on its literal source-value pin, then the original value was restored.
+After restoring the mutation, the focused transcription test and YAML flow-scalar guard passed. A deliberate mutation from `-8.91` to `-8.92` made the focused transcription test fail on its literal source-value pin, then the original value was restored. The review fix moves that pinned value into the context record and adds pins for the reaction, phase, and the other printed coefficients.
 
 The full combined run collected 624 tests: **621 passed, 3 failed**. The three failures are global validators blocked by two `recalculation_table` types already present in the unchanged base revision's `cottrell-2009-iron-xanes.yaml`; the failure report names no row in this Shornikov extract. The two Cottrell types are present at the starting commit and that file is untouched.
 
-No battery store regeneration was committed. Expected store delta on regeneration: **+51 observations and +12 context rows**.
+No battery store regeneration was committed. Revised expected store delta on regeneration: **+27 observations and +13 context rows**.
