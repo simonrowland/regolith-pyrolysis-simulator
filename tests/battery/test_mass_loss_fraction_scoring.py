@@ -325,6 +325,87 @@ def test_richter_r14_mass_loss_uses_source_declared_initial_glass_not_final_resi
     )
 
 
+def test_richter_catalogue_sibling_keeps_initial_through_finalization(
+    monkeypatch,
+) -> None:
+    source = LITERATURE / "extracts" / "kems-010-richter-2007.yaml"
+    document = deepcopy(load_yaml(source))
+    experiment = next(
+        item for item in document["experiments"] if item["experiment_id"] == "cai-r-14"
+    )
+    final_map = experiment["sample"]["printed_composition"]["state"]["value"]
+    experiment["sample"].pop("initial_composition")
+
+    catalogue_map = {
+        "MgO": 11.48,
+        "SiO2": 46.00,
+        "Al2O3": 19.39,
+        "CaO": 23.12,
+    }
+    source_note = "Richter 2007 Table 1, R-14 starting glass"
+    selection_rule = "the Table 1 starting-material composition for R-14"
+    document["species"].setdefault("Mg", {}).setdefault("observations", []).append(
+        {
+            "observation_id": "richter_2007_r14_catalogue_residue_composition",
+            "type": "composition_series",
+            "experiment": "cai-r-14",
+            "locator": {"table": "1", "row": "R-14"},
+            "phase": "l",
+            "regime": "langmuir_free_evaporation",
+            "units": "wt.%",
+            "values": {
+                "quantity": "residue_composition_vs_time",
+                "method_class": "measured_direct",
+                "composition_from_sample_catalog": True,
+                "composition_source": source_note,
+                "analysis_selection_rule": selection_rule,
+                "sample_oxide_composition_wt_pct": catalogue_map,
+                "series": [
+                    {
+                        "sample": "R-14",
+                        "T_C": 1800,
+                        "t_min": 30,
+                        **{f"{name}_wt_pct": amount for name, amount in final_map.items()},
+                    }
+                ],
+            },
+        }
+    )
+
+    original_load_yaml = load_yaml
+    monkeypatch.setattr(
+        migrate_module,
+        "load_yaml",
+        lambda path: document if path == source else original_load_yaml(path),
+    )
+    migrator = Migrator()
+    migrator._migrate_extract(source)
+    migrator.finalize()
+
+    row = next(
+        row
+        for row in migrator.result.observations.values()
+        if row.source_id == "kems-010-richter-2007"
+        and quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
+        and "R-14::T=2073.15" in row.observation_id
+    )
+    migrated = migrator.result.experiments[row.experiment_id]
+    initial = migrated.sample.initial_composition
+    assert initial is not None and initial.state.is_value
+    composition = initial.state.value
+    assert composition.proxy_flag == "composition_from_sample_catalog"
+    assert composition.proxy_source == source_note
+    assert composition.analysis_selection_rule == selection_rule
+    assert _initial_oxide_wt_percent(migrated.sample) == pytest.approx(
+        catalogue_map, abs=0.02
+    )
+
+    prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=migrated)
+    assert prediction.refusal_reason is None, prediction.refusal_detail
+    assert prediction.value is not None
+    assert abs(prediction.value - Decimal("0.5469")) <= Decimal("0.002")
+
+
 def test_richter_rep5_row_has_numeric_residual_and_domain_notice(mass_loss_rows) -> None:
     richter, experiment, _markova, _markova_experiment, _r14, _r14_experiment = (
         mass_loss_rows

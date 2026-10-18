@@ -18,6 +18,7 @@ from simulator.battery.enums import (
     EvidenceClass,
     NoticeKind,
     Phase,
+    RefusalReason,
     ValueKind,
 )
 from simulator.battery.migrate import (
@@ -1295,6 +1296,58 @@ def test_sample_catalogue_composition_is_typed_proxy_not_printed() -> None:
     assert sample.initial_composition.state.value.proxy_flag == (
         "composition_from_sample_catalog"
     )
+
+
+def test_conflicting_owner_selected_initials_are_withheld_with_migration_issue() -> None:
+    old_initial = sample_from_equipment(
+        {},
+        values={
+            "composition_from_sample_catalog": True,
+            "composition_source": "first catalogue source",
+            "sample_oxide_composition_wt_pct": {"SiO2": 60, "MgO": 40},
+        },
+    ).initial_composition
+    incoming_initial = sample_from_equipment(
+        {},
+        values={
+            "composition_from_sample_catalog": True,
+            "composition_source": "second catalogue source",
+            "sample_oxide_composition_wt_pct": {"SiO2": 55, "MgO": 45},
+        },
+    ).initial_composition
+    assert old_initial is not None and incoming_initial is not None
+
+    existing = tabulation_experiment("catalogue-initial-conflict")
+    existing = replace(
+        existing,
+        sample=replace(existing.sample, initial_composition=old_initial),
+    )
+    assert incoming_initial is not None
+    migrator = Migrator()
+    migrator.result.experiments[existing.experiment_id] = existing
+    merged = migrator._ensure_experiment(
+        work_id=existing.work_id,
+        experiment_id=existing.experiment_id,
+        locator=existing.locator,
+        method=existing.method,
+        equipment={},
+        values={
+            "composition_from_sample_catalog": True,
+            "composition_source": "second catalogue source",
+            "sample_oxide_composition_wt_pct": {"SiO2": 55, "MgO": 45},
+        },
+    )
+
+    assert merged.sample.initial_composition is None
+    conflict = next(
+        issue
+        for issue in migrator.result.registry_issues
+        if "initial_composition_conflict" in issue.detail
+    )
+    assert conflict.path == (
+        "experiment[catalogue-initial-conflict].sample.initial_composition"
+    )
+    assert conflict.reason is RefusalReason.INVALID_SOURCE
 
 
 def test_ambiguous_mass_percent_initial_preserves_print_and_withholds_canonical() -> None:
