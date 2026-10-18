@@ -54,11 +54,11 @@ def _render_pins(document: dict) -> None:
     )["values"]["value"] == "271.522"
 
     marker_pins = (
-        ("CaO", "a", 0.50, "(1402, 3436)", "-0.3038"),
-        ("MgO", "b", 0.40, "(1374, 4738)", "-0.3996"),
-        ("Al2O3", "c", 0.010, "(2691, 4043)", "-1.9954"),
+        ("CaO", "a", 0.50, "(1402, 3436)", "(1402, 3434)", "0.3038"),
+        ("MgO", "b", 0.40, "(1374, 4738)", "(1374, 4736)", "0.3996"),
+        ("Al2O3", "c", 0.010, "(2691, 4043)", "(2689, 4043)", "1.9954"),
     )
-    for species, panel, activity, pixel, log_ordinate in marker_pins:
+    for species, panel, activity, first_pixel, second_pixel, log_ordinate in marker_pins:
         row = _observation(
             document,
             species,
@@ -66,14 +66,37 @@ def _render_pins(document: dict) -> None:
         )
         assert row["point_conditions"]["temperature_K"]["state"]["value"]["point"] == "1960"
         assert row["values"]["activity"] == activity
-        assert row["values"]["evidence_class"] == "figure_only"
-        assert pixel in row["locator"]["note"]
+        assert row["values"]["method_class"] == "figure_only"
+        assert first_pixel in row["locator"]["note"]
+        assert second_pixel in row["locator"]["note"]
         assert log_ordinate in row["locator"]["note"]
+        assert row.get("uncertainty", {}).get("read_uncertainty_dex") != 0.0
+
+    minimum = _observation(
+        document,
+        "CaO-MgO-Al2O3_melt",
+        "shornikov_2011_text_minimum_delta_fG1960_melt",
+    )
+    assert minimum["values"]["value_as_printed"] == "−31.5"
+    assert minimum["values"]["value"] == "-31.5"
+    assert minimum["values"]["method_class"] == "quoted_attributed"
+    assert minimum["values"]["composition_Al2O3_mole_pct_as_printed"] == "45"
+    assert minimum["values"]["T_K"] == "1960"
+    assert minimum["phase"] == "l"
+    assert "from oxides" in minimum["standard_state"]
+    assert (
+        minimum["point_conditions"]["composition"]["state"]["reason"]
+        == "incomplete_melt_composition"
+    )
+    assert document["species"]["Ca3MgAl4O10"]["context"][0]["values"]["concentration_mole_pct"] == {
+        "Al2O3": "33.3",
+    }
 
 
 def test_tables_and_figure_markers_match_the_render_pins() -> None:
     document = _document()
     observations = _observations(document)
+    assert len(observations) == 60
     assert len(document["species"]["MgO"]["context"]) == 12
     table2 = document["species"]["MgO"]["context"]
     assert table2[0]["values"]["concentration_wt_pct"] == {
@@ -89,7 +112,12 @@ def test_tables_and_figure_markers_match_the_render_pins() -> None:
     markers = [row for row in observations if "_allibert_marker_" in row["observation_id"]]
     unavailable = [row for row in observations if row["values"].get("unavailable_reason")]
     assert len(markers) == 19
+    assert len(observations) == 60
     assert len(unavailable) == 8
+    for row in markers:
+        uncertainty = row.get("uncertainty", {})
+        assert uncertainty.get("read_uncertainty_dex") != 0.0
+        assert uncertainty.get("read_uncertainty_kJ_mol") != 0.0
     assert len(document["species"]["Al2O3"]["context"]) == 1
     assert check_all_fidelity_samples_match(document) == []
     _render_pins(document)
@@ -107,6 +135,18 @@ def test_render_pins_fail_when_a_digitized_value_is_mutated() -> None:
         _render_pins(document)
 
 
+def test_render_pins_fail_when_migrated_evidence_class_is_mutated() -> None:
+    document = deepcopy(_document())
+    row = _observation(
+        document,
+        "Al2O3",
+        "shornikov_2011_fig1_c_allibert_marker_01",
+    )
+    row["values"]["method_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _render_pins(document)
+
+
 def test_isolated_migration_preserves_temperature_conditions_and_unavailable_curves() -> None:
     migrator = Migrator(root=ROOT, index=None, aliases={})
     migrator._migrate_extract(EXTRACT)
@@ -114,12 +154,22 @@ def test_isolated_migration_preserves_temperature_conditions_and_unavailable_cur
     result = migrator.result
     observations = list(result.observations.values())
 
-    assert len(observations) == 59
-    assert sum(row.admission.status.value == "admitted" for row in observations) == 51
+    assert len(observations) == 60
+    assert sum(row.admission.status.value == "admitted" for row in observations) == 52
     assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 8
     assert result.validation is not None
     assert result.validation.hard_issues == ()
     assert result.registry_issues == []
+    minimum = next(
+        row
+        for row in observations
+        if row.observation_id.endswith("::shornikov_2011_text_minimum_delta_fG1960_melt")
+    )
+    assert minimum.admission.status.value == "admitted"
+    assert minimum.value.kind is ValueKind.POINT
+    assert minimum.identity.temperature_K is not None
+    assert minimum.point_conditions["composition"].state.is_unknown
+    assert minimum.point_conditions["composition"].locator is not None
     for row in observations:
         assert row.identity.temperature_K is not None
         assert row.identity.temperature_K.is_value

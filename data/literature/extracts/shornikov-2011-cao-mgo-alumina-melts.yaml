@@ -52,8 +52,8 @@ fidelity_samples:
     panel: a
     marker_symbol: open square
     series: '1'
-    note: '600 dpi centre reads: fresh crop 1 page pixel (1402, 3436), fresh crop 2 page pixel (1402, 3436); plotted
-      ordinate -0.3038 −lg activity.'
+    note: '600 dpi centre reads: fresh crop 1 page pixel (1402, 3436), fresh crop 2 page pixel (1402, 3434); plotted
+      ordinate 0.3038 −lg activity.'
 - species: MgO
   observation_id: shornikov_2011_fig1_b_allibert_marker_01
   field: activity
@@ -65,8 +65,8 @@ fidelity_samples:
     panel: b
     marker_symbol: open square
     series: '1'
-    note: '600 dpi centre reads: fresh crop 1 page pixel (1374, 4738), fresh crop 2 page pixel (1374, 4738); plotted
-      ordinate -0.3996 −lg activity.'
+    note: '600 dpi centre reads: fresh crop 1 page pixel (1374, 4738), fresh crop 2 page pixel (1374, 4736); plotted
+      ordinate 0.3996 −lg activity.'
 - species: Al2O3
   observation_id: shornikov_2011_fig1_c_allibert_marker_01
   field: activity
@@ -78,8 +78,8 @@ fidelity_samples:
     panel: c
     marker_symbol: open square
     series: '1'
-    note: '600 dpi centre reads: fresh crop 1 page pixel (2691, 4043), fresh crop 2 page pixel (2691, 4043); plotted
-      ordinate -1.9954 −lg activity.'
+    note: '600 dpi centre reads: fresh crop 1 page pixel (2691, 4043), fresh crop 2 page pixel (2689, 4043); plotted
+      ordinate 1.9954 −lg activity.'
 experiments:
 - experiment_id: shornikov_2011_table1_present_calculation
   method: ideal associated solutions thermodynamic calculation
@@ -104,6 +104,26 @@ experiments:
         table: '1'
         note: 'Table 1 title and caption: Gibbs energies calculated in the present study from the cited thermodynamic
           data at 1960 K.'
+- experiment_id: shornikov_2011_text_conclusion_minimum_melt
+  method: thermodynamic value quoted in the discussion
+  attribution_as_printed: Final paragraph reports the minimum Gibbs energy of melt formation from oxides and the composition near the liquidus.
+  locator:
+    page: 2
+    pdf_page_index: 1
+    section: Results
+    note: Final paragraph on PDF page 2.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1960'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Results
+        note: The value is labelled ΔfG1960.
 - experiment_id: shornikov_2011_figure1_series1_allibert_1979
   method: mass-spectrometric Knudsen effusion method
   attribution_as_printed: 'Figure 1 caption: series 1, obtained by mass-spectrometric Knudsen effusion method [Allibert
@@ -308,8 +328,8 @@ species:
         panel: c
         marker_symbol: open square
         series: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (2691, 4043), fresh crop 2 page pixel (2691, 4043);
-          plotted ordinate -1.9954 −lg activity.'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (2691, 4043), fresh crop 2 page pixel (2689, 4043);
+          plotted ordinate 1.9954 −lg activity.'
       units: dimensionless activity; x(Al2O3), mole %
       phase: l
       regime: figure_comparison
@@ -319,7 +339,7 @@ species:
       values:
         quantity: activity
         composition_component: Al2O3
-        method_class: quoted_attributed
+        method_class: figure_only
         evidence_class: figure_only
         admission_status: admitted
         activity: 0.01
@@ -342,8 +362,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2691, 4043), fresh crop 2 page pixel (2691, 4043);
-              plotted ordinate -1.9954 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2691, 4043), fresh crop 2 page pixel (2689, 4043);
+              plotted ordinate 1.9954 −lg activity.'
         composition:
           state:
             tag: unknown
@@ -355,8 +375,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2691, 4043), fresh crop 2 page pixel (2691, 4043);
-              plotted ordinate -1.9954 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2691, 4043), fresh crop 2 page pixel (2689, 4043);
+              plotted ordinate 1.9954 −lg activity.'
         total_pressure_Pa:
           state:
             tag: unknown
@@ -368,8 +388,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2691, 4043), fresh crop 2 page pixel (2691, 4043);
-              plotted ordinate -1.9954 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2691, 4043), fresh crop 2 page pixel (2689, 4043);
+              plotted ordinate 1.9954 −lg activity.'
         fO2_Pa:
           state:
             tag: unknown
@@ -381,10 +401,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2691, 4043), fresh crop 2 page pixel (2691, 4043);
-              plotted ordinate -1.9954 −lg activity.'
-      uncertainty:
-        read_uncertainty_dex: 0.0
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2691, 4043), fresh crop 2 page pixel (2689, 4043);
+              plotted ordinate 1.9954 −lg activity.'
     - observation_id: shornikov_2011_fig1_c_allibert_marker_02
       type: activity_coefficient
       locator:
@@ -394,8 +412,8 @@ species:
         panel: c
         marker_symbol: open square
         series: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (2819, 3732), fresh crop 2 page pixel (2819, 3732);
-          plotted ordinate -1.3120 −lg activity.'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (2819, 3732), fresh crop 2 page pixel (2820, 3732);
+          plotted ordinate 1.3120 −lg activity.'
       units: dimensionless activity; x(Al2O3), mole %
       phase: l
       regime: figure_comparison
@@ -405,7 +423,7 @@ species:
       values:
         quantity: activity
         composition_component: Al2O3
-        method_class: quoted_attributed
+        method_class: figure_only
         evidence_class: figure_only
         admission_status: admitted
         activity: 0.049
@@ -428,8 +446,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2819, 3732), fresh crop 2 page pixel (2819, 3732);
-              plotted ordinate -1.3120 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2819, 3732), fresh crop 2 page pixel (2820, 3732);
+              plotted ordinate 1.3120 −lg activity.'
         composition:
           state:
             tag: unknown
@@ -441,8 +459,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2819, 3732), fresh crop 2 page pixel (2819, 3732);
-              plotted ordinate -1.3120 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2819, 3732), fresh crop 2 page pixel (2820, 3732);
+              plotted ordinate 1.3120 −lg activity.'
         total_pressure_Pa:
           state:
             tag: unknown
@@ -454,8 +472,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2819, 3732), fresh crop 2 page pixel (2819, 3732);
-              plotted ordinate -1.3120 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2819, 3732), fresh crop 2 page pixel (2820, 3732);
+              plotted ordinate 1.3120 −lg activity.'
         fO2_Pa:
           state:
             tag: unknown
@@ -467,10 +485,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2819, 3732), fresh crop 2 page pixel (2819, 3732);
-              plotted ordinate -1.3120 −lg activity.'
-      uncertainty:
-        read_uncertainty_dex: 0.0
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2819, 3732), fresh crop 2 page pixel (2820, 3732);
+              plotted ordinate 1.3120 −lg activity.'
     - observation_id: shornikov_2011_fig1_c_allibert_marker_03
       type: activity_coefficient
       locator:
@@ -480,8 +496,8 @@ species:
         panel: c
         marker_symbol: open square
         series: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (2995, 3600), fresh crop 2 page pixel (2995, 3600);
-          plotted ordinate -1.0220 −lg activity.'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (2995, 3600), fresh crop 2 page pixel (2995, 3598);
+          plotted ordinate 1.0220 −lg activity.'
       units: dimensionless activity; x(Al2O3), mole %
       phase: l
       regime: figure_comparison
@@ -491,7 +507,7 @@ species:
       values:
         quantity: activity
         composition_component: Al2O3
-        method_class: quoted_attributed
+        method_class: figure_only
         evidence_class: figure_only
         admission_status: admitted
         activity: 0.095
@@ -514,8 +530,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2995, 3600), fresh crop 2 page pixel (2995, 3600);
-              plotted ordinate -1.0220 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2995, 3600), fresh crop 2 page pixel (2995, 3598);
+              plotted ordinate 1.0220 −lg activity.'
         composition:
           state:
             tag: unknown
@@ -527,8 +543,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2995, 3600), fresh crop 2 page pixel (2995, 3600);
-              plotted ordinate -1.0220 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2995, 3600), fresh crop 2 page pixel (2995, 3598);
+              plotted ordinate 1.0220 −lg activity.'
         total_pressure_Pa:
           state:
             tag: unknown
@@ -540,8 +556,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2995, 3600), fresh crop 2 page pixel (2995, 3600);
-              plotted ordinate -1.0220 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2995, 3600), fresh crop 2 page pixel (2995, 3598);
+              plotted ordinate 1.0220 −lg activity.'
         fO2_Pa:
           state:
             tag: unknown
@@ -553,10 +569,10 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2995, 3600), fresh crop 2 page pixel (2995, 3600);
-              plotted ordinate -1.0220 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2995, 3600), fresh crop 2 page pixel (2995, 3598);
+              plotted ordinate 1.0220 −lg activity.'
       uncertainty:
-        read_uncertainty_dex: 0.0
+        read_uncertainty_dex: 0.00219729
     - observation_id: shornikov_2011_fig1_c_allibert_marker_04
       type: activity_coefficient
       locator:
@@ -566,8 +582,8 @@ species:
         panel: c
         marker_symbol: open square
         series: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (3131, 3464), fresh crop 2 page pixel (3131, 3464);
-          plotted ordinate -0.7231 −lg activity.'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (3131, 3464), fresh crop 2 page pixel (3129, 3463);
+          plotted ordinate 0.7231 −lg activity.'
       units: dimensionless activity; x(Al2O3), mole %
       phase: l
       regime: figure_comparison
@@ -577,7 +593,7 @@ species:
       values:
         quantity: activity
         composition_component: Al2O3
-        method_class: quoted_attributed
+        method_class: figure_only
         evidence_class: figure_only
         admission_status: admitted
         activity: 0.19
@@ -600,8 +616,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (3131, 3464), fresh crop 2 page pixel (3131, 3464);
-              plotted ordinate -0.7231 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3131, 3464), fresh crop 2 page pixel (3129, 3463);
+              plotted ordinate 0.7231 −lg activity.'
         composition:
           state:
             tag: unknown
@@ -613,8 +629,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (3131, 3464), fresh crop 2 page pixel (3131, 3464);
-              plotted ordinate -0.7231 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3131, 3464), fresh crop 2 page pixel (3129, 3463);
+              plotted ordinate 0.7231 −lg activity.'
         total_pressure_Pa:
           state:
             tag: unknown
@@ -626,8 +642,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (3131, 3464), fresh crop 2 page pixel (3131, 3464);
-              plotted ordinate -0.7231 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3131, 3464), fresh crop 2 page pixel (3129, 3463);
+              plotted ordinate 0.7231 −lg activity.'
         fO2_Pa:
           state:
             tag: unknown
@@ -639,10 +655,10 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (3131, 3464), fresh crop 2 page pixel (3131, 3464);
-              plotted ordinate -0.7231 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3131, 3464), fresh crop 2 page pixel (3129, 3463);
+              plotted ordinate 0.7231 −lg activity.'
       uncertainty:
-        read_uncertainty_dex: 0.0
+        read_uncertainty_dex: 0.00109865
     - observation_id: shornikov_2011_fig1_c_allibert_marker_05
       type: activity_coefficient
       locator:
@@ -652,8 +668,8 @@ species:
         panel: c
         marker_symbol: open square
         series: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (3291, 3389), fresh crop 2 page pixel (3291, 3389);
-          plotted ordinate -0.5583 −lg activity.'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (3291, 3389), fresh crop 2 page pixel (3291, 3388);
+          plotted ordinate 0.5583 −lg activity.'
       units: dimensionless activity; x(Al2O3), mole %
       phase: l
       regime: figure_comparison
@@ -663,7 +679,7 @@ species:
       values:
         quantity: activity
         composition_component: Al2O3
-        method_class: quoted_attributed
+        method_class: figure_only
         evidence_class: figure_only
         admission_status: admitted
         activity: 0.28
@@ -686,8 +702,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (3291, 3389), fresh crop 2 page pixel (3291, 3389);
-              plotted ordinate -0.5583 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3291, 3389), fresh crop 2 page pixel (3291, 3388);
+              plotted ordinate 0.5583 −lg activity.'
         composition:
           state:
             tag: unknown
@@ -699,8 +715,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (3291, 3389), fresh crop 2 page pixel (3291, 3389);
-              plotted ordinate -0.5583 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3291, 3389), fresh crop 2 page pixel (3291, 3388);
+              plotted ordinate 0.5583 −lg activity.'
         total_pressure_Pa:
           state:
             tag: unknown
@@ -712,8 +728,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (3291, 3389), fresh crop 2 page pixel (3291, 3389);
-              plotted ordinate -0.5583 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3291, 3389), fresh crop 2 page pixel (3291, 3388);
+              plotted ordinate 0.5583 −lg activity.'
         fO2_Pa:
           state:
             tag: unknown
@@ -725,10 +741,10 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (3291, 3389), fresh crop 2 page pixel (3291, 3389);
-              plotted ordinate -0.5583 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3291, 3389), fresh crop 2 page pixel (3291, 3388);
+              plotted ordinate 0.5583 −lg activity.'
       uncertainty:
-        read_uncertainty_dex: 0.0
+        read_uncertainty_dex: 0.00109865
     - observation_id: shornikov_2011_fig1_c_allibert_marker_06
       type: activity_coefficient
       locator:
@@ -738,8 +754,8 @@ species:
         panel: c
         marker_symbol: open square
         series: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (3483, 3333), fresh crop 2 page pixel (3482, 3333);
-          plotted ordinate -0.4353 −lg activity.'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (3483, 3333), fresh crop 2 page pixel (3483, 3331);
+          plotted ordinate 0.4353 −lg activity.'
       units: dimensionless activity; x(Al2O3), mole %
       phase: l
       regime: figure_comparison
@@ -749,7 +765,7 @@ species:
       values:
         quantity: activity
         composition_component: Al2O3
-        method_class: quoted_attributed
+        method_class: figure_only
         evidence_class: figure_only
         admission_status: admitted
         activity: 0.37
@@ -772,8 +788,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (3483, 3333), fresh crop 2 page pixel (3482, 3333);
-              plotted ordinate -0.4353 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3483, 3333), fresh crop 2 page pixel (3483, 3331);
+              plotted ordinate 0.4353 −lg activity.'
         composition:
           state:
             tag: unknown
@@ -785,8 +801,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (3483, 3333), fresh crop 2 page pixel (3482, 3333);
-              plotted ordinate -0.4353 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3483, 3333), fresh crop 2 page pixel (3483, 3331);
+              plotted ordinate 0.4353 −lg activity.'
         total_pressure_Pa:
           state:
             tag: unknown
@@ -798,8 +814,8 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (3483, 3333), fresh crop 2 page pixel (3482, 3333);
-              plotted ordinate -0.4353 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3483, 3333), fresh crop 2 page pixel (3483, 3331);
+              plotted ordinate 0.4353 −lg activity.'
         fO2_Pa:
           state:
             tag: unknown
@@ -811,10 +827,10 @@ species:
             panel: c
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (3483, 3333), fresh crop 2 page pixel (3482, 3333);
-              plotted ordinate -0.4353 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (3483, 3333), fresh crop 2 page pixel (3483, 3331);
+              plotted ordinate 0.4353 −lg activity.'
       uncertainty:
-        read_uncertainty_dex: 0.0
+        read_uncertainty_dex: 0.00219729
     - observation_id: shornikov_2011_fig1_c_series2_unavailable
       type: activity_coefficient
       locator: &id001
@@ -931,12 +947,9 @@ species:
         statements_as_printed:
         - Observable deviations of the calculated values of activities a(MgO) from experimental data (Fig. 1b) are insignificant – approximately in 2 times.
         - The minimal value of the Gibbs energy of melt formation (from oxides) in the CaO–MgO–Al2O3 system is not large (ΔfG1960 = −31.5 kJ/mole).
-        - It corresponds to the composition containing 45 mole % Al2O3 close to liquidus line.
+        - It corresponds to the composition containing 45 mole % Al2O3 closed to liquidus line.
         - It shown the instability in melt of the ternary compound Ca3MgAl4O10 containing 33.3 mole % Al2O3.
         model_temperature_range_K_as_printed: ['1800', '2200']
-        delta_fG_kJ_per_mole_as_printed: −31.5
-        minimum_composition_Al2O3_mole_pct_as_printed: '45'
-        Ca3MgAl4O10_Al2O3_mole_pct_as_printed: '33.3'
   Al:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r03_c06
@@ -1082,8 +1095,8 @@ species:
         panel: a
         marker_symbol: open square
         series: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (1402, 3436), fresh crop 2 page pixel (1402, 3436);
-          plotted ordinate -0.3038 −lg activity.'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (1402, 3436), fresh crop 2 page pixel (1402, 3434);
+          plotted ordinate 0.3038 −lg activity.'
       units: dimensionless activity; x(Al2O3), mole %
       phase: l
       regime: figure_comparison
@@ -1093,7 +1106,7 @@ species:
       values:
         quantity: activity
         composition_component: CaO
-        method_class: quoted_attributed
+        method_class: figure_only
         evidence_class: figure_only
         admission_status: admitted
         activity: 0.5
@@ -1116,8 +1129,8 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1402, 3436), fresh crop 2 page pixel (1402, 3436);
-              plotted ordinate -0.3038 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1402, 3436), fresh crop 2 page pixel (1402, 3434);
+              plotted ordinate 0.3038 −lg activity.'
         composition:
           state:
             tag: unknown
@@ -1129,8 +1142,8 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1402, 3436), fresh crop 2 page pixel (1402, 3436);
-              plotted ordinate -0.3038 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1402, 3436), fresh crop 2 page pixel (1402, 3434);
+              plotted ordinate 0.3038 −lg activity.'
         total_pressure_Pa:
           state:
             tag: unknown
@@ -1142,8 +1155,8 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1402, 3436), fresh crop 2 page pixel (1402, 3436);
-              plotted ordinate -0.3038 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1402, 3436), fresh crop 2 page pixel (1402, 3434);
+              plotted ordinate 0.3038 −lg activity.'
         fO2_Pa:
           state:
             tag: unknown
@@ -1155,10 +1168,10 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1402, 3436), fresh crop 2 page pixel (1402, 3436);
-              plotted ordinate -0.3038 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1402, 3436), fresh crop 2 page pixel (1402, 3434);
+              plotted ordinate 0.3038 −lg activity.'
       uncertainty:
-        read_uncertainty_dex: 0.0
+        read_uncertainty_dex: 0.00132274
     - observation_id: shornikov_2011_fig1_a_allibert_marker_02
       type: activity_coefficient
       locator:
@@ -1168,8 +1181,8 @@ species:
         panel: a
         marker_symbol: open square
         series: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (1478, 3508), fresh crop 2 page pixel (1480, 3508);
-          plotted ordinate -0.3990 −lg activity.'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (1478, 3508), fresh crop 2 page pixel (1480, 3509);
+          plotted ordinate 0.3990 −lg activity.'
       units: dimensionless activity; x(Al2O3), mole %
       phase: l
       regime: figure_comparison
@@ -1179,7 +1192,7 @@ species:
       values:
         quantity: activity
         composition_component: CaO
-        method_class: quoted_attributed
+        method_class: figure_only
         evidence_class: figure_only
         admission_status: admitted
         activity: 0.4
@@ -1202,8 +1215,8 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1478, 3508), fresh crop 2 page pixel (1480, 3508);
-              plotted ordinate -0.3990 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1478, 3508), fresh crop 2 page pixel (1480, 3509);
+              plotted ordinate 0.3990 −lg activity.'
         composition:
           state:
             tag: unknown
@@ -1215,8 +1228,8 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1478, 3508), fresh crop 2 page pixel (1480, 3508);
-              plotted ordinate -0.3990 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1478, 3508), fresh crop 2 page pixel (1480, 3509);
+              plotted ordinate 0.3990 −lg activity.'
         total_pressure_Pa:
           state:
             tag: unknown
@@ -1228,8 +1241,8 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1478, 3508), fresh crop 2 page pixel (1480, 3508);
-              plotted ordinate -0.3990 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1478, 3508), fresh crop 2 page pixel (1480, 3509);
+              plotted ordinate 0.3990 −lg activity.'
         fO2_Pa:
           state:
             tag: unknown
@@ -1241,10 +1254,10 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1478, 3508), fresh crop 2 page pixel (1480, 3508);
-              plotted ordinate -0.3990 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1478, 3508), fresh crop 2 page pixel (1480, 3509);
+              plotted ordinate 0.3990 −lg activity.'
       uncertainty:
-        read_uncertainty_dex: 0.0
+        read_uncertainty_dex: 0.00066137
     - observation_id: shornikov_2011_fig1_a_allibert_marker_03
       type: activity_coefficient
       locator:
@@ -1254,8 +1267,8 @@ species:
         panel: a
         marker_symbol: open square
         series: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (1562, 3604), fresh crop 2 page pixel (1562, 3604);
-          plotted ordinate -0.5260 −lg activity.'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (1562, 3604), fresh crop 2 page pixel (1562, 3602);
+          plotted ordinate 0.5260 −lg activity.'
       units: dimensionless activity; x(Al2O3), mole %
       phase: l
       regime: figure_comparison
@@ -1265,7 +1278,7 @@ species:
       values:
         quantity: activity
         composition_component: CaO
-        method_class: quoted_attributed
+        method_class: figure_only
         evidence_class: figure_only
         admission_status: admitted
         activity: 0.3
@@ -1288,8 +1301,8 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1562, 3604), fresh crop 2 page pixel (1562, 3604);
-              plotted ordinate -0.5260 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1562, 3604), fresh crop 2 page pixel (1562, 3602);
+              plotted ordinate 0.5260 −lg activity.'
         composition:
           state:
             tag: unknown
@@ -1301,8 +1314,8 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1562, 3604), fresh crop 2 page pixel (1562, 3604);
-              plotted ordinate -0.5260 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1562, 3604), fresh crop 2 page pixel (1562, 3602);
+              plotted ordinate 0.5260 −lg activity.'
         total_pressure_Pa:
           state:
             tag: unknown
@@ -1314,8 +1327,8 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1562, 3604), fresh crop 2 page pixel (1562, 3604);
-              plotted ordinate -0.5260 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1562, 3604), fresh crop 2 page pixel (1562, 3602);
+              plotted ordinate 0.5260 −lg activity.'
         fO2_Pa:
           state:
             tag: unknown
@@ -1327,10 +1340,10 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1562, 3604), fresh crop 2 page pixel (1562, 3604);
-              plotted ordinate -0.5260 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1562, 3604), fresh crop 2 page pixel (1562, 3602);
+              plotted ordinate 0.5260 −lg activity.'
       uncertainty:
-        read_uncertainty_dex: 0.0
+        read_uncertainty_dex: 0.00132274
     - observation_id: shornikov_2011_fig1_a_allibert_marker_04
       type: activity_coefficient
       locator:
@@ -1340,8 +1353,8 @@ species:
         panel: a
         marker_symbol: open square
         series: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (1658, 3736), fresh crop 2 page pixel (1658, 3736);
-          plotted ordinate -0.7006 −lg activity.'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (1658, 3736), fresh crop 2 page pixel (1658, 3735);
+          plotted ordinate 0.7006 −lg activity.'
       units: dimensionless activity; x(Al2O3), mole %
       phase: l
       regime: figure_comparison
@@ -1351,7 +1364,7 @@ species:
       values:
         quantity: activity
         composition_component: CaO
-        method_class: quoted_attributed
+        method_class: figure_only
         evidence_class: figure_only
         admission_status: admitted
         activity: 0.2
@@ -1374,8 +1387,8 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1658, 3736), fresh crop 2 page pixel (1658, 3736);
-              plotted ordinate -0.7006 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1658, 3736), fresh crop 2 page pixel (1658, 3735);
+              plotted ordinate 0.7006 −lg activity.'
         composition:
           state:
             tag: unknown
@@ -1387,8 +1400,8 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1658, 3736), fresh crop 2 page pixel (1658, 3736);
-              plotted ordinate -0.7006 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1658, 3736), fresh crop 2 page pixel (1658, 3735);
+              plotted ordinate 0.7006 −lg activity.'
         total_pressure_Pa:
           state:
             tag: unknown
@@ -1400,8 +1413,8 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1658, 3736), fresh crop 2 page pixel (1658, 3736);
-              plotted ordinate -0.7006 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1658, 3736), fresh crop 2 page pixel (1658, 3735);
+              plotted ordinate 0.7006 −lg activity.'
         fO2_Pa:
           state:
             tag: unknown
@@ -1413,10 +1426,10 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1658, 3736), fresh crop 2 page pixel (1658, 3736);
-              plotted ordinate -0.7006 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1658, 3736), fresh crop 2 page pixel (1658, 3735);
+              plotted ordinate 0.7006 −lg activity.'
       uncertainty:
-        read_uncertainty_dex: 0.0
+        read_uncertainty_dex: 0.00066137
     - observation_id: shornikov_2011_fig1_a_allibert_marker_05
       type: activity_coefficient
       locator:
@@ -1426,8 +1439,8 @@ species:
         panel: a
         marker_symbol: open square
         series: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (1842, 3964), fresh crop 2 page pixel (1842, 3964);
-          plotted ordinate -1.0022 −lg activity.'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (1842, 3964), fresh crop 2 page pixel (1842, 3963);
+          plotted ordinate 1.0022 −lg activity.'
       units: dimensionless activity; x(Al2O3), mole %
       phase: l
       regime: figure_comparison
@@ -1437,7 +1450,7 @@ species:
       values:
         quantity: activity
         composition_component: CaO
-        method_class: quoted_attributed
+        method_class: figure_only
         evidence_class: figure_only
         admission_status: admitted
         activity: 0.099
@@ -1460,8 +1473,8 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1842, 3964), fresh crop 2 page pixel (1842, 3964);
-              plotted ordinate -1.0022 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1842, 3964), fresh crop 2 page pixel (1842, 3963);
+              plotted ordinate 1.0022 −lg activity.'
         composition:
           state:
             tag: unknown
@@ -1473,8 +1486,8 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1842, 3964), fresh crop 2 page pixel (1842, 3964);
-              plotted ordinate -1.0022 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1842, 3964), fresh crop 2 page pixel (1842, 3963);
+              plotted ordinate 1.0022 −lg activity.'
         total_pressure_Pa:
           state:
             tag: unknown
@@ -1486,8 +1499,8 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1842, 3964), fresh crop 2 page pixel (1842, 3964);
-              plotted ordinate -1.0022 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1842, 3964), fresh crop 2 page pixel (1842, 3963);
+              plotted ordinate 1.0022 −lg activity.'
         fO2_Pa:
           state:
             tag: unknown
@@ -1499,10 +1512,10 @@ species:
             panel: a
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1842, 3964), fresh crop 2 page pixel (1842, 3964);
-              plotted ordinate -1.0022 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1842, 3964), fresh crop 2 page pixel (1842, 3963);
+              plotted ordinate 1.0022 −lg activity.'
       uncertainty:
-        read_uncertainty_dex: 0.0
+        read_uncertainty_dex: 0.00066137
     - observation_id: shornikov_2011_fig1_a_series2_unavailable
       type: activity_coefficient
       locator: &id003
@@ -2159,6 +2172,21 @@ species:
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
       evidence_class: quoted_attributed
+    context:
+    - observation_id: shornikov_2011_text_ca3mgal4o10_composition
+      type: composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Results
+        note: The final paragraph reports 33.3 mole % Al2O3 for Ca3MgAl4O10.
+      units: mole % Al2O3
+      values:
+        method_class: quoted_attributed
+        concentration_mole_pct:
+          Al2O3: '33.3'
+        attribution: Final paragraph reports the Al2O3 composition of Ca3MgAl4O10.
+      experiment: shornikov_2011_text_conclusion_minimum_melt
   MgAl2O4:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r12_c02
@@ -2372,8 +2400,8 @@ species:
         panel: b
         marker_symbol: open square
         series: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (1374, 4738), fresh crop 2 page pixel (1374, 4738);
-          plotted ordinate -0.3996 −lg activity.'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (1374, 4738), fresh crop 2 page pixel (1374, 4736);
+          plotted ordinate 0.3996 −lg activity.'
       units: dimensionless activity; x(Al2O3), mole %
       phase: l
       regime: figure_comparison
@@ -2383,7 +2411,7 @@ species:
       values:
         quantity: activity
         composition_component: MgO
-        method_class: quoted_attributed
+        method_class: figure_only
         evidence_class: figure_only
         admission_status: admitted
         activity: 0.4
@@ -2406,8 +2434,8 @@ species:
             panel: b
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1374, 4738), fresh crop 2 page pixel (1374, 4738);
-              plotted ordinate -0.3996 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1374, 4738), fresh crop 2 page pixel (1374, 4736);
+              plotted ordinate 0.3996 −lg activity.'
         composition:
           state:
             tag: unknown
@@ -2419,8 +2447,8 @@ species:
             panel: b
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1374, 4738), fresh crop 2 page pixel (1374, 4738);
-              plotted ordinate -0.3996 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1374, 4738), fresh crop 2 page pixel (1374, 4736);
+              plotted ordinate 0.3996 −lg activity.'
         total_pressure_Pa:
           state:
             tag: unknown
@@ -2432,8 +2460,8 @@ species:
             panel: b
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1374, 4738), fresh crop 2 page pixel (1374, 4738);
-              plotted ordinate -0.3996 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1374, 4738), fresh crop 2 page pixel (1374, 4736);
+              plotted ordinate 0.3996 −lg activity.'
         fO2_Pa:
           state:
             tag: unknown
@@ -2445,10 +2473,10 @@ species:
             panel: b
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1374, 4738), fresh crop 2 page pixel (1374, 4738);
-              plotted ordinate -0.3996 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1374, 4738), fresh crop 2 page pixel (1374, 4736);
+              plotted ordinate 0.3996 −lg activity.'
       uncertainty:
-        read_uncertainty_dex: 0.0
+        read_uncertainty_dex: 0.00095057
     - observation_id: shornikov_2011_fig1_b_allibert_marker_02
       type: activity_coefficient
       locator:
@@ -2458,8 +2486,8 @@ species:
         panel: b
         marker_symbol: open square
         series: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (1514, 4870), fresh crop 2 page pixel (1514, 4870);
-          plotted ordinate -0.5250 −lg activity.'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (1514, 4870), fresh crop 2 page pixel (1514, 4868);
+          plotted ordinate 0.5250 −lg activity.'
       units: dimensionless activity; x(Al2O3), mole %
       phase: l
       regime: figure_comparison
@@ -2469,7 +2497,7 @@ species:
       values:
         quantity: activity
         composition_component: MgO
-        method_class: quoted_attributed
+        method_class: figure_only
         evidence_class: figure_only
         admission_status: admitted
         activity: 0.3
@@ -2492,8 +2520,8 @@ species:
             panel: b
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1514, 4870), fresh crop 2 page pixel (1514, 4870);
-              plotted ordinate -0.5250 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1514, 4870), fresh crop 2 page pixel (1514, 4868);
+              plotted ordinate 0.5250 −lg activity.'
         composition:
           state:
             tag: unknown
@@ -2505,8 +2533,8 @@ species:
             panel: b
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1514, 4870), fresh crop 2 page pixel (1514, 4870);
-              plotted ordinate -0.5250 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1514, 4870), fresh crop 2 page pixel (1514, 4868);
+              plotted ordinate 0.5250 −lg activity.'
         total_pressure_Pa:
           state:
             tag: unknown
@@ -2518,8 +2546,8 @@ species:
             panel: b
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1514, 4870), fresh crop 2 page pixel (1514, 4870);
-              plotted ordinate -0.5250 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1514, 4870), fresh crop 2 page pixel (1514, 4868);
+              plotted ordinate 0.5250 −lg activity.'
         fO2_Pa:
           state:
             tag: unknown
@@ -2531,10 +2559,10 @@ species:
             panel: b
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1514, 4870), fresh crop 2 page pixel (1514, 4870);
-              plotted ordinate -0.5250 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1514, 4870), fresh crop 2 page pixel (1514, 4868);
+              plotted ordinate 0.5250 −lg activity.'
       uncertainty:
-        read_uncertainty_dex: 0.0
+        read_uncertainty_dex: 0.00095057
     - observation_id: shornikov_2011_fig1_b_allibert_marker_03
       type: activity_coefficient
       locator:
@@ -2544,8 +2572,8 @@ species:
         panel: b
         marker_symbol: open square
         series: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (1828, 5054), fresh crop 2 page pixel (1828, 5054);
-          plotted ordinate -0.6999 −lg activity.'
+        note: '600 dpi centre reads: fresh crop 1 page pixel (1828, 5054), fresh crop 2 page pixel (1828, 5056);
+          plotted ordinate 0.6999 −lg activity.'
       units: dimensionless activity; x(Al2O3), mole %
       phase: l
       regime: figure_comparison
@@ -2555,7 +2583,7 @@ species:
       values:
         quantity: activity
         composition_component: MgO
-        method_class: quoted_attributed
+        method_class: figure_only
         evidence_class: figure_only
         admission_status: admitted
         activity: 0.2
@@ -2578,8 +2606,8 @@ species:
             panel: b
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1828, 5054), fresh crop 2 page pixel (1828, 5054);
-              plotted ordinate -0.6999 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1828, 5054), fresh crop 2 page pixel (1828, 5056);
+              plotted ordinate 0.6999 −lg activity.'
         composition:
           state:
             tag: unknown
@@ -2591,8 +2619,8 @@ species:
             panel: b
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1828, 5054), fresh crop 2 page pixel (1828, 5054);
-              plotted ordinate -0.6999 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1828, 5054), fresh crop 2 page pixel (1828, 5056);
+              plotted ordinate 0.6999 −lg activity.'
         total_pressure_Pa:
           state:
             tag: unknown
@@ -2604,8 +2632,8 @@ species:
             panel: b
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1828, 5054), fresh crop 2 page pixel (1828, 5054);
-              plotted ordinate -0.6999 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1828, 5054), fresh crop 2 page pixel (1828, 5056);
+              plotted ordinate 0.6999 −lg activity.'
         fO2_Pa:
           state:
             tag: unknown
@@ -2617,10 +2645,10 @@ species:
             panel: b
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (1828, 5054), fresh crop 2 page pixel (1828, 5054);
-              plotted ordinate -0.6999 −lg activity.'
+            note: '600 dpi centre reads: fresh crop 1 page pixel (1828, 5054), fresh crop 2 page pixel (1828, 5056);
+              plotted ordinate 0.6999 −lg activity.'
       uncertainty:
-        read_uncertainty_dex: 0.0
+        read_uncertainty_dex: 0.00095057
     - observation_id: shornikov_2011_fig1_b_allibert_marker_04
       type: activity_coefficient
       locator:
@@ -2631,7 +2659,7 @@ species:
         marker_symbol: open square
         series: '1'
         note: '600 dpi centre reads: fresh crop 1 page pixel (2034, 5054), fresh crop 2 page pixel (2034, 5054);
-          plotted ordinate -0.6999 −lg activity.'
+          plotted ordinate 0.6999 −lg activity.'
       units: dimensionless activity; x(Al2O3), mole %
       phase: l
       regime: figure_comparison
@@ -2641,7 +2669,7 @@ species:
       values:
         quantity: activity
         composition_component: MgO
-        method_class: quoted_attributed
+        method_class: figure_only
         evidence_class: figure_only
         admission_status: admitted
         activity: 0.2
@@ -2665,7 +2693,7 @@ species:
             marker_symbol: open square
             series: '1'
             note: '600 dpi centre reads: fresh crop 1 page pixel (2034, 5054), fresh crop 2 page pixel (2034, 5054);
-              plotted ordinate -0.6999 −lg activity.'
+              plotted ordinate 0.6999 −lg activity.'
         composition:
           state:
             tag: unknown
@@ -2678,7 +2706,7 @@ species:
             marker_symbol: open square
             series: '1'
             note: '600 dpi centre reads: fresh crop 1 page pixel (2034, 5054), fresh crop 2 page pixel (2034, 5054);
-              plotted ordinate -0.6999 −lg activity.'
+              plotted ordinate 0.6999 −lg activity.'
         total_pressure_Pa:
           state:
             tag: unknown
@@ -2691,7 +2719,7 @@ species:
             marker_symbol: open square
             series: '1'
             note: '600 dpi centre reads: fresh crop 1 page pixel (2034, 5054), fresh crop 2 page pixel (2034, 5054);
-              plotted ordinate -0.6999 −lg activity.'
+              plotted ordinate 0.6999 −lg activity.'
         fO2_Pa:
           state:
             tag: unknown
@@ -2704,9 +2732,7 @@ species:
             marker_symbol: open square
             series: '1'
             note: '600 dpi centre reads: fresh crop 1 page pixel (2034, 5054), fresh crop 2 page pixel (2034, 5054);
-              plotted ordinate -0.6999 −lg activity.'
-      uncertainty:
-        read_uncertainty_dex: 0.0
+              plotted ordinate 0.6999 −lg activity.'
     - observation_id: shornikov_2011_fig1_b_series2_unavailable
       type: activity_coefficient
       locator: &id005
@@ -3193,6 +3219,65 @@ species:
       evidence_class: quoted_attributed
   CaO-MgO-Al2O3_melt:
     observations:
+    - observation_id: shornikov_2011_text_minimum_delta_fG1960_melt
+      type: gibbs_table
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Results
+        note: 'Final paragraph: ΔfG1960 = −31.5 kJ/mole at 45 mole % Al2O3, closed to liquidus line.'
+      units: kJ/mole
+      phase: l
+      experiment: shornikov_2011_text_conclusion_minimum_melt
+      standard_state: Gibbs energy of melt formation from oxides, as stated in the source text.
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        value_as_printed: '−31.5'
+        value: '-31.5'
+        T_K: '1960'
+        composition_Al2O3_mole_pct_as_printed: '45'
+        attribution: Final paragraph reports the minimum melt Gibbs energy of formation from oxides and cites prior thermodynamic data.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1960'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            section: Results
+            note: The Gibbs-energy value is labelled ΔfG1960 in the final paragraph.
+        composition:
+          state:
+            tag: unknown
+            reason: incomplete_melt_composition
+          locator:
+            page: 2
+            pdf_page_index: 1
+            section: Results
+            note: The text gives 45 mole % Al2O3 but not the complete melt composition.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_discussion
+          locator:
+            page: 2
+            pdf_page_index: 1
+            section: Results
+            note: No pressure is reported for this text value.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_reported_for_discussion
+          locator:
+            page: 2
+            pdf_page_index: 1
+            section: Results
+            note: No oxygen fugacity is reported for this text value.
+      evidence_class: quoted_attributed
     - observation_id: shornikov_2011_fig1_d_allibert_marker_01
       type: gibbs_table
       locator:
@@ -3202,7 +3287,7 @@ species:
         panel: d
         marker_symbol: open square
         series: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (2555, 5233), fresh crop 2 page pixel (2555, 5233);
+        note: '600 dpi centre reads: fresh crop 1 page pixel (2555, 5233), fresh crop 2 page pixel (2557, 5233);
           plotted ordinate 22.6214 −ΔfG1960, kJ/mole.'
       units: kJ/mole
       phase: l
@@ -3211,7 +3296,7 @@ species:
       standard_state: Gibbs energy of melt formation from oxides, as captioned.
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        method_class: figure_only
         evidence_class: figure_only
         admission_status: admitted
         value: -23.0
@@ -3233,7 +3318,7 @@ species:
             panel: d
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2555, 5233), fresh crop 2 page pixel (2555, 5233);
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2555, 5233), fresh crop 2 page pixel (2557, 5233);
               plotted ordinate 22.6214 −ΔfG1960, kJ/mole.'
         composition:
           state:
@@ -3246,7 +3331,7 @@ species:
             panel: d
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2555, 5233), fresh crop 2 page pixel (2555, 5233);
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2555, 5233), fresh crop 2 page pixel (2557, 5233);
               plotted ordinate 22.6214 −ΔfG1960, kJ/mole.'
         total_pressure_Pa:
           state:
@@ -3259,7 +3344,7 @@ species:
             panel: d
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2555, 5233), fresh crop 2 page pixel (2555, 5233);
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2555, 5233), fresh crop 2 page pixel (2557, 5233);
               plotted ordinate 22.6214 −ΔfG1960, kJ/mole.'
         fO2_Pa:
           state:
@@ -3272,10 +3357,8 @@ species:
             panel: d
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2555, 5233), fresh crop 2 page pixel (2555, 5233);
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2555, 5233), fresh crop 2 page pixel (2557, 5233);
               plotted ordinate 22.6214 −ΔfG1960, kJ/mole.'
-      uncertainty:
-        read_uncertainty_kJ_mol: 0.0
     - observation_id: shornikov_2011_fig1_d_allibert_marker_02
       type: gibbs_table
       locator:
@@ -3285,7 +3368,7 @@ species:
         panel: d
         marker_symbol: open square
         series: '1'
-        note: '600 dpi centre reads: fresh crop 1 page pixel (2723, 5066), fresh crop 2 page pixel (2723, 5066);
+        note: '600 dpi centre reads: fresh crop 1 page pixel (2723, 5066), fresh crop 2 page pixel (2723, 5064);
           plotted ordinate 24.2427 −ΔfG1960, kJ/mole.'
       units: kJ/mole
       phase: l
@@ -3294,7 +3377,7 @@ species:
       standard_state: Gibbs energy of melt formation from oxides, as captioned.
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        method_class: figure_only
         evidence_class: figure_only
         admission_status: admitted
         value: -24.0
@@ -3316,7 +3399,7 @@ species:
             panel: d
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2723, 5066), fresh crop 2 page pixel (2723, 5066);
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2723, 5066), fresh crop 2 page pixel (2723, 5064);
               plotted ordinate 24.2427 −ΔfG1960, kJ/mole.'
         composition:
           state:
@@ -3329,7 +3412,7 @@ species:
             panel: d
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2723, 5066), fresh crop 2 page pixel (2723, 5066);
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2723, 5066), fresh crop 2 page pixel (2723, 5064);
               plotted ordinate 24.2427 −ΔfG1960, kJ/mole.'
         total_pressure_Pa:
           state:
@@ -3342,7 +3425,7 @@ species:
             panel: d
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2723, 5066), fresh crop 2 page pixel (2723, 5066);
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2723, 5066), fresh crop 2 page pixel (2723, 5064);
               plotted ordinate 24.2427 −ΔfG1960, kJ/mole.'
         fO2_Pa:
           state:
@@ -3355,10 +3438,10 @@ species:
             panel: d
             marker_symbol: open square
             series: '1'
-            note: '600 dpi centre reads: fresh crop 1 page pixel (2723, 5066), fresh crop 2 page pixel (2723, 5066);
+            note: '600 dpi centre reads: fresh crop 1 page pixel (2723, 5066), fresh crop 2 page pixel (2723, 5064);
               plotted ordinate 24.2427 −ΔfG1960, kJ/mole.'
       uncertainty:
-        read_uncertainty_kJ_mol: 0.0
+        read_uncertainty_kJ_mol: 0.00970874
     - observation_id: shornikov_2011_fig1_d_allibert_marker_03
       type: gibbs_table
       locator:
@@ -3377,7 +3460,7 @@ species:
       standard_state: Gibbs energy of melt formation from oxides, as captioned.
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        method_class: figure_only
         evidence_class: figure_only
         admission_status: admitted
         value: -27.0
@@ -3440,8 +3523,6 @@ species:
             series: '1'
             note: '600 dpi centre reads: fresh crop 1 page pixel (2897, 4736), fresh crop 2 page pixel (2897, 4736);
               plotted ordinate 27.4466 −ΔfG1960, kJ/mole.'
-      uncertainty:
-        read_uncertainty_kJ_mol: 0.0
     - observation_id: shornikov_2011_fig1_d_allibert_marker_04
       type: gibbs_table
       locator:
@@ -3460,7 +3541,7 @@ species:
       standard_state: Gibbs energy of melt formation from oxides, as captioned.
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        method_class: figure_only
         evidence_class: figure_only
         admission_status: admitted
         value: -30.0
@@ -3523,8 +3604,6 @@ species:
             series: '1'
             note: '600 dpi centre reads: fresh crop 1 page pixel (3079, 4503), fresh crop 2 page pixel (3079, 4503);
               plotted ordinate 29.7087 −ΔfG1960, kJ/mole.'
-      uncertainty:
-        read_uncertainty_kJ_mol: 0.0
     - observation_id: shornikov_2011_fig1_d_series2_unavailable
       type: gibbs_table
       locator: &id007
