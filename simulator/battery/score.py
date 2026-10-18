@@ -4593,6 +4593,9 @@ def predict_with_engine(
         REFUSAL_TIMEOUT,
         REFUSAL_UNAVAILABLE,
         Po2Request,
+        _OxygenBalanceEngineTrialRefusal,
+        _OxygenBalanceRefusal,
+        _solve_vapor_engine_cell_oxygen_balance,
         assess_qualification_gate,
         equilibrate_cell,
         identity_battery_pot,
@@ -5223,8 +5226,8 @@ def predict_with_engine(
                     },
                     notices=tuple(input_notices),
                 )
-            # The openimcc bridge discards pressure_bar; its balance solve uses
-            # printed composition-derived activities and T, never measured p_K.
+            # The cell's total-pressure boundary does not define its fO2;
+            # each supported engine's gas channels determine that balance.
             po2 = Po2Request(
                 mode=PO2_OXYGEN_BALANCE_EFFUSION,
                 po2_bar=None,
@@ -5381,16 +5384,112 @@ def predict_with_engine(
     use_isolated = isolated
     if use_isolated is None:
         use_isolated = qualification and name in MELTS_FAMILY_ENGINES
-    cell = equilibrate_cell(
-        handle,
-        pot,
-        temperature_K=float(T),
-        po2=po2,
-        qualification=qualification,
-        isolated=use_isolated,
-        arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
-        physical_pressure_bar=pressure_bar,
-    )
+    if po2.mode == PO2_OXYGEN_BALANCE_EFFUSION and engine in {
+        Engine.VAPOROCK,
+        Engine.ALPHAMELTS,
+    }:
+
+        def engine_call_at_po2(pO2_bar: float) -> object:
+            return equilibrate_cell(
+                handle,
+                pot,
+                temperature_K=float(T),
+                po2=Po2Request(
+                    mode=PO2_COMMANDED,
+                    po2_bar=pO2_bar,
+                ),
+                qualification=qualification,
+                isolated=use_isolated,
+                arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
+                physical_pressure_bar=pressure_bar,
+            )
+
+        try:
+            solved_pO2_bar, _pressures, balance, cell_fraction, cell_info = (
+                _solve_vapor_engine_cell_oxygen_balance(
+                    engine_call_at_po2,
+                    temperature_K=float(T),
+                    cell_material=po2.cell_material,
+                    fixed_point_activities=engine is Engine.ALPHAMELTS,
+                )
+            )
+        except _OxygenBalanceEngineTrialRefusal as exc:
+            cell = exc.cell
+        except _OxygenBalanceRefusal as exc:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(
+                    state=ExecutionState.UNSUPPORTED,
+                    call_evidence=f"cell_oxygen_balance:{name}",
+                ),
+                authority=Authority.REFUSED,
+                notices=tuple(extra_notices),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail={"reason": exc.reason_code, "detail": str(exc)},
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
+        else:
+            solved_notice = {
+                "kind": "fo2_oxygen_balance_effusion_solved",
+                "pO2_bar": solved_pO2_bar,
+                "relative_residual": balance["residual"],
+                "bracket_log10_bar": balance["bracket"],
+                "dominant_O_carriers": balance["dominant_O_carriers"],
+                "dominant_metal_carriers": balance["dominant_metal_carriers"],
+                "cell_material": cell_info["cell_material"],
+                "cell_oxide_flux_fraction": cell_fraction,
+                "buffer_pinned": cell_info["buffer_pinned"],
+                "buffer_pO2_bar": cell_info["buffer_pO2_bar"],
+                "cell_oxide_janaf_sources": cell_info[
+                    "cell_oxide_janaf_sources"
+                ],
+            }
+            extra_notices.append(
+                Notice(
+                    kind=NoticeKind.SOURCE_DISAGREEMENT,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        OXYGEN_BALANCE_NOTICE_PREFIX
+                        + " "
+                        + json.dumps(
+                            solved_notice,
+                            sort_keys=True,
+                            separators=(",", ":"),
+                        )
+                    ),
+                    origin=f"engine:{engine.value}",
+                )
+            )
+            po2 = Po2Request(
+                mode=PO2_COMMANDED,
+                po2_bar=solved_pO2_bar,
+            )
+            cell = equilibrate_cell(
+                handle,
+                pot,
+                temperature_K=float(T),
+                po2=po2,
+                qualification=qualification,
+                isolated=use_isolated,
+                arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
+                physical_pressure_bar=pressure_bar,
+            )
+    else:
+        cell = equilibrate_cell(
+            handle,
+            pot,
+            temperature_K=float(T),
+            po2=po2,
+            qualification=qualification,
+            isolated=use_isolated,
+            arm=ARM_QUALIFICATION if qualification else ARM_HEADLINE,
+            physical_pressure_bar=pressure_bar,
+        )
     notices = union_notices(tuple(extra_notices), cell_notices(quantity, engine, cell))
     authority, certified_band = _flags_from_scored_cell(cell, authority, certified_band)
     refusal = getattr(cell, "refusal_reason", None)

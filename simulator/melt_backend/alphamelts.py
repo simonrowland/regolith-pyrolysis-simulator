@@ -240,6 +240,10 @@ ALPHAMELTS_PHASE_MASS_DISPLAY_RESOLUTION_G = 0.001
 ALPHAMELTS_MIN_EMITTED_COMPONENT_WT_PCT = 0.001
 
 
+def _format_melts_file_fO2_offset(fO2_offset: float) -> str:
+    return f'{float(fO2_offset):.12g}'
+
+
 def serialize_melts_file_temperature_C(temperature_C: float) -> float:
     """Quantize request T to the AlphaMELTS binary32 determinant.
 
@@ -1984,6 +1988,8 @@ class _MELTSBackendSupport(MeltBackend):
         activity_coefficients: Optional[Mapping[str, float]] = None,
         vapor_pressures_Pa: Optional[Mapping[str, float]] = None,
         vapor_pressures_source: Optional[Mapping[str, str]] = None,
+        requested_fO2_log: Optional[float] = None,
+        printed_fO2_echo_log: Optional[float] = None,
         warnings: Optional[List[str]] = None,
         status: str = 'ok',
         diagnostics: Optional[Mapping[str, object]] = None,
@@ -2087,6 +2093,16 @@ class _MELTSBackendSupport(MeltBackend):
             solid_composition_wt_pct=dict(solid_composition_wt_pct or {}),
             bulk_composition_wt_pct=dict(bulk_composition_wt_pct or {}),
             phase_instances=[dict(instance) for instance in phase_instances or []],
+            requested_fO2_log=(
+                None
+                if requested_fO2_log is None
+                else float(requested_fO2_log)
+            ),
+            printed_fO2_echo_log=(
+                None
+                if printed_fO2_echo_log is None
+                else float(printed_fO2_echo_log)
+            ),
         )
         result.backend_name = self.backend_name
         result.engine_version = self.get_engine_version()
@@ -3451,7 +3467,9 @@ class _MELTSBackendSupport(MeltBackend):
         )
         lines.append(f'Initial Pressure: {P_bar:.6g}')
         lines.append(f'Log fO2 Path: {fO2_path}')
-        lines.append(f'Log fO2 Offset: {fO2_offset:.12g}')
+        lines.append(
+            f'Log fO2 Offset: {_format_melts_file_fO2_offset(fO2_offset)}'
+        )
 
         with open(path, 'w') as f:
             f.write('\n'.join(lines) + '\n')
@@ -4236,26 +4254,46 @@ class _MELTSBackendSupport(MeltBackend):
                 'System_main_tbl.txt lacks absolute engine fO2 echo',
             )
         executed_fO2_log = float(system_values['fO2_value'])
+        constraint_path = str(fO2_constraint.get('path') or '')
+        requested_fO2_log = None
+        if (
+            constraint_path.lower() == 'absolute'
+            and fO2_constraint.get('offset') is not None
+        ):
+            requested_fO2_log = float(
+                _format_melts_file_fO2_offset(
+                    float(fO2_constraint['offset'])
+                )
+            )
+        echo_comparison_fO2_log = (
+            requested_fO2_log
+            if requested_fO2_log is not None
+            else float(fO2_log)
+        )
         result_diagnostics['intrinsic_fO2_log'] = executed_fO2_log
         result_diagnostics['engine_reported_fO2_log'] = executed_fO2_log
+        result_diagnostics['printed_fO2_echo_log'] = executed_fO2_log
+        if requested_fO2_log is not None:
+            result_diagnostics['requested_fO2_log'] = requested_fO2_log
         result_diagnostics['engine_reported_fO2_header'] = fO2_header
         if not math.isclose(
             executed_fO2_log,
-            float(fO2_log),
+            echo_comparison_fO2_log,
             rel_tol=0.0,
             abs_tol=ALPHAMELTS_FO2_ECHO_TOLERANCE_LOG10,
         ):
             result_diagnostics.update({
                 'operating_point_clamped': True,
                 'fO2_clamped': True,
-                'requested_fO2_log': float(fO2_log),
+                'requested_fO2_log': echo_comparison_fO2_log,
                 'solved_fO2_log': executed_fO2_log,
                 'authoritative_for_requested_conditions': False,
                 'authoritative_for_solved_conditions': True,
             })
             result_warnings.append(
                 'AlphaMELTS solved at a different fO2: '
-                f'requested={float(fO2_log):g}, solved={executed_fO2_log:g}'
+                f'requested={echo_comparison_fO2_log:g}, '
+                f'solved={executed_fO2_log:g}'
             )
         if stable_verdict is None:
             result_warnings.append(
@@ -4359,6 +4397,8 @@ class _MELTSBackendSupport(MeltBackend):
             requested_temperature_C=requested_temperature_C,
             pressure_bar=pressure_bar,
             fO2_log=executed_fO2_log,
+            requested_fO2_log=requested_fO2_log,
+            printed_fO2_echo_log=executed_fO2_log,
             phases_present=phases_present,
             phase_masses_kg=phase_masses_kg,
             phase_species_mol=phase_species_mol,
@@ -5066,6 +5106,9 @@ class _MELTSBackendSupport(MeltBackend):
             )
 
         from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+        from simulator.chemistry.offgas_fo2 import (
+            _oxygen_atom_partial_pressure_bar,
+        )
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 
@@ -5089,6 +5132,17 @@ class _MELTSBackendSupport(MeltBackend):
                 mass_kg
                 / resolve_species_formula(str(species)).molar_mass_kg_per_mol()
             )
+        gas_fO2_log = (
+            eq.requested_fO2_log
+            if eq.requested_fO2_log is not None
+            else eq.fO2_log
+        )
+        # The absolute request is the physical gas coordinate: MELTS received
+        # it from the .12g melts-file offset, while System_main_tbl.txt only
+        # confirms it to three decimals. Reusing that rounded echo quantizes
+        # O2 and the vapor map at 1e-3 dex, so the existing 1e-12 dex
+        # fixed-point solve cannot settle. Keeping the serialized request
+        # makes the projected map continuous at the solver's root resolution.
         request = IntentRequest(
             intent=ChemistryIntent.VAPOR_PRESSURE,
             account_view=ProviderAccountView(
@@ -5097,7 +5151,7 @@ class _MELTSBackendSupport(MeltBackend):
             ),
             temperature_C=eq.temperature_C,
             pressure_bar=eq.pressure_bar,
-            fO2_log=eq.fO2_log,
+            fO2_log=gas_fO2_log,
             control_inputs={
                 # The alphaMELTS fO2 is the melt-redox constraint. This
                 # diagnostic has no live headspace ledger, so overhead-
@@ -5105,7 +5159,7 @@ class _MELTSBackendSupport(MeltBackend):
                 # setpoint: the unknown-body model floor until CF-1b supplies
                 # body-aware floors. It must not be derived from melt fO2.
                 'pO2_bar': self._vapor_transport_pO2_bar,
-                'intrinsic_fO2_log': eq.fO2_log,
+                'intrinsic_fO2_log': gas_fO2_log,
             },
         )
         result = provider.dispatch(request)
@@ -5129,6 +5183,38 @@ class _MELTSBackendSupport(MeltBackend):
                 'vapor pressure/source keys differ: '
                 f'pressures={sorted(pressures)!r}; sources={sorted(sources)!r}',
             )
+        if gas_fO2_log is None or not math.isfinite(float(gas_fO2_log)):
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY,
+                'missing finite commanded fO2 for O and O2 vapor channels',
+            )
+        try:
+            commanded_pO2_bar = 10.0 ** float(gas_fO2_log)
+            oxygen_atom_p_bar = _oxygen_atom_partial_pressure_bar(
+                eq.temperature_C + 273.15,
+                commanded_pO2_bar,
+                extract_path=(
+                    Path(__file__).resolve().parents[2]
+                    / 'data'
+                    / 'literature'
+                    / 'extracts'
+                    / 'nasa-cea-thermo.yaml'
+                ),
+            )
+        except Exception as exc:  # noqa: BLE001 - keep thermo refusal typed
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_VAPOR_PROJECTION_EMPTY,
+                f'cannot evaluate NASA CEA O2 dissociation: {exc}',
+            ) from exc
+        # With ideal gases fO2 = pO2. For O2 ⇌ 2O, CEA gives
+        # ΔG° = 2G°(O) − G°(O2), Kp = exp(−ΔG°/RT), and
+        # pO = P° sqrt(Kp * (pO2/P°)); both channels are returned in Pa.
+        pressures['O2'] = commanded_pO2_bar * 1.0e5
+        pressures['O'] = oxygen_atom_p_bar * 1.0e5
+        sources['O2'] = 'commanded_fO2_ideal_gas'
+        sources['O'] = 'NASA_CEA_O2_dissociation_equilibrium'
+        diagnostic['vapor_pressures_Pa'] = dict(pressures)
+        diagnostic['vapor_pressures_source'] = dict(sources)
         return pressures, sources, diagnostic
 
     def _vapor_pressures_via_vaporock_or_antoine(

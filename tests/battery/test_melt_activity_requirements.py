@@ -677,6 +677,67 @@ def test_printed_oxygen_is_commanded_and_not_the_engine_default(monkeypatch):
     assert prediction.value == Decimal("0.2")
 
 
+def test_alphamelts_activity_uses_printed_oxygen_and_matches_direct_call(monkeypatch):
+    calls = []
+
+    def _open(name):
+        return type("Handle", (), {
+            "name": name,
+            "available": True,
+            "unavailable_reason": None,
+            "supports_intrinsic_fO2": False,
+        })()
+
+    def _cell(_handle, _pot, *, po2, **_kwargs):
+        calls.append((po2.mode, po2.po2_bar))
+        activity = 0.25 + (po2.po2_bar or 0.0)
+        return type("Cell", (), {
+            "status": "ok",
+            "refusal_reason": None,
+            "melt_activities": {"SiO2": activity},
+            "melt_activity_coefficients": {},
+            "gas_partial_pressures_Pa": {},
+            "hostname": "test",
+            "exit_code": 0,
+            "exit_signal": None,
+            "notices": [],
+            "authority": None,
+            "certified_band": None,
+        })()
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import predict_with_engine
+
+    experiment, _bench, observation = _case(
+        composition=_composition(
+            ("Na2O", "0.2"), ("K2O", "0.2"), ("SiO2", "0.6"),
+        ),
+        oxygen=Decimal("-7"),
+        formula="SiO2",
+    )
+    prediction = predict_with_engine(
+        Engine.ALPHAMELTS, observation, experiment=experiment, isolated=False,
+    )
+    assert calls == [("commanded", pytest.approx(1e-7))]
+    assert prediction.value == Decimal(str(0.25 + 1e-7))
+
+    direct = _cell(
+        _open("alphamelts"), None,
+        po2=type("Po2", (), {"mode": "commanded", "po2_bar": 1e-7})(),
+    )
+    assert float(prediction.value) == pytest.approx(
+        direct.melt_activities["SiO2"], rel=1e-9,
+    )
+
+
 def test_coefficient_without_a_gamma_map_is_refused(monkeypatch):
     def _open(name):
         return type("Handle", (), {

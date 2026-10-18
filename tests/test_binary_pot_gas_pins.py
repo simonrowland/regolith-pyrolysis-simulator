@@ -18,6 +18,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
 
 # Regenerated at openimcc f037d05; the low-temperature Si2/Si3 gas rows come from upstream 8b99c3e.
 # Float outputs are stored as float.hex strings so these are exact pins.
+_IRON_LOW_FLAGS = "FeO(l) uses a source-tabulated supercooled liquid branch below the 1650 K fusion marker (Fe-019)"
 _GOLDEN = {
     ("cao_sio2_40_60", 1200.0, None): {
         "pressures": {
@@ -98,7 +99,7 @@ _GOLDEN = {
         "residual": "0x1.13a3f2adafb66p-50", "iterations": 14,
         "O": (("O2", "0x1.0c74c5e9972eep-46"), ("O", "0x1.72f0080b4eb1fp-50"), ("FeO", "0x1.a213c2947944ap-53"), ("SiO", "0x1.21baea9f5e0dbp-53"), ("SiO2", "0x1.dfb669c874fb6p-60")),
         "metal": (("Fe", "0x1.20219e351840ep-46"), ("SiO", "0x1.21baea9f5e0dbp-52"), ("FeO", "0x1.a213c2947944ap-53"), ("Mg", "0x1.3eb25ff51d446p-54"), ("SiO2", "0x1.dfb669c874fb6p-60")),
-        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
+        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Fe", _IRON_LOW_FLAGS), ("FeO", _IRON_LOW_FLAGS), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
         "flux": None, "buffer": None,
     },
     ("feo_mgo_sio2_30_20_50", 1200.0, "W"): {
@@ -117,7 +118,7 @@ _GOLDEN = {
         "residual": "0x1.f1ce1dcfe930dp-48", "iterations": 22,
         "O": (("W2O6", "0x1.5589cf27d5d48p-42"), ("W3O9", "0x1.285b8eb17c7f3p-42"), ("W3O8", "0x1.7547d86a091afp-45"), ("SiO", "0x1.5492952a894e0p-48"), ("W4O12", "0x1.86792fd81e23ep-51")),
         "metal": (("Fe", "0x1.52b175aaa4435p-41"), ("SiO", "0x1.5492952a894e0p-47"), ("Mg", "0x1.769f522e7eddap-49"), ("FeO", "0x1.a213c2947944ap-53"), ("SiO2", "0x1.dfb669c874fb6p-60")),
-        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
+        "flags": (("SiO", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Fe", _IRON_LOW_FLAGS), ("FeO", _IRON_LOW_FLAGS), ("Mg", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("MgO", "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009"), ("SiO2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si2", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"), ("Si3", "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038")),
         "flux": "0x1.fbde39f6ea1ffp-1", "buffer": "0x1.0e9617dca9e3ap-54",
     },
     ("feo_mgo_sio2_30_20_50", 1700.0, None): {
@@ -173,6 +174,9 @@ _PROVENANCE_CLASSES = {
 _COMMON_LOW_FLAGS = "Al2O3(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Al-100"
 _SILICA_LOW_FLAGS = "SiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-038"
 _TITANIA_LOW_FLAGS = "TiO2(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF O-044"
+_TITANIA_SUPERCOOLED_FLAGS = "TiO2(l) uses a source-tabulated supercooled liquid branch below the 2130 K fusion marker (O-044)"
+_POTASSIUM_OXIDE_LOW_FLAGS = "K2O(l) uses a tier-4 liquid_from_solid construction from K-012"
+_SODIUM_OXIDE_LOW_FLAGS = "Na2O(l) uses a source-tabulated supercooled liquid branch below the 1405.2 K fusion marker (Na-013)"
 _DOMAIN_FLAGS = {
     1200.0: {
         "Al": _COMMON_LOW_FLAGS,
@@ -181,28 +185,36 @@ _DOMAIN_FLAGS = {
         "AlO2": _COMMON_LOW_FLAGS,
         "Ca": "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028",
         "CaO": "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028",
-        "Fe": None, "FeO": None, "K": None, "K2": None, "K2O": None, "KO": None,
+        "Fe": _IRON_LOW_FLAGS, "FeO": _IRON_LOW_FLAGS,
+        "K": _POTASSIUM_OXIDE_LOW_FLAGS, "K2": _POTASSIUM_OXIDE_LOW_FLAGS,
+        "K2O": _POTASSIUM_OXIDE_LOW_FLAGS, "KO": _POTASSIUM_OXIDE_LOW_FLAGS,
         "Mg": "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009",
         "MgO": "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009",
-        "Na": None, "Na2": None, "Na2O": None, "NaO": None, "O": None, "O2": None,
+        "Na": _SODIUM_OXIDE_LOW_FLAGS, "Na2": _SODIUM_OXIDE_LOW_FLAGS,
+        "Na2O": _SODIUM_OXIDE_LOW_FLAGS, "NaO": _SODIUM_OXIDE_LOW_FLAGS,
+        "O": None, "O2": None,
         "Si": _SILICA_LOW_FLAGS,
         "Si2": _SILICA_LOW_FLAGS,
         "Si3": _SILICA_LOW_FLAGS,
         "SiO": _SILICA_LOW_FLAGS, "SiO2": _SILICA_LOW_FLAGS,
-        "Ti": _TITANIA_LOW_FLAGS, "TiO": _TITANIA_LOW_FLAGS, "TiO2": _TITANIA_LOW_FLAGS,
+        "Ti": _TITANIA_LOW_FLAGS, "TiO": _TITANIA_LOW_FLAGS,
+        "TiO2": _TITANIA_LOW_FLAGS,
     },
     1700.0: {
         "Al": _COMMON_LOW_FLAGS, "Al2": _COMMON_LOW_FLAGS, "Al2O": _COMMON_LOW_FLAGS,
         "Al2O2": _COMMON_LOW_FLAGS, "AlO": _COMMON_LOW_FLAGS, "AlO2": _COMMON_LOW_FLAGS,
         "Ca": "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028",
         "CaO": "CaO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Ca-028",
-        "Fe": None, "FeO": None, "K": None, "K2": None, "K2O": None, "KO": None,
+        "Fe": None, "FeO": None,
+        "K": _POTASSIUM_OXIDE_LOW_FLAGS, "K2": _POTASSIUM_OXIDE_LOW_FLAGS,
+        "K2O": _POTASSIUM_OXIDE_LOW_FLAGS, "KO": _POTASSIUM_OXIDE_LOW_FLAGS,
         "Mg": "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009",
         "MgO": "MgO(l) uses a labelled constant-Cp supercooled-liquid continuation from JANAF Mg-009",
         "Na": None, "Na2": None, "Na2O": None, "NaO": None, "O": None, "O2": None,
         "Si": _SILICA_LOW_FLAGS, "Si2": _SILICA_LOW_FLAGS, "Si3": _SILICA_LOW_FLAGS,
         "SiO": _SILICA_LOW_FLAGS, "SiO2": _SILICA_LOW_FLAGS,
-        "Ti": None, "TiO": None, "TiO2": None,
+        "Ti": _TITANIA_SUPERCOOLED_FLAGS,
+        "TiO": _TITANIA_SUPERCOOLED_FLAGS, "TiO2": _TITANIA_SUPERCOOLED_FLAGS,
     },
 }
 _CELL_SOURCE_LABELS = {
@@ -255,7 +267,7 @@ def test_binary_pot_gas_records_engine_binding_identity_and_hex_pins() -> None:
             "gas_table_digest": package_identity.gas_table_digest,
         },
         "pack": "1.0.3-d066-v1",
-        "pack_digest": "d894f4e5ce79ba393f7068ec7d9032336eda8276293c4f46cafb18944a8b247e",
+        "pack_digest": "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75",
         "package_version": "0.1.0.dev0",
     }
 

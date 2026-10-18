@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import inspect
+import json
+import math
 import types
 from dataclasses import replace
 from decimal import Decimal
@@ -399,14 +401,15 @@ def test_uniform_modelled_reactive_cell_requests_cell_oxide_reservoir(
 
 
 @pytest.mark.parametrize(
-    ("materials", "reason"),
+    ("engine", "materials", "reason"),
     (
-        ((CellMaterial.AL2O3,), "cell_material_not_inert"),
-        ((CellMaterial.PT, CellMaterial.AL2O3), "cell_material_not_inert"),
-        ((CellMaterial.OTHER,), "cell_material_not_inert"),
+        (Engine.OPENIMCC, (CellMaterial.AL2O3,), "cell_material_not_inert"),
+        (Engine.VAPOROCK, (CellMaterial.PT, CellMaterial.AL2O3), "cell_material_not_inert"),
+        (Engine.ALPHAMELTS, (CellMaterial.OTHER,), "cell_material_not_inert"),
     ),
 )
 def test_noninert_knudsen_cell_refuses_oxygen_balance(
+    engine: Engine,
     materials: tuple[CellMaterial, ...],
     reason: str,
     monkeypatch,
@@ -415,7 +418,7 @@ def test_noninert_knudsen_cell_refuses_oxygen_balance(
     observation, experiment = _kems_partial(cell_material=None)
 
     prediction = predict_with_engine(
-        Engine.OPENIMCC,
+        engine,
         observation,
         experiment=experiment,
         bench=_cell_material_bench(materials),
@@ -643,6 +646,87 @@ def test_printed_total_pressure_is_passed_without_an_assumption(monkeypatch) -> 
     assert seen["pressure_bar"] == pytest.approx(2500 / 1.0e5)
     assert not any(
         notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN for notice in prediction.notices
+    )
+
+
+@pytest.mark.parametrize("engine", [Engine.VAPOROCK, Engine.ALPHAMELTS])
+def test_oxygen_balance_vapour_rows_use_engine_pressures_at_commanded_po2(
+    engine, monkeypatch
+) -> None:
+    observation, experiment = _kems_partial(cell_material=None)
+    bench = _cell_material_bench((CellMaterial.PT,))
+    calls: list[tuple[float, dict[str, float]]] = []
+    handle = types.SimpleNamespace(
+        name=engine.value,
+        available=True,
+        unavailable_reason=None,
+        supports_intrinsic_fo2=False,
+        backend=types.SimpleNamespace(get_vapor_species=lambda: ["K", "O2"]),
+    )
+
+    def _open(_name):
+        return handle
+
+    def _cell(_handle, _pot, *, po2, **_kwargs):
+        assert po2.mode == PO2_COMMANDED
+        assert po2.po2_bar is not None and po2.po2_bar > 0.0
+        pressures = {
+            "K": 1e-6 * po2.po2_bar ** -0.25 * 1e5,
+            "O2": 0.02264 * po2.po2_bar * 1e5,
+        }
+        calls.append((po2.po2_bar, pressures))
+        return types.SimpleNamespace(
+            status="ok",
+            refusal_reason=None,
+            engine_reason=None,
+            hostname="test",
+            exit_code=0,
+            exit_signal=None,
+            notices=[],
+            authority=None,
+            certified_band=None,
+            melt_activities={},
+            melt_activity_coefficients={},
+            gas_partial_pressures_Pa=pressures,
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+
+    prediction = predict_with_engine(
+        engine,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        isolated=False,
+    )
+
+    assert prediction.value is not None
+    solved_notice = next(
+        notice
+        for notice in prediction.notices
+        if notice.reason.startswith("fo2_oxygen_balance_effusion_solved:")
+    )
+    solved = json.loads(solved_notice.reason.split(":", 1)[1])
+    score_pO2_bar, score_pressures = calls[-1]
+    direct_pressures = _cell(
+        handle,
+        None,
+        po2=Po2Request(PO2_COMMANDED, solved["pO2_bar"]),
+    ).gas_partial_pressures_Pa
+    assert score_pO2_bar == pytest.approx(solved["pO2_bar"], rel=1e-12)
+    assert math.isclose(
+        float(prediction.value), direct_pressures["K"], rel_tol=1e-9
+    )
+    assert math.isclose(
+        score_pressures["K"], direct_pressures["K"], rel_tol=1e-9
     )
 
 

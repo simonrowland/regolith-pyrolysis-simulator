@@ -305,6 +305,25 @@ def interpolate_equilibrium_payload(
     if controls.get("log_fO2") is not None:
         requested_fO2_log = float(controls.get("log_fO2"))
 
+    fO2_metadata_present = False
+    diagnostic_fO2_fields: set[str] = set()
+    for neighbor in neighbors:
+        neighbor_payload = neighbor.get("payload")
+        if not isinstance(neighbor_payload, Mapping):
+            continue
+        neighbor_result = neighbor_payload.get("equilibrium_result")
+        if not isinstance(neighbor_result, Mapping):
+            continue
+        fO2_metadata_present = fO2_metadata_present or any(
+            field in neighbor_result
+            for field in ("requested_fO2_log", "printed_fO2_echo_log")
+        )
+        neighbor_diagnostics = neighbor_result.get("diagnostics")
+        if isinstance(neighbor_diagnostics, Mapping):
+            for field in ("requested_fO2_log", "printed_fO2_echo_log"):
+                if field in neighbor_diagnostics:
+                    diagnostic_fO2_fields.add(field)
+
     solved_temperature_C = _weighted_average_scalar(
         neighbors,
         weights,
@@ -332,6 +351,23 @@ def interpolate_equilibrium_payload(
         interpolated_result["fO2_log"] = solved_fO2_log
     elif requested_fO2_log is not None:
         interpolated_result["fO2_log"] = requested_fO2_log
+    if fO2_metadata_present:
+        # These top-level fix4 fields are alphaMELTS metadata. The diagnostic
+        # requested_fO2_log predates fix4 and has other meanings in
+        # ThermoEngine and MAGEMin; alphaMELTS writes it at
+        # simulator/melt_backend/alphamelts.py:4283-4284.
+        # The synthesized state belongs to this query, so its requested gas
+        # coordinate is the query's coordinate, not a weighted neighbor request.
+        # No engine printed an echo for the synthesized state.
+        interpolated_result["requested_fO2_log"] = requested_fO2_log
+        interpolated_result["printed_fO2_echo_log"] = None
+        if diagnostic_fO2_fields:
+            diagnostics = dict(interpolated_result.get("diagnostics") or {})
+            if "requested_fO2_log" in diagnostic_fO2_fields:
+                diagnostics["requested_fO2_log"] = requested_fO2_log
+            if "printed_fO2_echo_log" in diagnostic_fO2_fields:
+                diagnostics["printed_fO2_echo_log"] = None
+            interpolated_result["diagnostics"] = diagnostics
 
     interpolated_result["liquid_fraction"] = _weighted_average_scalar(
         neighbors,

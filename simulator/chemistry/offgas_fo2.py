@@ -93,6 +93,7 @@ from __future__ import annotations
 import math
 import pathlib
 from dataclasses import dataclass, field
+from functools import lru_cache
 from typing import Any, Mapping, Sequence
 
 from simulator.vapour_rail.nasa_cea import (
@@ -236,15 +237,27 @@ def load_buffer_polynomials(
          REJECTS. The token it wants is ``observation['phase']`` ('gas').
     """
 
-    extract = load_cached_safe_yaml(pathlib.Path(extract_path).read_text())
+    return _load_cea_polynomials(
+        BUFFER_SPECIES,
+        extract_path,
+        requirement=(
+            "the offgas fO2 coupling needs all of " + ", ".join(BUFFER_SPECIES)
+        ),
+    )
+
+
+@lru_cache(maxsize=4)
+def _load_cea_polynomials_from_text(
+    names: tuple[str, ...], source_text: str, requirement: str
+) -> tuple[tuple[str, NasaCeaPolynomial], ...]:
+    extract = load_cached_safe_yaml(source_text)
     polynomials: dict[str, NasaCeaPolynomial] = {}
-    for name in BUFFER_SPECIES:
+    for name in names:
         try:
             entry = extract["species"][name]
         except (KeyError, TypeError) as exc:
             raise OffgasFO2Unavailable(
-                f"CEA extract has no record for {name!r}; the offgas fO2 coupling "
-                "needs all of " + ", ".join(BUFFER_SPECIES)
+                f"CEA extract has no record for {name!r}; {requirement}"
             ) from exc
         observation = next(
             (o for o in entry["observations"] if o.get("type") == "gibbs_table"),
@@ -279,7 +292,55 @@ def load_buffer_polynomials(
                 values.get("reference_pressure_Pa", 100_000.0)
             ),
         )
-    return polynomials
+    return tuple(polynomials.items())
+
+
+def _load_cea_polynomials(
+    names: tuple[str, ...],
+    extract_path: pathlib.Path | str,
+    *,
+    requirement: str,
+) -> dict[str, NasaCeaPolynomial]:
+    source_text = pathlib.Path(extract_path).read_text()
+    return dict(
+        _load_cea_polynomials_from_text(names, source_text, requirement)
+    )
+
+
+def _oxygen_atom_partial_pressure_bar(
+    temperature_K: float,
+    pO2_bar: float,
+    *,
+    extract_path: pathlib.Path | str,
+) -> float:
+    """Equilibrium O(g) pressure for O2(g) ⇌ 2 O(g), using NASA CEA Gibbs data."""
+
+    pO2 = float(pO2_bar)
+    if not math.isfinite(pO2) or pO2 <= 0.0:
+        raise OffgasFO2Unavailable(
+            f"commanded pO2 must be finite and positive; got {pO2_bar!r}"
+        )
+    polynomials = _load_cea_polynomials(
+        ("O", "O2"),
+        extract_path,
+        requirement="the oxygen-dissociation projection needs O and O2",
+    )
+    oxygen = polynomials["O"]
+    molecular_oxygen = polynomials["O2"]
+    if oxygen.reference_pressure_Pa != molecular_oxygen.reference_pressure_Pa:
+        raise OffgasFO2Unavailable(
+            "NASA CEA O and O2 records use different reference pressures"
+        )
+    reference_pressure_bar = molecular_oxygen.reference_pressure_Pa / 100_000.0
+    equilibrium_constant = reaction_equilibrium_constant(
+        (
+            (2.0, oxygen.evaluate(temperature_K)),
+            (-1.0, molecular_oxygen.evaluate(temperature_K)),
+        )
+    )
+    return reference_pressure_bar * math.sqrt(
+        equilibrium_constant * (pO2 / reference_pressure_bar)
+    )
 
 
 #: Which CEA records each couple's log10 K actually reads. Domain validation is
