@@ -216,6 +216,17 @@ def test_residue_disagreement_matches_the_stored_coordinates():
         expected = format(displacement / float(point["y_px_per_mole_pct"]), ".4f")
         assert point["read_disagreement_mole_pct"] == expected
         assert point["read_disagreement_mole_pct"] != "999"
+    first_square = next(
+        point
+        for block in document["species"].values()
+        for row in block.get("context") or []
+        if row["observation_id"] == "shornikov_2011_fig2c_CaO_mole_pct"
+        for point in row["values"]["points"]
+    )
+    assert first_square["page_600dpi_px_read_2"] == [1291.5, 3062.5]
+    assert first_square["embedded_px_read_2"] == [69.89, 515.93]
+    assert first_square["x_i_mole_pct_read_2"] == "30.7"
+    assert first_square["q_pct_read_2"] == "99.1"
 
 
 def test_mutating_the_consumed_gibbs_value_or_deleting_a_row_fails_the_pin():
