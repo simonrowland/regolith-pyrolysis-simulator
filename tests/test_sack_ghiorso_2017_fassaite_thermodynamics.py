@@ -36,7 +36,17 @@ def test_sack_ghiorso_tables_preserve_values_and_provenance() -> None:
         "** Benisek and others (2007)."
     )
     assert rows[11]["value_as_published"] == "25 ± 10"
+    assert rows[11]["footnote_marks"] == "§, §§, **"
+    assert rows[11]["attribution"] == (
+        "§ Cohen (1986), Vinograd (2001), and Warren and others (2001); "
+        "§§ Yang (1975); ** Benisek and others (2007)."
+    )
     assert rows[15]["value_as_published"] == "−55 ± 15"
+    assert rows[15]["footnote_marks"] == "§, §§, **"
+    assert rows[15]["attribution"] == (
+        "§ Cohen (1986), Vinograd (2001), and Warren and others (2001); "
+        "§§ Yang (1975); ** Benisek and others (2007)."
+    )
     assert all("uncertainty" not in row for row in rows)
 
     diopside = contexts[
