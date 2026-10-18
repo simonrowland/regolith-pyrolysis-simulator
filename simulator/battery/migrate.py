@@ -10749,11 +10749,41 @@ def _initial_compositions_conflict(
         return False
     old_value = old.state.value
     new_value = new.state.value
-    return (
-        old_value.basis != new_value.basis
-        or old_value.amount_basis is not new_value.amount_basis
-        or old_value.as_map() != new_value.as_map()
-    )
+
+    def mole_fraction_map(value: Composition) -> dict[str, Decimal] | None:
+        components = value.as_map()
+        if value.amount_basis is AmountBasis.MOLE_FRACTION:
+            return components
+        if value.amount_basis is AmountBasis.MASS_PERCENT:
+            try:
+                return wt_pct_to_mole_fraction(components).as_map()
+            except (ArithmeticError, ValueError):
+                return None
+        if value.amount_basis is AmountBasis.MOL_INVENTORY:
+            total = sum(components.values(), Decimal("0"))
+            if total <= 0:
+                return None
+            return {oxide: amount / total for oxide, amount in components.items()}
+        return None
+
+    old_components = mole_fraction_map(old_value)
+    new_components = mole_fraction_map(new_value)
+    if old_components is None or new_components is None:
+        return True
+
+    # A 12-decimal serialized mole fraction can differ from its source by at
+    # most half an ulp (5e-13). The converter's 28-digit Decimal divisions and
+    # sum add less than 1e-26 absolute error for normalized components; include
+    # that rounding margin in the component-wise comparison.
+    tolerance = Decimal("5e-13") + Decimal("1e-26")
+    for oxide in old_components.keys() | new_components.keys():
+        difference = abs(
+            old_components.get(oxide, Decimal("0"))
+            - new_components.get(oxide, Decimal("0"))
+        )
+        if difference > tolerance:
+            return True
+    return False
 
 
 def _merge_experiment_lab_params(
@@ -10777,7 +10807,26 @@ def _merge_experiment_lab_params(
         and existing_initial.state.is_value
         and incoming_initial.state.is_value
     ):
-        initial_composition = existing_initial
+        def provenance_richness(initial: Located[Composition]) -> int:
+            value = initial.state.value
+            return sum(
+                item is not None
+                for item in (
+                    initial.locator,
+                    initial.inference,
+                    value.proxy_flag,
+                    value.proxy_source,
+                    value.analysis_selection_rule,
+                )
+            )
+
+        existing_provenance = provenance_richness(existing_initial)
+        incoming_provenance = provenance_richness(incoming_initial)
+        initial_composition = (
+            incoming_initial
+            if incoming_provenance > existing_provenance
+            else existing_initial
+        )
     else:
         initial_composition = _prefer_located(existing_initial, incoming_initial)
     merged_sample = Sample(
