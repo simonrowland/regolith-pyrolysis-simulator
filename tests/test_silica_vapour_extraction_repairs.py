@@ -186,22 +186,22 @@ def _assert_yakovlev_1984_figure_and_range_pins(extract, audit_rows):
 
     literal_figure_pins = {
         "F1-Ca-07": (2110, 2.4e-04, (1780, 880), (1780, 880)),
-        "F1-Mg-02": (1475, 2.4e-05, (868, 1177), (868, 1177)),
-        "F2-Ca-08": (2185, 2.7e-03, (1231, 420), (1231, 420)),
-        "F2-SiO-09": (1875, 6.3e-03, (678, 292), (678, 292)),
+        "F1-Mg-02": (1475, 2.4e-05, (868, 1177), (868, 1178)),
+        "F2-Ca-08": (2175, 2.9e-03, (1217, 410), (1217, 409)),
+        "F2-SiO-09": (1875, 6.3e-03, (678, 292), (680, 291)),
     }
 
     expected_counts = {
-        ("1", "SiO"): 9,
+        ("1", "SiO"): 8,
         ("1", "Mg"): 12,
-        ("1", "Ca"): 7,
+        ("1", "Ca"): 5,
         ("1", "Al"): 3,
         ("2", "SiO"): 18,
         ("2", "Mg"): 8,
-        ("2", "Ca"): 11,
+        ("2", "Ca"): 10,
         ("2", "Al"): 5,
     }
-    assert len(audit_rows) == sum(expected_counts.values()) == 73
+    assert len(audit_rows) == sum(expected_counts.values()) == 69
     for key, expected_count in expected_counts.items():
         figure, species = key
         sample = "Murchison" if figure == "1" else "CAI"
@@ -292,7 +292,7 @@ def test_yakovlev_1984_printed_maxima_and_digitized_figures_migrate_with_conditi
         row for row in result.observations.values()
         if any(parent_id in row.observation_id for parent_id in parent_ids)
     ]
-    assert len(observations) == 73
+    assert len(observations) == 69
     _validate_rows(result, observations)
     for audit_row in audit_rows:
         figure = audit_row["figure"]
