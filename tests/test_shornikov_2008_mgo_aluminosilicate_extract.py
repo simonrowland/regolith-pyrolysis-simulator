@@ -22,7 +22,9 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
         for row in block.get("observations", [])
     ]
     table_rows = [
-        row for _, row in observations if row["locator"].get("table") == "3"
+        row
+        for _, row in observations
+        if "_p002_t03_" in row["observation_id"]
     ]
     marker_rows = [
         row
@@ -70,6 +72,8 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
         assert row["phase"] == phase
         assert row["locator"]["page"] == 2
         assert row["locator"]["published_page"] == 148
+        assert "table" not in row["locator"]
+        assert "unnumbered 'Table'" in row["locator"]["note"]
 
     # Literal page-render reads pin all three data shapes: activity log axes,
     # a different activity series, and the linearly plotted -delta_fG ordinate.
@@ -79,27 +83,33 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
             "activity",
             0.19,
             52,
-            0.00083,
+            None,
             [1053, 352],
-            [1002, 601],
+            [76, 67],
+            [1127, 685],
+            "review-p2-600dpi-a3",
         ),
         (
             "shornikov_2008_fig1_b_marker_2",
             "activity",
             "0.20",
-            19,
-            0.00042,
+            18,
+            0.0004163,
             [1756, 341],
-            [1705, 591],
+            [77, 72],
+            [1824, 668],
+            "review-p2-600dpi-b2",
         ),
         (
             "shornikov_2008_fig1_d_marker_3",
             "value",
             "-27",
             52,
-            0.0,
+            0.002671,
             [2119, 1277],
-            [2069, 1527],
+            [84, 65],
+            [2185, 1612],
+            "review-p2-600dpi-d3",
         ),
     )
     for (
@@ -110,21 +120,49 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
         uncertainty,
         pixel_1,
         pixel_2,
+        crop_origin,
+        crop_id,
     ) in rendered_figure_reads:
         row = next(row for _, row in observations if row["observation_id"] == observation_id)
         values = row["values"]
         assert values["T_K"] == "2050"
         assert values[value_key] == value
         assert values["x_SiO2_mol_pct_as_read"] == x_siO2_mol_pct
-        assert values.get("read_uncertainty_dex", values.get("read_uncertainty_kJ_mol")) == uncertainty
+        uncertainty_key = (
+            "read_uncertainty_kJ_mol" if value_key == "value" else "read_uncertainty_dex"
+        )
+        if uncertainty is None:
+            assert uncertainty_key not in values
+        else:
+            assert values[uncertainty_key] == uncertainty
+            assert values[uncertainty_key] > 0
         assert values["read_1"]["pixel_xy_crop"] == pixel_1
         assert values["read_2"]["pixel_xy_crop"] == pixel_2
+        assert values["read_2"]["crop_origin_xy_page_px"] == crop_origin
+        assert values["read_2"]["crop_id"] == crop_id
+
+    fresh_crop_ids = [row["values"]["read_2"]["crop_id"] for row in marker_rows]
+    assert len(set(fresh_crop_ids)) == 23
+    assert all(
+        row["values"].get("read_uncertainty_dex", row["values"].get("read_uncertainty_kJ_mol")) is None
+        or row["values"].get("read_uncertainty_dex", row["values"].get("read_uncertainty_kJ_mol")) > 0
+        for row in marker_rows
+    )
 
     prose_row = next(
         row for _, row in observations
         if row["observation_id"] == "shornikov_2008_prose_cordierite_minimum_delta_fg"
     )
     assert prose_row["values"]["value"] == "-26.9"
+    assert prose_row["locator"]["page"] == 1
+    assert prose_row["locator"]["pdf_page_index"] == 0
+    assert prose_row["locator"]["published_page"] == 147
+    assert "section" not in prose_row["locator"]
+    for condition in prose_row["point_conditions"].values():
+        assert condition["locator"]["page"] == 1
+        assert condition["locator"]["pdf_page_index"] == 0
+        assert condition["locator"]["published_page"] == 147
+        assert "section" not in condition["locator"]
     assert prose_row["point_conditions"]["composition"]["state"]["tag"] == "unknown"
 
     migrator = Migrator(root=ROOT, index=None, aliases={})
