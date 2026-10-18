@@ -128,6 +128,9 @@ def _materialize_refusal_snapshot_history(state: Mapping[str, Any]) -> None:
     history = getattr(model, 'operating_history', None)
     if isinstance(history, _RefusalSnapshotHistoryPrefix):
         model.operating_history = history.materialize()
+    history = getattr(model, 'cold_spot_history', None)
+    if isinstance(history, _RefusalSnapshotHistoryPrefix):
+        model.cold_spot_history = history.materialize()
 
 
 _REFUSAL_MISSING = object()
@@ -13678,6 +13681,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             memo[id(operating_history)] = _RefusalSnapshotHistoryPrefix(
                 operating_history, memo, mutable_tail=1,
             )
+        cold_spot_history = getattr(
+            getattr(self, '_condensation_model', None), 'cold_spot_history', None,
+        )
+        if defer_committed_history and isinstance(cold_spot_history, list):
+            # Cold-spot rows are deep-copied on append and never mutated after
+            # commit, so a refusal only needs a detached copy of this prefix.
+            memo[id(cold_spot_history)] = _RefusalSnapshotHistoryPrefix(
+                cold_spot_history, memo,
+            )
+        yield_disposition_history = getattr(
+            self, '_yield_disposition_ledger_snapshots', None,
+        )
+        if defer_committed_history and isinstance(yield_disposition_history, dict):
+            # Accounting captures this table after a successful step. A failed
+            # core hour cannot mutate it, so retain the committed rows by
+            # identity instead of copying the full run history every hour.
+            memo[id(yield_disposition_history)] = yield_disposition_history
         state_source = {
             name: value
             for name, value in self.__dict__.items()
@@ -13794,6 +13814,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             getattr(
                 terminal_refusal_state.get('_condensation_model'),
                 'operating_history', None,
+            ),
+            getattr(
+                terminal_refusal_state.get('_condensation_model'),
+                'cold_spot_history', None,
             ),
         )
         try:

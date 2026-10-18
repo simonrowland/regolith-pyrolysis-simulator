@@ -835,7 +835,10 @@ def test_successful_step_structurally_shares_committed_history(monkeypatch) -> N
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=4)
     sim.record = BatchRecord(snapshots=[committed])
+    yield_disposition_history = {"committed": committed}
+    sim._yield_disposition_ledger_snapshots = yield_disposition_history
     sim._condensation_model = SimpleNamespace(
+        cold_spot_history=[committed],
         operating_history=[committed, {"wall_temperature_C": 25.0}],
     )
     sim.runtime_state = {"nested": {"temperature_C": 25.0}}
@@ -848,10 +851,14 @@ def test_successful_step_structurally_shares_committed_history(monkeypatch) -> N
 
     assert sim.step().hour == 4
     assert sim.runtime_state == {"nested": {"temperature_C": 25.0}}
+    assert sim._yield_disposition_ledger_snapshots is yield_disposition_history
+    assert sim._yield_disposition_ledger_snapshots["committed"] is committed
     assert isinstance(sim.record.snapshots, list)
     assert sim.record.snapshots == [committed]
     assert sim.record.snapshots[0] is committed
-    assert len(created_prefixes) == 2
+    assert sim._condensation_model.cold_spot_history == [committed]
+    assert sim._condensation_model.cold_spot_history[0] is committed
+    assert len(created_prefixes) == 3
     assert all(prefix._memo == {} for prefix in created_prefixes)
     with pytest.raises(RefusalStateSnapshotError) as direct_snapshot:
         sim._snapshot_terminal_refusal_hour_state()
@@ -882,6 +889,8 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=37)
     sim.record = BatchRecord(snapshots=[committed])
+    yield_disposition_history = {"committed": {"hour": 37}}
+    sim._yield_disposition_ledger_snapshots = yield_disposition_history
     operating_prefix = {"pressures": {"Na": 1.0}}
     operating_tail = {"pressures": {"Na": 2.0}}
     sim._condensation_model = SimpleNamespace(
@@ -916,6 +925,7 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
 
     assert raised.value is refusal
     assert sim.runtime_state["nested"] == {"temperature_C": 25.0}
+    assert sim._yield_disposition_ledger_snapshots is yield_disposition_history
     cold_spot_history = sim._condensation_model.cold_spot_history
     assert cold_spot_history == [cold_spot_prefix]
     assert cold_spot_history[0] is not cold_spot_prefix
