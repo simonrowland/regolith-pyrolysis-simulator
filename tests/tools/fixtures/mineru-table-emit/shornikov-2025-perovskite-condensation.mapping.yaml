@@ -1,0 +1,117 @@
+source_id: shornikov-2025-perovskite-condensation
+source:
+  citation: 'Shornikov, S. I., & Yakovlev, O. I. (2025). Condensation parameters of perovskite as the least volatile compound of CAIs matter. Experiment in Geosciences, 31(1), 32–34.'
+  doi: null
+  year: 2025
+extraction:
+  method: Table 1 emitted from MinerU cell draft and checked against pdftotext-layout and the 600-dpi page render.
+  date: '2026-10-18'
+  worker: w4b-1018
+review_status: draft
+tables:
+  - page: 3
+    table_index: 1
+    type: partial_pressure
+    quantity: partial_pressure
+    evidence_class: quoted_attributed
+    attribution: 'Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)'
+    unit: atm
+    phase: gas
+    published_page: 33
+    rows: [3, 4, 5, 6, 7, 8, 9, 10]
+    temperature:
+      as_printed: '1800 K'
+      unit: K
+      locator: {page: 3, pdf_page_index: 2, published_page: 33, table: '1', column_header: '1800 K'}
+    value_pairs:
+      - {species_column: 1, value_column: 2, unit: atm, quantity: partial_pressure}
+  - page: 3
+    table_index: 1
+    type: partial_pressure
+    quantity: partial_pressure
+    evidence_class: quoted_attributed
+    attribution: 'Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)'
+    unit: atm
+    phase: gas
+    published_page: 33
+    rows: [3, 4, 5, 6, 7, 8, 9, 10]
+    temperature:
+      as_printed: '2241 K'
+      unit: K
+      locator: {page: 3, pdf_page_index: 2, published_page: 33, table: '1', column_header: '2241 K'}
+    value_pairs:
+      - {species_column: 1, value_column: 3, unit: atm, quantity: partial_pressure}
+  - page: 3
+    table_index: 1
+    type: partial_pressure
+    quantity: partial_pressure
+    evidence_class: quoted_attributed
+    attribution: 'Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)'
+    unit: atm
+    phase: gas
+    published_page: 33
+    rows: [3, 4, 5, 6, 7, 8, 9, 10]
+    temperature:
+      as_printed: '2400 K'
+      unit: K
+      locator: {page: 3, pdf_page_index: 2, published_page: 33, table: '1', column_header: '2400 K'}
+    value_pairs:
+      - {species_column: 1, value_column: 4, unit: atm, quantity: partial_pressure}
+  - page: 3
+    table_index: 1
+    type: concentration_series
+    quantity: vapor_mole_fraction
+    evidence_class: quoted_attributed
+    attribution: 'Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)'
+    unit: mol
+    phase: gas
+    published_page: 33
+    rows: [3, 4, 5, 6, 7, 8, 9, 10]
+    temperature:
+      as_printed: '1800 K'
+      unit: K
+      locator: {page: 3, pdf_page_index: 2, published_page: 33, table: '1', column_header: '1800 K'}
+    value_pairs:
+      - {species_column: 1, value_column: 5, quantity: vapor_mole_fraction}
+  - page: 3
+    table_index: 1
+    type: concentration_series
+    quantity: vapor_mole_fraction
+    evidence_class: quoted_attributed
+    attribution: 'Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)'
+    unit: mol
+    phase: gas
+    published_page: 33
+    rows: [3, 4, 5, 6, 7, 8, 9, 10]
+    temperature:
+      as_printed: '2241 K'
+      unit: K
+      locator: {page: 3, pdf_page_index: 2, published_page: 33, table: '1', column_header: '2241 K'}
+    value_pairs:
+      - {species_column: 1, value_column: 6, quantity: vapor_mole_fraction}
+  - page: 3
+    table_index: 1
+    type: concentration_series
+    quantity: vapor_mole_fraction
+    evidence_class: quoted_attributed
+    attribution: 'Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)'
+    unit: mol
+    phase: gas
+    published_page: 33
+    rows: [3, 4, 5, 6, 7, 8, 9, 10]
+    temperature:
+      as_printed: '2400 K'
+      unit: K
+      locator: {page: 3, pdf_page_index: 2, published_page: 33, table: '1', column_header: '2400 K'}
+    value_pairs:
+      - {species_column: 1, value_column: 7, quantity: vapor_mole_fraction}
+  - page: 3
+    table_index: 1
+    type: refusal
+    quantity: refused_source_content
+    evidence_class: method_only
+    unit: dimensionless ratio as printed
+    published_page: 33
+    rows: [3, 4, 5, 6, 7, 8, 9, 10]
+    value_pairs:
+      - {species_column: 1, value_column: 8}
