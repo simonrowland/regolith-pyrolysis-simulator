@@ -24,7 +24,7 @@ def test_shornikov_2023_table_and_deferred_figures_migrate_as_context() -> None:
         for context in work_contexts
     ]
     assert len(result.observations) == 0
-    assert len(contexts) == 10
+    assert len(contexts) == 12
     assert not result.validation.hard_issues
 
     table = next(
@@ -49,6 +49,80 @@ def test_shornikov_2023_table_and_deferred_figures_migrate_as_context() -> None:
     assert rows[3]["sample_compositions_wt_pct"]["M"] == "45.9"
     assert all(row["method_class"] == "quoted_attributed" for row in rows)
 
+    cai_contexts = document["species"]["CaO"]["context"]
+    modal = next(
+        context
+        for context in cai_contexts
+        if context["observation_id"] == "shornikov_2023_cai_modal_compositions"
+    )
+    assert modal["locator"]["page"] == 4
+    assert modal["locator"]["published_page"] == 9
+    assert modal["locator"]["pdf_page_index"] == 3
+    assert modal["values"]["type_A"]["other_mineral_formula_as_printed"] == (
+        "Ca2(Mg,Al)[(Al.Si)2O7]"
+    )
+
+    age = next(
+        context
+        for context in cai_contexts
+        if context["observation_id"] == "shornikov_2023_cai_age_context"
+    )
+    assert age["locator"]["page"] == 3
+    assert age["locator"]["published_page"] == 8
+    assert age["values"]["numeric_facts"] == [
+        {
+            "name": "CAI_age_as_printed",
+            "value": 4.567,
+            "unit": "billion years",
+            "locator": {
+                "page": 3,
+                "published_page": 8,
+                "pdf_page_index": 2,
+                "section": "Introduction",
+            },
+        }
+    ]
+
+    method = next(
+        context
+        for context in cai_contexts
+        if context["observation_id"] == "shornikov_2023_experimental_method_context"
+    )
+    assert method["values"]["studied_sample_as_printed"] == (
+        "natural inclusions of the Efremovka meteorite"
+    )
+    assert method["values"]["studied_meteorite_class_as_printed"] == "CV3"
+    assert method["values"]["comparison_sample_as_printed"] == "Murchison chondrite"
+    assert method["values"]["comparison_meteorite_class_as_printed"] == "CM2"
+
+    results = next(
+        context
+        for context in cai_contexts
+        if context["observation_id"] == "shornikov_2023_results_summary_context"
+    )
+    assert results["values"]["temperature_ranges_K_as_printed"] == {
+        "silicon_component_remains_in_CAIs": ">2500"
+    }
+    assert results["values"]["statements"] == [
+        "It is possible to notice the predominance of vapor species corresponding to a higher content of calcium and aluminum oxides in the melt in the case of CAIs type A (Fig. 2A), and for the case of CAIs type B – the predominance of vapor species corresponding to a higher content of magnesium and silicon oxides in the melt (Fig. 2B).",
+        "The high-temperature evaporation process occurs in an oxygen-enriched atmosphere.",
+        "The authors suggest that initial CAI mineral condensation also occurs in an oxygen environment.",
+    ]
+
+    murchison = next(
+        context
+        for context in cai_contexts
+        if context["observation_id"]
+        == "shornikov_2023_yakovlev_murchison_comparison_context"
+    )
+    assert murchison["values"]["method_class"] == "quoted_attributed"
+    assert murchison["values"]["attribution"] == "Yakovlev et al. (1987)"
+    assert murchison["values"]["sample_as_printed"] == "Murchison chondrite (CM2)"
+    assert murchison["values"]["temperature_ranges_K_as_printed"] == {
+        "higher_volatility": "1800–2100",
+        "almost_complete_evaporation": "2200–2300",
+    }
+
     figure_records = [
         context
         for record in document["species"].values()
@@ -56,6 +130,17 @@ def test_shornikov_2023_table_and_deferred_figures_migrate_as_context() -> None:
         if context["type"] == "figure_record"
     ]
     assert len(figure_records) == 6
+    assert {
+        item["observation_id"]: item["values"]["marker_count_per_series"]
+        for item in figure_records
+    } == {
+        "shornikov_2023_fig1_temperature_regimes": {"A": 31, "B": 26, "M": 27},
+        "shornikov_2023_fig2_ca_partial_pressure": {"A": 14, "B": 12, "C": 9},
+        "shornikov_2023_fig2_mg_partial_pressure": {"A": 12, "B": 11, "C": 13},
+        "shornikov_2023_fig2_al_partial_pressure": {"A": 8, "B": 11, "C": 9},
+        "shornikov_2023_fig2_sio_partial_pressure": {"A": 16, "B": 20, "C": 10},
+        "shornikov_2023_fig3_oxygen_pressure": {"A": 19, "B": 24, "M": 17},
+    }
     assert {item["locator"]["figure"] for item in figure_records} == {
         "1",
         "2",

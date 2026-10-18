@@ -113,9 +113,9 @@ species:
       - observation_id: shornikov_2023_cai_modal_compositions
         type: text_stated_composition_context
         locator:
-          page: 3
-          published_page: 8
-          pdf_page_index: 2
+          page: 4
+          published_page: 9
+          pdf_page_index: 3
           section: Introduction
           note: Printed modal mineral proportions for CAI types A and B.
         units: vol. % as printed
@@ -125,7 +125,7 @@ species:
           type_A:
             melilite: '≥80'
             spinel: '5–15'
-            other_mineral_formula_as_printed: Ca2(Mg,Al)[(Al,Si)2O7]
+            other_mineral_formula_as_printed: Ca2(Mg,Al)[(Al.Si)2O7]
           type_B:
             melilite: '60–70'
             fassaite: '10–25'
@@ -134,6 +134,29 @@ species:
           note: >-
             The paper describes type A as richer in calcium and aluminum oxides
             and poorer in MgO and SiO2 than type B.
+      - observation_id: shornikov_2023_cai_age_context
+        type: author_context
+        locator:
+          page: 3
+          published_page: 8
+          pdf_page_index: 2
+          section: Introduction
+          note: Printed age for CAIs.
+        units: source prose; numeric_facts units stated per value
+        values:
+          quantity: introductory_claims
+          method_class: quoted_unattributed
+          statements:
+            - They represent the most primitive matter of the Solar System with an age of 4.567 billion years.
+          numeric_facts:
+            - name: CAI_age_as_printed
+              value: 4.567
+              unit: billion years
+              locator:
+                page: 3
+                published_page: 8
+                pdf_page_index: 2
+                section: Introduction
       - observation_id: shornikov_2023_experimental_method_context
         type: experimental_method_context
         locator:
@@ -148,6 +171,10 @@ species:
           method_class: quoted_unattributed
           phase: l
           temperature_range_K_as_printed: '1300–2600'
+          studied_sample_as_printed: natural inclusions of the Efremovka meteorite
+          studied_meteorite_class_as_printed: CV3
+          comparison_sample_as_printed: Murchison chondrite
+          comparison_meteorite_class_as_printed: CM2
           sample_mass_mg_as_printed: '10–15'
           cell_as_printed: tungsten cylindrical effusion cell
           heating_as_printed: electron bombardment from tungsten cathodes
@@ -202,14 +229,35 @@ species:
           quantity: evaporation_results_as_printed
           method_class: quoted_unattributed
           temperature_ranges_K_as_printed:
-            murchison_higher_volatility: '1800–2100'
-            murchison_almost_completely_evaporated: '2200–2300'
             silicon_component_remains_in_CAIs: '>2500'
           statements:
-            - Type A MgO leaves the melt before SiO2.
-            - Type B MgO and SiO2 leave the melt simultaneously.
+            - It is possible to notice the predominance of vapor species corresponding to a higher content of calcium and aluminum oxides in the melt in the case of CAIs type A (Fig. 2A), and for the case of CAIs type B – the predominance of vapor species corresponding to a higher content of magnesium and silicon oxides in the melt (Fig. 2B).
             - The high-temperature evaporation process occurs in an oxygen-enriched atmosphere.
             - The authors suggest that initial CAI mineral condensation also occurs in an oxygen environment.
+      - observation_id: shornikov_2023_yakovlev_murchison_comparison_context
+        type: cited_comparison_context
+        locator:
+          page: 5
+          published_page: 10
+          pdf_page_index: 4
+          section: Results and discussion
+          note: Murchison comparison attributed to Yakovlev et al. (1987).
+        units: K as printed
+        values:
+          quantity: murchison_evaporation_comparison_as_printed
+          method_class: quoted_attributed
+          attribution: Yakovlev et al. (1987)
+          sample_as_printed: Murchison chondrite (CM2)
+          temperature_ranges_K_as_printed:
+            higher_volatility: '1800–2100'
+            almost_complete_evaporation: '2200–2300'
+          comparison_as_printed: >-
+            A comparison of the temperature dependencies of partial pressures
+            of vapor species over CAIs melts of types A and B with that for the
+            case of Murchison chondrite (Fig. 2C) shows that the latter has a
+            slightly higher volatility at 1800–2100 K, due to the high content
+            of magnesium and silicon oxides in the melt (compared with CAIs
+            types A and B) and almost completely evaporates at 2200–2300 K.
       - observation_id: shornikov_2023_fig1_temperature_regimes
         type: figure_record
         locator:

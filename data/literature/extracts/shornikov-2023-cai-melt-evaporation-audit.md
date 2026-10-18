@@ -4,7 +4,7 @@ Source: *Experimental study of evaporation of the Ca–Al–inclusions of chondr
 
 ## Duplicate check
 
-The corpus also contains the authors' 2023 LPSC abstract *Natural CAI Evaporation: Implications for the Formation of the First Ca-Al Phases*. It is a separate publication: its title and venue differ, and its Table 1 contains only A/B compositions. This journal article adds the Murchison column and cites the earlier comparison data. The two source records were retained separately.
+The corpus also contains `shornikov-2023-natural-cai-evaporation`, the authors' 2023 LPSC abstract *Mass Spectrometric Study of Evaporation of Natural CAIs Melts (Types A and B) in Efremovka Chondrite*, 54th Lunar and Planetary Science Conference, abstract 1983. It is a separate publication: its title and venue differ, and its Table 1 contains only A/B compositions. This journal article adds the Murchison column and cites the earlier comparison data. The two source records were retained separately.
 
 ## Table 1
 
@@ -21,7 +21,7 @@ The `mineru_table_draft` mapping emits all 12 cells. Its `compare` command repor
 
 ## Text and figure context
 
-The extract records the printed modal mineral proportions, the KEMS method and detected ions, and the qualitative evaporation results. It does not reconstruct a complete melt composition: amounts for the listed additional oxides are typed unknown because the article does not publish them. It also keeps the printed comparison ranges and attributions as context.
+The extract records the printed CAI age, modal mineral proportions, Efremovka CV3 sample identity, Murchison CM2 comparison, KEMS method and detected ions, and the article's qualitative evaporation results. The Murchison volatility ranges are a separate quoted-attributed context record for Yakovlev et al. (1987). It does not reconstruct a complete melt composition: amounts for the listed additional oxides are typed unknown because the article does not publish them.
 
 Figures 1–3 are recorded only under the relevant species sibling `context[]` containers. Their typed quantity and identity, phase, temperature, printed axes, captions, panels, series, marker counts, locators, and attributions are retained. Marker counts were tallied from the 600 dpi page renders; no coordinates or figure values were read. Every figure record says `digitisation: deferred to a figure pass` and contains no numeric points.
 
@@ -36,4 +36,4 @@ Figures 1–3 are recorded only under the relevant species sibling `context[]` c
 
 ## Migration and expected store delta
 
-The isolated migration reports 0 observations, 10 contexts, 0 hard issues, and 0 unavailable observations. Expected battery-store delta: 0 scored observations; the ten unscored context records remain available as source context. No battery store regeneration is committed.
+The isolated migration reports 0 observations, 12 contexts, 0 hard issues, and 0 unavailable observations. Expected battery-store delta: 0 scored observations; the twelve unscored context records remain available as source context. No battery store regeneration is committed.
