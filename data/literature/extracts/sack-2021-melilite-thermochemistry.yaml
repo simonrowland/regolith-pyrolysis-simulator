@@ -1,0 +1,807 @@
+schema_version: literature_extract.v1
+source_id: sack-2021-melilite-thermochemistry
+source:
+  citation: 'Sack, R. O. (2021), “Thermochemistry of melilites I. Towards resolving an inconsistency in nebular condensation calculations”, American Journal of Science 321, 424–457.'
+  doi: 10.2475/04.2021.02
+  year: 2021
+  corpus_asset: raw/sack-2021-melilite-thermochemistry/sack-2021-melilite-thermochemistry.pdf
+  corpus_sha256: 0e141308f0d7764b11f2cf55448e00c6f3c753b282bf2f663ede6e9fc92ad4cf
+extraction:
+  method: Manual transcription checked against 600 dpi page renders.
+  date: '2026-10-18'
+  worker: codex-w5-1018
+  provenance_path: text/sack-2021-melilite-thermochemistry/pdftotext-layout.txt
+  source_note: >-
+    Born-digital pdftotext-layout.txt is the primary read. No MinerU output is
+    present; the table emitter accepts MinerU HTML drafts and cannot draft from
+    this pdftotext-only source, so no mapping files apply. Tables 1–3 contain
+    symbolic Taylor-coefficient mappings rather than measured values. Table 4
+    contains adopted thermodynamic model inputs, not raw calorimetric or
+    phase-equilibrium measurements. The 6 Table 1 rows, 26 Table 2 rows, 21
+    Table 3 rows and both 8-row Table 4 blocks were hand transcribed and
+    checked against their 600 dpi renders (185 nonempty body cells). All
+    numeric values are retained as printed, including Table 4 header scale
+    factors. Original attributions and author-derived values are distinguished
+    within the context records. The raw calorimetric, crystallographic,
+    Mössbauer and phase-equilibrium points occur only in figures and remain
+    deferred under this wave’s figure rule.
+review_status: draft
+species:
+  gehlenite:
+    observations: []
+    context:
+      - observation_id: sack_2021_table1_ordered_melilite_model_parameter_mapping
+        type: model_parameter_table
+        locator:
+          published_page: 429
+          pdf_page_index: 6
+          table: '1'
+        units: as printed
+        values:
+          method_class: model_derived
+          title: Taylor coefficients and preferred thermodynamic parameters
+          column_headers:
+            - Taylor Coefficient
+            - Equivalent Thermodynamic Parameters
+          row_count: 6
+          rows_as_printed:
+            - coefficient: 'g0'
+              equivalent_parameter: 'Ḡ1°'
+            - coefficient: 'gX2'
+              equivalent_parameter: 'Ḡ2′° + ΔḠ2*Dis − Ḡ1° + W12'
+            - coefficient: 'gX2X2'
+              equivalent_parameter: '−W12'
+            - coefficient: 'gss'
+              equivalent_parameter: '−2(3/2 ΔḠ2*Dis + ΔW12 + 1/4 Δ²W12^ss)'
+            - coefficient: 'gX2ss'
+              equivalent_parameter: '2(ΔḠ2*Dis + ΔW12 + 3/4 Δ²W12^ss)'
+            - coefficient: 'gX2X2ss'
+              equivalent_parameter: '−Δ²W12^ss'
+          render_check:
+            method: page render at 600 dpi
+            pdf_page: 6
+      - observation_id: sack_2021_table2_quadrilateral_melilite_model_parameter_mapping
+        type: model_parameter_table
+        locator:
+          published_page: 437
+          pdf_page_index: 14
+          table: '2'
+        units: as printed
+        values:
+          method_class: model_derived
+          title: Taylor coefficients and preferred thermodynamic parameters
+          column_headers:
+            - Taylor Coefficient
+            - Equivalent Thermodynamic Parameters
+          row_count: 26
+          rows_as_printed:
+            - coefficient: 'g0'
+              equivalent_parameter: 'Ḡ1°'
+            - coefficient: 'gX2'
+              equivalent_parameter: 'Ḡ2′° + ΔḠ2*Dis − Ḡ1° + W12'
+            - coefficient: 'gX3'
+              equivalent_parameter: 'Ḡ3° − Ḡ1° + W13'
+            - coefficient: 'gX4'
+              equivalent_parameter: 'Ḡ4′° + ΔḠ4*Dis − Ḡ1° + W14'
+            - coefficient: 'gX5'
+              equivalent_parameter: 'Ḡ5* − Ḡ1° + W15'
+            - coefficient: 'gX2X2'
+              equivalent_parameter: '−W12'
+            - coefficient: 'gX3X3'
+              equivalent_parameter: '−W13'
+            - coefficient: 'gX4X4'
+              equivalent_parameter: '−W14'
+            - coefficient: 'gX5X5'
+              equivalent_parameter: '−W15'
+            - coefficient: 'gX2X3'
+              equivalent_parameter: 'W23 − W12 − W13'
+            - coefficient: 'gX2X4'
+              equivalent_parameter: 'W24 − W12 − W14'
+            - coefficient: 'gX2X5'
+              equivalent_parameter: 'W25 − W12 − W14'
+            - coefficient: 'gX3X4'
+              equivalent_parameter: 'W34 − W13 − W14'
+            - coefficient: 'gX3X5'
+              equivalent_parameter: 'W35 − W13 − W15'
+            - coefficient: 'gX4X5'
+              equivalent_parameter: 'W45 − W14 − W15'
+            - coefficient: 'gss'
+              equivalent_parameter: '−2(3/2 ΔḠ2*Dis + ΔW12 + 1/4 Δ²W12^ss)'
+            - coefficient: 'gtt'
+              equivalent_parameter: '−2(3/2 ΔḠ4*Dis + ΔW14 + 1/4 Δ²W14^tt)'
+            - coefficient: 'gst'
+              equivalent_parameter: 'W2′4′ + W24 − W2′4 − W24′ + 1/4(Δ²W12^st + Δ²W14^st + Δ²W24^ss + Δ²W24^tt + Δ²W24^st)'
+            - coefficient: 'gX2ss'
+              equivalent_parameter: '2(ΔḠ2*Dis + ΔW12 + 3/4 Δ²W12^ss)'
+            - coefficient: 'gX2tt'
+              equivalent_parameter: '2(ΔW14 − ΔW2′4 + 1/4(Δ²W12^tt + Δ²W24^tt))'
+            - coefficient: 'gX3ss'
+              equivalent_parameter: '2(ΔW12 − ΔW23 + 1/4(Δ²W13^ss + Δ²W23^ss))'
+            - coefficient: 'gX3tt'
+              equivalent_parameter: '2(ΔW14 − ΔW34 + 1/4(Δ²W13^tt + Δ²W34^tt))'
+            - coefficient: 'gX4ss'
+              equivalent_parameter: '2(ΔW12 − ΔW2′4 + 1/4(Δ²W14^ss + Δ²W24^ss))'
+            - coefficient: 'gX4tt'
+              equivalent_parameter: '2(ΔḠ4*Dis + ΔW14 + 3/4 Δ²W14^tt)'
+            - coefficient: 'gX5ss'
+              equivalent_parameter: '2(ΔW12 − ΔW25 + 1/4(Δ²W15^ss + Δ²W25^ss))'
+            - coefficient: 'gX5tt'
+              equivalent_parameter: '2(ΔW14 − ΔW45 + 1/4(Δ²W15^tt + Δ²W45^tt))'
+          additional_quartic_parameter_families_as_printed:
+            count: 30
+            expression: >-
+              The quartic parameters are equated with the negative of the
+              gXiXi ss, gXiXj ss, gXiXi tt, gXiXj tt, gXiXi st, and gXiXj st
+              coefficients. The printed parameter sequence is Δ²W1s2s,
+              Δ²W1s3s, Δ²W1s4s, Δ²W1s5s, Δ²W2s3s, Δ²W2s4s, Δ²W2s5s,
+              Δ²W3s4s, Δ²W3s5s, Δ²W4s5s, Δ²W1t2t, Δ²W1t3t, Δ²W1t4t,
+              Δ²W1t5t, Δ²W2t3t, Δ²W2t4t, Δ²W2t5t, Δ²W3t4t, Δ²W3t5t,
+              Δ²W4t5t, Δ²W1s2t, Δ²W1s3t, Δ²W1s4t, Δ²W1s5t, Δ²W2s3t,
+              Δ²W2s4t, Δ²W2s5t, Δ²W3s4t, Δ²W3s5t, and Δ²W4s5t.
+          omitted_terms_as_printed: Four ternary Xi st terms are omitted in equation (17).
+          transcription_note: The gX2X5 mapping is W25 − W12 − W14 as printed, despite the W15 subscript expected by its analogous row.
+          render_check:
+            method: page render at 600 dpi
+            pdf_page: 14
+      - observation_id: sack_2021_table3_disordered_melilite_model_parameter_mapping
+        type: model_parameter_table
+        locator:
+          published_page: 442
+          pdf_page_index: 19
+          table: '3'
+        units: as printed
+        values:
+          method_class: model_derived
+          title: Taylor coefficients and thermodynamic parameters for melilites with disordered Al-Si and Fe3+-Si distributions on T2 sites
+          column_headers:
+            - Taylor Coefficient
+            - Equivalent Thermodynamic Parameters
+          row_count: 21
+          rows_as_printed:
+            - coefficient: 'g0'
+              equivalent_parameter: 'Ḡ1°'
+            - coefficient: 'gX2'
+              equivalent_parameter: 'Ḡ2′° + ΔḠ2*Dis − Ḡ1° + W12'
+            - coefficient: 'gX3'
+              equivalent_parameter: 'Ḡ3° − Ḡ1° + W13'
+            - coefficient: 'gX4'
+              equivalent_parameter: 'Ḡ4* − Ḡ1° + W14'
+            - coefficient: 'gX5'
+              equivalent_parameter: 'Ḡ5* − Ḡ1° + W15'
+            - coefficient: 'gr'
+              equivalent_parameter: '1/2[ΔḠr° + (Ḡ4* − Ḡ2*) + W24 + WFeAl^T1 − WFeAl^T2]'
+            - coefficient: 'gX2X2'
+              equivalent_parameter: '−W12'
+            - coefficient: 'gX3X3'
+              equivalent_parameter: '−W13'
+            - coefficient: 'gX4X4'
+              equivalent_parameter: '−W14'
+            - coefficient: 'gX5X5'
+              equivalent_parameter: '−W15'
+            - coefficient: 'gX2X3'
+              equivalent_parameter: 'W23 − W12 − W13'
+            - coefficient: 'gX2X4'
+              equivalent_parameter: 'W24 − W12 − W14'
+            - coefficient: 'gX2X5'
+              equivalent_parameter: 'W25 − W12 − W15'
+            - coefficient: 'gX3X4'
+              equivalent_parameter: 'W34 − W13 − W14'
+            - coefficient: 'gX3X5'
+              equivalent_parameter: 'W35 − W13 − W15'
+            - coefficient: 'gX4X5'
+              equivalent_parameter: 'W45 − W14 − W15'
+            - coefficient: 'grr'
+              equivalent_parameter: '−WFeAl^T1'
+            - coefficient: 'gX2r'
+              equivalent_parameter: 'W12 + WFeAl^T1 − WFeAl−MgSi^ORD'
+            - coefficient: 'gX3r'
+              equivalent_parameter: 'WFeAl−FeSi^ORD − WFeAl−MgSi^ORD + W12 − W23'
+            - coefficient: 'gX4r'
+              equivalent_parameter: 'WFeAl^T2 − W24 − WFeAl^T1'
+            - coefficient: 'gX5r'
+              equivalent_parameter: 'WFeAl^T2 − WNaSi−CaFe^Al on T1 + W45 − W24'
+          render_check:
+            method: page render at 600 dpi
+            pdf_page: 19
+      - observation_id: sack_2021_table4_adopted_thermodynamic_inputs
+        type: model_input_table
+        locator:
+          published_page: 446
+          pdf_page_index: 23
+          table: '4'
+        units: as printed
+        values:
+          title: Adopted thermodynamic properties of endmember solids and CO2 gas
+          method_class: model_derived
+          enthalpy_entropy_volume_header_as_printed:
+            - ΔHf°298.15 (J)
+            - S°298.15 (J/K)
+            - V°298.15 (J/bar)
+          enthalpy_entropy_volume_row_count: 8
+          enthalpy_entropy_volume_rows_as_printed:
+            - phase: 'Anorthite¹,²'
+              formula: CaAl2Si2O8
+              delta_fH_J_as_printed: '-4228730'
+              entropy_J_per_K_as_printed: '200.186'
+              volume_J_per_bar_as_printed: '10.075'
+              attribution: 'Berman (1988); Berman and Brown (1985)'
+              method_class: quoted_attributed
+            - phase: 'Calcite¹,²'
+              formula: CaCO3
+              delta_fH_J_as_printed: '-1206819'
+              entropy_J_per_K_as_printed: '91.725'
+              volume_J_per_bar_as_printed: '3.690'
+              attribution: 'Berman (1988); Berman and Brown (1985)'
+              method_class: quoted_attributed
+            - phase: 'Carbon Dioxide (gas)¹,²'
+              formula: CO2
+              delta_fH_J_as_printed: '-393510'
+              entropy_J_per_K_as_printed: '213.677'
+              volume_J_per_bar_as_printed: '0.0'
+              attribution: 'Berman (1988); Berman and Brown (1985)'
+              method_class: quoted_attributed
+            - phase: 'Corundum¹,²'
+              formula: Al2O3
+              delta_fH_J_as_printed: '-1675700'
+              entropy_J_per_K_as_printed: '50.820'
+              volume_J_per_bar_as_printed: '2.558'
+              attribution: 'Berman (1988); Berman and Brown (1985)'
+              method_class: quoted_attributed
+            - phase: 'Wollastonite¹,²'
+              formula: CaSiO3
+              delta_fH_J_as_printed: '-1631500'
+              entropy_J_per_K_as_printed: '81.810'
+              volume_J_per_bar_as_printed: '3.983'
+              attribution: 'Berman (1988); Berman and Brown (1985)'
+              method_class: quoted_attributed
+            - phase: 'Diopside¹,³'
+              formula: CaMgSi2O6
+              delta_fH_J_as_printed: '-3200583'
+              entropy_J_per_K_as_printed: '141.60'
+              volume_J_per_bar_as_printed: '6.620'
+              attribution: 'Berman (1988); Sack and Ghiorso (2017)'
+              method_class: quoted_attributed
+            - phase: 'Åkermanite¹,⁷'
+              formula: Ca2MgSi2O7
+              delta_fH_J_as_printed: '-3859441'
+              entropy_J_per_K_as_printed: '212.00'
+              volume_J_per_bar_as_printed: '9.252'
+              attribution: 'Berman (1988); this study'
+              method_class: model_derived
+            - phase: 'Gehlenite¹,⁷'
+              formula: Ca2Al2SiO7
+              delta_fH_J_as_printed: '-3985158'
+              entropy_J_per_K_as_printed: '198.60'
+              volume_J_per_bar_as_printed: '9.033'
+              attribution: 'Berman (1988); this study'
+              method_class: model_derived
+          heat_capacity_header_as_printed: 'Cp° = k0 + k1/sqrt(T) + k2/T^2 + k3/T^3 (J/K); header scale factors: k1×10^-2, k2×10^-5, k3×10^-7'
+          heat_capacity_row_count: 8
+          heat_capacity_rows_as_printed:
+            - phase: Anorthite¹
+              k0: '439.37'
+              k1_x_10^-2: '-37.341'
+              k2_x_10^-5: '0.0'
+              k3_x_10^-7: '-31.702'
+              attribution: Berman (1988)
+              method_class: quoted_attributed
+            - phase: Calcite¹
+              k0: '178.19'
+              k1_x_10^-2: '-16.577'
+              k2_x_10^-5: '-4.827'
+              k3_x_10^-7: '16.660'
+              attribution: Berman (1988)
+              method_class: quoted_attributed
+            - phase: 'Carbon Dioxide (gas)¹,⁴'
+              k0: '93.00'
+              k1_x_10^-2: '-13.409'
+              k2_x_10^-5: '1.238'
+              k3_x_10^-7: null
+              attribution: 'Berman (1988); equation (36) extended with the printed terms −0.002876 T + 6336.20 T^-1'
+              method_class: quoted_attributed
+            - phase: Corundum¹
+              k0: '155.02'
+              k1_x_10^-2: '-8.284'
+              k2_x_10^-5: '-38.614'
+              k3_x_10^-7: '40.908'
+              attribution: Berman (1988)
+              method_class: quoted_attributed
+            - phase: Wollastonite¹
+              k0: '149.07'
+              k1_x_10^-2: '-6.903'
+              k2_x_10^-5: '-36.593'
+              k3_x_10^-7: '48.435'
+              attribution: Berman (1988)
+              method_class: quoted_attributed
+            - phase: Diopside³
+              k0: '305.52'
+              k1_x_10^-2: '-16.050'
+              k2_x_10^-5: '-70.870'
+              k3_x_10^-7: '87.550'
+              attribution: Sack and Ghiorso (2017)
+              method_class: quoted_attributed
+            - phase: 'Akermanite¹,⁸'
+              k0: '387.06'
+              k1_x_10^-2: '-29.388'
+              k2_x_10^-5: '0.0'
+              k3_x_10^-7: '-4.079'
+              attribution: 'Berman (1988); Hemingway and others (1986); this study'
+              method_class: model_derived
+            - phase: 'Gehlenite⁵,⁷'
+              k0: '361.025'
+              k1_x_10^-2: '-19.35'
+              k2_x_10^-5: '-58.5'
+              k3_x_10^-7: '58.5'
+              attribution: 'Pankratz and Kelley (1964); Weller and Kelley (1963); this study'
+              method_class: model_derived
+          footnotes_as_printed:
+            '1': Berman (1988).
+            '2': Berman and Brown (1985).
+            '3': Sack and Ghiorso (2017).
+            '4': Equation (36) extended to include −0.002876 T + 6336.20 T^-1.
+            '5': Pankratz and Kelley (1964) and Weller and Kelley (1963).
+            '6': For gehlenite the ki coefficients are for Cp*.
+            '7': This study.
+            '8': Following Berman (1988), the akermanite lambda transition terminating near 357.9 K (Hemingway and others, 1986) is treated as a first-order transition at 358 K with ΔHtr = 452 J/gfw and ΔStr = 1.26256983 J/gfw/K.
+          schema_gaps:
+            - Printed molar-volume property has no existing Quantity enum token; retained as attributed context.
+          render_check:
+            method: page render at 600 dpi
+            pdf_page: 23
+      - observation_id: sack_2021_model_reconciliation_results
+        type: model_summary
+        locator:
+          published_page: 432
+          pdf_page_index: 9
+          section: Results and discussion
+        units: as printed
+        values:
+          method_class: model_derived
+          model_parameters_and_outputs:
+            - name: preliminary gehlenite ordering ΔH2*Dis
+              value: '12'
+              units: kJ/gfw
+            - name: fitted gehlenite ordering ΔH2*Dis
+              value: '12.24595'
+              units: kJ/gfw
+            - name: W12
+              value: '17'
+              units: kJ/gfw
+            - name: ΔW12
+              value: '−1'
+              units: kJ/gfw
+            - name: Δ²W12ss
+              value: '30'
+              units: kJ/gfw
+            - name: predicted T2 Al-Si disordering critical temperature
+              value: '1443.41'
+              units: K
+          approximate_values:
+            - name: possible upward uncertainty in critical temperature
+              value:
+                kind: point
+                point: '30'
+                approximate: true
+              units: K
+            - name: akermanite formation-enthalpy adjustment from Berman (1988)
+              value:
+                kind: point
+                point: '1'
+                approximate: true
+              units: kJ/gfw
+              attribution: Berman (1988) baseline; adjustment inferred from Walter (1963) experimental brackets.
+            - name: gehlenite formation-enthalpy adjustment relative to Berman (1988)
+              value:
+                kind: point
+                point: '3'
+                approximate: true
+              units: kJ/gfw
+              attribution: Berman (1988) baseline; comparison to Walter (1963), Hoschek (1974) and Shmulovich (1974) brackets.
+            - name: gehlenite heat-capacity point discussed near melting
+              value:
+                kind: point
+                point: '1755'
+                approximate: true
+              units: K
+              attribution: Pankratz and Kelley (1964) drop calorimetry.
+          summary: >-
+            Model curves, fitted thermodynamic parameters, and revised endmember
+            values are model-derived context. Table 4’s non-author values retain
+            their printed quoted_attributed classifications. This paper reports
+            no raw calorimetric or phase-equilibrium data table; those marker
+            datasets appear in the deferred figures below.
+      - observation_id: sack_2021_fig1_excess_mixing_enthalpy
+        type: figure_record
+        locator:
+          figure: '1'
+          published_page: 427
+          pdf_page_index: 4
+        units: kJ/gfw
+        values:
+          quantity_as_printed: 970 K excess mixing enthalpy ΔHmix
+          quantity_token_gap: No Quantity enum token for excess mixing enthalpy.
+          species_as_printed: Ca2MgSi2O7–Ca2Al2SiO7 melilites
+          phase_as_printed: synthetic melilite
+          temperature_as_printed: 970 K measurements; model curves at 970, 1273 and 1573 K
+          axes_as_printed:
+            x: gehlenite component mole fraction X2^MEL, AK to GEHL
+            y: excess mixing enthalpy ΔHmix (kJ/gfw)
+          caption: >-
+            970 K excess enthalpy determinations of Charlu and others (1981) for
+            Ca2MgSi2O7–Ca2Al2SiO7 melilites compared with calculations with
+            equation (11) at 970, 1273 and 1573 K. Starting melilites were
+            prepared by solid-state sintering of component oxides (triangles) or
+            crystallization from glasses (circles) at 1573 K, then annealed for
+            3 hours at 970 K before calorimetric measurement.
+          panel: single panel
+          series:
+            - label: solid-state-sintered samples
+              attribution: Charlu and others (1981)
+              marker_as_printed: triangle
+              marker_count: 2
+            - label: samples crystallized from glass
+              attribution: Charlu and others (1981)
+              marker_as_printed: open circle
+              marker_count: 3
+            - label: present-study model curves
+              attribution: this study
+              marker_as_printed: none; curves
+              marker_count: 0
+          digitisation: deferred to a figure pass
+      - observation_id: sack_2021_fig2_order_and_configurational_entropy
+        type: figure_record
+        locator:
+          figure: '2'
+          published_page: 432
+          pdf_page_index: 9
+        units: order variable as plotted; configurational entropy J/gfw/K
+        values:
+          quantity_as_printed: order variable s and configurational entropy S^IC
+          quantity_token_gap: No Quantity enum token for the order variable; entropy curve is model-derived.
+          species_as_printed: gehlenite component in Ca2MgSi2O7–Ca2Al2SiO7 melilite
+          phase_as_printed: model solid solution
+          temperature_as_printed: 970, 1273 and 1573 K
+          axes_as_printed:
+            x: gehlenite component mole fraction X2^MEL, AK to GEHL
+            upper_panel_y: order variable s; scales as printed
+            lower_panel_y: configurational entropy S^IC (J/gfw K)
+          caption: >-
+            Order variable s–X2 and S^IC–X2 relations calculated at 970, 1273
+            and 1573 K from equations (5) and (8) with ΔH2*Dis = 12, ΔW12 = −1
+            and Δ²W12 = 30 kJ/gfw.
+          panel: upper and lower panels
+          series:
+            - label: order variable s at 970 K
+              attribution: this study
+              marker_as_printed: none; model curve
+              marker_count: 0
+            - label: order variable s at 1273 K
+              attribution: this study
+              marker_as_printed: none; model curve
+              marker_count: 0
+            - label: order variable s at 1573 K
+              attribution: this study
+              marker_as_printed: none; model curve
+              marker_count: 0
+            - label: configurational entropy S^IC at 970, 1273 and 1573 K
+              attribution: this study
+              marker_as_printed: none; model curves
+              marker_count: 0
+          digitisation: deferred to a figure pass
+      - observation_id: sack_2021_fig3_gehlenite_crystallographic_axial_ratio
+        type: figure_record
+        locator:
+          figure: '3'
+          published_page: 433
+          pdf_page_index: 10
+        units: dimensionless c/a
+        values:
+          quantity_as_printed: axial ratio c/a
+          quantity_token_gap: No Quantity enum token for crystallographic c/a axial ratio.
+          species_as_printed: gehlenite with Z ≈ 0.042
+          phase_as_printed: gehlenite crystal
+          temperature_as_printed: annealed between 600 and 1600°C
+          approximate_values:
+            - name: Z
+              value:
+                kind: point
+                point: '0.042'
+                approximate: true
+              units: dimensionless
+          axes_as_printed:
+            x: temperature T (°C)
+            y: axial ratio c/a
+          caption: >-
+            c/a axial ratios of gehlenites with Z (= XSiT1) of 0.042, annealed
+            between 600 and 1600°C by Woodhead and Waldbaum (1974). Dashed
+            curves show hypothetical gehlenite with Z = 0 based on Waldbaum and
+            Woodhead (1975) and others. The caption attributes the data to
+            Woodhead and Waldbaum (1974); the plotted legend labels the diamond
+            markers Waldbaum and Woodhead (1975).
+          panel: single panel
+          series:
+            - label: crystallographic c/a measurements, diamond markers
+              attribution: Woodhead and Waldbaum (1974) in caption; Waldbaum and Woodhead (1975) in legend
+              marker_as_printed: filled diamond
+              marker_count: 8
+            - label: this-study solid curves at Z ≈ 0.042 and Z = 0
+              attribution: this study
+              marker_as_printed: none; curves
+              marker_count: 0
+            - label: alternative red dashed curves at Z ≈ 0.042
+              attribution: Waldbaum and Woodhead (1975), figure 5 interpretation as described in caption
+              marker_as_printed: none; curves
+              marker_count: 0
+          digitisation: deferred to a figure pass
+      - observation_id: sack_2021_fig4_melilite_activity_composition_model
+        type: figure_record
+        locator:
+          figure: '4'
+          published_page: 434
+          pdf_page_index: 11
+        units: dimensionless activity
+        values:
+          quantity_as_printed: endmember activity–composition relations
+          species_as_printed: Ca2MgSi2O7–Ca2Al2SiO7 melilites; AK and GEHL components
+          phase_as_printed: modeled melilite solid solution
+          temperature_as_printed: this study at 970, 1273 and 1573 K; Beckett and Stolper series at 200 K intervals between 873 and 1673 K
+          axes_as_printed:
+            x: gehlenite component mole fraction X2^MEL, AK to GEHL
+            y: endmember activity aj
+          caption: >-
+            Calculated activity–composition relations for Ca2MgSi2O7–Ca2Al2SiO7
+            melilites at 970, 1273 and 1573 K using equations (8)–(12).
+            Dashed orange curves are corresponding relations from Beckett and
+            Stolper (1994) at 200 K intervals between 873 and 1673 K; no 1273 K
+            curve for the akermanite component was displayed by those authors.
+          panel: single panel
+          series:
+            - label: akermanite activity a1, three present-study temperatures
+              attribution: this study
+              marker_as_printed: none; solid curves
+              marker_count: 0
+            - label: gehlenite activity a2, three present-study temperatures
+              attribution: this study
+              marker_as_printed: none; solid curves
+              marker_count: 0
+            - label: akermanite activity a1, Beckett and Stolper comparison
+              attribution: Beckett and Stolper (1994), figure A1
+              marker_as_printed: none; dashed orange curves
+              marker_count: 0
+            - label: gehlenite activity a2, Beckett and Stolper comparison
+              attribution: Beckett and Stolper (1994), figure A1
+              marker_as_printed: none; dashed orange curves
+              marker_count: 0
+          digitisation: deferred to a figure pass
+      - observation_id: sack_2021_fig5_ferrigehlenite_ordering_model
+        type: figure_record
+        locator:
+          figure: '5'
+          published_page: 440
+          pdf_page_index: 17
+        units: dimensionless composition-ordering coordinates
+        values:
+          quantity_as_printed: composition-ordering square and reciprocal site-population ratio
+          quantity_token_gap: No Quantity enum token for the reciprocal site-population ratio or ordering variable r.
+          species_as_printed: Ca2Al2SiO7–Ca2Fe2SiO7–Ca2FeT1(Al,Si)T2_2O7–Ca2AlT1(Fe,Si)T2_2O7
+          phase_as_printed: synthetic melilite solid solution
+          temperature_as_printed: model curves at 700 and 1200°C; datum temperature not stated in caption
+          axes_as_printed:
+            x: r = XFe3+T1 − 2 XFe3+T2
+            y: Fe3+/(Fe3+ + Al3+)
+          caption: >-
+            The composition–ordering square is expressed in r and Fe3+/(Fe3+ +
+            Al3+). The circle is the datum from Akasaka and Ohashi (1985), with
+            the printed reciprocal site-population ratio equal to 0.65. Red and
+            blue curves are calculated at 1200 and 700°C.
+          panel: single panel
+          series:
+            - label: reciprocal site-population ratio datum
+              attribution: Akasaka and Ohashi (1985)
+              marker_as_printed: filled circle
+              marker_count: 1
+            - label: model relations at 700 and 1200°C
+              attribution: this study
+              marker_as_printed: none; red and blue curves
+              marker_count: 0
+          digitisation: deferred to a figure pass
+      - observation_id: sack_2021_fig6_synthetic_melilite_order_variable
+        type: figure_record
+        locator:
+          figure: '6'
+          published_page: 441
+          pdf_page_index: 18
+        units: dimensionless order variable and component mole fraction
+        values:
+          quantity_as_printed: non-convergent order variable r and akermanite mole fraction X1
+          quantity_token_gap: No Quantity enum token for the non-convergent order variable r.
+          species_as_printed: Ca2MgSi2O7–Ca2Al2SiO7–Ca2Fe2SiO7 synthetic melilites
+          phase_as_printed: synthetic melilite
+          temperature_as_printed: not stated in figure caption
+          axes_as_printed:
+            x: akermanite component mole fraction X1^MEL
+            y: r = XFe3+T1 − 2 XFe3+T2
+          caption: >-
+            Values of r and the mole fraction of akermanite component X1 for
+            synthetic melilites inferred from Mössbauer spectroscopy by Akasaka
+            and Ohashi (1985) (circles) and Hamada and Akasaka (2013) (squares).
+            The curve illustrating a possible relation between r and X1 is
+            schematic.
+          panel: single panel
+          series:
+            - label: Mössbauer data, circles
+              attribution: Akasaka and Ohashi (1985)
+              marker_as_printed: filled circle
+              marker_count: 3
+            - label: Mössbauer data, squares
+              attribution: Hamada and Akasaka (2013)
+              marker_as_printed: open square
+              marker_count: 3
+            - label: possible relationship between r and X1
+              attribution: this study
+              marker_as_printed: none; schematic curve
+              marker_count: 0
+          digitisation: deferred to a figure pass
+      - observation_id: sack_2021_fig7_decarbonation_equilibrium_temperatures
+        type: figure_record
+        locator:
+          figure: '7'
+          published_page: 445
+          pdf_page_index: 22
+        units: °C; pressure in bars
+        values:
+          quantity: transition_temperature
+          quantity_as_printed: equilibrium temperatures of reactions (31), (32) and (33)
+          species_as_printed: AK, CC, DI, AN, GE, WO, COR and CO2 in CaO–Al2O3–SiO2–CO2(–H2O)
+          phase_as_printed: solid assemblages + CO2 vapor
+          temperature_as_printed: plotted equilibrium temperatures; exact data points deferred
+          axes_as_printed:
+            x: pressure P (bars)
+            y: temperature T (°C)
+          caption: >-
+            Experimental data of Walter (1963); equilibrium temperatures of
+            reactions (32) and (33) inferred by extrapolating Hoschek (1974)
+            experiments into the H2O-free subsystem at 1 kbar; experimental
+            brackets by Shmulovich (1974) at 506.625 and 709.275 bars; and
+            Berman’s calculated temperature for reaction (32) at 1 kbar. Curves
+            show Berman-based and shifted formation-enthalpy calculations for
+            reactions (31)–(33).
+          panel: single panel
+          series:
+            - label: Walter reaction data, open purple circles
+              attribution: Walter (1963)
+              marker_as_printed: open purple circle
+              marker_count: 8
+            - label: Walter reaction data, filled purple circles
+              attribution: Walter (1963)
+              marker_as_printed: filled purple circle
+              marker_count: 8
+            - label: Shmulovich reaction brackets, filled blue squares
+              attribution: Shmulovich (1974)
+              marker_as_printed: filled blue square
+              marker_count: 2
+            - label: Shmulovich reaction brackets, open blue squares
+              attribution: Shmulovich (1974)
+              marker_as_printed: open blue square
+              marker_count: 2
+            - label: Shmulovich reaction brackets, filled blue circles
+              attribution: Shmulovich (1974)
+              marker_as_printed: filled blue circle
+              marker_count: 2
+            - label: Shmulovich reaction brackets, open blue circles
+              attribution: Shmulovich (1974)
+              marker_as_printed: open blue circle
+              marker_count: 2
+            - label: Hoschek extrapolated reaction (32) temperature
+              attribution: Hoschek (1974)
+              marker_as_printed: red square with vertical bracket
+              marker_count: 1
+            - label: Hoschek extrapolated reaction (33) temperature
+              attribution: Hoschek (1974)
+              marker_as_printed: green square with vertical bracket
+              marker_count: 1
+            - label: Berman reaction (32) calculated temperature
+              attribution: Berman (1988)
+              marker_as_printed: yellow circle
+              marker_count: 1
+            - label: reaction-equilibrium calculations
+              attribution: this study, based on Berman (1988) and enthalpy shifts
+              marker_as_printed: none; curves
+              marker_count: 0
+          digitisation: deferred to a figure pass
+      - observation_id: sack_2021_fig8_gehlenite_configurational_heat_capacity_models
+        type: figure_record
+        locator:
+          figure: '8'
+          published_page: 448
+          pdf_page_index: 25
+        units: J/gfw/K
+        values:
+          quantity: cp
+          quantity_as_printed: configurational heat capacity of Al-Si disorder, Cp_dis^IC
+          species_as_printed: gehlenite
+          phase_as_printed: gehlenite solid
+          temperature_as_printed: T in K
+          axes_as_printed:
+            x: temperature T (K)
+            y: configurational heat capacity Cp_dis^IC (J/gfw/K)
+          caption: >-
+            Configurational heat capacity of Al-Si disorder on T2a and T2b sites
+            in gehlenite as predicted by Berman (1988), this study’s
+            thermodynamic model, and four comparison functions. l1 = −l2(Tref)
+            and Tref = 305 K.
+          panel: single panel
+          series:
+            - label: Berman (1988)
+              attribution: Berman (1988)
+              marker_as_printed: none; curve
+              marker_count: 0
+            - label: this-study thermodynamic model
+              attribution: this study
+              marker_as_printed: none; curve
+              marker_count: 0
+            - label: T^0.5(l1 + l2T)
+              attribution: comparison function
+              marker_as_printed: none; curve
+              marker_count: 0
+            - label: T(l1 + l2T)
+              attribution: comparison function
+              marker_as_printed: none; curve
+              marker_count: 0
+            - label: T^0.7(l1 + l2T)
+              attribution: comparison function
+              marker_as_printed: none; curve
+              marker_count: 0
+            - label: T^0.5(l1 + l2T)^2
+              attribution: comparison function
+              marker_as_printed: none; curve
+              marker_count: 0
+          digitisation: deferred to a figure pass
+      - observation_id: sack_2021_fig9_gehlenite_calorimetric_heat_capacity
+        type: figure_record
+        locator:
+          figure: '9'
+          published_page: 449
+          pdf_page_index: 26
+        units: J/gfw/K
+        values:
+          quantity: cp
+          quantity_as_printed: heat capacity Cp
+          species_as_printed: synthetic gehlenite
+          phase_as_printed: synthetic gehlenite solid
+          temperature_as_printed: T in K; point near 1755 K is approximate in the text discussion
+          approximate_values:
+            - name: high-temperature Pankratz and Kelley point discussed in text
+              value:
+                kind: point
+                point: '1755'
+                approximate: true
+              units: K
+          axes_as_printed:
+            x: temperature T (K)
+            y: heat capacity Cp (J/gfw/K)
+          caption: >-
+            Heat capacities of synthetic gehlenite estimated from adiabatic
+            calorimetry of Weller and Kelley (1963) and inferred from drop
+            calorimetry of Pankratz and Kelley (1964). Red curves show Berman’s
+            (1988) Cp* and total Cp; blue curves show the corresponding values
+            adopted in this study.
+          panel: single panel
+          series:
+            - label: adiabatic heat-capacity measurements, filled dots
+              attribution: Weller and Kelley (1963)
+              marker_as_printed: filled dot
+              marker_count: 29
+            - label: drop-calorimetry-derived heat-capacity values, crosses
+              attribution: Pankratz and Kelley (1964)
+              marker_as_printed: cross
+              marker_count: 14
+            - label: Berman Cp* and total Cp
+              attribution: Berman (1988)
+              marker_as_printed: none; solid and dashed red curves
+              marker_count: 0
+            - label: this-study Cp* and total Cp
+              attribution: this study
+              marker_as_printed: none; solid and dashed blue curves
+              marker_count: 0
+          digitisation: deferred to a figure pass
