@@ -233,6 +233,60 @@ def test_compare_matches_every_scalar_row_written_by_emit(tmp_path: Path) -> Non
     assert all(row["matched_cell"]["column"] == 2 for row in compared)
 
 
+def test_compare_matches_scalar_alpha_values(tmp_path: Path) -> None:
+    draft_dir = tmp_path
+    (draft_dir / "table.csv").write_text(
+        "row,column,row_type,text,value_text,mark,numeric_column,origin_row,"
+        "origin_column,rowspan,colspan,flags\n"
+        "1,2,header,alpha,alpha,,1,1,2,1,1,[]\n"
+        "2,2,body,0.35,0.35,,1,2,2,1,1,[]\n",
+        encoding="utf-8",
+    )
+    (draft_dir / "index.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "tables": [
+                    {
+                        "table_key": "p001-t01",
+                        "pdf_page": 1,
+                        "columns": [{"column": 2, "header": "alpha"}],
+                        "csv": "table.csv",
+                    }
+                ]
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    extract = {
+        "species": {
+            "CaO": {
+                "observations": [
+                    {
+                        "observation_id": "alpha_p001_t01_r02_c02",
+                        "locator": {
+                            "page": 1,
+                            "pdf_page_index": 0,
+                            "table": "1",
+                        },
+                        "values": {
+                            "quantity": "evaporation_coefficient_alpha",
+                            "alpha": 0.35,
+                        },
+                    }
+                ]
+            }
+        }
+    }
+
+    compared = draft.compare_extract_to_draft(extract, draft_dir / "index.yaml")
+
+    assert len(compared) == 1
+    assert compared[0]["status"] == "matched"
+    assert compared[0]["value"] == Decimal("0.35")
+    assert compared[0]["path"].endswith(".values.alpha")
+
+
 def test_happy_path_keeps_verbatim_text_and_skips_dashes(tmp_path: Path) -> None:
     draft_dir = _convert_html(
         tmp_path,

@@ -1,0 +1,27 @@
+source_id: shornikov-2015-cai-vaporization-coefficients
+source:
+  citation: >-
+    Shornikov, S. I. (2015). Vaporization Coefficients of Oxides Contained in the
+    Melts of Ca–Al–Inclusions in Chondrites. Geochemistry International, 53(12),
+    1080–1089.
+  doi: 10.1134/S0016702915100055
+  year: 2015
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-18'
+  worker: w4c-1018
+review_status: draft
+tables:
+  - page: 7
+    table_index: 5
+    type: alpha
+    quantity: evaporation_coefficient_alpha
+    unit: dimensionless
+    evidence_class: author_estimate
+    phase: cr
+    published_page: 1086
+    rows: [3, 4, 5, 6, 7, 8]
+    species_form: printed_formula
+    value_pairs:
+      - species_column: 1
+        value_column: 8

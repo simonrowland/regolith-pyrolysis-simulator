@@ -703,6 +703,7 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
             values = observation.get("values") or {}
             value_fields = (
                 "value",
+                "alpha",
                 "pressure_atm",
                 "pressure_bar",
                 "pressure_Pa",

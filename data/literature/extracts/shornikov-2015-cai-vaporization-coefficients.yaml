@@ -1,0 +1,3887 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2015-cai-vaporization-coefficients
+source:
+  citation: Shornikov, S. I. (2015). “Vaporization Coefficients of Oxides Contained in the Melts of Ca–Al–Inclusions
+    in Chondrites.” Geochemistry International, 53(12), 1080–1089.
+  doi: 10.1134/S0016702915100055
+  url: https://doi.org/10.1134/S0016702915100055
+  year: 2015
+  corpus_asset: raw/shornikov-2015-cai-vaporization-coefficients/shornikov-2015-cai-vaporization-coefficients.pdf
+  corpus_sha256: 6c200e01f13ab9675d1407d4f90d65af90a58bd2a53b97e0b65bebd98903c390
+extraction:
+  method: MinerU table drafts and per-table emit mappings; all five tables reconciled to pdftotext-layout.txt,
+    with every table row/column assignment checked on 600-dpi PDF renders. Figures are metadata-only and
+    were not digitised. Table 5's composite thermochemical cells without a single row quantity token are
+    retained as typed-refusal context. The abstract/conclusion versus Table 5 Al2O3 and FeO coefficient
+    discrepancies are retained as separate observations.
+  date: '2026-10-18'
+  worker: w4c-1018
+review_status: draft
+fidelity_samples:
+- species: CaO
+  observable: alpha
+  observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t01_r02_c04
+  field: alpha
+  value: 0.79
+  locator:
+    page: 3
+    published_page: 1082
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1, first data row, 600-dpi render.
+- species: Al2O3
+  observable: alpha
+  observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r02_c04
+  field: alpha
+  value: 0.35
+  locator:
+    page: 4
+    published_page: 1083
+    pdf_page_index: 3
+    table: '3'
+    note: Table 3, first data row, 600-dpi render.
+- species: CaO
+  observable: alpha
+  observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r07_c08
+  field: alpha
+  value: 0.66
+  locator:
+    page: 7
+    published_page: 1086
+    pdf_page_index: 6
+    table: '5'
+    note: Table 5, CaO row, 600-dpi render.
+- species: SiO2
+  observable: alpha
+  observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r03_c04
+  field: alpha
+  value: 0.0223
+  locator:
+    page: 5
+    published_page: 1084
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4, second data row, 600-dpi render; (2.23 ± 0.30) × 10^-2.
+species:
+  CaO:
+    observations:
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t01_r02_c04
+      type: alpha
+      locator:
+        page: 3
+        published_page: 1082
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1. Experimental data on the vaporization coefficient of CaO; MinerU CSV row 2.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1283'
+              interval_high: '1473'
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '1'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '1'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '1'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: author_estimate
+        alpha: 0.79
+        alpha_as_printed: 0.79 ± 0.20*
+        attribution: Knyazeva and Vasil'ev, 1972; calculated in the course of this research
+        source_reference_as_printed: Knyazeva and Vasil'ev, 1972
+        material_of_crucible_or_matrix_as_printed: Ni
+        gas_phase_component_as_printed: Ca
+        temperature_as_printed: 1283–1473
+        phase_basis: The Results and Discussion state Tables 1 and 2 cover crystalline CaO and MgO only.
+        table_caption: Table 1. Experimental data on the vaporization coefficient of CaO
+        table_row: 1
+        calculation_note_as_printed: Calculated in the course of this research.
+      T_range_K:
+      - 1283.0
+      - 1473.0
+      uncertainty:
+        note: ± 0.20 as printed; confidence level not stated
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t01_r03_c04
+      type: alpha
+      locator:
+        page: 3
+        published_page: 1082
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1. Experimental data on the vaporization coefficient of CaO; MinerU CSV row 3.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1617'
+              interval_high: '1728'
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '1'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '1'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '1'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: author_estimate
+        alpha: 1.11
+        alpha_as_printed: 1.11 ± 0.30*
+        attribution: Claasen and Veenemans, 1933; calculated in the course of this research
+        source_reference_as_printed: Claasen and Veenemans, 1933
+        material_of_crucible_or_matrix_as_printed: Pt
+        gas_phase_component_as_printed: –
+        temperature_as_printed: 1617–1728
+        phase_basis: The Results and Discussion state Tables 1 and 2 cover crystalline CaO and MgO only.
+        table_caption: Table 1. Experimental data on the vaporization coefficient of CaO
+        table_row: 2
+        calculation_note_as_printed: Calculated in the course of this research.
+      T_range_K:
+      - 1617.0
+      - 1728.0
+      uncertainty:
+        note: ± 0.30 as printed; confidence level not stated
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t01_r04_c04
+      type: alpha
+      locator:
+        page: 3
+        published_page: 1082
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1. Experimental data on the vaporization coefficient of CaO; MinerU CSV row 4.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1773'
+              interval_high: '2173'
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '1'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '1'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '1'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha_range:
+        - 0.52
+        - 0.8
+        alpha_as_printed: 0.80–0.52
+        alpha_range_endpoint_order_as_printed:
+        - 0.8
+        - 0.52
+        attribution: Sata et al., 1982
+        source_reference_as_printed: Sata et al., 1982
+        material_of_crucible_or_matrix_as_printed: W
+        gas_phase_component_as_printed: –
+        temperature_as_printed: 1773–2173
+        phase_basis: The Results and Discussion state Tables 1 and 2 cover crystalline CaO and MgO only.
+        table_caption: Table 1. Experimental data on the vaporization coefficient of CaO
+        table_row: 3
+      T_range_K:
+      - 1773.0
+      - 2173.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t01_r05_c04
+      type: alpha
+      locator:
+        page: 3
+        published_page: 1082
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1. Experimental data on the vaporization coefficient of CaO; MinerU CSV row 5.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1873'
+              interval_high: '2173'
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '1'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '1'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '1'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 1.0
+        alpha_as_printed: '1.00'
+        attribution: Hashimoto et al., 1989
+        source_reference_as_printed: Hashimoto et al., 1989
+        material_of_crucible_or_matrix_as_printed: C
+        gas_phase_component_as_printed: –
+        temperature_as_printed: 1873–2173
+        phase_basis: The Results and Discussion state Tables 1 and 2 cover crystalline CaO and MgO only.
+        table_caption: Table 1. Experimental data on the vaporization coefficient of CaO
+        table_row: 4
+      T_range_K:
+      - 1873.0
+      - 2173.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r07_c08
+      type: alpha
+      locator:
+        page: 7
+        published_page: 1086
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5, data row 5, alpha column.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: No measurement temperature is printed for this coefficient row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: author_estimate
+        alpha: 0.66
+        alpha_as_printed: 0.66 ± 0.15
+        phase_as_printed: cr
+        table_caption: Table 5. Thermodynamic properties of oxides contained in the melts of Ca–Al–inclusions
+          and identified in the condensed and gas phases and evaporation coefficients of these oxides
+        note: The Table 5 T_melt column is a separate property and is not the measurement temperature for
+          this alpha value.
+        source_occurrences:
+        - as_printed: 0.66 ± 0.15
+          locator:
+            page: 1
+            published_page: 1080
+            pdf_page_index: 0
+            section: Abstract
+        - as_printed: 0.66 ± 0.15
+          locator:
+            page: 8
+            published_page: 1087
+            pdf_page_index: 7
+            section: Conclusions
+      uncertainty:
+        note: ± 0.15 as printed; confidence level not stated
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_cao_liquid_alpha_author_estimate
+      type: alpha
+      locator:
+        page: 5
+        published_page: 1084
+        pdf_page_index: 4
+        section: Results and Discussion
+        note: The theory of vaporization provides sound grounds to believe that the vaporization coefficients
+          of CaO, MgO, and TiO2 for the liquid phase are also equal to one; the paper says this hypothesis
+          is validated by thermodynamic simulations and is consistent with cited experimental results.
+      phase: l
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            section: Results and Discussion
+            note: No measurement temperature is printed for this coefficient row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            section: Results and Discussion
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            section: Results and Discussion
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: author_estimate
+        alpha: 1.0
+        alpha_as_printed: '1'
+        quote_as_printed: The theory of vaporization provides sound grounds to believe that the vaporization
+          coefficients of CaO, MgO, and TiO2 for the liquid phase are also equal to one; the paper says
+          this hypothesis is validated by thermodynamic simulations and is consistent with cited experimental
+          results.
+        attribution: Shornikov (2015).
+        note: Theory-based liquid-state expectation; no numeric temperature or uncertainty is printed.
+    context:
+    - observation_id: shornikov_2015_cai_table5_thermochemical_cells_cao
+      type: thermochemical_table_row
+      locator:
+        page: 7
+        published_page: 1086
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 thermochemical cells, data row 5; the alpha cell is stored as an alpha observation.
+      units: as printed per property column
+      values:
+        quantity: composite_thermochemical_table_row_without_single_observation_quantity
+        method_class: typed_refusal
+        admission_status: typed_refusal
+        schema_gap: Nine thermochemical property cells share a table row; this extract has no one observation
+          token that represents the complete multi-property row with per-cell attribution. The exact values
+          and headers are retained below.
+        cells_as_printed:
+        - property_as_printed: ΔHf, 298
+          header_as_printed: ΔHf, 298, kJ/g-at
+          value_as_printed: –317.5 ± 0.5
+        - property_as_printed: ΔSf, 298
+          header_as_printed: ΔSf, 298, J/(g-at K)
+          value_as_printed: 19.50 ± 0.20
+        - property_as_printed: Tmelt
+          header_as_printed: Tmelt, K
+          value_as_printed: 3200 ± 50
+        - property_as_printed: ΔHmelt
+          header_as_printed: ΔHmelt, kJ/g-a
+          value_as_printed: 39.8 ± 2.5
+        - property_as_printed: ΔSmelt
+          header_as_printed: ΔSmelt, J/(g-at K)
+          value_as_printed: 8.2 ± 1.0
+        - property_as_printed: ΔHsubl
+          header_as_printed: ΔHsubl, kJ/g-a
+          value_as_printed: 338 ± 8
+        - property_as_printed: ΔHf, 0
+          header_as_printed: ΔHf, 0, kJ/g-a
+          value_as_printed: 22 ± 8
+        - property_as_printed: ΔSf, 298 (gas)
+          header_as_printed: ΔSf, 298, J/(g-at K)
+          value_as_printed: 109.8 ± 0.5
+        - property_as_printed: ΔHat, 0
+          header_as_printed: ΔHat, 0, kJ/g-a
+          value_as_printed: 190 ± 8
+  MgO:
+    observations:
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r02_c04
+      type: alpha
+      locator:
+        page: 3
+        published_page: 1082
+        pdf_page_index: 2
+        table: '2'
+        note: Table 2. Experimental data on the vaporization coefficient of MgO; MinerU CSV row 2.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1621'
+              interval_high: '2133'
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha_range:
+        - 0.04
+        - 0.21
+        alpha_as_printed: 0.04–0.21
+        alpha_range_endpoint_order_as_printed:
+        - 0.04
+        - 0.21
+        attribution: Sata, 1983
+        source_reference_as_printed: Sata, 1983
+        material_of_crucible_or_matrix_as_printed: W
+        gas_phase_component_as_printed: –
+        temperature_as_printed: 1621–2133
+        phase_basis: The Results and Discussion state Tables 1 and 2 cover crystalline CaO and MgO only.
+        table_caption: Table 2. Experimental data on the vaporization coefficient of MgO
+        table_row: 1
+      T_range_K:
+      - 1621.0
+      - 2133.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r03_c04
+      type: alpha
+      locator:
+        page: 3
+        published_page: 1082
+        pdf_page_index: 2
+        table: '2'
+        note: Table 2. Experimental data on the vaporization coefficient of MgO; MinerU CSV row 3.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1673'
+              interval_high: '2073'
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha_range:
+        - 0.1
+        - 0.34
+        alpha_as_printed: 0.10–0.34
+        alpha_range_endpoint_order_as_printed:
+        - 0.1
+        - 0.34
+        attribution: Sasamoto et al., 1974
+        source_reference_as_printed: Sasamoto et al., 1974
+        material_of_crucible_or_matrix_as_printed: W
+        gas_phase_component_as_printed: Mg
+        temperature_as_printed: 1673–2073
+        phase_basis: The Results and Discussion state Tables 1 and 2 cover crystalline CaO and MgO only.
+        table_caption: Table 2. Experimental data on the vaporization coefficient of MgO
+        table_row: 2
+      T_range_K:
+      - 1673.0
+      - 2073.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r04_c04
+      type: alpha
+      locator:
+        page: 3
+        published_page: 1082
+        pdf_page_index: 2
+        table: '2'
+        note: Table 2. Experimental data on the vaporization coefficient of MgO; MinerU CSV row 4.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1685'
+              interval_high: '2089'
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha_range:
+        - 0.06
+        - 0.17
+        alpha_as_printed: 0.06–0.17
+        alpha_range_endpoint_order_as_printed:
+        - 0.06
+        - 0.17
+        attribution: Sata and Lee, 1978
+        source_reference_as_printed: Sata and Lee, 1978
+        material_of_crucible_or_matrix_as_printed: W
+        gas_phase_component_as_printed: –
+        temperature_as_printed: 1685–2089
+        phase_basis: The Results and Discussion state Tables 1 and 2 cover crystalline CaO and MgO only.
+        table_caption: Table 2. Experimental data on the vaporization coefficient of MgO
+        table_row: 3
+      T_range_K:
+      - 1685.0
+      - 2089.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r05_c04
+      type: alpha
+      locator:
+        page: 3
+        published_page: 1082
+        pdf_page_index: 2
+        table: '2'
+        note: Table 2. Experimental data on the vaporization coefficient of MgO; MinerU CSV row 5.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1800'
+              interval_high: '1900'
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha_range:
+        - 0.25
+        - 0.4
+        alpha_as_printed: 0.25–0.40
+        alpha_range_endpoint_order_as_printed:
+        - 0.25
+        - 0.4
+        attribution: Peleg and Alcock, 1974
+        source_reference_as_printed: Peleg and Alcock, 1974
+        material_of_crucible_or_matrix_as_printed: W
+        gas_phase_component_as_printed: –
+        temperature_as_printed: 1800–1900
+        phase_basis: The Results and Discussion state Tables 1 and 2 cover crystalline CaO and MgO only.
+        table_caption: Table 2. Experimental data on the vaporization coefficient of MgO
+        table_row: 4
+      T_range_K:
+      - 1800.0
+      - 1900.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r06_c04
+      type: alpha
+      locator:
+        page: 3
+        published_page: 1082
+        pdf_page_index: 2
+        table: '2'
+        note: Table 2. Experimental data on the vaporization coefficient of MgO; MinerU CSV row 6.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1820'
+              interval_high: '1960'
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 0.25
+        alpha_as_printed: '0.25'
+        attribution: Alcock and Peleg, 1967
+        source_reference_as_printed: Alcock and Peleg, 1967
+        material_of_crucible_or_matrix_as_printed: W
+        gas_phase_component_as_printed: –
+        temperature_as_printed: 1820–1960
+        phase_basis: The Results and Discussion state Tables 1 and 2 cover crystalline CaO and MgO only.
+        table_caption: Table 2. Experimental data on the vaporization coefficient of MgO
+        table_row: 5
+      T_range_K:
+      - 1820.0
+      - 1960.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r07_c04
+      type: alpha
+      locator:
+        page: 3
+        published_page: 1082
+        pdf_page_index: 2
+        table: '2'
+        note: Table 2. Experimental data on the vaporization coefficient of MgO; MinerU CSV row 7.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1873'
+              interval_high: '2173'
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha_range:
+        - 0.12
+        - 0.22
+        alpha_as_printed: 0.12–0.22
+        alpha_range_endpoint_order_as_printed:
+        - 0.12
+        - 0.22
+        attribution: Hashimoto, 1990
+        source_reference_as_printed: Hashimoto, 1990
+        material_of_crucible_or_matrix_as_printed: C
+        gas_phase_component_as_printed: Mg
+        temperature_as_printed: 1873–2173
+        phase_basis: The Results and Discussion state Tables 1 and 2 cover crystalline CaO and MgO only.
+        table_caption: Table 2. Experimental data on the vaporization coefficient of MgO
+        table_row: 6
+      T_range_K:
+      - 1873.0
+      - 2173.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r08_c04
+      type: alpha
+      locator:
+        page: 3
+        published_page: 1082
+        pdf_page_index: 2
+        table: '2'
+        note: Table 2. Experimental data on the vaporization coefficient of MgO; MinerU CSV row 8.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2273'
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: Temperature point printed in the source text.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 0.09
+        alpha_as_printed: '0.09'
+        attribution: Kronert and Boehm, 1972
+        source_reference_as_printed: Kronert and Boehm, 1972
+        material_of_crucible_or_matrix_as_printed: W
+        gas_phase_component_as_printed: –
+        temperature_as_printed: '2273'
+        phase_basis: The Results and Discussion state Tables 1 and 2 cover crystalline CaO and MgO only.
+        table_caption: Table 2. Experimental data on the vaporization coefficient of MgO
+        table_row: 7
+        T_K: 2273.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t02_r09_c04
+      type: alpha
+      locator:
+        page: 3
+        published_page: 1082
+        pdf_page_index: 2
+        table: '2'
+        note: Table 2. Experimental data on the vaporization coefficient of MgO; MinerU CSV row 9.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '2273'
+              interval_high: '2573'
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            table: '2'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: author_estimate
+        alpha: 0.59
+        alpha_as_printed: 0.59 ± 0.20*
+        attribution: Lukin and Poluboyarinov, 1964; calculated in the course of this research
+        source_reference_as_printed: Lukin and Poluboyarinov, 1964
+        material_of_crucible_or_matrix_as_printed: W
+        gas_phase_component_as_printed: –
+        temperature_as_printed: 2273–2573
+        phase_basis: The Results and Discussion state Tables 1 and 2 cover crystalline CaO and MgO only.
+        table_caption: Table 2. Experimental data on the vaporization coefficient of MgO
+        table_row: 8
+        calculation_note_as_printed: Calculated in the course of this research.
+      T_range_K:
+      - 2273.0
+      - 2573.0
+      uncertainty:
+        note: ± 0.20 as printed; confidence level not stated
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r06_c08
+      type: alpha
+      locator:
+        page: 7
+        published_page: 1086
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5, data row 4, alpha column.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: No measurement temperature is printed for this coefficient row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: author_estimate
+        alpha: 0.5
+        alpha_as_printed: 0.50 ± 0.20
+        phase_as_printed: cr
+        table_caption: Table 5. Thermodynamic properties of oxides contained in the melts of Ca–Al–inclusions
+          and identified in the condensed and gas phases and evaporation coefficients of these oxides
+        note: The Table 5 T_melt column is a separate property and is not the measurement temperature for
+          this alpha value.
+        source_occurrences:
+        - as_printed: 0.50 ± 0.20
+          locator:
+            page: 1
+            published_page: 1080
+            pdf_page_index: 0
+            section: Abstract
+        - as_printed: 0.50 ± 0.20
+          locator:
+            page: 8
+            published_page: 1087
+            pdf_page_index: 7
+            section: Conclusions
+      uncertainty:
+        note: ± 0.20 as printed; confidence level not stated
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_mgo_liquid_alpha_author_estimate
+      type: alpha
+      locator:
+        page: 5
+        published_page: 1084
+        pdf_page_index: 4
+        section: Results and Discussion
+        note: The theory of vaporization provides sound grounds to believe that the vaporization coefficients
+          of CaO, MgO, and TiO2 for the liquid phase are also equal to one; the paper says this hypothesis
+          is validated by thermodynamic simulations and is consistent with cited experimental results.
+      phase: l
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            section: Results and Discussion
+            note: No measurement temperature is printed for this coefficient row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            section: Results and Discussion
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            section: Results and Discussion
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: author_estimate
+        alpha: 1.0
+        alpha_as_printed: '1'
+        quote_as_printed: The theory of vaporization provides sound grounds to believe that the vaporization
+          coefficients of CaO, MgO, and TiO2 for the liquid phase are also equal to one; the paper says
+          this hypothesis is validated by thermodynamic simulations and is consistent with cited experimental
+          results.
+        attribution: Shornikov (2015).
+        note: Theory-based liquid-state expectation; no numeric temperature or uncertainty is printed.
+    context:
+    - observation_id: shornikov_2015_cai_table5_thermochemical_cells_mgo
+      type: thermochemical_table_row
+      locator:
+        page: 7
+        published_page: 1086
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 thermochemical cells, data row 4; the alpha cell is stored as an alpha observation.
+      units: as printed per property column
+      values:
+        quantity: composite_thermochemical_table_row_without_single_observation_quantity
+        method_class: typed_refusal
+        admission_status: typed_refusal
+        schema_gap: Nine thermochemical property cells share a table row; this extract has no one observation
+          token that represents the complete multi-property row with per-cell attribution. The exact values
+          and headers are retained below.
+        cells_as_printed:
+        - property_as_printed: ΔHf, 298
+          header_as_printed: ΔHf, 298, kJ/g-at
+          value_as_printed: –300.8 ± 0.2
+        - property_as_printed: ΔSf, 298
+          header_as_printed: ΔSf, 298, J/(g-at K)
+          value_as_printed: 13.48 ± 0.10
+        - property_as_printed: Tmelt
+          header_as_printed: Tmelt, K
+          value_as_printed: 3100 ± 25
+        - property_as_printed: ΔHmelt
+          header_as_printed: ΔHmelt, kJ/g-a
+          value_as_printed: 38.5 ± 3.0
+        - property_as_printed: ΔSmelt
+          header_as_printed: ΔSmelt, J/(g-at K)
+          value_as_printed: 12.4 ± 1.0
+        - property_as_printed: ΔHsubl
+          header_as_printed: ΔHsubl, kJ/g-a
+          value_as_printed: 315 ± 8
+        - property_as_printed: ΔHf, 0
+          header_as_printed: ΔHf, 0, kJ/g-a
+          value_as_printed: 16 ± 8
+        - property_as_printed: ΔSf, 298 (gas)
+          header_as_printed: ΔSf, 298, J/(g-at K)
+          value_as_printed: 106.6 ± 0.5
+        - property_as_printed: ΔHat, 0
+          header_as_printed: ΔHat, 0, kJ/g-a
+          value_as_printed: 180 ± 8
+  Al2O3:
+    observations:
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r02_c04
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3. Experimental data on the vaporization coefficient of Al2O3; MinerU CSV row 2.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1873'
+              interval_high: '2300'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 0.35
+        alpha_as_printed: '0.35'
+        attribution: Hashimoto et al., 1989
+        source_reference_as_printed: Hashimoto et al., 1989
+        material_of_crucible_or_matrix_as_printed: C
+        gas_phase_component_as_printed: –
+        temperature_as_printed: 1873–2300
+        phase_basis: Results and Discussion identifies the 2318 K Burns value and the higher-temperature
+          Drowart and Hashimoto rows with liquid Al2O3 vaporization; lower rows are below the Table 5 melting
+          interval.
+        table_caption: Table 3. Experimental data on the vaporization coefficient of Al2O3
+        table_row: 1
+      T_range_K:
+      - 1873.0
+      - 2300.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r03_c04
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3. Experimental data on the vaporization coefficient of Al2O3; MinerU CSV row 3.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1873'
+              interval_high: '2063'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha_range:
+        - 0.01
+        - 0.1
+        alpha_as_printed: 0.10–0.01
+        alpha_range_endpoint_order_as_printed:
+        - 0.1
+        - 0.01
+        attribution: Takigawa et al., 2012
+        source_reference_as_printed: Takigawa et al., 2012
+        material_of_crucible_or_matrix_as_printed: Ir
+        gas_phase_component_as_printed: –
+        temperature_as_printed: 1873–2063
+        phase_basis: Results and Discussion identifies the 2318 K Burns value and the higher-temperature
+          Drowart and Hashimoto rows with liquid Al2O3 vaporization; lower rows are below the Table 5 melting
+          interval.
+        table_caption: Table 3. Experimental data on the vaporization coefficient of Al2O3
+        table_row: 2
+      T_range_K:
+      - 1873.0
+      - 2063.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r04_c04
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3. Experimental data on the vaporization coefficient of Al2O3; MinerU CSV row 4.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '2077'
+              interval_high: '2322'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha_range:
+        - 0.11
+        - 1.0
+        alpha_as_printed: 0.11–1.00
+        alpha_range_endpoint_order_as_printed:
+        - 0.11
+        - 1.0
+        attribution: Sata, 1983
+        source_reference_as_printed: Sata, 1983
+        material_of_crucible_or_matrix_as_printed: W
+        gas_phase_component_as_printed: –
+        temperature_as_printed: 2077–2322
+        phase_basis: Results and Discussion identifies the 2318 K Burns value and the higher-temperature
+          Drowart and Hashimoto rows with liquid Al2O3 vaporization; lower rows are below the Table 5 melting
+          interval.
+        table_caption: Table 3. Experimental data on the vaporization coefficient of Al2O3
+        table_row: 3
+      T_range_K:
+      - 2077.0
+      - 2322.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r05_c04
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3. Experimental data on the vaporization coefficient of Al2O3; MinerU CSV row 5.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '2128'
+              interval_high: '2318'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha_range:
+        - 0.28
+        - 0.3
+        alpha_as_printed: 0.28–0.30
+        alpha_range_endpoint_order_as_printed:
+        - 0.28
+        - 0.3
+        attribution: Burns et al., 1964; Burns, 1966
+        source_reference_as_printed: Burns et al., 1964; Burns, 1966
+        material_of_crucible_or_matrix_as_printed: $Al_2O_3$
+        gas_phase_component_as_printed: Al
+        temperature_as_printed: 2128–2318
+        phase_basis: Results and Discussion identifies the 2318 K Burns value and the higher-temperature
+          Drowart and Hashimoto rows with liquid Al2O3 vaporization; lower rows are below the Table 5 melting
+          interval.
+        table_caption: Table 3. Experimental data on the vaporization coefficient of Al2O3
+        table_row: 4
+      T_range_K:
+      - 2128.0
+      - 2318.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r06_c04
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3. Experimental data on the vaporization coefficient of Al2O3; MinerU CSV row 6.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '2128'
+              interval_high: '2318'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha_range:
+        - 0.2
+        - 0.29
+        alpha_as_printed: 0.20–0.29
+        alpha_range_endpoint_order_as_printed:
+        - 0.2
+        - 0.29
+        attribution: Burns et al., 1964; Burns, 1966
+        source_reference_as_printed: Burns et al., 1964; Burns, 1966
+        material_of_crucible_or_matrix_as_printed: $Al_2O_3$
+        gas_phase_component_as_printed: AlO
+        temperature_as_printed: 2128–2318
+        phase_basis: Results and Discussion identifies the 2318 K Burns value and the higher-temperature
+          Drowart and Hashimoto rows with liquid Al2O3 vaporization; lower rows are below the Table 5 melting
+          interval.
+        table_caption: Table 3. Experimental data on the vaporization coefficient of Al2O3
+        table_row: 5
+      T_range_K:
+      - 2128.0
+      - 2318.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r07_c04
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3. Experimental data on the vaporization coefficient of Al2O3; MinerU CSV row 7.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '2128'
+              interval_high: '2318'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha_range:
+        - 0.19
+        - 0.27
+        alpha_as_printed: 0.19–0.27
+        alpha_range_endpoint_order_as_printed:
+        - 0.19
+        - 0.27
+        attribution: Burns et al., 1964; Burns, 1966
+        source_reference_as_printed: Burns et al., 1964; Burns, 1966
+        material_of_crucible_or_matrix_as_printed: $Al_2O_3$
+        gas_phase_component_as_printed: $Al_2O$
+        temperature_as_printed: 2128–2318
+        phase_basis: Results and Discussion identifies the 2318 K Burns value and the higher-temperature
+          Drowart and Hashimoto rows with liquid Al2O3 vaporization; lower rows are below the Table 5 melting
+          interval.
+        table_caption: Table 3. Experimental data on the vaporization coefficient of Al2O3
+        table_row: 6
+      T_range_K:
+      - 2128.0
+      - 2318.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r08_c04
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3. Experimental data on the vaporization coefficient of Al2O3; MinerU CSV row 8.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '2128'
+              interval_high: '2318'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha_range:
+        - 0.26
+        - 0.28
+        alpha_as_printed: 0.26–0.28
+        alpha_range_endpoint_order_as_printed:
+        - 0.26
+        - 0.28
+        attribution: Burns et al., 1964; Burns, 1966
+        source_reference_as_printed: Burns et al., 1964; Burns, 1966
+        material_of_crucible_or_matrix_as_printed: $Al_2O_3$
+        gas_phase_component_as_printed: O
+        temperature_as_printed: 2128–2318
+        phase_basis: Results and Discussion identifies the 2318 K Burns value and the higher-temperature
+          Drowart and Hashimoto rows with liquid Al2O3 vaporization; lower rows are below the Table 5 melting
+          interval.
+        table_caption: Table 3. Experimental data on the vaporization coefficient of Al2O3
+        table_row: 7
+      T_range_K:
+      - 2128.0
+      - 2318.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r09_c04
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3. Experimental data on the vaporization coefficient of Al2O3; MinerU CSV row 9.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '2000'
+              interval_high: '2318'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 0.33
+        alpha_as_printed: '0.33'
+        attribution: Fu and Burns, 1976
+        source_reference_as_printed: Fu and Burns, 1976
+        material_of_crucible_or_matrix_as_printed: $Al_2O_3$
+        gas_phase_component_as_printed: Al, AlO,  $Al_2O$ , O
+        temperature_as_printed: 2000–2318
+        phase_basis: Results and Discussion identifies the 2318 K Burns value and the higher-temperature
+          Drowart and Hashimoto rows with liquid Al2O3 vaporization; lower rows are below the Table 5 melting
+          interval.
+        table_caption: Table 3. Experimental data on the vaporization coefficient of Al2O3
+        table_row: 8
+      T_range_K:
+      - 2000.0
+      - 2318.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r10_c04
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3. Experimental data on the vaporization coefficient of Al2O3; MinerU CSV row 10.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1800'
+              interval_high: '1900'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha_range:
+        - 0.24
+        - 0.49
+        alpha_as_printed: 0.24–0.49
+        alpha_range_endpoint_order_as_printed:
+        - 0.24
+        - 0.49
+        attribution: Peleg and Alcock, 1974
+        source_reference_as_printed: Peleg and Alcock, 1974
+        material_of_crucible_or_matrix_as_printed: $Al_2O_3$
+        gas_phase_component_as_printed: –
+        temperature_as_printed: 1800–1900
+        phase_basis: Results and Discussion identifies the 2318 K Burns value and the higher-temperature
+          Drowart and Hashimoto rows with liquid Al2O3 vaporization; lower rows are below the Table 5 melting
+          interval.
+        table_caption: Table 3. Experimental data on the vaporization coefficient of Al2O3
+        table_row: 9
+      T_range_K:
+      - 1800.0
+      - 1900.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r11_c04
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3. Experimental data on the vaporization coefficient of Al2O3; MinerU CSV row 11.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2000'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: Temperature point printed in the source text.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 0.14
+        alpha_as_printed: '0.14'
+        attribution: Kronert and Boehm, 1972
+        source_reference_as_printed: Kronert and Boehm, 1972
+        material_of_crucible_or_matrix_as_printed: W
+        gas_phase_component_as_printed: –
+        temperature_as_printed: '2000'
+        phase_basis: Results and Discussion identifies the 2318 K Burns value and the higher-temperature
+          Drowart and Hashimoto rows with liquid Al2O3 vaporization; lower rows are below the Table 5 melting
+          interval.
+        table_caption: Table 3. Experimental data on the vaporization coefficient of Al2O3
+        table_row: 10
+        T_K: 2000.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r12_c04
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3. Experimental data on the vaporization coefficient of Al2O3; MinerU CSV row 12.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '2000'
+              interval_high: '2310'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha_range:
+        - 0.067
+        - 0.18
+        alpha_as_printed: 0.067–0.18
+        alpha_range_endpoint_order_as_printed:
+        - 0.067
+        - 0.18
+        attribution: Wolff and Alcock, 1962
+        source_reference_as_printed: Wolff and Alcock, 1962
+        material_of_crucible_or_matrix_as_printed: W
+        gas_phase_component_as_printed: –
+        temperature_as_printed: 2000–2310
+        phase_basis: Results and Discussion identifies the 2318 K Burns value and the higher-temperature
+          Drowart and Hashimoto rows with liquid Al2O3 vaporization; lower rows are below the Table 5 melting
+          interval.
+        table_caption: Table 3. Experimental data on the vaporization coefficient of Al2O3
+        table_row: 11
+      T_range_K:
+      - 2000.0
+      - 2310.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r13_c04
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3. Experimental data on the vaporization coefficient of Al2O3; MinerU CSV row 13.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2290'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: Temperature point printed in the source text.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 0.18
+        alpha_as_printed: '0.18'
+        attribution: Alcock and Peleg, 1967
+        source_reference_as_printed: Alcock and Peleg, 1967
+        material_of_crucible_or_matrix_as_printed: W
+        gas_phase_component_as_printed: –
+        temperature_as_printed: '2290'
+        phase_basis: Results and Discussion identifies the 2318 K Burns value and the higher-temperature
+          Drowart and Hashimoto rows with liquid Al2O3 vaporization; lower rows are below the Table 5 melting
+          interval.
+        table_caption: Table 3. Experimental data on the vaporization coefficient of Al2O3
+        table_row: 12
+        T_K: 2290.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r14_c04
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3. Experimental data on the vaporization coefficient of Al2O3; MinerU CSV row 14.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2300'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: Temperature point printed in the source text.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 0.2
+        alpha_as_printed: '0.20'
+        attribution: Srivastava and Farber, 1981
+        source_reference_as_printed: Srivastava and Farber, 1981
+        material_of_crucible_or_matrix_as_printed: $Al_2O_3$
+        gas_phase_component_as_printed: Al, AlO, O
+        temperature_as_printed: '2300'
+        phase_basis: Results and Discussion identifies the 2318 K Burns value and the higher-temperature
+          Drowart and Hashimoto rows with liquid Al2O3 vaporization; lower rows are below the Table 5 melting
+          interval.
+        table_caption: Table 3. Experimental data on the vaporization coefficient of Al2O3
+        table_row: 13
+        T_K: 2300.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r15_c04
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3. Experimental data on the vaporization coefficient of Al2O3; MinerU CSV row 15.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2300'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: Temperature point printed in the source text.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 0.1
+        alpha_as_printed: '0.10'
+        attribution: Srivastava and Farber, 1981
+        source_reference_as_printed: Srivastava and Farber, 1981
+        material_of_crucible_or_matrix_as_printed: $Al_2O_3$
+        gas_phase_component_as_printed: $Al_2O$
+        temperature_as_printed: '2300'
+        phase_basis: Results and Discussion identifies the 2318 K Burns value and the higher-temperature
+          Drowart and Hashimoto rows with liquid Al2O3 vaporization; lower rows are below the Table 5 melting
+          interval.
+        table_caption: Table 3. Experimental data on the vaporization coefficient of Al2O3
+        table_row: 14
+        T_K: 2300.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r16_c04
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3. Experimental data on the vaporization coefficient of Al2O3; MinerU CSV row 16.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2300'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: Temperature point printed in the source text.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 0.02
+        alpha_as_printed: '0.02'
+        attribution: Srivastava and Farber, 1981
+        source_reference_as_printed: Srivastava and Farber, 1981
+        material_of_crucible_or_matrix_as_printed: $Al_2O_3$
+        gas_phase_component_as_printed: $Al_2O_2$
+        temperature_as_printed: '2300'
+        phase_basis: Results and Discussion identifies the 2318 K Burns value and the higher-temperature
+          Drowart and Hashimoto rows with liquid Al2O3 vaporization; lower rows are below the Table 5 melting
+          interval.
+        table_caption: Table 3. Experimental data on the vaporization coefficient of Al2O3
+        table_row: 15
+        T_K: 2300.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r17_c04
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3. Experimental data on the vaporization coefficient of Al2O3; MinerU CSV row 17.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2300'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: Temperature point printed in the source text.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 0.01
+        alpha_as_printed: '0.01'
+        attribution: Srivastava and Farber, 1981
+        source_reference_as_printed: Srivastava and Farber, 1981
+        material_of_crucible_or_matrix_as_printed: $Al_2O_3$
+        gas_phase_component_as_printed: $AlO_2$
+        temperature_as_printed: '2300'
+        phase_basis: Results and Discussion identifies the 2318 K Burns value and the higher-temperature
+          Drowart and Hashimoto rows with liquid Al2O3 vaporization; lower rows are below the Table 5 melting
+          interval.
+        table_caption: Table 3. Experimental data on the vaporization coefficient of Al2O3
+        table_row: 16
+        T_K: 2300.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r18_c04
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3. Experimental data on the vaporization coefficient of Al2O3; MinerU CSV row 18.
+      phase: l
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2318'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: Temperature point printed in the source text.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 1.0
+        alpha_as_printed: 1.0 ± 0.2
+        attribution: Burns et al., 1964; Burns, 1966
+        source_reference_as_printed: Burns et al., 1964; Burns, 1966
+        material_of_crucible_or_matrix_as_printed: $Al_2O_3$
+        gas_phase_component_as_printed: Al, AlO,  $Al_2O$ , O
+        temperature_as_printed: '2318'
+        phase_basis: Results and Discussion identifies the 2318 K Burns value and the higher-temperature
+          Drowart and Hashimoto rows with liquid Al2O3 vaporization; lower rows are below the Table 5 melting
+          interval.
+        table_caption: Table 3. Experimental data on the vaporization coefficient of Al2O3
+        table_row: 17
+        source_occurrences:
+        - as_printed: αvap (Al2O3, liq) = 1.0 ± 0.2
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            section: Results and Discussion
+        - as_printed: liquid-phase vaporization coefficients are equal to one
+          locator:
+            page: 1
+            published_page: 1080
+            pdf_page_index: 0
+            section: Abstract
+        T_K: 2318.0
+      uncertainty:
+        note: ± 0.2 as printed; confidence level not stated
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r19_c04
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3. Experimental data on the vaporization coefficient of Al2O3; MinerU CSV row 19.
+      phase: l
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '2327'
+              interval_high: '2594'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 1.0
+        alpha_as_printed: 1.0 ± 0.2
+        attribution: Drowart et al., 1960
+        source_reference_as_printed: Drowart et al., 1960
+        material_of_crucible_or_matrix_as_printed: W, Mo
+        gas_phase_component_as_printed: Al, AlO,  $Al_2O$ , O
+        temperature_as_printed: 2327–2594
+        phase_basis: Results and Discussion identifies the 2318 K Burns value and the higher-temperature
+          Drowart and Hashimoto rows with liquid Al2O3 vaporization; lower rows are below the Table 5 melting
+          interval.
+        table_caption: Table 3. Experimental data on the vaporization coefficient of Al2O3
+        table_row: 18
+      T_range_K:
+      - 2327.0
+      - 2594.0
+      uncertainty:
+        note: ± 0.2 as printed; confidence level not stated
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r20_c04
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        table: '3'
+        note: Table 3. Experimental data on the vaporization coefficient of Al2O3; MinerU CSV row 20.
+      phase: l
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '2330'
+              interval_high: '2500'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            table: '3'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 0.35
+        alpha_as_printed: '0.35'
+        attribution: Hashimoto et al., 1989
+        source_reference_as_printed: Hashimoto et al., 1989
+        material_of_crucible_or_matrix_as_printed: C
+        gas_phase_component_as_printed: –
+        temperature_as_printed: 2330–2500
+        phase_basis: Results and Discussion identifies the 2318 K Burns value and the higher-temperature
+          Drowart and Hashimoto rows with liquid Al2O3 vaporization; lower rows are below the Table 5 melting
+          interval.
+        table_caption: Table 3. Experimental data on the vaporization coefficient of Al2O3
+        table_row: 19
+      T_range_K:
+      - 2330.0
+      - 2500.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r05_c08
+      type: alpha
+      locator:
+        page: 7
+        published_page: 1086
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5, data row 3, alpha column.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: No measurement temperature is printed for this coefficient row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: author_estimate
+        alpha: 0.32
+        alpha_as_printed: 0.32 ± 0.02
+        phase_as_printed: cr
+        table_caption: Table 5. Thermodynamic properties of oxides contained in the melts of Ca–Al–inclusions
+          and identified in the condensed and gas phases and evaporation coefficients of these oxides
+        note: Table 5 prints 0.32 ± 0.02; the abstract and conclusion recommend 0.33 ± 0.02. Both are retained
+          without averaging.
+        semantics: competing_observation_do_not_average
+        competing_observation_id: shornikov_2015_cai_abstract_al2o3_cr_recommendation
+      uncertainty:
+        note: ± 0.02 as printed; confidence level not stated
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_abstract_al2o3_cr_recommendation
+      type: alpha
+      locator:
+        page: 1
+        published_page: 1080
+        pdf_page_index: 0
+        section: Abstract
+        note: αvap (Al2O3, cr) = 0.33 ± 0.02
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 1080
+            pdf_page_index: 0
+            section: Abstract
+            note: No measurement temperature is printed for this coefficient row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 1080
+            pdf_page_index: 0
+            section: Abstract
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 1080
+            pdf_page_index: 0
+            section: Abstract
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: author_estimate
+        alpha: 0.33
+        alpha_as_printed: 0.33 ± 0.02
+        quote_as_printed: αvap (Al2O3, cr) = 0.33 ± 0.02
+        attribution: Shornikov (2015).
+        note: The abstract and conclusion differ from the 0.32 ± 0.02 value in Table 5; the two printed
+          values are retained without averaging.
+        semantics: competing_observation_do_not_average
+        competing_observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r05_c08
+        source_occurrences:
+        - as_printed: 0.33 ± 0.02
+          locator:
+            page: 8
+            published_page: 1087
+            pdf_page_index: 7
+            section: Conclusions
+      uncertainty:
+        note: ± 0.02 as printed; confidence level not stated
+        confidence_level: not_stated
+    context:
+    - observation_id: shornikov_2015_cai_table5_thermochemical_cells_al2o3
+      type: thermochemical_table_row
+      locator:
+        page: 7
+        published_page: 1086
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 thermochemical cells, data row 3; the alpha cell is stored as an alpha observation.
+      units: as printed per property column
+      values:
+        quantity: composite_thermochemical_table_row_without_single_observation_quantity
+        method_class: typed_refusal
+        admission_status: typed_refusal
+        schema_gap: Nine thermochemical property cells share a table row; this extract has no one observation
+          token that represents the complete multi-property row with per-cell attribution. The exact values
+          and headers are retained below.
+        cells_as_printed:
+        - property_as_printed: ΔHf, 298
+          header_as_printed: ΔHf, 298, kJ/g-at
+          value_as_printed: –335.1 ± 0.3
+        - property_as_printed: ΔSf, 298
+          header_as_printed: ΔSf, 298, J/(g-at K)
+          value_as_printed: 10.18 ± 0.02
+        - property_as_printed: Tmelt
+          header_as_printed: Tmelt, K
+          value_as_printed: 2327 ± 4
+        - property_as_printed: ΔHmelt
+          header_as_printed: ΔHmelt, kJ/g-a
+          value_as_printed: 22.3 ± 0.6
+        - property_as_printed: ΔSmelt
+          header_as_printed: ΔSmelt, J/(g-at K)
+          value_as_printed: 9.6 ± 0.3
+        - property_as_printed: ΔHsubl
+          header_as_printed: ΔHsubl, kJ/g-a
+          value_as_printed: 223 ± 20
+        - property_as_printed: ΔHf, 0
+          header_as_printed: ΔHf, 0, kJ/g-a
+          value_as_printed: –109 ± 20
+        - property_as_printed: ΔSf, 298 (gas)
+          header_as_printed: ΔSf, 298, J/(g-at K)
+          value_as_printed: 62.7 ± 3.0
+        - property_as_printed: ΔHat, 0
+          header_as_printed: ΔHat, 0, kJ/g-a
+          value_as_printed: 388 ± 20
+    - observation_id: shornikov_2015_cai_figure2_alpha_vs_melting_entropy
+      type: figure_only
+      locator: &id001
+        page: 7
+        published_page: 1086
+        pdf_page_index: 6
+        figure: '2'
+        note: Figure 2; marker count and series layout checked on the 600-dpi page render.
+      units: dimensionless alpha; entropy axis as printed
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: figure_only
+        admission_status: context_only
+        species_as_printed: &id002
+        - SiO2
+        - SnO2
+        - CaO
+        - FeO
+        - BeO
+        - BaO
+        - MgO
+        - Ga2O3
+        - Al2O3
+        - In2O3
+        - TiO2
+        phase_as_printed: crystalline
+        temperature_as_printed: not plotted
+        axes_as_printed:
+          x: ΔSmelt(i), J/(g-at K)
+          y: αvap(i, cr.), logarithmic
+        caption_as_printed: Fig. 2. Dependence of the vaporization coefficients of some individual oxides
+          in the crystalline phases on the melting entropy values (Glushko et al., 1978–1982; Kazenas and
+          Tsvetkov, 1997).
+        series:
+        - label: oxide measurements
+          marker: star
+          marker_count: 11
+          species_markers:
+          - species: SiO2
+            marker_count: 1
+          - species: SnO2
+            marker_count: 1
+          - species: CaO
+            marker_count: 1
+          - species: FeO
+            marker_count: 1
+          - species: BeO
+            marker_count: 1
+          - species: BaO
+            marker_count: 1
+          - species: MgO
+            marker_count: 1
+          - species: Ga2O3
+            marker_count: 1
+          - species: Al2O3
+            marker_count: 1
+          - species: In2O3
+            marker_count: 1
+          - species: TiO2
+            marker_count: 1
+          attribution: Glushko et al., 1978–1982; Kazenas and Tsvetkov, 1997
+        - label: author-drawn trend curve
+          marker_count: 0
+          attribution: Shornikov (2015)
+        digitisation: deferred to a figure pass
+    - observation_id: shornikov_2015_cai_figure2_trend_curve
+      type: model_curve
+      locator: *id001
+      units: dimensionless alpha
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: figure_only
+        admission_status: context_only
+        species_as_printed: *id002
+        phase_as_printed: crystalline
+        note: Figure 2's continuous trend curve has no markers and is not digitised.
+  SiO2:
+    observations:
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r02_c04
+      type: alpha
+      locator:
+        page: 5
+        published_page: 1084
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4. Experimental data on the vaporization coefficient of SiO2; MinerU CSV row 2.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1692'
+              interval_high: '1739'
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha_range:
+        - 0.022
+        - 0.036
+        alpha_as_printed: (2.2–3.6) × 10⁻²
+        alpha_range_endpoint_order_as_printed:
+        - 0.022
+        - 0.036
+        attribution: Firsova and Nesmeyanov, 1960
+        source_reference_as_printed: Firsova and Nesmeyanov, 1960
+        material_of_crucible_or_matrix_as_printed: Mo, W, Ir, Pt-Rh
+        gas_phase_component_as_printed: SiO
+        temperature_as_printed: 1692–1739
+        phase_basis: The source identifies SiO2 melting at 1996 ± 5 K and describes the 2000–2100 K coefficient
+          as liquid; the 2173–2373 K row is above that transition.
+        table_caption: Table 4. Experimental data on the vaporization coefficient of SiO2
+        table_row: 1
+      T_range_K:
+      - 1692.0
+      - 1739.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r03_c04
+      type: alpha
+      locator:
+        page: 5
+        published_page: 1084
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4. Experimental data on the vaporization coefficient of SiO2; MinerU CSV row 3.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1700'
+              interval_high: '1950'
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 0.0223
+        alpha_as_printed: (2.23 ± 0.30) × 10⁻²
+        attribution: Shornikov et al., 1998, 1999
+        source_reference_as_printed: Shornikov et al., 1998, 1999
+        material_of_crucible_or_matrix_as_printed: Mo, W, Ir, Pt-Rh
+        gas_phase_component_as_printed: SiO
+        temperature_as_printed: 1700–1950
+        phase_basis: The source identifies SiO2 melting at 1996 ± 5 K and describes the 2000–2100 K coefficient
+          as liquid; the 2173–2373 K row is above that transition.
+        table_caption: Table 4. Experimental data on the vaporization coefficient of SiO2
+        table_row: 2
+      T_range_K:
+      - 1700.0
+      - 1950.0
+      uncertainty:
+        note: ± 0.30 as printed; confidence level not stated
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r04_c04
+      type: alpha
+      locator:
+        page: 5
+        published_page: 1084
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4. Experimental data on the vaporization coefficient of SiO2; MinerU CSV row 4.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1800'
+              interval_high: '1950'
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 0.022
+        alpha_as_printed: (2.2 ± 0.8) × 10⁻²
+        attribution: Nagai et al., 1973
+        source_reference_as_printed: Nagai et al., 1973
+        material_of_crucible_or_matrix_as_printed: Pt-Rh,  $ZrO_{2}$ -CaO
+        gas_phase_component_as_printed: SiO
+        temperature_as_printed: 1800–1950
+        phase_basis: The source identifies SiO2 melting at 1996 ± 5 K and describes the 2000–2100 K coefficient
+          as liquid; the 2173–2373 K row is above that transition.
+        table_caption: Table 4. Experimental data on the vaporization coefficient of SiO2
+        table_row: 3
+      T_range_K:
+      - 1800.0
+      - 1950.0
+      uncertainty:
+        note: ± 0.8 as printed; confidence level not stated
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r05_c04
+      type: alpha
+      locator:
+        page: 5
+        published_page: 1084
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4. Experimental data on the vaporization coefficient of SiO2; MinerU CSV row 5.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1833'
+              interval_high: '1958'
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha_range:
+        - 0.011
+        - 0.015
+        alpha_as_printed: (1.1–1.5) × 10⁻²
+        alpha_range_endpoint_order_as_printed:
+        - 0.011
+        - 0.015
+        attribution: Hashimoto, 1990
+        source_reference_as_printed: Hashimoto, 1990
+        material_of_crucible_or_matrix_as_printed: C
+        gas_phase_component_as_printed: –
+        temperature_as_printed: 1833–1958
+        phase_basis: The source identifies SiO2 melting at 1996 ± 5 K and describes the 2000–2100 K coefficient
+          as liquid; the 2173–2373 K row is above that transition.
+        table_caption: Table 4. Experimental data on the vaporization coefficient of SiO2
+        table_row: 4
+      T_range_K:
+      - 1833.0
+      - 1958.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r06_c04
+      type: alpha
+      locator:
+        page: 5
+        published_page: 1084
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4. Experimental data on the vaporization coefficient of SiO2; MinerU CSV row 6.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1850'
+              interval_high: '1950'
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 0.018
+        alpha_as_printed: (1.80 ± 0.41) × 10⁻²
+        attribution: Shornikov et al., 1998, 1999
+        source_reference_as_printed: Shornikov et al., 1998, 1999
+        material_of_crucible_or_matrix_as_printed: Mo
+        gas_phase_component_as_printed: $SiO_{2}$
+        temperature_as_printed: 1850–1950
+        phase_basis: The source identifies SiO2 melting at 1996 ± 5 K and describes the 2000–2100 K coefficient
+          as liquid; the 2173–2373 K row is above that transition.
+        table_caption: Table 4. Experimental data on the vaporization coefficient of SiO2
+        table_row: 5
+      T_range_K:
+      - 1850.0
+      - 1950.0
+      uncertainty:
+        note: ± 0.41 as printed; confidence level not stated
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r07_c04
+      type: alpha
+      locator:
+        page: 5
+        published_page: 1084
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4. Experimental data on the vaporization coefficient of SiO2; MinerU CSV row 7.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1850'
+              interval_high: '1950'
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 0.0162
+        alpha_as_printed: (1.62 ± 0.47) × 10⁻²
+        attribution: Shornikov et al., 1998, 1999
+        source_reference_as_printed: Shornikov et al., 1998, 1999
+        material_of_crucible_or_matrix_as_printed: Mo
+        gas_phase_component_as_printed: $Si_{2}O_{2}$
+        temperature_as_printed: 1850–1950
+        phase_basis: The source identifies SiO2 melting at 1996 ± 5 K and describes the 2000–2100 K coefficient
+          as liquid; the 2173–2373 K row is above that transition.
+        table_caption: Table 4. Experimental data on the vaporization coefficient of SiO2
+        table_row: 6
+      T_range_K:
+      - 1850.0
+      - 1950.0
+      uncertainty:
+        note: ± 0.47 as printed; confidence level not stated
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r08_c04
+      type: alpha
+      locator:
+        page: 5
+        published_page: 1084
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4. Experimental data on the vaporization coefficient of SiO2; MinerU CSV row 8.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1873'
+              interval_high: '1973'
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 0.02
+        alpha_as_printed: 2 × 10⁻²
+        attribution: Nagahara, 1993
+        source_reference_as_printed: Nagahara, 1993
+        material_of_crucible_or_matrix_as_printed: W
+        gas_phase_component_as_printed: –
+        temperature_as_printed: 1873–1973
+        phase_basis: The source identifies SiO2 melting at 1996 ± 5 K and describes the 2000–2100 K coefficient
+          as liquid; the 2173–2373 K row is above that transition.
+        table_caption: Table 4. Experimental data on the vaporization coefficient of SiO2
+        table_row: 7
+      T_range_K:
+      - 1873.0
+      - 1973.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r09_c04
+      type: alpha
+      locator:
+        page: 5
+        published_page: 1084
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4. Experimental data on the vaporization coefficient of SiO2; MinerU CSV row 9.
+      phase: l
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '2000'
+              interval_high: '2100'
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 1.0
+        alpha_as_printed: 1.00 ± 0.02
+        attribution: Shornikov et al., 1998, 1999
+        source_reference_as_printed: Shornikov et al., 1998, 1999
+        material_of_crucible_or_matrix_as_printed: Mo, W, Ir, Pt-Rh
+        gas_phase_component_as_printed: SiO,  $SiO_{2}$ ,  $Si_{2}O_{2}$
+        temperature_as_printed: 2000–2100
+        phase_basis: The source identifies SiO2 melting at 1996 ± 5 K and describes the 2000–2100 K coefficient
+          as liquid; the 2173–2373 K row is above that transition.
+        table_caption: Table 4. Experimental data on the vaporization coefficient of SiO2
+        table_row: 8
+        source_occurrences:
+        - as_printed: αvap (SiO2, liq) = 1.00 ± 0.02
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            section: Results and Discussion
+        - as_printed: liquid-phase vaporization coefficients are equal to one
+          locator:
+            page: 1
+            published_page: 1080
+            pdf_page_index: 0
+            section: Abstract
+      T_range_K:
+      - 2000.0
+      - 2100.0
+      uncertainty:
+        note: ± 0.02 as printed; confidence level not stated
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r10_c04
+      type: alpha
+      locator:
+        page: 5
+        published_page: 1084
+        pdf_page_index: 4
+        table: '4'
+        note: Table 4. Experimental data on the vaporization coefficient of SiO2; MinerU CSV row 10.
+      phase: l
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: interval
+              interval_low: '2173'
+              interval_high: '2373'
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: Temperature interval printed in this table row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            table: '4'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha_range:
+        - 0.038
+        - 0.048
+        alpha_as_printed: (3.8–4.8) × 10⁻²
+        alpha_range_endpoint_order_as_printed:
+        - 0.038
+        - 0.048
+        attribution: Hashimoto, 1990
+        source_reference_as_printed: Hashimoto, 1990
+        material_of_crucible_or_matrix_as_printed: C
+        gas_phase_component_as_printed: –
+        temperature_as_printed: 2173–2373
+        phase_basis: The source identifies SiO2 melting at 1996 ± 5 K and describes the 2000–2100 K coefficient
+          as liquid; the 2173–2373 K row is above that transition.
+        table_caption: Table 4. Experimental data on the vaporization coefficient of SiO2
+        table_row: 9
+      T_range_K:
+      - 2173.0
+      - 2373.0
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r03_c08
+      type: alpha
+      locator:
+        page: 7
+        published_page: 1086
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5, data row 1, alpha column.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: No measurement temperature is printed for this coefficient row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: author_estimate
+        alpha: 0.022
+        alpha_as_printed: 0.022 ± 0.003
+        phase_as_printed: cr
+        table_caption: Table 5. Thermodynamic properties of oxides contained in the melts of Ca–Al–inclusions
+          and identified in the condensed and gas phases and evaporation coefficients of these oxides
+        note: The Table 5 T_melt column is a separate property and is not the measurement temperature for
+          this alpha value.
+        source_occurrences:
+        - as_printed: (2.2 ± 0.3) × 10–2
+          locator:
+            page: 1
+            published_page: 1080
+            pdf_page_index: 0
+            section: Abstract
+        - as_printed: (2.2 ± 0.3) × 10–2
+          locator:
+            page: 8
+            published_page: 1087
+            pdf_page_index: 7
+            section: Conclusions
+      uncertainty:
+        note: ± 0.003 as printed; confidence level not stated
+        confidence_level: not_stated
+    context:
+    - observation_id: shornikov_2015_cai_table5_thermochemical_cells_sio2
+      type: thermochemical_table_row
+      locator:
+        page: 7
+        published_page: 1086
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 thermochemical cells, data row 1; the alpha cell is stored as an alpha observation.
+      units: as printed per property column
+      values:
+        quantity: composite_thermochemical_table_row_without_single_observation_quantity
+        method_class: typed_refusal
+        admission_status: typed_refusal
+        schema_gap: Nine thermochemical property cells share a table row; this extract has no one observation
+          token that represents the complete multi-property row with per-cell attribution. The exact values
+          and headers are retained below.
+        cells_as_printed:
+        - property_as_printed: ΔHf, 298
+          header_as_printed: ΔHf, 298, kJ/g-at
+          value_as_printed: –303.6 ± 0.3
+        - property_as_printed: ΔSf, 298
+          header_as_printed: ΔSf, 298, J/(g-at K)
+          value_as_printed: 13.82 ± 0.07
+        - property_as_printed: Tmelt
+          header_as_printed: Tmelt, K
+          value_as_printed: 1996 ± 5
+        - property_as_printed: ΔHmelt
+          header_as_printed: ΔHmelt, kJ/g-a
+          value_as_printed: 3.2 ± 0.2
+        - property_as_printed: ΔSmelt
+          header_as_printed: ΔSmelt, J/(g-at K)
+          value_as_printed: 1.6 ± 0.1
+        - property_as_printed: ΔHsubl
+          header_as_printed: ΔHsubl, kJ/g-a
+          value_as_printed: 195 ± 3
+        - property_as_printed: ΔHf, 0
+          header_as_printed: ΔHf, 0, kJ/g-a
+          value_as_printed: –107 ± 3
+        - property_as_printed: ΔSf, 298 (gas)
+          header_as_printed: ΔSf, 298, J/(g-at K)
+          value_as_printed: 76.2 ± 1.0
+        - property_as_printed: ΔHat, 0
+          header_as_printed: ΔHat, 0, kJ/g-a
+          value_as_printed: 420 ± 4
+    - observation_id: shornikov_2015_cai_figure1_partial_pressure_panels
+      type: figure_only
+      locator: &id003
+        page: 6
+        published_page: 1085
+        pdf_page_index: 5
+        figure: '1'
+        note: Figure 1, panels (a) and (b).
+      units: atm as printed on the vertical axes; plotted values deferred
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        admission_status: context_only
+        species_as_printed:
+        - SiO
+        - SiO2
+        phase_as_printed: gas over SiO2
+        temperature_as_printed:
+          panel_a: 2200–1600 K on top axis
+          panel_b: 2300–1800 K on top axis
+        axes_as_printed:
+          x: 10^4/T, K^-1
+          panel_a_y: log p(SiO) [atm]
+          panel_b_y: log p(SiO2) [atm]
+        caption_as_printed: Fig. 1. (1) Total vapor pressure over SiO2 estimated according to Langmuir (Hashimoto,
+          1990) at vaporization in vacuum from a graphite crucible and (2) partial pressures of vapors of
+          (a) SiO and (b) SiO2 over SiO2 determined by Knudsen effusion mass spectrometry (Shornikov et
+          al., 1998, 1999) at SiO2 vaporization from (2) Pt, (3) Ir, (4) W, and (5) Mo cells and (6) calculated
+          in this publication from thermochemical data (Glushko et al., 1978–1982) for chemically neutral
+          conditions.
+        panels:
+        - panel: a
+          species: SiO
+          series:
+          - label: 1 total vapor pressure; Langmuir, Hashimoto (1990), graphite crucible
+            marker: open circle
+            marker_count: 9
+            attribution: Hashimoto, 1990
+          - label: 2 partial pressure from Pt cell
+            marker_count: 0
+            attribution: Shornikov et al., 1998, 1999
+          - label: 3 partial pressure from Ir cell
+            marker_count: 0
+            attribution: Shornikov et al., 1998, 1999
+          - label: 4 partial pressure from W cell
+            marker_count: 0
+            attribution: Shornikov et al., 1998, 1999
+          - label: 5 partial pressure from Mo cell
+            marker_count: 0
+            attribution: Shornikov et al., 1998, 1999
+          - label: 6 thermochemical calculation for chemically neutral conditions
+            marker_count: 0
+            attribution: calculated in this publication from Glushko et al., 1978–1982
+        - panel: b
+          species: SiO2
+          series:
+          - label: 1 total vapor pressure; Langmuir, Hashimoto (1990), graphite crucible
+            marker: open circle
+            marker_count: 9
+            attribution: Hashimoto, 1990
+          - label: 2 partial pressure from Pt cell
+            marker_count: 0
+            attribution: Shornikov et al., 1998, 1999
+          - label: 3 partial pressure from Ir cell
+            marker_count: 0
+            attribution: Shornikov et al., 1998, 1999
+          - label: 4 partial pressure from W cell
+            marker_count: 0
+            attribution: Shornikov et al., 1998, 1999
+          - label: 5 partial pressure from Mo cell
+            marker_count: 0
+            attribution: Shornikov et al., 1998, 1999
+          - label: 6 thermochemical calculation for chemically neutral conditions
+            marker_count: 0
+            attribution: calculated in this publication from Glushko et al., 1978–1982
+        digitisation: deferred to a figure pass
+    - observation_id: shornikov_2015_cai_figure1_thermochemical_model_curves
+      type: model_curve
+      locator: *id003
+      units: atm as printed on the vertical axes
+      values:
+        quantity: partial_pressure
+        method_class: figure_only
+        admission_status: context_only
+        species_as_printed:
+        - SiO
+        - SiO2
+        note: Figure 1 series 6 is calculated in this paper from thermochemical data; no plotted values
+          are digitised.
+    - observation_id: shornikov_2015_cai_vaporization_coefficient_definition_and_scope
+      type: method
+      locator:
+        page: 1
+        published_page: 1080
+        pdf_page_index: 0
+        section: Introduction
+      units: as printed
+      values:
+        quantity: vaporization_coefficient_definition_and_source_scope
+        method_class: quoted_unattributed
+        definition_as_printed: The vaporization coefficient is the ratio of molecules condensing on a surface
+          to molecules incident on it.
+        scope_as_printed: The paper reviews experimental and theoretical evidence for coefficients of individual
+          oxides in the CaO–MgO–FeO–Al2O3–TiO2–SiO2 system relevant to Ca–Al inclusions.
+        general_review_range_as_printed: 10^-6 to 1.0
+        general_review_attribution_as_printed: Powell et al., 1967; Pound, 1972; Kazenas and Tsvetkov, 1997
+  TiO2:
+    observations:
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r04_c08
+      type: alpha
+      locator:
+        page: 7
+        published_page: 1086
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5, data row 2, alpha column.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: No measurement temperature is printed for this coefficient row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: author_estimate
+        alpha: 0.23
+        alpha_as_printed: 0.23 ± 0.02
+        phase_as_printed: cr
+        table_caption: Table 5. Thermodynamic properties of oxides contained in the melts of Ca–Al–inclusions
+          and identified in the condensed and gas phases and evaporation coefficients of these oxides
+        note: The Table 5 T_melt column is a separate property and is not the measurement temperature for
+          this alpha value.
+        source_occurrences:
+        - as_printed: 0.23 ± 0.02
+          locator:
+            page: 1
+            published_page: 1080
+            pdf_page_index: 0
+            section: Abstract
+        - as_printed: 0.23 ± 0.02
+          locator:
+            page: 8
+            published_page: 1087
+            pdf_page_index: 7
+            section: Conclusions
+      uncertainty:
+        note: ± 0.02 as printed; confidence level not stated
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_semenov_tio2_alpha_1920K
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        section: Results and Discussion
+        note: αvap (TiO2, cr) = 0.20 ± 0.04 at 1920 K
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1920'
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            section: Results and Discussion
+            note: Temperature point printed in the source text.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            section: Results and Discussion
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            section: Results and Discussion
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: quoted_attributed
+        alpha: 0.2
+        alpha_as_printed: 0.20 ± 0.04 at 1920 K
+        quote_as_printed: αvap (TiO2, cr) = 0.20 ± 0.04 at 1920 K
+        attribution: Semenov (1969)
+        note: The paper calls the later modified-cell value more accurate and recommends 0.23 ± 0.02; this
+          earlier estimate remains separate.
+        T_K: 1920.0
+      T_range_K:
+      - 1850.0
+      - 2540.0
+      uncertainty:
+        note: ± 0.04 as printed; confidence level not stated
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_tio2_liquid_alpha_author_estimate
+      type: alpha
+      locator:
+        page: 5
+        published_page: 1084
+        pdf_page_index: 4
+        section: Results and Discussion
+        note: The theory of vaporization provides sound grounds to believe that the vaporization coefficients
+          of CaO, MgO, and TiO2 for the liquid phase are also equal to one; the paper says this hypothesis
+          is validated by thermodynamic simulations and is consistent with cited experimental results.
+      phase: l
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            section: Results and Discussion
+            note: No measurement temperature is printed for this coefficient row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            section: Results and Discussion
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            section: Results and Discussion
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: author_estimate
+        alpha: 1.0
+        alpha_as_printed: '1'
+        quote_as_printed: The theory of vaporization provides sound grounds to believe that the vaporization
+          coefficients of CaO, MgO, and TiO2 for the liquid phase are also equal to one; the paper says
+          this hypothesis is validated by thermodynamic simulations and is consistent with cited experimental
+          results.
+        attribution: Shornikov (2015).
+        note: Theory-based liquid-state expectation; no numeric temperature or uncertainty is printed.
+    context:
+    - observation_id: shornikov_2015_cai_table5_thermochemical_cells_tio2
+      type: thermochemical_table_row
+      locator:
+        page: 7
+        published_page: 1086
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 thermochemical cells, data row 2; the alpha cell is stored as an alpha observation.
+      units: as printed per property column
+      values:
+        quantity: composite_thermochemical_table_row_without_single_observation_quantity
+        method_class: typed_refusal
+        admission_status: typed_refusal
+        schema_gap: Nine thermochemical property cells share a table row; this extract has no one observation
+          token that represents the complete multi-property row with per-cell attribution. The exact values
+          and headers are retained below.
+        cells_as_printed:
+        - property_as_printed: ΔHf, 298
+          header_as_printed: ΔHf, 298, kJ/g-at
+          value_as_printed: –314.7 ± 0.3
+        - property_as_printed: ΔSf, 298
+          header_as_printed: ΔSf, 298, J/(g-at K)
+          value_as_printed: 16.87 ± 0.10
+        - property_as_printed: Tmelt
+          header_as_printed: Tmelt, K
+          value_as_printed: 2185 ± 10
+        - property_as_printed: ΔHmelt
+          header_as_printed: ΔHmelt, kJ/g-a
+          value_as_printed: 22.7 ± 3.0
+        - property_as_printed: ΔSmelt
+          header_as_printed: ΔSmelt, J/(g-at K)
+          value_as_printed: 10.4 ± 1.2
+        - property_as_printed: ΔHsubl
+          header_as_printed: ΔHsubl, kJ/g-a
+          value_as_printed: 206 ± 7
+        - property_as_printed: ΔHf, 0
+          header_as_printed: ΔHf, 0, kJ/g-a
+          value_as_printed: –107 ± 7
+        - property_as_printed: ΔSf, 298 (gas)
+          header_as_printed: ΔSf, 298, J/(g-at K)
+          value_as_printed: 85.3 ± 1.0
+        - property_as_printed: ΔHat, 0
+          header_as_printed: ΔHat, 0, kJ/g-a
+          value_as_printed: 428 ± 7
+  FeO:
+    observations:
+    - observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r08_c08
+      type: alpha
+      locator:
+        page: 7
+        published_page: 1086
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5, data row 6, alpha column.
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: No measurement temperature is printed for this coefficient row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: author_estimate
+        alpha: 1.0
+        alpha_as_printed: 1.00 ± 0.30
+        phase_as_printed: cr
+        table_caption: Table 5. Thermodynamic properties of oxides contained in the melts of Ca–Al–inclusions
+          and identified in the condensed and gas phases and evaporation coefficients of these oxides
+        note: Table 5 prints 1.00 ± 0.30; the abstract and conclusion recommend 1.00 ± 0.20. Both are retained
+          without averaging.
+        semantics: competing_observation_do_not_average
+        competing_observation_id: shornikov_2015_cai_abstract_feo_cr_recommendation
+      uncertainty:
+        note: ± 0.30 as printed; confidence level not stated
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_abstract_feo_cr_recommendation
+      type: alpha
+      locator:
+        page: 1
+        published_page: 1080
+        pdf_page_index: 0
+        section: Abstract
+        note: αvap (FeO, cr) = 1.00 ± 0.20
+      phase: cr
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 1080
+            pdf_page_index: 0
+            section: Abstract
+            note: No measurement temperature is printed for this coefficient row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 1080
+            pdf_page_index: 0
+            section: Abstract
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 1
+            published_page: 1080
+            pdf_page_index: 0
+            section: Abstract
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: author_estimate
+        alpha: 1.0
+        alpha_as_printed: 1.00 ± 0.20
+        quote_as_printed: αvap (FeO, cr) = 1.00 ± 0.20
+        attribution: Shornikov (2015).
+        note: The abstract and conclusion differ from the 1.00 ± 0.30 value in Table 5; the two printed
+          values are retained without averaging.
+        semantics: competing_observation_do_not_average
+        competing_observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r08_c08
+        source_occurrences:
+        - as_printed: 1.00 ± 0.20
+          locator:
+            page: 8
+            published_page: 1087
+            pdf_page_index: 7
+            section: Conclusions
+      uncertainty:
+        note: ± 0.20 as printed; confidence level not stated
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_feo_liquid_alpha
+      type: alpha
+      locator:
+        page: 4
+        published_page: 1083
+        pdf_page_index: 3
+        section: Results and Discussion
+        note: αvap (FeO, liq) = 1.00 ± 0.10
+      phase: l
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            section: Results and Discussion
+            note: No measurement temperature is printed for this coefficient row.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            section: Results and Discussion
+            note: No numeric total pressure is printed for this coefficient row.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 4
+            published_page: 1083
+            pdf_page_index: 3
+            section: Results and Discussion
+            note: No numeric oxygen fugacity is printed for this coefficient row.
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: author_estimate
+        alpha: 1.0
+        alpha_as_printed: 1.00 ± 0.10
+        quote_as_printed: αvap (FeO, liq) = 1.00 ± 0.10
+        attribution: Darken and Gurry (1946); Drowart et al. (1968)
+        note: The paper derives this value from the consistency of the cited liquid-FeO partial-pressure
+          data.
+        source_occurrences:
+        - as_printed: liquid-phase vaporization coefficients are equal to one
+          locator:
+            page: 1
+            published_page: 1080
+            pdf_page_index: 0
+            section: Abstract
+        - as_printed: liquid-phase vaporization coefficients are equal to one
+          locator:
+            page: 8
+            published_page: 1087
+            pdf_page_index: 7
+            section: Conclusions
+      uncertainty:
+        note: ± 0.10 as printed; confidence level not stated
+        confidence_level: not_stated
+    context:
+    - observation_id: shornikov_2015_cai_table5_thermochemical_cells_feo
+      type: thermochemical_table_row
+      locator:
+        page: 7
+        published_page: 1086
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5 thermochemical cells, data row 6; the alpha cell is stored as an alpha observation.
+      units: as printed per property column
+      values:
+        quantity: composite_thermochemical_table_row_without_single_observation_quantity
+        method_class: typed_refusal
+        admission_status: typed_refusal
+        schema_gap: Nine thermochemical property cells share a table row; this extract has no one observation
+          token that represents the complete multi-property row with per-cell attribution. The exact values
+          and headers are retained below.
+        cells_as_printed:
+        - property_as_printed: ΔHf, 298
+          header_as_printed: ΔHf, 298, kJ/g-at
+          value_as_printed: –136.5 ± 2.0
+        - property_as_printed: ΔSf, 298
+          header_as_printed: ΔSf, 298, J/(g-at K)
+          value_as_printed: 30.40 ± 0.80
+        - property_as_printed: Tmelt
+          header_as_printed: Tmelt, K
+          value_as_printed: 1650 ± 5
+        - property_as_printed: ΔHmelt
+          header_as_printed: ΔHmelt, kJ/g-a
+          value_as_printed: 15.5 ± 1.0
+        - property_as_printed: ΔSmelt
+          header_as_printed: ΔSmelt, J/(g-at K)
+          value_as_printed: 9.4 ± 0.6
+        - property_as_printed: ΔHsubl
+          header_as_printed: ΔHsubl, kJ/g-a
+          value_as_printed: 265 ± 6
+        - property_as_printed: ΔHf, 0
+          header_as_printed: ΔHf, 0, kJ/g-a
+          value_as_printed: 128 ± 6
+        - property_as_printed: ΔSf, 298 (gas)
+          header_as_printed: ΔSf, 298, J/(g-at K)
+          value_as_printed: 118.0 ± 1.5
+        - property_as_printed: ΔHat, 0
+          header_as_printed: ΔHat, 0, kJ/g-a
+          value_as_printed: 201 ± 6
