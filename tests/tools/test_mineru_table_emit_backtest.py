@@ -124,6 +124,18 @@ def _locator_key(locator: dict) -> tuple[str, str] | None:
     return ("pdf_page", str(page)) if page is not None else None
 
 
+def _emitted_scalar(observation: dict) -> object:
+    values = observation.get("values") or {}
+    quantity = str(values.get("quantity") or "")
+    field = {
+        "activity": "activity",
+        "activity_coefficient": "gamma",
+        "ion_intensity": "value",
+        "partial_pressure": f"pressure_{observation.get('units') or ''}",
+    }.get(quantity, "value")
+    return values.get(field)
+
+
 def _extract_targets(
     mapping: dict, extract: dict
 ) -> dict[tuple[str, str, str, str], Counter[Decimal]]:
@@ -165,21 +177,234 @@ def _emitted_cells(document: dict) -> dict[tuple[str, str, str, str], Counter[De
         for observation in block.get("observations") or []:
             values = observation.get("values") or {}
             quantity = str(values.get("quantity") or "")
-            field = {
-                "activity": "activity",
-                "activity_coefficient": "gamma",
-            }.get(quantity, "value")
-            if quantity == "ion_intensity":
-                field = "value"
-            if quantity == "partial_pressure":
-                unit = str(observation.get("units") or "")
-                field = f"pressure_{unit}"
-            number = _decimal(values.get(field))
+            number = _decimal(_emitted_scalar(observation))
             if number is not None:
                 locator_key = _locator_key(observation.get("locator") or {})
                 if locator_key is not None:
                     emitted[(quantity, str(species), *locator_key)][number] += 1
     return emitted
+
+
+def _assert_exact_landed_values(expected: dict, emitted: dict) -> None:
+    missing = {
+        key: counts - emitted.get(key, Counter())
+        for key, counts in expected.items()
+        if counts - emitted.get(key, Counter())
+    }
+    extra = {
+        key: counts - expected.get(key, Counter())
+        for key, counts in emitted.items()
+        if counts - expected.get(key, Counter())
+    }
+    assert not missing and not extra, f"landed cell mismatch; missing={missing}; extra={extra}"
+
+
+def _table_matches_observation(table: dict, observation: dict) -> bool:
+    locator = observation.get("locator") or {}
+    if str(locator.get("table")) != str(table["table_index"]):
+        return False
+    if table.get("published_page") is not None:
+        return str(locator.get("published_page")) == str(table["published_page"])
+    return _locator_page(locator) == int(table["page"])
+
+
+def _assert_emitted_cells_bind_to_mapping(
+    mapping: dict, draft_dir: Path, document: dict
+) -> None:
+    index_path = draft.resolve_draft_index(draft_dir, mapping["source_id"])
+    index = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    headers = {
+        (int(table["pdf_page"]), int(table["source_table_number"])): {
+            int(column["column"]): str(column["header"])
+            for column in table["columns"]
+        }
+        for table in index["tables"]
+    }
+    specs: dict[tuple[int, int], list[dict]] = defaultdict(list)
+    for spec in mapping.get("tables") or []:
+        specs[(int(spec["page"]), int(spec["table_index"]))].append(spec)
+    for species, block in (document.get("species") or {}).items():
+        for observation in block.get("observations") or []:
+            match = re.search(
+                r"_p(?P<page>\d+)_t(?P<table>\d+)_r(?P<row>\d+)_c(?P<column>\d+)$",
+                str(observation.get("observation_id") or ""),
+            )
+            assert match, f"emitted cell has no mapped row/column identity: {observation}"
+            page, table_index, row, column = (
+                int(match.group(name)) for name in ("page", "table", "row", "column")
+            )
+            locator = observation.get("locator") or {}
+            values = observation.get("values") or {}
+            matching = [
+                (spec, item)
+                for spec in specs[(page, table_index)]
+                if spec.get("rows", "all") == "all"
+                or row in {int(selected) for selected in spec["rows"]}
+                for item in draft._measurement_columns(spec)
+                if int(
+                    item["column"]
+                    if item["kind"] == "fixed"
+                    else item["value_column"]
+                ) == column
+                and (
+                    (
+                        item["kind"] == "fixed"
+                        and str(item["species"]) == str(species)
+                    )
+                    or (
+                        item["kind"] == "pair"
+                        and draft.printed_formula(
+                            str(locator.get("row_label") or "")
+                        )
+                        == str(species)
+                    )
+                )
+            ]
+            assert matching, f"emitted cell is outside its mapping: {observation['observation_id']}"
+            assert locator.get("column_header", "") == headers[(page, table_index)].get(
+                column, ""
+            )
+            assert "row_label" in locator
+            assert any(
+                (
+                    item["kind"] == "pair"
+                    and draft.printed_formula(str(locator["row_label"])) == str(species)
+                )
+                or (
+                    item["kind"] == "fixed"
+                    and spec.get("temperature")
+                    and "column" in spec["temperature"]
+                    and locator["row_label"]
+                    == values.get(draft._TEMPERATURE_FIELDS[str(spec["temperature"]["unit"])])
+                )
+                or (
+                    item["kind"] == "fixed"
+                    and not (
+                        spec.get("temperature")
+                        and "column" in spec["temperature"]
+                    )
+                    and str(locator["row_label"]) == str(row)
+                )
+                for spec, item in matching
+            ), f"emitted cell has an unmapped row label: {observation['observation_id']}"
+
+
+def _assert_duplicate_columns_match_sources(
+    mapping: dict, extract: dict, document: dict
+) -> None:
+    emitted_by_column: dict[tuple[str, str, int, int, int], list[Decimal]] = defaultdict(list)
+    for species, block in (document.get("species") or {}).items():
+        for observation in block.get("observations") or []:
+            match = re.search(
+                r"_p(?P<page>\d+)_t(?P<table>\d+)_r(?P<row>\d+)_c(?P<column>\d+)$",
+                str(observation.get("observation_id") or ""),
+            )
+            if not match:
+                continue
+            quantity = str((observation.get("values") or {}).get("quantity") or "")
+            number = _decimal(_emitted_scalar(observation))
+            if number is not None:
+                emitted_by_column[
+                    (
+                        quantity,
+                        str(species),
+                        int(match.group("page")),
+                        int(match.group("table")),
+                        int(match.group("column")),
+                    )
+                ].append(number)
+
+    for table in mapping.get("tables") or []:
+        grouped: dict[tuple[str, str, str], list[int]] = defaultdict(list)
+        for measurement in table.get("values") or []:
+            quantity = str(measurement.get("quantity") or table["quantity"])
+            species = str(measurement["species"])
+            evidence = str(
+                measurement.get("evidence_class") or table.get("evidence_class") or ""
+            )
+            grouped[(quantity, species, evidence)].append(int(measurement["column"]))
+        for (quantity, species, evidence), columns in grouped.items():
+            if len(columns) < 2:
+                continue
+            source_observations = [
+                observation
+                for observation in (extract.get("species") or {}).get(species, {}).get(
+                    "observations", []
+                )
+                if str((observation.get("values") or {}).get("quantity") or "") == quantity
+                and _table_matches_observation(table, observation)
+                and str(
+                    (observation.get("values") or {}).get("evidence_class")
+                    or (observation.get("values") or {}).get("method_class")
+                    or ""
+                ) == evidence
+            ]
+            if len(source_observations) != len(columns):
+                # Some landed extracts keep a single point series with per-point
+                # column locators; there is no one-series-per-mapped-column pairing.
+                continue
+            for column, source_observation in zip(columns, source_observations):
+                expected_values = [
+                    number
+                    for value in _field_values(source_observation, quantity)
+                    if (number := _decimal(value)) is not None
+                ]
+                output_values = emitted_by_column.get(
+                    (quantity, species, int(table["page"]), int(table["table_index"]), column),
+                    [],
+                )
+                assert output_values == expected_values, (
+                    f"mapped column {column} row values differ for {species}: "
+                    f"expected {expected_values}, emitted {output_values}"
+                )
+
+
+def _assert_per_column_method_classes(mapping: dict, extract: dict, document: dict) -> None:
+    for table in mapping.get("tables") or []:
+        for measurement in table.get("values") or []:
+            if "evidence_class" not in measurement:
+                continue
+            quantity = str(measurement.get("quantity") or table["quantity"])
+            species = str(measurement["species"])
+            expected_class = str(measurement["evidence_class"])
+            source_observations = [
+                observation
+                for observation in (extract.get("species") or {}).get(species, {}).get(
+                    "observations", []
+                )
+                if str((observation.get("values") or {}).get("quantity") or "") == quantity
+                and _table_matches_observation(table, observation)
+            ]
+            assert any(
+                str((observation.get("values") or {}).get("method_class") or "")
+                == expected_class
+                for observation in source_observations
+            ), (
+                f"mapped method_class {expected_class} is absent from landed "
+                f"{species} observations on page {table['page']}"
+            )
+            emitted_count = 0
+            for emitted_species, block in (document.get("species") or {}).items():
+                if str(emitted_species) != species:
+                    continue
+                for observation in block.get("observations") or []:
+                    match = re.search(
+                        r"_p(?P<page>\d+)_t(?P<table>\d+)_r\d+_c(?P<column>\d+)$",
+                        str(observation.get("observation_id") or ""),
+                    )
+                    values = observation.get("values") or {}
+                    if (
+                        match
+                        and int(match.group("page")) == int(table["page"])
+                        and int(match.group("table")) == int(table["table_index"])
+                        and int(match.group("column")) == int(measurement["column"])
+                        and str(values.get("quantity") or "") == quantity
+                    ):
+                        emitted_count += 1
+                        assert str(values.get("method_class") or "") == expected_class
+            assert emitted_count, (
+                f"no emitted {species} cells for mapped column {measurement['column']}"
+            )
 
 
 @pytest.mark.parametrize(
@@ -212,14 +437,10 @@ def test_committed_emit_mappings_reproduce_landed_decimal_cells(
     expected = _extract_targets(mapping, extract)
     emitted = _emitted_cells(document)
     assert expected, f"no landed numeric cells found for mapped source {source_id}"
-
-    missing: dict[tuple[str, str, str, str], Counter[Decimal]] = {}
-    for key, counts in expected.items():
-        absent = counts - emitted.get(key, Counter())
-        if absent:
-            missing[key] = absent
-
-    assert not missing, f"landed cells absent from emit: {missing}"
+    _assert_exact_landed_values(expected, emitted)
+    _assert_emitted_cells_bind_to_mapping(mapping, draft_dir, document)
+    _assert_duplicate_columns_match_sources(mapping, extract, document)
+    _assert_per_column_method_classes(mapping, extract, document)
     for observation in (
         item
         for block in (document.get("species") or {}).values()
@@ -267,3 +488,61 @@ def test_wrong_printed_scale_direction_fails_landed_value_comparison(
         counts - emitted.get(key, Counter())
         for key, counts in expected.items()
     ), "the wrong direction unexpectedly reproduces landed values"
+
+
+def test_backtest_rejects_extra_cells_and_same_key_column_swaps(
+    tmp_path: Path,
+) -> None:
+    mapping_path = FIXTURES / "stolyarova-1995-cao-alumina-kems.mapping.yaml"
+    mapping = yaml.safe_load(mapping_path.read_text(encoding="utf-8"))
+    corpus_root, raw_root = _corpus_roots()
+    source_id = mapping["source_id"]
+    source = _source_dir(corpus_root, raw_root, source_id)
+    draft_dir = _convert_source(source, source_id, tmp_path, raw_root)
+    document = draft.emit_extract(
+        draft_dir, mapping_path, tmp_path / "stolyarova-1995.yaml"
+    )
+    extract = yaml.safe_load(
+        (EXTRACTS / f"{source_id}.yaml").read_text(encoding="utf-8")
+    )
+    expected = _extract_targets(mapping, extract)
+
+    extra_document = copy.deepcopy(document)
+    oxygen_observations = extra_document["species"]["O"]["observations"]
+    extra_cell = copy.deepcopy(
+        next(
+            observation
+            for observation in oxygen_observations
+            if observation["values"]["quantity"] == "partial_pressure"
+        )
+    )
+    extra_cell["values"]["pressure_atm"] = "0.123"
+    oxygen_observations.append(extra_cell)
+    with pytest.raises(AssertionError, match="extra="):
+        _assert_exact_landed_values(expected, _emitted_cells(extra_document))
+
+    swapped_document = copy.deepcopy(document)
+    by_column_and_row: dict[tuple[int, int], dict] = {}
+    for observation in swapped_document["species"]["O"]["observations"]:
+        match = re.search(
+            r"_p\d+_t\d+_r(?P<row>\d+)_c(?P<column>\d+)$",
+            observation["observation_id"],
+        )
+        if not match or observation["values"]["quantity"] != "partial_pressure":
+            continue
+        key = (int(match.group("column")), int(match.group("row")))
+        by_column_and_row[key] = observation
+    row = next(
+        row
+        for row in sorted({row for _, row in by_column_and_row})
+        if (5, row) in by_column_and_row and (6, row) in by_column_and_row
+    )
+    first = by_column_and_row[(5, row)]["values"]
+    second = by_column_and_row[(6, row)]["values"]
+    first["pressure_atm"], second["pressure_atm"] = (
+        second["pressure_atm"],
+        first["pressure_atm"],
+    )
+    assert _emitted_cells(swapped_document) == expected
+    with pytest.raises(AssertionError, match="mapped column"):
+        _assert_duplicate_columns_match_sources(mapping, extract, swapped_document)
