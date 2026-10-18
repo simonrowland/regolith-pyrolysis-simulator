@@ -423,10 +423,14 @@ def test_freeze_gate_cache_key_distinguishes_provider_inputs(
     oxides_before = water_sim.atom_ledger.project_account_mol(
         _CLEANED_MELT_ACCOUNT
     )
+    oxide_total_mol = sum(
+        float(oxides_before.get(species, 0.0))
+        for species in _FREEZE_GATE_COMPOSITION_SPECIES
+    )
     water_sim.atom_ledger.load_external_mol(
         _CLEANED_MELT_ACCOUNT,
-        {'H2O': 500.0},
-        source='b-839 cache key water variant',
+        {'H2O': oxide_total_mol * 0.004 / 100.0},
+        source='b-839 0.004 mol water per 100 mol oxides',
         material_origin='feedstock',
     )
     oxides_after = water_sim.atom_ledger.project_account_mol(

@@ -393,6 +393,17 @@ _FREEZE_GATE_EPSILON = 1.0e-12
 # fraction by 0.00105. A 0.0001 quantum leaves more than ten bins across that
 # physical delta while remaining well above floating-point composition jitter.
 _FREEZE_GATE_FRACTION_QUANTUM = 0.0001
+# MAGEMin on the same cleaned lunar-mare melt projected to the ig basis gave
+# dry solidus/liquidus 918.75/1370.3125 C. At 0.004 mol H2O per 100 mol oxides
+# (water fraction 3.99984e-5), its partial out_of_domain curve changed by up
+# to 0.022144 in the shared 400-1050 C samples; at 900 C it was 0.005215 vs
+# 0 dry. At 0.1/100 (fraction 9.99001e-4), the valid curve gave
+# 770.3125/1370.3125 C and max |delta fraction|=0.096407. Using a 1e-4
+# liquid-fraction comparison tolerance, the low-water result implies
+# q <= 1e-4 * 3.99984e-5 / 0.022144 = 1.8e-7; q=1e-7 estimates a fraction
+# change of 5.6e-5. Scaling the 0.1/100 solidus response to q gives 0.015 C,
+# below MAGEMin's 2 C search tolerance.
+_FREEZE_GATE_WATER_FRACTION_QUANTUM = 1e-7
 _FREEZE_GATE_PRESSURE_BAR_QUANTUM = 0.01
 _FREEZE_GATE_FO2_LOG_QUANTUM = 1.0
 _FREEZE_GATE_FO2_LOG_BOUND = 30.0
@@ -2514,8 +2525,8 @@ class EvaporationMixin:
             else 0.0
         )
         water_bucket = (
-            round(water_fraction / _FREEZE_GATE_FRACTION_QUANTUM)
-            * _FREEZE_GATE_FRACTION_QUANTUM
+            round(water_fraction / _FREEZE_GATE_WATER_FRACTION_QUANTUM)
+            * _FREEZE_GATE_WATER_FRACTION_QUANTUM
         )
         inert_components = (
             getattr(self.inventory, 'inert_melt_components_kg', {}) or {}
@@ -2555,7 +2566,7 @@ class EvaporationMixin:
             pressure_bar=round(pressure_bucket, 6),
             fO2_log=round(fO2_bucket, 6),
             composition_mol_fractions=tuple(sorted(composition_key)),
-            water_mol_fraction=round(water_bucket, 6),
+            water_mol_fraction=round(water_bucket, 7),
             formula_registry_digest=_digest(
                 getattr(self, 'species_formula_registry', {}) or {}
             ),
