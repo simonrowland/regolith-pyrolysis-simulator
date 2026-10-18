@@ -10,13 +10,12 @@ extraction:
   method: 'Corpus PDF is a 2009 Acrobat Paper Capture scan of the LPI/ADS LPSC XV abstract (2 letter pages,
     published pp. 945–946). pdftotext -layout and MinerU are noisy OCR layers and were not used as data.
     Printed partial-pressure sentences and the Po2 table transcribed from a 400 dpi pdftoppm PNG. Figs
-    1–2 listed figure-only and were not digitised. Authors'' measured KEMS partial pressures (torr as
+    1–2 were digitised for SiO, Mg, Ca, and Al from a 600 dpi pdftoppm render; paired pixel reads and axis fits are in the companion figure audit CSV. Other plotted species remain figure-only. Authors'' measured KEMS partial pressures (torr as
     printed) are kept distinct from the Po2 table, which the authors calculate from AlO=Al+O and O2=2O.
     Temperatures converted from printed C to K use T_K = T_C + 273.15. The printed range sentence says
     ''Maximum P_FeO=10^-2 tor'' over 1450–1725 C, while the adjacent sentence gives a top iron-oxide
     pressure P_FeO=8.1×10^-5 tor at 1650 C; this conflict is preserved. The range row remains assigned
-    to Fe(g) under the existing correction based on Fig. 1 labels; Figs. 1–2 remain figure-only and are
-    not digitised. Authors'' measured KEMS pressures remain distinct from the model-derived Po2 table.
+    to Fe(g) under the existing correction based on Fig. 1 labels; The existing figure index rows remain figure-only; SiO, Mg, Ca, and Al marker series are stored in separate species-owned digitized observations. Authors'' measured KEMS pressures remain distinct from the model-derived Po2 table.
     Typewriter I for 1 in that table (I.4×10^-6) is read as 1.4.'
   date: '2026-09-12'
   worker: extract-kems-026
@@ -402,6 +401,7 @@ species:
         status: typed_refusal
         reason: Maximum over a temperature range is not a single-temperature point pressure.
         semantics: bound_not_point_ordering
+        p_torr: 1.0e-2
         T_C_range:
         - 1450.0
         - 1725.0
@@ -472,6 +472,7 @@ species:
         status: typed_refusal
         reason: Maximum over a temperature range is not a single-temperature point pressure.
         semantics: bound_not_point_ordering
+        p_torr: 2.0e-2
         T_C_range:
         - 1750.0
         - 1825.0
@@ -559,6 +560,89 @@ species:
         - 2200
       uncertainty:
         note: Figure-only; curve not digitised.
+    - observation_id: yakovlev_1984_fig1_Murchison_SiO_digitized
+      type: psat_series
+      locator:
+        figure: '1'
+        published_page: 946
+        pdf_page_index: 2
+        note: Partial pressures in vapor released from heated Murchison sample.
+      T_range_K:
+      - 1838.15
+      - 2113.15
+      phase: Murchison_CM_chondrite_melt_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison chondrite in a Knudsen effusion cell.
+      standard_state: partial pressure of SiO over Murchison; plotted as lg10 P(torr) versus T(C)
+      regime: kems_effusion
+      units: torr
+      values:
+        quantity: partial_pressure
+        gas_species: SiO(g)
+        method_class: figure_only
+        admission_status: admitted
+        axis: lg10_P_torr vs T_C
+        points:
+        - {point_id: F1-SiO-01, marker_symbol: 'open circle', T_C: 1565, P: 1.3e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-SiO-01; log10(p_torr)=-2.88235; pixel reads=(998,659)/(999,658); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-SiO-02, marker_symbol: 'open circle', T_C: 1605, P: 2.9e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-SiO-02; log10(p_torr)=-2.54622; pixel reads=(1054,558)/(1053,559); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-SiO-03, marker_symbol: 'open circle', T_C: 1640, P: 3.8e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-SiO-03; log10(p_torr)=-2.41513; pixel reads=(1100,520)/(1101,519); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-SiO-04, marker_symbol: 'open circle', T_C: 1670, P: 6.4e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-SiO-04; log10(p_torr)=-2.19328; pixel reads=(1145,453)/(1144,454); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-SiO-05, marker_symbol: 'open circle', T_C: 1690, P: 7.8e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-SiO-05; log10(p_torr)=-2.10588; pixel reads=(1172,428)/(1173,427); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-SiO-06, marker_symbol: 'open circle', T_C: 1705, P: 9.9e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-SiO-06; log10(p_torr)=-2.00504; pixel reads=(1199,397)/(1198,398); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-SiO-07, marker_symbol: 'open circle', T_C: 1755, P: 1.3e-02, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-SiO-07; log10(p_torr)=-1.87731; pixel reads=(1270,360)/(1271,359); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-SiO-08, marker_symbol: 'open circle', T_C: 1805, P: 1.6e-02, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-SiO-08; log10(p_torr)=-1.79664; pixel reads=(1340,335)/(1339,336); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-SiO-09, marker_symbol: 'open circle', T_C: 1840, P: 1.9e-02, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-SiO-09; log10(p_torr)=-1.70924; pixel reads=(1394,310)/(1395,309); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+      uncertainty:
+        note: No numeric uncertainty printed; marker pressures read to two significant figures. Paired pixel reads and axis fits are in the companion figure audit CSV.
+    - observation_id: yakovlev_1984_fig2_CAI_SiO_digitized
+      type: psat_series
+      locator:
+        figure: '2'
+        published_page: 946
+        pdf_page_index: 2
+        note: Partial pressures in vapor released from heated Efremovka CAI inclusions.
+      T_range_K:
+      - 1878.15
+      - 2553.15
+      phase: Efremovka_CAI_type_A_and_B_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Efremovka CAI inclusions types A and B in a Knudsen effusion cell.
+      standard_state: partial pressure of SiO over CAI; plotted as lg10 P(torr) versus T(C)
+      regime: kems_effusion
+      units: torr
+      values:
+        quantity: partial_pressure
+        gas_species: SiO(g)
+        method_class: figure_only
+        admission_status: admitted
+        axis: lg10_P_torr vs T_C
+        points:
+        - {point_id: F2-SiO-01, marker_symbol: 'open circle', T_C: 1605, P: 4.3e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-SiO-01; log10(p_torr)=-3.36900; pixel reads=(186,699)/(187,698); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-SiO-02, marker_symbol: 'open circle', T_C: 1630, P: 5.3e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-SiO-02; log10(p_torr)=-3.27687; pixel reads=(230,666)/(229,667); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-SiO-03, marker_symbol: 'open circle', T_C: 1655, P: 6.7e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-SiO-03; log10(p_torr)=-3.17322; pixel reads=(280,631)/(281,630); read uncertainty ±0.00143 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-SiO-04, marker_symbol: 'open circle', T_C: 1690, P: 9.0e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-SiO-04; log10(p_torr)=-3.04655; pixel reads=(342,586)/(341,587); read uncertainty ±0.00143 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-SiO-05, marker_symbol: 'open circle', T_C: 1740, P: 1.5e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-SiO-05; log10(p_torr)=-2.82773; pixel reads=(429,511)/(430,510); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-SiO-06, marker_symbol: 'open circle', T_C: 1785, P: 2.1e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-SiO-06; log10(p_torr)=-2.68378; pixel reads=(511,460)/(510,461); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-SiO-07, marker_symbol: 'open circle', T_C: 1805, P: 3.0e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-SiO-07; log10(p_torr)=-2.51967; pixel reads=(552,404)/(553,403); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-SiO-08, marker_symbol: 'open circle', T_C: 1830, P: 4.4e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-SiO-08; log10(p_torr)=-2.35844; pixel reads=(596,347)/(595,348); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-SiO-09, marker_symbol: 'open circle', T_C: 1875, P: 6.3e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-SiO-09; log10(p_torr)=-2.19722; pixel reads=(678,292)/(679,291); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-SiO-10, marker_symbol: 'open circle', T_C: 1920, P: 3.1e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-SiO-10; log10(p_torr)=-2.51104; pixel reads=(760,400)/(759,401); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-SiO-11, marker_symbol: 'open circle', T_C: 1950, P: 1.9e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-SiO-11; log10(p_torr)=-2.71545; pixel reads=(812,472)/(813,471); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-SiO-12, marker_symbol: 'open circle', T_C: 2015, P: 1.2e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-SiO-12; log10(p_torr)=-2.91987; pixel reads=(926,542)/(925,543); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-SiO-13, marker_symbol: 'open circle', T_C: 2070, P: 1.2e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-SiO-13; log10(p_torr)=-2.91123; pixel reads=(1030,540)/(1031,539); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-SiO-14, marker_symbol: 'open circle', T_C: 2115, P: 1.2e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-SiO-14; log10(p_torr)=-2.92850; pixel reads=(1105,545)/(1104,546); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-SiO-15, marker_symbol: 'open circle', T_C: 2175, P: 1.1e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-SiO-15; log10(p_torr)=-2.96593; pixel reads=(1214,559)/(1215,558); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-SiO-16, marker_symbol: 'open circle', T_C: 2200, P: 9.3e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-SiO-16; log10(p_torr)=-3.03503; pixel reads=(1262,582)/(1261,583); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-SiO-17, marker_symbol: 'open circle', T_C: 2255, P: 7.2e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-SiO-17; log10(p_torr)=-3.13868; pixel reads=(1357,619)/(1358,618); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-SiO-18, marker_symbol: 'open circle', T_C: 2280, P: 5.4e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-SiO-18; log10(p_torr)=-3.26536; pixel reads=(1404,662)/(1403,663); read uncertainty ±0.00143 dex; see companion figure audit CSV'}}}}
+      uncertainty:
+        note: No numeric uncertainty printed; marker pressures read to two significant figures. Paired pixel reads and axis fits are in the companion figure audit CSV.
   Mg:
     observations:
     - observation_id: yakovlev_1984_murchison_Mg_max_1750_1825C
@@ -589,6 +673,7 @@ species:
         status: typed_refusal
         reason: Maximum over a temperature range is not a single-temperature point pressure.
         semantics: bound_not_point_ordering
+        p_torr: 8.3e-3
         T_C_range:
         - 1750.0
         - 1825.0
@@ -596,6 +681,82 @@ species:
         T_K_conversion: T_K = T_C + 273.15
       uncertainty:
         note: The prose gives a range maximum, not a point; it is retained categorically and rejected from point-pressure scoring.
+    - observation_id: yakovlev_1984_fig1_Murchison_Mg_digitized
+      type: psat_series
+      locator:
+        figure: '1'
+        published_page: 946
+        pdf_page_index: 2
+        note: Partial pressures in vapor released from heated Murchison sample.
+      T_range_K:
+      - 1693.15
+      - 2153.15
+      phase: Murchison_CM_chondrite_melt_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison chondrite in a Knudsen effusion cell.
+      standard_state: partial pressure of Mg over Murchison; plotted as lg10 P(torr) versus T(C)
+      regime: kems_effusion
+      units: torr
+      values:
+        quantity: partial_pressure
+        gas_species: Mg(g)
+        method_class: figure_only
+        admission_status: admitted
+        axis: lg10_P_torr vs T_C
+        points:
+        - {point_id: F1-Mg-01, marker_symbol: 'open square', T_C: 1420, P: 2.9e-05, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Mg-01; log10(p_torr)=-4.54286; pixel reads=(787,1153)/(788,1152); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-Mg-02, marker_symbol: 'open square', T_C: 1465, P: 2.9e-05, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Mg-02; log10(p_torr)=-4.53613; pixel reads=(850,1150)/(849,1151); read uncertainty ±0.00169 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-Mg-03, marker_symbol: 'open square', T_C: 1505, P: 3.0e-05, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Mg-03; log10(p_torr)=-4.51597; pixel reads=(905,1145)/(906,1144); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-Mg-04, marker_symbol: 'open square', T_C: 1535, P: 8.6e-05, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Mg-04; log10(p_torr)=-4.06555; pixel reads=(949,1010)/(948,1011); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-Mg-05, marker_symbol: 'open square', T_C: 1590, P: 1.0e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Mg-05; log10(p_torr)=-3.99832; pixel reads=(1033,991)/(1034,990); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-Mg-06, marker_symbol: 'open square', T_C: 1635, P: 2.5e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Mg-06; log10(p_torr)=-3.60840; pixel reads=(1095,874)/(1094,875); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-Mg-07, marker_symbol: 'open square', T_C: 1670, P: 3.0e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Mg-07; log10(p_torr)=-3.52437; pixel reads=(1145,850)/(1146,849); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-Mg-08, marker_symbol: 'open square', T_C: 1695, P: 8.0e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Mg-08; log10(p_torr)=-3.10084; pixel reads=(1185,723)/(1184,724); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-Mg-09, marker_symbol: 'open square', T_C: 1740, P: 1.2e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Mg-09; log10(p_torr)=-2.91261; pixel reads=(1244,668)/(1245,667); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-Mg-10, marker_symbol: 'open square', T_C: 1760, P: 2.2e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Mg-10; log10(p_torr)=-2.65042; pixel reads=(1276,589)/(1275,590); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-Mg-11, marker_symbol: 'open square', T_C: 1780, P: 4.6e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Mg-11; log10(p_torr)=-2.33445; pixel reads=(1305,496)/(1306,495); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-Mg-12, marker_symbol: 'open square', T_C: 1880, P: 3.7e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Mg-12; log10(p_torr)=-2.43193; pixel reads=(1448,524)/(1447,525); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+      uncertainty:
+        note: No numeric uncertainty printed; marker pressures read to two significant figures. Paired pixel reads and axis fits are in the companion figure audit CSV.
+    - observation_id: yakovlev_1984_fig2_CAI_Mg_digitized
+      type: psat_series
+      locator:
+        figure: '2'
+        published_page: 946
+        pdf_page_index: 2
+        note: Partial pressures in vapor released from heated Efremovka CAI inclusions.
+      T_range_K:
+      - 1873.15
+      - 2153.15
+      phase: Efremovka_CAI_type_A_and_B_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Efremovka CAI inclusions types A and B in a Knudsen effusion cell.
+      standard_state: partial pressure of Mg over CAI; plotted as lg10 P(torr) versus T(C)
+      regime: kems_effusion
+      units: torr
+      values:
+        quantity: partial_pressure
+        gas_species: Mg(g)
+        method_class: figure_only
+        admission_status: admitted
+        axis: lg10_P_torr vs T_C
+        points:
+        - {point_id: F2-Mg-01, marker_symbol: 'open square', T_C: 1600, P: 1.1e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Mg-01; log10(p_torr)=-3.97649; pixel reads=(184,910)/(185,909); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Mg-02, marker_symbol: 'open square', T_C: 1650, P: 1.9e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Mg-02; log10(p_torr)=-3.72025; pixel reads=(274,820)/(273,821); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Mg-03, marker_symbol: 'open square', T_C: 1690, P: 2.2e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Mg-03; log10(p_torr)=-3.64827; pixel reads=(342,796)/(343,795); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Mg-04, marker_symbol: 'open square', T_C: 1740, P: 3.1e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Mg-04; log10(p_torr)=-3.51296; pixel reads=(430,748)/(429,749); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Mg-05, marker_symbol: 'open square', T_C: 1785, P: 3.1e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Mg-05; log10(p_torr)=-3.50432; pixel reads=(513,746)/(514,745); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Mg-06, marker_symbol: 'open square', T_C: 1805, P: 4.0e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Mg-06; log10(p_torr)=-3.39779; pixel reads=(545,708)/(544,709); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Mg-07, marker_symbol: 'open square', T_C: 1835, P: 6.1e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Mg-07; log10(p_torr)=-3.21353; pixel reads=(600,645)/(601,644); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Mg-08, marker_symbol: 'open square', T_C: 1880, P: 3.1e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Mg-08; log10(p_torr)=-3.50432; pixel reads=(680,745)/(679,746); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+      uncertainty:
+        note: No numeric uncertainty printed; marker pressures read to two significant figures. Paired pixel reads and axis fits are in the companion figure audit CSV.
   Ca:
     observations:
     - observation_id: yakovlev_1984_murchison_Ca_1825C
@@ -657,6 +818,7 @@ species:
         status: typed_refusal
         reason: Maximum over a temperature range is not a single-temperature point pressure.
         semantics: bound_not_point_ordering
+        p_torr: 4.4e-4
         T_C_range:
         - 1950.0
         - 2025.0
@@ -664,6 +826,80 @@ species:
         P_TiO_gt_P_TiO2: true
       uncertainty:
         note: The prose gives a range maximum, not a point; it is retained categorically and rejected from point-pressure scoring.
+    - observation_id: yakovlev_1984_fig1_Murchison_Ca_digitized
+      type: psat_series
+      locator:
+        figure: '1'
+        published_page: 946
+        pdf_page_index: 2
+        note: Partial pressures in vapor released from heated Murchison sample.
+      T_range_K:
+      - 2163.15
+      - 2423.15
+      phase: Murchison_CM_chondrite_melt_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison chondrite in a Knudsen effusion cell.
+      standard_state: partial pressure of Ca over Murchison; plotted as lg10 P(torr) versus T(C)
+      regime: kems_effusion
+      units: torr
+      values:
+        quantity: partial_pressure
+        gas_species: Ca(g)
+        method_class: figure_only
+        admission_status: admitted
+        axis: lg10_P_torr vs T_C
+        points:
+        - {point_id: F1-Ca-01, marker_symbol: 'filled square', T_C: 1890, P: 2.5e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Ca-01; log10(p_torr)=-3.60840; pixel reads=(1460,875)/(1461,874); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-Ca-02, marker_symbol: 'filled square', T_C: 1950, P: 3.5e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Ca-02; log10(p_torr)=-3.46050; pixel reads=(1550,830)/(1549,831); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-Ca-03, marker_symbol: 'filled square', T_C: 1985, P: 4.2e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Ca-03; log10(p_torr)=-3.37311; pixel reads=(1600,805)/(1601,804); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-Ca-04, marker_symbol: 'filled square', T_C: 2025, P: 4.2e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Ca-04; log10(p_torr)=-3.37647; pixel reads=(1660,805)/(1659,806); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-Ca-05, marker_symbol: 'filled square', T_C: 2060, P: 3.8e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Ca-05; log10(p_torr)=-3.42353; pixel reads=(1710,820)/(1711,819); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-Ca-06, marker_symbol: 'filled square', T_C: 2105, P: 3.0e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Ca-06; log10(p_torr)=-3.52773; pixel reads=(1770,850)/(1769,851); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-Ca-07, marker_symbol: 'filled square', T_C: 2150, P: 2.4e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Ca-07; log10(p_torr)=-3.62521; pixel reads=(1840,880)/(1841,879); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+      uncertainty:
+        note: No numeric uncertainty printed; marker pressures read to two significant figures. Paired pixel reads and axis fits are in the companion figure audit CSV.
+    - observation_id: yakovlev_1984_fig2_CAI_Ca_digitized
+      type: psat_series
+      locator:
+        figure: '2'
+        published_page: 946
+        pdf_page_index: 2
+        note: Partial pressures in vapor released from heated Efremovka CAI inclusions.
+      T_range_K:
+      - 2163.15
+      - 2603.15
+      phase: Efremovka_CAI_type_A_and_B_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Efremovka CAI inclusions types A and B in a Knudsen effusion cell.
+      standard_state: partial pressure of Ca over CAI; plotted as lg10 P(torr) versus T(C)
+      regime: kems_effusion
+      units: torr
+      values:
+        quantity: partial_pressure
+        gas_species: Ca(g)
+        method_class: figure_only
+        admission_status: admitted
+        axis: lg10_P_torr vs T_C
+        points:
+        - {point_id: F2-Ca-01, marker_symbol: 'filled square', T_C: 1890, P: 7.7e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Ca-01; log10(p_torr)=-3.11276; pixel reads=(700,610)/(701,609); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Ca-02, marker_symbol: 'filled square', T_C: 1915, P: 2.0e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Ca-02; log10(p_torr)=-2.69818; pixel reads=(750,465)/(749,466); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Ca-03, marker_symbol: 'filled square', T_C: 1970, P: 3.3e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Ca-03; log10(p_torr)=-2.47937; pixel reads=(850,390)/(851,389); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Ca-04, marker_symbol: 'filled square', T_C: 2010, P: 4.2e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Ca-04; log10(p_torr)=-2.38148; pixel reads=(920,355)/(919,356); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Ca-05, marker_symbol: 'filled square', T_C: 2070, P: 4.2e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Ca-05; log10(p_torr)=-2.37860; pixel reads=(1030,355)/(1031,354); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Ca-06, marker_symbol: 'filled square', T_C: 2105, P: 2.8e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Ca-06; log10(p_torr)=-2.55422; pixel reads=(1090,415)/(1089,416); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Ca-07, marker_symbol: 'filled square', T_C: 2140, P: 2.9e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Ca-07; log10(p_torr)=-2.53695; pixel reads=(1155,410)/(1156,409); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Ca-08, marker_symbol: 'filled square', T_C: 2165, P: 2.1e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Ca-08; log10(p_torr)=-2.66939; pixel reads=(1200,455)/(1199,456); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Ca-09, marker_symbol: 'filled square', T_C: 2215, P: 1.9e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Ca-09; log10(p_torr)=-2.70969; pixel reads=(1290,470)/(1291,469); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Ca-10, marker_symbol: 'filled square', T_C: 2280, P: 1.8e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Ca-10; log10(p_torr)=-2.74136; pixel reads=(1400,480)/(1399,481); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Ca-11, marker_symbol: 'filled square', T_C: 2330, P: 1.6e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Ca-11; log10(p_torr)=-2.79607; pixel reads=(1495,500)/(1496,499); read uncertainty ±0.00143 dex; see companion figure audit CSV'}}}}
+      uncertainty:
+        note: No numeric uncertainty printed; marker pressures read to two significant figures. Paired pixel reads and axis fits are in the companion figure audit CSV.
   Al:
     observations:
     - observation_id: yakovlev_1984_murchison_Al_max_2100C
@@ -698,6 +934,70 @@ species:
           pressure of aluminium
       uncertainty:
         note: No numeric uncertainty printed.
+    - observation_id: yakovlev_1984_fig1_Murchison_Al_digitized
+      type: psat_series
+      locator:
+        figure: '1'
+        published_page: 946
+        pdf_page_index: 2
+        note: Partial pressures in vapor released from heated Murchison sample.
+      T_range_K:
+      - 2343.15
+      - 2448.15
+      phase: Murchison_CM_chondrite_melt_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison chondrite in a Knudsen effusion cell.
+      standard_state: partial pressure of Al over Murchison; plotted as lg10 P(torr) versus T(C)
+      regime: kems_effusion
+      units: torr
+      values:
+        quantity: partial_pressure
+        gas_species: Al(g)
+        method_class: figure_only
+        admission_status: admitted
+        axis: lg10_P_torr vs T_C
+        points:
+        - {point_id: F1-Al-01, marker_symbol: 'open triangle', T_C: 2070, P: 1.4e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Al-01; log10(p_torr)=-2.86219; pixel reads=(1724,653)/(1725,652); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-Al-02, marker_symbol: 'open triangle', T_C: 2110, P: 1.8e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Al-02; log10(p_torr)=-2.73782; pixel reads=(1780,615)/(1779,616); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+        - {point_id: F1-Al-03, marker_symbol: 'open triangle', T_C: 2175, P: 1.8e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '1', published_page: 946, pdf_page_index: 2, note: 'F1-Al-03; log10(p_torr)=-2.75126; pixel reads=(1870,620)/(1871,619); read uncertainty ±0.00168 dex; see companion figure audit CSV'}}}}
+      uncertainty:
+        note: No numeric uncertainty printed; marker pressures read to two significant figures. Paired pixel reads and axis fits are in the companion figure audit CSV.
+    - observation_id: yakovlev_1984_fig2_CAI_Al_digitized
+      type: psat_series
+      locator:
+        figure: '2'
+        published_page: 946
+        pdf_page_index: 2
+        note: Partial pressures in vapor released from heated Efremovka CAI inclusions.
+      T_range_K:
+      - 2393.15
+      - 2603.15
+      phase: Efremovka_CAI_type_A_and_B_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Efremovka CAI inclusions types A and B in a Knudsen effusion cell.
+      standard_state: partial pressure of Al over CAI; plotted as lg10 P(torr) versus T(C)
+      regime: kems_effusion
+      units: torr
+      values:
+        quantity: partial_pressure
+        gas_species: Al(g)
+        method_class: figure_only
+        admission_status: admitted
+        axis: lg10_P_torr vs T_C
+        points:
+        - {point_id: F2-Al-01, marker_symbol: 'open triangle', T_C: 2120, P: 9.7e-04, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Al-01; log10(p_torr)=-3.01200; pixel reads=(1115,575)/(1116,574); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Al-02, marker_symbol: 'open triangle', T_C: 2160, P: 1.6e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Al-02; log10(p_torr)=-2.79894; pixel reads=(1190,500)/(1189,501); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Al-03, marker_symbol: 'open triangle', T_C: 2190, P: 2.1e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Al-03; log10(p_torr)=-2.68090; pixel reads=(1240,460)/(1241,459); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Al-04, marker_symbol: 'open triangle', T_C: 2255, P: 4.6e-03, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Al-04; log10(p_torr)=-2.33829; pixel reads=(1360,340)/(1359,341); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+        - {point_id: F2-Al-05, marker_symbol: 'open triangle', T_C: 2330, P: 1.0e-02, point_conditions: {composition: {state: {tag: unknown, reason: numerical_bulk_composition_not_published}, locator: {figure: '2', published_page: 946, pdf_page_index: 2, note: 'F2-Al-05; log10(p_torr)=-1.98992; pixel reads=(1490,220)/(1491,219); read uncertainty ±0.00144 dex; see companion figure audit CSV'}}}}
+      uncertainty:
+        note: No numeric uncertainty printed; marker pressures read to two significant figures. Paired pixel reads and axis fits are in the companion figure audit CSV.
   AlO:
     observations:
     - observation_id: yakovlev_1984_CAI_Al_suboxide_fraction
@@ -994,7 +1294,15 @@ deepening:
     figure_only:
     - yakovlev_1984_fig1_murchison_psat_figure_only
     - yakovlev_1984_fig2_CAI_psat_figure_only
+    - yakovlev_1984_fig1_Murchison_SiO_digitized
+    - yakovlev_1984_fig1_Murchison_Mg_digitized
+    - yakovlev_1984_fig1_Murchison_Ca_digitized
+    - yakovlev_1984_fig1_Murchison_Al_digitized
+    - yakovlev_1984_fig2_CAI_SiO_digitized
+    - yakovlev_1984_fig2_CAI_Mg_digitized
+    - yakovlev_1984_fig2_CAI_Ca_digitized
+    - yakovlev_1984_fig2_CAI_Al_digitized
     model:
     - yakovlev_1984_Po2_table_calculated
   battery_limitation: Printed prose includes point anchors and range maxima; the range maxima are categorical
-    bound-not-point observations, not point pressures. Figs 1–2 remain figure-only.
+    bound-not-point observations, not point pressures. Ca, Mg, Al, and SiO from Figs. 1–2 are digitized; other plotted series remain figure-only.
