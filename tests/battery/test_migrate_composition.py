@@ -1301,7 +1301,46 @@ def test_sample_catalogue_composition_is_typed_proxy_not_printed() -> None:
     )
 
 
-def test_equivalent_initial_inventories_keep_richer_owner_provenance() -> None:
+def _located_initial_composition(
+    components: dict[str, Decimal | str],
+    *,
+    amount_basis: AmountBasis,
+    proxy_flag: str | None = None,
+    proxy_source: str | None = None,
+    analysis_selection_rule: str | None = None,
+):
+    payload = {
+        "basis": "test_initial_composition",
+        "amount_basis": amount_basis.value,
+        "components": [[oxide, str(amount)] for oxide, amount in components.items()],
+    }
+    if proxy_flag is not None:
+        payload["proxy_flag"] = proxy_flag
+    if proxy_source is not None:
+        payload["proxy_source"] = proxy_source
+    if analysis_selection_rule is not None:
+        payload["analysis_selection_rule"] = analysis_selection_rule
+    return migrate_module._composition_located_from_plain(payload)
+
+
+def _merge_sample_initials(existing_initial, incoming_initial):
+    experiment = tabulation_experiment("initial-authority-merge")
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample, initial_composition=existing_initial
+        ),
+    )
+    merged = migrate_module._merge_experiment_lab_params(
+        experiment,
+        replace(experiment.sample, initial_composition=incoming_initial),
+        experiment.apparatus,
+        experiment.pressure_environment,
+    )
+    return merged.sample.initial_composition
+
+
+def test_equivalent_initial_inventories_keep_higher_authority_owner() -> None:
     starting_glass = {
         "composition_material_state": "starting_glass",
         "composition_wt_pct": {"SiO2": 60, "MgO": 40},
@@ -1375,16 +1414,105 @@ def test_equivalent_initial_inventories_keep_richer_owner_provenance() -> None:
 
     initial = merged.sample.initial_composition
     assert initial is not None and initial.state.is_value
-    assert initial.state.value.proxy_flag == "composition_from_sample_catalog"
-    assert initial.state.value.proxy_source.startswith(
-        "Lunar Sample Compendium entry 10017"
-    )
-    assert initial.state.value.analysis_selection_rule == (
-        "first complete named whole-sample analysis"
-    )
+    assert initial == existing_initial
     assert not any(
         "initial_composition_conflict" in issue.detail
         for issue in migrator.result.registry_issues
+    )
+
+    measured_initial = replace(
+        existing_initial,
+        state=replace(
+            existing_initial.state,
+            value=replace(
+                existing_initial.state.value,
+                analysis_selection_rule=(
+                    "directly measured starting-material analysis"
+                ),
+            ),
+        ),
+    )
+    assert _merge_sample_initials(incoming_initial, existing_initial) == incoming_initial
+    assert _merge_sample_initials(existing_initial, measured_initial) == measured_initial
+
+    initial_charge = _located_initial_composition(
+        {"SiO2": "0.5015472170832676561113000772", "MgO": "0.4984527829167323438886999228"},
+        amount_basis=AmountBasis.MOLE_FRACTION,
+        proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    )
+    assert _merge_sample_initials(incoming_initial, initial_charge) == initial_charge
+
+    generic_proxy = _located_initial_composition(
+        {"SiO2": "0.5015472170832676561113000772", "MgO": "0.4984527829167323438886999228"},
+        amount_basis=AmountBasis.MOLE_FRACTION,
+        proxy_flag="model_proxy",
+        proxy_source="model estimate",
+    )
+    assert _merge_sample_initials(existing_initial, generic_proxy) == existing_initial
+
+    tied_initial = replace(
+        existing_initial,
+        state=replace(
+            existing_initial.state,
+            value=replace(
+                existing_initial.state.value,
+                proxy_source="extra provenance without higher authority",
+            ),
+        ),
+    )
+    assert _merge_sample_initials(existing_initial, tied_initial) == existing_initial
+
+
+def test_absolute_mole_inventories_compare_amount_and_prefer_absolute() -> None:
+    fraction = _located_initial_composition(
+        {"SiO2": "0.6", "MgO": "0.4"},
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    same_absolute_inventory = _located_initial_composition(
+        {"SiO2": "0.6", "MgO": "0.4"},
+        amount_basis=AmountBasis.MOL_INVENTORY,
+    )
+    tenfold_absolute_inventory = _located_initial_composition(
+        {"SiO2": "6", "MgO": "4"},
+        amount_basis=AmountBasis.MOL_INVENTORY,
+    )
+    assert not migrate_module._initial_compositions_conflict(
+        fraction, tenfold_absolute_inventory
+    )
+    assert _merge_sample_initials(fraction, tenfold_absolute_inventory) == (
+        tenfold_absolute_inventory
+    )
+    assert migrate_module._initial_compositions_conflict(
+        same_absolute_inventory, tenfold_absolute_inventory
+    )
+
+    rounded_absolute_inventory = _located_initial_composition(
+        {"SiO2": "0.6000000000002", "MgO": "0.4"},
+        amount_basis=AmountBasis.MOL_INVENTORY,
+    )
+    assert not migrate_module._initial_compositions_conflict(
+        same_absolute_inventory, rounded_absolute_inventory
+    )
+
+
+def test_initial_composition_component_keys_must_match() -> None:
+    omitted_trace = _located_initial_composition(
+        {"SiO2": "1"}, amount_basis=AmountBasis.MOLE_FRACTION
+    )
+    stated_trace = _located_initial_composition(
+        {"SiO2": "1", "Na2O": "1e-13"},
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    stated_zero = _located_initial_composition(
+        {"SiO2": "1", "Na2O": "0"},
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+
+    assert migrate_module._initial_compositions_conflict(
+        omitted_trace, stated_trace
+    )
+    assert not migrate_module._initial_compositions_conflict(
+        stated_zero, stated_trace
     )
 
 
