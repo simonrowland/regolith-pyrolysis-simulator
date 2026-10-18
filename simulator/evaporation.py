@@ -2684,7 +2684,7 @@ class EvaporationMixin:
             return curve
         record_gate_curve_provider_outcome(
             self,
-            GateCurveProviderOutcome.NO_PROVIDER,
+            GateCurveProviderOutcome.FAILED,
         )
         return None
 
@@ -2767,7 +2767,7 @@ class EvaporationMixin:
         if curve is None and status_outcome is GateCurveProviderOutcome.PRODUCED:
             record_gate_curve_provider_outcome(
                 self,
-                GateCurveProviderOutcome.NO_PROVIDER,
+                GateCurveProviderOutcome.FAILED,
             )
         return curve
 
@@ -2863,7 +2863,7 @@ class EvaporationMixin:
         if curve is None:
             record_gate_curve_provider_outcome(
                 self,
-                GateCurveProviderOutcome.NO_PROVIDER,
+                GateCurveProviderOutcome.FAILED,
             )
         else:
             record_gate_curve_provider_outcome(

@@ -6963,3 +6963,91 @@ def test_freeze_gate_backend_fallback_receives_redox_state(
     assert curve['liquidus_T_C'] == pytest.approx(1300.0)
     assert calls[0]['redox_state'] is state
     assert calls[0]['fO2_log'] == pytest.approx(reference_value)
+
+
+def test_ok_invalid_gate_provider_fallback_does_not_enter_any_memo(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    provider_calls = []
+    shared_cache = {}
+    sim._freeze_gate_shared_curve_cache = shared_cache
+
+    def injected_provider_result(intent, *args, **kwargs):
+        assert intent is ChemistryIntent.GATE_LIQUID_FRACTION
+        provider_calls.append(intent)
+        if len(provider_calls) == 1:
+            return IntentResult(
+                intent=intent,
+                status='ok',
+                transition=None,
+                diagnostic={
+                    'backend_status': 'ok',
+                    'solidus_T_C': 1300.0,
+                    'liquidus_T_C': 1200.0,
+                },
+            )
+        return IntentResult(
+            intent=intent,
+            status='ok',
+            transition=None,
+            diagnostic={
+                'backend_status': 'ok',
+                'solidus_T_C': 1000.0,
+                'liquidus_T_C': 1300.0,
+                'liquid_fraction_path': (
+                    (1000.0, 0.0),
+                    (1300.0, 1.0),
+                ),
+            },
+        )
+
+    monkeypatch.setattr(sim, '_dispatch_only', injected_provider_result)
+
+    def successful_backend_fallback(reasons, **_kwargs):
+        from simulator.reduced_real_determinism import (
+            record_gate_curve_provider_outcome,
+        )
+
+        record_gate_curve_provider_outcome(
+            sim,
+            GateCurveProviderOutcome.PRODUCED,
+        )
+        return {
+            'source': 'liquidus_solidus:backend',
+            'solidus_T_C': 1100.0,
+            'liquidus_T_C': 1400.0,
+        }
+
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve_from_backend_liquidus',
+        successful_backend_fallback,
+    )
+
+    first = sim._melt_redox_liquidus_gate_curve()
+    key = _freeze_gate_key_for_current_state(sim)
+
+    assert first['source'] == 'liquidus_solidus:backend'
+    assert sim._freeze_gate_liquid_fraction_cache is None
+    assert shared_cache == {}
+    assert key not in sim._freeze_gate_liquid_fraction_curve_memo
+
+    second = sim._melt_redox_liquidus_gate_curve()
+
+    assert len(provider_calls) == 2
+    assert second['source'] == 'gate_liquid_fraction'
+    assert second['solidus_T_C'] == 1000.0
+    assert second['liquidus_T_C'] == 1300.0
+    assert shared_cache[key]['curve']['source'] == 'gate_liquid_fraction'
+    assert sim._freeze_gate_liquid_fraction_curve_memo[key][
+        'provider_outcome'
+    ] is GateCurveProviderOutcome.PRODUCED
