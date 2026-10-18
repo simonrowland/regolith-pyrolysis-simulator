@@ -1,0 +1,69 @@
+source_id: shornikov-2019-perovskite-evaporation-rjpc
+source:
+  citation: 'Shornikov, S. I. (2019), "Mass-Spectrometric Study of Evaporation of Perovskite," Russian Journal of Physical Chemistry A 93(6), 1024–1031.'
+  doi: 10.1134/S0036024419060293
+  year: 2019
+extraction:
+  method: mineru_table_draft emit; duplicated and model-derived tables are emitted only as comparison/transcription intermediates
+  date: '2026-10-18'
+  worker: w4b-1018
+review_status: draft
+tables:
+  - page: 6
+    table_index: 2
+    type: partial_pressure
+    quantity: partial_pressure
+    evidence_class: measured_direct
+    unit: atm
+    per: mol_species
+    experiment: shornikov_2019_rjpc_molybdenum_cell
+    regime: knudsen_effusion
+    condensed_form: solid
+    published_page: 1029
+    rows: all
+    temperature:
+      column: 1
+      unit: K
+    values:
+      - column: 2
+        species: Ca
+      - column: 3
+        species: CaO
+      - column: 4
+        species: Ti
+      - column: 5
+        species: TiO
+      - column: 6
+        species: TiO2
+      - column: 7
+        species: O2
+      - column: 8
+        species: CaTiO3
+  - page: 6
+    table_index: 3
+    type: partial_pressure
+    quantity: partial_pressure
+    evidence_class: model_derived
+    unit: atm
+    per: mol_species
+    experiment: shornikov_2019_rjpc_molybdenum_cell
+    regime: knudsen_effusion
+    condensed_form: solid
+    published_page: 1029
+    rows: all
+    temperature:
+      column: 1
+      unit: K
+    values:
+      - column: 2
+        species: O
+      - column: 3
+        species: O
+      - column: 4
+        species: O
+      - column: 5
+        species: O
+      - column: 6
+        species: O
+      - column: 7
+        species: O

@@ -1,0 +1,1049 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2019-perovskite-evaporation-rjpc
+source:
+  citation: 'Shornikov, S. I. (2019), "Mass-Spectrometric Study of Evaporation of Perovskite," Russian Journal of Physical Chemistry A 93(6), 1024–1031.'
+  year: 2019
+  doi: 10.1134/S0036024419060293
+  corpus_asset: raw/shornikov-2019-perovskite-evaporation-rjpc/shornikov-2019-perovskite-evaporation-rjpc.pdf
+  corpus_sha256: e0f388db7dffd5bc8bb1ac21fd3d1d77c9efb9beeae161a2262c65f737dc11c0
+extraction:
+  method: >-
+    MinerU tables and pdftotext-layout were compared; mapped numeric cells were emitted and checked against the page renders. Table 2 and Table 5 are shared with the TMS chapter extract and are cross-referenced. Table 3 model values, Table 4 fit refusals, unique cited context, and deferred figure records are retained in species context containers.
+  date: '2026-10-18'
+  worker: w4b-1018
+review_status: draft
+notes:
+  - >-
+    Table 2 has 76 numeric pressure cells and matches the existing TMS chapter series point for point: Ca 13, CaO 10, Ti 8, TiO 13, TiO2 13, O2 11, and CaTiO3 8. The seven existing observation IDs are cross-referenced below; no duplicate scored observations are stored.
+  - >-
+    Table 5 matches all ten existing TMS thermochemistry context rows. Its three negative values retain their negative signs in the RJPC and TMS renders; differing OCR dash glyphs are not value differences. Existing IDs are cross-referenced below.
+  - >-
+    The relative ion-current ratio at 2182 K differs between the publications. Both readings and locators are preserved in the CaTiO3 context and flagged for controller decision; the existing TMS extract is unchanged.
+  - >-
+    Table 4 prints a function fit and coefficients but the extract schema has no token for this coefficient form. Eight fit records are typed refusals with their printed coefficients retained in context; no pressures are reconstructed.
+fidelity_samples:
+  - species: O
+    observation_id: shornikov_2019_rjpc_table3_atomic_oxygen_calculations
+    index: 0
+    field: equation_22_23_as_printed
+    value: '1.26 × 10–10'
+    locator:
+      page: 6
+      published_page: 1029
+      pdf_page_index: 5
+      table: '3'
+  - species: O
+    observation_id: shornikov_2019_rjpc_table3_atomic_oxygen_calculations
+    index: 3
+    field: equation_24_as_printed
+    value: '1.29 × 10–9'
+    locator:
+      page: 6
+      published_page: 1029
+      pdf_page_index: 5
+      table: '3'
+  - species: O
+    observation_id: shornikov_2019_rjpc_table3_atomic_oxygen_calculations
+    index: 12
+    field: equation_28_as_printed
+    value: '7.78 × 10–8'
+    locator:
+      page: 6
+      published_page: 1029
+      pdf_page_index: 5
+      table: '3'
+species:
+  Ca:
+    observations: []
+    context:
+      - observation_id: shornikov_2019_rjpc_table2_existing_ca_pressure_series
+        type: cross_reference
+        locator:
+          page: 6
+          published_page: 1029
+          pdf_page_index: 5
+          table: '2'
+        units: atm; T in K
+        values:
+          quantity: existing_partial_pressure_series
+          existing_source_id: shornikov-2019-perovskite-evaporation
+          existing_observation_id: shornikov_2019_t1_p_ca
+          existing_extract_locator:
+            page: 8
+            published_page: 260
+            pdf_page_index: 7
+            table: '1'
+          matching_rjpc_locator:
+            published_page: 1029
+            pdf_page_index: 5
+            table: '2'
+          matching_numeric_points: 13
+          comparison: all temperatures and printed pressures match
+          disposition: cross_reference_only
+      - observation_id: shornikov_2019_rjpc_table4_ca_fit_refusal
+        type: fit_refusal
+        locator:
+          page: 6
+          published_page: 1029
+          pdf_page_index: 5
+          table: '4'
+          table_row_number: 3
+        units: coefficients in log pi = ai/T + bi; T in K
+        values:
+          quantity: partial_pressure_log_temperature_fit_coefficients
+          species_as_printed: (Ca)
+          phase: gas
+          method_class: model_derived
+          admission_status: typed_refusal
+          reason: schema_gap_function_valued_fit
+          unavailable_reason: schema_gap_function_valued_fit
+          fit_range_T_K_as_printed: '1791–2182'
+          minus_ai_column_value_as_printed: '27921 ± 182'
+          bi_as_printed: '6.919 ± 0.092'
+          equation_as_printed: 'log pi = ai/T + bi'
+      - observation_id: shornikov_2019_rjpc_figure1_panel_a
+        type: figure_record
+        locator:
+          page: 3
+          published_page: 1026
+          pdf_page_index: 2
+          figure: '1'
+          panel: a
+        units: log10 pressure in atm; temperature in K
+        values:
+          quantity: partial_pressure
+          species: Ca
+          phase: gas
+          temperature_axis_as_printed: 'T, K'
+          pressure_axis_as_printed: '−log pCa [atm]'
+          caption_as_printed: >-
+            Fig. 1. Logarithmic dependences of the partial pressures of the components (a) Ca, (b) TiO, (c) TiO2, and (d) O of vapor over (1–3) perovskite, (4, 5, 5*) calcium oxide, and (6–8, 8*) titanium oxide on the reciprocal temperature determined by the Knudsen effusion mass spectrometric method: (1) in the present study, (2) by Banon et al. [15], (4) Samoilova and Kazenas [27], (5) Shornikov [35], (6) Groves et al. [36], (7) Berkovits et al. [29], (8) Kazenas and Tsvetkov [11]; in the vacuum furnace by the Langmuir method: (3) Zhang et al. [5]; and also calculated (5*, 8*) in the present study from the thermochemical data of [9]. The vertical dashed lines 9 and 10 indicate the melting points of titanium oxide and perovskite, respectively.
+          panel: a
+          series:
+            - id: '1'
+              symbol: filled circle
+              attribution: present study
+              marker_count: 13
+            - id: '2'
+              symbol: open square
+              attribution: Banon et al. [15]
+              marker_count: 1
+            - id: '3'
+              symbol: half-filled circle
+              attribution: Zhang et al. [5]
+              marker_count: 1
+            - id: '4'
+              symbol: open triangle
+              attribution: Samoilova and Kazenas [27]
+              marker_count: 12
+            - id: '5'
+              symbol: open circle
+              attribution: Shornikov [35]
+              marker_count: 4
+            - id: '5*'
+              symbol: line
+              attribution: present-study calculation from thermochemical data [9]
+              marker_count: 0
+          melting_point_lines:
+            - id: '9'
+              attribution: titanium oxide melting point
+            - id: '10'
+              attribution: perovskite melting point
+          marker_count_note: visual counts from the 600-dpi render; some symbols overlap
+          digitisation: deferred to a figure pass
+  CaO:
+    observations: []
+    context:
+      - observation_id: shornikov_2019_rjpc_table2_existing_cao_pressure_series
+        type: cross_reference
+        locator:
+          page: 6
+          published_page: 1029
+          pdf_page_index: 5
+          table: '2'
+        units: atm; T in K
+        values:
+          quantity: existing_partial_pressure_series
+          existing_source_id: shornikov-2019-perovskite-evaporation
+          existing_observation_id: shornikov_2019_t1_p_cao
+          existing_extract_locator:
+            page: 8
+            published_page: 260
+            pdf_page_index: 7
+            table: '1'
+          matching_rjpc_locator:
+            published_page: 1029
+            pdf_page_index: 5
+            table: '2'
+          matching_numeric_points: 10
+          comparison: all temperatures and printed pressures match
+          disposition: cross_reference_only
+      - observation_id: shornikov_2019_rjpc_table4_cao_fit_refusal
+        type: fit_refusal
+        locator:
+          page: 6
+          published_page: 1029
+          pdf_page_index: 5
+          table: '4'
+          table_row_number: 4
+        units: coefficients in log pi = ai/T + bi; T in K
+        values:
+          quantity: partial_pressure_log_temperature_fit_coefficients
+          species_as_printed: (CaO)
+          phase: gas
+          method_class: model_derived
+          admission_status: typed_refusal
+          reason: schema_gap_function_valued_fit
+          unavailable_reason: schema_gap_function_valued_fit
+          fit_range_T_K_as_printed: '1920–2182'
+          minus_ai_column_value_as_printed: '35055 ± 406'
+          bi_as_printed: '6.880 ± 0.201'
+          equation_as_printed: 'log pi = ai/T + bi'
+  Ti:
+    observations: []
+    context:
+      - observation_id: shornikov_2019_rjpc_table2_existing_ti_pressure_series
+        type: cross_reference
+        locator:
+          page: 6
+          published_page: 1029
+          pdf_page_index: 5
+          table: '2'
+        units: atm; T in K
+        values:
+          quantity: existing_partial_pressure_series
+          existing_source_id: shornikov-2019-perovskite-evaporation
+          existing_observation_id: shornikov_2019_t1_p_ti
+          existing_extract_locator:
+            page: 8
+            published_page: 260
+            pdf_page_index: 7
+            table: '1'
+          matching_rjpc_locator:
+            published_page: 1029
+            pdf_page_index: 5
+            table: '2'
+          matching_numeric_points: 8
+          comparison: all temperatures and printed pressures match
+          disposition: cross_reference_only
+      - observation_id: shornikov_2019_rjpc_table4_ti_fit_refusal
+        type: fit_refusal
+        locator:
+          page: 6
+          published_page: 1029
+          pdf_page_index: 5
+          table: '4'
+          table_row_number: 5
+        units: coefficients in log pi = ai/T + bi; T in K
+        values:
+          quantity: partial_pressure_log_temperature_fit_coefficients
+          species_as_printed: (Ti)
+          phase: gas
+          method_class: model_derived
+          admission_status: typed_refusal
+          reason: schema_gap_function_valued_fit
+          unavailable_reason: schema_gap_function_valued_fit
+          fit_range_T_K_as_printed: '1956–2182'
+          minus_ai_column_value_as_printed: '46531 ± 224'
+          bi_as_printed: '12.456 ± 0.111'
+          equation_as_printed: 'log pi = ai/T + bi'
+  TiO:
+    observations: []
+    context:
+      - observation_id: shornikov_2019_rjpc_table2_existing_tio_pressure_series
+        type: cross_reference
+        locator:
+          page: 6
+          published_page: 1029
+          pdf_page_index: 5
+          table: '2'
+        units: atm; T in K
+        values:
+          quantity: existing_partial_pressure_series
+          existing_source_id: shornikov-2019-perovskite-evaporation
+          existing_observation_id: shornikov_2019_t1_p_tio
+          existing_extract_locator:
+            page: 8
+            published_page: 260
+            pdf_page_index: 7
+            table: '1'
+          matching_rjpc_locator:
+            published_page: 1029
+            pdf_page_index: 5
+            table: '2'
+          matching_numeric_points: 13
+          comparison: all temperatures and printed pressures match
+          disposition: cross_reference_only
+      - observation_id: shornikov_2019_rjpc_table4_tio_fit_refusal
+        type: fit_refusal
+        locator:
+          page: 6
+          published_page: 1029
+          pdf_page_index: 5
+          table: '4'
+          table_row_number: 6
+        units: coefficients in log pi = ai/T + bi; T in K
+        values:
+          quantity: partial_pressure_log_temperature_fit_coefficients
+          species_as_printed: (TiO)
+          phase: gas
+          method_class: model_derived
+          admission_status: typed_refusal
+          reason: schema_gap_function_valued_fit
+          unavailable_reason: schema_gap_function_valued_fit
+          fit_range_T_K_as_printed: '1791–2182'
+          minus_ai_column_value_as_printed: '39 002 ± 109'
+          bi_as_printed: '11.847 ± 0.052'
+          equation_as_printed: 'log pi = ai/T + bi'
+      - observation_id: shornikov_2019_rjpc_figure1_panel_b
+        type: figure_record
+        locator:
+          page: 3
+          published_page: 1026
+          pdf_page_index: 2
+          figure: '1'
+          panel: b
+        units: log10 pressure in atm; temperature in K
+        values:
+          quantity: partial_pressure
+          species_as_captioned: TiO
+          species_as_axis_labelled: Ti
+          phase: gas
+          identity_note: caption names TiO while the panel y-axis prints pTi; both are retained as printed
+          temperature_axis_as_printed: 'T, K'
+          pressure_axis_as_printed: '−log pTi [atm]'
+          caption_as_printed: >-
+            Fig. 1. Logarithmic dependences of the partial pressures of the components (a) Ca, (b) TiO, (c) TiO2, and (d) O of vapor over (1–3) perovskite, (4, 5, 5*) calcium oxide, and (6–8, 8*) titanium oxide on the reciprocal temperature determined by the Knudsen effusion mass spectrometric method: (1) in the present study, (2) by Banon et al. [15], (4) Samoilova and Kazenas [27], (5) Shornikov [35], (6) Groves et al. [36], (7) Berkovits et al. [29], (8) Kazenas and Tsvetkov [11]; in the vacuum furnace by the Langmuir method: (3) Zhang et al. [5]; and also calculated (5*, 8*) in the present study from the thermochemical data of [9]. The vertical dashed lines 9 and 10 indicate the melting points of titanium oxide and perovskite, respectively.
+          panel: b
+          series:
+            - id: '1'
+              symbol: filled circle
+              attribution: present study
+              marker_count: 8
+            - id: '2'
+              symbol: open square
+              attribution: Banon et al. [15]
+              marker_count: 1
+            - id: '8'
+              symbol: inverted triangle
+              attribution: Kazenas and Tsvetkov [11]
+              marker_count: 16
+            - id: '8*'
+              symbol: line
+              attribution: present-study calculation from thermochemical data [9]
+              marker_count: 0
+          melting_point_lines:
+            - id: '9'
+              attribution: titanium oxide melting point
+            - id: '10'
+              attribution: perovskite melting point
+          marker_count_note: visual counts from the 600-dpi render; some symbols overlap
+          digitisation: deferred to a figure pass
+  TiO2:
+    observations: []
+    context:
+      - observation_id: shornikov_2019_rjpc_table2_existing_tio2_pressure_series
+        type: cross_reference
+        locator:
+          page: 6
+          published_page: 1029
+          pdf_page_index: 5
+          table: '2'
+        units: atm; T in K
+        values:
+          quantity: existing_partial_pressure_series
+          existing_source_id: shornikov-2019-perovskite-evaporation
+          existing_observation_id: shornikov_2019_t1_p_tio2
+          existing_extract_locator:
+            page: 8
+            published_page: 260
+            pdf_page_index: 7
+            table: '1'
+          matching_rjpc_locator:
+            published_page: 1029
+            pdf_page_index: 5
+            table: '2'
+          matching_numeric_points: 13
+          comparison: all temperatures and printed pressures match
+          disposition: cross_reference_only
+      - observation_id: shornikov_2019_rjpc_table4_tio2_fit_refusal
+        type: fit_refusal
+        locator:
+          page: 6
+          published_page: 1029
+          pdf_page_index: 5
+          table: '4'
+          table_row_number: 7
+        units: coefficients in log pi = ai/T + bi; T in K
+        values:
+          quantity: partial_pressure_log_temperature_fit_coefficients
+          species_as_printed: (TiO2)
+          phase: gas
+          method_class: model_derived
+          admission_status: typed_refusal
+          reason: schema_gap_function_valued_fit
+          unavailable_reason: schema_gap_function_valued_fit
+          fit_range_T_K_as_printed: '1791–2182'
+          minus_ai_column_value_as_printed: '33851 ± 182'
+          bi_as_printed: '9.701 ± 0.093'
+          equation_as_printed: 'log pi = ai/T + bi'
+      - observation_id: shornikov_2019_rjpc_figure1_panel_c
+        type: figure_record
+        locator:
+          page: 3
+          published_page: 1026
+          pdf_page_index: 2
+          figure: '1'
+          panel: c
+        units: log10 pressure in atm; temperature in K
+        values:
+          quantity: partial_pressure
+          species: TiO2
+          phase: gas
+          temperature_axis_as_printed: 'T, K'
+          pressure_axis_as_printed: '−log pTiO2 [atm]'
+          caption_as_printed: >-
+            Fig. 1. Logarithmic dependences of the partial pressures of the components (a) Ca, (b) TiO, (c) TiO2, and (d) O of vapor over (1–3) perovskite, (4, 5, 5*) calcium oxide, and (6–8, 8*) titanium oxide on the reciprocal temperature determined by the Knudsen effusion mass spectrometric method: (1) in the present study, (2) by Banon et al. [15], (4) Samoilova and Kazenas [27], (5) Shornikov [35], (6) Groves et al. [36], (7) Berkovits et al. [29], (8) Kazenas and Tsvetkov [11]; in the vacuum furnace by the Langmuir method: (3) Zhang et al. [5]; and also calculated (5*, 8*) in the present study from the thermochemical data of [9]. The vertical dashed lines 9 and 10 indicate the melting points of titanium oxide and perovskite, respectively.
+          panel: c
+          series:
+            - id: '1'
+              symbol: filled circle
+              attribution: present study
+              marker_count: 13
+            - id: '2'
+              symbol: open square
+              attribution: Banon et al. [15]
+              marker_count: 1
+            - id: '3'
+              symbol: half-filled circle
+              attribution: Zhang et al. [5]
+              marker_count: 1
+            - id: '6'
+              symbol: diamond
+              attribution: Groves et al. [36]
+              marker_count: 11
+            - id: '7'
+              symbol: filled square
+              attribution: Berkovits et al. [29]
+              marker_count: 1
+            - id: '8'
+              symbol: inverted triangle
+              attribution: Kazenas and Tsvetkov [11]
+              marker_count: 20
+            - id: '8*'
+              symbol: line
+              attribution: present-study calculation from thermochemical data [9]
+              marker_count: 0
+          melting_point_lines:
+            - id: '9'
+              attribution: titanium oxide melting point
+            - id: '10'
+              attribution: perovskite melting point
+          marker_count_note: visual counts from the 600-dpi render; some symbols overlap
+          digitisation: deferred to a figure pass
+  O:
+    observations: []
+    context:
+      - observation_id: shornikov_2019_rjpc_table3_atomic_oxygen_calculations
+        type: model_derived_table
+        locator:
+          page: 6
+          published_page: 1029
+          pdf_page_index: 5
+          table: '3'
+        units: atm; T in K
+        quantity: partial_pressure
+        phase: gas
+        method_class: model_derived
+        table_caption_as_printed: 'Table 3. Partial vapor pressures of atomic oxygen over perovskite, atm (calculated by (22)–(28))'
+        equation_columns_as_printed:
+          - (22), (23)
+          - (24)
+          - (25)
+          - (26)
+          - (27)
+          - (28)
+        row_count: 13
+        numeric_cell_count: 68
+        values:
+          - T_K: 1791
+            equation_22_23_as_printed: '1.26 × 10–10'
+            equation_24_as_printed: '—'
+            equation_25_as_printed: '—'
+            equation_26_as_printed: '1.25 × 10–10'
+            equation_27_as_printed: '—'
+            equation_28_as_printed: '1.31 × 10–10'
+            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 2}
+          - T_K: 1845
+            equation_22_23_as_printed: '3.52 × 10–10'
+            equation_24_as_printed: '—'
+            equation_25_as_printed: '—'
+            equation_26_as_printed: '3.61 × 10–10'
+            equation_27_as_printed: '—'
+            equation_28_as_printed: '3.69 × 10–10'
+            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 3}
+          - T_K: 1875
+            equation_22_23_as_printed: '6.10 × 10–10'
+            equation_24_as_printed: '—'
+            equation_25_as_printed: '6.02 × 10–10'
+            equation_26_as_printed: '5.96 × 10–10'
+            equation_27_as_printed: '—'
+            equation_28_as_printed: '6.01 × 10–10'
+            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 4}
+          - T_K: 1920
+            equation_22_23_as_printed: '1.36 × 10–9'
+            equation_24_as_printed: '1.29 × 10–9'
+            equation_25_as_printed: '1.24 × 10–9'
+            equation_26_as_printed: '1.36 × 10–9'
+            equation_27_as_printed: '—'
+            equation_28_as_printed: '1.43 × 10–9'
+            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 5}
+          - T_K: 1941
+            equation_22_23_as_printed: '1.97 × 10–9'
+            equation_24_as_printed: '2.12 × 10–9'
+            equation_25_as_printed: '1.80 × 10–9'
+            equation_26_as_printed: '2.04 × 10–9'
+            equation_27_as_printed: '—'
+            equation_28_as_printed: '1.88 × 10–9'
+            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 6}
+          - T_K: 1956
+            equation_22_23_as_printed: '2.52 × 10–9'
+            equation_24_as_printed: '2.61 × 10–9'
+            equation_25_as_printed: '2.34 × 10–9'
+            equation_26_as_printed: '2.43 × 10–9'
+            equation_27_as_printed: '2.53 × 10–9'
+            equation_28_as_printed: '2.49 × 10–9'
+            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 7}
+          - T_K: 1976
+            equation_22_23_as_printed: '3.52 × 10–9'
+            equation_24_as_printed: '3.58 × 10–9'
+            equation_25_as_printed: '3.31 × 10–9'
+            equation_26_as_printed: '3.52 × 10–9'
+            equation_27_as_printed: '3.53 × 10–9'
+            equation_28_as_printed: '3.45 × 10–9'
+            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 8}
+          - T_K: 1992
+            equation_22_23_as_printed: '4.57 × 10–9'
+            equation_24_as_printed: '3.87 × 10–9'
+            equation_25_as_printed: '4.33 × 10–9'
+            equation_26_as_printed: '4.46 × 10–9'
+            equation_27_as_printed: '4.37 × 10–9'
+            equation_28_as_printed: '4.56 × 10–9'
+            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 9}
+          - T_K: 2027
+            equation_22_23_as_printed: '7.76 × 10–9'
+            equation_24_as_printed: '6.71 × 10–9'
+            equation_25_as_printed: '7.73 × 10–9'
+            equation_26_as_printed: '7.96 × 10–9'
+            equation_27_as_printed: '7.75 × 10–9'
+            equation_28_as_printed: '7.94 × 10–9'
+            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 10}
+          - T_K: 2037
+            equation_22_23_as_printed: '9.31 × 10–9'
+            equation_24_as_printed: '9.67 × 10–9'
+            equation_25_as_printed: '9.08 × 10–9'
+            equation_26_as_printed: '9.30 × 10–9'
+            equation_27_as_printed: '9.43 × 10–9'
+            equation_28_as_printed: '9.10 × 10–9'
+            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 11}
+          - T_K: 2051
+            equation_22_23_as_printed: '1.13 × 10–8'
+            equation_24_as_printed: '1.12 × 10–8'
+            equation_25_as_printed: '1.14 × 10–8'
+            equation_26_as_printed: '1.13 × 10–8'
+            equation_27_as_printed: '1.19 × 10–8'
+            equation_28_as_printed: '1.18 × 10–8'
+            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 12}
+          - T_K: 2100
+            equation_22_23_as_printed: '2.39 × 10–8'
+            equation_24_as_printed: '2.45 × 10–8'
+            equation_25_as_printed: '2.43 × 10–8'
+            equation_26_as_printed: '2.50 × 10–8'
+            equation_27_as_printed: '2.34 × 10–8'
+            equation_28_as_printed: '2.31 × 10–8'
+            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 13}
+          - T_K: 2182
+            equation_22_23_as_printed: '7.73 × 10–8'
+            equation_24_as_printed: '7.40 × 10–8'
+            equation_25_as_printed: '8.00 × 10–8'
+            equation_26_as_printed: '6.88 × 10–8'
+            equation_27_as_printed: '7.56 × 10–8'
+            equation_28_as_printed: '7.78 × 10–8'
+            locator: {page: 6, published_page: 1029, pdf_page_index: 5, table: '3', table_row_number: 14}
+      - observation_id: shornikov_2019_rjpc_table4_oxygen_fit_refusal
+        type: fit_refusal
+        locator:
+          page: 6
+          published_page: 1029
+          pdf_page_index: 5
+          table: '4'
+          table_row_number: 1
+        units: coefficients in log pi = ai/T + bi; T in K
+        values:
+          quantity: partial_pressure_log_temperature_fit_coefficients
+          species_as_printed: (O)
+          phase: gas
+          method_class: model_derived
+          admission_status: typed_refusal
+          reason: schema_gap_function_valued_fit
+          unavailable_reason: schema_gap_function_valued_fit
+          fit_range_T_K_as_printed: '1791–2182'
+          minus_ai_column_value_as_printed: '27825 ± 103'
+          bi_as_printed: '5.628 ± 0.053'
+          equation_as_printed: 'log pi = ai/T + bi'
+      - observation_id: shornikov_2019_rjpc_figure1_panel_d
+        type: figure_record
+        locator:
+          page: 3
+          published_page: 1026
+          pdf_page_index: 2
+          figure: '1'
+          panel: d
+        units: log10 pressure in atm; temperature in K
+        values:
+          quantity: partial_pressure
+          species: O
+          phase: gas
+          temperature_axis_as_printed: 'T, K'
+          pressure_axis_as_printed: '−log pO [atm]'
+          caption_as_printed: >-
+            Fig. 1. Logarithmic dependences of the partial pressures of the components (a) Ca, (b) TiO, (c) TiO2, and (d) O of vapor over (1–3) perovskite, (4, 5, 5*) calcium oxide, and (6–8, 8*) titanium oxide on the reciprocal temperature determined by the Knudsen effusion mass spectrometric method: (1) in the present study, (2) by Banon et al. [15], (4) Samoilova and Kazenas [27], (5) Shornikov [35], (6) Groves et al. [36], (7) Berkovits et al. [29], (8) Kazenas and Tsvetkov [11]; in the vacuum furnace by the Langmuir method: (3) Zhang et al. [5]; and also calculated (5*, 8*) in the present study from the thermochemical data of [9]. The vertical dashed lines 9 and 10 indicate the melting points of titanium oxide and perovskite, respectively.
+          panel: d
+          series:
+            - id: '1'
+              symbol: filled circle
+              attribution: present study
+              marker_count: 13
+            - id: '2'
+              symbol: open square
+              attribution: Banon et al. [15]
+              marker_count: 1
+            - id: '4'
+              symbol: open triangle
+              attribution: Samoilova and Kazenas [27]
+              marker_count: 8
+            - id: '5'
+              symbol: open circle
+              attribution: Shornikov [35]
+              marker_count: 4
+            - id: '8'
+              symbol: inverted triangle
+              attribution: Kazenas and Tsvetkov [11]
+              marker_count: 12
+            - id: '5*'
+              symbol: line
+              attribution: present-study calculation from thermochemical data [9]
+              marker_count: 0
+            - id: '8*'
+              symbol: line
+              attribution: present-study calculation from thermochemical data [9]
+              marker_count: 0
+          melting_point_lines:
+            - id: '9'
+              attribution: titanium oxide melting point
+            - id: '10'
+              attribution: perovskite melting point
+          marker_count_note: visual counts from the 600-dpi render; some symbols overlap
+          digitisation: deferred to a figure pass
+  O2:
+    observations: []
+    context:
+      - observation_id: shornikov_2019_rjpc_table2_existing_o2_pressure_series
+        type: cross_reference
+        locator:
+          page: 6
+          published_page: 1029
+          pdf_page_index: 5
+          table: '2'
+        units: atm; T in K
+        values:
+          quantity: existing_partial_pressure_series
+          existing_source_id: shornikov-2019-perovskite-evaporation
+          existing_observation_id: shornikov_2019_t1_p_o2
+          existing_extract_locator:
+            page: 8
+            published_page: 260
+            pdf_page_index: 7
+            table: '1'
+          matching_rjpc_locator:
+            published_page: 1029
+            pdf_page_index: 5
+            table: '2'
+          matching_numeric_points: 11
+          comparison: all temperatures and printed pressures match
+          disposition: cross_reference_only
+      - observation_id: shornikov_2019_rjpc_table4_o2_fit_refusal
+        type: fit_refusal
+        locator:
+          page: 6
+          published_page: 1029
+          pdf_page_index: 5
+          table: '4'
+          table_row_number: 2
+        units: coefficients in log pi = ai/T + bi; T in K
+        values:
+          quantity: partial_pressure_log_temperature_fit_coefficients
+          species_as_printed: (O2)
+          phase: gas
+          method_class: model_derived
+          admission_status: typed_refusal
+          reason: schema_gap_function_valued_fit
+          unavailable_reason: schema_gap_function_valued_fit
+          fit_range_T_K_as_printed: '1875–2182'
+          minus_ai_column_value_as_printed: '30072 ± 305'
+          bi_as_printed: '4.792 ± 0.155'
+          equation_as_printed: 'log pi = ai/T + bi'
+  CaTiO3:
+    observations: []
+    context:
+      - observation_id: shornikov_2019_rjpc_table2_existing_catio3_pressure_series
+        type: cross_reference
+        locator:
+          page: 6
+          published_page: 1029
+          pdf_page_index: 5
+          table: '2'
+        units: atm; T in K
+        values:
+          quantity: existing_partial_pressure_series
+          existing_source_id: shornikov-2019-perovskite-evaporation
+          existing_observation_id: shornikov_2019_t1_p_catio3
+          existing_extract_locator:
+            page: 8
+            published_page: 260
+            pdf_page_index: 7
+            table: '1'
+          matching_rjpc_locator:
+            published_page: 1029
+            pdf_page_index: 5
+            table: '2'
+          matching_numeric_points: 8
+          comparison: all temperatures and printed pressures match
+          disposition: cross_reference_only
+      - observation_id: shornikov_2019_rjpc_table5_existing_thermochemistry
+        type: cross_reference
+        locator:
+          page: 7
+          published_page: 1030
+          pdf_page_index: 6
+          table: '5'
+        units: kJ/mol for enthalpy; J/(K mol) for entropy
+        values:
+          quantity: existing_reaction_thermochemistry
+          existing_source_id: shornikov-2019-perovskite-evaporation
+          existing_observation_ids:
+            - shornikov_2019_table2_rxn1_ref18
+            - shornikov_2019_table2_rxn1_ref26
+            - shornikov_2019_table2_rxn1_current
+            - shornikov_2019_table2_rxn2_ref18
+            - shornikov_2019_table2_rxn2_current
+            - shornikov_2019_table2_rxn3_ref18
+            - shornikov_2019_table2_rxn3_ref26
+            - shornikov_2019_table2_rxn3_current
+            - shornikov_2019_table2_rxn4_ref26
+            - shornikov_2019_table2_rxn4_current
+          matching_rjpc_locator:
+            published_page: 1030
+            pdf_page_index: 6
+            table: '5'
+          matching_rows: 10
+          numeric_fields_compared: 40
+          comparison: all readings match; three OCR dash-glyph differences were confirmed as negative values in both renders
+          disposition: cross_reference_only
+      - observation_id: shornikov_2019_rjpc_ion_current_ratio_2182k_conflict
+        type: attributed_measurement_conflict
+        locator:
+          page: 4
+          published_page: 1027
+          pdf_page_index: 3
+          section: Experimental
+        units: relative ion-current intensity as printed
+        values:
+          quantity: relative_ion_current_intensities
+          method_class: measured_direct
+          temperature_K: 2182
+          ion_current_ratio_order_as_printed: 'I_Ca : I_CaO : I_Ti : I_TiO : I_TiO2 : I_CaTiO3 : I_O : I_O2'
+          rjpc_ratio_as_printed: '100 : 0.06 : 0.07 : 54 : 100 : 0.12 : 0.73 : 0.02'
+          existing_source_id: shornikov-2019-perovskite-evaporation
+          existing_observation_id: shornikov_2019_ion_currents_2182k
+          existing_ratio_as_printed: '80 : 0.04 : 0.1 : 75 : 100 : 0.02 : 40 : 0.3'
+          existing_locator:
+            page: 5
+            published_page: 257
+            pdf_page_index: 4
+            section: Experimental
+          disposition: controller_decision_required
+          note: >-
+            Both publications report the same species order at 2182 K but print different ratios. Do not change the TMS chapter extract until the controller decides which reading to retain. The shared CaTiO3 fragmentation ratio 6 : 10 : 13 : 100 is already in the existing observation and is not duplicated here.
+      - observation_id: shornikov_2019_rjpc_shared_narrative_context_cross_references
+        type: cross_reference
+        locator:
+          page: 5
+          published_page: 1028
+          pdf_page_index: 4
+          section: Experimental
+        units: matching literature-context values; original units retained in the referenced extract
+        values:
+          quantity: existing_narrative_context
+          existing_source_id: shornikov-2019-perovskite-evaporation
+          references:
+            - existing_observation_id: shornikov_2019_mi1201_mo
+              matching_rjpc_locators:
+                - page: 5
+                  published_page: 1028
+                  pdf_page_index: 4
+                  section: Experimental
+              matching_items:
+                - MI-1201 mass spectrometer and operating temperature capability
+                - molybdenum Knudsen cell and 20 eV ionization energy
+                - sample preparation schedule
+            - existing_observation_id: shornikov_2019_qualifying_statements
+              matching_rjpc_locators:
+                - page: 4
+                  published_page: 1027
+                  pdf_page_index: 3
+                  section: Experimental
+                - page: 7
+                  published_page: 1030
+                  pdf_page_index: 6
+                  section: Results and Discussion
+              matching_items:
+                - Mo-cell ion-current ratio
+                - CaTiO3+ appearance energy
+                - TiO2 and perovskite melting temperatures
+                - relative pressure error statement for the Table 2 pressures
+            - existing_observation_id: shornikov_2019_background_numeric_statements
+              matching_rjpc_locators:
+                - page: 2
+                  published_page: 1025
+                  pdf_page_index: 1
+                  table: '1'
+                - page: 3
+                  published_page: 1026
+                  pdf_page_index: 2
+                  section: Introduction
+              matching_items:
+                - Banon et al. sample count and temperature range
+                - Lopatin and Semenov cited evaporation conditions and appearance energy
+                - Zhang et al. vacuum-furnace temperature
+          disposition: cross_reference_only_except_flagged_ion_ratio
+          note: The 2182 K species ratio that differs is handled in the separate conflict record above.
+      - observation_id: shornikov_2019_rjpc_temperature_and_residual_pressure_context
+        type: method
+        locator:
+          page: 4
+          published_page: 1027
+          pdf_page_index: 3
+          section: Experimental
+        units: K; atm
+        values:
+          quantity: temperature_measurement_and_background_pressure
+          method_class: method_only
+          temperature_sensor_as_printed: EOP-66 optical pyrometer
+          temperature_error_as_printed: up to 10 K at 2400 K
+          residual_gas_pressure_upper_bound_as_printed: did not exceed 10⁻¹⁰ atm
+          pdftotext_layout_spelling: '10–10 atm'
+          note: >-
+            Rendered text confirms a superscript minus-ten exponent. The pdftotext-layout spelling is retained separately to document that glyph.
+      - observation_id: shornikov_2019_rjpc_table1_laser_study_context
+        type: literature_context
+        locator:
+          page: 2
+          published_page: 1025
+          pdf_page_index: 1
+          table: '1'
+          table_row_number: 1
+        units: K; μs; Å; J; relative ion-current intensity
+        values:
+          quantity: quoted_laser_ion_emission_context
+          method_class: quoted_attributed
+          attribution: Zakharov and Protas [14] (1974)
+          system_as_printed: CaTiO3
+          temperature_as_printed_in_table: '4890'
+          estimated_temperature_as_printed_in_text: '4890 ± 70 K'
+          pulse_duration_as_printed: 800–1000 μs
+          wavelength_as_printed: '6943 Å'
+          pulse_energy_as_printed: 3–5 J
+          observed_species_as_printed: 'O, Ca, CaO, Ti, TiO, CaTiO3'
+          ion_current_ratio_order_as_printed: 'I_O : I_Ca : I_CaO : I_Ti : I_TiO : I_CaTiO3'
+          ion_current_ratio_as_printed: '0.41 : 100 : 0.17 : 4.32 : 0.54 : 0.05'
+          text_locator:
+            page: 3
+            published_page: 1026
+            pdf_page_index: 2
+            section: Introduction
+          note: Table 1 prints 4890 without uncertainty; the discussion gives the estimate 4890 ± 70 K.
+      - observation_id: shornikov_2019_rjpc_comparable_laser_temperature_range
+        type: literature_context
+        locator:
+          page: 3
+          published_page: 1026
+          pdf_page_index: 2
+          section: Introduction
+        units: K
+        values:
+          quantity: comparable_laser_mass_spectrometry_temperature_range
+          method_class: quoted_unattributed
+          temperature_range_as_printed: 4000–6000 K
+          note: Authors state this range for similar laser-impact mass-spectrometry experiments.
+      - observation_id: shornikov_2019_rjpc_table1_row3_context
+        type: literature_context
+        locator:
+          page: 2
+          published_page: 1025
+          pdf_page_index: 1
+          table: '1'
+          table_row_number: 3
+        units: K; quoted study summary
+        values:
+          quantity: cited_study_summary
+          method_class: quoted_attributed
+          attribution_as_printed: '[16, 17], 2000'
+          system_as_printed: CaTiO3–CaSiO3
+          cell_material_as_printed: Mo
+          temperature_range_as_printed: 1700–2500
+          observed_components_as_printed: 'Ca, CaO, TiO, TiO2, SiO, SiO2, MoO2, MoO3'
+          main_results_as_printed: 'ai,2100; ΔGm,2100'
+      - observation_id: shornikov_2019_rjpc_table1_row4_context
+        type: literature_context
+        locator:
+          page: 2
+          published_page: 1025
+          pdf_page_index: 1
+          table: '1'
+          table_row_number: 4
+        units: K; quoted study summary
+        values:
+          quantity: cited_study_summary
+          method_class: quoted_attributed
+          attribution_as_printed: '[18], 2000'
+          system_as_printed: CaO–TiO2–SiO2
+          cell_material_as_printed: Mo
+          temperature_range_as_printed: 1850–2350
+          observed_components_as_printed: 'Ca, TiO, TiO2, SiO, SiO2, MoO2, MoO3'
+          main_results_as_printed: 'aSiO2,1850'
+      - observation_id: shornikov_2019_rjpc_table1_row6_context
+        type: literature_context
+        locator:
+          page: 2
+          published_page: 1025
+          pdf_page_index: 1
+          table: '1'
+          table_row_number: 6
+        units: K; quoted study summary
+        values:
+          quantity: cited_study_summary
+          method_class: quoted_attributed
+          attribution_as_printed: '[19], 2003'
+          system_as_printed: CaTiO3–SiO2
+          cell_material_as_printed: Mo
+          temperature_range_as_printed: 1582–2529
+          observed_components_as_printed: 'O, Ca, TiO, SiO'
+          main_results_as_printed: 'ai,2100; ΔGm,2100'
+      - observation_id: shornikov_2019_rjpc_table1_row7_context
+        type: literature_context
+        locator:
+          page: 2
+          published_page: 1025
+          pdf_page_index: 1
+          table: '1'
+          table_row_number: 7
+        units: K; quoted study summary
+        values:
+          quantity: cited_study_summary
+          method_class: quoted_attributed
+          attribution_as_printed: '[20], 2004'
+          system_as_printed: CaO–TiO2–SiO2
+          cell_material_as_printed: W
+          temperature_range_as_printed: 1800–2200
+          observed_components_as_printed: 'CaO, SiO, WO2, WO3'
+          main_results_as_printed: 'pCaO,1981; pSiO2,1981; aCaO,2057; aSiO2,1981'
+      - observation_id: shornikov_2019_rjpc_table1_duplicate_rows_cross_reference
+        type: cross_reference
+        locator:
+          page: 2
+          published_page: 1025
+          pdf_page_index: 1
+          table: '1'
+          note: rows 2, 5 and 8
+        units: cited-study summaries as printed
+        values:
+          quantity: existing_literature_context
+          existing_source_id: shornikov-2019-perovskite-evaporation
+          row_2_existing_observation_id: shornikov_2019_background_numeric_statements
+          row_2_attribution_as_printed: '[15], 1981'
+          row_5_existing_observation_ids:
+            - shornikov_2019_table2_rxn1_ref18
+            - shornikov_2019_table2_rxn2_ref18
+            - shornikov_2019_table2_rxn3_ref18
+          row_5_attribution_as_printed: '[21], 2001'
+          row_8_existing_observation_id: shornikov_2019_background_numeric_statements
+          row_8_attribution_as_printed: '[3–5], 1995–2014'
+          note: >-
+            Repeated values for Banon et al., Lopatin and Semenov, and Zhang et al. are represented by the existing TMS context and Table 5 cross-reference above; no row temperatures or result values are repeated here.
+      - observation_id: shornikov_2019_rjpc_table4_cati_o3_fit_refusal
+        type: fit_refusal
+        locator:
+          page: 6
+          published_page: 1029
+          pdf_page_index: 5
+          table: '4'
+          table_row_number: 8
+        units: coefficients in log pi = ai/T + bi; T in K
+        values:
+          quantity: partial_pressure_log_temperature_fit_coefficients
+          species_as_printed: (CaTiO3)
+          phase: gas
+          method_class: model_derived
+          admission_status: typed_refusal
+          reason: schema_gap_function_valued_fit
+          unavailable_reason: schema_gap_function_valued_fit
+          fit_range_T_K_as_printed: 1956–2182
+          minus_ai_column_value_as_printed: '53659 ± 527'
+          bi_as_printed: '15.498 ± 0.262'
+          equation_as_printed: 'log pi = ai/T + bi'
+      - observation_id: shornikov_2019_rjpc_laser_surface_temperature_estimate
+        type: model_estimate
+        locator:
+          page: 7
+          published_page: 1030
+          pdf_page_index: 6
+          section: Results and Discussion
+          equation: '31'
+        units: K
+        values:
+          quantity: laser_heated_surface_temperature_estimate
+          method_class: model_derived
+          estimate_as_printed: '4730 ± 100 K'
+          basis_as_printed: >-
+            Equilibrium (31), 2(CaO) + 2(TiO) = (CaTiO3) + (Ti) + (Ca) + (O), using the ion-current ratio reported by Zakharov and Protas [14].
+          note: This is a model estimate in the article text, not a digitized figure value.
+      - observation_id: shornikov_2019_rjpc_figure2_reaction_equilibrium
+        type: figure_record
+        locator:
+          page: 4
+          published_page: 1027
+          pdf_page_index: 3
+          figure: '2'
+        units: log10 equilibrium constant; temperature in K
+        values:
+          quantity: reaction_equilibrium_constant
+          species: CaTiO3
+          phase: gas
+          reaction_as_printed: '(CaTiO3) = (CaO) + (TiO2)'
+          temperature_axis_as_printed: 'T, K'
+          equilibrium_axis_as_printed: '−log K16(T)'
+          caption_as_printed: >-
+            Fig. 2. Logarithmic dependences of the equilibrium constant of the reaction (CaTiO3) = (CaO) + (TiO2) on the reciprocal temperature determined by the Knudsen effusion mass spectrometric method in (1) this study and (2) Lopatin and Semenov's study [21]. The vertical dashed line 3 represents the melting point of perovskite.
+          panel: single
+          series:
+            - id: '1'
+              symbol: filled circle
+              attribution: this study
+              marker_count: 8
+            - id: '2'
+              symbol: open circle
+              attribution: Lopatin and Semenov [21]
+              marker_count: 12
+          marker_count_note: visual counts; symbols overlap in clustered portions
+          digitisation: deferred to a figure pass
