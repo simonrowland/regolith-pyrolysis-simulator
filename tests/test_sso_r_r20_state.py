@@ -1961,7 +1961,7 @@ def test_c7_external_al_credit_changes_cao_basis_without_fe_redox_step(
     assert 0.75 * external_al_mol == pytest.approx(0.5 * ca_mol)
     assert breakdown.get("terms_mol_o2_equiv_by_label", {}).get(
         label, 0.0
-    ) == pytest.approx(0.0, abs=1.0e-12)
+    ) == 0.0
     assert label not in breakdown.get("applied_terms_mol_o2_equiv_by_label", {})
     assert label not in breakdown.get("skipped_reasons_by_label", {})
     assert _transition_account_species_mol(
@@ -1972,22 +1972,19 @@ def test_c7_external_al_credit_changes_cao_basis_without_fe_redox_step(
         species="CaO",
     ) == pytest.approx(2.0 * ca_mol)
     after_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
-    assert after_mol["FeO"] == pytest.approx(before_mol["FeO"])
-    assert after_mol.get("Fe2O3", 0.0) == pytest.approx(
-        before_mol.get("Fe2O3", 0.0)
-    )
+    assert after_mol["FeO"] == before_mol["FeO"]
+    assert after_mol.get("Fe2O3", 0.0) == before_mol.get("Fe2O3", 0.0)
     assert after_mol["CaO"] < before_mol["CaO"]
     transition.validate_conservation(sim.species_formula_registry)
 
-    # The ledger changes CaO activity but does not change Fe valence. Any
-    # potential shift therefore comes from that small composition change,
-    # never from a second oxygen source step.
+    # This branch stores fO2 as a scalar: with no C7 source term and unchanged
+    # Fe inventories, the scalar must remain exactly unchanged. At the b-899
+    # rebase, replace this with the redox owner's Kress inverse on the new
+    # composition and the same Fe2+/Fe3+ inventory, to its solver tolerance.
     fO2_change = sim._current_melt_redox_fO2_log() - before_fO2
-    assert fO2_change >= 0.0
-    assert abs(fO2_change) < 0.1
-    assert sim.melt.oxygen_reservoir.redox_source_delta_ln_fO2 == pytest.approx(
-        0.0
-    )
+    assert fO2_change == 0.0
+    assert sim._current_melt_redox_fO2_log() == before_fO2
+    assert sim.melt.oxygen_reservoir.redox_source_delta_ln_fO2 == 0.0
 
 
 def test_c7_mixed_in_situ_and_external_al_balances_both_source_accounts(
