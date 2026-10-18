@@ -6441,7 +6441,7 @@ def test_freeze_gate_curve_path_records_sr18_repair_notice(
     ]
 
 
-def test_freeze_gate_memos_preserve_sr18_and_sr19_repair_notices(
+def test_failed_freeze_gate_fallback_preserves_repair_notices_without_memoizing(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -6459,6 +6459,8 @@ def test_freeze_gate_memos_preserve_sr18_and_sr19_repair_notices(
     sim._freeze_gate_shared_curve_cache = shared_cache
     store = PT0DeterminismStore('capture')
     sim.configure_pt0_determinism_store(store)
+    gate_provider_calls = []
+
     def dispatch(intent, *args, **kwargs):
         if intent is ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM:
             return IntentResult(
@@ -6467,6 +6469,7 @@ def test_freeze_gate_memos_preserve_sr18_and_sr19_repair_notices(
                 transition=None,
                 diagnostic={},
             )
+        gate_provider_calls.append(intent)
         return IntentResult(
             intent=intent,
             status='ok',
@@ -6508,30 +6511,15 @@ def test_freeze_gate_memos_preserve_sr18_and_sr19_repair_notices(
     assert sim._reduced_real_repair_notices[-1]['replacement_source'] == (
         'liquidus_solidus:backend'
     )
-    local = sim._freeze_gate_liquid_fraction_cache
-    shared = shared_cache[local['key']]
-    assert local['repair_notices'] == sim._reduced_real_repair_notices
-    assert shared['repair_notices'] == sim._reduced_real_repair_notices
-    assert next(iter(store.entries.values()))['repair_notices_json'] == (
-        canonical_json_bytes(sim._reduced_real_repair_notices).decode('utf-8')
-    )
-
     expected_notices = list(sim._reduced_real_repair_notices)
+    assert sim._freeze_gate_liquid_fraction_cache is None
+    assert shared_cache == {}
+    assert store.entries == {}
+
     sim._reduced_real_repair_notices = []
     assert sim._freeze_gate_curve() == curve
     assert sim._reduced_real_repair_notices == expected_notices
-
-    sibling = _build_freeze_gate_sim(
-        vapor_pressure_data,
-        feedstocks_data,
-        setpoints_data,
-        enabled=True,
-    )
-    sibling.melt.temperature_C = 1600.0
-    sibling.melt.p_total_mbar = 10.0
-    sibling._freeze_gate_shared_curve_cache = shared_cache
-    assert sibling._freeze_gate_curve() == curve
-    assert sibling._reduced_real_repair_notices == expected_notices
+    assert len(gate_provider_calls) == 2
 
 
 def test_uncacheable_gate_curve_fallback_skips_every_memo(
