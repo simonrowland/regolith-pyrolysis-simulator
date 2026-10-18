@@ -1380,7 +1380,8 @@ def test_conflicting_owner_selected_initials_are_withheld_with_migration_issue(
             value=replace(old_initial.state.value, basis="other_engine_basis"),
         ),
     )
-    assert migrate_module._initial_compositions_conflict(
+    # Engine-basis labels are metadata; the physical maps are identical.
+    assert not migrate_module._initial_compositions_conflict(
         old_initial, basis_conflict
     )
 
@@ -1460,6 +1461,32 @@ def test_conflicting_owner_selected_initials_are_withheld_with_migration_issue(
             if "initial_composition_conflict" in issue.detail
         ]
     ) == 1
+
+
+def test_bischof_measured_and_nominal_initials_remain_conflicted() -> None:
+    source = REPO_ROOT / "data/literature/extracts/kems-137-bischof-2023.yaml"
+    migrator = Migrator()
+    migrator._migrate_extract(source)
+    migrator.finalize()
+
+    expected_runs = {"an-di-1-low", "an-di-2-low", "an-di-3-high"}
+    conflicts = [
+        issue
+        for issue in migrator.result.registry_issues
+        if "initial_composition_conflict" in issue.detail
+    ]
+    assert len(conflicts) == 3
+    assert {
+        run
+        for run in expected_runs
+        if any(f"::{run}]" in issue.path for issue in conflicts)
+    } == expected_runs
+    assert all(issue.reason is RefusalReason.INVALID_SOURCE for issue in conflicts)
+    assert all(
+        experiment.sample.initial_composition is None
+        for experiment_id, experiment in migrator.result.experiments.items()
+        if any(experiment_id.endswith(f"::{run}") for run in expected_runs)
+    )
 
 
 def test_ambiguous_mass_percent_initial_preserves_print_and_withholds_canonical() -> None:
