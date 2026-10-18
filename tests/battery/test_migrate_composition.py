@@ -246,6 +246,28 @@ def test_plante_hastie_fit_coefficients_are_not_composition_evidence() -> None:
     assert source_experiment.sample.initial_composition is None
 
 
+def test_hastie_typed_initial_charge_reaches_experiment_sample() -> None:
+    path = REPO_ROOT / "data/literature/extracts/kems-020-hastie-1981-nbsir.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    observation = next(
+        item
+        for item in document["species"]["K2O"]["observations"]
+        if item["observation_id"] == "hastie_1981_fig11_k1_slag_k2o_gamma_digitized"
+    )
+    assert observation["values"]["composition_role"]["value"] == "initial_charge_only"
+    selected = sample_from_equipment(None, values=observation["values"])
+    assert selected.initial_composition is not None
+
+    migrator = Migrator()
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    experiment = migrator.result.experiments[
+        "10.6028/nbs.ir.81-2279::experiment::hastie-1981-k1-kms"
+    ]
+
+    assert experiment.sample.initial_composition == selected.initial_composition
+
+
 def _plante_analytical_composition(doc: dict) -> tuple[dict[str, Decimal], object]:
     table1 = next(
         item
