@@ -37,25 +37,79 @@ def _at_path(value: dict, path: tuple[str, ...]) -> object:
 
 RENDER_PINS = (
     # 600 dpi PDF p. 9, Table 4, experiment 1.
-    ("naess14_table4_experiment_01", ("values", "measured_or_calculated_results", "measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1"), "0.98", 9),
+    (
+        "naess14_table4_experiment_01",
+        ("values", "measured_or_calculated_results", "measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1"),
+        "0.98",
+        9,
+        403,
+    ),
     # 600 dpi PDF p. 9, Table 4, experiment 11.
-    ("naess14_table4_experiment_11", ("values", "measured_or_calculated_results", "measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1"), "5.99", 9),
+    (
+        "naess14_table4_experiment_11",
+        ("values", "measured_or_calculated_results", "measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1"),
+        "5.99",
+        9,
+        403,
+    ),
     # 600 dpi PDF p. 9, Table 4, experiment 17.
-    ("naess14_table4_experiment_17", ("values", "measured_or_calculated_results", "measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1"), "11.34", 9),
+    (
+        "naess14_table4_experiment_17",
+        ("values", "measured_or_calculated_results", "measured_flux_JSiO2_header_scale_10^-3_mol_m^-2_s^-1"),
+        "11.34",
+        9,
+        403,
+    ),
     # 600 dpi PDF p. 12, Table 5, measured flux at 5 m/s.
-    ("naess14_table5_measured_flux_by_dry_air_velocity", ("values", "gas_velocity_at_nozzle_exit_m_s", "5"), "1.2", 12),
+    (
+        "naess14_table5_measured_flux_by_dry_air_velocity",
+        ("values", "gas_velocity_at_nozzle_exit_m_s", "5"),
+        "1.2",
+        12,
+        406,
+    ),
     # PDF p. 2 prose quotes the approximate mean diameter from prior work.
-    ("naess14_prior_fume_characterisation_and_industrial_flux", ("values", "mean_diameter_as_printed"), "~60 nm", 2),
+    (
+        "naess14_prior_fume_characterisation_and_industrial_flux",
+        ("values", "mean_diameter_as_printed"),
+        "~60 nm",
+        2,
+        396,
+    ),
     # PDF p. 11 prose quotes the industrial particle-size range from prior work.
-    ("naess14_quoted_industrial_particle_diameter_range", ("values", "industrial_particle_diameter_range_as_printed"), "56–66 nm", 11),
+    (
+        "naess14_quoted_industrial_particle_diameter_range",
+        ("values", "industrial_particle_diameter_range_as_printed"),
+        "56–66 nm",
+        11,
+        405,
+    ),
 )
+
+PUBLISHED_FOOTERS = {
+    2: 396,
+    3: 397,
+    4: 398,
+    5: 399,
+    6: 400,
+    7: 401,
+    8: 402,
+    9: 403,
+    10: 404,
+    11: 405,
+    12: 406,
+    13: 407,
+    18: 412,
+}
 
 
 def _assert_render_pins(document: dict) -> None:
-    for observation_id, path, expected, pdf_page in RENDER_PINS:
+    for observation_id, path, expected, pdf_page, published_page in RENDER_PINS:
         record = _context(document, observation_id)
         assert _at_path(record, path) == expected
         assert record["locator"]["page"] == pdf_page
+        assert record["locator"]["published_page"] == published_page
+        assert record["locator"]["pdf_page_index"] == pdf_page - 1
 
 
 def test_naess_table_rows_and_render_pins() -> None:
@@ -65,6 +119,11 @@ def test_naess_table_rows_and_render_pins() -> None:
     context = document["species"]["SiO2"]["context"]
     ids = [row["observation_id"] for row in context]
     assert len(ids) == len(set(ids))
+    for row in context:
+        locator = row["locator"]
+        page = locator["page"]
+        assert locator["published_page"] == PUBLISHED_FOOTERS[page]
+        assert locator["pdf_page_index"] == page - 1
     evidence_classes = {member.value for member in EvidenceClass}
     assert all(
         row["values"].get("method_class") in evidence_classes
