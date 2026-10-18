@@ -1,0 +1,52 @@
+source_id: shornikov-2020-perovskite-chemical-fractionation
+source:
+  citation: 'Shornikov, S. I., & Yakovlev, O. I. (2020). The chemical fractionation of perovskite at evaporation. Experiment in Geosciences, 26(1), 37–39.'
+  doi: null
+  year: 2020
+extraction:
+  method: >-
+    MinerU table draft emitted to refusal-only staging rows. The source prints reaction equilibrium constants, for which the extract schema has no quantity token; the final extract keeps each printed row in a species context refusal.
+  date: '2026-10-18'
+  worker: w4b-1018
+review_status: draft
+tables:
+  - page: 2
+    table_index: 2
+    type: refusal
+    quantity: refused_source_content
+    evidence_class: method_only
+    unit: dimensionless equilibrium constant as printed
+    published_page: 37
+    rows: all
+    temperature:
+      as_printed: '2278 K'
+      unit: K
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 37
+        table: '1'
+        column_header: '$K_{r_i,2278}$'
+    values:
+      - column: 4
+        species: reaction_equilibrium_constant
+  - page: 3
+    table_index: 3
+    type: refusal
+    quantity: refused_source_content
+    evidence_class: method_only
+    unit: dimensionless equilibrium constant as printed
+    published_page: 38
+    rows: all
+    temperature:
+      as_printed: '2278 K'
+      unit: K
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 38
+        table: '1'
+        column_header: '$K_{r_i,2278}$'
+    values:
+      - column: 3
+        species: reaction_equilibrium_constant
