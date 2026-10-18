@@ -128,6 +128,8 @@ species:
       - 1473.0
       uncertainty:
         note: ± 0.20 as printed; confidence level not stated
+        value: 0.20
+        units: dimensionless
         confidence_level: not_stated
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t01_r03_c04
       type: alpha
@@ -192,6 +194,8 @@ species:
       - 1728.0
       uncertainty:
         note: ± 0.30 as printed; confidence level not stated
+        value: 0.30
+        units: dimensionless
         confidence_level: not_stated
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p003_t01_r04_c04
       type: alpha
@@ -384,6 +388,8 @@ species:
             section: Conclusions
       uncertainty:
         note: ± 0.15 as printed; confidence level not stated
+        value: 0.15
+        units: dimensionless
         confidence_level: not_stated
     - observation_id: shornikov_2015_cai_cao_liquid_alpha_author_estimate
       type: alpha
@@ -439,6 +445,98 @@ species:
           results.
         attribution: Shornikov (2015).
         note: Theory-based liquid-state expectation; no numeric temperature or uncertainty is printed.
+    - observation_id: shornikov_2015_cai_table5_melting_point_cao
+      type: transition_point
+      locator:
+        page: 7
+        published_page: 1086
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5, CaO row, Tmelt column.
+      phase: condensed_solid
+      units: K
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: Table 5 does not state pressure for this melting temperature.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: Table 5 does not state oxygen fugacity for this melting temperature.
+      values:
+        quantity: transition_temperature
+        property_kind: melting_point
+        method_class: author_estimate
+        admission_status: admitted
+        phase_as_printed: condensed phase
+        T_K: 3200
+        T_K_as_printed: '3200 ± 50 K'
+        T_m_uncertainty_K: 50
+        table_caption: Table 5. Thermodynamic properties of oxides contained in the melts of Ca–Al–inclusions
+          and identified in the condensed and gas phases and evaporation coefficients of these oxides
+      uncertainty:
+        note: Temperature uncertainty printed as ± 50 K; confidence level not stated.
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_cao_melting_point_chase_1998
+      type: transition_point
+      locator:
+        page: 3
+        published_page: 1082
+        pdf_page_index: 2
+        section: Results and Discussion
+        note: CaO liquid-phase transition threshold attributed to Chase (1998).
+      phase: condensed_solid
+      units: K
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            section: Results and Discussion
+            note: The cited melting temperature is reported without pressure conditions.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            section: Results and Discussion
+            note: The cited melting temperature is reported without oxygen fugacity conditions.
+      values:
+        quantity: transition_temperature
+        property_kind: melting_point
+        method_class: quoted_attributed
+        admission_status: admitted
+        phase_as_printed: liquid phase
+        T_K: 3172
+        T_K_as_printed: '3172 ± 30 K'
+        T_m_uncertainty_K: 30
+        attribution: Chase (1998)
+        attribution_as_printed: Chase, 1998
+        quote_as_printed: The region of the liquid phase occurs at temperatures above 3172 ± 30 K.
+        note: Separate cited value; Table 5 independently prints 3200 ± 50 K for CaO.
+      uncertainty:
+        note: Temperature uncertainty printed as ± 30 K; confidence level not stated.
+        confidence_level: not_stated
     context:
     - observation_id: shornikov_2015_cai_table5_thermochemical_cells_cao
       type: thermochemical_table_row
@@ -447,13 +545,13 @@ species:
         published_page: 1086
         pdf_page_index: 6
         table: '5'
-        note: Table 5 thermochemical cells, data row 5; the alpha cell is stored as an alpha observation.
+        note: Table 5 thermochemical cells, data row 5; alpha and Tmelt are stored as separate observations.
       units: as printed per property column
       values:
         quantity: composite_thermochemical_table_row_without_single_observation_quantity
         method_class: typed_refusal
         admission_status: typed_refusal
-        schema_gap: Nine thermochemical property cells share a table row; this extract has no one observation
+        schema_gap: Eight remaining thermochemical property cells share a table row; this extract has no one observation
           token that represents the complete multi-property row with per-cell attribution. The exact values
           and headers are retained below.
         cells_as_printed:
@@ -463,9 +561,6 @@ species:
         - property_as_printed: ΔSf, 298
           header_as_printed: ΔSf, 298, J/(g-at K)
           value_as_printed: 19.50 ± 0.20
-        - property_as_printed: Tmelt
-          header_as_printed: Tmelt, K
-          value_as_printed: 3200 ± 50
         - property_as_printed: ΔHmelt
           header_as_printed: ΔHmelt, kJ/g-a
           value_as_printed: 39.8 ± 2.5
@@ -991,6 +1086,8 @@ species:
       - 2573.0
       uncertainty:
         note: ± 0.20 as printed; confidence level not stated
+        value: 0.20
+        units: dimensionless
         confidence_level: not_stated
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p007_t05_r06_c08
       type: alpha
@@ -1058,6 +1155,8 @@ species:
             section: Conclusions
       uncertainty:
         note: ± 0.20 as printed; confidence level not stated
+        value: 0.20
+        units: dimensionless
         confidence_level: not_stated
     - observation_id: shornikov_2015_cai_mgo_liquid_alpha_author_estimate
       type: alpha
@@ -1113,6 +1212,60 @@ species:
           results.
         attribution: Shornikov (2015).
         note: Theory-based liquid-state expectation; no numeric temperature or uncertainty is printed.
+    - observation_id: shornikov_2015_cai_table5_melting_point_mgo
+      type: transition_point
+      locator:
+        page: 7
+        published_page: 1086
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5, MgO row, Tmelt column.
+      phase: condensed_solid
+      units: K
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: Table 5 does not state pressure for this melting temperature.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: Table 5 does not state oxygen fugacity for this melting temperature.
+      values:
+        quantity: transition_temperature
+        property_kind: melting_point
+        method_class: quoted_attributed
+        admission_status: admitted
+        phase_as_printed: condensed phase
+        T_K: 3100
+        T_K_as_printed: '3100 ± 25 K'
+        T_m_uncertainty_K: 25
+        attribution: Glushko et al., 1978–1982
+        attribution_as_printed: Glushko et al., 1978–1982
+        source_occurrences:
+        - as_printed: 3100 ± 25 K (Glushko et al., 1978–1982)
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            section: Results and Discussion
+        table_caption: Table 5. Thermodynamic properties of oxides contained in the melts of Ca–Al–inclusions
+          and identified in the condensed and gas phases and evaporation coefficients of these oxides
+      uncertainty:
+        note: Temperature uncertainty printed as ± 25 K; confidence level not stated.
+        confidence_level: not_stated
     context:
     - observation_id: shornikov_2015_cai_table5_thermochemical_cells_mgo
       type: thermochemical_table_row
@@ -1121,13 +1274,13 @@ species:
         published_page: 1086
         pdf_page_index: 6
         table: '5'
-        note: Table 5 thermochemical cells, data row 4; the alpha cell is stored as an alpha observation.
+        note: Table 5 thermochemical cells, data row 4; alpha and Tmelt are stored as separate observations.
       units: as printed per property column
       values:
         quantity: composite_thermochemical_table_row_without_single_observation_quantity
         method_class: typed_refusal
         admission_status: typed_refusal
-        schema_gap: Nine thermochemical property cells share a table row; this extract has no one observation
+        schema_gap: Eight remaining thermochemical property cells share a table row; this extract has no one observation
           token that represents the complete multi-property row with per-cell attribution. The exact values
           and headers are retained below.
         cells_as_printed:
@@ -1137,9 +1290,6 @@ species:
         - property_as_printed: ΔSf, 298
           header_as_printed: ΔSf, 298, J/(g-at K)
           value_as_printed: 13.48 ± 0.10
-        - property_as_printed: Tmelt
-          header_as_printed: Tmelt, K
-          value_as_printed: 3100 ± 25
         - property_as_printed: ΔHmelt
           header_as_printed: ΔHmelt, kJ/g-a
           value_as_printed: 38.5 ± 3.0
@@ -2248,6 +2398,8 @@ species:
         T_K: 2318.0
       uncertainty:
         note: ± 0.2 as printed; confidence level not stated
+        value: 0.2
+        units: dimensionless
         confidence_level: not_stated
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r19_c04
       type: alpha
@@ -2313,6 +2465,8 @@ species:
       - 2594.0
       uncertainty:
         note: ± 0.2 as printed; confidence level not stated
+        value: 0.2
+        units: dimensionless
         confidence_level: not_stated
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p004_t03_r20_c04
       type: alpha
@@ -2431,6 +2585,8 @@ species:
         competing_observation_id: shornikov_2015_cai_abstract_al2o3_cr_recommendation
       uncertainty:
         note: ± 0.02 as printed; confidence level not stated
+        value: 0.02
+        units: dimensionless
         confidence_level: not_stated
     - observation_id: shornikov_2015_cai_abstract_al2o3_cr_recommendation
       type: alpha
@@ -2493,6 +2649,53 @@ species:
             section: Conclusions
       uncertainty:
         note: ± 0.02 as printed; confidence level not stated
+        value: 0.02
+        units: dimensionless
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_table5_melting_point_al2o3
+      type: transition_point
+      locator:
+        page: 7
+        published_page: 1086
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5, Al2O3 row, Tmelt column.
+      phase: condensed_solid
+      units: K
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: Table 5 does not state pressure for this melting temperature.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: Table 5 does not state oxygen fugacity for this melting temperature.
+      values:
+        quantity: transition_temperature
+        property_kind: melting_point
+        method_class: author_estimate
+        admission_status: admitted
+        phase_as_printed: condensed phase
+        T_K: 2327
+        T_K_as_printed: '2327 ± 4 K'
+        T_m_uncertainty_K: 4
+        table_caption: Table 5. Thermodynamic properties of oxides contained in the melts of Ca–Al–inclusions
+          and identified in the condensed and gas phases and evaporation coefficients of these oxides
+      uncertainty:
+        note: Temperature uncertainty printed as ± 4 K; confidence level not stated.
         confidence_level: not_stated
     context:
     - observation_id: shornikov_2015_cai_table5_thermochemical_cells_al2o3
@@ -2502,13 +2705,13 @@ species:
         published_page: 1086
         pdf_page_index: 6
         table: '5'
-        note: Table 5 thermochemical cells, data row 3; the alpha cell is stored as an alpha observation.
+        note: Table 5 thermochemical cells, data row 3; alpha and Tmelt are stored as separate observations.
       units: as printed per property column
       values:
         quantity: composite_thermochemical_table_row_without_single_observation_quantity
         method_class: typed_refusal
         admission_status: typed_refusal
-        schema_gap: Nine thermochemical property cells share a table row; this extract has no one observation
+        schema_gap: Eight remaining thermochemical property cells share a table row; this extract has no one observation
           token that represents the complete multi-property row with per-cell attribution. The exact values
           and headers are retained below.
         cells_as_printed:
@@ -2518,9 +2721,6 @@ species:
         - property_as_printed: ΔSf, 298
           header_as_printed: ΔSf, 298, J/(g-at K)
           value_as_printed: 10.18 ± 0.02
-        - property_as_printed: Tmelt
-          header_as_printed: Tmelt, K
-          value_as_printed: 2327 ± 4
         - property_as_printed: ΔHmelt
           header_as_printed: ΔHmelt, kJ/g-a
           value_as_printed: 22.3 ± 0.6
@@ -2746,6 +2946,8 @@ species:
       - 1950.0
       uncertainty:
         note: ± 0.30 as printed; confidence level not stated
+        value: 0.0030
+        units: dimensionless
         confidence_level: not_stated
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r04_c04
       type: alpha
@@ -2810,6 +3012,8 @@ species:
       - 1950.0
       uncertainty:
         note: ± 0.8 as printed; confidence level not stated
+        value: 0.008
+        units: dimensionless
         confidence_level: not_stated
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r05_c04
       type: alpha
@@ -2940,6 +3144,8 @@ species:
       - 1950.0
       uncertainty:
         note: ± 0.41 as printed; confidence level not stated
+        value: 0.0041
+        units: dimensionless
         confidence_level: not_stated
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r07_c04
       type: alpha
@@ -3004,6 +3210,8 @@ species:
       - 1950.0
       uncertainty:
         note: ± 0.47 as printed; confidence level not stated
+        value: 0.0047
+        units: dimensionless
         confidence_level: not_stated
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r08_c04
       type: alpha
@@ -3142,6 +3350,8 @@ species:
       - 2100.0
       uncertainty:
         note: ± 0.02 as printed; confidence level not stated
+        value: 0.02
+        units: dimensionless
         confidence_level: not_stated
     - observation_id: shornikov_2015_cai_vaporization_coefficients_p005_t04_r10_c04
       type: alpha
@@ -3202,8 +3412,8 @@ species:
         material_of_crucible_or_matrix_as_printed: C
         gas_phase_component_as_printed: –
         temperature_as_printed: 2173–2373
-        phase_basis: The source identifies SiO2 melting at 1996 ± 5 K and describes the 2000–2100 K coefficient
-          as liquid; the 2173–2373 K row is above that transition.
+        phase_basis: Table 5 prints Tmelt = 1996 ± 5 K; this 2173–2373 K interval is above that melting
+          temperature, supporting the printed liquid phase assignment.
         table_caption: Table 4. Experimental data on the vaporization coefficient of SiO2
         table_row: 9
       T_range_K:
@@ -3275,6 +3485,62 @@ species:
             section: Conclusions
       uncertainty:
         note: ± 0.003 as printed; confidence level not stated
+        value: 0.003
+        units: dimensionless
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_table5_melting_point_sio2
+      type: transition_point
+      locator:
+        page: 7
+        published_page: 1086
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5, SiO2 row, Tmelt column.
+      phase: condensed_solid
+      units: K
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: Table 5 does not state pressure for this melting temperature.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: Table 5 does not state oxygen fugacity for this melting temperature.
+      values:
+        quantity: transition_temperature
+        property_kind: melting_point
+        method_class: quoted_attributed
+        admission_status: admitted
+        phase_as_printed: condensed phase
+        T_K: 1996
+        T_K_as_printed: '1996 ± 5 K'
+        T_m_uncertainty_K: 5
+        attribution: Glushko et al., 1978–1982
+        attribution_as_printed: Glushko et al., 1978–1982
+        source_occurrences:
+        - as_printed: 1996 ± 5 K (Glushko et al., 1978–1982)
+          locator:
+            page: 5
+            published_page: 1084
+            pdf_page_index: 4
+            section: Results and Discussion
+        table_caption: Table 5. Thermodynamic properties of oxides contained in the melts of Ca–Al–inclusions
+          and identified in the condensed and gas phases and evaporation coefficients of these oxides
+      uncertainty:
+        note: Temperature uncertainty printed as ± 5 K; confidence level not stated.
         confidence_level: not_stated
     context:
     - observation_id: shornikov_2015_cai_table5_thermochemical_cells_sio2
@@ -3284,13 +3550,13 @@ species:
         published_page: 1086
         pdf_page_index: 6
         table: '5'
-        note: Table 5 thermochemical cells, data row 1; the alpha cell is stored as an alpha observation.
+        note: Table 5 thermochemical cells, data row 1; alpha and Tmelt are stored as separate observations.
       units: as printed per property column
       values:
         quantity: composite_thermochemical_table_row_without_single_observation_quantity
         method_class: typed_refusal
         admission_status: typed_refusal
-        schema_gap: Nine thermochemical property cells share a table row; this extract has no one observation
+        schema_gap: Eight remaining thermochemical property cells share a table row; this extract has no one observation
           token that represents the complete multi-property row with per-cell attribution. The exact values
           and headers are retained below.
         cells_as_printed:
@@ -3300,9 +3566,6 @@ species:
         - property_as_printed: ΔSf, 298
           header_as_printed: ΔSf, 298, J/(g-at K)
           value_as_printed: 13.82 ± 0.07
-        - property_as_printed: Tmelt
-          header_as_printed: Tmelt, K
-          value_as_printed: 1996 ± 5
         - property_as_printed: ΔHmelt
           header_as_printed: ΔHmelt, kJ/g-a
           value_as_printed: 3.2 ± 0.2
@@ -3495,6 +3758,8 @@ species:
             section: Conclusions
       uncertainty:
         note: ± 0.02 as printed; confidence level not stated
+        value: 0.02
+        units: dimensionless
         confidence_level: not_stated
     - observation_id: shornikov_2015_cai_semenov_tio2_alpha_1920K
       type: alpha
@@ -3554,6 +3819,8 @@ species:
       - 2540.0
       uncertainty:
         note: ± 0.04 as printed; confidence level not stated
+        value: 0.04
+        units: dimensionless
         confidence_level: not_stated
     - observation_id: shornikov_2015_cai_tio2_liquid_alpha_author_estimate
       type: alpha
@@ -3609,6 +3876,51 @@ species:
           results.
         attribution: Shornikov (2015).
         note: Theory-based liquid-state expectation; no numeric temperature or uncertainty is printed.
+    - observation_id: shornikov_2015_cai_table5_melting_point_tio2
+      type: transition_point
+      locator:
+        page: 7
+        published_page: 1086
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5, TiO2 row, Tmelt column.
+      phase: condensed_solid
+      units: K
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: Table 5 does not state pressure for this melting temperature.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: Table 5 does not state oxygen fugacity for this melting temperature.
+      values:
+        quantity: transition_temperature
+        property_kind: melting_point
+        method_class: author_estimate
+        admission_status: admitted
+        phase_as_printed: condensed phase
+        T_K: 2185
+        T_K_as_printed: '2185 ± 10 K'
+        T_m_uncertainty_K: 10
+        table_caption: Table 5. Thermodynamic properties of oxides contained in the melts of Ca–Al–inclusions
+          and identified in the condensed and gas phases and evaporation coefficients of these oxides
+      uncertainty:
+        note: Temperature uncertainty printed as ± 10 K; confidence level not stated.
+        confidence_level: not_stated
     context:
     - observation_id: shornikov_2015_cai_table5_thermochemical_cells_tio2
       type: thermochemical_table_row
@@ -3617,13 +3929,13 @@ species:
         published_page: 1086
         pdf_page_index: 6
         table: '5'
-        note: Table 5 thermochemical cells, data row 2; the alpha cell is stored as an alpha observation.
+        note: Table 5 thermochemical cells, data row 2; alpha and Tmelt are stored as separate observations.
       units: as printed per property column
       values:
         quantity: composite_thermochemical_table_row_without_single_observation_quantity
         method_class: typed_refusal
         admission_status: typed_refusal
-        schema_gap: Nine thermochemical property cells share a table row; this extract has no one observation
+        schema_gap: Eight remaining thermochemical property cells share a table row; this extract has no one observation
           token that represents the complete multi-property row with per-cell attribution. The exact values
           and headers are retained below.
         cells_as_printed:
@@ -3633,9 +3945,6 @@ species:
         - property_as_printed: ΔSf, 298
           header_as_printed: ΔSf, 298, J/(g-at K)
           value_as_printed: 16.87 ± 0.10
-        - property_as_printed: Tmelt
-          header_as_printed: Tmelt, K
-          value_as_printed: 2185 ± 10
         - property_as_printed: ΔHmelt
           header_as_printed: ΔHmelt, kJ/g-a
           value_as_printed: 22.7 ± 3.0
@@ -3711,6 +4020,8 @@ species:
         competing_observation_id: shornikov_2015_cai_abstract_feo_cr_recommendation
       uncertainty:
         note: ± 0.30 as printed; confidence level not stated
+        value: 0.30
+        units: dimensionless
         confidence_level: not_stated
     - observation_id: shornikov_2015_cai_abstract_feo_cr_recommendation
       type: alpha
@@ -3722,17 +4033,23 @@ species:
         note: αvap (FeO, cr) = 1.00 ± 0.20
       phase: cr
       units: dimensionless
+      T_range_K:
+      - 1373.0
+      - 1623.0
       point_conditions:
         temperature_K:
           state:
-            tag: unknown
-            reason: not_published
+            tag: value
+            value:
+              kind: interval
+              interval_low: '1373'
+              interval_high: '1623'
           locator:
-            page: 1
-            published_page: 1080
-            pdf_page_index: 0
-            section: Abstract
-            note: No measurement temperature is printed for this coefficient row.
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            section: Results and Discussion
+            note: The crystalline-phase temperature interval is printed in Results and Discussion.
         total_pressure_Pa:
           state:
             tag: unknown
@@ -3771,8 +4088,16 @@ species:
             published_page: 1087
             pdf_page_index: 7
             section: Conclusions
+        - as_printed: crystalline phase region at 1373–1623 K
+          locator:
+            page: 3
+            published_page: 1082
+            pdf_page_index: 2
+            section: Results and Discussion
       uncertainty:
         note: ± 0.20 as printed; confidence level not stated
+        value: 0.20
+        units: dimensionless
         confidence_level: not_stated
     - observation_id: shornikov_2015_cai_feo_liquid_alpha
       type: alpha
@@ -3839,6 +4164,53 @@ species:
             section: Conclusions
       uncertainty:
         note: ± 0.10 as printed; confidence level not stated
+        value: 0.10
+        units: dimensionless
+        confidence_level: not_stated
+    - observation_id: shornikov_2015_cai_table5_melting_point_feo
+      type: transition_point
+      locator:
+        page: 7
+        published_page: 1086
+        pdf_page_index: 6
+        table: '5'
+        note: Table 5, FeO row, Tmelt column.
+      phase: condensed_solid
+      units: K
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: Table 5 does not state pressure for this melting temperature.
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+          locator:
+            page: 7
+            published_page: 1086
+            pdf_page_index: 6
+            table: '5'
+            note: Table 5 does not state oxygen fugacity for this melting temperature.
+      values:
+        quantity: transition_temperature
+        property_kind: melting_point
+        method_class: author_estimate
+        admission_status: admitted
+        phase_as_printed: condensed phase
+        T_K: 1650
+        T_K_as_printed: '1650 ± 5 K'
+        T_m_uncertainty_K: 5
+        table_caption: Table 5. Thermodynamic properties of oxides contained in the melts of Ca–Al–inclusions
+          and identified in the condensed and gas phases and evaporation coefficients of these oxides
+      uncertainty:
+        note: Temperature uncertainty printed as ± 5 K; confidence level not stated.
         confidence_level: not_stated
     context:
     - observation_id: shornikov_2015_cai_table5_thermochemical_cells_feo
@@ -3848,13 +4220,13 @@ species:
         published_page: 1086
         pdf_page_index: 6
         table: '5'
-        note: Table 5 thermochemical cells, data row 6; the alpha cell is stored as an alpha observation.
+        note: Table 5 thermochemical cells, data row 6; alpha and Tmelt are stored as separate observations.
       units: as printed per property column
       values:
         quantity: composite_thermochemical_table_row_without_single_observation_quantity
         method_class: typed_refusal
         admission_status: typed_refusal
-        schema_gap: Nine thermochemical property cells share a table row; this extract has no one observation
+        schema_gap: Eight remaining thermochemical property cells share a table row; this extract has no one observation
           token that represents the complete multi-property row with per-cell attribution. The exact values
           and headers are retained below.
         cells_as_printed:
@@ -3864,9 +4236,6 @@ species:
         - property_as_printed: ΔSf, 298
           header_as_printed: ΔSf, 298, J/(g-at K)
           value_as_printed: 30.40 ± 0.80
-        - property_as_printed: Tmelt
-          header_as_printed: Tmelt, K
-          value_as_printed: 1650 ± 5
         - property_as_printed: ΔHmelt
           header_as_printed: ΔHmelt, kJ/g-a
           value_as_printed: 15.5 ± 1.0
