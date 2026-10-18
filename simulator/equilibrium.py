@@ -480,19 +480,18 @@ class EquilibriumMixin:
         # SiO suppression reads the headspace reservoir.
         pO2_bar = self._headspace_transport_pO2_bar()
         vacuum_floor_bar = self._vacuum_floor_bar()
-        reservoir = getattr(self.melt, "oxygen_reservoir", None)
-        intrinsic_fO2_value = getattr(
-            reservoir, "melt_intrinsic_fO2_log", None
-        )
-        if intrinsic_fO2_value is None:
-            intrinsic_fO2_value = getattr(self.melt, 'melt_fO2_log', None)
-        if intrinsic_fO2_value is None:
-            current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
-            if callable(current_fO2):
-                intrinsic_fO2_log = float(current_fO2())
-            else:
-                intrinsic_fO2_log = float(getattr(self.melt, 'fO2_log', -9.0))
+        current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
+        if callable(current_fO2):
+            intrinsic_fO2_log = float(current_fO2())
         else:
+            reservoir = getattr(self.melt, "oxygen_reservoir", None)
+            intrinsic_fO2_value = getattr(
+                reservoir, "melt_intrinsic_fO2_log", None
+            )
+            if intrinsic_fO2_value is None:
+                intrinsic_fO2_value = getattr(self.melt, 'melt_fO2_log', None)
+            if intrinsic_fO2_value is None:
+                intrinsic_fO2_value = getattr(self.melt, 'fO2_log', -9.0)
             intrinsic_fO2_log = float(intrinsic_fO2_value)
 
         melt_dissociation_pO2_bar, melt_pO2_clamped = (

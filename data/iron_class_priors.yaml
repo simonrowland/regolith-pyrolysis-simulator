@@ -1,0 +1,121 @@
+# Physical class envelopes in log10(fO2/IW), NOT measured lot intervals.
+# Sources constrain the class context; reasoning identifies rounded bounds
+# and assumed transfers. No metal inventory or precipitation is inferred.
+unclassified:
+  # Historical split_feot_composition default: delta=0 against the pure
+  # liquid Fe/FeO (Holzheid1997 Eq9) reference, not conventional solid IW.
+  # +/-10 dex spans a factor 1e20 in the fO2 ratio. This deliberately broad
+  # model envelope includes the named classes; it is not a measured range.
+  delta_iw: 0.0
+  interval: [-10.0, 10.0]
+  buffer: wustite_FeO_l_holzheid1997_eq9
+  source: 'class prior, no corpus citation'
+  buffer_source: {reference: 'Holzheid et al. 1997 Eq.9, wustite-liquid FeO reference', page: 30}
+  reasoning: 'Unclassified analysis: historical predicted IW default from split_feot_composition; broad assumed envelope without lot or class evidence. No metal precipitation from this prior.'
+terrestrial_basalt:
+  # Sossi2018 p10921 places terrestrial magmatic liquids near FMQ. Existing
+  # Frost1991 Table1 FMQ at 1 bar is 8.735-25096.3/T; Sato1973 IW is
+  # 6.824-27470/T+log10(1.01325). At 1673.15 K their difference is
+  # +3.323985 dex, rounded to +3 for this broad class proxy. Both fits are
+  # extrapolated here. Subtracting log10 pressures in bar gives a unitless
+  # log ratio; identical buffers would give delta=0. This is not a lot assay.
+  delta_iw: 3.0
+  interval: [1.5, 5.5]
+  buffer: solid_iron_wustite_sato1973
+  source: kems-045-sossi-2018-pnas-cr
+  locator: {published_page: 10921}
+  reasoning: 'class range: physical reasoning, no corpus citation; approximate FMQ-2 to FMQ+2 magmatic envelope, rounded on the IW scale using the conversion above; Sossi supports the center, not the endpoints.'
+terrestrial_anorthosite:
+  delta_iw: 3.0
+  interval: [1.5, 5.5]
+  buffer: solid_iron_wustite_sato1973
+  source: kems-045-sossi-2018-pnas-cr
+  locator: {published_page: 10921}
+  reasoning: 'class range: physical reasoning, no corpus citation; transfer of the terrestrial magmatic envelope above to anorthosite aggregate, without a class-specific or batch valence assay.'
+lunar_mare:
+  delta_iw: -1.0
+  interval: [-2.5, 0.5]
+  buffer: solid_iron_wustite_sato1973
+  source: wadhwa-2008-redox-small-bodies
+  locator: {published_page: 497}
+  reasoning: Wadhwa p497 lunar estimates IW-2 to IW+0.2, rounded outward by several tenths for class transfer; not a lot assay.
+lunar_kreep:
+  delta_iw: -1.0
+  interval: [-2.5, 0.5]
+  buffer: solid_iron_wustite_sato1973
+  source: wadhwa-2008-redox-small-bodies
+  locator: {published_page: 497}
+  reasoning: Assumed KREEP transfer of the p497 lunar IW-2 to IW+0.2 range, rounded outward; no enriched-blend valence assay.
+lunar_highland:
+  delta_iw: -1.0
+  interval: [-2.5, 0.5]
+  buffer: solid_iron_wustite_sato1973
+  source: wadhwa-2008-redox-small-bodies
+  locator: {published_page: 497}
+  reasoning: Assumed highland transfer of the p497 lunar IW-2 to IW+0.2 range, rounded outward; no highland-specific molten valence constraint.
+mars_basalt:
+  delta_iw: 1.5
+  interval: [-1.0, 4.0]
+  buffer: solid_iron_wustite_sato1973
+  source: wadhwa-2008-redox-small-bodies
+  locator: {published_page: 505}
+  reasoning: Wadhwa pp499-505 spans reduced shergottites around IW-1 to nakhlites at IW+3 to IW+4; the center retains the p502 shergottite midpoint.
+mars_regolith:
+  delta_iw: 1.5
+  interval: [-1.0, 4.0]
+  buffer: solid_iron_wustite_sato1973
+  source: wadhwa-2008-redox-small-bodies
+  locator: {published_page: 505}
+  reasoning: Assumed regolith transfer of the pp499-505 martian magmatic IW-1 to IW+4 envelope; alteration and terrestrial MGS-1 manufacture remain unmeasured.
+s_type_ordinary_chondrite:
+  # At 1200 K, Sato Eq5 gives IW=6.824-27470/1200+log10(1.01325)
+  # ~= -16.062 (bar). The quoted -17.1 and -17.3 log10(fO2/bar)
+  # imply -1.04 and -1.24 dex relative to IW; -1 is a rounded class proxy.
+  # Subtracting equal pressure-reference logarithms cancels the units;
+  # an observation exactly at IW would give delta=0.
+  delta_iw: -1.0
+  interval: [-3.0, 1.0]
+  buffer: solid_iron_wustite_sato1973
+  source: schaefer-and-fegley-2007-icarus-outgassing-of-oc
+  locator: {published_page: 472, section: '3.1'}
+  reasoning: p472 measurements imply IW-1.04 and IW-1.24 with 0.6 dex errors; rounded envelope adds about a dex for model/reference and solid-to-liquid transfer, not published endpoints.
+v_type_hed:
+  delta_iw: -1.0
+  interval: [-2.0, 0.0]
+  buffer: solid_iron_wustite_sato1973
+  source: wadhwa-2008-redox-small-bodies
+  locator: {published_page: 496}
+  reasoning: p496 eucrite estimates near IW-1; assumed one-dex allowance each side for HED lithology and transfer, not published endpoints.
+e_type_enstatite:
+  delta_iw: -5.0
+  interval: [-7.0, -3.0]
+  buffer: solid_iron_wustite_sato1973
+  source: wadhwa-2008-redox-small-bodies
+  locator: {published_page: 494}
+  reasoning: p494 enstatite-chondrite estimate near IW-5; assumed two-dex reduced-parent transfer allowance each side for aubrite and processed silicate, not published endpoints.
+m_type_silicate:
+  delta_iw: -2.5
+  interval: [-4.0, -1.0]
+  buffer: solid_iron_wustite_sato1973
+  source: wadhwa-2008-redox-small-bodies
+  locator: {published_page: 495}
+  reasoning: p495 IAB/winonaite silicates span IW-3 to IW-2; extend one dex each side for an assumed generic M-type silicate transfer.
+cm_carbonaceous:
+  delta_iw: 2.0
+  interval: [1.0, 3.0]
+  buffer: solid_iron_wustite_sato1973
+  source: wadhwa-2008-redox-small-bodies
+  locator: {published_page: 494}
+  reasoning: p494 carbonaceous range IW+1 to IW+3, assumed applicable to heated CM; hydrated CM is not a measured liquid.
+ceres:
+  delta_iw: 2.0
+  interval: [1.0, 3.0]
+  buffer: solid_iron_wustite_sato1973
+  source: class prior, no corpus citation
+  reasoning: 'class range: physical reasoning, no corpus citation; altered carbonaceous analogue at IW+1 to IW+3, without a Ceres high-temperature iron valence constraint.'
+comet_nucleus:
+  delta_iw: -1.0
+  interval: [-5.0, 3.0]
+  buffer: solid_iron_wustite_sato1973
+  source: class prior, no corpus citation
+  reasoning: 'class range: physical reasoning, no corpus citation; union of reduced enstatite-like IW-5 and oxidized carbonaceous-like IW+3 constituent proxies, not one equilibrated cometary liquid.'

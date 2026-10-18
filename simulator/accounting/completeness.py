@@ -9,6 +9,7 @@ from typing import Any, Mapping
 
 from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.formulas import parse_formula
+from simulator.accounting.ledger import _merge_species_amounts_from_accounts
 from simulator.account_ids import METAL_BOTTOM_POOL_ACCOUNT, METAL_FLOAT_LAYER_ACCOUNT
 from simulator.state import MOLAR_MASS
 
@@ -901,13 +902,15 @@ def _species_kg_by_accounts(
     ledger = getattr(queries, "ledger", None)
     if ledger is None:
         raise CompletionContractBlocked("ledger surface is unavailable")
-    values: dict[str, float] = {}
-    for account in accounts:
-        for species, kg in ledger.project_account_kg(str(account)).items():
-            amount = float(kg)
-            if amount:
-                values[str(species)] = values.get(str(species), 0.0) + amount
-    return values
+    account_names = tuple(str(account) for account in accounts)
+    balances = {
+        account: {
+            str(species): float(kg)
+            for species, kg in ledger.project_account_kg(account).items()
+        }
+        for account in account_names
+    }
+    return _merge_species_amounts_from_accounts(balances, account_names)
 
 
 def _species_kg_by_account_pattern(

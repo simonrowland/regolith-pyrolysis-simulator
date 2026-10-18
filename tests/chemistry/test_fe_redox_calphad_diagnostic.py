@@ -9,6 +9,7 @@ from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.fe_redox import (
+    _feo_activity_saturation_log10_fO2_bar,
     calphad_ferrous_feo_activity_diagnostic,
     feo_iw_log10_fO2_bar,
     holzheid_stoich_feo_gamma_band,
@@ -126,7 +127,7 @@ def test_calphad_feo_activity_central_diverges_below_iw_and_carries_tiepoint():
         "delta_iw_log10_shift_central_minus_current"
     ] == pytest.approx(0.0)
     assert tiepoint["iw_pure_feo_log10_fO2_bar"] == pytest.approx(
-        feo_iw_log10_fO2_bar(_T_K, a_feo=1.0)
+        _feo_activity_saturation_log10_fO2_bar(_T_K, a_feo=1.0)
     )
     assert tiepoint["central_melt_metal_saturation_log10_fO2_bar"] == (
         pytest.approx(
@@ -316,11 +317,12 @@ def test_feo_activity_iw_pure_feo_basis_documents_melt_offset():
         pytest.approx(0.0)
     )
     assert diagnostic["a_FeO_current"] == pytest.approx(central)
-    assert tiepoint["iw_pure_feo_log10_fO2_bar"] == pytest.approx(iw)
+    saturation_iw = _feo_activity_saturation_log10_fO2_bar(_T_K, a_feo=1.0)
+    assert tiepoint["iw_pure_feo_log10_fO2_bar"] == pytest.approx(saturation_iw)
     assert offset == pytest.approx(2.0 * math.log10(central))
     assert offset < 0.0
     assert tiepoint["central_melt_metal_saturation_log10_fO2_bar"] == (
-        pytest.approx(iw + offset)
+        pytest.approx(saturation_iw + offset)
     )
 
 

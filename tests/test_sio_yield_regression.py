@@ -300,8 +300,8 @@ def test_sio_wall_sweep_refuses_negative_pO2_before_floor() -> None:
 # lunar 1.0409922677e-05 -> 1.04099076417e-05,
 # mars 1.05360311732e-05 -> 1.05354760695e-05.
 BASELINE_SIO_EVOLVED_KG = {
-    "lunar_mare_low_ti": 1.04099076417e-05,
-    "mars_basalt": 1.05354760695e-05,
+    "lunar_mare_low_ti": 1.04324626941e-05,  # d-166 regen at 8367b269a (studio-1)
+    "mars_basalt": 1.04871832899e-05,  # d-166 regen at 8367b269a (studio-1)
 }
 
 
@@ -416,8 +416,8 @@ BASELINE_STAGE4_SIO2_KG = {
 # lunar 2.73730270602e-06 -> 2.73729872021e-06,
 # mars 2.75788843064e-06 -> 2.75786146523e-06.
 BASELINE_STAGE3_SIO2_KG = {
-    "lunar_mare_low_ti": 2.73729872021e-06,
-    "mars_basalt": 2.75786146523e-06,
+    "lunar_mare_low_ti": 2.7432218567e-06,  # d-166 regen at 8367b269a (studio-1)
+    "mars_basalt": 2.7577514718e-06,  # d-166 regen at 8367b269a (studio-1)
 }
 
 
@@ -586,11 +586,13 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     # after subtracting nearly equal Si inventories, so the small route shift
     # moves the reported percent by a larger relative factor.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 6.164333700073318e-7,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "lunar_mare_low_ti": 2.715361335824935e-07,
         # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
         # from reservoir.fo2_buffer; the unbacked remainder is held and the
         # resulting subtraction residual is reported by the production resolver.
-        "mars_basalt": 2.271604686598938e-7,
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        "mars_basalt": 2.8394928218105905e-07,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15
@@ -1130,6 +1132,18 @@ def test_po2_wall_sweep_mode_suppresses_first_tick_sio_release():
     )
     setpoints_data = yaml.safe_load((data_dir / "setpoints.yaml").read_text())
 
+    # Isolate the SiO transport law: real iron redox at startup can release
+    # enough O2 that its headspace pressure dominates both commanded floors.
+    # These declared zero-iron controls are a test composition, not a lunar assay.
+    feedstock = feedstocks_data['lunar_mare_low_ti']
+    feedstock['fe_redox_split_unknown'] = False
+    for oxide in ('FeO', 'Fe2O3'):
+        feedstock['composition_wt_pct'][oxide] = 0.0
+        feedstock.setdefault('composition_basis', {})[oxide] = {
+            'method': 'defined iron-free SiO transport fixture',
+            'source': 'test_po2_wall_sweep_mode_suppresses_first_tick_sio_release',
+        }
+
     def _evolved_sio_kg_one_tick(*, pO2_mbar: float) -> float:
         sim = _build_sim(
             "lunar_mare_low_ti",
@@ -1160,6 +1174,9 @@ def test_po2_wall_sweep_mode_suppresses_first_tick_sio_release():
 
         initial_sio_mol = _sio_mol_total()
         sim.step()
+        assert sim._last_vapor_pressure_diagnostic['pO2_bar'] == pytest.approx(
+            pO2_mbar / 1000.0,
+        )
         sio_mol = max(0.0, _sio_mol_total() - initial_sio_mol)
         from simulator.state import MOLAR_MASS
         sio_molar_mass_kg_mol = MOLAR_MASS["SiO"] / 1000.0

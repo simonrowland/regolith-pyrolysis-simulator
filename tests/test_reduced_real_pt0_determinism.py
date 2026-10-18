@@ -35,6 +35,7 @@ from simulator.config import (
     DEFAULT_ALPHAMELTS_MODEL,
     resolve_alphamelts_python_api_model,
 )
+from tests.chemistry.conftest import _seed_melt_redox
 from simulator.grind_preflight import GrindSourceGateError
 from simulator.melt_backend.base import (
     EquilibriumResult,
@@ -348,7 +349,10 @@ def test_control_quantization_default_production_key_is_byte_identical() -> None
     # 2026-08-05 batch data fold (1a1ab47, 7e6bebc, d1b4f5d): the parsed
     # carrier/P catalogs and MC-1 feedstock payloads are deliberate key inputs.
     # Two in-process evaluations and the cross-process test pin determinism.
-    assert key_hash == "aa4dd3b20f35e622b503841d42cc094556dea5607ebbd4ec91f2257fda19358b"
+    # Owner-approved b-899 rebaseline: the serialized input now carries the
+    # initialized FeO/Fe2O3 split, whole-assay normalization, and ledger-derived
+    # fO2; key schema and descriptor are unchanged.
+    assert key_hash == "38e628b3f629f57e9fa317e5288f7558d160b800b7660e1164008106b0c4f1ba"
     assert canonical_json_bytes(fine_key) == canonical_json_bytes(key)
     assert _key_hash(fine_key) == key_hash
 
@@ -471,7 +475,7 @@ def _run_authoritative_alphamelts_equilibrium(
     if not allow_internal_analytical_fallback:
         sim._backend_allows_internal_analytical_fallback = lambda: False
 
-    def fail_backend_equilibrate(*_args, **_kwargs):
+    def fail_backend_equilibrate(*_args, composition_mol_by_account=None, **_kwargs):
         raise AssertionError(
             "authoritative SILICATE_EQUILIBRIUM used backend.equilibrate"
         )
@@ -586,14 +590,15 @@ def _run_capped_c2a_with_equilibrium_counter(
     original_equilibrate = sim.backend.equilibrate
     calls = 0
 
-    def counted_equilibrate(*args, **kwargs):
+    def counted_equilibrate(*args, composition_mol_by_account=None, **kwargs):
         nonlocal calls
         calls += 1
         if fail_live:
             raise AssertionError(
                 "PT-2 cached live run attempted backend.equilibrate"
             )
-        return original_equilibrate(*args, **kwargs)
+        return original_equilibrate(
+            *args, composition_mol_by_account=composition_mol_by_account, **kwargs)
 
     sim.backend.equilibrate = counted_equilibrate
     sim.backend.find_liquidus_solidus = lambda **_kwargs: SimpleNamespace(
@@ -797,8 +802,10 @@ def test_alphamelts_provider_key_partitions_mode_not_engine_version() -> None:
         "mode": "subprocess",
         "magemin_database": None,
     }
+    # This mode/version pin moves with the same normalized FeO/Fe2O3 and
+    # ledger-derived fO2 inputs; provider identity and version are not key fields.
     assert _key_hash(base) == (
-        "3914dfa4cca7d7503c290122f70e67ab003fbcdaca1d5c230e49120236a8b048"
+        "d45d2b34935f44b81f873e78f2179ba74295b00165ed8a0028a70e0f3a4a83a8"
     )
     assert thermoengine["model"]["mode"] == "thermoengine"
     assert "engine_version" not in next_engine["model"]
@@ -927,15 +934,17 @@ def test_python_api_identity_pins_current_model_and_provider_fields(
 @pytest.mark.parametrize(
     ("model", "expected_hash"),
     [
-        (None, "1754e315cc016d162243334396a464d6caed842b252638f80cb532b0ffd7a088"),
-        ("", "b43e6955cdee10f871c8aaceaa9b45eea9524da6d6fc9449f252c9f463281dd9"),
-        (DEFAULT_ALPHAMELTS_MODEL, "7797a4c8de6ca270d6dd2118c5f22fe309175b95e991a70fb108a2a7f66d1645"),
-        ("pMELTS", "632a85c2c53b207343c5b33ff54275f4d610bedfdad9a9d4e2774dee4140f2c5"),
-        ("MELTSv1.1.0", "da91bc89b90ad478d80e727462027fcffa9fd12435c60126dbcb9ffb315249c6"),
-        ("MELTSv1.2.0", "faecc7fca96b82b0121c50de8a431908cfaaccfe79bbe154fee91d5b7135d982"),
+        # Each API digest reflects the initialized FeO/Fe2O3 split, normalized
+        # assay, and ledger-derived fO2 entering the key; identity is unchanged.
+        (None, "59a5bd2a3b2af8ab75441e7db0043900f5277c7b63d055312faaa28610cd5c1b"),
+        ("", "131f8f484a0d09bc9a7422cf369f3d3ec6edde49a905d5436d6ab895b0013408"),
+        (DEFAULT_ALPHAMELTS_MODEL, "592426fa092e0e05020848054db7875c0e533808c683b2dc2baa2c7bacbb53ea"),
+        ("pMELTS", "50b940badad14616d0023cedb4a18ce2cdda6e879f5236a67398a6ab74678c0d"),
+        ("MELTSv1.1.0", "d32f0cf63c0b40dafca9d8c50e2a1e39488388837804a63dc5c3006158539b9c"),
+        ("MELTSv1.2.0", "9e0a413c6278a52f01d288669d5dbfe7a42306487e79c7589b8c8f48a3fa8948"),
     ],
 )
-def test_python_api_accepted_replay_key_hashes_remain_base_bytes(
+def test_python_api_accepted_replay_key_hashes_pin_physical_input_vector(
     model: str | None,
     expected_hash: str,
 ) -> None:
@@ -950,15 +959,17 @@ def test_python_api_accepted_replay_key_hashes_remain_base_bytes(
 @pytest.mark.parametrize(
     ("model", "expected_hash"),
     [
-        (None, "1754e315cc016d162243334396a464d6caed842b252638f80cb532b0ffd7a088"),
-        ("", "7797a4c8de6ca270d6dd2118c5f22fe309175b95e991a70fb108a2a7f66d1645"),
-        (DEFAULT_ALPHAMELTS_MODEL, "7797a4c8de6ca270d6dd2118c5f22fe309175b95e991a70fb108a2a7f66d1645"),
-        ("pMELTS", "632a85c2c53b207343c5b33ff54275f4d610bedfdad9a9d4e2774dee4140f2c5"),
-        ("MELTSv1.1.0", "da91bc89b90ad478d80e727462027fcffa9fd12435c60126dbcb9ffb315249c6"),
-        ("MELTSv1.2.0", "faecc7fca96b82b0121c50de8a431908cfaaccfe79bbe154fee91d5b7135d982"),
+        # Cached-real API digests change for the same physical input vector;
+        # cached-real authorization and model identity remain pinned separately.
+        (None, "59a5bd2a3b2af8ab75441e7db0043900f5277c7b63d055312faaa28610cd5c1b"),
+        ("", "592426fa092e0e05020848054db7875c0e533808c683b2dc2baa2c7bacbb53ea"),
+        (DEFAULT_ALPHAMELTS_MODEL, "592426fa092e0e05020848054db7875c0e533808c683b2dc2baa2c7bacbb53ea"),
+        ("pMELTS", "50b940badad14616d0023cedb4a18ce2cdda6e879f5236a67398a6ab74678c0d"),
+        ("MELTSv1.1.0", "d32f0cf63c0b40dafca9d8c50e2a1e39488388837804a63dc5c3006158539b9c"),
+        ("MELTSv1.2.0", "9e0a413c6278a52f01d288669d5dbfe7a42306487e79c7589b8c8f48a3fa8948"),
     ],
 )
-def test_cached_real_python_api_replay_key_hashes_remain_base_bytes(
+def test_cached_real_python_api_replay_key_hashes_pin_physical_input_vector(
     tmp_path: Path,
     model: str | None,
     expected_hash: str,
@@ -1096,9 +1107,11 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
         fe_redox_policy="intrinsic",
     )
     magemin_bytes = canonical_json_bytes(magemin_key)
-    assert len(magemin_bytes) == 1648
+    # Fe2O3, whole-assay normalization, and ledger-derived fO2 change the
+    # serialized physical inputs without adding a key field or descriptor.
+    assert len(magemin_bytes) == 1670  # d-166 regen: d-160 seed moved fO2 -10.741 -> -10.588 and the Fe split; same key fields
     assert hashlib.sha256(magemin_bytes).hexdigest() == (
-        "13ada0c3401a52f88761e3a2b0abcd64caefc16765e943e9812398bf3fcb7d90"
+        "7a3cb26a97a899f8c296b9bf071f3433278a37ed9254f5f84975a88d35b3ba27"
     )
 
     generic_store = PT0DeterminismStore("capture")
@@ -1106,9 +1119,11 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
     generic_key = generic_store._equilibrium_key(generic_sim)
     generic_bytes = canonical_json_bytes(generic_key)
     assert generic_key["namespace_id"] == "internal-analytical:equilibrium-composite"
-    assert len(generic_bytes) == 1687
+    # The generic key carries the same normalized ledger input vector; its
+    # namespace/schema and redox descriptor are unchanged.
+    assert len(generic_bytes) == 1709  # d-166 regen: same input-vector move as the MAGEMin key above
     assert hashlib.sha256(generic_bytes).hexdigest() == (
-        "f23032fcd2ddba188fccad867d238b352c63e4ca53b77c3dc643baae0af422f9"
+        "6d918f34fb8bc5984f33e4f2299dfae4054f4aacc8fbe6f4363ccbf82f52d25b"
     )
 
 
@@ -1785,14 +1800,7 @@ def test_pt0_gate_curve_key_is_tstd_aligned_across_isochemical_ramp(
     replay_key = replay.replay_sequence[-1]["key"]
     assert replay_key == capture_key
 
-    capacity = replay_sim._melt_redox_capacity_mol_per_ln_fO2(
-        fO2_log=replay_sim._current_melt_redox_fO2_log(),
-        T_K=1600.0 + 273.15,
-    )
-    replay_sim._apply_oxygen_reservoir_redox_source_terms(
-        {"pt0_real_redox_step": capacity * math.log(10.0) * 0.25},
-        temperature_K=1600.0 + 273.15,
-    )
+    _seed_melt_redox(replay_sim, replay_sim._current_melt_redox_fO2_log() + 0.25)
     redox_key = canonical_replay_key(
         replay_sim,
         artifact="freeze_gate_curve",
@@ -1888,8 +1896,6 @@ def test_pt0_gate_curve_rekeys_from_live_fo2_after_first_liquid_seed(
     capture_sim = _build_pt0_sim(capture)
     capture_sim.start_campaign(CampaignPhase.C2A_STAGED)
     capture_sim.melt.temperature_C = 1450.0
-    capture_sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
-    capture_sim.melt.oxygen_reservoir.reference_T_K = None
     capture_sim._sync_oxygen_reservoir_mirror()
     preseed_redox_key_fO2_log = capture_sim._freeze_gate_redox_key_fO2_log()
     preseed_local_key = capture_sim._freeze_gate_cache_key(
@@ -1900,7 +1906,7 @@ def test_pt0_gate_curve_rekeys_from_live_fo2_after_first_liquid_seed(
 
     assert capture_sim._freeze_gate_curve() == curve
     preseed_controls = capture.capture_sequence[-1]["key"]["controls"]
-    assert preseed_controls["log_fO2"] == pytest.approx(-9.0)
+    assert capture_sim.melt.oxygen_reservoir.reference_T_K is not None
     assert preseed_controls["T_K"] == pytest.approx(298.15)
     assert preseed_redox_key_fO2_log == pytest.approx(
         preseed_controls["log_fO2"],
@@ -1913,13 +1919,17 @@ def test_pt0_gate_curve_rekeys_from_live_fo2_after_first_liquid_seed(
     replay_sim = _build_pt0_sim(replay)
     replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
     replay_sim.melt.temperature_C = 1450.0
-    replay_sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
-    replay_sim.melt.oxygen_reservoir.reference_T_K = None
     replay_sim._sync_oxygen_reservoir_mirror()
     assert replay_sim._freeze_gate_curve() == curve
     assert replay.replay_sequence[-1]["key"]["controls"] == preseed_controls
 
     replay_sim._re_reference_melt_fO2_to_temperature(1723.15)
+    # The formation reference already exists at load. Merely re-expressing
+    # the same split at its first liquid T must preserve cache identity.
+    assert replay_sim._freeze_gate_redox_key_fO2_log() == pytest.approx(
+        preseed_redox_key_fO2_log)
+    # A real change of the iron split must still invalidate the replay key.
+    _seed_melt_redox(replay_sim, replay_sim._current_melt_redox_fO2_log() + 0.25)
     postseed_redox_key_fO2_log = replay_sim._freeze_gate_redox_key_fO2_log()
     postseed_local_key = replay_sim._freeze_gate_cache_key(
         pressure_bar=replay_sim.melt.p_total_mbar / 1000.0,
@@ -1933,7 +1943,7 @@ def test_pt0_gate_curve_rekeys_from_live_fo2_after_first_liquid_seed(
 
     postseed_controls = replay.replay_sequence[-1]["key"]["controls"]
     expected_postseed_fO2 = kress91_referenced_log_fO2(
-        -9.0,
+        replay_sim._current_melt_redox_fO2_log(),
         reference_T_K=1723.15,
         target_T_K=KRESS91_FO2_KEY_REFERENCE_T_K,
     )
@@ -2560,7 +2570,9 @@ def test_control_quantization_coarse_store_fine_lookup_uses_ladder(
         db_path=db_path,
         control_quantization=ControlQuantization.from_name("coarse"),
     )
-    capture_sim = _build_pt0_sim(capture_store)
+    capture_sim = _build_pt0_sim(None)
+    _seed_melt_redox(capture_sim, -10.0)
+    capture_sim.configure_pt0_determinism_store(capture_store)
     capture_sim.backend = AlphaMELTSBackend()
     capture_sim._chem_registry.register(
         provider,
@@ -2586,7 +2598,9 @@ def test_control_quantization_coarse_store_fine_lookup_uses_ladder(
         db_path=db_path,
         control_quantization=ControlQuantization.from_name("fine"),
     )
-    replay_sim = _build_pt0_sim(replay_store)
+    replay_sim = _build_pt0_sim(None)
+    _seed_melt_redox(replay_sim, -10.0)
+    replay_sim.configure_pt0_determinism_store(replay_store)
     replay_sim.backend = AlphaMELTSBackend()
     replay_sim._chem_registry.register(
         provider,
