@@ -1,0 +1,42 @@
+source_id: zaitsev-2000-sodium-silicate-thermodynamics
+source:
+  citation: >-
+    Zaitsev, A. I., Shelkova, N. E., and Mogutnov, B. M. (2000).
+    Thermodynamics of Na2O-SiO2 Melts. Inorganic Materials 36(6), 529–543.
+  doi: 10.1007/BF02757949
+  year: 2000
+extraction:
+  method: Born-digital pdftotext-layout with MinerU table drafts; measured cells checked against 600 dpi renders.
+  date: '2026-10-18'
+  worker: fam1-1018
+review_status: draft
+tables:
+  - page: 7
+    table_index: 4
+    type: activity
+    quantity: activity
+    unit: dimensionless
+    evidence_class: measured_direct
+    phase: l
+    published_page: 535
+    temperature: {column: 2, unit: K}
+    values:
+      - {column: 3, species: SiO2, evidence_class: measured_reduced}
+      - {column: 5, species: Na2O, evidence_class: measured_direct}
+  # Select the two printed -Delta H columns; final extract signs are negated
+  # per the controller ruling because the stored token is Delta H.
+  - page: 9
+    table_index: 6
+    type: partial_molar_enthalpy
+    quantity: partial_molar_enthalpy
+    unit: kJ/mol
+    evidence_class: measured_reduced
+    phase: l
+    published_page: 537
+    temperature:
+      as_printed: '1473'
+      unit: K
+      locator: {page: 9, published_page: 537, pdf_page_index: 8, table: '6'}
+    values:
+      - {column: 2, species: Na2O, evidence_class: measured_reduced}
+      - {column: 3, species: Na2O, evidence_class: quoted_attributed, attribution: '[34]'}
