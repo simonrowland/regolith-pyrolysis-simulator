@@ -302,6 +302,13 @@ def test_crown_high_t_markers_keep_values_pixels_and_conditions(
             assert observation.identity.species.formula
             if source_id == "yakovlev-2024-cai-vaporization":
                 assert observation.identity.species.phase.is_value
+    for observation in crown_high_t_migrated.observations.values():
+        if observation.value.kind is ValueKind.POINT:
+            assert observation.point_conditions is not None
+            assert all(
+                condition.locator is not None
+                for condition in observation.point_conditions.values()
+            )
 
     extract_dir = _REPO_ROOT / "data" / "literature" / "extracts"
     yakovlev = yaml.safe_load(
@@ -322,3 +329,88 @@ def test_crown_high_t_markers_keep_values_pixels_and_conditions(
         "mantle_akermanite_wt_pct",
         "rim_akermanite_wt_pct",
     )] == [50.0, 20.0, 7.0]
+    sample = yakovlev["experiments"][0]["sample"]
+    assert sample["printed_composition"]["state"]["reason"] == (
+        "CAI type B named; only a qualitative mineral profile and quoted akermanite "
+        "fractions printed; no initial oxide map"
+    )
+    sample_profile = sample["characterization"]["state"]["value"]
+    assert "Kerekgyarto et al. (2016)" in sample_profile
+    assert "approximately 50 wt. %" in sample_profile
+    assert "drops to 20 wt. %" in sample_profile
+    assert "up to 7 wt. % in the rim zone" in sample_profile
+
+    activity_lineage = {
+        "yakovlev_2024_fig2b_cao_figure_only": (
+            "CaO",
+            "yakovlev_2024_fig2a_ca_figure_only",
+        ),
+        "yakovlev_2024_fig2b_mgo_figure_only": (
+            "MgO",
+            "yakovlev_2024_fig2a_mg_figure_only",
+        ),
+        "yakovlev_2024_fig2b_al2o3_figure_only": (
+            "Al2O3",
+            "yakovlev_2024_fig2a_al_figure_only",
+        ),
+        "yakovlev_2024_fig2b_sio2_figure_only": (
+            "SiO2",
+            "yakovlev_2024_fig2a_sio_figure_only",
+        ),
+    }
+    migrated_observations = _source_observations(
+        crown_high_t_migrated, "yakovlev-2024-cai-vaporization"
+    )
+    for activity_id, (oxide, pressure_id) in activity_lineage.items():
+        values = next(
+            series["values"]
+            for series in yakovlev["species"][oxide]["observations"]
+            if series["observation_id"] == activity_id
+        )
+        assert values["method_class"] == "measured_reduced"
+        assert values["derived_from"] == [pressure_id]
+        assert "Eqs. (1)–(3)" in values["derivation"]["relation"]
+        migrated = next(
+            observation
+            for observation in migrated_observations
+            if activity_id in observation.observation_id
+        )
+        assert migrated.derived_from
+        assert all(
+            parent.startswith(
+                f"yakovlev-2024-cai-vaporization::{pressure_id}::T="
+            )
+            for parent in migrated.derived_from
+        )
+
+    kems = yaml.safe_load(
+        (extract_dir / "kems-029-yakovlev-shornikov-2011.yaml").read_text()
+    )
+    complementary = next(
+        observation
+        for observation in kems["species"]["Na"]["observations"]
+        if observation["observation_id"]
+        == "yakovlev_shornikov_2011_complementary_vapor_wt_pct"
+    )["values"]
+    pressure_series = {
+        "kems_029_fig1_Na_psat_digitized",
+        "kems_029_fig1_SiO_psat_digitized",
+        "kems_029_fig2_SiO_psat_digitized",
+        "kems_029_fig1_K_psat_digitized",
+        "kems_029_fig1_Fe_psat_digitized",
+        "kems_029_fig2_Fe_psat_digitized",
+        "kems_029_fig1_Mg_psat_digitized",
+        "kems_029_fig2_Mg_psat_digitized",
+        "kems_029_fig1_Al_psat_digitized",
+        "kems_029_fig2_Al_psat_digitized",
+        "kems_029_fig1_Ca_psat_digitized",
+        "kems_029_fig2_Ca_psat_digitized",
+        "kems_029_fig1_TiO_psat_digitized",
+        "kems_029_fig2_TiO_psat_digitized",
+        "yakovlev_shornikov_2011_CAI_SiO_highT_about_1e-6_bar",
+        "yakovlev_shornikov_2011_Po2_table_bar_calculated",
+    }
+    assert set(complementary["derived_from"]) == pressure_series
+    derivation_relation = complementary["derivation"]["relation"]
+    assert "Hertz–Knudsen equation" in derivation_relation
+    assert "all 16 this-work partial-pressure source rows" in derivation_relation

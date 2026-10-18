@@ -420,8 +420,48 @@ species:
           was prevailed and reached ~40 wt. %. It is important to note that at the temperature 1800 C
           and higher the SiO disappeared in the vapor phase while the Al2O3 and CaO increased. The Al2O3
           contents reached 60-65 wt. % at the temperature ~2000 C.
-        derivation_note: Partial pressures were converted to evaporation rates with the Hertz–Knudsen equation;
-          rates were used to determine residual-melt and vapor compositions.
+        derived_from:
+        - kems_029_fig1_Na_psat_digitized
+        - kems_029_fig1_SiO_psat_digitized
+        - kems_029_fig2_SiO_psat_digitized
+        - kems_029_fig1_K_psat_digitized
+        - kems_029_fig1_Fe_psat_digitized
+        - kems_029_fig2_Fe_psat_digitized
+        - kems_029_fig1_Mg_psat_digitized
+        - kems_029_fig2_Mg_psat_digitized
+        - kems_029_fig1_Al_psat_digitized
+        - kems_029_fig2_Al_psat_digitized
+        - kems_029_fig1_Ca_psat_digitized
+        - kems_029_fig2_Ca_psat_digitized
+        - kems_029_fig1_TiO_psat_digitized
+        - kems_029_fig2_TiO_psat_digitized
+        - yakovlev_shornikov_2011_CAI_SiO_highT_about_1e-6_bar
+        - yakovlev_shornikov_2011_Po2_table_bar_calculated
+        derivation:
+          relation: >-
+            The authors state: “The measurement of the partial pressures of these species allowed us to calculate
+            their evaporation rates using the Hertz–Knudsen equation. In turn, the evaporation rates were used to
+            determine the compositions of residual melts and vapors at various temperatures and evaporation mass
+            losses.” The paper does not map individual vapor-composition values to pressure series, so this row
+            links all 16 this-work partial-pressure source rows: the 14 marker series in Figs. 1–2, the
+            text-reported SiO pressure, and the Table O2 pressures.
+          inputs:
+          - kems_029_fig1_Na_psat_digitized
+          - kems_029_fig1_SiO_psat_digitized
+          - kems_029_fig2_SiO_psat_digitized
+          - kems_029_fig1_K_psat_digitized
+          - kems_029_fig1_Fe_psat_digitized
+          - kems_029_fig2_Fe_psat_digitized
+          - kems_029_fig1_Mg_psat_digitized
+          - kems_029_fig2_Mg_psat_digitized
+          - kems_029_fig1_Al_psat_digitized
+          - kems_029_fig2_Al_psat_digitized
+          - kems_029_fig1_Ca_psat_digitized
+          - kems_029_fig2_Ca_psat_digitized
+          - kems_029_fig1_TiO_psat_digitized
+          - kems_029_fig2_TiO_psat_digitized
+          - yakovlev_shornikov_2011_CAI_SiO_highT_about_1e-6_bar
+          - yakovlev_shornikov_2011_Po2_table_bar_calculated
       uncertainty:
         note: Ranges and ~ values as printed; no further numeric uncertainty.
     context:
@@ -984,6 +1024,23 @@ species:
       T_range_K:
       - 2273.15
       - 2673.15
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: source reports a range, not a single point temperature
+          locator:
+            published_page: 2
+            pdf_page_index: 2
+            paragraph: At high temperature fields (2000–2400 C)
+        composition:
+          state:
+            tag: unknown
+            reason: composition_not_published
+          locator:
+            published_page: 2
+            pdf_page_index: 2
+            paragraph: the partial pressure value of SiO is rather high (~10^-6 bar)
       phase: Efremovka_CAI_type_A_and_B_knudsen
       condensed_form:
         state: liquid

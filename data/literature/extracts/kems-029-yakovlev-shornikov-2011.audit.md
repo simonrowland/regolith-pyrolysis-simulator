@@ -133,3 +133,7 @@ Each marker was read twice: first by selecting its visual centre, then by an ind
 | Fig. 2 | TiO | 6 | [3940, 1195] | [3940, 1196] | 2121.31326 | -7.03058 | 9.32001e-08 | ±0.05 dex | 0.003091 | no |
 | Fig. 2 | TiO | 7 | [4204, 1372] | [4204, 1372] | 2268.22474 | -7.57765 | 2.64453e-08 | ±0.05 dex | 0 | no |
 | Fig. 2 | TiO | 8 | [4349, 1463] | [4349, 1463] | 2348.91475 | -7.85891 | 1.38385e-08 | ±0.05 dex | 0 | no |
+
+## Complementary-vapor lineage
+
+The paper does not map individual complementary-vapor values to pressure series. Its printed method statement is: “The measurement of the partial pressures of these species allowed us to calculate their evaporation rates using the Hertz–Knudsen equation. In turn, the evaporation rates were used to determine the compositions of residual melts and vapors at various temperatures and evaporation mass losses.” The complementary-vapor row therefore links all 16 this-work partial-pressure source rows: 14 marker series in Figs. 1–2, the text-reported SiO pressure, and the O2 table pressures.

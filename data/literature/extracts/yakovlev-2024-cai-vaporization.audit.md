@@ -249,3 +249,13 @@ Each marker was read twice: first by selecting its visual centre, then by an ind
 ## Typed-unavailable schema gaps
 
 Fig. 3B contains ratios of two activities and has no current Quantity token. All 32 marker reads (16 per ratio series) are listed above but were not assigned to Quantity.ACTIVITY. The Fig. 1 akermanite contents (approximately 50, 20 and 7 wt% for core, mantle and rim) are attributed to Kerekgyarto et al. (2016), not the initial melt composition.
+
+## Series lineage, pure-compound references, and sample profile
+
+Each Fig. 2B activity series links to the same-species Fig. 2A partial-pressure series at series level. The correspondence is by figure x-position: Fig. 2A plots temperature and Fig. 2B plots Al2O3 mol%, so the axes do not support point-to-point links.
+
+Yakovlev and Shornikov (2024, p. 31) state: “The oxide activities in melts of the «pure» compounds were taken from data obtained in (Shornikov et al., 1996; Bale et al., 2016; Shornikov, 2017).” They do not print numerical pure-compound reference values or identify which cited source supplies each phase/component activity. The three Lewis relations (1)–(3) on pp. 31–32 use the Fig. 2B oxide activities to calculate the Fig. 3A spinel, akermanite, and gehlenite activities; no numerical pure-phase input table is printed alongside the equations.
+
+The Shornikov et al. (1996) primary article is available in the older raw corpus as stolyarova-1996-cao-alumina-silica-kems.pdf, and Shornikov (2017) is available as shornikov-2017-spinel-thermodynamics.pdf. Bale et al. (2016), “FactSage thermochemical software and databases, 2010–2016,” has no primary-source PDF in the specified raw roots; the citation and missing file are recorded without filling in unverified reference values.
+
+The sample description retains the quoted type-B1 zonal profile attributed to Kerekgyarto et al. (2016): approximately 50 wt% akermanite in the core, 20 wt% in the mantle melilite zone, and 7 wt% in the rim. It also retains the printed description of the gehlenite-rich melilite rim and the statement that subtype B2 is mineralogically similar to the subtype B1 core. These cited profile details do not define a complete initial oxide composition.

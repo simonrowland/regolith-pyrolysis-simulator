@@ -113,11 +113,27 @@ experiments:
     printed_composition:
       state:
         tag: unknown
-        reason: not_published
+        reason: CAI type B named; only a qualitative mineral profile and quoted akermanite fractions printed; no initial oxide map
       locator:
         published_page: 30
         pdf_page_index: 2
         note: The paper names a CAI type B sample but does not print a complete initial-melt oxide composition map.
+    characterization:
+      state:
+        tag: value
+        value: >-
+          Quoted mineral profile in Yakovlev and Shornikov (2024, p. 30): “an external monomineral rim
+          consisting of melilite rich in gehlenite”; the paper says the “typical profile of akermanite and
+          δ25Mg between the core and rim zones in CAI of subtype B1 (Allende 5241)” is from Kerekgyarto et
+          al. (2016). Their quoted values are: “the akermanite content in the core zone of the inclusion is
+          approximately 50 wt. %, the akermanite content drops to 20 wt. % in the mantle melilite zone, and
+          up to 7 wt. % in the rim zone.” Yakovlev and Shornikov (2024) also state: “Subtype B2 is similar in
+          mineral composition to the core zone of subtype B1.” These are cited zonal profile values, not an
+          initial bulk oxide map.
+      locator:
+        published_page: 30
+        pdf_page_index: 2
+        paragraph: Fig. 1 discussion; Kerekgyarto et al. (2016) citation
   conditions:
     temperature_K:
       state:
@@ -1421,6 +1437,18 @@ species:
         digitized_from_figure: true
         species_formula: CaO
         axis: log_activity
+        derived_from:
+        - yakovlev_2024_fig2a_ca_figure_only
+        derivation:
+          relation: >-
+            Fig. 2B CaO activity is reduced from the matching Fig. 2A Ca(g) partial-pressure series by
+            figure x-position; Fig. 2A uses temperature while Fig. 2B uses Al2O3 mol%. The paper states that
+            oxide activities in melts of the “pure” compounds were taken from Shornikov et al. (1996), Bale
+            et al. (2016), and Shornikov (2017), but it gives no numerical reference values or per-activity
+            assignment. The authors use the oxide activities in the printed Lewis Eqs. (1)–(3) to
+            calculate the Fig. 3A compound activities.
+          inputs:
+          - yakovlev_2024_fig2a_ca_figure_only
         points:
         - activity: 0.0097508
           Al2O3_mol_pct_as_read: 17.46
@@ -1937,6 +1965,18 @@ species:
         digitized_from_figure: true
         species_formula: MgO
         axis: log_activity
+        derived_from:
+        - yakovlev_2024_fig2a_mg_figure_only
+        derivation:
+          relation: >-
+            Fig. 2B MgO activity is reduced from the matching Fig. 2A Mg(g) partial-pressure series by
+            figure x-position; Fig. 2A uses temperature while Fig. 2B uses Al2O3 mol%. The paper states that
+            oxide activities in melts of the “pure” compounds were taken from Shornikov et al. (1996), Bale
+            et al. (2016), and Shornikov (2017), but it gives no numerical reference values or per-activity
+            assignment. The authors use the oxide activities in the printed Lewis Eqs. (1)–(3) to
+            calculate the Fig. 3A compound activities.
+          inputs:
+          - yakovlev_2024_fig2a_mg_figure_only
         points:
         - activity: 0.146
           Al2O3_mol_pct_as_read: 17.46
@@ -2453,6 +2493,18 @@ species:
         digitized_from_figure: true
         species_formula: Al2O3
         axis: log_activity
+        derived_from:
+        - yakovlev_2024_fig2a_al_figure_only
+        derivation:
+          relation: >-
+            Fig. 2B Al2O3 activity is reduced from the matching Fig. 2A Al(g) partial-pressure series by
+            figure x-position; Fig. 2A uses temperature while Fig. 2B uses Al2O3 mol%. The paper states that
+            oxide activities in melts of the “pure” compounds were taken from Shornikov et al. (1996), Bale
+            et al. (2016), and Shornikov (2017), but it gives no numerical reference values or per-activity
+            assignment. The authors use the oxide activities in the printed Lewis Eqs. (1)–(3) to
+            calculate the Fig. 3A compound activities.
+          inputs:
+          - yakovlev_2024_fig2a_al_figure_only
         points:
         - activity: 0.138
           Al2O3_mol_pct_as_read: 17.46
@@ -2969,6 +3021,18 @@ species:
         digitized_from_figure: true
         species_formula: SiO2
         axis: log_activity
+        derived_from:
+        - yakovlev_2024_fig2a_sio_figure_only
+        derivation:
+          relation: >-
+            Fig. 2B SiO2 activity is reduced from the matching Fig. 2A SiO(g) partial-pressure series by
+            figure x-position; Fig. 2A uses temperature while Fig. 2B uses Al2O3 mol%. The paper states that
+            oxide activities in melts of the “pure” compounds were taken from Shornikov et al. (1996), Bale
+            et al. (2016), and Shornikov (2017), but it gives no numerical reference values or per-activity
+            assignment. The authors use the oxide activities in the printed Lewis Eqs. (1)–(3) to
+            calculate the Fig. 3A compound activities.
+          inputs:
+          - yakovlev_2024_fig2a_sio_figure_only
         points:
         - activity: 0.07867
           Al2O3_mol_pct_as_read: 17.46
