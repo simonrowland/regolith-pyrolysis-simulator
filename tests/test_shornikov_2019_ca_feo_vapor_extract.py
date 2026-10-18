@@ -71,6 +71,18 @@ def test_table_and_figure_rows_are_render_pinned_and_migrate_with_conditions():
             "review-p1-b-1",
             [2464, 2849],
         ),
+        (
+            "1833",
+            1,
+            1,
+            62,
+            0.42,
+            0.000499,
+            [382, 617],
+            [46, 64],
+            "lmax-r2-b02",
+            [2535, 2902],
+        ),
     )
     for (
         temperature,

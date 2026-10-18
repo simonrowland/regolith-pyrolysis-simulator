@@ -58,7 +58,10 @@ the absolute difference of the two log10 activities when the ordinates differ.
 When the two centres share an ordinate, the uncertainty is the dex width of
 half a pixel on the activity axis. The key is present and positive on every
 marker. Panel-b marker 2 is the half-disk under the printed curve label 5.
-Both reads are that half-disk's equator, not the counter of the numeral.
+Both reads are the white/black equator of that disk, page (2581, 2966), below the
+curve that crosses the fill. Marker 3's click sits in the same fill. The next
+half-disks are markers 1 and 4, so marker 3 is not a separate symbol and its
+read is unchanged.
 
 | Panel | x tick labels and pixel x | Fitted x map | y tick labels and pixel y | Fitted y map |
 | --- | --- | --- | --- | --- |
@@ -88,7 +91,7 @@ The Figure 2 caption assigns marker symbol 1 to Ban-Ya et al. (1980) in panel a 
 | a17 | (1731, 69) | (91.25, 0.9611) | lmax-r2-a17; (1997, 2403); (35, 16) | (91.2821, 0.9611) | (91, 0.96) | 0.00022 |
 | a18 | (1813, 45) | (93.8782, 0.9844) | lmax-r2-a18; (2067, 2345); (46, 49) | (93.8782, 0.9854) | (94, 0.98) | 0.00022 |
 | b1 | (331, 581) | (60, 0.4591) | review-p1-b-1; (2464, 2849); (68, 84) | (60.0641, 0.4561) | (60, 0.46) | 0.001424 |
-| b2 | (381, 594) | (61.6026, 0.4464) | lmax-r2-b02; (2535, 2902); (45, 41) | (61.6026, 0.4464) | (62, 0.45) | 0.000474 |
+| b2 | (382, 617) | (61.6346, 0.4240) | lmax-r2-b02; (2535, 2902); (46, 64) | (61.6346, 0.4240) | (62, 0.42) | 0.000499 |
 | b3 | (379, 592) | (61.5385, 0.4483) | review-p1-b-3; (2501, 2857); (77, 87) | (61.5385, 0.4454) | (62, 0.45) | 0.001409 |
 | b4 | (431, 597) | (63.2051, 0.4435) | lmax-r2-b04; (2572, 2882); (57, 64) | (63.1731, 0.4435) | (63, 0.44) | 0.000477 |
 | b5 | (453, 495) | (63.9103, 0.5429) | review-p1-b-5; (2589, 2782); (66, 63) | (64.0064, 0.5419) | (64, 0.54) | 0.0004 |

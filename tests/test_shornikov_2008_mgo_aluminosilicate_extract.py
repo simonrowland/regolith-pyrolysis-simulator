@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from decimal import Decimal
 from pathlib import Path
 
 import yaml
@@ -88,6 +89,17 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
             [36, 64],
             [1166, 689],
             "lmax-r2-a3",
+        ),
+        (
+            "shornikov_2008_fig1_b_marker_1",
+            "activity",
+            "0.19",
+            2.0,
+            0.000832,
+            [1579, 346],
+            [32, 60],
+            [1697, 686],
+            "lmax-r2-b1",
         ),
         (
             "shornikov_2008_fig1_b_marker_2",
@@ -214,6 +226,19 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
             assert composition.locator is not None
             assert row.identity.composition.is_value
             assert row.identity.composition.value == composition.state.value
+
+    b1 = next(
+        row for row in migrated if row.observation_id.endswith("shornikov_2008_fig1_b_marker_1")
+    )
+    assert b1.admission.status is AdmissionStatus.ADMITTED
+    assert dict(b1.identity.composition.value.components) == {
+        "MgAl2O4": Decimal("0.980"),
+        "SiO2": Decimal("0.020"),
+    }
+    assert dict(b1.point_conditions["composition"].state.value.components) == {
+        "MgAl2O4": Decimal("0.980"),
+        "SiO2": Decimal("0.020"),
+    }
 
     for row in migrated:
         if row.locator.figure == "1" and "fig1_d_marker_" in row.observation_id:
