@@ -36,6 +36,7 @@ from simulator.melt_backend.openimcc_bridge import (
 import simulator.melt_backend.openimcc_bridge as openimcc_bridge_module
 from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
 from simulator.run_executor import RunExecutor
+from simulator.physical_constants import GAS_CONSTANT
 from simulator.runner import (
     PyrolysisRun,
     _high_t_melt_activity_fallback_sentence,
@@ -357,11 +358,11 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
     ).hexdigest() == "7a8024a3a3235a06fbf1dd3bd20385c804a3098ac1d1b0b717cdd93b7cf57ad0"
 
 
-@pytest.mark.parametrize("gap_K, hour_gap, held", [
-    (7.5, 1, True), (15.0, 2, True), (15.01, 1, False), (0.0, 3, True),
+@pytest.mark.parametrize("gap_K, hour_gap", [
+    (7.5, 1), (15.0, 2), (15.01, 1), (0.0, 3),
 ])
 def test_refused_activity_holds_only_local_certified_gamma(
-    monkeypatch, gap_K, hour_gap, held,
+    monkeypatch, gap_K, hour_gap,
 ) -> None:
     provider = _provider()
     previous = provider.dispatch(_history_request(_LUNAR_CALL_60, 2393.15, 60))
@@ -387,22 +388,26 @@ def test_refused_activity_holds_only_local_certified_gamma(
     notices = [n for n in authority["notices"] if n["code"] == "hold_last_certified_effective_gamma"]
     assert authority["authority"] == "extrapolated"
     assert authority["fallback_reason"]["code"] == "imcc_nonconvergence"
-    if not held:
-        assert not notices
-        assert activity.activity == melt_oxide_activity("SiO2", _LUNAR_CALL_62).activity
-        assert "openimcc_refused_constant_gamma_fallback" in activity.warning
-        return
-    assert 0.0038 < activity.activity < 0.0041
+    # Call 62's composition is one ramp step from the certificate, inside
+    # every continued parent's cap. A larger thermal gap no longer drops
+    # that parent to the table.
     silica_notice = next(n for n in notices if n["parent"] == "SiO2")
+    assert silica_notice["method"] == "extrapolated_first_order_ln_gamma"
     assert silica_notice["temperature_K"] == 2400.65
-    assert silica_notice["temperature_gap_K"] == gap_K
+    assert silica_notice["temperature_gap_K"] == pytest.approx(gap_K)
     assert silica_notice["hour_gap"] == hour_gap
     assert silica_notice["window_K"] == 15.0
     assert silica_notice["original_refusal"]["code"] == "imcc_nonconvergence"
-    assert "hold_last_certified_effective_gamma" in activity.warning
+    assert activity.activity_model == "extrapolated_first_order_ln_gamma"
+    assert activity.activity_model in activity.warning
+    assert activity.activity != melt_oxide_activity("SiO2", _LUNAR_CALL_62).activity
     provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["SiO"]
-    assert provenance["melt_activity_authority"] == "hold_last_certified_effective_gamma"
+    assert provenance["melt_activity_authority"] == "extrapolated_first_order_ln_gamma"
     assert provenance["openimcc_refusal"]["code"] == "imcc_nonconvergence"
+    if gap_K == 0.0:
+        assert silica_notice["progress_s"] == 0.0
+        assert activity.effective_gamma == silica_notice["gamma_last"]
+        assert 0.0038 < activity.activity < 0.0041
     if gap_K == 7.5:
         # Independent call-62 transport observation: at frozen geometry and
         # resistances J is linear in (p_eq-p_bulk). Scale the measured solved
@@ -424,9 +429,9 @@ def test_refused_activity_holds_only_local_certified_gamma(
             cleaned_melt_kg={"SiO2": parent_mass}, available_o2_kg=0.0,
         )
         removed_mol = rates["SiO"] / resolve_species_formula("SiO").molar_mass_kg_per_mol()
-        # Logged solved draw is 5.0014%; the local hold is about 5.83%,
-        # rather than the refused table leg's measured 93.2713%.
-        assert 0.05 < removed_mol / _LUNAR_CALL_62["SiO2"] < 0.065
+        # Logged solved draw is 5.0014%. The refused table leg drew 93.2713%.
+        # The continued activity stays near the solved draw.
+        assert 0.04 < removed_mol / _LUNAR_CALL_62["SiO2"] < 0.065
         sim.melt = SimpleNamespace(hour=61, campaign=CampaignPhase.C2A)
         sim._note_high_t_melt_activity_fallback(
             authority, result.diagnostic["vapor_pressure_numerator_provenance"],
@@ -434,7 +439,9 @@ def test_refused_activity_holds_only_local_certified_gamma(
         run_notice = sim.high_t_melt_activity_run_notice()
         assert silica_notice in run_notice["notices"]
         assert run_notice["reason"] == "imcc_nonconvergence"
-        assert "held effective-gamma" in _high_t_melt_activity_fallback_sentence(run_notice)
+        sentence = _high_t_melt_activity_fallback_sentence(run_notice)
+        assert "first-order ln-gamma extrapolated" in sentence
+        assert "frozen past a species cap" in sentence
     # A refused prediction must never refresh the certificate or its clock.
     assert authority["certified_effective_gamma_by_parent"] == (
         certified.diagnostic["high_t_melt_activity"]["certified_effective_gamma_by_parent"]
@@ -443,8 +450,13 @@ def test_refused_activity_holds_only_local_certified_gamma(
         **request.control_inputs, "high_t_melt_activity_previous": authority,
         "simulation_hour": 64,
     }))
-    assert not any(n["code"] == "hold_last_certified_effective_gamma"
-                   for n in again.diagnostic["high_t_melt_activity"]["notices"])
+    again_silica = next(
+        n for n in again.diagnostic["high_t_melt_activity"]["notices"]
+        if n.get("code") == "hold_last_certified_effective_gamma"
+        and n.get("parent") == "SiO2"
+    )
+    assert again_silica["method"] == "extrapolated_first_order_ln_gamma"
+    assert again_silica["consecutive_refusal_count"] == 2
 
 
 def _certify_lunar_calls_60_61(provider):
@@ -557,6 +569,17 @@ def test_logged_refusal_extrapolates_ln_gamma_and_hold_does_not(
             authority=authority,
         )
         assert activity.activity_model == "extrapolated_first_order_ln_gamma"
+    # Every probe failed, so the bridge is exhausted and the capped secant
+    # is the fallback. The probes stay inside the ±75 K schedule.
+    bridge = authority["temperature_bridge"]
+    assert bridge["call_count"] == vapor_pressure_module._TEMPERATURE_BRIDGE_MAX_CALLS
+    assert bridge["cap_K"] == 75.0
+    refused_T = _LUNAR_SOLVED_T_K[62]
+    assert [abs(probe_T - refused_T) for probe_T in bridge["attempted_temperatures_K"]] == (
+        pytest.approx([25.0, 25.0, 50.0, 50.0, 75.0, 75.0])
+    )
+    assert notice["bridge_fallback"] == "fewer_than_two_temperature_points"
+    assert notice["method"] != "same_composition_T_bridge"
     sodium = vapor_pressure_module._high_t_activity_for_parent(
         "Na2O", _LUNAR_CALL_62, temperature_K=_LUNAR_SOLVED_T_K[62],
         authority=authority,
@@ -635,9 +658,181 @@ def test_logged_refusal_extrapolates_ln_gamma_and_hold_does_not(
     assert beyond_notice["flag"] == "extrapolation_capped_frozen"
 
 
-@pytest.mark.parametrize("silica_factor, held", [(1.0, True), (0.99, False)])
+_CALLLOG_ROOT = Path(
+    "/Users/simonrowland/Repos/regolith-pyrolysis-simulator/docs-private/"
+    "research/2026-10-17-rump-collapse-541d69c/calllog"
+)
+_C2B7B4E_SRC = (
+    "/Users/simonrowland/.cache/regolith-engine/oimcc-c2b7b4e/src"
+)
+
+
+def _call_record(engine: str, index: int) -> dict:
+    path = next((_CALLLOG_ROOT / engine).glob("*.jsonl"))
+    with path.open() as handle:
+        for record_index, line in enumerate(handle):
+            if record_index == index:
+                return json.loads(line)
+    raise AssertionError(f"{engine} call log has no record {index}")
+
+
+def _c2b7b4e_effective_gammas(composition: dict, temperature_K: float) -> dict:
+    """Single-cation gamma from a fresh c2b7b4e solve, not from this tree."""
+
+    script = r"""
+import json, sys
+sys.path.insert(0, sys.argv[1])
+sys.path.insert(1, sys.argv[2])
+from simulator.chemistry.melt_activity import single_cation_mole_fractions
+from simulator.melt_backend.openimcc_bridge import evaluate_cleaned_melt
+item = json.loads(sys.stdin.read())
+try:
+    cleaned = evaluate_cleaned_melt(
+        item["composition"], item["T"], allow_extrapolation=False,
+    )
+    fractions = single_cation_mole_fractions(item["composition"])
+    gammas = {
+        oxide: float(activity) / float(fractions[oxide])
+        for oxide, activity in cleaned.single_cation_activities.items()
+        if float(fractions.get(oxide, 0.0)) > 0.0
+    }
+    print(json.dumps({"ok": True, "gammas": gammas}))
+except Exception as exc:
+    print(json.dumps({"ok": False, "err": f"{type(exc).__name__}: {exc}"[:400]}))
+"""
+    env = os.environ.copy()
+    env["PYTHONPATH"] = _C2B7B4E_SRC
+    env.setdefault("MPLCONFIGDIR", "/private/tmp/claude-501/main-review/mplcache")
+    completed = subprocess.run(
+        [
+            sys.executable, "-c", script, _C2B7B4E_SRC, str(REPO_ROOT),
+        ],
+        input=json.dumps({"composition": composition, "T": temperature_K}),
+        text=True,
+        capture_output=True,
+        env=env,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    payload = json.loads(completed.stdout)
+    assert payload["ok"], payload
+    return payload["gammas"]
+
+
+def _reference_regular_solution_gamma(
+    observations: list[tuple[float, float]], temperature_K: float,
+) -> float:
+    """RT ln γ = W + S T through another engine's solves.
+
+    This is the specified temperature line, evaluated on c2b7b4e gammas.
+    It is not the production function. Two points fix the line; the refused
+    temperature is where that line is read.
+    """
+
+    (first_T, first_gamma), (second_T, second_gamma) = observations
+    first_y = GAS_CONSTANT * first_T * math.log(first_gamma)
+    second_y = GAS_CONSTANT * second_T * math.log(second_gamma)
+    entropy = (second_y - first_y) / (second_T - first_T)
+    enthalpy = first_y - entropy * first_T
+    return math.exp(
+        (enthalpy + entropy * temperature_K) / (GAS_CONSTANT * temperature_K)
+    )
+
+
+def test_refused_calls_use_same_composition_temperature_bridge() -> None:
+    """e975edd calls 62 and 65 refuse; the bridge is the primary gamma.
+
+    Call 62 has the same composition in the solved c2b7b4e log, so that
+    log is the truth. Call 65's trajectories have diverged, and c2b7b4e
+    also refuses that composition at 2430.65 K, so its truth is the
+    regular-solution line through c2b7b4e solves at the bridge temperatures.
+    """
+
+    provider = _provider()
+    certified = _certify_lunar_calls_60_61(provider)
+    refused_62 = _call_record("e975edd", 62)
+    solved_62 = _call_record("c2b7b4e", 62)
+    assert refused_62["ok"] is False
+    assert solved_62["composition"] == refused_62["composition"]
+    result_62 = provider.dispatch(_history_request(
+        refused_62["composition"], refused_62["T_K"], 62, certified,
+    ))
+    authority = result_62.diagnostic["high_t_melt_activity"]
+    bridge_parents = _ONE_STEP_PARENTS + ("Na2O",)
+    errors = {}
+    solved_activity = dict(zip(
+        solved_62["parent_oxides"], solved_62["parent_activity"],
+    ))
+    for oxide in bridge_parents:
+        activity = vapor_pressure_module._high_t_activity_for_parent(
+            oxide, refused_62["composition"],
+            temperature_K=refused_62["T_K"], authority=authority,
+        )
+        solved_cation_activity, fraction = single_cation_activity_and_fraction(
+            oxide, solved_activity[oxide], solved_62["composition"],
+        )
+        truth = solved_cation_activity / fraction
+        errors[oxide] = (activity.effective_gamma - truth) / truth
+        notice = next(n for n in authority["notices"] if n.get("parent") == oxide)
+        assert notice["method"] == "same_composition_T_bridge"
+        assert notice["bridge_mode"] == "interpolation"
+        assert notice["bridge_call_count"] <= 6
+        assert notice["bridge_cap_K"] == 75.0
+        assert math.isfinite(notice["W_J_per_mol"])
+        assert math.isfinite(notice["S_J_per_mol_K"])
+        for probe_T in notice["bridge_attempted_temperatures_K"]:
+            offset = abs(probe_T - refused_62["T_K"])
+            assert min(abs(offset - step) for step in (25.0, 50.0, 75.0)) < 1e-6
+        assert activity.activity_model == "same_composition_T_bridge"
+        assert activity.activity != melt_oxide_activity(
+            oxide, refused_62["composition"],
+        ).activity
+    assert all(abs(error) < 0.01 for error in errors.values()), errors
+    assert "K2O" not in authority["held_effective_gamma_by_parent"]
+    assert (
+        result_62.diagnostic["vapor_pressure_numerator_provenance"]["SiO"][
+            "melt_activity_authority"
+        ]
+        == "same_composition_T_bridge"
+    )
+
+    refused_65 = _call_record("e975edd", 65)
+    assert refused_65["ok"] is False
+    result_65 = provider.dispatch(_history_request(
+        refused_65["composition"], refused_65["T_K"], 65,
+    ))
+    authority_65 = result_65.diagnostic["high_t_melt_activity"]
+    silica = next(
+        n for n in authority_65["notices"] if n.get("parent") == "SiO2"
+    )
+    assert silica["method"] == "same_composition_T_bridge"
+    assert silica["bridge_mode"] == "interpolation"
+    assert silica["bridge_fit"] == "exact_line"
+    assert silica["bridge_call_count"] <= 6
+    probe_temperatures = silica["bridge_temperatures_K"]
+    assert len(probe_temperatures) == 2
+    reference_observations = []
+    for probe_T in probe_temperatures:
+        gammas = _c2b7b4e_effective_gammas(refused_65["composition"], probe_T)
+        reference_observations.append((probe_T, gammas["SiO2"]))
+    reference = _reference_regular_solution_gamma(
+        reference_observations, refused_65["T_K"],
+    )
+    activity_65 = vapor_pressure_module._high_t_activity_for_parent(
+        "SiO2", refused_65["composition"],
+        temperature_K=refused_65["T_K"], authority=authority_65,
+    )
+    assert (activity_65.effective_gamma - reference) / reference == pytest.approx(
+        0.0, abs=0.01,
+    )
+    assert activity_65.activity != melt_oxide_activity(
+        "SiO2", refused_65["composition"],
+    ).activity
+
+
+@pytest.mark.parametrize("silica_factor", [1.0, 0.99])
 def test_first_high_t_certificate_without_previous_temperature_can_hold(
-    monkeypatch, silica_factor, held,
+    monkeypatch, silica_factor,
 ) -> None:
     request = _request(BASE_MELT_MOL, 2400.65)
     provider = _provider()
@@ -659,26 +854,37 @@ def test_first_high_t_certificate_without_previous_temperature_can_hold(
     certificate = certified["certified_effective_gamma_by_parent"]["SiO2"]
     assert certificate["window_K"] == 0.0
     assert certificate["composition_window_L1"] == 0.0
-    assert bool(authority["held_effective_gamma_by_parent"]) is held
+    # One certified call has no slope, so the continuation is the
+    # zero-order hold. A 1% silica change is inside the SiO2 cap and
+    # must not fall through to the table.
+    assert authority["held_effective_gamma_by_parent"]
     activity = vapor_pressure_module._high_t_activity_for_parent(
         "SiO2", composition, temperature_K=2400.65, authority=authority,
     )
-    if held:
-        assert activity.activity == pytest.approx(certified["activities_by_oxide"]["SiO2"])
+    assert activity.effective_gamma == certificate["gamma_last"]
+    assert activity.activity_model == "hold_last_certified_effective_gamma"
+    assert "openimcc_refused_constant_gamma_fallback" not in (activity.warning or "")
+    if silica_factor == 1.0:
+        assert activity.activity == pytest.approx(
+            certified["activities_by_oxide"]["SiO2"]
+        )
     else:
-        assert activity.activity == melt_oxide_activity("SiO2", composition).activity
-        assert "openimcc_refused_constant_gamma_fallback" in activity.warning
+        assert activity.activity != certified["activities_by_oxide"]["SiO2"]
+        assert activity.activity != melt_oxide_activity("SiO2", composition).activity
 
 
-@pytest.mark.parametrize("drift_mol, held", [(0.125, True), (0.25, True), (0.2578125, False)])
+@pytest.mark.parametrize("drift_mol, inside_cap", [
+    (0.125, True), (0.25, False), (0.2578125, False),
+])
 def test_isothermal_refusal_expires_on_composition_drift(
-    monkeypatch, drift_mol, held,
+    monkeypatch, drift_mol, inside_cap,
 ) -> None:
     provider = _provider()
-    # Eight mol of cations, with dyadic amounts so the boundary is exact.
+    # Eight mol of cations, with dyadic amounts so the distances are exact.
     # Swap 1/8 mol Si for Mg: each X changes by 1/64, so the L1 step is
-    # 1/32 and the two-step window is 1/16 (dimensionless). A further
-    # 1/4 mol swap reaches that window; any larger swap must expire.
+    # 1/32. A further swap of d mol moves L1 by d/4. The SiO2 cap is three
+    # mean ramp steps (about 0.0385), between the one-step drift (0.03125)
+    # and the two-step drift (0.0625). Past the cap the gamma freezes.
     initial = {
         "SiO2": 4.0, "MgO": 1.0, "FeO": 1.0, "CaO": 1.0,
         "Al2O3": 0.25, "TiO2": 0.25, "Na2O": 0.0625, "K2O": 0.0625,
@@ -705,17 +911,30 @@ def test_isothermal_refusal_expires_on_composition_drift(
     activity = vapor_pressure_module._high_t_activity_for_parent(
         "SiO2", composition, temperature_K=2400.65, authority=authority,
     )
-    assert bool(authority["held_effective_gamma_by_parent"]) is held
+    assert authority["held_effective_gamma_by_parent"]
     notice = next(n for n in authority["notices"] if n.get("parent") == "SiO2")
     assert notice["temperature_gap_K"] == 0.0
     assert notice["composition_window_L1"] == 0.0625
-    assert (notice["composition_distance_L1"] <= notice["composition_window_L1"]) is held
-    assert authority["certified_effective_gamma_by_parent"] == certified["certified_effective_gamma_by_parent"]
-    if held:
-        assert activity.activity_model == "hold_last_certified_effective_gamma"
+    assert notice["progress_variable"] == "composition"
+    cap = vapor_pressure_module._EXTRAPOLATION_CAP_L1["SiO2"]
+    assert (notice["composition_distance_L1"] <= cap) is inside_cap
+    assert authority["certified_effective_gamma_by_parent"] == (
+        certified["certified_effective_gamma_by_parent"]
+    )
+    if inside_cap:
+        # L1 scales with the swapped moles on this dyadic melt, and the
+        # certified step was 0.125 mol, so s = drift_mol / 0.125.
+        assert notice["method"] == "extrapolated_first_order_ln_gamma"
+        assert notice["progress_s"] == pytest.approx(drift_mol / 0.125)
+        assert activity.activity_model == "extrapolated_first_order_ln_gamma"
+        assert notice.get("flag") != "extrapolation_capped_frozen"
     else:
-        assert activity.activity == melt_oxide_activity("SiO2", composition).activity
-        assert "openimcc_refused_constant_gamma_fallback" in activity.warning
+        assert notice["flag"] == "extrapolation_capped_frozen"
+        assert notice["method"] == "extrapolation_capped_frozen"
+        assert notice["composition_distance_L1"] > notice["composition_cap_L1"]
+        assert activity.activity_model == "extrapolation_capped_frozen"
+        assert activity.activity != melt_oxide_activity("SiO2", composition).activity
+        assert "openimcc_refused_constant_gamma_fallback" not in (activity.warning or "")
     assert activity.evidence_tier == "PREDICT_AND_FLAG"
 
 
