@@ -554,23 +554,13 @@ def test_openimcc_parent_activity_parity(pack_name: str) -> None:
 def test_openimcc_activity_parity_fails_when_ln_k_is_scaled(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    package = _openimcc_or_skip()
+    _openimcc_or_skip()
     import openimcc.kernel as kernel_module
-
-    fixture = json.loads("\n".join(
-        line for line in GREEN_ACTIVITY_FIXTURE.read_text().splitlines()
-        if not line.startswith("#")
-    ))
-    row = fixture["rows"][0]
-    composition, basis_type = COMPOSITIONS[row["composition"]]
-    pack = _load_pack("published-core")
-    baseline = package.evaluate(
-        composition, row["temperature_K"], pack, basis_type=basis_type
-    )
-    baseline_bounds = _oracle_activity_log_bounds(row, pack, baseline)
     original = kernel_module.active_residual_jacobian
 
-    def scale_ln_k(y, x_target, nu, ln_k, stoichiometric_totals, xp):
+    def scale_ln_k(
+        y, x_target, nu, ln_k, stoichiometric_totals, xp=kernel_module.np
+    ):
         return original(
             y,
             x_target,
@@ -581,15 +571,8 @@ def test_openimcc_activity_parity_fails_when_ln_k_is_scaled(
         )
 
     monkeypatch.setattr(kernel_module, "active_residual_jacobian", scale_ln_k)
-    mutated = bridge_evaluate(
-        composition_kg=composition,
-        temperature_K=row["temperature_K"],
-        pack="published-core",
-    )
-    with pytest.raises(AssertionError, match="oracle-residual bound"):
-        _assert_activity_parity(
-            mutated.parent_oxide_activities, row, baseline_bounds
-        )
+    with pytest.raises(AssertionError, match="frozen-oracle bound"):
+        test_openimcc_parent_activity_parity("published-core")
 
 
 def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
