@@ -6,6 +6,7 @@ import copy
 from dataclasses import replace
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import subprocess
@@ -20,7 +21,10 @@ from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
-from simulator.chemistry.melt_activity import melt_oxide_activity
+from simulator.chemistry.melt_activity import (
+    melt_oxide_activity,
+    single_cation_activity_and_fraction,
+)
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.melt_backend.openimcc_bridge import (
@@ -254,6 +258,85 @@ _LUNAR_CALL_62 = {
     "Na2O": 1.9086093358233833e-07, "SiO2": 1273.040628414757,
     "TiO2": 192.8976539872457, "FeO": 0.02787490262712387,
 }
+_LUNAR_CALL_63 = {
+    "Al2O3": 1360.0091148463453, "CaO": 2014.8633514615274,
+    "K2O": 8.269791565459423, "MgO": 2290.487668001232,
+    "Na2O": 1.9086093358233833e-07, "SiO2": 1209.370400395345,
+    "TiO2": 192.8971940440544, "FeO": 0.02787490262712387,
+}
+_LUNAR_CALL_64 = {
+    "Al2O3": 1360.0091143072966, "CaO": 2014.862647632118,
+    "K2O": 8.251242256104423, "MgO": 2289.896426237898,
+    "Na2O": 1.9086093358233833e-07, "SiO2": 1148.9258228745186,
+    "TiO2": 192.8967375771004, "FeO": 0.02787490262712387,
+}
+# Logged parent activities, c2b7b4e/oimcc-calls-c2b7b4e-56179.jsonl.
+# These are the solved OpenIMCC parent activities (x*), not a continuation.
+_LUNAR_SOLVED_ACTIVITY = {
+    60: {
+        "SiO2": 0.00491910632589734, "MgO": 0.29003803439475734,
+        "FeO": 7.6081001780881665e-06, "CaO": 0.020298134754009073,
+        "Al2O3": 0.019497982908272645, "TiO2": 0.0015332892917718512,
+        "Na2O": 8.975956307200665e-23, "K2O": 3.895324724042545e-09,
+    },
+    61: {
+        "SiO2": 0.004107876381715498, "MgO": 0.3069501381169543,
+        "FeO": 7.564477722792486e-06, "CaO": 0.0232759536601634,
+        "Al2O3": 0.018185272341414004, "TiO2": 0.001387386098867267,
+        "Na2O": 1.0440512588493435e-22, "K2O": 4.7504875012812956e-09,
+    },
+    62: {
+        "SiO2": 0.0034549055949816875, "MgO": 0.32269118913215145,
+        "FeO": 7.557748782306461e-06, "CaO": 0.02647372170951418,
+        "Al2O3": 0.017056218137053623, "TiO2": 0.0012651960434469285,
+        "Na2O": 1.1901243047466535e-22, "K2O": 5.637959524195314e-09,
+    },
+    63: {
+        "SiO2": 0.002922487950859203, "MgO": 0.3372778580135101,
+        "FeO": 7.542008809495907e-06, "CaO": 0.029900010771698942,
+        "Al2O3": 0.01607812602659893, "TiO2": 0.001161825240157193,
+        "Na2O": 1.3344162376079728e-22, "K2O": 6.544378404416625e-09,
+    },
+    64: {
+        "SiO2": 0.0024835135180372647, "MgO": 0.35073146643562825,
+        "FeO": 7.5193910058890244e-06, "CaO": 0.033564239286234934,
+        "Al2O3": 0.015225486004163104, "TiO2": 0.001073551039351885,
+        "Na2O": 1.4757610544606816e-22, "K2O": 7.458665140677511e-09,
+    },
+}
+_LUNAR_CALL_66 = {
+    "Al2O3": 1360.0091129793375, "CaO": 2014.8606802533598,
+    "K2O": 8.212126474571518, "MgO": 2288.4374740969147,
+    "Na2O": 1.9086093358233833e-07, "SiO2": 1036.2482058023359,
+    "TiO2": 192.89582454128606, "FeO": 0.02787490262712387,
+}
+_LUNAR_SOLVED_COMPOSITION = {
+    60: _LUNAR_CALL_60, 61: _LUNAR_CALL_61, 62: _LUNAR_CALL_62,
+    63: _LUNAR_CALL_63, 64: _LUNAR_CALL_64, 66: _LUNAR_CALL_66,
+}
+_LUNAR_SOLVED_T_K = {
+    60: 2393.15, 61: 2400.65, 62: 2408.15, 63: 2415.65, 64: 2423.15, 66: 2438.15,
+}
+_LUNAR_SOLVED_ACTIVITY[66] = {"SiO2": 0.0018117532732782316}
+# Parents whose one-step continuation is inside the 1% bound. Na2O's cap is
+# zero. K2O stays on the constant-gamma table by the existing exclusion.
+_ONE_STEP_PARENTS = ("SiO2", "MgO", "FeO", "CaO", "Al2O3", "TiO2")
+
+
+def _solved_effective_gamma(call_index: int, oxide: str) -> float:
+    """Bulk single-cation gamma of a logged solve.
+
+    a(MO) = a(parent) ** (1/c) and X is the cation fraction of the logged
+    composition. gamma = a/X is the coefficient the high-T owner certifies.
+    This is the solved call, not the continuation formula.
+    """
+
+    activity, fraction = single_cation_activity_and_fraction(
+        oxide,
+        _LUNAR_SOLVED_ACTIVITY[call_index][oxide],
+        _LUNAR_SOLVED_COMPOSITION[call_index],
+    )
+    return activity / fraction
 
 
 def _history_request(composition, temperature_K, hour, previous=None):
@@ -362,6 +445,194 @@ def test_refused_activity_holds_only_local_certified_gamma(
     }))
     assert not any(n["code"] == "hold_last_certified_effective_gamma"
                    for n in again.diagnostic["high_t_melt_activity"]["notices"])
+
+
+def _certify_lunar_calls_60_61(provider):
+    previous = provider.dispatch(_history_request(
+        _LUNAR_CALL_60, _LUNAR_SOLVED_T_K[60], 60,
+    ))
+    certified = provider.dispatch(_history_request(
+        _LUNAR_CALL_61, _LUNAR_SOLVED_T_K[61], 61,
+        previous.diagnostic["high_t_melt_activity"],
+    ))
+    authority = certified.diagnostic["high_t_melt_activity"]
+    assert authority["provider"] == "openimcc"
+    return authority
+
+
+def _refuse_lunar_call(provider, monkeypatch, call_index, previous):
+    def nonconverge(**kwargs):
+        raise ImccNonconvergenceError(f"replayed refusal at call {call_index}", {})
+
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate", nonconverge)
+    result = provider.dispatch(_history_request(
+        _LUNAR_SOLVED_COMPOSITION[call_index],
+        _LUNAR_SOLVED_T_K[call_index],
+        call_index,
+        previous,
+    ))
+    return result.diagnostic["high_t_melt_activity"]
+
+
+def test_extrapolation_caps_match_c2b7b4e_step_prior() -> None:
+    """Per-species L1 caps are the owner's step counts times the ramp mean.
+
+    Step counts are the c2b7b4e measurement (median absolute error ≤ 5%,
+    worst ≤ 20%): FeO 8, MgO and CaO 4, SiO2, Al2O3 and TiO2 3, K2O 1,
+    Na2O 0. The mean is the single-cation L1 of one 7.5 K step, summed
+    over the 69 such steps and divided by 69.
+    """
+
+    steps = {
+        "FeO": 8, "MgO": 4, "CaO": 4,
+        "SiO2": 3, "Al2O3": 3, "TiO2": 3,
+        "K2O": 1, "Na2O": 0,
+    }
+    assert vapor_pressure_module._EXTRAPOLATION_CAP_STEPS == steps
+    mean = vapor_pressure_module._EXTRAPOLATION_MEAN_STEP_L1
+    assert mean == pytest.approx(0.8844714170310508 / 69)
+    caps = vapor_pressure_module._EXTRAPOLATION_CAP_L1
+    assert set(caps) == set(steps)
+    for oxide, count in steps.items():
+        assert caps[oxide] == count * mean
+    assert caps["Na2O"] == 0.0
+
+
+def test_logged_refusal_extrapolates_ln_gamma_and_hold_does_not(
+    monkeypatch,
+) -> None:
+    """Replay c2b7b4e calls 62 and 62–64, then call 66, as refusals.
+
+    Solved gammas are the logged parent activities on the bulk
+    single-cation basis. One step must land within 1% for each parent
+    the cap allows. The zero-order hold of the call-61 coefficient misses
+    that bound. Na2O's cap is zero, so its gamma stays at the certificate.
+    Call 63 is inside the SiO2 cap (SiO2 error about -2.0%). Call 64 is
+    just past that cap, so gamma freezes at the call-63 value instead of
+    falling through to the table. The in-cap slope, read at s=3, is the
+    measured SiO2 growth of -3.7%. Call 66 is the cap plus two thermal
+    steps; the frozen error stays below the table's error.
+    """
+
+    provider = _provider()
+    certified = _certify_lunar_calls_60_61(provider)
+    certificates = certified["certified_effective_gamma_by_parent"]
+    hold_errors = {
+        oxide: (
+            certificates[oxide]["gamma_last"] - _solved_effective_gamma(62, oxide)
+        ) / _solved_effective_gamma(62, oxide)
+        for oxide in _ONE_STEP_PARENTS
+    }
+    # The zero-order hold is outside 1% (SiO2 is about +14%). FeO's hold
+    # can sit near 1%; SiO2 is the parent that proves the bound discriminates.
+    assert abs(hold_errors["SiO2"]) > 0.01
+    assert max(abs(error) for error in hold_errors.values()) > 0.01
+
+    authority = _refuse_lunar_call(provider, monkeypatch, 62, certified)
+    assert authority["certified_effective_gamma_by_parent"] == certificates
+    assert "K2O" not in authority["held_effective_gamma_by_parent"]
+    errors = {}
+    for oxide in _ONE_STEP_PARENTS:
+        activity = vapor_pressure_module._high_t_activity_for_parent(
+            oxide, _LUNAR_CALL_62, temperature_K=_LUNAR_SOLVED_T_K[62],
+            authority=authority,
+        )
+        solved = _solved_effective_gamma(62, oxide)
+        errors[oxide] = (activity.effective_gamma - solved) / solved
+    assert all(abs(error) < 0.01 for error in errors.values()), errors
+    for oxide in _ONE_STEP_PARENTS:
+        notice = next(
+            n for n in authority["notices"]
+            if n.get("parent") == oxide
+            and n["code"] == "hold_last_certified_effective_gamma"
+        )
+        assert notice["method"] == "extrapolated_first_order_ln_gamma"
+        assert notice["progress_variable"] == "temperature"
+        assert notice["progress_s"] == pytest.approx(1.0)
+        assert notice["consecutive_refusal_count"] == 1
+        assert math.isfinite(notice["ln_gamma_slope"])
+        assert notice.get("flag") != "extrapolation_capped_frozen"
+        activity = vapor_pressure_module._high_t_activity_for_parent(
+            oxide, _LUNAR_CALL_62, temperature_K=_LUNAR_SOLVED_T_K[62],
+            authority=authority,
+        )
+        assert activity.activity_model == "extrapolated_first_order_ln_gamma"
+    sodium = vapor_pressure_module._high_t_activity_for_parent(
+        "Na2O", _LUNAR_CALL_62, temperature_K=_LUNAR_SOLVED_T_K[62],
+        authority=authority,
+    )
+    sodium_notice = next(n for n in authority["notices"] if n.get("parent") == "Na2O")
+    assert sodium.effective_gamma == certificates["Na2O"]["gamma_last"]
+    assert sodium.activity_model != "extrapolated_first_order_ln_gamma"
+    assert sodium_notice["flag"] == "extrapolation_capped_frozen"
+    assert sodium_notice["composition_cap_L1"] == 0.0
+    assert sodium_notice["composition_distance_L1"] > 0.0
+
+    # s = 0 is the certified state: the step must return that coefficient.
+    at_certificate = _refuse_lunar_call(provider, monkeypatch, 61, certified)
+    silica = vapor_pressure_module._high_t_activity_for_parent(
+        "SiO2", _LUNAR_CALL_61, temperature_K=_LUNAR_SOLVED_T_K[61],
+        authority=at_certificate,
+    )
+    silica_notice = next(
+        n for n in at_certificate["notices"] if n.get("parent") == "SiO2"
+    )
+    assert silica_notice["progress_s"] == 0.0
+    assert silica.effective_gamma == certificates["SiO2"]["gamma_last"]
+
+    # Calls 62–64 in a row. Certificates stay at call 61, so s grows.
+    chained = certified
+    live_gamma = {}
+    for call_index in (62, 63, 64):
+        chained = _refuse_lunar_call(provider, monkeypatch, call_index, chained)
+        assert chained["certified_effective_gamma_by_parent"] == certificates
+        notice = next(n for n in chained["notices"] if n.get("parent") == "SiO2")
+        assert notice["consecutive_refusal_count"] == call_index - 61
+        activity = vapor_pressure_module._high_t_activity_for_parent(
+            "SiO2", _LUNAR_SOLVED_COMPOSITION[call_index],
+            temperature_K=_LUNAR_SOLVED_T_K[call_index], authority=chained,
+        )
+        live_gamma[call_index] = activity.effective_gamma
+        if call_index == 64:
+            assert notice["flag"] == "extrapolation_capped_frozen"
+            assert notice["composition_distance_L1"] > notice["composition_cap_L1"]
+            assert activity.activity != melt_oxide_activity(
+                "SiO2", _LUNAR_CALL_64,
+            ).activity
+            continue
+        assert notice["method"] == "extrapolated_first_order_ln_gamma"
+        assert notice["progress_s"] == pytest.approx(call_index - 61)
+        solved = _solved_effective_gamma(call_index, "SiO2")
+        if call_index == 63:
+            assert (live_gamma[63] - solved) / solved == pytest.approx(-0.020, abs=0.0015)
+    # Past the cap, gamma is the last in-cap extrapolation, not a new step.
+    assert live_gamma[64] == live_gamma[63]
+    # The slope published while still inside the cap, read at s=3, is the
+    # measured SiO2 growth of -3.7% against the logged solve.
+    in_cap = next(n for n in authority["notices"] if n.get("parent") == "SiO2")
+    s_three = (
+        (_LUNAR_SOLVED_T_K[64] - in_cap["temperature_K"])
+        / (in_cap["temperature_K"] - in_cap["temperature_prev_K"])
+    )
+    assert s_three == pytest.approx(3.0)
+    predicted = math.exp(in_cap["ln_gamma_last"] + in_cap["ln_gamma_slope"] * s_three)
+    solved_64 = _solved_effective_gamma(64, "SiO2")
+    assert (predicted - solved_64) / solved_64 == pytest.approx(-0.037, abs=0.0015)
+
+    # Call 66 is five thermal steps from call 61: the SiO2 cap plus two.
+    beyond = _refuse_lunar_call(provider, monkeypatch, 66, chained)
+    frozen = vapor_pressure_module._high_t_activity_for_parent(
+        "SiO2", _LUNAR_CALL_66, temperature_K=_LUNAR_SOLVED_T_K[66],
+        authority=beyond,
+    )
+    solved_66 = _solved_effective_gamma(66, "SiO2")
+    table = melt_oxide_activity("SiO2", _LUNAR_CALL_66)
+    frozen_error = abs(frozen.effective_gamma - solved_66) / solved_66
+    table_error = abs(table.effective_gamma - solved_66) / solved_66
+    assert frozen.effective_gamma == live_gamma[63]
+    assert frozen_error < table_error
+    beyond_notice = next(n for n in beyond["notices"] if n.get("parent") == "SiO2")
+    assert beyond_notice["flag"] == "extrapolation_capped_frozen"
 
 
 @pytest.mark.parametrize("silica_factor, held", [(1.0, True), (0.99, False)])
