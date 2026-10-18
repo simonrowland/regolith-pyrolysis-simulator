@@ -120,7 +120,10 @@ def _assert_locator(record: dict, page: int, published_page: int) -> None:
 
 
 def _assert_review_fix_pins(document: dict) -> None:
-    figure_fit = _context(document, "naess14_fig3_dry_air_regression")["values"]
+    prose_fit = _context(document, "naess14_fig3_dry_air_regression")
+    _assert_locator(prose_fit, 7, 401)
+    assert "figure" not in prose_fit["locator"]
+    figure_fit = prose_fit["values"]
     assert "R_squared_as_printed" not in figure_fit
     assert figure_fit["flat_plate_comparison_R_squared_as_printed"] == "0.76"
     for figure_number in (1, 2, 6):
@@ -183,6 +186,7 @@ def test_naess_table_rows_and_render_pins() -> None:
     context = document["species"]["SiO2"]["context"]
     ids = [row["observation_id"] for row in context]
     assert len(ids) == len(set(ids))
+    assert document["scope_assessment"]["context_records"] == len(context) == 47
     for row in context:
         locator = row["locator"]
         page = locator["page"]
@@ -250,6 +254,7 @@ def test_naess_render_pin_rejects_a_changed_cell() -> None:
         "figure_1_annotation",
         "figure_2_annotation",
         "figure_6_annotation",
+        "r2_page",
         "diffusion_page",
         "boundary_wording",
         "o2_boundary_page",
@@ -267,6 +272,8 @@ def test_naess_review_fix_pins_reject_regressions(regression: str) -> None:
         _context(document, f"naess14_figure_{figure_number}_deferred")["values"][
             "non_data_annotations_as_printed"
         ] = "returned annotation"
+    elif regression == "r2_page":
+        _context(document, "naess14_fig3_dry_air_regression")["locator"]["page"] = 8
     elif regression == "diffusion_page":
         _context(document, "naess14_model_derived_diffusion_coefficients")["locator"][
             "page"

@@ -18,7 +18,7 @@ review_status: draft
 scope_assessment:
   document_type: experimental liquid-silicon oxidation and CFD/kinetic modeling study
   typed_observations: 0
-  context_records: 43
+  context_records: 47
   subject_scope: measured SiO2 fume fluxes, gas-flow conditions, oxygen consumption, BET particle sizes, and model-derived
     transport/condensation results
   schema_gap: The existing quantity enum has no silica-fume flux in mol m^-2 s^-1, BET particle diameter in nm,
@@ -843,10 +843,9 @@ species:
     - observation_id: naess14_fig3_dry_air_regression
       type: experiment_series
       locator:
-        page: 8
-        published_page: 402
-        pdf_page_index: 7
-        figure: '3'
+        page: 7
+        published_page: 401
+        pdf_page_index: 6
       units: regression relation between JSiO2 and vg^(3/4); R^2 dimensionless
       values:
         method_class: model_derived
