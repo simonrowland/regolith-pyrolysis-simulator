@@ -1,0 +1,979 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2000-silica-gas-equilibria
+source:
+  citation: >-
+    Shornikov, S. I., Archakov, I. Yu., and Shul'ts, M. M. (2000),
+    "Mass-Spectrometric Study of Evaporation and Thermodynamic Properties of
+    Silica: III. Equilibrium Reactions of Molecules Occurring in the Gas Phase
+    over Silica", Russian Journal of General Chemistry 70(3), 360-368
+    (translation; original pages 386-394).
+  year: 2000
+  doi: null
+  corpus_asset: raw/shornikov-2000-silica-gas-equilibria/shornikov-2000-silica-gas-equilibria.pdf
+  corpus_sha256: 46da8a5d29ae6919c515529f27c4f166fdc7118d7aea142b0bd04afb63db01e6
+extraction:
+  method: >-
+    Born-digital source: pdftotext-layout.txt was transcribed by table row and
+    checked against 600 dpi PDF renders for Tables 1-6 (published pp. 361-366),
+    Table 4 appearance potentials, and Figure 1 (p. 368). The six tables' full
+    rows are retained below. Figure 1 is deferred without numeric points.
+    Table 3 and the prose report measured ion-current ratios. Those values are
+    retained pending a controller ruling on the existing ion_intensity_ratio
+    identity subtype, which the extract migrator does not read from source
+    fields. No schema or migrator change is made here.
+  date: '2026-10-18'
+  worker: fam2-1018
+  provenance_path: text/shornikov-2000-silica-gas-equilibria/pdftotext-layout.txt
+review_status: draft
+species:
+  SiO2:
+    observations: []
+    context:
+    - observation_id: shornikov_2000_table1_reaction_1
+      type: tabulation
+      locator:
+        table: '1'
+        published_page: 361
+        pdf_page_index: 1
+      units: 'a: K; b: dimensionless; ΔrH_T: kJ mol−1'
+      values:
+        quantity: 'log Kr1 = −a/T + b; ΔrH_T'
+        method_class: mixed
+        schema_gap: No stored quantity token for log Kr or reaction enthalpy.
+        reaction_as_printed: '[SiO2] = (SiO) + (O)'
+        columns_as_printed: [Cell material, T (K), a, b, ΔrH_T (kJ mol−1), References]
+        rows:
+        - cell_material: '—'
+          T_as_printed: '0'
+          a_as_printed: '—'
+          b_as_printed: '—'
+          delta_rH_T_as_printed: '1052.5 ± 23*'
+          attribution: '[11]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '0–2000'
+          a_as_printed: '53 413'
+          b_as_printed: '15.87'
+          delta_rH_T_as_printed: '1022.5'
+          attribution: '[8]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1300–1996'
+          a_as_printed: '54 461 ± 46'
+          b_as_printed: '16.30 ± 0.03'
+          delta_rH_T_as_printed: '1042.6 ± 0.9'
+          attribution: '[11]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1400–1950'
+          a_as_printed: '54 585 ± 29'
+          b_as_printed: '16.00 ± 0.02'
+          delta_rH_T_as_printed: '1045.0 ± 0.6'
+          attribution: '[13]'
+          method_class: quoted_attributed
+        - cell_material: Mo
+          T_as_printed: '1600–1800'
+          a_as_printed: '49 052 ± 3122*'
+          b_as_printed: '13.13 ± 0.84*'
+          delta_rH_T_as_printed: '939.0 ± 60*'
+          attribution: '[20]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1600–1996'
+          a_as_printed: '54 316 ± 21'
+          b_as_printed: '16.31 ± 0.01'
+          delta_rH_T_as_printed: '1039.9 ± 0.4'
+          attribution: '[12]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1600–1996'
+          a_as_printed: '54 309 ± 26'
+          b_as_printed: '16.30 ± 0.01'
+          delta_rH_T_as_printed: '1039.7 ± 0.5'
+          attribution: '[14]'
+          method_class: quoted_attributed
+        - cell_material: Mo
+          T_as_printed: '1610–1980'
+          a_as_printed: '54 214 ± 605'
+          b_as_printed: '16.49 ± 0.31'
+          delta_rH_T_as_printed: '1037.9 ± 12'
+          attribution: This work
+          method_class: model_derived
+        - cell_material: Ir
+          T_as_printed: '1773–2001'
+          a_as_printed: '55 025 ± 2092*'
+          b_as_printed: '16.21 ± 1.03*'
+          delta_rH_T_as_printed: '1053.4 ± 40*'
+          attribution: '[21,22]'
+          method_class: quoted_attributed
+        - cell_material: Al2O3
+          T_as_printed: '1800–1900'
+          a_as_printed: '40 618 ± 1213*'
+          b_as_printed: '13.13 ± 0.35*'
+          delta_rH_T_as_printed: '777.6 ± 23'
+          attribution: '[3]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1800–2000'
+          a_as_printed: '52 843'
+          b_as_printed: '16.19'
+          delta_rH_T_as_printed: '1011.6'
+          attribution: '[7]'
+          method_class: quoted_attributed
+        - cell_material: 'Pt, Pt–Rh, Al2O3'
+          T_as_printed: '1820–1960'
+          a_as_printed: '55 530 ± 1523*'
+          b_as_printed: '16.71 ± 0.56*'
+          delta_rH_T_as_printed: '1063.0 ± 29*'
+          attribution: '[23]'
+          method_class: quoted_attributed
+        - cell_material: Mo
+          T_as_printed: '1833–1995'
+          a_as_printed: '54 157 ± 662'
+          b_as_printed: '15.97 ± 0.32'
+          delta_rH_T_as_printed: '1036.8 ± 13'
+          attribution: '[2]'
+          method_class: quoted_attributed
+        - cell_material: Pt–Rh
+          T_as_printed: '1872–1997'
+          a_as_printed: '53 934 ± 850'
+          b_as_printed: '16.28 ± 0.43'
+          delta_rH_T_as_printed: '1032.5 ± 16'
+          attribution: '[2]'
+          method_class: quoted_attributed
+        - cell_material: Pt
+          T_as_printed: '1887–1985'
+          a_as_printed: '53 923 ± 600*'
+          b_as_printed: '16.27 ± 0.06*'
+          delta_rH_T_as_printed: '1032.3 ± 12*'
+          attribution: '[5]'
+          method_class: quoted_attributed
+        - cell_material: Pt
+          T_as_printed: '1895–1984'
+          a_as_printed: '55 586 ± 922'
+          b_as_printed: '17.07 ± 0.35'
+          delta_rH_T_as_printed: '1064.1 ± 18'
+          attribution: '[5]'
+          method_class: quoted_attributed
+        - cell_material: W
+          T_as_printed: '1903–1982'
+          a_as_printed: '54 671 ± 868'
+          b_as_printed: '15.70 ± 0.46'
+          delta_rH_T_as_printed: '1046.6 ± 17'
+          attribution: '[2]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1996–2500'
+          a_as_printed: '53 437 ± 55'
+          b_as_printed: '15.80 ± 0.03'
+          delta_rH_T_as_printed: '1023.0 ± 1.0'
+          attribution: '[11]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1996–2500'
+          a_as_printed: '53 910 ± 33'
+          b_as_printed: '16.10 ± 0.01'
+          delta_rH_T_as_printed: '1032.1 ± 0.6'
+          attribution: '[12]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1996–2500'
+          a_as_printed: '53 259 ± 52'
+          b_as_printed: '15.77 ± 0.02'
+          delta_rH_T_as_printed: '1019.6 ± 1.0'
+          attribution: '[14]'
+          method_class: quoted_attributed
+        - cell_material: Mo
+          T_as_printed: '2000–2038'
+          a_as_printed: '51 506 ± 1686'
+          b_as_printed: '15.54 ± 0.85'
+          delta_rH_T_as_printed: '986.0 ± 32'
+          attribution: '[2]'
+          method_class: quoted_attributed
+        - cell_material: Pt–Rh
+          T_as_printed: '2000–2032'
+          a_as_printed: '53 380 ± 1005'
+          b_as_printed: '15.74 ± 0.61'
+          delta_rH_T_as_printed: '1021.9 ± 19'
+          attribution: '[2]'
+          method_class: quoted_attributed
+        - cell_material: W
+          T_as_printed: '2000–2100'
+          a_as_printed: '53 134 ± 2386'
+          b_as_printed: '15.84 ± 1.39'
+          delta_rH_T_as_printed: '1017.2 ± 46'
+          attribution: '[2]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '2000–4000'
+          a_as_printed: '51 139'
+          b_as_printed: '15.33'
+          delta_rH_T_as_printed: '979.0'
+          attribution: '[7]'
+          method_class: quoted_attributed
+    - observation_id: shornikov_2000_table2_reaction_4
+      type: tabulation
+      locator:
+        table: '2'
+        published_page: 362
+        pdf_page_index: 2
+      units: 'a: K; b: dimensionless; ΔrH_T: kJ mol−1'
+      values:
+        quantity: 'log Kr4 = −a/T + b; ΔrH_T'
+        method_class: mixed
+        schema_gap: No stored quantity token for log Kr or reaction enthalpy.
+        reaction_as_printed: '[SiO2] = (SiO2)'
+        columns_as_printed: [Cell material, T (K), a, b, ΔrH_T (kJ mol−1), References]
+        rows:
+        - cell_material: '—'
+          T_as_printed: '0'
+          a_as_printed: '—'
+          b_as_printed: '—'
+          delta_rH_T_as_printed: '585.0 ± 10*'
+          attribution: '[11]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1400–1950'
+          a_as_printed: '29 980 ± 24'
+          b_as_printed: '8.75 ± 0.01'
+          delta_rH_T_as_printed: '573.9 ± 0.5'
+          attribution: '[13]'
+          method_class: quoted_attributed
+        - cell_material: Mo
+          T_as_printed: '1600–1800'
+          a_as_printed: '23 455 ± 2130*'
+          b_as_printed: '5.32 ± 1.40*'
+          delta_rH_T_as_printed: '449.0 ± 41*'
+          attribution: '[20]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1600–1996'
+          a_as_printed: '29 858 ± 26'
+          b_as_printed: '8.79 ± 0.02'
+          delta_rH_T_as_printed: '571.6 ± 0.5'
+          attribution: '[11]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1600–1996'
+          a_as_printed: '30 635 ± 26'
+          b_as_printed: '8.73 ± 0.02'
+          delta_rH_T_as_printed: '586.5 ± 0.5'
+          attribution: '[12]'
+          method_class: quoted_attributed
+        - cell_material: Mo
+          T_as_printed: '1610–1980'
+          a_as_printed: '30 283 ± 517'
+          b_as_printed: '8.67 ± 0.29'
+          delta_rH_T_as_printed: '579.7 ± 10'
+          attribution: This work
+          method_class: model_derived
+        - cell_material: Al2O3
+          T_as_printed: '1800–1900'
+          a_as_printed: '27 519 ± 1601*'
+          b_as_printed: '7.33 ± 0.43*'
+          delta_rH_T_as_printed: '526.8 ± 31*'
+          attribution: '[3]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1800–2000'
+          a_as_printed: '16 944'
+          b_as_printed: '7.63'
+          delta_rH_T_as_printed: '324.4'
+          attribution: '[7]'
+          method_class: quoted_attributed
+        - cell_material: ZrO2
+          T_as_printed: '1833–1877'
+          a_as_printed: '18 793 ± 2009'
+          b_as_printed: '2.84 ± 1.08'
+          delta_rH_T_as_printed: '359.8 ± 39'
+          attribution: '[4]'
+          method_class: quoted_attributed
+        - cell_material: Mo
+          T_as_printed: '1833–1995'
+          a_as_printed: '30 710 ± 510'
+          b_as_printed: '8.46 ± 0.47'
+          delta_rH_T_as_printed: '587.9 ± 10'
+          attribution: '[2]'
+          method_class: quoted_attributed
+        - cell_material: Ir
+          T_as_printed: '1866–1983'
+          a_as_printed: '30 637 ± 1720'
+          b_as_printed: '8.40 ± 0.72'
+          delta_rH_T_as_printed: '586.5 ± 33'
+          attribution: '[2]'
+          method_class: quoted_attributed
+        - cell_material: Pt–Rh
+          T_as_printed: '1872–1997'
+          a_as_printed: '30 155 ± 1251'
+          b_as_printed: '8.23 ± 0.59'
+          delta_rH_T_as_printed: '577.3 ± 24'
+          attribution: '[2]'
+          method_class: quoted_attributed
+        - cell_material: W
+          T_as_printed: '1903–1982'
+          a_as_printed: '30 505 ± 950'
+          b_as_printed: '8.25 ± 0.53'
+          delta_rH_T_as_printed: '584.0 ± 18'
+          attribution: '[2]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1905–1985'
+          a_as_printed: '29 633 ± 600*'
+          b_as_printed: '8.67 ± 0.06*'
+          delta_rH_T_as_printed: '567.3 ± 12*'
+          attribution: '[5]'
+          method_class: quoted_attributed
+        - cell_material: Pt
+          T_as_printed: '1905–1988'
+          a_as_printed: '28 984 ± 1121'
+          b_as_printed: '8.33 ± 0.58'
+          delta_rH_T_as_printed: '554.9 ± 22'
+          attribution: '[5]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1996–2300'
+          a_as_printed: '28 834 ± 35'
+          b_as_printed: '8.27 ± 0.02'
+          delta_rH_T_as_printed: '552.0 ± 0.7'
+          attribution: '[11]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1996–2500'
+          a_as_printed: '30 307 ± 29'
+          b_as_printed: '8.56 ± 0.01'
+          delta_rH_T_as_printed: '580.2 ± 0.6'
+          attribution: '[12]'
+          method_class: quoted_attributed
+        - cell_material: Pt–Rh
+          T_as_printed: '2000–2032'
+          a_as_printed: '28 815 ± 1343'
+          b_as_printed: '8.17 ± 0.65'
+          delta_rH_T_as_printed: '551.6 ± 26'
+          attribution: '[2]'
+          method_class: quoted_attributed
+        - cell_material: Mo
+          T_as_printed: '2000–2038'
+          a_as_printed: '28 771 ± 669'
+          b_as_printed: '8.05 ± 0.64'
+          delta_rH_T_as_printed: '550.8 ± 13'
+          attribution: '[2]'
+          method_class: quoted_attributed
+        - cell_material: W
+          T_as_printed: '2000–2100'
+          a_as_printed: '28 383 ± 1151'
+          b_as_printed: '7.92 ± 0.55'
+          delta_rH_T_as_printed: '543.4 ± 22'
+          attribution: '[2]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '2000–4000'
+          a_as_printed: '28 983'
+          b_as_printed: '6.99'
+          delta_rH_T_as_printed: '554.8'
+          attribution: '[24]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '2000–3750'
+          a_as_printed: '28 110'
+          b_as_printed: '7.91'
+          delta_rH_T_as_printed: '538.1'
+          attribution: '[7]'
+          method_class: quoted_attributed
+        - cell_material: Ir
+          T_as_printed: '2007–2100'
+          a_as_printed: '27 093 ± 1714'
+          b_as_printed: '8.00 ± 0.91'
+          delta_rH_T_as_printed: '518.7 ± 33'
+          attribution: '[2]'
+          method_class: quoted_attributed
+    - observation_id: shornikov_2000_table3_previous_mass_spectra
+      type: mass_spectrum
+      locator:
+        table: '3'
+        published_page: 363
+        pdf_page_index: 3
+      units: normalized ion intensity relative to (SiO)+ as printed
+      values:
+        quantity: ion_intensity_ratio
+        method_class: quoted_attributed
+        schema_gap: >-
+          The extract migration profile requires identity.subtype for
+          ion_intensity_ratio, but the migrator does not map the printed ion
+          pair to that axis. Table 3's this-work row is retained in context
+          until that mapping is ruled.
+        source_row_count: 10
+        this_work_row_observation_id: shornikov_2000_table3_this_work_ratios
+        columns_as_printed: [Cell material, System, T (K), (Si)+, (SiO)+, (SiO2)+, (Si2O2)+, References]
+        rows:
+        - cell_material: Al2O3
+          system_as_printed: Si–SiO2
+          T_as_printed: '1463'
+          Si_plus_as_printed: '—'
+          SiO_plus_as_printed: '1.00'
+          SiO2_plus_as_printed: '—'
+          Si2O2_plus_as_printed: '7.83 × 10−4'
+          attribution: '[3]'
+        - cell_material: ZrO2
+          system_as_printed: Si–SiO2
+          T_as_printed: '1467'
+          Si_plus_as_printed: '—'
+          SiO_plus_as_printed: '1.00'
+          SiO2_plus_as_printed: '—'
+          Si2O2_plus_as_printed: '1.11 × 10−4'
+          attribution: '[4]'
+        - cell_material: Mo
+          system_as_printed: Si–Li2O
+          T_as_printed: '1538'
+          Si_plus_as_printed: '+'
+          SiO_plus_as_printed: '1.00'
+          SiO2_plus_as_printed: '1.88 × 10−5'
+          Si2O2_plus_as_printed: '3.44 × 10−4'
+          attribution: '[27]'
+        - cell_material: Mo
+          system_as_printed: Si–Ge–SiO2
+          T_as_printed: '1548'
+          Si_plus_as_printed: '2.29 × 10−4'
+          SiO_plus_as_printed: '1.00'
+          SiO2_plus_as_printed: '—'
+          Si2O2_plus_as_printed: '—'
+          attribution: '[41]'
+        - cell_material: C
+          system_as_printed: Si–SiO2
+          T_as_printed: '1550'
+          Si_plus_as_printed: '1.50 × 10−1'
+          SiO_plus_as_printed: '1.00'
+          SiO2_plus_as_printed: '—'
+          Si2O2_plus_as_printed: '—'
+          attribution: '[17,18]'
+        - cell_material: Si3N4
+          system_as_printed: Si–Si2N2O–Si3N4
+          T_as_printed: '1550'
+          Si_plus_as_printed: '1.50 × 10−1'
+          SiO_plus_as_printed: '1.00'
+          SiO2_plus_as_printed: '—'
+          Si2O2_plus_as_printed: '+'
+          attribution: '[19]'
+        - cell_material: Mo
+          system_as_printed: Si–Ge–SiO2
+          T_as_printed: '1560'
+          Si_plus_as_printed: '3.19 × 10−2'
+          SiO_plus_as_printed: '1.00'
+          SiO2_plus_as_printed: '—'
+          Si2O2_plus_as_printed: '—'
+          attribution: '[39]'
+        - cell_material: Al2O3
+          system_as_printed: SiO2
+          T_as_printed: '1900'
+          Si_plus_as_printed: '—'
+          SiO_plus_as_printed: '1.00'
+          SiO2_plus_as_printed: '4.44 × 10−3'
+          Si2O2_plus_as_printed: '—'
+          attribution: '[3]'
+        - cell_material: Pt
+          system_as_printed: SiO2
+          T_as_printed: '1950'
+          Si_plus_as_printed: '—'
+          SiO_plus_as_printed: '1.00'
+          SiO2_plus_as_printed: '6.32 × 10−2'
+          Si2O2_plus_as_printed: '—'
+          attribution: '[5]'
+    - observation_id: shornikov_2000_table4_appearance_potentials
+      type: appearance_potential
+      locator:
+        table: '4'
+        published_page: 363
+        pdf_page_index: 3
+      units: eV
+      values:
+        quantity: appearance potential
+        schema_gap: No stored quantity token for electron-impact appearance potential.
+        method_class: mixed
+        columns_as_printed: [System, SiO (eV), SiO2 (eV), Si2O2 (eV), References]
+        rows:
+        - system_as_printed: SiO2, Si–SiO2
+          SiO_as_printed: 10.8 ± 0.5
+          SiO2_as_printed: 11.7 ± 0.5
+          Si2O2_as_printed: 10 ± 1
+          attribution: '[3]'
+          method_class: quoted_attributed
+        - system_as_printed: Si–Ge–SiO2
+          SiO_as_printed: 11.6 ± 0.2
+          SiO2_as_printed: '—'
+          Si2O2_as_printed: '—'
+          attribution: '[39]'
+          method_class: quoted_attributed
+        - system_as_printed: Si–Ge–SiO2
+          SiO_as_printed: 11.58 ± 0.10
+          SiO2_as_printed: '—'
+          Si2O2_as_printed: '—'
+          attribution: '[40]'
+          method_class: quoted_attributed
+        - system_as_printed: Si–Ge–SiO2
+          SiO_as_printed: 11.5 ± 0.3
+          SiO2_as_printed: '—'
+          Si2O2_as_printed: '—'
+          attribution: '[41]'
+          method_class: quoted_attributed
+        - system_as_printed: SiO2
+          SiO_as_printed: 11.0 ± 0.5
+          SiO2_as_printed: 11.5 ± 0.5
+          Si2O2_as_printed: '—'
+          attribution: '[4]'
+          method_class: quoted_attributed
+        - system_as_printed: Si–Li2O
+          SiO_as_printed: 11.0 ± 0.5
+          SiO2_as_printed: 12.0 ± 0.5
+          Si2O2_as_printed: 11.0 ± 0.5
+          attribution: '[27]'
+          method_class: quoted_attributed
+        - system_as_printed: '—'
+          SiO_as_printed: 10.51 ± 0.02**
+          SiO2_as_printed: 11.7 ± 0.5
+          Si2O2_as_printed: 10 ± 1
+          attribution: '[45]'
+          method_class: quoted_attributed
+        - system_as_printed: SiO
+          SiO_as_printed: 11.69 ± 0.16
+          SiO2_as_printed: '—'
+          Si2O2_as_printed: '—'
+          attribution: '[36]'
+          method_class: quoted_attributed
+        - system_as_printed: SiO2
+          SiO_as_printed: 11.5 ± 0.2
+          SiO2_as_printed: 11.2 ± 0.2
+          Si2O2_as_printed: 10.7 ± 0.3
+          attribution: This work
+          method_class: measured_direct
+    - observation_id: shornikov_2000_table5_reaction_5
+      type: tabulation
+      locator:
+        table: '5'
+        published_page: 365
+        pdf_page_index: 5
+      units: 'a: K; b: dimensionless; ΔrH_T: kJ mol−1'
+      values:
+        quantity: 'log Kr5 = −a/T + b; ΔrH_T'
+        method_class: mixed
+        schema_gap: No stored quantity token for log Kr or reaction enthalpy.
+        reaction_as_printed: '(Si2O2) = 2(SiO)'
+        columns_as_printed: [Cell material, System, T (K), a, b, ΔrH_T (kJ mol−1), References]
+        rows:
+        - cell_material: '—'
+          system_as_printed: SiO2
+          T_as_printed: '1400–1950'
+          a_as_printed: '7 895 ± 14'
+          b_as_printed: '5.26 ± 0.01'
+          delta_rH_T_as_printed: '151.1 ± 0.3'
+          attribution: '[13]'
+          method_class: quoted_attributed
+        - cell_material: ZrO2
+          system_as_printed: Si–SiO2
+          T_as_printed: '1431–1487'
+          a_as_printed: '15 323 ± 1094'
+          b_as_printed: '11.19 ± 0.75'
+          delta_rH_T_as_printed: '293.4 ± 21'
+          attribution: '[4]'
+          method_class: quoted_attributed
+        - cell_material: Si3N4
+          system_as_printed: Si–Si2N2O–Si3N4
+          T_as_printed: '1493–1590'
+          a_as_printed: '16 238 ± 2849'
+          b_as_printed: '11.19 ± 1.85'
+          delta_rH_T_as_printed: '310.9 ± 55'
+          attribution: '[19]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          system_as_printed: SiO2
+          T_as_printed: '1600–3000'
+          a_as_printed: '11 474'
+          b_as_printed: '7.30'
+          delta_rH_T_as_printed: '219.7'
+          attribution: '[7]'
+          method_class: quoted_attributed
+        - cell_material: Mo
+          system_as_printed: SiO2
+          T_as_printed: '1704–1980'
+          a_as_printed: '25 233 ± 1606'
+          b_as_printed: '11.34 ± 0.91'
+          delta_rH_T_as_printed: '483.1 ± 31'
+          attribution: This work
+          method_class: model_derived
+    - observation_id: shornikov_2000_table6_reaction_17
+      type: tabulation
+      locator:
+        table: '6'
+        published_page: 366
+        pdf_page_index: 6
+      units: 'a: K; b: dimensionless; ΔrH_T: kJ mol−1'
+      values:
+        quantity: 'log Kr17 = −a/T + b; ΔrH_T'
+        method_class: mixed
+        schema_gap: No stored quantity token for log Kr or reaction enthalpy.
+        reaction_as_printed: '(SiO2) = (SiO) + (O)'
+        columns_as_printed: [Cell material, T (K), a, b, ΔrH_T (kJ mol−1), References]
+        rows:
+        - cell_material: '—'
+          T_as_printed: '0'
+          a_as_printed: '—'
+          b_as_printed: '—'
+          delta_rH_T_as_printed: '467.5 ± 10*'
+          attribution: '[11]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1400–1950'
+          a_as_printed: '24 603 ± 6'
+          b_as_printed: '7.57 ± 0.01'
+          delta_rH_T_as_printed: '471.0 ± 0.1'
+          attribution: '[13]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1500–1700'
+          a_as_printed: '27 906 ± 971'
+          b_as_printed: '9.50 ± 0.61'
+          delta_rH_T_as_printed: '534.2 ± 19'
+          attribution: '[53]'
+          method_class: quoted_attributed
+        - cell_material: Mo
+          T_as_printed: '1600–1800'
+          a_as_printed: '25 597 ± 4607*'
+          b_as_printed: '7.82 ± 2.03*'
+          delta_rH_T_as_printed: '490.0 ± 88*'
+          attribution: '[20]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1600–2500'
+          a_as_printed: '24 603 ± 8'
+          b_as_printed: '7.55 ± 0.01'
+          delta_rH_T_as_printed: '471.0 ± 0.2'
+          attribution: '[11]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1600–2500'
+          a_as_printed: '23 637 ± 7'
+          b_as_printed: '7.55 ± 0.01'
+          delta_rH_T_as_printed: '452.5 ± 0.2'
+          attribution: '[12]'
+          method_class: quoted_attributed
+        - cell_material: Mo
+          T_as_printed: '1610–1980'
+          a_as_printed: '23 931 ± 374'
+          b_as_printed: '7.82 ± 0.18'
+          delta_rH_T_as_printed: '458.1 ± 7'
+          attribution: This work
+          method_class: model_derived
+        - cell_material: Al2O3
+          T_as_printed: '1800–1900'
+          a_as_printed: '13 399 ± 782'
+          b_as_printed: '2.92 ± 0.22'
+          delta_rH_T_as_printed: '256.5 ± 15'
+          attribution: '[3]'
+          method_class: quoted_attributed
+        - cell_material: Mo
+          T_as_printed: '1833–1995'
+          a_as_printed: '23 447 ± 600'
+          b_as_printed: '7.06 ± 0.36'
+          delta_rH_T_as_printed: '448.9 ± 12'
+          attribution: '[2]'
+          method_class: quoted_attributed
+        - cell_material: Pt–Rh
+          T_as_printed: '1872–1997'
+          a_as_printed: '23 779 ± 967'
+          b_as_printed: '7.60 ± 0.47'
+          delta_rH_T_as_printed: '455.2 ± 19'
+          attribution: '[2]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '1800–2000'
+          a_as_printed: '23 339'
+          b_as_printed: '7.47'
+          delta_rH_T_as_printed: '446.8'
+          attribution: '[7]'
+          method_class: quoted_attributed
+        - cell_material: W
+          T_as_printed: '1903–1982'
+          a_as_printed: '24 166 ± 893'
+          b_as_printed: '7.00 ± 0.48'
+          delta_rH_T_as_printed: '462.6 ± 17'
+          attribution: '[2]'
+          method_class: quoted_attributed
+        - cell_material: Pt
+          T_as_printed: '1946–1961'
+          a_as_printed: '24 272 ± 600*'
+          b_as_printed: '7.89 ± 0.06*'
+          delta_rH_T_as_printed: '464.7 ± 12*'
+          attribution: '[5]'
+          method_class: quoted_attributed
+        - cell_material: Pt–Rh
+          T_as_printed: '1963–2065'
+          a_as_printed: '33 706 ± 5595'
+          b_as_printed: '13.16 ± 2.76'
+          delta_rH_T_as_printed: '645.3 ± 107'
+          attribution: '[54]'
+          method_class: quoted_attributed
+        - cell_material: Pt–Rh
+          T_as_printed: '2000–2032'
+          a_as_printed: '24 565 ± 1144'
+          b_as_printed: '7.57 ± 0.53'
+          delta_rH_T_as_printed: '470.3 ± 22'
+          attribution: '[2]'
+          method_class: quoted_attributed
+        - cell_material: Mo
+          T_as_printed: '2000–2038'
+          a_as_printed: '22 735 ± 1268'
+          b_as_printed: '7.49 ± 0.78'
+          delta_rH_T_as_printed: '435.2 ± 24'
+          attribution: '[2]'
+          method_class: quoted_attributed
+        - cell_material: W
+          T_as_printed: '2000–2100'
+          a_as_printed: '24 751 ± 1972'
+          b_as_printed: '7.92 ± 1.11'
+          delta_rH_T_as_printed: '473.8 ± 38'
+          attribution: '[2]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '2000–4000'
+          a_as_printed: '25 768'
+          b_as_printed: '8.38'
+          delta_rH_T_as_printed: '493.3'
+          attribution: '[24]'
+          method_class: quoted_attributed
+        - cell_material: '—'
+          T_as_printed: '2000–4000'
+          a_as_printed: '35 899'
+          b_as_printed: '8.56'
+          delta_rH_T_as_printed: '687.2'
+          attribution: '[7]'
+          method_class: quoted_attributed
+    - observation_id: shornikov_2000_table3_this_work_ratios
+      type: ion_current_ratio
+      locator:
+        table: '3'
+        published_page: 363
+        pdf_page_index: 3
+      phase: gas
+      units: ion intensity ratio (dimensionless)
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        admission_status: typed_refusal
+        refusal_reason: unresolved_ion_intensity_ratio_subtype
+        cell_material_as_printed: Mo
+        system_as_printed: SiO2
+        T_K: 1950
+        ionizing_energy_eV: 20
+        method: Knudsen mass-spectrometric effusion
+        rows:
+        - ion_pair: I((Si)+)/I((SiO)+)
+          ion_intensity_ratio: 3.03e-2
+        - ion_pair: I((SiO)+)/I((SiO)+)
+          ion_intensity_ratio: 1.00
+        - ion_pair: I((SiO2)+)/I((SiO)+)
+          ion_intensity_ratio: 1.13e-3
+        - ion_pair: I((Si2O2)+)/I((SiO)+)
+          ion_intensity_ratio: 1.39e-2
+        uncertainty:
+          note: No uncertainty is printed for the ion intensity ratios.
+    - observation_id: shornikov_2000_mo_oxide_ion_current_ratios
+      type: ion_current_ratio
+      locator:
+        published_page: 363
+        pdf_page_index: 3
+        paragraph: Table 3 discussion
+      phase: gas
+      units: ion intensity ratio (dimensionless)
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        system_as_printed: SiO2
+        cell_material_as_printed: Mo
+        T_K: 1950
+        ionizing_energy_eV: 20
+        ratio_as_printed: 'I(MoO)+ : I(MoO2)+ : I(MoO3)+ = 0.04 : 1.00 : 0.58'
+        rows:
+        - ion_pair: I(MoO+)/I(MoO2+)
+          ion_intensity_ratio: 0.04
+        - ion_pair: I(MoO2+)/I(MoO2+)
+          ion_intensity_ratio: 1.00
+        - ion_pair: I(MoO3+)/I(MoO2+)
+          ion_intensity_ratio: 0.58
+        uncertainty:
+          note: No uncertainty is printed for the ion intensity ratios.
+    - observation_id: shornikov_2000_text_mo_oxide_concentration
+      type: concentration_ratio
+      locator:
+        published_page: 363
+        pdf_page_index: 3
+        paragraph: Table 3 discussion
+      phase: gas
+      units: relative concentration as printed
+      values:
+        quantity: 'total concentration of Mo oxides relative to (SiO)+'
+        method_class: measured_direct
+        approximate: true
+        value_as_printed: nearly 10%
+        schema_gap: No stored quantity token for a gas concentration ratio.
+    - observation_id: shornikov_2000_figure1_reaction5
+      type: figure
+      locator:
+        published_page: 368
+        pdf_page_index: 8
+        figure: '1'
+      phase: gas
+      units: log Kr5 versus 1000/T (K−1)
+      values:
+        quantity: log Kr5
+        method_class: mixed
+        admission_status: figure_only
+        digitisation: deferred to a figure pass
+        system_as_printed: SiO2
+        species_as_printed: '(SiO), (Si2O2)'
+        reaction_as_printed: '2(SiO) = (Si2O2)'
+        temperature_as_printed: '1000/T, K−1 axis; no fixed temperature'
+        axes_as_printed:
+          x: '1000/T, K−1'
+          y: log Kr5
+        panel: single panel
+        caption_as_printed: >-
+          Temperature dependence of the equilibrium constant of reaction (5)
+          obtained (1–4) by the Knudsen mass-spectrometric effusion procedure
+          {evaporation of (1) silica [this work], (2, 3) Si–SiO2 system ([3]
+          and [4], respectively), and (4) Si–Si2N2O–Si3N4 system [19]} and by
+          calculations in (5) [7] and (6) [13].
+        series:
+        - series_id: '1'
+          source_as_printed: silica, this work
+          method_class: measured_direct
+          marker_count: 0
+        - series_id: '2'
+          source_as_printed: Si–SiO2 system [3]
+          method_class: measured_direct
+          marker_count: 1
+        - series_id: '3'
+          source_as_printed: Si–SiO2 system [4]
+          method_class: measured_direct
+          marker_count: 0
+        - series_id: '4'
+          source_as_printed: Si–Si2N2O–Si3N4 system [19]
+          method_class: measured_direct
+          marker_count: 0
+        - series_id: '5'
+          source_as_printed: calculations [7]
+          method_class: model_derived
+          marker_count: 0
+        - series_id: '6'
+          source_as_printed: calculations [13]
+          method_class: model_derived
+          marker_count: 0
+        attribution: '[3], [4], [7], [13], [19], and this work, as captioned'
+        note: No numeric figure points transcribed.
+    - observation_id: shornikov_2000_text_recommended_reaction_enthalpies
+      type: thermodynamic_estimate
+      locator:
+        published_page: 365
+        pdf_page_index: 5
+        section: discussion
+      units: kJ mol−1
+      values:
+        quantity: reaction enthalpy
+        method_class: model_derived
+        schema_gap: No stored quantity token for enthalpy of the printed reactions.
+        estimates:
+        - reaction_as_printed: reaction (1)
+          value_as_printed: 1038 ± 14
+          T_range_as_printed: 1600–1996 K
+          attribution: this work, recommended from this and previous work
+        - reaction_as_printed: reaction (1)
+          value_as_printed: 1020 ± 35
+          T_range_as_printed: 1996–2100 K
+          attribution: this work, recommended from this and previous work
+        - reaction_as_printed: reaction (2)
+          value_as_printed: 580 ± 21
+          T_range_as_printed: 1600–1996 K
+          attribution: this work
+        - reaction_as_printed: reaction (2)
+          value_as_printed: 552 ± 26
+          T_range_as_printed: above the melting point of silica
+          attribution: this work
+    - observation_id: shornikov_2000_text_silica_melting_enthalpy_comparison
+      type: thermodynamic_comparison
+      locator:
+        published_page: 366
+        pdf_page_index: 6
+        section: discussion
+      units: kJ mol−1
+      values:
+        quantity: silica melting enthalpy
+        method_class: mixed
+        schema_gap: The printed comparisons do not map unambiguously to a single heat_of_fusion estimate.
+        values_as_printed:
+        - value: 19.6 ± 1.9
+          attribution_as_printed: this work's thermodynamic calculations
+        - value: 20.1 ± 1.5
+          attribution_as_printed: data in [11] and [14], respectively, as printed
+          method_class: quoted_attributed
+        - value: 7.8 ± 1.0
+          attribution_as_printed: '[12], reaction (1)'
+          method_class: quoted_attributed
+        - value: 6.3 ± 1.1
+          attribution_as_printed: '[12], reaction (4)'
+          method_class: quoted_attributed
+        - value: 9.3 ± 0.6
+          attribution_as_printed: recommended in [11–14]
+          method_class: quoted_attributed
+        - value: 36 ± 25
+          attribution_as_printed: '[2]'
+          method_class: quoted_attributed
+        note: The source's linking sentence is retained without reassigning values across reactions.
+    - observation_id: shornikov_2000_text_reaction17_comparison
+      type: thermodynamic_comparison
+      locator:
+        published_page: 366
+        pdf_page_index: 6
+        section: discussion
+      units: kJ mol−1
+      values:
+        quantity: reaction (17) enthalpy
+        method_class: model_derived
+        schema_gap: No stored quantity token for enthalpy of the printed reaction.
+        this_work_recommended_value_as_printed: 458 ± 10
+        this_work_T_range_as_printed: 1610–2100 K
+        quoted_recommendation_as_printed: 471.04 ± 0.4
+        quoted_recommendation_attribution: '[11]'
+        values_calculated_from_reference_54:
+          - value_as_printed: 645 ± 107
+            method_as_printed: Clausius–Clapeyron equation
+          - value_as_printed: 429 ± 16
+            method_as_printed: Gibbs–Helmholtz equation
+        values_calculated_from_reference_54_method_class: model_derived
+        source_note: The two results use data given in [54], as stated on p. 366.
+    - observation_id: shornikov_2000_text_calibration_and_sensitivity
+      type: experimental_method_details
+      locator:
+        published_page: 363
+        pdf_page_index: 3
+        section: mass spectra discussion
+      units: eV; atm
+      values:
+        quantity: electron-impact calibration and sensitivity limit
+        method_class: mixed
+        silver_ion_ionization_potential_as_printed: 7.6 ± 0.1 eV
+        silver_ion_ionization_potential_attribution: reference used in this work
+        comparison_value_as_printed: 7.58 eV
+        comparison_attribution: recommended in [45]
+        oxygen_molecule_sensitivity_limit_as_printed: 10−10 atm
+        note: (O2)+ intensity was below the stated setup sensitivity limit.
+    - observation_id: shornikov_2000_experimental_method
+      type: experiment_series
+      locator:
+        published_page: 368
+        pdf_page_index: 8
+        section: Experimental
+      units: as printed
+      values:
+        quantity: Knudsen mass-spectrometric effusion method details
+        method_class: quoted_unattributed
+        silica_sample_as_printed: silica
+        cell_material_as_printed: molybdenum
+        evaporation_surface_to_effusion_orifice_area_ratio: no less than 650
+        note: The paper's abstract gives the studied temperature range as 1610–1980 K.
