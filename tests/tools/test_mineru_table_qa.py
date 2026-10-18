@@ -7,6 +7,8 @@ import sys
 from io import StringIO
 from pathlib import Path
 
+import pytest
+
 from tools import mineru_table_qa as qa
 
 
@@ -210,6 +212,8 @@ def test_calibration_tsv_matches_live_scores_and_ranks_mangled_tables(tmp_path: 
     corpus_root = Path(os.environ.get(
         "REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus"
     )).expanduser()
+    if not corpus_root.is_dir():
+        pytest.skip("regolith-corpus checkout is absent")
 
     subprocess.run(
         [
