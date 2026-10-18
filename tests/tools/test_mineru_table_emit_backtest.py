@@ -203,7 +203,15 @@ def _assert_exact_landed_values(expected: dict, emitted: dict) -> None:
 def _table_matches_observation(table: dict, observation: dict) -> bool:
     locator = observation.get("locator") or {}
     if str(locator.get("table")) != str(table["table_index"]):
-        return False
+        values = observation.get("values") or {}
+        if not (
+            # The source uses its printed Table 4.4 label; the mapping uses
+            # MinerU's document-wide table index 11.
+            table.get("quantity") == "sodium_disilicate_total_weight_loss"
+            and values.get("quantity") == "sodium_disilicate_total_weight_loss"
+            and _locator_page(locator) == int(table["page"])
+        ):
+            return False
     if table.get("published_page") is not None:
         return str(locator.get("published_page")) == str(table["published_page"])
     return _locator_page(locator) == int(table["page"])
@@ -304,16 +312,15 @@ def _assert_duplicate_columns_match_sources(
                 continue
             quantity = str((observation.get("values") or {}).get("quantity") or "")
             number = _decimal(_emitted_scalar(observation))
+            key = (
+                quantity,
+                str(species),
+                int(match.group("page")),
+                int(match.group("table")),
+                int(match.group("column")),
+            )
             if number is not None:
-                emitted_by_column[
-                    (
-                        quantity,
-                        str(species),
-                        int(match.group("page")),
-                        int(match.group("table")),
-                        int(match.group("column")),
-                    )
-                ].append(number)
+                emitted_by_column[key].append(number)
 
     for table in mapping.get("tables") or []:
         grouped: dict[tuple[str, str, str], list[int]] = defaultdict(list)
@@ -337,9 +344,66 @@ def _assert_duplicate_columns_match_sources(
                 and str(
                     (observation.get("values") or {}).get("evidence_class")
                     or (observation.get("values") or {}).get("method_class")
+                    or (observation.get("values") or {}).get("measurement_status")
                     or ""
                 ) == evidence
             ]
+            if (
+                quantity == "sodium_disilicate_total_weight_loss"
+                and len(source_observations) == 1
+                and (source_observations[0].get("values") or {}).get("rows")
+            ):
+                source_rows = source_observations[0]["values"]["rows"]
+                expected_by_locator: dict[tuple[str, str], Decimal] = {}
+                output_by_locator: dict[tuple[str, str], Decimal] = {}
+                headers_by_column: dict[int, str] = {}
+                for emitted_species, block in (document.get("species") or {}).items():
+                    if emitted_species != species:
+                        continue
+                    for observation in block.get("observations") or []:
+                        match = re.search(
+                            r"_p(?P<page>\d+)_t(?P<table>\d+)_r\d+_c(?P<column>\d+)$",
+                            str(observation.get("observation_id") or ""),
+                        )
+                        if (
+                            not match
+                            or int(match.group("page")) != int(table["page"])
+                            or int(match.group("table")) != int(table["table_index"])
+                            or int(match.group("column")) not in columns
+                            or (observation.get("values") or {}).get("quantity")
+                            != quantity
+                        ):
+                            continue
+                        locator = observation.get("locator") or {}
+                        column = int(match.group("column"))
+                        header = str(locator.get("column_header") or "")
+                        headers_by_column[column] = header
+                        number = _decimal(_emitted_scalar(observation))
+                        if number is not None:
+                            output_by_locator[
+                                (str(locator.get("row_label") or ""), header)
+                            ] = number
+                for column in columns:
+                    header = headers_by_column[column]
+                    normalized_header = header.casefold()
+                    if "extractive" in normalized_header:
+                        field = "extractive_weight_loss_mg"
+                    elif "gravimetric" in normalized_header:
+                        field = "gravimetric_weight_loss_mg"
+                    else:
+                        raise AssertionError(
+                            f"unrecognized Van Limpt column header: {header}"
+                        )
+                    for row in source_rows:
+                        label = str(row["temperature_C"])
+                        expected = _decimal(row[field])
+                        assert expected is not None
+                        expected_by_locator[(label, header)] = expected
+                assert output_by_locator == expected_by_locator, (
+                    "Van Limpt cells differ by row_label and column_header: "
+                    f"expected {expected_by_locator}, emitted {output_by_locator}"
+                )
+                continue
             if len(source_observations) != len(columns):
                 # Some landed extracts keep a single point series with per-point
                 # column locators; there is no one-series-per-mapped-column pairing.
@@ -526,6 +590,47 @@ def test_shornikov_2016_spanning_headers_resolve_each_gibbs_column(
             seen[column] += 1
 
     assert seen == Counter({2: 13, 4: 8, 6: 17})
+
+
+def test_van_limpt_extract_column_swap_fails_by_row_and_header(
+    tmp_path: Path,
+) -> None:
+    mapping_path = FIXTURES / "kems-046-van-limpt-2007.mapping.yaml"
+    mapping = yaml.safe_load(mapping_path.read_text(encoding="utf-8"))
+    corpus_root, raw_root = _corpus_roots()
+    source_id = mapping["source_id"]
+    source = _source_dir(corpus_root, raw_root, source_id)
+    if not source.is_dir():
+        pytest.skip(f"MinerU source directory is absent for {source_id}: {source}")
+    draft_dir = _convert_source(source, source_id, tmp_path, raw_root)
+    document = draft.emit_extract(draft_dir, mapping_path, tmp_path / "van-limpt.yaml")
+    extract = yaml.safe_load(
+        (EXTRACTS / f"{source_id}.yaml").read_text(encoding="utf-8")
+    )
+    swapped_extract = copy.deepcopy(extract)
+    observation = next(
+        item
+        for item in swapped_extract["species"]["Na"]["observations"]
+        if (item.get("values") or {}).get("quantity")
+        == "sodium_disilicate_total_weight_loss"
+        and _table_matches_observation(mapping["tables"][0], item)
+    )
+    first_row = next(
+        row for row in observation["values"]["rows"] if row["temperature_C"] == 1416
+    )
+    assert (
+        first_row["extractive_weight_loss_mg"],
+        first_row["gravimetric_weight_loss_mg"],
+    ) == (112, 125)
+    first_row["extractive_weight_loss_mg"], first_row["gravimetric_weight_loss_mg"] = (
+        first_row["gravimetric_weight_loss_mg"],
+        first_row["extractive_weight_loss_mg"],
+    )
+
+    with pytest.raises(
+        AssertionError, match="row_label and column_header"
+    ):
+        _assert_duplicate_columns_match_sources(mapping, swapped_extract, document)
 
 
 def test_backtest_rejects_extra_cells_and_same_key_column_swaps(
