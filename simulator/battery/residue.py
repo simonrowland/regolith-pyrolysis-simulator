@@ -312,6 +312,12 @@ class _HashimotoGeometryIntegration:
         yield self.refusal
         yield self.atom_closure
 
+    def __getitem__(self, index: int | slice) -> object:
+        return tuple(self)[index]
+
+    def __len__(self) -> int:
+        return 5
+
 
 @dataclass(frozen=True)
 class _HashimotoResiduePrediction:
