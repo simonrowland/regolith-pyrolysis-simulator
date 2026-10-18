@@ -1136,11 +1136,12 @@ def test_current_cached_real_replay_key_bytes_and_live_result_shape(
     live_result = live_sim._get_equilibrium()
     live_payload = equilibrium_payload(live_sim, live_result)
     live_payload_bytes = canonical_json_bytes(live_payload)
-    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
-    assert len(live_payload_bytes) == 7541
+    # F1 / d-166: the declared DeltaIW anchor is imposed_fO2, not a measured
+    # split. Only notice.method changes predicted_kress91_split -> imposed_fO2:
+    # 7541 -> 7529 bytes; restoring that leaf restores the old digest exactly.
+    assert len(live_payload_bytes) == 7529
     assert hashlib.sha256(live_payload_bytes).hexdigest() == (
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
-        'b330dbdaec6c7ad54d4350a3e88d2caab20f88144fe1061e9e1d3a87a4a10e52'
+        'd90b77fac52f9dec719a43f6778d43dfa702078a096ba309b0b3d6efbd6df1c0'
     )
     assert set(live_payload) == {
         "authority",
