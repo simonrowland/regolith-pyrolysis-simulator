@@ -826,7 +826,11 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
     # ------------------------------------------------------------------
     # Regime A: intrinsic fO2 (IW-like) -- literature comparison
     # ------------------------------------------------------------------
-    from simulator.fe_redox import feo_iw_log10_fO2_bar
+    from simulator.fe_redox import (
+        feo_iw_log10_fO2_bar,
+        kress91_intrinsic_state,
+        melt_mol_fractions_for_kress91,
+    )
     fO2_log_iw = feo_iw_log10_fO2_bar(sim.melt.temperature_C + 273.15)
 
     vaporock_iw = backend.equilibrate(
@@ -882,7 +886,18 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
     sim.melt.melt_fO2_log = fO2_log_iw
     sim.melt.pO2_mbar = floor_pO2_bar * 1000.0
     builtin_divergent = sim._internal_analytical_equilibrium()
-    assert builtin_divergent.fO2_log == pytest.approx(fO2_log_iw)
+    # F2: scalar assignments cannot set intrinsic ledger redox. The same
+    # Fe inventory at its retained reference gives -9.7407543564 dex,
+    # replacing the pre-sync IW mirror (-8.2132809451 dex).
+    inventory = sim.atom_ledger.mol_by_account('process.cleaned_melt')
+    ledger_fO2 = kress91_intrinsic_state(
+        feo_mol=inventory['FeO'], fe2o3_mol=inventory['Fe2O3'],
+        mol_fractions=melt_mol_fractions_for_kress91(sim._melt_oxide_wt_pct()),
+        T_K=sim._current_melt_redox_reference_T_K(),
+        pressure_bar=sim.melt.p_total_mbar / 1000.0,
+        exchange_fO2_log=math.log10(floor_pO2_bar),
+    )['fO2_log']
+    assert builtin_divergent.fO2_log == pytest.approx(ledger_fO2)
 
     vaporock_floor = backend.equilibrate(
         sim.melt.temperature_C,
@@ -906,8 +921,8 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
         expected_iw_to_floor_ratio, rel=1.0e-6
     )
 
-    # t-333 made the channels independent. Align them intentionally for
-    # provider parity: builtin SiO reads headspace transport pO2; the direct
+    # t-333 made the channels independent. Align provider transport inputs
+    # for parity: builtin SiO reads headspace transport pO2; the direct
     # VapoRock adapter call receives that same pressure as gas fO2. The
     # pseudo-Antoine SiO row has a documented ~0.270-decade maximum residual
     # (docs/chemistry-methods.md section 2.1), versus ~0.086 observed here.
@@ -927,7 +942,7 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
         sim.melt.pO2_mbar = basis_pO2_bar * 1000.0
 
         builtin = sim._internal_analytical_equilibrium()
-        assert builtin.fO2_log == pytest.approx(basis_fO2_log)
+        assert builtin.fO2_log == pytest.approx(ledger_fO2)
         vaporock = backend.equilibrate(
             sim.melt.temperature_C,
             composition_mol=sim._backend_composition_mol(),
