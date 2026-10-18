@@ -115,6 +115,33 @@ def test_each_mechanical_flag_fires_only_on_the_suspect_cell() -> None:
     assert not grid[3][2].flags
 
 
+def test_letter_for_digit_flags_casefold_confusables_without_a_scale_token() -> None:
+    for text in (
+        "L.23 x 10^2",
+        "l.23 x 10^2",
+        "O.23 x 10^2",
+        "o.23 x 10^2",
+        "S.23 x 10^2",
+        "s.23 x 10^2",
+        "O.23 x",
+    ):
+        assert "letter_for_digit" in draft._render_traps(
+            {"text": text, "value_text": text}, None
+        )
+    assert "letter_for_digit" not in draft._render_traps(
+        {"text": "0.23 x", "value_text": "0.23 x"}, None
+    )
+    for text in ("SiO2", "solid", "Olivine"):
+        assert "letter_for_digit" not in draft._render_traps(
+            {"text": text, "value_text": text}, None
+        )
+
+
+def test_stacked_values_bare_integer_cutoff_stays_at_seven_digits() -> None:
+    assert not draft._stacked_values("123456")
+    assert draft._stacked_values("1234567")
+
+
 def test_comma_formats_distinguish_decimal_from_ambiguous_grouping() -> None:
     grid = draft.parse_table_html(
         "<table><tr><th>Value</th></tr><tr><td>123.456</td></tr>"

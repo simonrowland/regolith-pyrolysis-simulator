@@ -931,7 +931,8 @@ _LETTER_FOR_DIGIT = re.compile(
     r"(?<![A-Za-z0-9])"
     r"(?P<mantissa>[+\-−]?[0-9IlOS]+(?:\.[0-9IlOS]+)?)"
     r"\s*(?:×|\\times|x)\s*"
-    r"(?P<scale>[0-9IlOS]+(?:\s*\^\s*\{?[+\-−]?[0-9IlOS]+\}?)?)"
+    r"(?P<scale>[0-9IlOS]+(?:\s*\^\s*\{?[+\-−]?[0-9IlOS]+\}?)?)?",
+    re.IGNORECASE | re.ASCII,
 )
 _RUN_TOGETHER = re.compile(r"\d+\.\d+\.\d")
 _FUSED_SUPERSCRIPT_EXPONENT = re.compile(r"(?<![A-Za-z0-9])10[-−]\d+(?!\w)")
@@ -1162,7 +1163,8 @@ def printed_formula(text: str) -> str:
 def _stacked_values(text: str) -> bool:
     if _LATEX_OR_CARET.search(text) or _UNCERTAINTY_MARK.search(text):
         return False
-    # A long bare integer can contain stacked values if MinerU lost a line break.
+    # Keep shorter bare integers unflagged: they are common measurements, while
+    # seven or more digits are a deliberate conservative cutoff for concatenation.
     if re.fullmatch(r"\d{7,}", text.strip()):
         return True
     if "\n" in text:
@@ -1181,7 +1183,7 @@ def _has_letter_for_digit(text: str) -> bool:
         any(
             char in "IiLlOoSs"
             for group in ("mantissa", "scale")
-            for char in match.group(group)
+            for char in (match.group(group) or "")
         )
         for match in _LETTER_FOR_DIGIT.finditer(text)
     )
