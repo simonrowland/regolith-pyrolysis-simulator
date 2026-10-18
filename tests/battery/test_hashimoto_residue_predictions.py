@@ -23,14 +23,7 @@ STORE = ROOT / "data/literature/extracts-v2/kems-015-hashimoto-1983.yaml"
 PRIMARY_TABLE3_PREFIX = "::hashimoto_1983_table3_residue_composition_series::"
 OXIDES = ("FeO", "MgO", "SiO2", "CaO", "Al2O3")
 
-
-@pytest.fixture(autouse=True)
-def _close_openimcc_worker_between_tests():
-    from simulator.battery.residue import _close_openimcc_evaluation_worker
-
-    _close_openimcc_evaluation_worker()
-    yield
-    _close_openimcc_evaluation_worker()
+pytestmark = pytest.mark.usefixtures("_close_openimcc_worker_between_tests")
 
 
 def _hanging_openimcc_engine(**_kwargs):

@@ -38,6 +38,8 @@ from simulator.battery.score import (
     quantity_token,
 )
 
+pytestmark = pytest.mark.usefixtures("_close_openimcc_worker_between_tests")
+
 
 @pytest.fixture(scope="module")
 def mass_loss_rows():
