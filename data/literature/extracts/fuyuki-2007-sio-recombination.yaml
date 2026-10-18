@@ -1,0 +1,686 @@
+schema_version: literature_extract.v1
+source_id: fuyuki-2007-sio-recombination
+source:
+  citation: 'Fuyuki, M., Sugita, S., Kadono, T., Hasegawa, S. & Matsui, T. (2007), “Spectroscopic measurements of Si-O recombination process in laser-induced quartz vapor plumes”, Earth, Planets and Space 59:437–451.'
+  doi: 10.1186/BF03352705
+  year: 2007
+extraction:
+  method: >-
+    Manual extraction from the born-digital pdftotext-layout source. The table tool
+    accepts MinerU content-list tables and refuses pdftotext-only tables, so Table 1
+    was transcribed by hand and every numeric and N/A cell was checked against a
+    600 dpi render of PDF page 13. Figures 1–14 are recorded without numeric points
+    as required for this figure-deferred pass. Unsupported measured and calculated
+    quantities are preserved in context rather than assigned an unrelated token.
+  date: '2026-10-18'
+  worker: fam4-1018
+  provenance_path: raw/fuyuki-2007-sio-recombination/fuyuki-2007-sio-recombination.pdf
+review_status: draft
+corrections: []
+species:
+  SiO2:
+    context:
+      - observation_id: fuyuki_2007_measured_recombination_summary
+        type: relation
+        locator:
+          section: Abstract; Concluding Remarks
+          page: 437
+          published_page: 437
+          pdf_page_index: 0
+        phase: laser-induced quartz vapor plume, gas
+        units: K; dimensionless number ratio
+        values:
+          quantity_as_printed: Si and O recombination during plume cooling
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          species: Si(g), O(g), SiO(g); quartz starting material SiO2(s)
+          temperature_interval_as_printed: 5000 K to 3000 K
+          Si_to_SiO_number_ratio_as_printed: 15 to 0.5
+          Si_to_SiO_number_ratio_as_printed_in_Fig14_caption: 10 to 0.1
+          method_as_printed: time-resolved Si atomic-line and SiO molecular-band spectroscopy with spectral inversion
+          note: The abstract and discussion give 15 to 0.5, while the Figure 14 caption gives 10 to 0.1. The Si/SiO number ratio has no matching quantity token; both printed ranges are retained here and the result is also represented without points in Figures 12 and 14.
+      - observation_id: fuyuki_2007_textual_temperature_and_cooling_results
+        type: relation
+        locator:
+          section: 3.1, 3.2, 3.5
+          page: 440
+          published_page: 440
+          pdf_page_index: 3
+        phase: laser-induced quartz vapor plume, gas
+        units: K; μs; dimensionless exponent
+        values:
+          quantity_as_printed: measured plume temperature and fitted cooling law
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          species: Si(g), SiO(g)
+          early_plume_temperature:
+            value: 5200
+            unit: K
+            approximate: true
+            condition: early observation, 10–13 ns after laser irradiation
+          observation_period_temperature_interval_as_printed: 4400 K to 3200 K
+          observation_period_as_printed: 20–100 μs
+          fitted_temperature_time_exponent:
+            value: 0.22
+            uncertainty: 0.02
+            unit: dimensionless
+            method_class: model_derived
+            equation_as_printed: T = A × t^-b
+          cooling_timescale_temperature_exponent:
+            value: -5.7
+            approximate: true
+            unit: dimensionless
+            method_class: model_derived
+          note: Plume temperature is not a transition temperature, and the simulator has no quantity token for temperature-versus-time or cooling-time exponent profiles.
+      - observation_id: fuyuki_2007_measured_sample_loss
+        type: relation
+        locator:
+          section: 2.2 Experimental results
+          page: 438
+          published_page: 438
+          pdf_page_index: 1
+        phase: quartz sample, solid
+        units: mg per 1000 laser pulses
+        values:
+          quantity_as_printed: quartz sample mass lost
+          method_class: measured_direct
+          evidence_class: measured_direct
+          species: SiO2(s)
+          value_as_printed: about 10–20 mg after 1000 laser pulses
+          value:
+            minimum: 10
+            maximum: 20
+            unit: mg
+            approximate: true
+          laser_pulses: 1000
+      - observation_id: fuyuki_2007_model_derived_spectral_parameters
+        type: relation
+        locator:
+          section: 3.3, 3.5, 4.2
+          page: 442
+          published_page: 442
+          pdf_page_index: 5
+        phase: SiO gas in laser-induced quartz vapor plume
+        units: K; mmol m^-2; dimensionless; kJ mol^-1
+        values:
+          quantity_as_printed: spectral-fit parameters and reaction interpretation
+          method_class: model_derived
+          evidence_class: model_derived
+          species: SiO(g), Si(g), O(g)
+          spectral_fit_optimum:
+            temperature:
+              value: 3200
+              unit: K
+              approximate: true
+            SiO_column_density:
+              value: 1.6
+              unit: mmol m^-2
+              approximate: true
+            observation_period: 80–100 μs
+            fit_method: synthetic SiO spectrum minimising square-mean spectral error
+          initial_vapor_state_estimate:
+            temperature: 8600
+            temperature_unit: K
+            pressure: 120
+            pressure_unit: bar
+            attribution: Sugita et al. (2003) pressure–temperature relation, applied in this paper
+          effective_activation_energy_as_printed:
+            value: approximately 0
+            unit: kJ mol^-1
+            approximate: true
+            attribution: Fuyuki et al. (2007) interpretation; qualitatively consistent with Andreazza et al. (1995)
+          note: Column density, reaction activation energy, and the model-derived initial state have no matching quantity tokens in the extract schema.
+      - observation_id: fuyuki_2007_table1_effective_collision_cross_sections
+        type: relation
+        locator:
+          table: '1'
+          section: Appendix B
+          page: 449
+          published_page: 449
+          pdf_page_index: 12
+        phase: vapor plume, gas
+        units: collision diameter in Å; effective collision cross section in 10^-19 m^2
+        values:
+          quantity_as_printed: effective collision cross sections in the vapor plume
+          method_class: model_derived
+          evidence_class: model_derived
+          collision_diameter_unit_as_printed: Å
+          effective_collision_cross_section_scale_as_printed: 10^-19 m^2
+          rows:
+            - interaction: dipole-induced dipole
+              particle_pair: Si–SiO
+              collision_diameter_as_printed: '10.8'
+              effective_collision_cross_section_as_printed: '9.2'
+              reference_as_printed: Park and Arnold (1978)
+              method_class: quoted_attributed
+            - interaction: dipole-induced dipole
+              particle_pair: SiO–O
+              collision_diameter_as_printed: '10.8'
+              effective_collision_cross_section_as_printed: '9.2'
+              reference_as_printed: Park and Arnold (1978)
+              method_class: quoted_attributed
+            - interaction: dipole-induced dipole
+              particle_pair: SiO–O2
+              collision_diameter_as_printed: '10.8'
+              effective_collision_cross_section_as_printed: '9.2'
+              reference_as_printed: Park and Arnold (1978)
+              method_class: quoted_attributed
+            - interaction: dipole-induced dipole
+              particle_pair: SiO–SiO2
+              collision_diameter_as_printed: '10.8'
+              effective_collision_cross_section_as_printed: '9.2'
+              reference_as_printed: Park and Arnold (1978)
+              method_class: quoted_attributed
+            - interaction: dipole-dipole
+              particle_pair: SiO–SiO
+              collision_diameter_as_printed: '3.7'
+              effective_collision_cross_section_as_printed: '11'
+              reference_as_printed: Park and Arnold (1978)
+              method_class: quoted_attributed
+            - interaction: non-dipole-non-dipole
+              particle_pair: Si–Si
+              collision_diameter_as_printed: '11.4'
+              effective_collision_cross_section_as_printed: '10.2'
+              reference_as_printed: Eq. (B.10)
+              method_class: model_derived
+            - interaction: non-dipole-non-dipole
+              particle_pair: Si–O
+              collision_diameter_as_printed: N/A
+              effective_collision_cross_section_as_printed: N/A
+              reference_as_printed: null
+              method_class: model_derived
+            - interaction: non-dipole-non-dipole
+              particle_pair: Si–O2
+              collision_diameter_as_printed: '10.3'
+              effective_collision_cross_section_as_printed: '8.3'
+              reference_as_printed: Eq. (B.10)
+              method_class: model_derived
+            - interaction: non-dipole-non-dipole
+              particle_pair: O–O
+              collision_diameter_as_printed: N/A
+              effective_collision_cross_section_as_printed: N/A
+              reference_as_printed: null
+              method_class: model_derived
+            - interaction: non-dipole-non-dipole
+              particle_pair: O–O2
+              collision_diameter_as_printed: N/A
+              effective_collision_cross_section_as_printed: N/A
+              reference_as_printed: null
+              method_class: model_derived
+            - interaction: non-dipole-non-dipole
+              particle_pair: O2–O2
+              collision_diameter_as_printed: '9.3'
+              effective_collision_cross_section_as_printed: '6.8'
+              reference_as_printed: Eq. (B.10)
+              method_class: model_derived
+            - interaction: non-dipole-non-dipole
+              particle_pair: SiO2–SiO2
+              collision_diameter_as_printed: '8.2'
+              effective_collision_cross_section_as_printed: '5.3'
+              reference_as_printed: Eq. (B.10)
+              method_class: model_derived
+            - interaction: non-dipole-non-dipole
+              particle_pair: Si–SiO2
+              collision_diameter_as_printed: '9.8'
+              effective_collision_cross_section_as_printed: '7.5'
+              reference_as_printed: Eq. (B.10)
+              method_class: model_derived
+          note: Collision diameter and cross section have no matching quantity tokens. Non-dipole radii are summed in Eq. (B.10); the listed SiO2 radii come from Ahrens and O’Keefe (1972), and Si and O2 radii from Kagaku Binran (1984).
+      - observation_id: fuyuki_2007_figure_1_experimental_system
+        type: figure_only
+        locator:
+          figure: '1'
+          page: 438
+          published_page: 438
+          pdf_page_index: 1
+        units: schematic diagram
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: experimental system schematic
+          species: quartz SiO2, Ar, Si, O, SiO
+          phase: quartz sample solid; laser-induced plume gas
+          temperature_as_printed: not stated
+          x_axis_as_printed: no quantitative axis; schematic
+          y_axis_as_printed: no quantitative axis; schematic
+          caption_as_printed: 'Figure 1. A schematic diagram of our experimental system.'
+          panel: single
+          series: []
+          attribution: Fuyuki et al. (2007)
+          digitisation: deferred to a figure pass
+      - observation_id: fuyuki_2007_figure_2_observed_emission_spectra
+        type: figure_only
+        locator:
+          figure: '2'
+          page: 439
+          published_page: 439
+          pdf_page_index: 2
+        units: nm; relative intensity (a.u.); μs
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: observed Si and SiO emission spectra over time
+          species: Si(g), SiO(g), Ar II plasma lines; NO contamination in panel d
+          phase: gas/plasma
+          temperature_as_printed: not stated
+          x_axis_as_printed: Wavelength (nm)
+          y_axis_as_printed: Intensity (a.u.)
+          caption_as_printed: 'Figure 2. Observed emission spectra as a function of time after the laser irradiation. Exposure time for each spectrum is: (a) 10–13 ns, (b) 20–21 μs, (c) 40–60 μs, (d) 80–100 μs. The number of data added together for each condition is: (a) 100, (b) 500, (c) 500, (d) 500. The intensity scale for the spectra in Fig. 2(b)–(d) is normalized by Si line spectrum at 288.1 nm. The band emissions at 307 nm and 310 nm in Fig. 2(d) are those of NO due to contamination of Air.'
+          panel: (a)–(d)
+          series:
+            - name: observed emission spectrum, panel a
+              marker: continuous line
+              marker_count: 0
+              method_class: measured_direct
+            - name: observed emission spectrum, panel b
+              marker: continuous line
+              marker_count: 0
+              method_class: measured_direct
+            - name: observed emission spectrum, panel c
+              marker: continuous line
+              marker_count: 0
+              method_class: measured_direct
+            - name: observed emission spectrum, panel d
+              marker: continuous line
+              marker_count: 0
+              method_class: measured_direct
+          attribution: Fuyuki et al. (2007)
+          digitisation: deferred to a figure pass
+      - observation_id: fuyuki_2007_figure_3_blackbody_spectrum
+        type: figure_only
+        locator:
+          figure: '3'
+          page: 440
+          published_page: 440
+          pdf_page_index: 3
+        units: nm; relative intensity (a.u.); K
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: early plume blackbody radiation and Planck functions
+          species: vapor plume containing Si and O
+          phase: gas
+          temperature_as_printed: observed 10–13 ns; Planck fits 5000 K, 5200 K, and 5400 K
+          x_axis_as_printed: Wavelength (nm)
+          y_axis_as_printed: Intensity (a.u.)
+          caption_as_printed: 'Figure 3. The blackbody radiation obtained in the early stage of observation (10–13 ns) and Plank functions at various temperatures. Note that the functions are scaled to fit the intensity of the observed spectrum at 260 nm.'
+          panel: single
+          series:
+            - name: observed blackbody spectrum
+              marker: continuous line
+              marker_count: 0
+              method_class: measured_direct
+            - name: Planck function at 5000 K
+              marker: continuous line
+              marker_count: 0
+              method_class: model_derived
+            - name: Planck function at 5200 K
+              marker: continuous line
+              marker_count: 0
+              method_class: model_derived
+            - name: Planck function at 5400 K
+              marker: continuous line
+              marker_count: 0
+              method_class: model_derived
+          attribution: Fuyuki et al. (2007)
+          digitisation: deferred to a figure pass
+      - observation_id: fuyuki_2007_figure_4_silicon_energy_levels
+        type: figure_only
+        locator:
+          figure: '4'
+          page: 440
+          published_page: 440
+          pdf_page_index: 3
+        units: nm; E/k (K)
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: upper and lower Si electronic energy levels for emission lines
+          species: Si(g)
+          phase: gas
+          temperature_as_printed: gray zone indicates temperatures below the initial 5200 K plume temperature during expansion
+          x_axis_as_printed: Wavelength (nm)
+          y_axis_as_printed: Energy level E/k (K)
+          caption_as_printed: 'Figure 4. The upper and lower energy levels of electronic transitions for line emissions of Si. The gray zone shows the region of the temperature the vapor plume is expected to experience during expansion.'
+          panel: single
+          series:
+            - name: Si electronic transitions
+              marker: arrow
+              marker_count: 5
+              method_class: quoted_attributed
+          attribution: Fuyuki et al. (2007), line data cited to Wiese and Martin (1980)
+          digitisation: deferred to a figure pass
+      - observation_id: fuyuki_2007_figure_5_silicon_temperature
+        type: figure_only
+        locator:
+          figure: '5'
+          page: 440
+          published_page: 440
+          pdf_page_index: 3
+        units: μs; K
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: Si excitation temperature versus time
+          species: Si(g)
+          phase: gas
+          temperature_as_printed: Temperature (K) axis; values are shown as points in the figure and are deferred
+          x_axis_as_printed: Time (us)
+          y_axis_as_printed: Temperature (K)
+          caption_as_printed: 'Figure 5. The excitation temperature of Si measured as a function of time. The data show that the vapor plume cools monotonically.'
+          panel: single
+          series:
+            - name: measured Si excitation temperature
+              marker: open diamond with error bars
+              marker_count: 6
+              method_class: measured_reduced
+          attribution: Fuyuki et al. (2007)
+          digitisation: deferred to a figure pass
+      - observation_id: fuyuki_2007_figure_6_sio_spectral_fits
+        type: figure_only
+        locator:
+          figure: '6'
+          page: 441
+          published_page: 441
+          pdf_page_index: 4
+        units: nm; relative intensity (a.u.); residual (a.u.); K; mmol m^-2
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: observed and synthetic SiO Main System spectra with model parameters
+          species: SiO(g)
+          phase: gas
+          temperature_as_printed: panels a–e show 2000 K, 5000 K, 3200 K, 3200 K, and 3200 K, respectively
+          x_axis_as_printed: Wavelength (nm)
+          y_axis_as_printed: Intensity (a.u.); residual is plotted below zero
+          caption_as_printed: 'Figure 6. Comparison between an observed spectrum and several theoretical synthetics of the SiO Main System with various model parameters. The bands of strong intensities are separated into three parts by Δν. The observed spectrum was obtained in the observation period between 80 μs and 100 μs. The calculation is only for a single value of the line-broadening ratio α of 0.1.'
+          panel: (a)–(e)
+          series:
+            - name: observed spectrum, all five panels
+              marker: filled circle
+              marker_count: 525
+              method_class: measured_direct
+            - name: synthetic spectra, all five panels
+              marker: continuous line
+              marker_count: 0
+              method_class: model_derived
+            - name: residuals, all five panels
+              marker: open circle
+              marker_count: 525
+              method_class: model_derived
+          attribution: Fuyuki et al. (2007)
+          digitisation: deferred to a figure pass
+      - observation_id: fuyuki_2007_figure_7_sio_fit_error
+        type: figure_only
+        locator:
+          figure: '7'
+          page: 442
+          published_page: 442
+          pdf_page_index: 5
+        units: K; mmol m^-2; square-mean error (%)
+        values:
+          method_class: model_derived
+          typed_quantity: null
+          quantity_as_printed: square-mean error contour maps for synthetic SiO spectra
+          species: SiO(g)
+          phase: gas
+          temperature_as_printed: Temperature (K) axis; optimum shown about 3200 K
+          x_axis_as_printed: Temperature (K)
+          y_axis_as_printed: log(Column Density) (mol m^-2)
+          z_axis_as_printed: square-mean error (%)
+          caption_as_printed: 'Figure 7. (a) Contour map of the square mean error (%) of synthetic spectra as a function of both temperature and column density of SiO molecules. The observed spectrum shown in Fig. 6 is used here for the analysis. The minimum error is given by the temperature of 3200 K and column density of 1.6 mmol/m2. This error analysis assumes the ratio of line-broadening factor α of 0.1. The optimum temperature depends only a little on α, and the optimum column density depends somewhat on α. (b) Contour maps of the square mean error (%) of synthetic spectra as a function of both temperature and column density of SiO molecules. The observed spectrum shown in Fig. 6 is used here for the analysis. The line-broadening ratio α for each estimation is indicated in the figures. These figures show how the optimum set of temperature and column density depends on α. The optimum temperature depends only a little on α, and the optimum column density depends somewhat on α.'
+          panel: (a), (b)
+          series:
+            - name: error contours, panel a, α = 0.1
+              marker: contour lines
+              marker_count: 0
+              method_class: model_derived
+            - name: error contours, panel b, α = 0.001
+              marker: contour lines
+              marker_count: 0
+              method_class: model_derived
+            - name: error contours, panel b, α = 0.1
+              marker: contour lines
+              marker_count: 0
+              method_class: model_derived
+            - name: error contours, panel b, α = 100
+              marker: contour lines
+              marker_count: 0
+              method_class: model_derived
+          attribution: Fuyuki et al. (2007)
+          digitisation: deferred to a figure pass
+      - observation_id: fuyuki_2007_figure_8_sio_temperature_column_density
+        type: figure_only
+        locator:
+          figure: '8'
+          page: 442
+          published_page: 442
+          pdf_page_index: 5
+        units: K; mol m^-2; μs
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: SiO temperature and column density derived from molecular radiation
+          species: SiO(g)
+          phase: gas
+          temperature_as_printed: Temperature (K) axis; observations at 20–21, 40–60, 60–80, and 80–100 μs
+          x_axis_as_printed: Temperature (K)
+          y_axis_as_printed: Column Density (mol m^-2)
+          caption_as_printed: 'Figure 8. The temperature and column density derived from SiO molecular radiation. The data points denoted by diamonds in the figure are observed 20–21 μs, 40–60 μs, 60–80 μs, and 80–100 μs after the laser irradiation, respectively from the right to the left. The temperature and column density with the square mean Er of the difference smaller than 12% are considered to be the optimum. The vertical error bars are estimated by the uncertainty in the electronic transition probability (30%) and that in the line-broadening ratio α. With larger α, the optimal column density becomes higher. The data points denoted by diamonds on each cross indicate the values when α is assumed to 1.0. Horizontal errors are estimated by only square mean Er.'
+          panel: single
+          series:
+            - name: optimum temperature and column density, four periods
+              marker: diamond with error bars
+              marker_count: 4
+              method_class: measured_reduced
+            - name: α = 1.0 parameter values, four periods
+              marker: diamond over cross
+              marker_count: 4
+              method_class: model_derived
+          attribution: Fuyuki et al. (2007)
+          digitisation: deferred to a figure pass
+      - observation_id: fuyuki_2007_figure_9_sio_optical_thickness
+        type: figure_only
+        locator:
+          figure: '9'
+          page: 443
+          published_page: 443
+          pdf_page_index: 6
+        units: K; mol m^-2; optical thickness
+        values:
+          method_class: model_derived
+          typed_quantity: null
+          quantity_as_printed: optical thickness of synthetic SiO spectra versus temperature and column density
+          species: SiO(g)
+          phase: gas
+          temperature_as_printed: Temperature (K) axis; observation periods are 20–21, 40–60, 60–80, and 80–100 μs
+          x_axis_as_printed: Temperature (K)
+          y_axis_as_printed: log(Column Density) (mol m^-2)
+          z_axis_as_printed: optical thickness τ
+          caption_as_printed: 'Figure 9. The optical thickness of synthetic spectra as a function of temperature and column density. The line-broadening ratio α is assumed 0.1. The optimum sets of temperature and column density with the error Er smaller than 12% are also shown in the figure. The observation periods for optimum sets are 20–21 μs, 40–60 μs, 60–80 μs, and 80–100 μs, respectively from right to left.'
+          panel: single
+          series:
+            - name: optical-thickness model contours
+              marker: contour lines
+              marker_count: 0
+              method_class: model_derived
+            - name: optimum sets, four observation periods
+              marker: plotted point
+              marker_count: 4
+              method_class: model_derived
+          attribution: Fuyuki et al. (2007)
+          digitisation: deferred to a figure pass
+      - observation_id: fuyuki_2007_figure_10_si_sio_intensity_ratio
+        type: figure_only
+        locator:
+          figure: '10'
+          page: 443
+          published_page: 443
+          pdf_page_index: 6
+        units: μs; dimensionless intensity ratio
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: ratio of Si line to SiO band emission intensity
+          species: Si(g), SiO(g)
+          phase: gas
+          temperature_as_printed: not stated
+          x_axis_as_printed: Time (us)
+          y_axis_as_printed: Ratio of intensity Si vs SiO
+          caption_as_printed: 'Figure 10. The ratio of intensity of observed spectra of Si emission line at 391 nm to that of the SiO Main system between 256 nm and 284 nm.'
+          panel: single
+          series:
+            - name: observed Si-to-SiO emission-intensity ratio
+              marker: open diamond with horizontal error bars
+              marker_count: 4
+              method_class: measured_reduced
+          attribution: Fuyuki et al. (2007)
+          digitisation: deferred to a figure pass
+      - observation_id: fuyuki_2007_figure_11_spectral_source_intensity
+        type: figure_only
+        locator:
+          figure: '11'
+          page: 444
+          published_page: 444
+          pdf_page_index: 7
+        units: K; W mol^-1 m^-2 sr^-1
+        values:
+          method_class: model_derived
+          typed_quantity: null
+          quantity_as_printed: theoretical source spectral intensities
+          species: Si(g), SiO(g)
+          phase: gas
+          temperature_as_printed: Temperature (K) axis, 2000–5000 K
+          x_axis_as_printed: Temperature (K)
+          y_axis_as_printed: Intensity (W/mol/m^2/sr)
+          caption_as_printed: 'Figure 11. The intensities of theoretical source spectra from: (a) a Si atom at 391 nm and (b) a SiO molecule between 256 nm and 284 nm.'
+          panel: (a), (b)
+          series:
+            - name: Si atom at 391 nm, panel a
+              marker: continuous line
+              marker_count: 0
+              method_class: model_derived
+            - name: SiO molecule between 256 and 284 nm, panel b
+              marker: continuous line
+              marker_count: 0
+              method_class: model_derived
+          attribution: Fuyuki et al. (2007)
+          digitisation: deferred to a figure pass
+      - observation_id: fuyuki_2007_figure_12_sio_number_ratio
+        type: figure_only
+        locator:
+          figure: '12'
+          page: 445
+          published_page: 445
+          pdf_page_index: 8
+        units: K; dimensionless number ratio; μs
+        values:
+          method_class: figure_only
+          typed_quantity: null
+          quantity_as_printed: Si/SiO number ratio versus temperature
+          species: Si(g), SiO(g)
+          phase: gas
+          temperature_as_printed: Temperature (K) axis; four observation periods from 20–21 to 80–100 μs
+          x_axis_as_printed: Temperature (K)
+          y_axis_as_printed: Molar Ratio Si/SiO
+          caption_as_printed: 'Figure 12. The number ratio of Si/SiO as a function of temperature. The observation periods for the data points are 20–21 μs, 40–60 μs, 60–80 μs, and 80–100 μs, respectively from right to left. The vertical error bars indicate the uncertainty of τSiO (0 ∼ 0.5) and that of electronic transition probabilities of the emission line and band. The data points denoted by diamonds on each cross indicate the value when τSiO is assumed to be 0.'
+          panel: single
+          series:
+            - name: observed Si/SiO ratio, four periods
+              marker: diamond with cross/error bars
+              marker_count: 4
+              method_class: measured_reduced
+            - name: ratio with τSiO assumed zero, four periods
+              marker: diamond on cross
+              marker_count: 4
+              method_class: measured_reduced
+          attribution: Fuyuki et al. (2007)
+          digitisation: deferred to a figure pass
+      - observation_id: fuyuki_2007_figure_13_equilibrium_molar_fractions
+        type: figure_only
+        locator:
+          figure: '13'
+          page: 445
+          published_page: 445
+          pdf_page_index: 8
+        units: K; molar fraction; bar
+        values:
+          method_class: model_derived
+          typed_quantity: equilibrium_phase_composition
+          quantity_as_printed: molar fraction of each compound under chemical equilibrium
+          species: SiO2(c), SiO2(g), SiO(g), Si(g), O2(g), O(g)
+          phase: gas and condensed phases
+          temperature_as_printed: 2500–6000 K; total pressure fixed at 1 bar
+          x_axis_as_printed: Temperature (K)
+          y_axis_as_printed: Molar Ratio
+          caption_as_printed: 'Figure 13. The molar fraction of each compound under a chemical equilibrium condition. The pressure of the system is fixed at 1 bar.'
+          panel: single
+          series:
+            - name: SiO2(c)
+              marker: cross
+              marker_count: 8
+              method_class: model_derived
+            - name: SiO2(g)
+              marker: plus
+              marker_count: 36
+              method_class: model_derived
+            - name: SiO(g)
+              marker: open circle
+              marker_count: 36
+              method_class: model_derived
+            - name: Si(g)
+              marker: open square
+              marker_count: 24
+              method_class: model_derived
+            - name: O2(g)
+              marker: open triangle
+              marker_count: 36
+              method_class: model_derived
+            - name: O(g)
+              marker: open inverted triangle
+              marker_count: 36
+              method_class: model_derived
+          attribution: Fuyuki et al. (2007)
+          digitisation: deferred to a figure pass
+      - observation_id: fuyuki_2007_figure_14_sio_ratio_equilibrium_comparison
+        type: figure_only
+        locator:
+          figure: '14'
+          page: 445
+          published_page: 445
+          pdf_page_index: 8
+        units: K; dimensionless number ratio; bar
+        values:
+          method_class: model_derived
+          typed_quantity: null
+          quantity_as_printed: observed and equilibrium Si/SiO number ratio versus temperature
+          species: Si(g), SiO(g)
+          phase: gas
+          temperature_as_printed: Temperature (K) axis, 2000–6000 K; equilibrium pressures 0.02, 1, and 10 bar plus SiO2 saturation curve
+          x_axis_as_printed: Temperature (K)
+          y_axis_as_printed: Si/SiO Ratio
+          caption_as_printed: 'Figure 14. The number ratio of Si/SiO as a function of temperature. The data points with error bars represent the observed Si/SiO number ratio. The observation periods for the data points are 20–21 μs, 40–60 μs, 60–80 μs, and 80–100 μs, respectively from right to left. The four lines represent Si/SiO in chemical equilibrium conditions. Constant pressures [0.02 bar (dash line), 1 bar (dot line), and 10 bar (dash-dot line)] and the saturation pressure of SiO2 (dash-dot-dot line) are assumed for calculations. If the vapor observed is in a chemical equilibrium, Si/SiO of the vapor is within the region below the dash line (chemical equilibrium at pressure = 0.02 bar). However, the data in the figure show that the Si/SiO ratio is out of any possible equilibrium condition but that it changes from 10 to 0.1 as a function of time. This suggests that Si and O recombine under a non-equilibrium.'
+          panel: single
+          series:
+            - name: observed Si/SiO ratio, four observation periods
+              marker: open diamond with error bars
+              marker_count: 4
+              method_class: measured_reduced
+            - name: chemical equilibrium at 0.02 bar
+              marker: dashed line
+              marker_count: 0
+              method_class: model_derived
+            - name: chemical equilibrium at 1 bar
+              marker: dotted line
+              marker_count: 0
+              method_class: model_derived
+            - name: chemical equilibrium at 10 bar
+              marker: dash-dot line
+              marker_count: 0
+              method_class: model_derived
+            - name: equilibrium on SiO2 saturation curve
+              marker: dash-dot-dot line
+              marker_count: 0
+              method_class: model_derived
+          attribution: Fuyuki et al. (2007)
+          digitisation: deferred to a figure pass
