@@ -157,7 +157,7 @@ def test_baborak_page_pins_compound_identity_and_quench_conditions() -> None:
         assert observation.uncertainty.verbatim["T_m_uncertainty_K"] == 5
         quench = observation.point_conditions["quench_state"]
         assert quench.state.value == "not_stated"
-        assert quench.locator.published_page == 457
+        assert quench.locator.published_page == 456
         source_row = _row(document, observation_id)
         assert source_row["quench_statement"]["text"] == (
             "Finally, the samples were extracted from the furnace and quenched by "
