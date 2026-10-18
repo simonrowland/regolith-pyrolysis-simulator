@@ -1,0 +1,1168 @@
+schema_version: literature_extract.v1
+source_id: nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization
+source:
+  citation: "E. Nekhoroshev, M. Shevchenko, H. Cheng, D. Shishin, E. Jak (2024), Thermodynamic re-optimization of the CaO-SiO2 system integrated with experimental phase equilibria studies, Ceramics International 50(18B), 33686-33702."
+  doi: 10.1016/j.ceramint.2024.06.187
+  url: https://doi.org/10.1016/j.ceramint.2024.06.187
+  year: 2024
+extraction:
+  method: "Manual transcription from the born-digital layout text; Table 3 values checked against the 600 dpi PDF render."
+  date: '2026-10-18'
+  worker: w6-1018
+review_status: draft
+fidelity_samples:
+  - species: CaO
+    observable: equilibrium_phase_composition
+    observation_id: nk24_cs1_liquid_cao
+    field: value
+    value: 36.1
+    locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS1 Liquid Slag', column: CaO}
+  - species: SiO2
+    observable: equilibrium_phase_composition
+    observation_id: nk24_cs7_alpha_c2s_sio2
+    field: value
+    value: 33.2
+    locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS7 α-C2S', column: SiO2}
+  - species: CaO
+    observable: equilibrium_phase_composition
+    observation_id: nk24_cs8_slag2_cao
+    field: value
+    value: 1.0
+    locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS8 Slag2*', column: CaO}
+species:
+  CaO:
+    observations:
+      - observation_id: nk24_cs1_liquid_cao
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS1 Liquid Slag', column: CaO}
+        phase: glass
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS1}, locator: {page: 4, table: '3', row: CS1}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Paper reports slow reaction of glassy liquids during brine quenching but does not claim preservation or alteration'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS1}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1500, value: 36.1, sample_id: CS1}
+        uncertainty: '±0.07 mol%; confidence level not stated'
+      - observation_id: nk24_cs1_cristobalite_cao
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS1 Cristobalite', column: CaO}
+        phase: cr
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS1}, locator: {page: 4, table: '3', row: CS1}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS1}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1500, value: 0.3, sample_id: CS1}
+        uncertainty: '±0.1 mol%; confidence level not stated'
+      - observation_id: nk24_cs2_liquid_cao
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS2 Liquid Slag', column: CaO}
+        phase: glass
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS2}, locator: {page: 4, table: '3', row: CS2}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Paper reports slow reaction of glassy liquids during brine quenching but does not claim preservation or alteration'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS2}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1550, value: 34.7, sample_id: CS2}
+        uncertainty: '±0.32 mol%; confidence level not stated'
+      - observation_id: nk24_cs2_cristobalite_cao
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS2 Cristobalite', column: CaO}
+        phase: cr
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS2}, locator: {page: 4, table: '3', row: CS2}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS2}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1550, value: 0.2, sample_id: CS2}
+        uncertainty: '±0.02 mol%; confidence level not stated'
+      - observation_id: nk24_cs3_liquid_cao
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS3 Liquid Slag', column: CaO}
+        phase: glass
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS3}, locator: {page: 4, table: '3', row: CS3}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Paper reports slow reaction of glassy liquids during brine quenching but does not claim preservation or alteration'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS3}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1600, value: 32.7, sample_id: CS3}
+        uncertainty: '±0.14 mol%; confidence level not stated'
+      - observation_id: nk24_cs4_slag_cao
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS4 Slag', column: CaO}
+        phase: glass
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS4}, locator: {page: 4, table: '3', row: CS4}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Paper reports slow reaction of glassy liquids during brine quenching but does not claim preservation or alteration'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS4}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1680, value: 28.6, sample_id: CS4}
+        uncertainty: '±0.12 mol%; confidence level not stated'
+      - observation_id: nk24_cs5_slag_cao
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS5 Slag', column: CaO}
+        phase: glass
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS5}, locator: {page: 4, table: '3', row: CS5}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Paper reports slow reaction of glassy liquids during brine quenching but does not claim preservation or alteration'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, table: '3', row: CS5}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1480, value: 41.8, sample_id: CS5}
+        uncertainty: '±0.06 mol%; confidence level not stated'
+      - observation_id: nk24_cs5_ps_woll_cao
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS5 Pseudowollastonite', column: CaO}
+        phase: cr
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS5}, locator: {page: 4, table: '3', row: CS5}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, table: '3', row: CS5}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1480, value: 50.1, sample_id: CS5}
+        uncertainty: '±0.08 mol%; confidence level not stated'
+      - observation_id: nk24_cs6_slag_cao
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS6 Slag', column: CaO}
+        phase: glass
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS6}, locator: {page: 4, table: '3', row: CS6}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Paper reports slow reaction of glassy liquids during brine quenching but does not claim preservation or alteration'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, table: '3', row: CS6}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1465, value: 56.7, sample_id: CS6}
+        uncertainty: '±0.14 mol%; confidence level not stated'
+      - observation_id: nk24_cs6_ps_woll_cao
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS6 Pseudowollastonite', column: CaO}
+        phase: cr
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS6}, locator: {page: 4, table: '3', row: CS6}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, table: '3', row: CS6}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1465, value: 50.0, sample_id: CS6}
+        uncertainty: '±0.12 mol%; confidence level not stated'
+      - observation_id: nk24_cs7_slag_cao
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS7 Slag', column: CaO}
+        phase: glass
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS7}, locator: {page: 4, table: '3', row: CS7}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Paper reports slow reaction of glassy liquids during brine quenching but does not claim preservation or alteration'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + α-C2S'}, locator: {page: 4, table: '3', row: CS7}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1465, value: 56.8, sample_id: CS7}
+        uncertainty: '±0.27 mol%; confidence level not stated'
+      - observation_id: nk24_cs7_alpha_c2s_cao
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS7 α-C2S', column: CaO}
+        phase: cr
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS7}, locator: {page: 4, table: '3', row: CS7}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + α-C2S'}, locator: {page: 4, table: '3', row: CS7}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1465, value: 66.8, sample_id: CS7}
+        uncertainty: '±0.12 mol%; confidence level not stated'
+      - observation_id: nk24_cs8_slag1_cao
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS8 Slag1*', column: CaO}
+        phase: glass
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS8}, locator: {page: 4, table: '3', row: CS8}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Paper reports slow reaction of glassy liquids during brine quenching but does not claim preservation or alteration'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag1* + Slag2* + Cristobalite'}, locator: {page: 4, table: '3', row: CS8}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1697, value: 27.2, sample_id: CS8}
+        uncertainty: '±0.16 mol%; confidence level not stated'
+      - observation_id: nk24_cs8_slag2_cao
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS8 Slag2*', column: CaO}
+        phase: glass
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS8}, locator: {page: 4, table: '3', row: CS8}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Paper reports slow reaction of glassy liquids during brine quenching but does not claim preservation or alteration'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag1* + Slag2* + Cristobalite'}, locator: {page: 4, table: '3', row: CS8}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'CaO component in phase, mol%', T_C: 1697, value: 1.0, sample_id: CS8}
+        uncertainty: '±0.16 mol%; confidence level not stated'
+      - observation_id: nk24_t7_kanolt_1913_melting_point
+        type: transition_point
+        locator: {page: 9, published_page: 33694, pdf_page: 9, table: '7', row: "Kanolt’1913 [16]"}
+        units: °C as printed
+        point_conditions:
+          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, published_page: 33694, table: '7', row: "Kanolt’1913 [16]"}}
+        values: {method_class: quoted_attributed, property_kind: melting_point, phase_from: solid, phase_to: liquid, T_C: 2572, temperature_C_as_printed: 2572, attribution: "Kanolt’1913 [16]", methodology_as_printed: H2 atmosphere}
+      - observation_id: nk24_t7_schumacher_1926_melting_point
+        type: transition_point
+        locator: {page: 9, published_page: 33694, pdf_page: 9, table: '7', row: "Schumacher’1926 [17]"}
+        units: °C as printed
+        point_conditions:
+          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, published_page: 33694, table: '7', row: "Schumacher’1926 [17]"}}
+        values: {method_class: quoted_attributed, property_kind: melting_point, phase_from: solid, phase_to: liquid, T_C: 2576, temperature_C_as_printed: 2576, attribution: "Schumacher’1926 [17]", methodology_as_printed: 'optical pyrometer, H2 atmosphere, tungsten crucible'}
+      - observation_id: nk24_t7_doman_1963_melting_point
+        type: transition_point
+        locator: {page: 9, published_page: 33694, pdf_page: 9, table: '7', row: "Doman’1963 [18]"}
+        units: °C as printed
+        point_conditions:
+          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, published_page: 33694, table: '7', row: "Doman’1963 [18]"}}
+        values: {method_class: quoted_attributed, property_kind: melting_point, phase_from: solid, phase_to: liquid, T_C: 2625, temperature_C_as_printed: 2625, attribution: "Doman’1963 [18]", methodology_as_printed: 'optical pyrometer, N2 atmosphere, crucible material not indicated'}
+      - observation_id: nk24_t7_panek_1979_melting_point
+        type: transition_point
+        locator: {page: 9, published_page: 33694, pdf_page: 9, table: '7', row: "Panek’1979 [19]"}
+        units: °C as printed
+        point_conditions:
+          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, published_page: 33694, table: '7', row: "Panek’1979 [19]"}}
+        values: {method_class: quoted_attributed, property_kind: melting_point, phase_from: solid, phase_to: liquid, T_C: 2637, temperature_C_as_printed: 2637, attribution: "Panek’1979 [19]", methodology_as_printed: 'reducing atmosphere, optical pyrometer'}
+      - observation_id: nk24_t7_foex_1968_melting_point
+        type: transition_point
+        locator: {page: 9, published_page: 33694, pdf_page: 9, table: '7', row: "Foex’1968 [21]"}
+        units: °C as printed
+        point_conditions:
+          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, published_page: 33694, table: '7', row: "Foex’1968 [21]"}}
+        values: {method_class: quoted_attributed, property_kind: melting_point, phase_from: solid, phase_to: liquid, T_C: 2950, temperature_C_as_printed: 2950, attribution: "Foex’1968 [21]", methodology_as_printed: 'solar/plasma furnaces, optical pyrometer'}
+      - observation_id: nk24_t7_foex_1965_melting_point
+        type: transition_point
+        locator: {page: 9, published_page: 33694, pdf_page: 9, table: '7', row: "Foex’1965 [20]"}
+        units: °C as printed
+        point_conditions:
+          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, published_page: 33694, table: '7', row: "Foex’1965 [20]"}}
+        values: {method_class: quoted_attributed, property_kind: melting_point, phase_from: solid, phase_to: liquid, T_C: 2910, temperature_C_as_printed: 2910, attribution: "Foex’1965 [20]", methodology_as_printed: 'solar furnace, optical pyrometer'}
+      - observation_id: nk24_t7_traverse_1969_melting_point
+        type: transition_point
+        locator: {page: 9, published_page: 33694, pdf_page: 9, table: '7', row: "Traverse’1969 [22]"}
+        units: °C as printed
+        point_conditions:
+          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, published_page: 33694, table: '7', row: "Traverse’1969 [22]"}}
+        values: {method_class: quoted_attributed, property_kind: melting_point, phase_from: solid, phase_to: liquid, T_C: 2900, temperature_C_as_printed: 2900, attribution: "Traverse’1969 [22]", methodology_as_printed: 'solar furnace, optical pyrometer, air atmosphere'}
+      - observation_id: nk24_t7_yamada_1986_melting_point
+        type: transition_point
+        locator: {page: 9, published_page: 33694, pdf_page: 9, table: '7', row: "Yamada’1986 [23]"}
+        units: °C as printed
+        point_conditions:
+          total_pressure_Pa: {state: {tag: unknown, reason: Table 7 does not state numeric total pressure}, locator: {page: 9, published_page: 33694, table: '7', row: "Yamada’1986 [23]"}}
+        values: {method_class: quoted_attributed, property_kind: melting_point, phase_from: solid, phase_to: liquid, T_C: 2899, temperature_C_as_printed: 2899, attribution: "Yamada’1986 [23]", methodology_as_printed: arc imaging furnace}
+      - observation_id: nk24_cs5_pseudowollastonite_liquidus
+        type: transition_point
+        phase: l
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: CS5, note: Liquid Slag + Pseudowollastonite}
+        units: °C as printed; liquid composition mol% as printed
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_direct
+          evidence_class: measured_direct
+          composition_mole_fraction: {CaO: 0.418, SiO2: 0.582}
+          composition_as_published: {CaO_mol_percent: 41.8, SiO2_mol_percent: 58.2}
+          points:
+            - T_C: 1480
+              point_conditions:
+                sample_id: {state: {tag: value, value: CS5}, locator: {page: 4, published_page: 33689, table: '3', row: CS5}}
+                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
+                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Pseudowollastonite}}, locator: {page: 4, published_page: 33689, table: '3', row: CS5}}
+        uncertainty: '±3 K overall temperature accuracy; confidence level not stated'
+      - observation_id: nk24_cs6_pseudowollastonite_liquidus
+        type: transition_point
+        phase: l
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: CS6, note: Liquid Slag + Pseudowollastonite}
+        units: °C as printed; liquid composition mol% as printed
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_direct
+          evidence_class: measured_direct
+          composition_mole_fraction: {CaO: 0.567, SiO2: 0.433}
+          composition_as_published: {CaO_mol_percent: 56.7, SiO2_mol_percent: 43.3}
+          points:
+            - T_C: 1465
+              point_conditions:
+                sample_id: {state: {tag: value, value: CS6}, locator: {page: 4, published_page: 33689, table: '3', row: CS6}}
+                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
+                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Pseudowollastonite}}, locator: {page: 4, published_page: 33689, table: '3', row: CS6}}
+        uncertainty: '±3 K overall temperature accuracy; confidence level not stated'
+      - observation_id: nk24_cs7_alpha_c2s_liquidus
+        type: transition_point
+        phase: l
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: CS7, note: Slag + α-C2S}
+        units: °C as printed; liquid composition mol% as printed
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_direct
+          evidence_class: measured_direct
+          composition_mole_fraction: {CaO: 0.568, SiO2: 0.432}
+          composition_as_published: {CaO_mol_percent: 56.8, SiO2_mol_percent: 43.2}
+          points:
+            - T_C: 1465
+              point_conditions:
+                sample_id: {state: {tag: value, value: CS7}, locator: {page: 4, published_page: 33689, table: '3', row: CS7}}
+                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
+                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: 'α-C2S'}}, locator: {page: 4, published_page: 33689, table: '3', row: CS7}}
+        uncertainty: '±3 K overall temperature accuracy; confidence level not stated'
+    context:
+      - observation_id: nk24_t7_eriksson_1994_cao_melting_point_assessment
+        type: model_point
+        locator: {page: 9, published_page: 33694, pdf_page: 9, table: '7', row: "Eriksson’1994 [3]"}
+        units: °C as printed
+        values: {quantity: transition_temperature, method_class: model_derived, property_kind: melting_point, T_C: 2572, attribution: "Eriksson’1994 [3]", note: assessment}
+      - observation_id: nk24_t7_present_cao_melting_point_assessment
+        type: model_point
+        locator: {page: 9, published_page: 33694, pdf_page: 9, table: '7', row: Present work}
+        units: °C as printed
+        values: {quantity: transition_temperature, method_class: model_derived, property_kind: melting_point, T_C: 2896, attribution: Present work, note: assessment}
+      - observation_id: nk24_cs3_cristobalite_composition_unavailable
+        type: refusal
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS3 Cristobalite'}
+        units: mol% as printed
+        values:
+          quantity: equilibrium_phase_composition
+          printed_text: Crystal too small to measure
+          composition: {state: {tag: unknown, reason: Crystal too small to measure}, locator: {page: 4, table: '3', row: 'CS3 Cristobalite'}}
+      - observation_id: nk24_cs4_cristobalite_composition_unavailable
+        type: refusal
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS4 Cristobalite'}
+        units: mol% as printed
+        values:
+          quantity: equilibrium_phase_composition
+          printed_text: Crystals too small to measure
+          composition: {state: {tag: unknown, reason: Crystals too small to measure}, locator: {page: 4, table: '3', row: 'CS4 Cristobalite'}}
+      - observation_id: nk24_table4_stoichiometric_compound_properties
+        type: model_table
+        locator: {page: 5, published_page: 33690, pdf_page: 5, table: '4'}
+        units: ΔfH298, J/mol; S298, J/(mol·K); CP, J/(mol·K)
+        values:
+          method_class: model_derived
+          quantity_tokens: [delta_fH, S, cp]
+          table_title: Thermodynamic properties of stoichiometric compounds in the CaO–SiO2 system.
+          table_as_published: |
+            Compound | ΔfH298, J/mol | S298, J/(mol·K) | CP, J/(mol·K)
+            SiO2(low quartz) | −910699.94 | 41.46 | 1.22017·10−4T3−1.51256·10−6T4 (1–50 K); −3.503501+0.168742T+4.85665·10−4T2−2.96634·10−6T3+4.20792·10−9T4 (50–298.15 K); 80.012−3546684T−2−240.276T−0.5+491568369T−3 (298.15–373 K); 80.012+8.440022·10−3T−3546684T−2−4.52127·10−5T2+6.055045·10−8T3−240.276T−0.5+491568369T−3 (373–848 K); 80.012−3546684T−2−240.276T−0.5+491568369T−3 (848–3000 K)
+            SiO2(high quartz) | −908626.77 | 44.21 | 1.22017·10−4T3−1.51256·10−6T4 (1–50 K); −3.5035+0.168742T+4.85665·10−4T2−2.96634·10−6T3+4.20792·10−9T4 (50–298.15 K); 80.012−3546684T−2−240.276T−0.5+491568369T−3 (298.15–3000 K)
+            SiO2(low tridymite) | −907605.16 | 43.77 | 3·10−4T3−8.03274·10−6T4+6.14328·10−8T5 (1–50 K); −1.58728+0.130882573T+8.01248·10−4T2−4.05645·10−6T3+5.54804·10−9T4 (50–298.15 K); 75.372668+0.182077T−5958095.1T−2−1.2338172·10−3T2+2.0902·10−6T3+958246123T−3 (298.15–390 K); 75.373−5958095.1T−2+958246123T−3 (390–3000 K)
+            SiO2(high tridymite) | −907045.13 | 45.52 | 3·10−4T3−8.03274·10−6T4+6.14328·10−8T5 (1–50 K); −1.587277+0.130883T+8.01248·10−4T2−4.05645·10−6T3+5.54804·10−9T4 (50–298.15 K); 75.372668−5958095.1T−2+958246123T−3 (390–3000 K)
+            SiO2(low cristobalite) | −907753.36 | 43.39 | 3·10−4T3−8.03274·10−6T4+6.14328·10−8T5 (1–50 K); −1.58728+0.130883T+8.01248·10−4T2−4.05645·10−6T3+5.54804·10−9T4 (50–298.15 K); 83.5136+0.02021T−2455356T−2−1.255062·10−4T2+1.94852·10−7T3−374.693T−0.5+280072194T−3 (298.15–535 K); 83.5136−2455356T−2−374.693T−0.5+280072194T−3 (535–3000 K)
+            SiO2(high cristobalite) | −906377.23 | 46.03 | 3·10−4T3−8.03274·10−6T4+6.14328·10−8T5 (1–50 K); −1.58728+0.1308826T+8.01248·10−4T2−4.05645·10−6T3+5.54804·10−9T4 (50–298.15 K); 83.5136−2455356T−2−374.693T−0.5+280072194T−3 (535–3000 K)
+            SiO2(coesite) | −906898.74 | 40.50 | 9.7318·10−5T3−1.15515·10−6T4+5.50907·10−10T5 (1–50 K); 0.557478+1.4·10−3T+2.28039·10−3T2−1.01414·10−5T3+1.37527·10−8T4 (50–298.15 K); 78.9−5.065·106T−2−163.5T−0.5+8.25·108T−3 (298.15–3000 K)
+            SiO2(stishovite) | −864000.18 | 29.50 | 5.16341·10−5T3−1.39798·10−6T4+1.18802·10−8T5 (1–50 K); 2.48244−0.115804T+2.177516·10−3T2−5.96031·10−6T3+4.90311·10−9T4 (50–298.15 K); 85.78−3.605·106T−2−345.5T−0.5+4.511·108T−3 (298.15–3000 K)
+            SiO2(liq) | −906244.79 | 43.73 | 3·10−4T3−8.03274·10−6T4+6.14328·10−8T5 (1–50 K); −1.58728+0.130883T+8.01248·10−4T2−4.05645·10−6T3+5.51748·10−9T4 (50–298.15 K); −209.8903−0.15584T−1307291.8T−2+9.22876·10−6T2−2925.304T−1+11.6634T0.5+2130.9285T−0.5 (298.15–3500 K)
+            CaO(s) | −635090.0 | 38.10 | 1.98221·10−5T3+2.5373·10−8T4 (1–50 K); −6.75527+0.122733T+1.6886·10−3T2−8.92786·10−6T3+1.2419·10−8T4 (50–298.15 K); 261.028+0.135084T+2995315.3T−2−6.92489·10−6T2−38450.277T−1−9.496T0.5 (298.15–3500 K)
+            CaO(liq) | −588140 | 38.1 | 1.98221·10−5T3+2.53727·10−8T4 (1–50 K); −6.75527+0.122733T+0.0016886T2−8.92786·10−6T3+1.2419·10−8T4 (50–298.15 K); −34.206+0.129544T−2503210.2T−2−4.1202·10−5T2+20531.72T−1 (298.15–1473 K); 80 (1473–6000 K)
+            Ca3SiO5(s) | −2931236.76 | 167.65 | 2.82501·10−4T3−2.5183·10−6T4 (1–50 K); −27.372+0.84814T+2.746339·10−3T2−2.0993·10−5T3+3.2782·10−8T4 (50–298.15 K); 259.295−12141866.3T−2−195.689T−0.5+1616495689T−3 (298.15–3000 K)
+            Ca2SiO4(s1), γ-C2S | −2317787.50 | 120.50 | 1.71321·10−4T3−1.29656·10−6T4 (1–50 K); −20.5608+0.61941T+1.793674·10−3T2−1.37471·10−5T3+2.1234·10−8T4 (50–298.15 K); 298.476+9986979.4T−2−1503814945T−3−3924.32T−0.5 (298.15–1150 K); 239.0−18589004.92T−2−1206.714T−0.5 (1150–3000 K)
+            Ca2SiO4(s2), α′-C2S endmember | −2305345.25 | 129.33 | 2.10419·10−4T3−1.77373·10−6T4 (1–50 K); −28.072+0.897821T−4.62535·10−4T2−6.32915·10−6T3+1.24013·10−8T4 (50–298.15 K); 85.1506+4.5244·10−2T−13694962.6T−2+1799160789T−3+2000T−0.5 (298.15–1755 K); 239−94712191T−2 (1755–3000 K)
+            Ca2SiO4(s3), α-C2S endmember | −2291965.00 | 136.07 | 2.35866·10−4T3−1.77373·10−6T4 (1–50 K); −24.891+0.897821T−4.62535·10−4T2−6.32915·10−6T3+1.24013·10−8T4 (50–298.15 K); 85.1506+4.5244117·10−2T−13412210.4T−2+1799160789T−3+2000T−0.5 (298.15–1755 K); 239−94712191T−2 (1755–3000 K)
+            Ca3Si2O7(s), rankinite | −3952913.5 | 210.66 | 3.74796·10−4T3−3.38517·10−6T4 (1–50 K); −38.950+1.29354T+5.87459·10−4T2−1.401·10−5T3+2.366·10−8T4 (50–298.15 K); 399.3−2448449.7T−2−3099.4T−0.5+591634564T−3 (298.15–3000 K)
+            CaSiO3(s1), wollastonite | −1634675.99 | 81.54 | 7.59556·10−5T3 (1–50 K); −18.7497+0.61883T−1.116252·10−3T2+7.40773·10−7T3 (50–298.15 K); 146.558−4195600T−2−603.058T−0.5+5.764·108T−3 (298.15–3000 K)
+            CaSiO3(s2), pseudowollastonite | −1627327.05 | 87.19 | 9.27916·10−5T3 (1–50 K); −18.320+0.6591T−1.251252·10−3T2+7.40773·10−7T3 (50–298.15 K); 154.659−7.354·105T−2−1008.9T−0.5 (298.15–3000 K)
+      - observation_id: nk24_table5_liquid_interaction_parameters
+        type: model_table
+        locator: {page: 7, published_page: 33692, pdf_page: 7, table: '5'}
+        units: J as printed
+        values:
+          method_class: model_derived
+          quantity_as_printed: Interaction parameters in the liquid slag phase
+          schema_gap: No quantity token for liquid-slag interaction parameters; values retained as model context.
+          table_title: Interaction parameters in the liquid slag phase of the CaO–SiO2 system.
+          formalism_as_printed: Interactions starting with g use pair fraction expansion (GUTS); interactions prefixed with b use Bragg-Williams formalism.
+          rows:
+            - {interaction_as_printed: bCa0Si0, value_as_printed: '−61421.3'}
+            - {interaction_as_printed: gCa0Si0, value_as_printed: '−125520.8 + 5.9379T'}
+            - {interaction_as_printed: gCa1Si0, value_as_printed: '12201.0 + 1.7890T'}
+            - {interaction_as_printed: gCa2Si0, value_as_printed: '13349.1'}
+            - {interaction_as_printed: gCa0Si1, value_as_printed: '23544.7−28.1414T'}
+            - {interaction_as_printed: gCa0Si3, value_as_printed: '260346.2'}
+            - {interaction_as_printed: gCa0Si4, value_as_printed: '−281246.1−24.4085T'}
+            - {interaction_as_printed: gCa0Si5, value_as_printed: '245141.6'}
+            - {interaction_as_printed: gCa0Si7, value_as_printed: '−191208.8'}
+            - {interaction_as_printed: gCa0Si9, value_as_printed: '176146.4 + 13.3888T'}
+            - {interaction_as_printed: gCa0Si11, value_as_printed: '10041.6'}
+            - {interaction_as_printed: gCa0Si14, value_as_printed: '−383714.6−30.5432T'}
+            - {interaction_as_printed: gCa0Si15, value_as_printed: '379781.7'}
+      - observation_id: nk24_table6_solid_solution_added_g_terms
+        type: model_table
+        locator: {page: 9, published_page: 33694, pdf_page: 9, table: '6'}
+        units: J as printed
+        values:
+          method_class: model_derived
+          quantity_as_printed: Added Gibbs energy terms
+          schema_gap: No quantity token for added endmember Gibbs energy terms; values retained as model context.
+          table_title: Added Gibbs energy terms of α-Ca2SiO4 and α′-Ca2SiO4 endmembers. No excess interaction parameters are used.
+          rows:
+            - {solution_as_printed: 'α-Ca2SiO4', endmember_as_printed: Ca2SiO4, added_G_term_as_printed: '0.0'}
+            - {solution_as_printed: 'α-Ca2SiO4', endmember_as_printed: CaO, added_G_term_as_printed: '62760'}
+            - {solution_as_printed: 'α′-Ca2SiO4', endmember_as_printed: Ca2SiO4, added_G_term_as_printed: '0.0'}
+            - {solution_as_printed: 'α′-Ca2SiO4', endmember_as_printed: CaO, added_G_term_as_printed: '64852'}
+      - observation_id: nk24_table8_calculated_invariant_points
+        type: model_table
+        locator: {page: 14, published_page: 33699, pdf_page: 14, table: '8'}
+        units: °C and mol% as printed
+        values:
+          method_class: model_derived
+          quantity_tokens: [transition_temperature, equilibrium_phase_composition]
+          table_title: Calculated invariant points in the CaO–SiO2 system.
+          table_as_published: |
+            Invariant | T, °C | Phase | CaO, mol% | SiO2, mol%
+            CaO = Slag | 2896.2 | Slag | 100.00 | 0.00
+            CaO + α-C2S = Slag | 2044.0 | Slag | 71.11 | 28.89; α-C2S | 67.53 | 32.47
+            CaO + α-C2S––C3S | 1947.8 | α-C2S | 67.42 | 32.58
+            CaO + α′-C2S––C3S | 1243.2 | α′-C2S | 66.80 | 33.20
+            CaO + γ-C2S = α′C2S | 848.1 | α′-C2S | 66.69 | 33.31
+            C3S + α′-C2S = α-C2S | 1432.0 | α-C2S | 66.90 | 33.10; α′-C2S | 66.87 | 33.13
+            α-C2S = Slag | 2131.0 | Slag | 67.09 | 32.91; α-C2S | 67.09 | 32.91
+            α-C2S + Slag = C3S2 | 1465.5 | Slag | 56.64 | 43.36; α-C2S | 66.67 | 33.33
+            C3S2 + ps. woll = Slag | 1465.0 | Slag | 56.60 | 43.40
+            α′C2S = α-C2S + C3S2 | 1436.8 | α-C2S | 66.67 | 33.33; α′-C2S | 66.67 | 33.33
+            γ-C2S = α′-C2S + C3S2 | 849.5 | α′-C2S | 66.67 | 33.33
+            Woll = ps. woll | 1125.3 | Woll | 50.00 | 50.00
+            Ps. woll = Slag | 1542.5 | Slag | 50.00 | 50.00
+            Ps. woll + Tri = Slag | 1440.3 | Slag | 37.88 | 62.12
+            Qz = Tri | 866.9 | Qz | 0.00 | 100.00
+            Tri = Cri (+ Slag) | 1465.3 | Slag | 37.21 | 62.79
+            Cri + Slag1 = Slag2 | 1695.0 | Slag1 | 27.33 | 72.67; Slag2 | 1.13 | 98.87
+            Cri = Slag | 1722.8 | Slag | 0.00 | 100.00
+      - observation_id: nk24_figure1_microstructures
+        type: figure
+        locator: {page: 4, published_page: 33689, pdf_page: 4, figure: '1'}
+        units: micrograph labels and scale bars as printed
+        values:
+          method_class: model_derived
+          quantity: equilibrium_phase_composition
+          species: [CaO, SiO2]
+          phase: liquid and coexisting solids/liquids
+          temperature_as_printed: panel-specific temperatures in °C
+          axes_as_printed: no plotted axes
+          caption_as_printed: Backscattered images taken on JEOL 8200L showing typical microstructure of samples, a) Liquid slag + cristobalite, b) Liquid slag + pseudowollastonite, c) Liquid slag + dicalcium silicate (C2S), and d) Two immiscible liquid slags + cristobalite (metastable).
+          panels:
+            - {panel: a, temperature_C_as_printed: 1500, phases_as_printed: Liquid slag + cristobalite}
+            - {panel: b, temperature_C_as_printed: 1480, phases_as_printed: Liquid slag + pseudowollastonite}
+            - {panel: c, temperature_C_as_printed: 1465, phases_as_printed: Liquid slag + dicalcium silicate (C2S)}
+            - {panel: d, temperature_C_as_printed: 1697, phases_as_printed: Two immiscible liquid slags + cristobalite (metastable)}
+          series: []
+          marker_count_per_series: []
+          attribution: Nekhoroshev et al., present study
+          digitisation: deferred to a figure pass
+      - observation_id: nk24_figure2_heat_capacity_endmembers
+        type: figure
+        locator: {page: 7, published_page: 33692, pdf_page: 7, figure: '2'}
+        units: axes as printed
+        values:
+          method_class: model_derived
+          quantity: cp
+          species: [SiO2, CaO]
+          phase: liquid and solid tridymite; liquid CaO and solid lime
+          temperature_as_printed: Temperature, K on x axes
+          axes_as_printed: {x: 'Temperature, K', y: 'CP, J·mol−1·K−1'}
+          caption_as_printed: Heat capacity (CP) of (a) SiO2 (liquid and solid tridymite) and (b) CaO (liquid and solid lime) as a function of temperature, comparing present study and previous assessments against experimental data. Data sources are Eliezer et al. [90], Stebbins et al. [42], Lange and Navrotsky [44], Alvares et al. [45], and Bonnickson [36].
+          panels: [a, b]
+          series:
+            - {panel: a, series_as_printed: 'Present study, SiO2', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {panel: a, series_as_printed: 'Eriksson [3], SiO2', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {panel: a, series_as_printed: 'JANAF Webbook (NIST), SiO2', attribution: 'JANAF Webbook (NIST)', marker_count: 0}
+            - {panel: a, series_as_printed: 'Eliezer [90], SiO2(liq)', attribution: 'Eliezer et al. [90]', marker_count: 1}
+            - {panel: a, series_as_printed: 'Stebbins [42], SiO2(liq)', attribution: 'Stebbins et al. [42]', marker_count: 2}
+            - {panel: a, series_as_printed: 'Lange [44], SiO2(liq)', attribution: 'Lange and Navrotsky [44]', marker_count: 2}
+            - {panel: b, series_as_printed: 'Present study, CaO', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {panel: b, series_as_printed: 'Eriksson [3], CaO', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {panel: b, series_as_printed: 'JANAF Webbook (NIST), CaO', attribution: 'JANAF Webbook (NIST)', marker_count: 0}
+            - {panel: b, series_as_printed: 'Stebbins [42], CaO(liq)', attribution: 'Stebbins et al. [42]', marker_count: 2}
+            - {panel: b, series_as_printed: 'Lange [44], CaO(liq)', attribution: 'Lange and Navrotsky [44]', marker_count: 2}
+            - {panel: b, series_as_printed: 'Alvares [45], CaO(liq)', attribution: 'Alvares et al. [45]', marker_count: '~15'}
+            - {panel: b, series_as_printed: 'Alvares [45], CaO(lime)', attribution: 'Alvares et al. [45]', marker_count: '~7'}
+            - {panel: b, series_as_printed: 'Bonnickson [36], CaO(liq)', attribution: 'Bonnickson [36]', marker_count: 2}
+          attribution: Eliezer et al. [90]; Stebbins et al. [42]; Lange and Navrotsky [44]; Alvares et al. [45]; Bonnickson [36]
+          digitisation: deferred to a figure pass
+      - observation_id: nk24_figure3_mixing_properties
+        type: figure
+        locator: {page: 8, published_page: 33693, pdf_page: 8, figure: '3'}
+        units: Δmix G and Δmix H in kJ·mol−1; Δmix S in J·mol−1·K−1 as printed
+        values:
+          method_class: model_derived
+          quantity_as_printed: Gibbs energy, enthalpy, and entropy of mixing
+          schema_gap: No existing quantity token represents these mixing properties; no curves digitized.
+          species: [CaO, SiO2]
+          phase: liquid
+          temperature_as_printed: 1800 K
+          axes_as_printed: x is molar ratio SiO2/(CaO+SiO2); panels plot Δmix G, Δmix H, and Δmix S
+          caption_as_printed: Gibbs energy (a), enthalpy (b), and entropy of mixing (c) of the liquid CaO–SiO2 system relative to pure liquids at 1800 K comparing the old assessment by Eriksson et al. [3] with the present work.
+          panels: [a, b, c]
+          series:
+            - {panel: a, series_as_printed: 'Δmix G, Eriksson [3]', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {panel: a, series_as_printed: 'Δmix G, present study', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {panel: b, series_as_printed: 'Δmix H, Eriksson [3]', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {panel: b, series_as_printed: 'Δmix H, present study', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {panel: c, series_as_printed: 'Sideal', attribution: 'ideal mixing reference', marker_count: 0}
+            - {panel: c, series_as_printed: 'Δmix S, Eriksson [3]', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {panel: c, series_as_printed: 'Δmix S, present study', attribution: 'Nekhoroshev et al.', marker_count: 0}
+          attribution: Eriksson et al. [3]; Nekhoroshev et al., present study
+          digitisation: deferred to a figure pass
+      - observation_id: nk24_figure4_cao_heat_capacity
+        type: figure
+        locator: {page: 9, published_page: 33694, pdf_page: 9, figure: '4'}
+        units: axes as printed
+        values:
+          method_class: model_derived
+          quantity: cp
+          species: CaO
+          phase: solid lime
+          temperature_as_printed: Temperature, K on x axes
+          axes_as_printed: {x: 'Temperature, K', y: 'CP, J·mol−1·K−1'}
+          caption_as_printed: (a) Heat capacity of CaO solid as a function of temperature, (b) enlarged low temperature region, comparing the present optimization (solid lines) with the optimization by Eriksson et al. [3] (dashed lines). Data sources are Gmelin [33], Park and Kelley [25], and Alvares et al. [45].
+          panels: [a, b]
+          series:
+            - {series_as_printed: 'Present optimization', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {series_as_printed: 'Eriksson et al. [3]', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {series_as_printed: 'Gmelin [33]', attribution: 'Gmelin [33]', marker_count: '~20'}
+            - {series_as_printed: 'Park [25]', attribution: 'Park and Kelley [25]', marker_count: '~10'}
+            - {series_as_printed: 'Alvares [45]', attribution: 'Alvares et al. [45]', marker_count: '~15'}
+          attribution: Gmelin [33]; Park and Kelley [25]; Alvares et al. [45]
+          digitisation: deferred to a figure pass
+      - observation_id: nk24_figure5_cao_heat_content
+        type: figure
+        locator: {page: 9, published_page: 33694, pdf_page: 9, figure: '5'}
+        units: axes as printed
+        values:
+          method_class: model_derived
+          quantity: H_minus_H298
+          species: CaO
+          phase: solid lime
+          temperature_as_printed: Temperature, K
+          axes_as_printed: {x: 'Temperature, K', y: 'H−H298, kJ·mol−1'}
+          caption_as_printed: Heat content of CaO as a function of temperature, comparing the present optimization (solid lines) with the optimization by Eriksson et al. [3] (dashed lines). Data sources are Fischer and Ertmer [38], Lander [35], Roth and Bertram [28], Magnus [24], Esser et al. [29], Richet and Fiquet [43], and Chekhovskoi et al. [104].
+          panels: [single]
+          series:
+            - {series_as_printed: 'Present optimization', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {series_as_printed: 'Eriksson et al. [3]', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {series_as_printed: 'Fischer [38]', attribution: 'Fischer and Ertmer [38]', marker_count: '~4'}
+            - {series_as_printed: 'Lander [35]', attribution: 'Lander [35]', marker_count: '~18'}
+            - {series_as_printed: 'Roth [28]', attribution: 'Roth and Bertram [28]', marker_count: '~16'}
+            - {series_as_printed: 'Chekhovskoi [104]', attribution: 'Chekhovskoi et al. [104]', marker_count: '~20'}
+            - {series_as_printed: 'Magnus [24]', attribution: 'Magnus [24]', marker_count: '~3'}
+            - {series_as_printed: 'Esser [29]', attribution: 'Esser et al. [29]', marker_count: '~5'}
+            - {series_as_printed: 'Richet [43]', attribution: 'Richet and Fiquet [43]', marker_count: '~12'}
+          attribution: Fischer and Ertmer [38]; Lander [35]; Roth and Bertram [28]; Magnus [24]; Esser et al. [29]; Richet and Fiquet [43]; Chekhovskoi et al. [104]
+          digitisation: deferred to a figure pass
+      - observation_id: nk24_figure6_ca3sio5_heat_capacity
+        type: figure
+        locator: {page: 10, published_page: 33695, pdf_page: 10, figure: '6'}
+        units: axes as printed
+        values:
+          method_class: model_derived
+          quantity: cp
+          species: Ca3SiO5
+          phase: solid
+          temperature_as_printed: Temperature, K on x axes
+          axes_as_printed: {x: 'Temperature, K', y: 'CP, J·mol−1·K−1'}
+          caption_as_printed: (a) Heat capacity of Ca3SiO5 solid as a function of temperature, (b) enlarged low temperature region, comparing the present optimization (solid lines) with the optimization by Eriksson et al. [3] (dashed lines). Data source is Todd [31].
+          panels: [a, b]
+          series:
+            - {series_as_printed: 'Present optimization', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {series_as_printed: 'Eriksson et al. [3]', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {series_as_printed: 'Todd [31]', attribution: 'Todd [31]', marker_count: '~24'}
+          attribution: Todd [31]
+          digitisation: deferred to a figure pass
+      - observation_id: nk24_figure7_ca3sio5_heat_content
+        type: figure
+        locator: {page: 10, published_page: 33695, pdf_page: 10, figure: '7'}
+        units: axes as printed
+        values:
+          method_class: model_derived
+          quantity: H_minus_H298
+          species: Ca3SiO5
+          phase: solid
+          temperature_as_printed: Temperature, K
+          axes_as_printed: {x: 'Temperature, K', y: 'H−H298, kJ·mol−1'}
+          caption_as_printed: Heat content of Ca3SiO5 solid as a function of temperature, comparing the present optimization (solid lines) with the optimization by Eriksson et al. [3] (dashed lines). Data source is Gronow and Schwiete [30].
+          panels: [single]
+          series:
+            - {series_as_printed: 'Present optimization', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {series_as_printed: 'Eriksson et al. [3]', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {series_as_printed: 'Gronow and Schwiete [30]', attribution: 'Gronow and Schwiete [30]', marker_count: 6}
+          attribution: Gronow and Schwiete [30]
+          digitisation: deferred to a figure pass
+      - observation_id: nk24_figure8_ca2sio4_heat_capacity
+        type: figure
+        locator: {page: 11, published_page: 33696, pdf_page: 11, figure: '8'}
+        units: axes as printed
+        values:
+          method_class: model_derived
+          quantity: cp
+          species: Ca2SiO4
+          phase: γ-C2S, α′-C2S, α-C2S
+          temperature_as_printed: Temperature, K on x axes
+          axes_as_printed: {x: 'Temperature, K', y: 'CP, J·mol−1·K−1'}
+          caption_as_printed: (a) Heat capacity of Ca2SiO4 solids as a function of temperature, (b) enlarged low temperature region, comparing the present optimization (solid lines) with the optimization by Eriksson et al. [3] (dashed lines). Data sources are King [32], Todd [31] (β-C2S, a supercooled metastable structure close to α′-C2S), and Coughlin and O’Brien [37].
+          panels: [a, b]
+          series:
+            - {series_as_printed: 'Present optimization', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {series_as_printed: 'Eriksson et al. [3]', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {series_as_printed: 'King [32]', attribution: 'King [32]', marker_count: '~20'}
+            - {series_as_printed: 'Todd [31]', attribution: 'Todd [31]', marker_count: '~12'}
+            - {series_as_printed: 'Coughlin and O’Brien [37]', attribution: 'Coughlin and O’Brien [37]', marker_count: '~18'}
+          attribution: King [32]; Todd [31]; Coughlin and O’Brien [37]
+          digitisation: deferred to a figure pass
+      - observation_id: nk24_figure9_ca2sio4_heat_content
+        type: figure
+        locator: {page: 11, published_page: 33696, pdf_page: 11, figure: '9'}
+        units: axes as printed
+        values:
+          method_class: model_derived
+          quantity: H_minus_H298
+          species: Ca2SiO4
+          phase: most stable Ca2SiO4 modifications
+          temperature_as_printed: Temperature, K
+          axes_as_printed: {x: 'Temperature, K', y: 'H−H298, kJ·mol−1'}
+          caption_as_printed: Heat content of Ca2SiO4 as a function of temperature, comparing the present optimization (solid lines) with the optimization by Eriksson et al. [3] (dashed lines) and FTOxid database (dotted lines). Data sources are Coughlin and O’Brien [37], Gronow and Schwiete [30], and Abdul et al. [12].
+          panels: [a, b]
+          series:
+            - {series_as_printed: 'Present optimization', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {series_as_printed: 'Eriksson et al. [3]', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {series_as_printed: FTOxid, attribution: 'FactSage FTOxid database', marker_count: 0}
+            - {series_as_printed: 'Coughlin and O’Brien [37]', attribution: 'Coughlin and O’Brien [37]', marker_count: '~18'}
+            - {series_as_printed: 'Gronow and Schwiete [30]', attribution: 'Gronow and Schwiete [30]', marker_count: '~11'}
+            - {series_as_printed: 'Abdul et al. [12]', attribution: 'Abdul et al. [12]', marker_count: '~8'}
+          attribution: Coughlin and O’Brien [37]; Gronow and Schwiete [30]; Abdul et al. [12]
+          digitisation: deferred to a figure pass
+      - observation_id: nk24_figure10_rankinite_heat_capacity
+        type: figure
+        locator: {page: 11, published_page: 33696, pdf_page: 11, figure: '10'}
+        units: axes as printed
+        values:
+          method_class: model_derived
+          quantity: cp
+          species: Ca3Si2O7
+          phase: rankinite solid
+          temperature_as_printed: Temperature, K on x axes
+          axes_as_printed: {x: 'Temperature, K', y: 'CP, J·mol−1·K−1'}
+          caption_as_printed: Heat capacity of Ca3Si2O7 rankinite solid as a function of temperature, comparing the present optimization (solid lines) with the optimization by Eriksson et al. [3] (dashed lines). Data source is King [32].
+          panels: [a, b]
+          series:
+            - {series_as_printed: 'Present optimization', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {series_as_printed: 'Eriksson et al. [3]', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {series_as_printed: 'King [32]', attribution: 'King [32]', marker_count: '~20'}
+          attribution: King [32]
+          digitisation: deferred to a figure pass
+      - observation_id: nk24_figure11_rankinite_heat_content
+        type: figure
+        locator: {page: 12, published_page: 33697, pdf_page: 12, figure: '11'}
+        units: axes as printed
+        values:
+          method_class: model_derived
+          quantity: H_minus_H298
+          species: Ca3Si2O7
+          phase: rankinite solid
+          temperature_as_printed: Temperature, K
+          axes_as_printed: {x: 'Temperature, K', y: 'H−H298, kJ·mol−1'}
+          caption_as_printed: Heat content of Ca3Si2O7 as a function of temperature, comparing the present optimization (solid lines) with the optimization by Eriksson et al. [3] (dashed lines). Data source is Abdul et al. [12].
+          panels: [single]
+          series:
+            - {series_as_printed: 'Present optimization', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {series_as_printed: 'Eriksson et al. [3]', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {series_as_printed: 'Abdul et al. [12]', attribution: 'Abdul et al. [12]', marker_count: 7}
+          attribution: Abdul et al. [12]
+          digitisation: deferred to a figure pass
+      - observation_id: nk24_figure12_casiO3_heat_capacity
+        type: figure
+        locator: {page: 12, published_page: 33697, pdf_page: 12, figure: '12'}
+        units: axes as printed
+        values:
+          method_class: model_derived
+          quantity: cp
+          species: CaSiO3
+          phase: wollastonite and pseudowollastonite solids
+          temperature_as_printed: Temperature, K on x axes
+          axes_as_printed: {x: 'Temperature, K', y: 'CP, J·mol−1·K−1'}
+          caption_as_printed: Heat capacity of CaSiO3 solids, wollastonite and pseudowollastonite as a function of temperature, comparing the present optimization (solid lines) with the optimization by Eriksson et al. [3] (dashed lines). Data sources are Krupka [34], Parks and Kelley [26], Wagner [27], and Richet et al. [105].
+          panels: [a, b]
+          series:
+            - {series_as_printed: 'Present optimization', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {series_as_printed: 'Eriksson et al. [3]', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {series_as_printed: 'Krupka [34]', attribution: 'Krupka et al. [34]', marker_count: '~25'}
+            - {series_as_printed: 'Parks and Kelley [26]', attribution: 'Parks and Kelley [26]', marker_count: '~20'}
+            - {series_as_printed: 'Wagner [27]', attribution: 'Wagner [27]', marker_count: '~12'}
+            - {series_as_printed: 'Richet et al. [105]', attribution: 'Richet et al. [105]', marker_count: '~15'}
+          attribution: Krupka [34]; Parks and Kelley [26]; Wagner [27]; Richet et al. [105]
+          digitisation: deferred to a figure pass
+      - observation_id: nk24_figure13_casiO3_heat_content
+        type: figure
+        locator: {page: 12, published_page: 33697, pdf_page: 12, figure: '13'}
+        units: axes as printed
+        values:
+          method_class: model_derived
+          quantity: H_minus_H298
+          species: CaSiO3
+          phase: wollastonite and pseudowollastonite
+          temperature_as_printed: Temperature, K
+          axes_as_printed: {x: 'Temperature, K', y: 'H−H298, kJ·mol−1'}
+          caption_as_printed: Heat content of CaSiO3 as a function of temperature, comparing the present optimization (solid lines) with the optimization by Eriksson et al. [3] (dashed lines). Data sources are Gronow and Schwiete [30], Adamkovicova et al. [39], and Richet et al. [105].
+          panels: [single]
+          series:
+            - {series_as_printed: 'Present optimization', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {series_as_printed: 'Eriksson et al. [3]', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {series_as_printed: 'Gronow and Schwiete [30]', attribution: 'Gronow and Schwiete [30]', marker_count: 1}
+            - {series_as_printed: 'Adamkovicova et al. [39]', attribution: 'Adamkovicova et al. [39]', marker_count: 1}
+            - {series_as_printed: 'Richet et al. [105]', attribution: 'Richet et al. [105]', marker_count: '~8'}
+          attribution: Gronow and Schwiete [30]; Adamkovicova et al. [39]; Richet et al. [105]
+          digitisation: deferred to a figure pass
+      - observation_id: nk24_figure14_formation_from_oxides
+        type: figure
+        locator: {page: 13, published_page: 33698, pdf_page: 13, figure: '14'}
+        units: ΔH in kJ·mol−1; ΔS in J·mol−1·K−1 as printed
+        values:
+          method_class: model_derived
+          quantity_as_printed: Enthalpy and entropy of formation of solid CaO–SiO2 oxides from pure CaO and SiO2 reference state
+          typed_quantity: unavailable
+          schema_gap: No existing quantity token for formation from oxides; these are not delta_fH or absolute S.
+          species: [CaO, SiO2]
+          phase: solid CaO–SiO2 compounds
+          temperature_as_printed: 298 K standard state for plotted formation values
+          axes_as_printed: x is molar ratio SiO2/(CaO+SiO2); panels plot ΔH(oxides) and ΔS(oxides)
+          caption_as_printed: Enthalpy and entropy of formation of solid CaO–SiO2 oxides from pure CaO and SiO2 reference state, comparing the present optimization (solid lines) with the optimization by Eriksson et al. [3] and the public FTOxid database of FactSage [1]. Data sources are King [46], Kracek [47], Charlu et al. [48], King [32], Todd [31], and Krupka [106,107].
+          panels: [a, b]
+          series:
+            - {panel: a, series_as_printed: 'Eriksson [3]', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {panel: a, series_as_printed: FTOxid, attribution: 'FactSage FTOxid database [1]', marker_count: 0}
+            - {panel: a, series_as_printed: 'Present study', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {panel: a, series_as_printed: 'King [46], β-C2S and C3S', attribution: 'King [46]', marker_count: '~4'}
+            - {panel: a, series_as_printed: 'Kracek [47], wollastonite and pseudowollastonite', attribution: 'Kracek [47]', marker_count: '~4'}
+            - {panel: a, series_as_printed: 'Charlu et al. [48], wollastonite and pseudowollastonite', attribution: 'Charlu et al. [48]', marker_count: '~4'}
+            - {panel: b, series_as_printed: 'King [32], γ-C2S and C3S2', attribution: 'King [32]', marker_count: '~4'}
+            - {panel: b, series_as_printed: 'Todd [31], β-C2S and C3S', attribution: 'Todd [31]', marker_count: '~4'}
+            - {panel: b, series_as_printed: 'Krupka [106], wollastonite', attribution: 'Krupka et al. [106,107]', marker_count: '~2'}
+          attribution: King [46]; Kracek [47]; Charlu et al. [48]; King [32]; Todd [31]; Krupka [106,107]
+          digitisation: deferred to a figure pass
+      - observation_id: nk24_figure15_binary_phase_diagram
+        type: figure
+        locator: {page: 13, published_page: 33698, pdf_page: 13, figure: '15'}
+        units: temperature in °C; composition as molar ratio as printed
+        values:
+          method_class: model_derived
+          quantity: transition_temperature
+          species: [CaO, SiO2]
+          phase: liquid, lime, Ca-silicate compounds, silica polymorphs, and two-liquid region
+          temperature_as_printed: Temperature, °C on y axis
+          axes_as_printed: {x: 'molar ratio SiO2/(CaO+SiO2)', y: 'Temperature, °C'}
+          caption_as_printed: Phase diagram of the CaO–SiO2 system together with the experimental data. Data sources are Cheng et al. [7], Zhao [57], Greig [53], Hageman et al. [56], Tromel et al. [52], and Tewhey and Hess [55]. Previous optimizations are Eriksson [3] and Abdul et al. [12].
+          panels: [single]
+          series:
+            - {series_as_printed: 'Present optimization', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {series_as_printed: 'Eriksson [3] optimization', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {series_as_printed: 'Abdul [12] optimization', attribution: 'Abdul et al. [12]', marker_count: 0}
+            - {series_as_printed: 'Present study measurements', attribution: 'Nekhoroshev et al.', marker_count: '~8'}
+            - {series_as_printed: 'Cheng et al. [7]', attribution: 'Cheng et al. [7]', marker_count: '~10'}
+            - {series_as_printed: 'Zhao [57]', attribution: 'Zhao [57]', marker_count: '~4'}
+            - {series_as_printed: 'Greig [53]', attribution: 'Greig [53]', marker_count: '~4'}
+            - {series_as_printed: 'Hageman et al. [56]', attribution: 'Hageman et al. [56]', marker_count: '~4'}
+            - {series_as_printed: 'Tromel et al. [52]', attribution: 'Tromel et al. [52]', marker_count: '~3'}
+            - {series_as_printed: 'Tewhey and Hess [55]', attribution: 'Tewhey and Hess [55]', marker_count: '~3'}
+          attribution: Cheng et al. [7]; Zhao [57]; Greig [53]; Hageman et al. [56]; Tromel et al. [52]; Tewhey and Hess [55]; Eriksson [3]; Abdul et al. [12]
+          digitisation: deferred to a figure pass
+      - observation_id: nk24_figure16_enlarged_phase_diagram
+        type: figure
+        locator: {page: 13, published_page: 33698, pdf_page: 13, figure: '16'}
+        units: temperature in °C; composition as molar ratio as printed
+        values:
+          method_class: model_derived
+          quantity: transition_temperature
+          species: [CaO, SiO2]
+          phase: liquidus and solidus regions and two-liquid region
+          temperature_as_printed: Temperature, °C on y axes
+          axes_as_printed: {x: 'molar ratio SiO2/(CaO+SiO2)', y: 'Temperature, °C'}
+          caption_as_printed: Enlarged parts of the CaO–SiO2 phase diagram showing areas with experimental data. Data sources are Cheng et al. [7], Zhao [57], Greig [53], Hageman et al. [56], Tromel et al. [52], and Tewhey and Hess [55]. Previous optimizations are Eriksson et al. [3] and Abdul et al. [12].
+          panels: [a, b]
+          series:
+            - {series_as_printed: 'Present optimization', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {series_as_printed: 'Eriksson et al. [3]', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {series_as_printed: 'Abdul et al. [12]', attribution: 'Abdul et al. [12]', marker_count: 0}
+            - {series_as_printed: 'Cheng et al. [7]', attribution: 'Cheng et al. [7]', marker_count: '~10'}
+            - {series_as_printed: 'Zhao [57]', attribution: 'Zhao [57]', marker_count: '~4'}
+            - {series_as_printed: 'Greig [53]', attribution: 'Greig [53]', marker_count: '~4'}
+            - {series_as_printed: 'Hageman et al. [56]', attribution: 'Hageman et al. [56]', marker_count: '~4'}
+            - {series_as_printed: 'Tromel et al. [52]', attribution: 'Tromel et al. [52]', marker_count: '~3'}
+            - {series_as_printed: 'Tewhey and Hess [55]', attribution: 'Tewhey and Hess [55]', marker_count: '~3'}
+          attribution: Cheng et al. [7]; Zhao [57]; Greig [53]; Hageman et al. [56]; Tromel et al. [52]; Tewhey and Hess [55]
+          digitisation: deferred to a figure pass
+      - observation_id: nk24_figure17_silica_activity_liquid
+        type: figure
+        locator: {page: 14, published_page: 33699, pdf_page: 14, figure: '17'}
+        units: activity as plotted; composition as molar ratio as printed
+        values:
+          method_class: model_derived
+          quantity: activity
+          species: SiO2
+          phase: liquid CaO–SiO2 slag
+          temperature_as_printed: 1450, 1500, 1550, 1600, 1650, and 1700 °C are shown in the legend
+          standard_state_as_printed: most stable pure solid SiO2
+          axes_as_printed: {x: 'molar ratio SiO2/(CaO+SiO2)', y: 'a(SiO2)'}
+          caption_as_printed: Activity of SiO2 in liquid CaO–SiO2 slags relative to the most stable pure solid at different temperatures as a function of composition, comparing the present study with previous assessments. The initial α-version is dotted and the present version is solid. Data sources are Chang and Derge [58], Fulton and Chipman [60], Zou et al. [64], Sanbongi and Ohtani [59], Sharma and Richardson [67], Kay and Taylor [62], and Rein and Chipman [63].
+          panels: [single]
+          series:
+            - {series_as_printed: 'Initial α-version', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {series_as_printed: 'Present version', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {series_as_printed: 'Eriksson [3] assessment', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {series_as_printed: 'FTOxid assessment', attribution: 'FactSage FTOxid database', marker_count: 0}
+            - {series_as_printed: 'Chang and Derge [58]', attribution: 'Chang and Derge [58]', marker_count: '~12'}
+            - {series_as_printed: 'Fulton and Chipman [60]', attribution: 'Fulton and Chipman [60]', marker_count: '~10'}
+            - {series_as_printed: 'Zou et al. [64]', attribution: 'Zou et al. [64]', marker_count: '~8'}
+            - {series_as_printed: 'Sanbongi and Ohtani [59]', attribution: 'Sanbongi and Ohtani [59]', marker_count: '~12'}
+            - {series_as_printed: 'Sharma and Richardson [67]', attribution: 'Sharma and Richardson [67]', marker_count: '~5'}
+            - {series_as_printed: 'Kay and Taylor [62]', attribution: 'Kay and Taylor [62]', marker_count: '~10'}
+            - {series_as_printed: 'Rein and Chipman [63]', attribution: 'Rein and Chipman [63]', marker_count: '~5'}
+          attribution: Chang and Derge [58]; Fulton and Chipman [60]; Zou et al. [64]; Sanbongi and Ohtani [59]; Sharma and Richardson [67]; Kay and Taylor [62]; Rein and Chipman [63]
+          digitisation: deferred to a figure pass
+      - observation_id: nk24_figure18_cao_activity_liquid
+        type: figure
+        locator: {page: 14, published_page: 33699, pdf_page: 14, figure: '18'}
+        units: log10 activity; composition as molar ratio as printed
+        values:
+          method_class: model_derived
+          quantity: activity
+          species: CaO
+          phase: liquid CaO–SiO2 slag
+          temperature_as_printed: 1500 and 1600 °C
+          standard_state_as_printed: pure solid CaO
+          axes_as_printed: {x: 'molar ratio SiO2/(CaO+SiO2)', y: 'log10 a(CaO)'}
+          caption_as_printed: Activity of CaO in liquid CaO–SiO2 slags relative to pure solid at different temperatures as a function of composition, comparing the present optimization (solid lines) with the optimization by Eriksson et al. [3] (dashed lines). Data sources are Zou et al. [64] and Sharma and Richardson [67].
+          panels: [single]
+          series:
+            - {series_as_printed: 'Present study, 1500 °C', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {series_as_printed: 'Present study, 1600 °C', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {series_as_printed: 'Eriksson [3], 1500 °C', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {series_as_printed: 'Eriksson [3], 1600 °C', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {series_as_printed: 'Zou et al. [64], 1600 °C', attribution: 'Zou et al. [64]', marker_count: '~12'}
+            - {series_as_printed: 'Sharma and Richardson [67], 1500 °C', attribution: 'Sharma and Richardson [67]', marker_count: '~8'}
+          attribution: Zou et al. [64]; Sharma and Richardson [67]
+          digitisation: deferred to a figure pass
+      - observation_id: nk24_figure19_cao_activity_solids
+        type: figure
+        locator: {page: 15, published_page: 33700, pdf_page: 15, figure: '19'}
+        units: activity as plotted
+        values:
+          method_class: model_derived
+          quantity: activity
+          species: CaO
+          phase: solid CaO–SiO2 assemblages
+          temperature_as_printed: top axis T, °C; bottom axis 1000/T, K−1
+          standard_state_as_printed: pure solid CaO
+          axes_as_printed: {x_bottom: '1000/T, K−1', x_top: 'T, °C', y: 'log10 a(CaO)'}
+          caption_as_printed: Activity of CaO in solid CaO–SiO2 slags relative to pure solid as a function of temperature, comparing the present optimization (solid lines) with the optimization by Eriksson et al. [3] (dashed lines) and FTOxid database (dotted lines). Data source is Benz and Wagner [66].
+          panels: [single]
+          series:
+            - {series_as_printed: 'Present optimization', attribution: 'Nekhoroshev et al.', marker_count: 0}
+            - {series_as_printed: 'Eriksson et al. [3]', attribution: 'Eriksson et al. [3]', marker_count: 0}
+            - {series_as_printed: FTOxid, attribution: 'FactSage FTOxid database', marker_count: 0}
+            - {series_as_printed: 'Benz and Wagner [66], SiO2/CaSiO3', attribution: 'Benz and Wagner [66]', marker_count: '~15'}
+            - {series_as_printed: 'Benz and Wagner [66], CaSiO3/Ca3Si2O7', attribution: 'Benz and Wagner [66]', marker_count: '~6'}
+            - {series_as_printed: 'Benz and Wagner [66], Ca3Si2O7/Ca2SiO4', attribution: 'Benz and Wagner [66]', marker_count: '~6'}
+          attribution: Benz and Wagner [66]
+          digitisation: deferred to a figure pass
+      - observation_id: nk24_figure20_calculated_weight_ratio_phase_diagram
+        type: figure
+        locator: {page: 15, published_page: 33700, pdf_page: 15, figure: '20'}
+        units: temperature in °C; composition as weight ratio as printed
+        values:
+          method_class: model_derived
+          quantity: transition_temperature
+          species: [CaO, SiO2]
+          phase: CaO–SiO2 phase diagram
+          temperature_as_printed: Temperature, °C on y axis
+          axes_as_printed: {x: 'weight ratio SiO2/(CaO+SiO2)', y: 'Temperature, °C'}
+          caption_as_printed: Calculated CaO–SiO2 phase diagram in weight ratio using the present optimization.
+          panels: [single]
+          series:
+            - {series_as_printed: 'Present optimization', attribution: 'Nekhoroshev et al.', marker_count: 0}
+          attribution: Nekhoroshev et al., present optimization
+          digitisation: deferred to a figure pass
+  SiO2:
+    observations:
+      - observation_id: nk24_cs1_liquid_sio2
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS1 Liquid Slag', column: SiO2}
+        phase: glass
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS1}, locator: {page: 4, table: '3', row: CS1}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Paper reports slow reaction of glassy liquids during brine quenching but does not claim preservation or alteration'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS1}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1500, value: 63.9, sample_id: CS1}
+        uncertainty: '±0.07 mol%; confidence level not stated'
+      - observation_id: nk24_cs1_cristobalite_sio2
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS1 Cristobalite', column: SiO2}
+        phase: cr
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS1}, locator: {page: 4, table: '3', row: CS1}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS1}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1500, value: 99.7, sample_id: CS1}
+        uncertainty: '±0.09 mol%; confidence level not stated'
+      - observation_id: nk24_cs2_liquid_sio2
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS2 Liquid Slag', column: SiO2}
+        phase: glass
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS2}, locator: {page: 4, table: '3', row: CS2}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Paper reports slow reaction of glassy liquids during brine quenching but does not claim preservation or alteration'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS2}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1550, value: 65.3, sample_id: CS2}
+        uncertainty: '±0.32 mol%; confidence level not stated'
+      - observation_id: nk24_cs2_cristobalite_sio2
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS2 Cristobalite', column: SiO2}
+        phase: cr
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS2}, locator: {page: 4, table: '3', row: CS2}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS2}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1550, value: 99.8, sample_id: CS2}
+        uncertainty: '±0.01 mol%; confidence level not stated'
+      - observation_id: nk24_cs3_liquid_sio2
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS3 Liquid Slag', column: SiO2}
+        phase: glass
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS3}, locator: {page: 4, table: '3', row: CS3}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Paper reports slow reaction of glassy liquids during brine quenching but does not claim preservation or alteration'}}
+          coexisting_phases: {state: {tag: value, value: 'Liquid Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS3}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1600, value: 67.3, sample_id: CS3}
+        uncertainty: '±0.14 mol%; confidence level not stated'
+      - observation_id: nk24_cs4_slag_sio2
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS4 Slag', column: SiO2}
+        phase: glass
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS4}, locator: {page: 4, table: '3', row: CS4}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Paper reports slow reaction of glassy liquids during brine quenching but does not claim preservation or alteration'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Cristobalite'}, locator: {page: 4, table: '3', row: CS4}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1680, value: 71.4, sample_id: CS4}
+        uncertainty: '±0.13 mol%; confidence level not stated'
+      - observation_id: nk24_cs5_slag_sio2
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS5 Slag', column: SiO2}
+        phase: glass
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS5}, locator: {page: 4, table: '3', row: CS5}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Paper reports slow reaction of glassy liquids during brine quenching but does not claim preservation or alteration'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, table: '3', row: CS5}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1480, value: 58.2, sample_id: CS5}
+        uncertainty: '±0.07 mol%; confidence level not stated'
+      - observation_id: nk24_cs5_ps_woll_sio2
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS5 Pseudowollastonite', column: SiO2}
+        phase: cr
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS5}, locator: {page: 4, table: '3', row: CS5}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, table: '3', row: CS5}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1480, value: 49.9, sample_id: CS5}
+        uncertainty: '±0.08 mol%; confidence level not stated'
+      - observation_id: nk24_cs6_slag_sio2
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS6 Slag', column: SiO2}
+        phase: glass
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS6}, locator: {page: 4, table: '3', row: CS6}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Paper reports slow reaction of glassy liquids during brine quenching but does not claim preservation or alteration'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, table: '3', row: CS6}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1465, value: 43.3, sample_id: CS6}
+        uncertainty: '±0.14 mol%; confidence level not stated'
+      - observation_id: nk24_cs6_ps_woll_sio2
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS6 Pseudowollastonite', column: SiO2}
+        phase: cr
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS6}, locator: {page: 4, table: '3', row: CS6}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + Pseudowollastonite'}, locator: {page: 4, table: '3', row: CS6}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1465, value: 50.0, sample_id: CS6}
+        uncertainty: '±0.12 mol%; confidence level not stated'
+      - observation_id: nk24_cs7_slag_sio2
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS7 Slag', column: SiO2}
+        phase: glass
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS7}, locator: {page: 4, table: '3', row: CS7}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Paper reports slow reaction of glassy liquids during brine quenching but does not claim preservation or alteration'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + α-C2S'}, locator: {page: 4, table: '3', row: CS7}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1465, value: 43.2, sample_id: CS7}
+        uncertainty: '±0.27 mol%; confidence level not stated'
+      - observation_id: nk24_cs7_alpha_c2s_sio2
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS7 α-C2S', column: SiO2}
+        phase: cr
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS7}, locator: {page: 4, table: '3', row: CS7}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag + α-C2S'}, locator: {page: 4, table: '3', row: CS7}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1465, value: 33.2, sample_id: CS7}
+        uncertainty: '±0.12 mol%; confidence level not stated'
+      - observation_id: nk24_cs8_slag1_sio2
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS8 Slag1*', column: SiO2}
+        phase: glass
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS8}, locator: {page: 4, table: '3', row: CS8}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Paper reports slow reaction of glassy liquids during brine quenching but does not claim preservation or alteration'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag1* + Slag2* + Cristobalite'}, locator: {page: 4, table: '3', row: CS8}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1697, value: 72.8, sample_id: CS8}
+        uncertainty: '±0.17 mol%; confidence level not stated'
+      - observation_id: nk24_cs8_slag2_sio2
+        type: equilibrium_phase_composition
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS8 Slag2*', column: SiO2}
+        phase: glass
+        units: mol% as printed
+        point_conditions:
+          sample_id: {state: {tag: value, value: CS8}, locator: {page: 4, table: '3', row: CS8}}
+          temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Overall temperature accuracy estimated ±3 K'}}
+          quench_state: {state: {tag: value, value: not_stated}, locator: {page: 3, published_page: 33688, section: 'Methodology', note: 'Paper reports slow reaction of glassy liquids during brine quenching but does not claim preservation or alteration'}}
+          coexisting_phases: {state: {tag: value, value: 'Slag1* + Slag2* + Cristobalite'}, locator: {page: 4, table: '3', row: CS8}}
+        values: {quantity: equilibrium_phase_composition, method_class: measured_direct, basis_as_published: 'SiO2 component in phase, mol%', T_C: 1697, value: 99.0, sample_id: CS8}
+        uncertainty: '±0.16 mol%; confidence level not stated'
+      - observation_id: nk24_cs1_cristobalite_liquidus
+        type: transition_point
+        phase: l
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: CS1, note: Liquid Slag + Cristobalite}
+        units: °C as printed; liquid composition mol% as printed
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_direct
+          evidence_class: measured_direct
+          composition_mole_fraction: {CaO: 0.361, SiO2: 0.639}
+          composition_as_published: {CaO_mol_percent: 36.1, SiO2_mol_percent: 63.9}
+          points:
+            - T_C: 1500
+              point_conditions:
+                sample_id: {state: {tag: value, value: CS1}, locator: {page: 4, published_page: 33689, table: '3', row: CS1}}
+                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
+                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Cristobalite}}, locator: {page: 4, published_page: 33689, table: '3', row: CS1}}
+        uncertainty: '±3 K overall temperature accuracy; confidence level not stated'
+      - observation_id: nk24_cs2_cristobalite_liquidus
+        type: transition_point
+        phase: l
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: CS2, note: Liquid Slag + Cristobalite}
+        units: °C as printed; liquid composition mol% as printed
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_direct
+          evidence_class: measured_direct
+          composition_mole_fraction: {CaO: 0.347, SiO2: 0.653}
+          composition_as_published: {CaO_mol_percent: 34.7, SiO2_mol_percent: 65.3}
+          points:
+            - T_C: 1550
+              point_conditions:
+                sample_id: {state: {tag: value, value: CS2}, locator: {page: 4, published_page: 33689, table: '3', row: CS2}}
+                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
+                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Cristobalite}}, locator: {page: 4, published_page: 33689, table: '3', row: CS2}}
+        uncertainty: '±3 K overall temperature accuracy; confidence level not stated'
+      - observation_id: nk24_cs3_cristobalite_liquidus
+        type: transition_point
+        phase: l
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: CS3, note: Liquid Slag + Cristobalite; solid composition too small to measure}
+        units: °C as printed; liquid composition mol% as printed
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_direct
+          evidence_class: measured_direct
+          composition_mole_fraction: {CaO: 0.327, SiO2: 0.673}
+          composition_as_published: {CaO_mol_percent: 32.7, SiO2_mol_percent: 67.3}
+          points:
+            - T_C: 1600
+              point_conditions:
+                sample_id: {state: {tag: value, value: CS3}, locator: {page: 4, published_page: 33689, table: '3', row: CS3}}
+                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
+                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Cristobalite}}, locator: {page: 4, published_page: 33689, table: '3', row: CS3}}
+        uncertainty: '±3 K overall temperature accuracy; confidence level not stated'
+      - observation_id: nk24_cs4_cristobalite_liquidus
+        type: transition_point
+        phase: l
+        regime: quench_equilibration
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: CS4, note: Slag + Cristobalite; solid composition too small to measure}
+        units: °C as printed; liquid composition mol% as printed
+        values:
+          quantity: transition_temperature
+          property_kind: liquidus
+          method_class: measured_direct
+          evidence_class: measured_direct
+          composition_mole_fraction: {CaO: 0.286, SiO2: 0.714}
+          composition_as_published: {CaO_mol_percent: 28.6, SiO2_mol_percent: 71.4}
+          points:
+            - T_C: 1680
+              point_conditions:
+                sample_id: {state: {tag: value, value: CS4}, locator: {page: 4, published_page: 33689, table: '3', row: CS4}}
+                temperature_uncertainty_K: {state: {tag: value, value: {kind: point, point: '3'}}, locator: {page: 3, published_page: 33688, section: Methodology, note: 'Overall temperature accuracy estimated ±3 K'}}
+                saturation_phase_as_printed: {state: {tag: value, value: {printed_phase: Cristobalite}}, locator: {page: 4, published_page: 33689, table: '3', row: CS4}}
+        uncertainty: '±3 K overall temperature accuracy; confidence level not stated'
+    context:
+      - observation_id: nk24_cs8_cristobalite_composition_unavailable
+        type: refusal
+        locator: {page: 4, published_page: 33689, pdf_page: 4, table: '3', row: 'CS8 Cristobalite'}
+        units: mol% as printed
+        values:
+          quantity: equilibrium_phase_composition
+          printed_text: n/a**
+          composition: {state: {tag: unknown, reason: 'No accurate measurement; metastable phase expected to disappear with more equilibration time'}, locator: {page: 4, table: '3', row: 'CS8 Cristobalite'}}
