@@ -573,6 +573,34 @@ def _source_files(source: str | Path, corpus_root: Path) -> tuple[str, list[Path
     return sid, files
 
 
+def _column_headers(
+    header_rows: list[list[str]], numeric_columns: set[int], width: int
+) -> list[str]:
+    leaf_headers = header_rows[-1] if header_rows else []
+    repeated_numeric_headers = Counter(
+        leaf_headers[column].strip()
+        for column in numeric_columns
+        if column < len(leaf_headers) and leaf_headers[column].strip()
+    )
+    headers = []
+    for column in range(width):
+        parts = [row[column] for row in header_rows if column < len(row)]
+        leaf = leaf_headers[column].strip() if column < len(leaf_headers) else ""
+        if (
+            column in numeric_columns
+            and repeated_numeric_headers[leaf] > 1
+            and column > 0
+            and column - 1 < len(leaf_headers)
+            and column - 1 not in numeric_columns
+            and leaf_headers[column - 1].strip()
+        ):
+            # Paired species/value tables put the phase heading over the species
+            # cell and repeat one generic value heading over each numeric cell.
+            parts = [leaf_headers[column - 1].strip(), leaf]
+        headers.append(" ".join(parts).strip())
+    return headers
+
+
 def _render_table(
     item: Mapping[str, Any],
     *,
@@ -596,6 +624,11 @@ def _render_table(
     header_rows = [
         [cell.text for cell in row] for row in grid[:header_count]
     ]
+    column_headers = _column_headers(
+        header_rows,
+        numeric_columns,
+        max((len(row) for row in grid), default=0),
+    )
 
     with csv_path.open("w", encoding="utf-8", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=_CSV_FIELDS, lineterminator="\n")
@@ -639,7 +672,7 @@ def _render_table(
         "columns": [
             {
                 "column": column + 1,
-                "header": " ".join(row[column] for row in header_rows).strip(),
+                "header": column_headers[column],
                 "numeric": column in numeric_columns,
             }
             for column in range(max((len(row) for row in grid), default=0))

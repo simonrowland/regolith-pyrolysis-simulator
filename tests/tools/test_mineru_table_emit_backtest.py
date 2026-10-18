@@ -17,6 +17,7 @@ FIXTURES = Path(__file__).parent / "fixtures" / "mineru-table-emit"
 EXTRACTS = Path(__file__).resolve().parents[2] / "data" / "literature" / "extracts"
 DEFAULT_CORPUS = Path.home() / "Repos" / "regolith-corpus"
 MAPPINGS = sorted(FIXTURES.glob("*.mapping.yaml"))
+HEADER_FIXTURES = Path(__file__).parent / "fixtures" / "mineru-table-header"
 
 
 def _corpus_roots() -> tuple[Path, Path]:
@@ -488,6 +489,43 @@ def test_wrong_printed_scale_direction_fails_landed_value_comparison(
         counts - emitted.get(key, Counter())
         for key, counts in expected.items()
     ), "the wrong direction unexpectedly reproduces landed values"
+
+
+def test_shornikov_2016_spanning_headers_resolve_each_gibbs_column(
+    tmp_path: Path,
+) -> None:
+    mapping_path = HEADER_FIXTURES / "shornikov-2016-cao-mgo-silicate.mapping.yaml"
+    mapping = yaml.safe_load(mapping_path.read_text(encoding="utf-8"))
+    corpus_root, raw_root = _corpus_roots()
+    source_id = mapping["source_id"]
+    source = _source_dir(corpus_root, raw_root, source_id)
+    if not source.is_dir():
+        pytest.skip(f"MinerU source directory is absent for {source_id}: {source}")
+    draft_dir = _convert_source(source, source_id, tmp_path, raw_root)
+    document = draft.emit_extract(
+        draft_dir, mapping_path, tmp_path / "shornikov-2016.yaml"
+    )
+
+    expected_headers = {
+        2: "Solid phases $\\Delta_f G^{\\circ}_{2000},$  kJ/mole",
+        4: "Liquid phases $\\Delta_f G^{\\circ}_{2000},$  kJ/mole",
+        6: "Vapor species $\\Delta_f G^{\\circ}_{2000},$  kJ/mole",
+    }
+    seen: Counter[int] = Counter()
+    for block in (document.get("species") or {}).values():
+        for observation in block.get("observations") or []:
+            match = re.search(
+                r"_p002_t02_r\d+_c(?P<column>\d+)$",
+                str(observation.get("observation_id") or ""),
+            )
+            if not match:
+                continue
+            column = int(match.group("column"))
+            assert column in expected_headers
+            assert observation["locator"]["column_header"] == expected_headers[column]
+            seen[column] += 1
+
+    assert seen == Counter({2: 13, 4: 8, 6: 17})
 
 
 def test_backtest_rejects_extra_cells_and_same_key_column_swaps(
