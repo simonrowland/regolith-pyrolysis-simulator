@@ -658,65 +658,13 @@ def test_logged_refusal_extrapolates_ln_gamma_and_hold_does_not(
     assert beyond_notice["flag"] == "extrapolation_capped_frozen"
 
 
-_CALLLOG_ROOT = Path(
-    "/Users/simonrowland/Repos/regolith-pyrolysis-simulator/docs-private/"
-    "research/2026-10-17-rump-collapse-541d69c/calllog"
-)
-_C2B7B4E_SRC = (
-    "/Users/simonrowland/.cache/regolith-engine/oimcc-c2b7b4e/src"
+_BRIDGE_REFERENCE = json.loads(
+    (Path(__file__).parent / "fixtures" / "openimcc_temperature_bridge.json").read_text()
 )
 
 
 def _call_record(engine: str, index: int) -> dict:
-    path = next((_CALLLOG_ROOT / engine).glob("*.jsonl"))
-    with path.open() as handle:
-        for record_index, line in enumerate(handle):
-            if record_index == index:
-                return json.loads(line)
-    raise AssertionError(f"{engine} call log has no record {index}")
-
-
-def _c2b7b4e_effective_gammas(composition: dict, temperature_K: float) -> dict:
-    """Single-cation gamma from a fresh c2b7b4e solve, not from this tree."""
-
-    script = r"""
-import json, sys
-sys.path.insert(0, sys.argv[1])
-sys.path.insert(1, sys.argv[2])
-from simulator.chemistry.melt_activity import single_cation_mole_fractions
-from simulator.melt_backend.openimcc_bridge import evaluate_cleaned_melt
-item = json.loads(sys.stdin.read())
-try:
-    cleaned = evaluate_cleaned_melt(
-        item["composition"], item["T"], allow_extrapolation=False,
-    )
-    fractions = single_cation_mole_fractions(item["composition"])
-    gammas = {
-        oxide: float(activity) / float(fractions[oxide])
-        for oxide, activity in cleaned.single_cation_activities.items()
-        if float(fractions.get(oxide, 0.0)) > 0.0
-    }
-    print(json.dumps({"ok": True, "gammas": gammas}))
-except Exception as exc:
-    print(json.dumps({"ok": False, "err": f"{type(exc).__name__}: {exc}"[:400]}))
-"""
-    env = os.environ.copy()
-    env["PYTHONPATH"] = _C2B7B4E_SRC
-    env.setdefault("MPLCONFIGDIR", "/private/tmp/claude-501/main-review/mplcache")
-    completed = subprocess.run(
-        [
-            sys.executable, "-c", script, _C2B7B4E_SRC, str(REPO_ROOT),
-        ],
-        input=json.dumps({"composition": composition, "T": temperature_K}),
-        text=True,
-        capture_output=True,
-        env=env,
-        check=False,
-    )
-    assert completed.returncode == 0, completed.stderr
-    payload = json.loads(completed.stdout)
-    assert payload["ok"], payload
-    return payload["gammas"]
+    return _BRIDGE_REFERENCE["records"][f"{engine}:{index}"]
 
 
 def _reference_regular_solution_gamma(
@@ -813,7 +761,7 @@ def test_refused_calls_use_same_composition_temperature_bridge() -> None:
     assert len(probe_temperatures) == 2
     reference_observations = []
     for probe_T in probe_temperatures:
-        gammas = _c2b7b4e_effective_gammas(refused_65["composition"], probe_T)
+        gammas = _BRIDGE_REFERENCE["c2b7b4e_call_65_probe_gammas"][str(probe_T)]
         reference_observations.append((probe_T, gammas["SiO2"]))
     reference = _reference_regular_solution_gamma(
         reference_observations, refused_65["T_K"],
@@ -1745,7 +1693,7 @@ def test_non_cr_mn_projection_still_uses_one_percent_threshold() -> None:
         _request(composition, CAP_PLUS_T_K, high_t_melt_activity="openimcc")
     )
     high_t = result.diagnostic["high_t_melt_activity"]
-    assert high_t["provider"] == "constant_gamma"
+    assert high_t["provider"] == "openimcc"
     assert high_t["fallback_reason"]["code"] == (
         "openimcc_projection_over_threshold"
     )
@@ -1777,26 +1725,51 @@ def test_cr_mn_relaxation_does_not_change_other_projection_gate(
     assert refusal.value.code == "openimcc_projection_over_threshold"
 
 
-def test_projection_over_one_percent_refuses_and_provider_flags_fallback() -> None:
+def test_projection_over_one_percent_refuses_and_provider_solves_projected(
+    monkeypatch,
+) -> None:
     composition = _moles_from_wt(_projected_weights(over_threshold=True))
     with pytest.raises(OpenImccCompositionPolicyRefusal) as refusal:
         evaluate_cleaned_melt(composition, CAP_PLUS_T_K)
     assert refusal.value.code == "openimcc_projection_over_threshold"
     assert "composition_projection_classification" in refusal.value.diagnostics
 
-    result = _provider().dispatch(
-        _request(composition, CAP_PLUS_T_K, high_t_melt_activity="openimcc")
-    )
+    _, projected = openimcc_bridge_module._cleaned_melt_projection(composition)
+    expected = evaluate_cleaned_melt(projected, CAP_PLUS_T_K)
+    certified = _provider().dispatch(_history_request(BASE_MELT_MOL, 2400.65, 1))
+    previous = certified.diagnostic["high_t_melt_activity"]
+
+    def no_numerical_continuation(*args, **kwargs):
+        pytest.fail("composition policy refusal entered numerical continuation")
+
+    monkeypatch.setattr(vapor_pressure_module, "_same_composition_temperature_bridge", no_numerical_continuation)
+    monkeypatch.setattr(vapor_pressure_module, "_continued_certified_effective_gamma", no_numerical_continuation)
+    result = _provider().dispatch(_history_request(composition, CAP_PLUS_T_K, 2, previous))
     high_t = result.diagnostic["high_t_melt_activity"]
     assert result.status == "ok"
-    assert high_t["provider"] == "constant_gamma"
+    assert high_t["provider"] == "openimcc"
     assert high_t["fallback"] is True
     assert high_t["authority"] == "extrapolated"
     assert high_t["fallback_reason"]["code"] == "openimcc_projection_over_threshold"
-    assert any(
-        "openimcc_refused_constant_gamma_fallback" in source
-        for source in result.diagnostic["vapor_pressures_source"].values()
-    )
+    notice = high_t["projected_composition_solve"]
+    classifier = refusal.value.diagnostics["composition_projection_classification"]
+    assert notice["method"] == "projected_composition_solve"
+    assert notice["authority"] == "extrapolated"
+    assert notice["omitted_component_wt_pct"] == classifier["dropped_component_wt_pct"]
+    assert notice["omitted_total_wt_pct"] == classifier["dropped_total_wt_pct"]
+    assert notice["projection_threshold_wt_pct"] == 1.0
+    assert notice["temperature_K"] == CAP_PLUS_T_K
+    assert high_t["certified_effective_gamma_by_parent"] == previous["certified_effective_gamma_by_parent"]
+    assert not high_t.get("held_effective_gamma_by_parent")
+    for parent, activity in expected.single_cation_activities.items():
+        if parent == "K2O":
+            continue
+        selected = vapor_pressure_module._high_t_activity_for_parent(
+            parent, composition, temperature_K=CAP_PLUS_T_K, authority=high_t,
+        )
+        assert selected.activity == activity
+        assert selected.activity_model == "projected_composition_solve"
+        assert selected.effective_gamma * selected.x_single_cation == pytest.approx(activity)
     fallback_provenance = result.diagnostic[
         "vapor_pressure_numerator_provenance"
     ]
@@ -1806,6 +1779,49 @@ def test_projection_over_one_percent_refuses_and_provider_flags_fallback() -> No
         for row in fallback_provenance.values()
         if "composition_projection_classification" in row
     )
+    assert fallback_provenance["SiO"]["projected_composition_solve"] == notice
+    assert fallback_provenance["SiO"]["melt_activity_authority"] == "projected_composition_solve"
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.melt = SimpleNamespace(hour=1, campaign=CampaignPhase.C2A)
+    sim._note_high_t_melt_activity_fallback(high_t, fallback_provenance)
+    run_notice = sim.high_t_melt_activity_run_notice()
+    assert notice in run_notice["notices"]
+    assert "projected-composition" in _high_t_melt_activity_fallback_sentence(run_notice)
+
+
+def test_projected_nonconvergence_bridges_the_projected_composition(monkeypatch) -> None:
+    composition = _moles_from_wt(_projected_weights(over_threshold=True))
+    _, projected = openimcc_bridge_module._cleaned_melt_projection(composition)
+    evaluate = openimcc_bridge_module.evaluate_cleaned_melt
+    calls = []
+
+    def refuse_projected_at_actual_T(composition_mol, temperature_K, **kwargs):
+        calls.append((dict(composition_mol), temperature_K))
+        if composition_mol == projected and temperature_K == CAP_PLUS_T_K:
+            raise ImccNonconvergenceError("test projected numerical gap", {})
+        return evaluate(composition_mol, temperature_K, **kwargs)
+
+    monkeypatch.setattr(openimcc_bridge_module, "evaluate_cleaned_melt", refuse_projected_at_actual_T)
+    result = _provider().dispatch(_history_request(composition, CAP_PLUS_T_K, 1))
+    high_t = result.diagnostic["high_t_melt_activity"]
+    assert calls[0] == (composition, CAP_PLUS_T_K)
+    assert calls[1] == (projected, CAP_PLUS_T_K)
+    assert all(comp == projected for comp, _ in calls[2:])
+    assert high_t["fallback_reason"]["code"] == "imcc_nonconvergence"
+    assert high_t["projected_composition_solve"]["original_refusal"]["code"] == "openimcc_projection_over_threshold"
+    silica = high_t["held_effective_gamma_by_parent"]["SiO2"]
+    assert silica["method"] == "same_composition_T_bridge"
+    # The bridge's a(T) must be independent of the denominator used to
+    # report effective gamma; compare with its existing projected-bulk path.
+    reference = _provider().dispatch(_history_request(projected, CAP_PLUS_T_K, 1))
+    projected_activity = vapor_pressure_module._high_t_activity_for_parent(
+        "SiO2", projected, temperature_K=CAP_PLUS_T_K,
+        authority=reference.diagnostic["high_t_melt_activity"],
+    )
+    bulk_activity = vapor_pressure_module._high_t_activity_for_parent(
+        "SiO2", composition, temperature_K=CAP_PLUS_T_K, authority=high_t,
+    )
+    assert bulk_activity.activity == pytest.approx(projected_activity.activity, rel=1e-12)
 
 
 @pytest.mark.parametrize("parent, amount", [("NaCl", -1.0), ("MgO", -1.0), ("MgO", float("nan"))])
