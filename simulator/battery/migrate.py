@@ -1597,10 +1597,7 @@ def _value_from_plain(payload: object) -> Value:
         kwargs["expression_domain"] = str(payload["expression_domain"])
     if payload.get("unavailable_reason") is not None:
         kwargs["unavailable_reason"] = str(payload["unavailable_reason"])
-    kwargs["approximate"] = bool(
-        payload.get("approximate", False)
-        or (kind is ValueKind.POINT and payload.get("qualifier") == "approximate")
-    )
+    kwargs["approximate"] = bool(payload.get("approximate", False))
     return Value(**kwargs)
 
 
@@ -8561,6 +8558,10 @@ def _unavailable_selection(
     )
 
 
+def _is_approximate_qualifier(payload: Mapping[str, Any] | None) -> bool:
+    return payload is not None and payload.get("qualifier") == "approximate"
+
+
 def _point_selection(
     amount: Decimal,
     field_name: str,
@@ -8572,7 +8573,8 @@ def _point_selection(
         value=Value(
             ValueKind.POINT,
             point=amount,
-            approximate=bool(payload.get("approximate")),
+            approximate=bool(payload.get("approximate"))
+            or _is_approximate_qualifier(payload),
         ),
         field_name=field_name,
         unit_trail=unit_trail,
@@ -10111,26 +10113,29 @@ def _located_from_hit(
             )
             for key in ("inference", "qualifier", "note", "quote")
         )
-    approximate = (
+    approximate = _is_approximate_qualifier(mapping) or (
         is_pressure
-        and isinstance(mapping, Mapping)
         and (
             str(mapping.get("kind") or "").lower() in {"about_nominal", "approximate"}
             or bool(mapping.get("approximate"))
             or bool(_PRESSURE_NON_POINT_RE.search(own_printed))
         )
     )
-    state = (
-        State.of(si)
-        if isinstance(si, Value)
-        else State.of(
+    if isinstance(si, Value):
+        value = (
+            replace(si, approximate=True)
+            if approximate and si.kind is ValueKind.POINT
+            else si
+        )
+        state = State.of(value)
+    elif approximate:
+        state = State.of(
             _value_from_plain(
                 {"kind": ValueKind.POINT.value, "point": si, "approximate": True}
             )
         )
-        if approximate
-        else State.of(si)
-    )
+    else:
+        state = State.of(si)
     if non_point:
         state = State.unknown(
             f"extract {hit.entry.printed} is a bound or approximate value, not a point; "

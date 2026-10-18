@@ -470,6 +470,65 @@ def _migrate_real_extract(
     return migrate(root, write=write)
 
 
+def test_tachibana_approximate_author_estimate_reaches_residual_stratum(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
+        ScoreContext,
+        compile_residual,
+        flagged_strata,
+    )
+
+    result = _migrate_real_extract(
+        tmp_path, "tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml"
+    )
+    assert len(result.observations) == 6
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith(
+            "tachibana_1998_forsterite_hbd_alpha_assumption"
+        )
+    )
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == Decimal("0.1")
+    assert observation.value.approximate is True
+
+    context = ScoreContext(
+        works=result.works,
+        experiments=result.experiments,
+        observations=result.observations,
+        extract_review={observation.source_id or "": "reviewed"},
+    )
+    residual, _ = compile_residual(
+        observation, Engine.INTERNAL_ANALYTICAL, context=context
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert flagged_strata(residual.notices) == (
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
+    )
+
+
+def test_flemetakis_approximate_sample_mass_reaches_value_without_row_growth(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "ta-flemetakis-2024.yaml")
+
+    assert len(result.observations) == 72
+    sample_masses = [
+        experiment.sample.mass_kg.state.value
+        for experiment in result.experiments.values()
+        if experiment.sample is not None
+        and experiment.sample.mass_kg is not None
+        and experiment.sample.mass_kg.state.is_value
+        and experiment.sample.mass_kg.state.value.kind is ValueKind.POINT
+        and experiment.sample.mass_kg.state.value.point == Decimal("0.00004")
+    ]
+    assert len(sample_masses) == 1
+    assert sample_masses[0].approximate is True
+
+
 def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(
     tmp_path: Path,
 ) -> None:
@@ -2240,17 +2299,6 @@ def test_numeric_value_kind_plain_admission_pin(
     assert any(notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in decoded.notices) is (
         expected_status is AdmissionStatus.ADMITTED
     )
-
-
-def test_nested_approximate_value_qualifier_is_preserved() -> None:
-    from simulator.battery.migrate import _value_from_plain
-
-    value = _value_from_plain(
-        {"kind": "point", "point": "1.25", "qualifier": "approximate"}
-    )
-
-    assert value.point == Decimal("1.25")
-    assert value.approximate is True
 
 
 def test_missing_admission_status_keeps_unmeasured_row_pending(tmp_path: Path) -> None:
