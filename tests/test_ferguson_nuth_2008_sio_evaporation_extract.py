@@ -28,6 +28,17 @@ def test_table_rows_migrate_temperature_conditions_and_source_pins(
     assert check_all_fidelity_samples_match(document, label=str(EXTRACT)) == []
     points = document["species"]["SiO"]["observations"][0]["values"]["points"]
     assert len(points) == 42
+    context = {
+        item["observation_id"]: item
+        for item in document["species"]["SiO"]["context"]
+    }
+    fits = context["ferguson_nuth_2008_table2_fit_results"]["values"]["points"]
+    assert fits[0]["R"] == 0.019
+    assert fits[13]["delta_rxnH_kJ_mol"] == 360
+    prior = context["ferguson_nuth_2008_quoted_prior_evaporation_coefficients"]
+    fedkin = prior["values"]["quotations"][2]
+    assert fedkin["method_class"] == "quoted_attributed"
+    assert fedkin["value_range"] == {"kind": "interval", "low": 0.12, "high": 0.21}
 
     changed_pin = deepcopy(document)
     changed_pin["species"]["SiO"]["observations"][0]["values"]["points"][0][
