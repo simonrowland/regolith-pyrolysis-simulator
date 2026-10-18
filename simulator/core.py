@@ -436,6 +436,7 @@ from simulator.fe_redox import (
     CONVENTIONAL_IW_SOURCE,
     kress91_oxygen_demand_mol,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+    kress91_ln_fO2_temperature_delta,
     kress91_split,
     melt_mol_fractions_for_kress91,
     normalize_redox_state,
@@ -4107,6 +4108,98 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 doctrine_category=CATEGORY_MARK,
             )
 
+    def _carry_continuum_notice_through_source_duct(
+        self,
+        pre_closure_total_Pa: float,
+        live_flux,
+    ) -> None:
+        diagnostic = getattr(self, '_last_evaporation_flux_diagnostic', None)
+        if not isinstance(diagnostic, dict):
+            return
+        if diagnostic.get('continuum_extrapolation_notice'):
+            return
+        overhead_Pa = max(0.0, float(pre_closure_total_Pa))
+        if overhead_Pa <= 0.0:
+            return
+        from simulator.condensation import _knudsen_number
+        from simulator.evaporation import viscous_p_bulk_out_of_domain_diagnostic
+        from simulator.transport_regime import continuum_validity_refuses
+
+        carrier_resolver = getattr(self, '_resolve_condensation_carrier_gas', None)
+        carrier_gas = carrier_resolver() if callable(carrier_resolver) else 'N2'
+        pipe_diameter_m = float(
+            getattr(self.overhead_model, 'pipe_diameter_m', 0.12) or 0.12
+        )
+        gas_temperature_K = float(
+            getattr(self.overhead, 'headspace_temperature_K', 0.0)
+            or (self.melt.temperature_C + 273.15)
+        )
+        campaign_name = str(
+            getattr(getattr(self.melt, 'campaign', None), 'name', '') or ''
+        )
+        affected = tuple(
+            sorted(
+                str(species)
+                for species, rate in dict(
+                    getattr(live_flux, 'species_kg_hr', {}) or {}
+                ).items()
+                if float(rate) > 1.0e-12
+            )
+        )
+        kn_domain = _knudsen_number(
+            overhead_Pa,
+            max(gas_temperature_K, 1.0),
+            max(pipe_diameter_m, 0.0) or 0.12,
+            carrier_gas=carrier_gas,
+        )
+        domain_refusal = viscous_p_bulk_out_of_domain_diagnostic(
+            knudsen_number=kn_domain,
+            overhead_pressure_pa=overhead_Pa,
+            commanded_pressure_pa=max(
+                0.0,
+                float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0) * 100.0,
+            ),
+            pipe_diameter_m=pipe_diameter_m,
+            gas_temperature_K=gas_temperature_K,
+            carrier_gas=carrier_gas,
+            affected_species=affected,
+            campaign_name=campaign_name or None,
+            asking_site='engines.builtin.evaporation_flux',
+        )
+        if not (
+            domain_refusal
+            and continuum_validity_refuses(domain_refusal)
+            and domain_refusal.get('reason')
+            == 'viscous_p_bulk_transport_out_of_domain'
+        ):
+            return
+        notice = {
+            **{
+                key: value
+                for key, value in domain_refusal.items()
+                if key not in ('silent_zero_notes', 'evaporation_flux_kg_hr')
+            },
+            'status': 'extrapolated',
+            'authority_level': 'extrapolated',
+            'authority_class': 'extrapolated',
+            'doctrine_category': 2,
+            'ledger_yields_authorized': True,
+            'evaporation_flux_status': 'extrapolated',
+            'detail': (
+                str(domain_refusal.get('detail') or '')
+                + '; finite continuation of the same continuum fit; '
+                'not certified transitional transport'
+            ),
+        }
+        diagnostic['continuum_extrapolation_notice'] = notice
+        series = diagnostic.get('evaporation_series_resistance')
+        if isinstance(series, dict):
+            for species_diag in series.values():
+                if isinstance(species_diag, dict) and (
+                    'continuum_extrapolation_notice' not in species_diag
+                ):
+                    species_diag['continuum_extrapolation_notice'] = dict(notice)
+
     def _install_source_duct_surface(self, capacity_result) -> None:
         from simulator.capacity_coupling import SourceDuctConvergence
         from simulator.thermal_train import NoColdTrain
@@ -5664,6 +5757,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if self._melt_redox_temperature_shift_is_liquid(
             T_now, gate_authority=gate_authority,
         ):
+            # Inverse-at-T already includes the Kress91 T-shift. Call the
+            # pressure consumer on the installed actual total so redox
+            # readers stay on that owner (fold actual-total pin).
+            pressure_bar = floor_vacuum_pressure_bar(
+                float(self._melt_headspace_total_pressure_bar()),
+                floor_bar=self._vacuum_floor_bar(),
+            )
+            kress91_ln_fO2_temperature_delta(
+                float(reference_T_K) if reference_T_K is not None else T_now,
+                T_now,
+                reference_pressure_bar=pressure_bar,
+                target_pressure_bar=pressure_bar,
+            )
             reference_T_K = T_now
             return self._current_melt_redox_fO2_log(T_now), reference_T_K
         return self._current_melt_redox_fO2_log(), reference_T_K
@@ -14089,19 +14195,38 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if capacity_result is not None:
                 from simulator.thermal_train import NoColdTrain as _NoColdTrain
 
+                live_kwargs = {
+                    'overhead_partials_override_Pa': (
+                        capacity_result.partial_pressures_Pa
+                    ),
+                }
+                pre_closure_total_Pa = None
                 if isinstance(capacity_result.capacity, _NoColdTrain):
+                    pre_closure_total_Pa = (
+                        self._melt_headspace_total_pressure_bar() * 1.0e5
+                    )
                     self._record_source_duct_closure(capacity_result)
                     self._install_source_duct_surface(capacity_result)
                     self._reprice_native_fe_residual_at_installed_surface()
+                else:
+                    # FiniteCapacity Picard freezes the owner total. Live
+                    # repricing must use that same total, not the sum of the
+                    # Picard iterate, or the rate sets diverge and abort.
+                    live_kwargs['overhead_pressure_pa'] = (
+                        self._melt_headspace_total_pressure_bar() * 1.0e5
+                    )
                 live_raw_flux = self._calculate_evaporation(
                     equilibrium,
-                    overhead_partials_override_Pa=(
-                        capacity_result.partial_pressures_Pa
-                    ),
+                    **live_kwargs,
                 )
                 live_effective_flux = (
                     self._apply_analytic_evaporation_depletion(live_raw_flux)
                 )
+                if pre_closure_total_Pa is not None:
+                    self._carry_continuum_notice_through_source_duct(
+                        pre_closure_total_Pa,
+                        live_effective_flux,
+                    )
                 solved_rates = {
                     species: float(rate)
                     for species, rate in (
@@ -14115,8 +14240,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     if float(rate) > 1.0e-12
                 }
                 if not isinstance(capacity_result.capacity, _NoColdTrain):
-                    assert set(live_rates) == set(solved_rates)
-                    assert all(
+                    mismatched = set(live_rates) != set(solved_rates) or not all(
                         math.isclose(
                             live_rates[species],
                             solved_rates[species],
@@ -14125,6 +14249,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         )
                         for species in solved_rates
                     )
+                    if mismatched:
+                        from simulator.silent_zero import (
+                            CATEGORY_MARK,
+                            ZeroBecause,
+                            record_on_host,
+                        )
+
+                        record_on_host(
+                            self,
+                            ZeroBecause.OUT_OF_DOMAIN_MARKED,
+                            site='capacity_coupling.finite_capacity_live_solved_mismatch',
+                            field='evaporation_flux_kg_hr',
+                            detail=(
+                                'FiniteCapacity live flux at the Picard film '
+                                'diverged from the solved rates; last Picard '
+                                'iterate kept'
+                            ),
+                            doctrine_category=CATEGORY_MARK,
+                        )
                 committed_rates = (
                     live_rates
                     if isinstance(capacity_result.capacity, _NoColdTrain)

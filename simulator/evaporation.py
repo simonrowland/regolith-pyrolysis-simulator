@@ -772,6 +772,7 @@ class EvaporationMixin:
         *,
         gate_authority: Any = _RESOLVE_EVAPORATION_GATE_AUTHORITY,
         overhead_partials_override_Pa: Mapping[str, float] | None = None,
+        overhead_pressure_pa: float | None = None,
     ) -> EvaporationFlux:
         """
         Calculate evaporation flux using a series-resistance source.
@@ -1176,22 +1177,24 @@ class EvaporationMixin:
         # The dispatch-only helper centralises melt-derived T/P plumbing
         # so this call site stays in lock-step with the rest of the
         # simulator's kernel callers.
+        if overhead_pressure_pa is not None:
+            film_total_Pa = float(overhead_pressure_pa)
+        elif overhead_partials_override_Pa is not None:
+            # NoColdTrain source/duct: the override is the actual boundary
+            # mixture (carrier fill plus vapour). Summing it keeps the series
+            # film at that total; a vapour-only override would drop the carrier.
+            film_total_Pa = EvaporationMixin._evaporation_overhead_total_pressure_Pa(
+                self,
+                overhead_partials_Pa,
+            )
+        else:
+            film_total_Pa = self._melt_headspace_total_pressure_bar() * 1.0e5
         control_inputs, molar_masses_kg_mol = (
             EvaporationMixin._evaporation_flux_control_inputs(
                 self,
                 equilibrium,
                 overhead_partials_Pa=overhead_partials_Pa,
-                overhead_pressure_pa=(
-                    EvaporationMixin._evaporation_overhead_total_pressure_Pa(
-                        self,
-                        overhead_partials_Pa,
-                    )
-                    if overhead_partials_override_Pa is not None
-                    else self._melt_headspace_total_pressure_bar() * 1.0e5
-                ),
-                # Override is the actual boundary mixture (regulator/carrier
-                # fill plus vapour partials). Summing it keeps the series film
-                # at that total; a vapour-only override would drop the carrier.
+                overhead_pressure_pa=film_total_Pa,
                 vapour_batch_flux_pressures_Pa=vapor_pressures,
                 vapour_batch_report=batch_report,
                 vapour_batch_flux_overlay=flux_overlay_report,
