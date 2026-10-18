@@ -661,10 +661,27 @@ class PT0DeterminismStore:
         repair_notices: Sequence[Mapping[str, Any]] | None = None,
         redox_state: RedoxState | None = None,
     ) -> None:
-        if uncacheable_replay_disposition(sim):
-            self._mark_uncacheable_capture(sim)
-            return
-        if not _is_cacheable_gate_curve(curve):
+        active_record = getattr(
+            sim,
+            "_freeze_gate_liquid_fraction_cache",
+            None,
+        )
+        provider_outcome = (
+            active_record.get("provider_outcome")
+            if isinstance(active_record, Mapping)
+            else None
+        )
+        disposition = (
+            active_record.get("disposition", "live")
+            if isinstance(active_record, Mapping)
+            else "live"
+        )
+        if not gate_curve_memo_is_cacheable(
+            sim,
+            curve,
+            provider_outcome,
+            disposition=disposition,
+        ):
             self._mark_uncacheable_capture(sim)
             return
         redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
@@ -673,11 +690,6 @@ class PT0DeterminismStore:
             gate_curve_memo_origin_matches,
         )
 
-        active_record = getattr(
-            sim,
-            "_freeze_gate_liquid_fraction_cache",
-            None,
-        )
         if not (
             isinstance(active_record, Mapping)
             and active_record.get("disposition") in {"live", "memo-hit"}
@@ -2635,6 +2647,43 @@ class GateCurveProviderOutcome(str, Enum):
     FAILED = "failed"
 
 
+_GATE_CURVE_TRANSIENT_PROVIDER_REASONS = frozenset({
+    "engine_crash",
+    "engine_worker_timeout",
+    "engine_worker_unavailable",
+    "missing_binary",
+    "negative_convergence_evidence",
+    "no_convergence",
+    "nonzero_exit",
+    "not_converged",
+    "parse_empty_output",
+    "phase_mass_incomplete",
+    "smoke_equilibrium_timeout",
+    "subprocess_died",
+    "subprocess_fe_free_absolute_fo2_crash",
+    "system_output_missing",
+    "thermoengine_adapter_unavailable",
+    "timeout",
+    "warm_call_equilibrium_timeout",
+    "worker_pool_error",
+})
+
+_GATE_CURVE_STABLE_REFUSAL_REASONS = frozenset({
+    "clamped_operating_point",
+    "composition_projected",
+    "input_composition_projected",
+    "invalid_fo2_log",
+    "invalid_input",
+    "invalid_pressure_bar",
+    "non_finite_composition",
+    "out_of_domain",
+    "redox_state_not_expressible",
+    "subprocess_pressure_below_minimum",
+    "subprocess_temperature_below_minimum",
+    "unsupported_input",
+})
+
+
 def gate_curve_provider_outcome_for_status(
     status: str,
     diagnostic: Mapping[str, Any] | None = None,
@@ -2642,18 +2691,29 @@ def gate_curve_provider_outcome_for_status(
     """Classify outcomes by whether the cache key determines the result."""
 
     normalized_status = str(status).strip().lower()
+    reasons: list[str] = []
+    if isinstance(diagnostic, Mapping):
+        for field in (
+            "backend_status_reason",
+            "backend_failure_reason_code",
+            "reason",
+            "reason_refused",
+        ):
+            value = diagnostic.get(field)
+            if value is not None and str(value).strip():
+                reasons.append(str(value).strip().lower())
+    if any(
+        reason in _GATE_CURVE_TRANSIENT_PROVIDER_REASONS
+        for reason in reasons
+    ):
+        return GateCurveProviderOutcome.FAILED
     if normalized_status == "ok":
         return GateCurveProviderOutcome.PRODUCED
     if normalized_status in {"out_of_domain", "unsupported"}:
-        return GateCurveProviderOutcome.STABLE_REFUSAL
-    if normalized_status == "refused" and isinstance(diagnostic, Mapping):
-        reason = str(
-            diagnostic.get("reason")
-            or diagnostic.get("reason_refused")
-            or diagnostic.get("backend_status_reason")
-            or ""
-        ).strip().lower()
-        if reason in {"invalid_input", "out_of_domain", "unsupported_input"}:
+        if not reasons or all(
+            reason in _GATE_CURVE_STABLE_REFUSAL_REASONS
+            for reason in reasons
+        ):
             return GateCurveProviderOutcome.STABLE_REFUSAL
     return GateCurveProviderOutcome.FAILED
 

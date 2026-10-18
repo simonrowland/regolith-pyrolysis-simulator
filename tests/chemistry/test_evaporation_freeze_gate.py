@@ -5355,9 +5355,52 @@ def test_missing_gate_provider_outcome_is_not_reusable():
         ('out_of_domain', {}, GateCurveProviderOutcome.STABLE_REFUSAL),
         ('unsupported', {}, GateCurveProviderOutcome.STABLE_REFUSAL),
         (
+            'out_of_domain',
+            {'backend_status_reason': 'invalid_input'},
+            GateCurveProviderOutcome.STABLE_REFUSAL,
+        ),
+        (
+            'out_of_domain',
+            {'backend_status_reason': 'unrecognized'},
+            GateCurveProviderOutcome.FAILED,
+        ),
+        (
+            'out_of_domain',
+            {'backend_status_reason': 'timeout'},
+            GateCurveProviderOutcome.FAILED,
+        ),
+        (
+            'out_of_domain',
+            {'backend_status_reason': 'subprocess_died'},
+            GateCurveProviderOutcome.FAILED,
+        ),
+        (
+            'out_of_domain',
+            {'backend_status_reason': 'no_convergence'},
+            GateCurveProviderOutcome.FAILED,
+        ),
+        (
+            'unsupported',
+            {'backend_status_reason': 'unrecognized'},
+            GateCurveProviderOutcome.FAILED,
+        ),
+        (
+            'ok',
+            {'backend_status_reason': 'timeout'},
+            GateCurveProviderOutcome.FAILED,
+        ),
+        (
+            'ok',
+            {
+                'backend_status_reason': 'unrecognized',
+                'reason': 'timeout',
+            },
+            GateCurveProviderOutcome.FAILED,
+        ),
+        (
             'refused',
             {'reason': 'invalid_input'},
-            GateCurveProviderOutcome.STABLE_REFUSAL,
+            GateCurveProviderOutcome.FAILED,
         ),
         (
             'refused',
@@ -6058,6 +6101,7 @@ def test_gate_capture_rejects_foreign_origin_with_valid_consumer_receipt(
         'liquidus_T_C': 1300.0,
     }
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
+    record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
         **record,
@@ -6140,6 +6184,7 @@ def test_gate_capture_requires_curve_associated_with_active_record(
         'liquidus_T_C': 1300.0,
     }
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
+    record['provider_outcome'] = GateCurveProviderOutcome.FAILED
     sim._freeze_gate_liquid_fraction_cache = {
         'key': _freeze_gate_key_for_current_state(sim),
         **record,
@@ -6148,6 +6193,20 @@ def test_gate_capture_requires_curve_associated_with_active_record(
 
     control_store = PT0DeterminismStore(
         'capture', db_path=tmp_path / 'associated-curve.db'
+    )
+    failed_store = PT0DeterminismStore(
+        'capture', db_path=tmp_path / 'failed-provider.db'
+    )
+    failed_store.capture_gate_curve(
+        sim,
+        fO2_log=fO2_log,
+        curve=curve,
+    )
+    assert failed_store.summary()['capture_calls'] == 0
+    assert failed_store.summary()['entries'] == 0
+
+    sim._freeze_gate_liquid_fraction_cache['provider_outcome'] = (
+        GateCurveProviderOutcome.PRODUCED
     )
     control_store.capture_gate_curve(
         sim,
@@ -7235,6 +7294,22 @@ def test_freeze_gate_backend_fallback_receives_redox_state(
             'unavailable',
             {'backend_status': 'unavailable'},
             id='initialization-failure',
+        ),
+        pytest.param(
+            'out_of_domain',
+            {
+                'backend_status': 'out_of_domain',
+                'backend_status_reason': 'timeout',
+            },
+            id='timeout-retries-provider',
+        ),
+        pytest.param(
+            'out_of_domain',
+            {
+                'backend_status': 'out_of_domain',
+                'backend_status_reason': 'subprocess_died',
+            },
+            id='subprocess-death-retries-provider',
         ),
     ],
 )
