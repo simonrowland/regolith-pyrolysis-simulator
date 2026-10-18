@@ -115,13 +115,21 @@ def test_shornikov_2023_table_and_deferred_figures_migrate_as_context() -> None:
         if context["observation_id"]
         == "shornikov_2023_yakovlev_murchison_comparison_context"
     )
-    assert murchison["values"]["method_class"] == "quoted_attributed"
-    assert murchison["values"]["attribution"] == "Yakovlev et al. (1987)"
+    assert murchison["values"]["method_class"] == "quoted_unattributed"
+    assert "attribution" not in murchison["values"]
     assert murchison["values"]["sample_as_printed"] == "Murchison chondrite (CM2)"
     assert murchison["values"]["temperature_ranges_K_as_printed"] == {
         "higher_volatility": "1800–2100",
         "almost_complete_evaporation": "2200–2300",
     }
+    assert murchison["values"]["comparison_as_printed"] == (
+        "A comparison of the temperature dependencies of partial pressures "
+        "of vapor species over CAIs melts of types A and B with that for the "
+        "case of Murchison chondrite (Fig. 2C) shows that the latter has a "
+        "slightly higher volatility at 1800–2100 K, due to the high content "
+        "of magnesium and silicon oxides in the melt (compared with CAIs "
+        "types A and B) and almost completely evaporates at 2200–2300 K."
+    )
 
     figure_records = [
         context

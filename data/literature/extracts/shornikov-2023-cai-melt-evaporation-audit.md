@@ -21,7 +21,7 @@ The `mineru_table_draft` mapping emits all 12 cells. Its `compare` command repor
 
 ## Text and figure context
 
-The extract records the printed CAI age, modal mineral proportions, Efremovka CV3 sample identity, Murchison CM2 comparison, KEMS method and detected ions, and the article's qualitative evaporation results. The Murchison volatility ranges are a separate quoted-attributed context record for Yakovlev et al. (1987). It does not reconstruct a complete melt composition: amounts for the listed additional oxides are typed unknown because the article does not publish them.
+The extract records the printed CAI age, modal mineral proportions, Efremovka CV3 sample identity, Murchison CM2 comparison, KEMS method and detected ions, and the article's qualitative evaporation results. The Murchison volatility ranges are this article's own comparison text on PDF page 5 / published page 10, retained as `quoted_unattributed` context. Yakovlev et al. (1987) is cited on PDF page 4 as the source of the Murchison evaporation data and remains on the figure-series attributions. The extract does not reconstruct a complete melt composition: amounts for the listed additional oxides are typed unknown because the article does not publish them.
 
 Figures 1–3 are recorded only under the relevant species sibling `context[]` containers. Their typed quantity and identity, phase, temperature, printed axes, captions, panels, series, marker counts, locators, and attributions are retained. Marker counts were tallied from the 600 dpi page renders; no coordinates or figure values were read. Every figure record says `digitisation: deferred to a figure pass` and contains no numeric points.
 
