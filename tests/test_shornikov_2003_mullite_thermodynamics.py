@@ -19,7 +19,8 @@ EXTRACT = (
 def _observations(document: dict) -> dict[str, dict]:
     return {
         row["observation_id"]: row
-        for row in document["species"]["Al6Si2O13"]["observations"]
+        for block in document["species"].values()
+        for row in block["observations"]
     }
 
 
@@ -40,10 +41,31 @@ def _assert_render_pins(document: dict) -> None:
     assert rows[
         "shornikov_2003_mullite_thermodynamics_text_2100k_gibbs_range"
     ]["values"]["range"] == ["-10", "-5"]
+    sentence = rows[
+        "shornikov_2003_mullite_thermodynamics_text_ref66_melt_gibbs_extrapolation"
+    ]
+    assert sentence["values"]["value_as_printed"] == "–12"
+    assert sentence["values"]["value"] == "-12"
+    assert sentence["phase"] == "l"
+    assert "T_K" not in sentence["values"]
+    assert sentence["point_conditions"]["temperature_K"]["state"]["tag"] == "unknown"
+    assert "temperature of fusion of mullite" in sentence["locator"]["note"]
 
 
 def _assert_figure_pins(document: dict) -> None:
     rows = _observations(document)
+    figure_experiments = [
+        experiment
+        for experiment in document["experiments"]
+        if experiment["experiment_id"].startswith(
+            "shornikov_2003_mullite_figure1_series_"
+        )
+    ]
+    assert len(figure_experiments) == 23
+    for experiment in figure_experiments:
+        assert "table" not in experiment["locator"]
+        for condition in experiment.get("conditions", {}).values():
+            assert "table" not in condition["locator"]
     expected = {
         1: ("-1.8", 1070.64, [662, 503]),
         4: ("-5.0", 1825.19, [1770, 840]),
@@ -62,12 +84,17 @@ def _assert_figure_pins(document: dict) -> None:
         assert len(row["values"]["figure_read"]["reads"]) == 2
         assert row["point_conditions"]["temperature_K"]["state"]["tag"] == "value"
         assert row["point_conditions"]["temperature_K"]["locator"]["figure"] == "1"
+    for row_id, row in rows.items():
+        if "_fig1_" not in row_id:
+            continue
+        assert "table" not in row["locator"]
+        assert "table" not in row["point_conditions"]["temperature_K"]["locator"]
 
 
 def test_shornikov_2003_mullite_rows_and_render_pins() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     rows = _observations(document)
-    assert len(rows) == 93
+    assert len(rows) == 94
     assert sum("_p002_t01_" in row_id and row_id.endswith("_c04") for row_id in rows) == 31
     assert sum("_p002_t01_" in row_id and row_id.endswith("_c05") for row_id in rows) == 17
     assert sum("_p004_t02_" in row_id and row_id.endswith("_c03") for row_id in rows) == 7
