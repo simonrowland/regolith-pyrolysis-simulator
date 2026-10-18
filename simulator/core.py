@@ -9215,6 +9215,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
             return self._record_equilibrium_status(self._internal_analytical_equilibrium())
 
+        backend_name = getattr(self.backend, 'backend_name', None)
+        producer = (
+            backend_name
+            if backend_name and backend_name != 'unknown'
+            else getattr(self.backend, 'name', None)
+            or backend_name
+            or type(self.backend).__name__
+        )
+        if getattr(self, 'atom_ledger', None) is None:
+            # F2 requires inventory, never a stored mirror as a substitute.
+            self._last_backend_error = (
+                f'{producer} equilibrium requires an AtomLedger for '
+                'intrinsic melt redox'
+            )
+            self._disable_backend_after_failure()
+            raise RuntimeError(self._last_backend_error)
+
         diagnostic_silicate_equilibrium = False
         try:
             backend_composition_by_account = (
@@ -9363,14 +9380,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and not diagnostic_silicate_equilibrium
             and self._equilibrium_result_has_phase_species(result)
         ):
-            backend_name = getattr(self.backend, 'backend_name', None)
-            producer = (
-                backend_name
-                if backend_name and backend_name != 'unknown'
-                else getattr(self.backend, 'name', None)
-                or backend_name
-                or type(self.backend).__name__
-            )
             self._last_backend_error = (
                 f'{producer} returned post-equilibrium phase material without '
                 'an AtomLedger transition'
