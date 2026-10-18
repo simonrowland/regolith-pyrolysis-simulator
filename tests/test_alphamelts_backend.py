@@ -6222,7 +6222,11 @@ def test_endmember_activity_labels_resolve_antoine_without_mutating_payload():
         sim,
     )
 
-    PyrolysisSimulator._calculate_evaporation(sim, result)
+    PyrolysisSimulator._calculate_evaporation(
+        sim,
+        result,
+        overhead_pressure_pa=1e-6 * 1.0e5,
+    )
 
     assert captured['vapor_pressure_activities'] == {'Na2SiO3': 0.08}
     assert 'Na2O' not in captured['vapor_pressure_activities']

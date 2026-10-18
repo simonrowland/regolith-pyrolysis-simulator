@@ -1634,6 +1634,7 @@ def _cj_flux_values(
                 # this anchored harness supplies its frozen one-species set.
                 "vapour_batch_flux_pressures_Pa": vapor_pressures,
                 "overhead_partials_Pa": {},
+                "overhead_pressure_pa": 1e-12 * 1.0e5,
                 "gas_pO2_bar": 1e-12,
                 "intrinsic_pO2_bar": 1e-12,
                 "molar_mass_kg_mol": molar_masses_kg_mol,

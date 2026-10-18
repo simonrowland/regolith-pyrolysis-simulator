@@ -325,7 +325,11 @@ def test_evaporation_partial_channel_refusal_notes_survive_dispatch(
         lambda self, eq, **kw: ({}, {}),
     )
 
-    flux = EvaporationMixin._calculate_evaporation(sim, equilibrium)
+    flux = EvaporationMixin._calculate_evaporation(
+        sim,
+        equilibrium,
+        overhead_pressure_pa=0.0,
+    )
 
     # Numeric neutrality: kernel flux values pass through unchanged; the
     # refused K channel stays out of the flux map.

@@ -59,6 +59,9 @@ def _request(
 ) -> IntentRequest:
     controls = dict(control_inputs or {})
     controls.setdefault("pO2_bar", pO2_bar)
+    if intent is ChemistryIntent.EVAPORATION_FLUX:
+        # Knudsen-cell / imposed film: pressure_bar is the boundary.
+        controls.setdefault("overhead_pressure_pa", 1.0 * 1.0e5)
     return IntentRequest(
         intent=intent,
         account_view=_account_view(),

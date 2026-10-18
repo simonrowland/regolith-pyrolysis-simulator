@@ -241,7 +241,7 @@ def _surface_temperature_rows(schedule: dict) -> list[dict]:
     )
     session = run._start_session()
     sim = session.simulator
-    sim._calculate_evaporation = lambda _equilibrium: EvaporationFlux(
+    sim._calculate_evaporation = lambda _equilibrium, **_kwargs: EvaporationFlux(
         species_kg_hr={"SiO": 0.02},
         total_kg_hr=0.02,
     )
