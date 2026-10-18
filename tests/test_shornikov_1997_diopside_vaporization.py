@@ -341,7 +341,10 @@ def test_table4_lineage_resolves_to_same_source_table3_activity_rows():
         )
 
     row = table4_rows[0]
-    phantom = "tables:shornikov-1997-diopside-vaporization"
+    # tables:{source_id} is the corpus tables-directory asset once INDEX
+    # records tables.exists. kems-ms2000-044 stores that asset as a real
+    # derived_from parent, so it cannot be this check's unresolved token.
+    phantom = "not-a-source-asset:shornikov-1997-diopside-vaporization"
     mutated_row = replace(
         row,
         derived_from=(phantom,),
