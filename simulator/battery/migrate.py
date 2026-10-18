@@ -3593,6 +3593,22 @@ _COMPOSITION_MOL_META_KEYS = frozenset(
     }
 )
 _DEFAULT_COMPOSITION_MOL_BASIS = "printed_mole_fraction"
+_MOLE_FRACTION_COMPOSITION_BASES = frozenset(
+    {
+        _DEFAULT_COMPOSITION_MOL_BASIS,
+        "normalized_mole_fraction_from_published_xA_over_xC_and_xS",
+        "normalized_mole_fraction_from_published_Fo93Fa7",
+        "printed_formula_stoichiometry",
+        "derived_from_formula",
+        "stoichiometric_Ca3SiO5_oxide_mole_fractions",
+    }
+)
+_SUPPORTED_EXTRACT_COMPOSITION_BASES = _MOLE_FRACTION_COMPOSITION_BASES | frozenset(
+    {
+        "printed_oxides",
+        "sample_catalog_proxy",
+    }
+)
 
 
 def _composition_mol_items(raw: object) -> Iterator[tuple[str, object]]:
