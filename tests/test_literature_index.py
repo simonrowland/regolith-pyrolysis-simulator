@@ -687,7 +687,7 @@ def test_source_status_anti_loss_nonempty_cases(tmp_path, monkeypatch):
     assert anti["stale_claims"]["count"] >= 1
 
 
-def test_source_status_untracked_corpus_scratch_is_excluded(tmp_path, monkeypatch):
+def test_source_status_untracked_corpus_scratch_is_excluded(tmp_path, monkeypatch, capsys):
     root, corpus = _status_tree(tmp_path, monkeypatch, git_corpus=True)
     tracked = corpus / "tracked.txt"
     tracked.write_text("base")
@@ -709,6 +709,12 @@ def test_source_status_untracked_corpus_scratch_is_excluded(tmp_path, monkeypatc
     assert status["anti_loss"]["corpus_uncommitted"] == {"count": 1, "ids": ["tracked.txt"]}
     assert "tracked.txt" in output
     assert all(name not in output for name in private_names)
+
+    cli_out = tmp_path / "cli-out"
+    assert builder.main(["--root", str(root), "--out-dir", str(cli_out)]) == 0
+    stderr = capsys.readouterr().err.splitlines()
+    assert stderr == ["corpus untracked files (not in SOURCE_STATUS): 1"]
+    assert all(name not in "\n".join(stderr) for name in private_names)
 
 
 def test_observation_store_summary_matches_full_scan():

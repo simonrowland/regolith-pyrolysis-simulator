@@ -1314,7 +1314,7 @@ def load_scored_residuals(root: Path) -> dict[str, str]:
 def git_uncommitted_paths(root: Path) -> tuple[list[str], str | None]:
     try:
         result = subprocess.run(
-            # Exclude untracked paths so committed status stays host-independent.
+            # Exclude untracked paths from the committed artifact for host-independence; report their count on stderr.
             ["git", "-C", str(root), "status", "--porcelain", "-uno"],
             capture_output=True, text=True, check=False,
         )
@@ -1334,6 +1334,19 @@ def git_uncommitted_paths(root: Path) -> tuple[list[str], str | None]:
             continue
         ids.append(path)
     return sorted(set(ids)), None
+
+
+def git_untracked_count(root: Path) -> int | None:
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(root), "status", "--porcelain", "-unormal"],
+            capture_output=True, text=True, check=False,
+        )
+    except OSError:
+        return None
+    if result.returncode != 0:
+        return None
+    return sum(line.startswith("?? ") for line in result.stdout.splitlines())
 
 
 def git_unpushed_commits(root: Path) -> tuple[list[str], str | None]:
@@ -1610,7 +1623,11 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     write_index(build_index(root, private_roots=list(args.private_root), hunt_json=args.hunt_json, root_label="."),
                 out_dir)
-    write_source_status(build_source_status(root, root_label="."), out_dir)
+    status = build_source_status(root, root_label=".")
+    untracked_count = git_untracked_count(Path(status["scan"]["corpus_root"]))
+    if untracked_count is not None:
+        print(f"corpus untracked files (not in SOURCE_STATUS): {untracked_count}", file=sys.stderr)
+    write_source_status(status, out_dir)
     return 0
 
 if __name__ == "__main__":
