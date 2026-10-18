@@ -1856,17 +1856,15 @@ def _sample_from_plain(
     if printed_from_initial:
         printed_located = _mass_percent_printed_from_plain(initial)
     composition_role, _role_refusal = _declared_composition_role(payload)
-    selected_column = _selected_printed_composition_column(initial_located)
     owner_initial = None
     if (
-        printed_from_initial
-        or composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG
-        or selected_column is not None
-    ):
-        owner_initial = _owner_initial_from_printed(
-            printed_located,
-            initial_located,
+        not (initial_located is not None and initial_located.state.is_value)
+        and (
+            printed_from_initial
+            or composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG
         )
+    ):
+        owner_initial = _owner_initial_from_printed(printed_located)
     if owner_initial is not None:
         initial_located = owner_initial
     return Sample(
@@ -3890,29 +3888,8 @@ def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
     return None, None
 
 
-def _selected_printed_composition_column(
-    selected_initial: Located[Composition] | None,
-) -> str | None:
-    if selected_initial is None:
-        return None
-    selection_text = " ".join(
-        selected_initial.inference.inputs
-        if selected_initial.inference is not None
-        else ()
-    ).casefold()
-    return next(
-        (
-            column
-            for column in ("analytical", "nominal")
-            if re.search(rf"\b{column}\b.*\bcolumn selected\b", selection_text)
-        ),
-        None,
-    )
-
-
 def _owner_initial_from_printed(
     printed: Located[Any] | None,
-    selected_initial: Located[Composition] | None = None,
 ) -> Located[Composition] | None:
     """Convert the printed map already selected by the typed-role owner."""
 
@@ -3920,20 +3897,15 @@ def _owner_initial_from_printed(
         return None
     raw = printed.state.value
     locator = printed.locator
-    selected_column = _selected_printed_composition_column(selected_initial)
-    if selected_column is not None:
-        if not isinstance(raw, Mapping) or not isinstance(
-            raw.get(selected_column), Mapping
-        ):
-            return Located(
-                State.unknown(
-                    f"selected {selected_column} composition column is absent from printed map"
-                ),
-                locator=(selected_initial.locator if selected_initial else None)
-                or printed.locator,
-            )
-        raw = raw[selected_column]
-        locator = selected_initial.locator or printed.locator
+    if isinstance(raw, Mapping) and sum(
+        isinstance(value, Mapping) for value in raw.values()
+    ) > 1:
+        return Located(
+            State.unknown(
+                "printed composition has multiple columns and no typed selection"
+            ),
+            locator=locator,
+        )
     refusal_reason: list[str] = []
     pairs = _mass_percent_pairs(raw)
     if pairs is not None:

@@ -599,9 +599,7 @@ def test_typed_print_completeness_survives_canonical_fallback(monkeypatch, bound
     else:
         inputs = _serialized_consumer_inputs(sample, conditions)
         waypoint = inputs.waypoints["normalized_composition"]
-        expected_valid = component == "MgO" or (
-            component == "FeOT" and boundary == "sample_printed"
-        )
+        expected_valid = component == "MgO"
         if not expected_valid:
             assert waypoint.selected is None
             assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
@@ -610,9 +608,7 @@ def test_typed_print_completeness_survives_canonical_fallback(monkeypatch, bound
             )
         requests = engine_point_requests(inputs)
     assert len(requests) == 7
-    expected_valid = component == "MgO" or (
-        component == "FeOT" and boundary == "sample_printed"
-    )
+    expected_valid = component == "MgO"
     for request in requests:
         assert (request.payload is not None) == expected_valid
         if component == "FeOT" and expected_valid:

@@ -490,16 +490,12 @@ def test_round8_plante_initial_is_independent_of_selection_prose(
     inputs[selection_note] = "No nominal column selected; analytical is not a selector"
     changed_prose = _sample_from_plain(sample_payload, experiment_id=experiment_id)
 
-    expected_components = to_plain(expected)["components"]
-    original_components = to_plain(original.initial_composition)["state"]["value"][
-        "components"
-    ]
-    changed_components = to_plain(changed_prose.initial_composition)["state"][
-        "value"
-    ]["components"]
-    assert original_components == expected_components
-    assert changed_components == expected_components
-    assert original_components == changed_components
+    expected_value = to_plain(expected)
+    original_value = to_plain(original.initial_composition)["state"]["value"]
+    changed_value = to_plain(changed_prose.initial_composition)["state"]["value"]
+    assert original_value == expected_value
+    assert changed_value == expected_value
+    assert original_value == changed_value
 
 
 def test_round8_existing_typed_initial_beats_printed_column_and_prose() -> None:
@@ -1193,7 +1189,7 @@ def test_mass_percent_composition_keeps_printed_map_and_derives_moles() -> None:
     )
 
 
-def test_printed_wt_percent_replaces_a_stale_pretyped_initial_composition() -> None:
+def test_printed_wt_percent_does_not_replace_a_typed_initial_composition() -> None:
     printed = {"SiO2": "50", "FeOT": "30", "SO3": "20"}
     raw = {
         "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
@@ -1209,15 +1205,12 @@ def test_printed_wt_percent_replaces_a_stale_pretyped_initial_composition() -> N
     }
 
     sample = _sample_from_plain(raw)
-    expected = wt_pct_to_mole_fraction(
-        {key: Decimal(value) for key, value in printed.items()}
-    )
-
     assert sample.initial_composition is not None
     assert sample.initial_composition.state.is_value
-    assert sample.initial_composition.inference is not None
-    assert sample.initial_composition.inference.relation == "wt_pct_to_mole_fraction"
-    assert dict(sample.initial_composition.state.value.components) == dict(expected.components)
+    assert sample.initial_composition.inference is None
+    assert dict(sample.initial_composition.state.value.components) == {
+        "SiO2": Decimal("1")
+    }
 
 
 @pytest.mark.parametrize("duplicate_name", ("SiO2", " SiO2 "))
