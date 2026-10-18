@@ -7,7 +7,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import AdmissionStatus, Phase, Quantity, ValueKind
+from simulator.battery.enums import AdmissionStatus, Phase, Quantity, UncertaintyKind, ValueKind
 from simulator.battery.migrate import Migrator
 
 
@@ -35,9 +35,42 @@ def test_table_and_figure_rows_are_render_pinned_and_migrate_with_conditions():
     assert [len(row["values"]["points"]) for row in figure_series] == [18, 18]
 
     rendered_figure_reads = (
-        ("1673", 0, 0, 59, 0.47, 0.0, [733, 576], [734, 576]),
-        ("1673", 0, 9, 79, 0.75, 0.0006, [1354, 281], [1353, 283]),
-        ("1873", 1, 0, 60, 0.46, 0.0005, [331, 581], [331, 582]),
+        (
+            "1673",
+            0,
+            0,
+            59,
+            0.47,
+            None,
+            [733, 576],
+            [76, 70],
+            "review-p1-a-1",
+            [956, 2856],
+        ),
+        (
+            "1673",
+            0,
+            9,
+            79,
+            0.76,
+            0.000259,
+            [1354, 281],
+            [62, 70],
+            "review-p1-a-10",
+            [1590, 2560],
+        ),
+        (
+            "1833",
+            1,
+            0,
+            60,
+            0.46,
+            0.001424,
+            [331, 581],
+            [68, 84],
+            "review-p1-b-1",
+            [2464, 2849],
+        ),
     )
     for (
         temperature,
@@ -48,14 +81,18 @@ def test_table_and_figure_rows_are_render_pinned_and_migrate_with_conditions():
         uncertainty,
         pixel_1,
         pixel_2,
+        crop_id,
+        crop_origin,
     ) in rendered_figure_reads:
         point = figure_series[series_index]["values"]["points"][point_index]
         assert point["T_K"] == temperature
         assert point["FeO_mol_pct_as_read"] == composition
         assert point["activity"] == activity
-        assert point["read_uncertainty_dex"] == uncertainty
+        assert point.get("read_uncertainty_dex") == uncertainty
         assert point["read_1"]["pixel_xy_crop"] == pixel_1
         assert point["read_2"]["pixel_xy_crop"] == pixel_2
+        assert point["read_2"]["crop_id"] == crop_id
+        assert point["read_2"]["crop_origin_xy_page_px"] == crop_origin
 
     rendered_cells = (
         (
@@ -109,6 +146,14 @@ def test_table_and_figure_rows_are_render_pinned_and_migrate_with_conditions():
     assert not result.registry_issues
     assert not result.validation.hard_issues
 
+    all_points = [point for series in figure_series for point in series["values"]["points"]]
+    assert len({point["read_2"]["crop_id"] for point in all_points}) == 36
+    assert all(
+        point.get("read_uncertainty_dex") is None
+        or point["read_uncertainty_dex"] > 0
+        for point in all_points
+    )
+
     for row in migrated:
         temperature = row.point_conditions["temperature_K"]
         assert temperature.state.is_value
@@ -127,6 +172,75 @@ def test_table_and_figure_rows_are_render_pinned_and_migrate_with_conditions():
             assert row.point_conditions["composition"].locator is not None
             if row.value.kind is ValueKind.POINT:
                 assert row.admission.status is AdmissionStatus.REJECTED
+
+    panel_b_rows = [
+        row
+        for row in migrated
+        if "shornikov_2019_fig2_panel_b_ban_ya_or_fujita_markers" in row.observation_id
+    ]
+    assert len(panel_b_rows) == 18
+    for row in panel_b_rows:
+        assert row.identity.temperature_K.value == Decimal("1833")
+        plotted_temperature = row.point_conditions["plotted_panel_temperature_K"]
+        assert plotted_temperature.state.is_value
+        assert plotted_temperature.state.value.point == Decimal("1873")
+
+    transitions = {
+        row.observation_id.rsplit("::", 1)[-1]: row
+        for row in migrated
+        if row.observation_id.endswith("_allen_snow_1955")
+    }
+    decomposition = transitions["shornikov_2019_c2f2o5_decomposition_allen_snow_1955"]
+    dissociation = transitions["shornikov_2019_c2feo3_dissociation_allen_snow_1955"]
+    assert decomposition.identity.species.formula == "Ca2Fe2O5"
+    assert dissociation.identity.species.formula == "CaFe2O3"
+    assert decomposition.uncertainty.kind is UncertaintyKind.PRINTED
+    assert dissociation.uncertainty.kind is UncertaintyKind.PRINTED
+    assert decomposition.locator.page == dissociation.locator.page == 1
+    assert decomposition.locator.published_page == dissociation.locator.published_page == 82
+
+    shugurov = next(row for row in migrated if row.observation_id.endswith("shornikov_2019_cafeo2_delta_fh298_shugurov_2005"))
+    assert shugurov.locator.page == 2
+    assert shugurov.locator.pdf_page_index == 1
+    assert shugurov.locator.published_page == 83
+
+    fig2_curves = [
+        row
+        for row in migrated
+        if row.locator.figure == "2"
+        and row.value.kind is ValueKind.UNAVAILABLE
+    ]
+    assert len(fig2_curves) == 12
+    for row in fig2_curves:
+        expected_temperature = Decimal("1673") if "panel_a" in row.observation_id else Decimal("1873")
+        assert row.identity.temperature_K.is_value
+        assert row.identity.temperature_K.value == expected_temperature
+
+    refusal_ids = {
+        "shornikov_2019_cafeo2_sintering_temperature_range_srikanth_bazhin",
+        "shornikov_2019_fig3_cao_feo_minimum_mixing_energy_range",
+        *(f"shornikov_2019_fig3_cao_feo_panel_{panel}_curve_{curve}" for panel, curves in (("a", (1, 2, 3)), ("b", (4, 5, 6))) for curve in curves),
+    }
+    refused_source_rows = [
+        row
+        for block in document["species"].values()
+        for row in block.get("context", [])
+        if row["observation_id"] in refusal_ids
+    ]
+    assert len(refused_source_rows) == 8
+    assert all(row["type"] == "thermodynamic_example" for row in refused_source_rows)
+    assert all(row.get("locator") for row in refused_source_rows)
+    assert all(row["values"].get("attribution") for row in refused_source_rows)
+    assert all(row["values"].get("reason_no_number") for row in refused_source_rows)
+    assert all(
+        row["values"].get("sentence_as_published") or row["values"].get("caption_as_published")
+        for row in refused_source_rows
+    )
+    assert all(
+        not {"value", "quantity", "T_K", "admission_status"} & row["values"].keys()
+        for row in refused_source_rows
+    )
+    assert not refusal_ids & {row.observation_id.rsplit("::", 1)[-1] for row in migrated}
 
     for formula, observation_id, value, _ in rendered_cells:
         row = next(

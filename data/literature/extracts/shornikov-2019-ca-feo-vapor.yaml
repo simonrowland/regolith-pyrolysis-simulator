@@ -199,13 +199,13 @@ species:
           locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
       values:
         quantity: activity
+        T_K: '1673'
         method_class: figure_only
         admission_status: typed_refusal
         reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
         component: CaO
         activity_basis_as_published: a_CaO
         curve_number: '4'
-        T_K: '1673'
         attribution: Wu et al. (1993)
     - observation_id: shornikov_2019_fig2_cao_panel_a_curve_6
       type: activity_coefficient
@@ -228,6 +228,7 @@ species:
           locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
       values:
         quantity: activity
+        T_K: '1673'
         method_class: figure_only
         admission_status: typed_refusal
         reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
@@ -256,6 +257,7 @@ species:
           locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
       values:
         quantity: activity
+        T_K: '1673'
         method_class: figure_only
         admission_status: typed_refusal
         reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
@@ -284,6 +286,7 @@ species:
           locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
       values:
         quantity: activity
+        T_K: '1873'
         method_class: figure_only
         admission_status: typed_refusal
         reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
@@ -312,6 +315,7 @@ species:
           locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
       values:
         quantity: activity
+        T_K: '1873'
         method_class: figure_only
         admission_status: typed_refusal
         reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
@@ -340,6 +344,7 @@ species:
           locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
       values:
         quantity: activity
+        T_K: '1873'
         method_class: figure_only
         admission_status: typed_refusal
         reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
@@ -377,6 +382,19 @@ species:
               point: '1873'
           locator: *id001
   CaFeO2:
+    context:
+    - observation_id: shornikov_2019_cafeo2_sintering_temperature_range_srikanth_bazhin
+      type: thermodynamic_example
+      units: as reported
+      locator:
+        page: 1
+        pdf_page_index: 0
+        published_page: 82
+        section: Introduction
+      values:
+        sentence_as_published: 'When sintering the sludge at the temperature region 1173–1523 K in the composition of the synthesized material (Srikanth et al. 2005), as well as in the waste of electrolysis production (Bazhin et al., 2017), it was found the compound CaFeO2.'
+        attribution: 'Srikanth et al. (2005) and Bazhin et al. (2017), as cited in the text.'
+        reason_no_number: 'This is a process range, not one transition temperature; no numeric observation is scored.'
     observations:
     - observation_id: shornikov_2019_ca_feo_vapor_p003_t01_r04_c02
       type: gibbs_table
@@ -417,7 +435,7 @@ species:
       locator:
         page: 2
         pdf_page_index: 1
-        published_page: 82
+        published_page: 83
         section: Introduction
         note: The cited calculation is described in the sentence on CaFeO2 formation enthalpy.
       units: kJ/mol
@@ -426,7 +444,7 @@ species:
       point_conditions:
         temperature_K:
           state: {tag: value, value: {kind: point, point: '298'}}
-          locator: {page: 2, pdf_page_index: 1, published_page: 82, section: Introduction, note: 'ΔfH298'}
+          locator: {page: 2, pdf_page_index: 1, published_page: 83, section: Introduction, note: 'ΔfH298'}
       values:
         quantity: delta_fH
         method_class: quoted_attributed
@@ -590,234 +608,265 @@ species:
           T_K: '1673'
           FeO_mol_pct_as_read: 59
           activity: 0.47
-          read_uncertainty_dex: 0
           read_1:
             pixel_xy_crop: [733, 576]
             FeO_mol_pct: 59.2628
             activity: 0.4679
           read_2:
-            pixel_xy_crop: [734, 576]
-            FeO_mol_pct: 59.2949
+            crop_id: review-p1-a-1
+            crop_origin_xy_page_px: [956, 2856]
+            pixel_xy_crop: [76, 70]
+            FeO_mol_pct: 59.2308
             activity: 0.4679
         - marker: 2
           T_K: '1673'
           FeO_mol_pct_as_read: 61
-          activity: 0.51
-          read_uncertainty_dex: 0.0004
+          activity: 0.52
+          read_uncertainty_dex: 0.000422
           read_1:
             pixel_xy_crop: [800, 528]
             FeO_mol_pct: 61.4103
             activity: 0.5146
           read_2:
-            pixel_xy_crop: [801, 529]
-            FeO_mol_pct: 61.4423
-            activity: 0.5136
+            crop_id: review-p1-a-2
+            crop_origin_xy_page_px: [1030, 2794]
+            pixel_xy_crop: [70, 83]
+            FeO_mol_pct: 61.4103
+            activity: 0.5156
         - marker: 3
           T_K: '1673'
           FeO_mol_pct_as_read: 67
           activity: 0.56
-          read_uncertainty_dex: 0
           read_1:
             pixel_xy_crop: [970, 478]
             FeO_mol_pct: 66.859
             activity: 0.5632
           read_2:
-            pixel_xy_crop: [972, 478]
-            FeO_mol_pct: 66.9231
+            crop_id: review-p1-a-3
+            crop_origin_xy_page_px: [1207, 2755]
+            pixel_xy_crop: [66, 73]
+            FeO_mol_pct: 66.9551
             activity: 0.5632
         - marker: 4
           T_K: '1673'
-          FeO_mol_pct_as_read: 69
-          activity: 0.57
-          read_uncertainty_dex: 0.0029
+          FeO_mol_pct_as_read: 68
+          activity: 0.58
           read_1:
             pixel_xy_crop: [1022, 464]
             FeO_mol_pct: 68.5256
             activity: 0.5768
           read_2:
-            pixel_xy_crop: [1026, 472]
-            FeO_mol_pct: 68.6538
-            activity: 0.5691
+            crop_id: review-p1-a-4
+            crop_origin_xy_page_px: [1241, 2752]
+            pixel_xy_crop: [79, 62]
+            FeO_mol_pct: 68.4615
+            activity: 0.5768
         - marker: 5
           T_K: '1673'
           FeO_mol_pct_as_read: 70
-          activity: 0.6
-          read_uncertainty_dex: 0.0007
+          activity: 0.61
+          read_uncertainty_dex: 0.0014
           read_1:
             pixel_xy_crop: [1065, 437]
             FeO_mol_pct: 69.9038
             activity: 0.6031
           read_2:
-            pixel_xy_crop: [1070, 439]
-            FeO_mol_pct: 70.0641
-            activity: 0.6012
+            crop_id: review-p1-a-5
+            crop_origin_xy_page_px: [1291, 2711]
+            pixel_xy_crop: [74, 72]
+            FeO_mol_pct: 69.9038
+            activity: 0.6070
         - marker: 6
           T_K: '1673'
           FeO_mol_pct_as_read: 71
           activity: 0.65
-          read_uncertainty_dex: 0.0003
+          read_uncertainty_dex: 0.000965
           read_1:
             pixel_xy_crop: [1112, 385]
             FeO_mol_pct: 71.4103
             activity: 0.6537
           read_2:
-            pixel_xy_crop: [1110, 386]
-            FeO_mol_pct: 71.3462
-            activity: 0.6527
+            crop_id: review-p1-a-6
+            crop_origin_xy_page_px: [1345, 2670]
+            pixel_xy_crop: [69, 68]
+            FeO_mol_pct: 71.4744
+            activity: 0.6508
         - marker: 7
           T_K: '1673'
           FeO_mol_pct_as_read: 73
-          activity: 0.65
-          read_uncertainty_dex: 0.0016
+          activity: 0.66
+          read_uncertainty_dex: 0.000298
           read_1:
             pixel_xy_crop: [1152, 384]
             FeO_mol_pct: 72.6923
             activity: 0.6547
           read_2:
-            pixel_xy_crop: [1153, 389]
-            FeO_mol_pct: 72.7244
-            activity: 0.6498
+            crop_id: review-p1-a-7
+            crop_origin_xy_page_px: [1392, 2655]
+            pixel_xy_crop: [57, 78]
+            FeO_mol_pct: 72.5962
+            activity: 0.6556
         - marker: 8
           T_K: '1673'
-          FeO_mol_pct_as_read: 77
+          FeO_mol_pct_as_read: 76
           activity: 0.7
-          read_uncertainty_dex: 0.0003
+          read_uncertainty_dex: 0.000309
           read_1:
             pixel_xy_crop: [1269, 333]
             FeO_mol_pct: 76.4423
             activity: 0.7043
           read_2:
-            pixel_xy_crop: [1274, 334]
-            FeO_mol_pct: 76.6026
+            crop_id: review-p1-a-8
+            crop_origin_xy_page_px: [1491, 2615]
+            pixel_xy_crop: [80, 69]
+            FeO_mol_pct: 76.5064
             activity: 0.7033
         - marker: 9
           T_K: '1673'
           FeO_mol_pct_as_read: 77
           activity: 0.71
-          read_uncertainty_dex: 0.0003
           read_1:
             pixel_xy_crop: [1294, 329]
             FeO_mol_pct: 77.2436
             activity: 0.7082
           read_2:
-            pixel_xy_crop: [1295, 330]
-            FeO_mol_pct: 77.2756
-            activity: 0.7072
+            crop_id: review-p1-a-9
+            crop_origin_xy_page_px: [1523, 2597]
+            pixel_xy_crop: [71, 82]
+            FeO_mol_pct: 77.2436
+            activity: 0.7082
         - marker: 10
           T_K: '1673'
           FeO_mol_pct_as_read: 79
-          activity: 0.75
-          read_uncertainty_dex: 0.0006
+          activity: 0.76
+          read_uncertainty_dex: 0.000259
           read_1:
             pixel_xy_crop: [1354, 281]
             FeO_mol_pct: 79.1667
             activity: 0.7549
           read_2:
-            pixel_xy_crop: [1353, 283]
-            FeO_mol_pct: 79.1346
-            activity: 0.7529
+            crop_id: review-p1-a-10
+            crop_origin_xy_page_px: [1590, 2560]
+            pixel_xy_crop: [62, 70]
+            FeO_mol_pct: 79.1026
+            activity: 0.7558
         - marker: 11
           T_K: '1673'
           FeO_mol_pct_as_read: 81
           activity: 0.77
-          read_uncertainty_dex: 0.0003
+          read_uncertainty_dex: 0.000284
           read_1:
             pixel_xy_crop: [1412, 271]
             FeO_mol_pct: 81.0256
             activity: 0.7646
           read_2:
-            pixel_xy_crop: [1413, 270]
+            crop_id: review-p1-a-11
+            crop_origin_xy_page_px: [1630, 2561]
+            pixel_xy_crop: [83, 59]
             FeO_mol_pct: 81.0577
             activity: 0.7656
         - marker: 12
           T_K: '1673'
           FeO_mol_pct_as_read: 83
           activity: 0.8
-          read_uncertainty_dex: 0
+          read_uncertainty_dex: 0.00027
           read_1:
             pixel_xy_crop: [1480, 232]
             FeO_mol_pct: 83.2051
             activity: 0.8025
           read_2:
-            pixel_xy_crop: [1483, 232]
+            crop_id: review-p1-a-12
+            crop_origin_xy_page_px: [1705, 2508]
+            pixel_xy_crop: [78, 73]
             FeO_mol_pct: 83.3013
-            activity: 0.8025
+            activity: 0.8035
         - marker: 13
           T_K: '1673'
           FeO_mol_pct_as_read: 86
           activity: 0.87
-          read_uncertainty_dex: 0.0005
+          read_uncertainty_dex: 0.000501
           read_1:
             pixel_xy_crop: [1566, 166]
             FeO_mol_pct: 85.9615
             activity: 0.8667
           read_2:
-            pixel_xy_crop: [1568, 168]
-            FeO_mol_pct: 86.0256
-            activity: 0.8648
+            crop_id: review-p1-a-13
+            crop_origin_xy_page_px: [1798, 2453]
+            pixel_xy_crop: [68, 61]
+            FeO_mol_pct: 85.9615
+            activity: 0.8687
         - marker: 14
           T_K: '1673'
           FeO_mol_pct_as_read: 88
           activity: 0.86
-          read_uncertainty_dex: 0.0002
+          read_uncertainty_dex: 0.000253
           read_1:
             pixel_xy_crop: [1629, 175]
             FeO_mol_pct: 87.9808
             activity: 0.858
           read_2:
-            pixel_xy_crop: [1630, 176]
-            FeO_mol_pct: 88.0128
-            activity: 0.857
+            crop_id: review-p1-a-14
+            crop_origin_xy_page_px: [1868, 2448]
+            pixel_xy_crop: [61, 78]
+            FeO_mol_pct: 87.9808
+            activity: 0.8570
         - marker: 15
           T_K: '1673'
           FeO_mol_pct_as_read: 89
           activity: 0.9
-          read_uncertainty_dex: 0.0009
+          read_uncertainty_dex: 0.000242
           read_1:
             pixel_xy_crop: [1658, 135]
             FeO_mol_pct: 88.9103
             activity: 0.8969
           read_2:
-            pixel_xy_crop: [1658, 131]
-            FeO_mol_pct: 88.9103
-            activity: 0.9008
+            crop_id: review-p1-a-15
+            crop_origin_xy_page_px: [1879, 2419]
+            pixel_xy_crop: [78, 65]
+            FeO_mol_pct: 88.8782
+            activity: 0.8979
         - marker: 16
           T_K: '1673'
           FeO_mol_pct_as_read: 89
           activity: 0.92
-          read_uncertainty_dex: 0
+          read_uncertainty_dex: 0.000683
           read_1:
             pixel_xy_crop: [1664, 107]
             FeO_mol_pct: 89.1026
             activity: 0.9241
           read_2:
-            pixel_xy_crop: [1662, 107]
-            FeO_mol_pct: 89.0385
-            activity: 0.9241
+            crop_id: review-p1-a-16
+            crop_origin_xy_page_px: [1892, 2377]
+            pixel_xy_crop: [71, 83]
+            FeO_mol_pct: 89.0705
+            activity: 0.9212
         - marker: 17
           T_K: '1673'
           FeO_mol_pct_as_read: 91
           activity: 0.96
-          read_uncertainty_dex: 0.0002
+          read_uncertainty_dex: 0.000226
           read_1:
             pixel_xy_crop: [1731, 69]
             FeO_mol_pct: 91.25
             activity: 0.9611
           read_2:
-            pixel_xy_crop: [1732, 70]
+            crop_id: review-p1-a-17
+            crop_origin_xy_page_px: [1966, 2350]
+            pixel_xy_crop: [66, 70]
             FeO_mol_pct: 91.2821
             activity: 0.9601
         - marker: 18
           T_K: '1673'
           FeO_mol_pct_as_read: 94
           activity: 0.98
-          read_uncertainty_dex: 0
           read_1:
             pixel_xy_crop: [1813, 45]
             FeO_mol_pct: 93.8782
             activity: 0.9844
           read_2:
-            pixel_xy_crop: [1813, 45]
+            crop_id: review-p1-a-18
+            crop_origin_xy_page_px: [2030, 2312]
+            pixel_xy_crop: [83, 83]
             FeO_mol_pct: 93.8782
             activity: 0.9844
 
@@ -838,6 +887,9 @@ species:
         temperature_K:
           state: {tag: value, value: {kind: point, point: '1873'}}
           locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
+        plotted_panel_temperature_K:
+          state: {tag: value, value: {kind: point, point: '1873'}}
+          locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
         composition:
           state: {tag: unknown, reason: 'FeO mol% is printed, but the schema has no mole-percent composition basis; original x values are retained per point and these reads are typed-refused.'}
           locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
@@ -855,241 +907,271 @@ species:
         marker_count: 18
         points:
         - marker: 1
-          T_K: '1873'
+          T_K: '1833'
           FeO_mol_pct_as_read: 60
           activity: 0.46
-          read_uncertainty_dex: 0.0005
+          read_uncertainty_dex: 0.001424
           read_1:
             pixel_xy_crop: [331, 581]
             FeO_mol_pct: 60
             activity: 0.4591
           read_2:
-            pixel_xy_crop: [331, 582]
-            FeO_mol_pct: 60
-            activity: 0.4581
+            crop_id: review-p1-b-1
+            crop_origin_xy_page_px: [2464, 2849]
+            pixel_xy_crop: [68, 84]
+            FeO_mol_pct: 60.0641
+            activity: 0.4561
         - marker: 2
-          T_K: '1873'
+          T_K: '1833'
           FeO_mol_pct_as_read: 61
           activity: 0.52
-          read_uncertainty_dex: 0.0004
+          read_uncertainty_dex: 0.000419
           read_1:
             pixel_xy_crop: [363, 521]
             FeO_mol_pct: 61.0256
             activity: 0.5175
           read_2:
-            pixel_xy_crop: [364, 522]
-            FeO_mol_pct: 61.0577
-            activity: 0.5166
+            crop_id: review-p1-b-2
+            crop_origin_xy_page_px: [2478, 2800]
+            pixel_xy_crop: [83, 69]
+            FeO_mol_pct: 60.9936
+            activity: 0.5185
         - marker: 3
-          T_K: '1873'
+          T_K: '1833'
           FeO_mol_pct_as_read: 62
           activity: 0.45
-          read_uncertainty_dex: 0
+          read_uncertainty_dex: 0.001409
           read_1:
             pixel_xy_crop: [379, 592]
             FeO_mol_pct: 61.5385
             activity: 0.4483
           read_2:
-            pixel_xy_crop: [379, 592]
+            crop_id: review-p1-b-3
+            crop_origin_xy_page_px: [2501, 2857]
+            pixel_xy_crop: [77, 87]
             FeO_mol_pct: 61.5385
-            activity: 0.4483
+            activity: 0.4454
         - marker: 4
-          T_K: '1873'
+          T_K: '1833'
           FeO_mol_pct_as_read: 63
           activity: 0.44
-          read_uncertainty_dex: 0.0005
           read_1:
             pixel_xy_crop: [431, 597]
             FeO_mol_pct: 63.2051
             activity: 0.4435
           read_2:
-            pixel_xy_crop: [432, 598]
-            FeO_mol_pct: 63.2372
-            activity: 0.4425
+            crop_id: review-p1-b-4
+            crop_origin_xy_page_px: [2560, 2873]
+            pixel_xy_crop: [70, 73]
+            FeO_mol_pct: 63.2051
+            activity: 0.4435
         - marker: 5
-          T_K: '1873'
+          T_K: '1833'
           FeO_mol_pct_as_read: 64
-          activity: 0.55
-          read_uncertainty_dex: 0.0019
+          activity: 0.54
+          read_uncertainty_dex: 0.0004
           read_1:
             pixel_xy_crop: [453, 495]
             FeO_mol_pct: 63.9103
             activity: 0.5429
           read_2:
-            pixel_xy_crop: [458, 490]
-            FeO_mol_pct: 64.0705
-            activity: 0.5478
+            crop_id: review-p1-b-5
+            crop_origin_xy_page_px: [2589, 2782]
+            pixel_xy_crop: [66, 63]
+            FeO_mol_pct: 64.0064
+            activity: 0.5419
         - marker: 6
-          T_K: '1873'
+          T_K: '1833'
           FeO_mol_pct_as_read: 66
           activity: 0.59
-          read_uncertainty_dex: 0
+          read_uncertainty_dex: 0.000733
           read_1:
             pixel_xy_crop: [517, 443]
             FeO_mol_pct: 65.9615
             activity: 0.5936
           read_2:
-            pixel_xy_crop: [518, 443]
-            FeO_mol_pct: 65.9936
-            activity: 0.5936
+            crop_id: review-p1-b-6
+            crop_origin_xy_page_px: [2635, 2716]
+            pixel_xy_crop: [85, 78]
+            FeO_mol_pct: 66.0897
+            activity: 0.5916
         - marker: 7
-          T_K: '1873'
+          T_K: '1833'
           FeO_mol_pct_as_read: 68
           activity: 0.59
-          read_uncertainty_dex: 0
+          read_uncertainty_dex: 0.000329
           read_1:
             pixel_xy_crop: [577, 442]
             FeO_mol_pct: 67.8846
             activity: 0.5945
           read_2:
-            pixel_xy_crop: [577, 442]
-            FeO_mol_pct: 67.8846
-            activity: 0.5945
+            crop_id: review-p1-b-7
+            crop_origin_xy_page_px: [2702, 2726]
+            pixel_xy_crop: [75, 66]
+            FeO_mol_pct: 67.9167
+            activity: 0.5936
         - marker: 8
-          T_K: '1873'
+          T_K: '1833'
           FeO_mol_pct_as_read: 71
           activity: 0.69
-          read_uncertainty_dex: 0.0003
+          read_uncertainty_dex: 0.000601
           read_1:
             pixel_xy_crop: [659, 347]
             FeO_mol_pct: 70.5128
             activity: 0.6871
           read_2:
-            pixel_xy_crop: [660, 348]
+            crop_id: review-p1-b-8
+            crop_origin_xy_page_px: [2791, 2617]
+            pixel_xy_crop: [68, 81]
             FeO_mol_pct: 70.5449
-            activity: 0.6862
+            activity: 0.6852
         - marker: 9
-          T_K: '1873'
+          T_K: '1833'
           FeO_mol_pct_as_read: 79
           activity: 0.81
-          read_uncertainty_dex: 0
+          read_uncertainty_dex: 0.000512
           read_1:
             pixel_xy_crop: [923, 224]
             FeO_mol_pct: 78.9744
             activity: 0.807
           read_2:
-            pixel_xy_crop: [923, 224]
+            crop_id: review-p1-b-9
+            crop_origin_xy_page_px: [3062, 2505]
+            pixel_xy_crop: [60, 70]
             FeO_mol_pct: 78.9744
-            activity: 0.807
+            activity: 0.8051
         - marker: 10
-          T_K: '1873'
+          T_K: '1833'
           FeO_mol_pct_as_read: 79
           activity: 0.77
-          read_uncertainty_dex: 0
           read_1:
             pixel_xy_crop: [923, 265]
             FeO_mol_pct: 78.9744
             activity: 0.7671
           read_2:
-            pixel_xy_crop: [924, 265]
-            FeO_mol_pct: 79.0064
+            crop_id: review-p1-b-10
+            crop_origin_xy_page_px: [3044, 2532]
+            pixel_xy_crop: [77, 82]
+            FeO_mol_pct: 78.9423
             activity: 0.7671
         - marker: 11
-          T_K: '1873'
+          T_K: '1833'
           FeO_mol_pct_as_read: 81
-          activity: 0.84
-          read_uncertainty_dex: 0
+          activity: 0.83
+          read_uncertainty_dex: 0.00026
           read_1:
             pixel_xy_crop: [985, 195]
             FeO_mol_pct: 80.9615
             activity: 0.8353
           read_2:
-            pixel_xy_crop: [986, 195]
-            FeO_mol_pct: 80.9936
-            activity: 0.8353
+            crop_id: review-p1-b-11
+            crop_origin_xy_page_px: [3113, 2473]
+            pixel_xy_crop: [73, 72]
+            FeO_mol_pct: 81.0256
+            activity: 0.8343
         - marker: 12
-          T_K: '1873'
+          T_K: '1833'
           FeO_mol_pct_as_read: 83
           activity: 0.85
-          read_uncertainty_dex: 0
           read_1:
             pixel_xy_crop: [1043, 181]
             FeO_mol_pct: 82.8205
             activity: 0.8489
           read_2:
-            pixel_xy_crop: [1043, 181]
-            FeO_mol_pct: 82.8205
+            crop_id: review-p1-b-12
+            crop_origin_xy_page_px: [3178, 2470]
+            pixel_xy_crop: [66, 60]
+            FeO_mol_pct: 82.8846
             activity: 0.8489
         - marker: 13
-          T_K: '1873'
+          T_K: '1833'
           FeO_mol_pct_as_read: 85
           activity: 0.89
-          read_uncertainty_dex: 0.0002
+          read_uncertainty_dex: 0.00071
           read_1:
             pixel_xy_crop: [1102, 141]
             FeO_mol_pct: 84.7115
             activity: 0.8879
           read_2:
-            pixel_xy_crop: [1103, 142]
+            crop_id: review-p1-b-13
+            crop_origin_xy_page_px: [3219, 2416]
+            pixel_xy_crop: [83, 77]
             FeO_mol_pct: 84.7436
-            activity: 0.8869
+            activity: 0.8850
         - marker: 14
-          T_K: '1873'
+          T_K: '1833'
           FeO_mol_pct_as_read: 85
           activity: 0.84
-          read_uncertainty_dex: 0.0003
+          read_uncertainty_dex: 0.000516
           read_1:
             pixel_xy_crop: [1110, 189]
             FeO_mol_pct: 84.9679
             activity: 0.8411
           read_2:
-            pixel_xy_crop: [1110, 190]
-            FeO_mol_pct: 84.9679
-            activity: 0.8402
+            crop_id: review-p1-b-14
+            crop_origin_xy_page_px: [3234, 2475]
+            pixel_xy_crop: [77, 61]
+            FeO_mol_pct: 85.0321
+            activity: 0.8431
         - marker: 15
-          T_K: '1873'
+          T_K: '1833'
           FeO_mol_pct_as_read: 86
           activity: 0.86
-          read_uncertainty_dex: 0
+          read_uncertainty_dex: 0.000251
           read_1:
             pixel_xy_crop: [1142, 165]
             FeO_mol_pct: 85.9936
             activity: 0.8645
           read_2:
-            pixel_xy_crop: [1142, 165]
-            FeO_mol_pct: 85.9936
-            activity: 0.8645
+            crop_id: review-p1-b-15
+            crop_origin_xy_page_px: [3273, 2437]
+            pixel_xy_crop: [66, 76]
+            FeO_mol_pct: 85.9295
+            activity: 0.8655
         - marker: 16
-          T_K: '1873'
+          T_K: '1833'
           FeO_mol_pct_as_read: 91
           activity: 0.9
-          read_uncertainty_dex: 0
           read_1:
             pixel_xy_crop: [1292, 131]
             FeO_mol_pct: 90.8013
             activity: 0.8977
           read_2:
-            pixel_xy_crop: [1293, 131]
-            FeO_mol_pct: 90.8333
+            crop_id: review-p1-b-16
+            crop_origin_xy_page_px: [3430, 2414]
+            pixel_xy_crop: [61, 66]
+            FeO_mol_pct: 90.8013
             activity: 0.8977
         - marker: 17
-          T_K: '1873'
+          T_K: '1833'
           FeO_mol_pct_as_read: 93
-          activity: 0.95
-          read_uncertainty_dex: 0
+          activity: 0.94
+          read_uncertainty_dex: 0.000667
           read_1:
             pixel_xy_crop: [1347, 82]
             FeO_mol_pct: 92.5641
             activity: 0.9454
           read_2:
-            pixel_xy_crop: [1348, 82]
-            FeO_mol_pct: 92.5962
-            activity: 0.9454
+            crop_id: review-p1-b-17
+            crop_origin_xy_page_px: [3467, 2351]
+            pixel_xy_crop: [81, 83]
+            FeO_mol_pct: 92.6282
+            activity: 0.9425
         - marker: 18
-          T_K: '1873'
+          T_K: '1833'
           FeO_mol_pct_as_read: 94
           activity: 0.92
-          read_uncertainty_dex: 0.0002
           read_1:
             pixel_xy_crop: [1381, 112]
             FeO_mol_pct: 93.6538
             activity: 0.9162
           read_2:
-            pixel_xy_crop: [1381, 113]
-            FeO_mol_pct: 93.6538
-            activity: 0.9152
+            crop_id: review-p1-b-18
+            crop_origin_xy_page_px: [3508, 2392]
+            pixel_xy_crop: [71, 69]
+            FeO_mol_pct: 93.6218
+            activity: 0.9162
 
-        temperature_disagreement_as_printed: 'Figure 2 caption: 1873 K; prose: 1833 K'
     - observation_id: shornikov_2019_fig2_feo_panel_a_curve_3
       type: activity_coefficient
       experiment: shornikov-2019-model-curves
@@ -1111,6 +1193,7 @@ species:
           locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
       values:
         quantity: activity
+        T_K: '1673'
         method_class: figure_only
         admission_status: typed_refusal
         reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
@@ -1139,6 +1222,7 @@ species:
           locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
       values:
         quantity: activity
+        T_K: '1673'
         method_class: figure_only
         admission_status: typed_refusal
         reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
@@ -1167,6 +1251,7 @@ species:
           locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: a}
       values:
         quantity: activity
+        T_K: '1673'
         method_class: figure_only
         admission_status: typed_refusal
         reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
@@ -1195,6 +1280,7 @@ species:
           locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
       values:
         quantity: activity
+        T_K: '1873'
         method_class: figure_only
         admission_status: typed_refusal
         reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
@@ -1223,6 +1309,7 @@ species:
           locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
       values:
         quantity: activity
+        T_K: '1873'
         method_class: figure_only
         admission_status: typed_refusal
         reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
@@ -1251,6 +1338,7 @@ species:
           locator: {page: 3, pdf_page_index: 2, published_page: 84, figure: '2', panel: b}
       values:
         quantity: activity
+        T_K: '1873'
         method_class: figure_only
         admission_status: typed_refusal
         reason: Smooth model curve has no discrete data markers; no numeric points are sampled.
@@ -1509,14 +1597,14 @@ species:
     - observation_id: shornikov_2019_c2f2o5_decomposition_oelsen_maetz_1941
       experiment: oelsen-maetz-1941
       type: transition_point
-      locator: {page: 2, pdf_page_index: 1, published_page: 82, section: Introduction}
+      locator: {page: 1, pdf_page_index: 0, published_page: 82, section: Introduction}
       units: K
       phase: cr
       T_range_K: ['1423', '1423']
       point_conditions:
         temperature_K:
           state: {tag: value, value: {kind: point, point: '1423'}}
-          locator: {page: 2, pdf_page_index: 1, published_page: 82, section: Introduction}
+          locator: {page: 1, pdf_page_index: 0, published_page: 82, section: Introduction}
       values:
         quantity: transition_temperature
         method_class: quoted_attributed
@@ -1526,47 +1614,147 @@ species:
         event_as_printed: decomposition
         attribution: Oelsen and Maetz (1941), as cited by Shornikov and Shornikova (2019).
         confidence_level: not stated
-  CaFe2O3:
-    observations:
-    - observation_id: shornikov_2019_c2feo3_dissociation_allen_snow_1955
-      experiment: allen-snow-1955
-      type: transition_point
-      locator: {page: 2, pdf_page_index: 1, published_page: 82, section: Introduction}
-      units: K
-      phase: cr
-      T_range_K: ['1406', '1406']
-      point_conditions:
-        temperature_K:
-          state: {tag: value, value: {kind: point, point: '1406'}}
-          locator: {page: 2, pdf_page_index: 1, published_page: 82, section: Introduction}
-      values:
-        quantity: transition_temperature
-        method_class: quoted_attributed
-        admission_status: admitted
-        T_K: '1406'
-        T_K_as_printed: '1406 ± 3'
-        temperature_uncertainty_K: '3'
-        event_as_printed: dissociation
-        attribution: Allen and Snow (1955), as cited by Shornikov and Shornikova (2019).
-        uncertainty_note: Confidence level not stated; width retained as printed.
     - observation_id: shornikov_2019_c2f2o5_decomposition_allen_snow_1955
       experiment: allen-snow-1955
       type: transition_point
-      locator: {page: 2, pdf_page_index: 1, published_page: 82, section: Introduction}
+      locator: {page: 1, pdf_page_index: 0, published_page: 82, section: Introduction}
       units: K
       phase: cr
       T_range_K: ['1381', '1381']
       point_conditions:
         temperature_K:
           state: {tag: value, value: {kind: point, point: '1381'}}
-          locator: {page: 2, pdf_page_index: 1, published_page: 82, section: Introduction}
+          locator: {page: 1, pdf_page_index: 0, published_page: 82, section: Introduction}
       values:
         quantity: transition_temperature
         method_class: quoted_attributed
         admission_status: admitted
         T_K: '1381'
         T_K_as_printed: '1381 ± 3'
-        temperature_uncertainty_K: '3'
+        T_m_uncertainty_K: '3'
         event_as_printed: decomposition
         attribution: Allen and Snow (1955), as cited by Shornikov and Shornikova (2019).
         uncertainty_note: Confidence level not stated; width retained as printed.
+  CaFe2O3:
+    observations:
+    - observation_id: shornikov_2019_c2feo3_dissociation_allen_snow_1955
+      experiment: allen-snow-1955
+      type: transition_point
+      locator: {page: 1, pdf_page_index: 0, published_page: 82, section: Introduction}
+      units: K
+      phase: cr
+      T_range_K: ['1406', '1406']
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: {kind: point, point: '1406'}}
+          locator: {page: 1, pdf_page_index: 0, published_page: 82, section: Introduction}
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_K: '1406'
+        T_K_as_printed: '1406 ± 3'
+        T_m_uncertainty_K: '3'
+        event_as_printed: dissociation
+        attribution: Allen and Snow (1955), as cited by Shornikov and Shornikova (2019).
+        uncertainty_note: Confidence level not stated; width retained as printed.
+  'CaO–FeO melt system':
+    context:
+    - observation_id: shornikov_2019_fig3_cao_feo_minimum_mixing_energy_range
+      type: thermodynamic_example
+      units: as reported
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        section: Results
+        figure: '3'
+      values:
+        sentence_as_published: 'The minimum of the ΔGm values is in the region of the eutectic composition of solid solutions of CaO and FeO (fields 4 and 7 in Fig. 1) and is in the range from –6.5 to –9.0 kJ/mol in the considered temperature range.'
+        attribution: 'The present study, compared with Bjorkvall et al. (2001) and Wu et al. (1993), as described in the text.'
+        reason_no_number: 'The source gives a range and the extract schema has no mixing-energy quantity; no numeric observation is scored.'
+    - observation_id: shornikov_2019_fig3_cao_feo_panel_a_curve_1
+      type: thermodynamic_example
+      units: as reported
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '3'
+        panel: a
+        curve: '1'
+      values:
+        caption_as_published: 'Fig. 3. The calculated mixing energy in the CaO–FeO melts at 1673 (1–3) and 1873 K (4–6): 1 and 4 –Wu et al. (1993), 2 and 5 –Bjorkvall et al. (2001), 3 and 6 – in the present study.'
+        attribution: 'Wu et al. (1993)'
+        reason_no_number: 'This is an attributed model curve; the extract has no mixing-energy quantity and scores no curve coordinates.'
+    - observation_id: shornikov_2019_fig3_cao_feo_panel_a_curve_2
+      type: thermodynamic_example
+      units: as reported
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '3'
+        panel: a
+        curve: '2'
+      values:
+        caption_as_published: 'Fig. 3. The calculated mixing energy in the CaO–FeO melts at 1673 (1–3) and 1873 K (4–6): 1 and 4 –Wu et al. (1993), 2 and 5 –Bjorkvall et al. (2001), 3 and 6 – in the present study.'
+        attribution: 'Bjorkvall et al. (2001)'
+        reason_no_number: 'This is an attributed model curve; the extract has no mixing-energy quantity and scores no curve coordinates.'
+    - observation_id: shornikov_2019_fig3_cao_feo_panel_a_curve_3
+      type: thermodynamic_example
+      units: as reported
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '3'
+        panel: a
+        curve: '3'
+      values:
+        caption_as_published: 'Fig. 3. The calculated mixing energy in the CaO–FeO melts at 1673 (1–3) and 1873 K (4–6): 1 and 4 –Wu et al. (1993), 2 and 5 –Bjorkvall et al. (2001), 3 and 6 – in the present study.'
+        attribution: 'the present study'
+        reason_no_number: 'This is an attributed model curve; the extract has no mixing-energy quantity and scores no curve coordinates.'
+    - observation_id: shornikov_2019_fig3_cao_feo_panel_b_curve_4
+      type: thermodynamic_example
+      units: as reported
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '3'
+        panel: b
+        curve: '4'
+      values:
+        caption_as_published: 'Fig. 3. The calculated mixing energy in the CaO–FeO melts at 1673 (1–3) and 1873 K (4–6): 1 and 4 –Wu et al. (1993), 2 and 5 –Bjorkvall et al. (2001), 3 and 6 – in the present study.'
+        attribution: 'Wu et al. (1993)'
+        reason_no_number: 'This is an attributed model curve; the extract has no mixing-energy quantity and scores no curve coordinates.'
+    - observation_id: shornikov_2019_fig3_cao_feo_panel_b_curve_5
+      type: thermodynamic_example
+      units: as reported
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '3'
+        panel: b
+        curve: '5'
+      values:
+        caption_as_published: 'Fig. 3. The calculated mixing energy in the CaO–FeO melts at 1673 (1–3) and 1873 K (4–6): 1 and 4 –Wu et al. (1993), 2 and 5 –Bjorkvall et al. (2001), 3 and 6 – in the present study.'
+        attribution: 'Bjorkvall et al. (2001)'
+        reason_no_number: 'This is an attributed model curve; the extract has no mixing-energy quantity and scores no curve coordinates.'
+    - observation_id: shornikov_2019_fig3_cao_feo_panel_b_curve_6
+      type: thermodynamic_example
+      units: as reported
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 84
+        figure: '3'
+        panel: b
+        curve: '6'
+      values:
+        caption_as_published: 'Fig. 3. The calculated mixing energy in the CaO–FeO melts at 1673 (1–3) and 1873 K (4–6): 1 and 4 –Wu et al. (1993), 2 and 5 –Bjorkvall et al. (2001), 3 and 6 – in the present study.'
+        attribution: 'the present study'
+        reason_no_number: 'This is an attributed model curve; the extract has no mixing-energy quantity and scores no curve coordinates.'
+    observations: []
