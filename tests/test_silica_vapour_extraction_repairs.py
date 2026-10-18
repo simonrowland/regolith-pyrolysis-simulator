@@ -184,6 +184,13 @@ def _assert_yakovlev_1984_figure_and_range_pins(extract, audit_rows):
         assert float(row["values"]["p_torr"]) == expected_pressure
         assert row["values"]["admission_status"] == "rejected"
 
+    literal_figure_pins = {
+        "F1-Ca-07": (2110, 2.4e-04, (1780, 880), (1780, 880)),
+        "F1-Mg-02": (1475, 2.4e-05, (868, 1177), (868, 1177)),
+        "F2-Ca-08": (2185, 2.7e-03, (1231, 420), (1231, 420)),
+        "F2-SiO-09": (1875, 6.3e-03, (678, 292), (678, 292)),
+    }
+
     expected_counts = {
         ("1", "SiO"): 9,
         ("1", "Mg"): 12,
@@ -211,6 +218,14 @@ def _assert_yakovlev_1984_figure_and_range_pins(extract, audit_rows):
             point = points[row["point_id"]]
             assert point["T_C"] == int(row["stored_T_C"])
             assert point["P"] == float(row["stored_p_torr"])
+            if row["point_id"] in literal_figure_pins:
+                temperature, pressure, read1, read2 = literal_figure_pins[row["point_id"]]
+                assert point["T_C"] == temperature
+                assert point["P"] == pressure
+                assert int(row["stored_T_C"]) == temperature
+                assert float(row["stored_p_torr"]) == pressure
+                assert (int(row["read1_x_px"]), int(row["read1_y_px"])) == read1
+                assert (int(row["read2_x_px"]), int(row["read2_y_px"])) == read2
             assert point["marker_symbol"] == {
                 "open_circle": "open circle",
                 "open_square": "open square",
@@ -247,9 +262,18 @@ def test_yakovlev_1984_printed_maxima_and_digitized_figures_migrate_with_conditi
     _assert_yakovlev_1984_figure_and_range_pins(extract, audit_rows)
 
     mutated = deepcopy(extract)
-    mutated["species"]["SiO"]["observations"][-1]["values"]["points"][0]["P"] *= 2
+    mutated_audit_rows = deepcopy(audit_rows)
+    mutated_point = next(
+        point
+        for observation in mutated["species"]["SiO"]["observations"]
+        for point in observation["values"].get("points", [])
+        if point["point_id"] == "F2-SiO-09"
+    )
+    mutated_row = next(row for row in mutated_audit_rows if row["point_id"] == "F2-SiO-09")
+    mutated_point["P"] *= 2
+    mutated_row["stored_p_torr"] = str(float(mutated_row["stored_p_torr"]) * 2)
     with pytest.raises(AssertionError):
-        _assert_yakovlev_1984_figure_and_range_pins(mutated, audit_rows)
+        _assert_yakovlev_1984_figure_and_range_pins(mutated, mutated_audit_rows)
     mutated = deepcopy(extract)
     fe_max = next(
         item for item in mutated["species"]["Fe"]["observations"]
