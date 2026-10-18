@@ -43,6 +43,14 @@ fidelity_samples:
       pdf_page_index: 8
       table: '3'
       row: '23'
+  - path: species.enstatite.observations[tachibana_2002_table3_h2_6p1e6_mass_loss_fraction].values.points[1].mass_loss_pct
+    value: 8.4
+    note: Table 3 evaporated-fraction cell for row 2
+    locator:
+      published_page: 721
+      pdf_page_index: 8
+      table: '3'
+      row: '2'
 experiments:
   - experiment_id: tachibana_2002_enstatite_h2_6p1e6
     method:
@@ -63,6 +71,29 @@ experiments:
       published_page: 715
       pdf_page_index: 2
       section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.61'}}
+        locator:
+          published_page: 721
+          pdf_page_index: 8
+          table: '3'
+          note: Printed p(H2) = 0.0000061 bar; 1 bar = 1e5 Pa
+      sweep_gas:
+        state:
+          tag: value
+          value:
+            species: H2
+            flow_sccm: {tag: unknown, reason: not_published}
+            partial_pressure_Pa:
+              tag: unknown
+              reason: represented_by_total_pressure_Pa
+        locator:
+          published_page: 715
+          pdf_page_index: 2
+          section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
     conditions:
       hydrogen_partial_pressure_bar: &tachibana_h2_6p1e6
         state: {tag: value, value: '0.0000061'}
@@ -90,6 +121,29 @@ experiments:
       published_page: 715
       pdf_page_index: 2
       section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.20'}}
+        locator:
+          published_page: 721
+          pdf_page_index: 8
+          table: '3'
+          note: Printed p(H2) = 0.0000020 bar; 1 bar = 1e5 Pa
+      sweep_gas:
+        state:
+          tag: value
+          value:
+            species: H2
+            flow_sccm: {tag: unknown, reason: not_published}
+            partial_pressure_Pa:
+              tag: unknown
+              reason: represented_by_total_pressure_Pa
+        locator:
+          published_page: 715
+          pdf_page_index: 2
+          section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
     conditions:
       hydrogen_partial_pressure_bar: &tachibana_h2_2p0e6
         state: {tag: value, value: '0.0000020'}
@@ -117,6 +171,29 @@ experiments:
       published_page: 715
       pdf_page_index: 2
       section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: {kind: point, point: '0.072'}}
+        locator:
+          published_page: 721
+          pdf_page_index: 8
+          table: '3'
+          note: Printed p(H2) = 0.00000072 bar; 1 bar = 1e5 Pa
+      sweep_gas:
+        state:
+          tag: value
+          value:
+            species: H2
+            flow_sccm: {tag: unknown, reason: not_published}
+            partial_pressure_Pa:
+              tag: unknown
+              reason: represented_by_total_pressure_Pa
+        locator:
+          published_page: 715
+          pdf_page_index: 2
+          section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
     conditions:
       hydrogen_partial_pressure_bar: &tachibana_h2_7p2e7
         state: {tag: value, value: '0.00000072'}
@@ -134,6 +211,7 @@ species:
         locator: {published_page: 721, pdf_page_index: 8, table: '3'}
         phase: cr
         units: '%'
+        per: initial_mass
         uncertainty:
           note: >-
             Table 3 gives no per-run uncertainty for F. The text reports an
@@ -142,6 +220,9 @@ species:
         values:
           quantity: mass_loss_fraction
           method_class: measured_tabulated
+          oxides_wt_pct:
+            MgO: '39.83'
+            SiO2: '60.04'
           points:
             - row_as_printed: '1'
               T_C: 1300
@@ -266,6 +347,7 @@ species:
         locator: {published_page: 721, pdf_page_index: 8, table: '3'}
         phase: cr
         units: '%'
+        per: initial_mass
         uncertainty:
           note: >-
             Table 3 gives no per-run uncertainty for F. The text reports an
@@ -274,6 +356,9 @@ species:
         values:
           quantity: mass_loss_fraction
           method_class: measured_tabulated
+          oxides_wt_pct:
+            MgO: '39.83'
+            SiO2: '60.04'
           points:
             - row_as_printed: '10'
               T_C: 1300
@@ -421,6 +506,7 @@ species:
         locator: {published_page: 721, pdf_page_index: 8, table: '3'}
         phase: cr
         units: '%'
+        per: initial_mass
         uncertainty:
           note: >-
             Table 3 gives no per-run uncertainty for F. Surface-area measurement
@@ -428,6 +514,9 @@ species:
         values:
           quantity: mass_loss_fraction
           method_class: measured_tabulated
+          oxides_wt_pct:
+            MgO: '39.83'
+            SiO2: '60.04'
           points:
             - {row_as_printed: '19', T_C: 1300, duration_h: 11, mass_loss_pct: 3.1, locator: {published_page: 721, pdf_page_index: 8, table: '3', row: '19'}, point_conditions: {temperature_K: {state: {tag: value, value: '1573.15'}, locator: {published_page: 721, pdf_page_index: 8, table: '3', row: '19'}}, duration_h: {state: {tag: value, value: 11}, locator: {published_page: 721, pdf_page_index: 8, table: '3', row: '19'}}, hydrogen_partial_pressure_bar: *tachibana_h2_7p2e7}}
             - {row_as_printed: '20', T_C: 1300, duration_h: 23, mass_loss_pct: 4.0, locator: {published_page: 721, pdf_page_index: 8, table: '3', row: '20'}, point_conditions: {temperature_K: {state: {tag: value, value: '1573.15'}, locator: {published_page: 721, pdf_page_index: 8, table: '3', row: '20'}}, duration_h: {state: {tag: value, value: 23}, locator: {published_page: 721, pdf_page_index: 8, table: '3', row: '20'}}, hydrogen_partial_pressure_bar: *tachibana_h2_7p2e7}}
@@ -508,6 +597,8 @@ species:
           hydrogen_temperature_precision_C_as_printed: ±5
           temperature_calibration_points_C_as_printed: ['Au 1064.43', 'Ni 1455', 'Pd 1554']
           vacuum_temperature_calibration_points_C_as_printed: ['Ni 1455', 'Co 1494']
+          vacuum_preheat_C_as_printed: 500
+          vacuum_preheat_duration_h_as_printed: '0.5 to 5'
           hydrogen_preheat_C_as_printed: about 500
           hydrogen_preheat_duration_as_printed: a few hours
           heatup_time_from_preheat_as_printed: about 15 min
@@ -599,8 +690,8 @@ species:
       - observation_id: tachibana_2002_forsterite_residue_composition
         type: composition
         locator:
-          published_page: 720
-          pdf_page_index: 7
+          published_page: 718
+          pdf_page_index: 5
           section: Experiments in Hydrogen Gas
         units: Mg/Si ratio and qualitative phase identity as printed
         values:
@@ -613,6 +704,12 @@ species:
             - name: IR absorption feature associated with forsterite in residue
               value: {kind: point, point: '610', approximate: true}
               units: cm^-1
+          orthoenstatite_IR_absorption_feature_as_printed:
+            value: {kind: point, point: '405'}
+            units: cm^-1
+            locator:
+              published_page: 716
+              pdf_page_index: 3
           quantitative_analysis_limitation: >-
             Precise quantitative analysis was difficult because the surface was
             rough. The hydrogen-run forsterite layer was too thin for optical
@@ -842,11 +939,24 @@ species:
           pressure_group_bar_as_printed: ['6.1 × 10^-6', '2.0 × 10^-6', '7.2 × 10^-7']
           group_order: pressure group then T ascending
           uncertainty_as_printed: parenthesized errors
+          quoted_attributed_values:
+            attribution: Carmichael, 1989
+            method_class: quoted_attributed
+            locator:
+              published_page: 725
+              pdf_page_index: 12
+            values:
+              average_enstatite_density:
+                value: {kind: point, point: '3.209'}
+                units: g cm^-3
+              average_forsterite_density:
+                value: {kind: point, point: '3.213'}
+                units: g cm^-3
       - observation_id: tachibana_2002_textual_kinetics_results
         type: thermodynamic_example
         locator:
-          published_page: 719
-          pdf_page_index: 6
+          published_page: 718
+          pdf_page_index: 5
           section: Results and Discussion
         units: as printed
         values:
@@ -885,8 +995,8 @@ species:
       - observation_id: tachibana_2002_solar_nebula_model_context
         type: model_curve
         locator:
-          published_page: 726
-          pdf_page_index: 13
+          published_page: 725
+          pdf_page_index: 12
           figure: '10'
           section: Application to Incongruent Evaporation of Enstatite under Kinetic Conditions in the Solar Nebula
         units: μm, bar, and kJ/mol as printed
@@ -914,6 +1024,16 @@ species:
             units: ratio to ideal evaporation rate
             method_class: quoted_attributed
             attribution: Tsuchiyama et al. (1998)
+          kappa_en_activation_energy_restatement:
+            value: {kind: point, point: '458'}
+            units: kJ/mol
+            method_class: model_derived
+            locator:
+              published_page: 726
+              pdf_page_index: 13
+            note: >-
+              Discussion restatement of the fitted activation energy; Eqn. 6
+              retains 457 (±58) kJ/mol.
           regime_definitions_as_printed:
             FED: free evaporation dominated
             HRD: hydrogen reaction dominated
