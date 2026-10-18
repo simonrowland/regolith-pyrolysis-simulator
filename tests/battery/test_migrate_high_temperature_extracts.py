@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
 from unittest.mock import patch
@@ -9,6 +10,7 @@ import yaml
 
 import simulator.battery.migrate as migrate_module
 from simulator.battery.enums import Quantity, ValueKind
+from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -326,14 +328,31 @@ def test_crown_high_t_markers_keep_values_pixels_and_conditions(
     ):
         assert point["locator"]["pdf_page_index"] == 2
         assert pixel in point["locator"]["note"]
-    assert "read_uncertainty_dex=0 dex" in ca_reads[0]["locator"]["note"]
-    assert "read_uncertainty_dex=0.00128 dex" in ca_reads[2]["locator"]["note"]
-    assert cao["activity"] == pytest.approx(9.8e-3, rel=0.10)
+    assert "pixel=(1062, 1242)" in ca_reads[0]["locator"]["note"]
+    assert "pixel=(1152, 1049)" in ca_reads[1]["locator"]["note"]
+    assert "pixel=(1238, 963)" in ca_reads[2]["locator"]["note"]
+    assert "read_uncertainty_dex=0.0064183 dex" in ca_reads[0]["locator"]["note"]
+    assert "read_uncertainty_dex=0.0025673 dex" in ca_reads[1]["locator"]["note"]
+    assert "read_uncertainty_dex=0.0064183 dex" in ca_reads[2]["locator"]["note"]
+    audit = (extract_dir / "yakovlev-2024-cai-vaporization.audit.md").read_text()
+    assert "| Fig. 2A | Ca | 1 | [1048, 1237] | [1062, 1242] |" in audit
+    assert "| Fig. 2A | Ca | 2 | [1157, 1047] | [1152, 1049] |" in audit
+    assert "| Fig. 2A | Ca | 3 | [1242, 958] | [1238, 963] |" in audit
+    assert cao["activity"] == 0.0098
     assert "pixel=(2476, 1499)" in cao["locator"]["note"]
-    assert gehlenite["activity"] == pytest.approx(5.3e-2, rel=0.10)
+    assert "pixel=(2464, 1501)" in cao["locator"]["note"]
+    assert "| Fig. 2B | CaO | 1 | [2476, 1499] | [2464, 1501] |" in audit
+    assert gehlenite["activity"] == 0.053
     assert "pixel=(356, 1467)" in gehlenite["locator"]["note"]
+    assert "pixel=(352, 1471)" in gehlenite["locator"]["note"]
+    assert "| Fig. 3A | Ca2Al2SiO7 | 1 | [356, 1467] | [352, 1471] |" in audit
+    assert check_all_fidelity_samples_match(yakovlev) == []
+    mutated = deepcopy(yakovlev)
+    mutated["species"]["CaO"]["observations"][0]["values"]["points"][0]["activity"] = 0.0090
+    assert check_all_fidelity_samples_match(mutated)
     profile = yakovlev["extraction"]["printed_text_values"][0]["values"]
-    assert yakovlev["extraction"]["printed_text_values"][0]["locator"]["pdf_page_index"] == 1
+    assert yakovlev["extraction"]["printed_text_values"][0]["locator"]["pdf_page_index"] == 2
+    assert yakovlev["extraction"]["printed_text_values"][0]["locator"]["published_page"] == 31
     assert [profile[key] for key in (
         "core_akermanite_wt_pct",
         "mantle_akermanite_wt_pct",

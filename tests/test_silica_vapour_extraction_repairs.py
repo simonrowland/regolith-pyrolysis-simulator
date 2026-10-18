@@ -171,7 +171,11 @@ def test_yakovlev_shornikov_2011_about_sio_and_o2_values_keep_provenance():
     extract = yaml.safe_load(
         (EXTRACTS / "kems-029-yakovlev-shornikov-2011.yaml").read_text()
     )
-    sio = extract["species"]["SiO"]["observations"][0]
+    sio = next(
+        row
+        for row in extract["species"]["SiO"]["observations"]
+        if row["observation_id"] == "yakovlev_shornikov_2011_CAI_SiO_highT_about_1e-6_bar"
+    )
     o2 = extract["species"]["O2"]["observations"][0]
     assert sio["values"]["p_bar"] == 1e-06
     assert sio["values"]["approximate"] is True
@@ -180,7 +184,12 @@ def test_yakovlev_shornikov_2011_about_sio_and_o2_values_keep_provenance():
     assert o2["values"]["points"][10]["p_bar"] == 2.5e-07
     assert check_all_fidelity_samples_match(extract) == []
     mutated = deepcopy(extract)
-    mutated["species"]["SiO"]["observations"][0]["values"]["p_bar"] *= 2
+    mutated_sio = next(
+        row
+        for row in mutated["species"]["SiO"]["observations"]
+        if row["observation_id"] == "yakovlev_shornikov_2011_CAI_SiO_highT_about_1e-6_bar"
+    )
+    mutated_sio["values"]["p_bar"] *= 2
     assert check_all_fidelity_samples_match(mutated)
 
     result = _migrate("kems-029-yakovlev-shornikov-2011.yaml")
