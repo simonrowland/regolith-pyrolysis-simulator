@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal
 
 import pytest
 
+import simulator.battery.migrate as migrate_module
 from simulator.battery.enums import (
     Engine,
     MethodToken,
@@ -211,6 +213,80 @@ def test_untyped_richter_final_map_never_becomes_initial(mass_loss_rows) -> None
         r14,
         experiment=replace(r14_experiment, sample=untyped_sample),
     )
+    assert prediction.refusal_detail["reason"] == "initial_composition_not_stated"
+
+
+@pytest.mark.parametrize(
+    ("label", "locator", "extract_comment"),
+    (
+        (
+            "table_header",
+            {"table": "1: composition after evaporation"},
+            None,
+        ),
+        (
+            "caption",
+            {"paragraph": "Caption: final residual melt composition"},
+            None,
+        ),
+        (
+            "extract_comment",
+            {"table": "1"},
+            "The composition is the final residue after evaporation.",
+        ),
+        ("no_role", {"table": "1"}, None),
+    ),
+)
+def test_finalize_never_promotes_untyped_observation_map_to_initial(
+    label, locator, extract_comment, monkeypatch
+) -> None:
+    source = LITERATURE / "extracts" / "kems-010-richter-2007.yaml"
+    original = load_yaml(source)
+    enriched = migrate_module.Migrator._richter_table1_sample_inputs(original)
+    experiment = next(
+        deepcopy(item)
+        for item in enriched["experiments"]
+        if item.get("experiment_id") == "cai-r-14"
+    )
+    final_map = experiment["sample"].pop("printed_composition")["state"]["value"]
+    experiment["sample"].pop("initial_composition")
+    observation = next(
+        deepcopy(item)
+        for item in original["species"]["Mg"]["observations"]
+        if item.get("observation_id")
+        == "richter_2007_mg_table1_mass_loss_fraction_R-14"
+    )
+    observation.pop("supersedes", None)
+    observation["values"]["composition_wt_pct"] = deepcopy(final_map)
+    observation["values"]["locator"] = locator
+    document = {
+        **deepcopy(enriched),
+        "experiments": [experiment],
+        "species": {"Mg": {"observations": [observation]}},
+    }
+    if extract_comment is not None:
+        document["extraction"]["comment"] = extract_comment
+
+    migrator = Migrator()
+    original_load_yaml = load_yaml
+    monkeypatch.setattr(
+        migrate_module,
+        "load_yaml",
+        lambda path: document if path == source else original_load_yaml(path),
+    )
+    migrator._migrate_extract(source)
+    row = next(
+        row
+        for row in migrator.result.observations.values()
+        if quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
+    )
+    before = migrator.result.experiments[row.experiment_id]
+    assert before.sample.initial_composition is None, label
+
+    migrator.finalize()
+    after = migrator.result.experiments[row.experiment_id]
+    assert after.sample.initial_composition is None, label
+    prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=after)
     assert prediction.refusal_detail["reason"] == "initial_composition_not_stated"
 
 
