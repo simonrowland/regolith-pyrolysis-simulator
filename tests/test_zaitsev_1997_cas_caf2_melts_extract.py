@@ -49,12 +49,17 @@ def test_extract_validates_and_fidelity_mutation_is_detected() -> None:
 
 
 def test_table4_migrates_all_activities_with_located_temperature_and_unknown_composition() -> None:
+    document = _document()
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
 
     records = list(migrator.result.observations.values())
     assert len(records) == 42
+    assert Counter(record.identity.temperature_K.value for record in records) == {
+        1798: 12,
+        1873: 30,
+    }
     assert not migrator.result.validation.hard_issues
     assert not migrator.result.registry_issues
     assert all(
@@ -70,7 +75,6 @@ def test_table4_migrates_all_activities_with_located_temperature_and_unknown_com
 
     for record in records:
         assert record.identity.temperature_K.is_value
-        assert record.identity.temperature_K.value in {1798, 1873}
         assert record.point_conditions is not None
         temperature = record.point_conditions["temperature_K"]
         composition = record.point_conditions["composition"]
@@ -83,6 +87,32 @@ def test_table4_migrates_all_activities_with_located_temperature_and_unknown_com
         assert composition.locator.pdf_page_index == 6
         assert record.identity.composition is not None
         assert record.identity.composition.is_unknown
+
+    present_1798 = _observation(document, "zaitsev_1997_table4_present_1798k")
+    present_1873 = _observation(document, "zaitsev_1997_table4_present_1873k")
+    ref5_1798 = _observation(document, "zaitsev_1997_table4_ref5_1798k")
+    ref5_1873 = _observation(document, "zaitsev_1997_table4_ref5_1873k")
+    assert present_1798["T_K"] == ref5_1798["T_K"] == 1798
+    assert present_1873["T_K"] == ref5_1873["T_K"] == 1873
+    assert len(present_1798["values"]["points"]) == 6
+    assert len(ref5_1798["values"]["points"]) == 6
+    assert len(present_1873["values"]["points"]) == 15
+    assert len(ref5_1873["values"]["points"]) == 15
+    right_block = next(
+        point
+        for point in present_1873["values"]["points"]
+        if point["row_as_printed"] == "7"
+    )
+    assert right_block["activity_as_printed"] == "3.96 × 10−4"
+    assert right_block["x_SiO2_as_printed"] == "0.103"
+    assert right_block["x_Al2O3_as_printed"] == "0.319"
+    assert right_block["point_conditions"]["temperature_K"]["state"]["value"] == 1873
+    quoted_right_block = next(
+        point
+        for point in ref5_1873["values"]["points"]
+        if point["row_as_printed"] == "7"
+    )
+    assert quoted_right_block["point_conditions"]["temperature_K"]["state"]["value"] == 1873
 
 
 def test_model_tables_and_all_figures_remain_context_only() -> None:
@@ -122,3 +152,17 @@ def test_model_tables_and_all_figures_remain_context_only() -> None:
         for item in context
         if item.get("type") == "table_record"
     )
+
+    experiment_context = next(
+        item
+        for item in context
+        if item["observation_id"]
+        == "zaitsev_1997_text_effusion_random_sampling_and_composition_accuracy"
+    )
+    assert experiment_context["type"] == "textual_fact"
+    assert experiment_context["locator"]["pdf_page_index"] == 1
+    assert experiment_context["values"]["value_as_printed"] == "<0.05%"
+    assert experiment_context["values"]["comparator"] == "less_than"
+    assert "below 0.05%" in experiment_context["values"]["bound_semantics"]
+    assert experiment_context["values"]["composition_accuracy_as_printed"] == "±0.0001 to ±0.0002"
+    assert "initial melt mole fractions" in experiment_context["values"]["composition_accuracy_meaning"]
