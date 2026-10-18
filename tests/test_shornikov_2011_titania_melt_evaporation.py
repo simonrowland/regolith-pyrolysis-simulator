@@ -27,9 +27,9 @@ RENDERED_CELLS = (
     ("Ca", "shornikov_2011_titania_melt_evaporation_p001_t01_r03_c06", "-25.442", Phase.G),
 )
 
-# Figure 1 marker centres. Read 1 is the distance-transform peak on the
-# embedded JPEG. Read 2 is a separate centre of that symbol's pixels.
-# T, activity, both pixel reads, and the half-difference uncertainty are
+# Figure 1 marker centres. Read 1 is the thick-marker centre on the embedded
+# JPEG. Read 2 is the interior centre on a fresh 600 dpi page crop. T,
+# activity, both pixel reads, and the half-difference uncertainty are
 # literals from the page, not from the audit table.
 FIGURE_READS = (
     (
@@ -39,8 +39,8 @@ FIGURE_READS = (
         "0.017",
         [148.0, 256.0],
         [1572.4, 2445.8],
-        [148.17, 256.98],
-        "0.007",
+        [148.12, 256.79],
+        "0.006",
     ),
     (
         "TiO2",
@@ -49,7 +49,7 @@ FIGURE_READS = (
         "0.021",
         [109.0, 262.0],
         [1416.4, 2469.8],
-        [108.96, 261.96],
+        [108.89, 262.04],
         None,
     ),
     (
@@ -59,7 +59,30 @@ FIGURE_READS = (
         "0.0023",
         [421.0, 198.0],
         [2664.2, 2213.6],
-        [421.24, 198.13],
+        [421.12, 198.03],
+        None,
+    ),
+)
+
+# Shared 50 mole % endpoints on the panel divider. Stored once, on panel a.
+# The legend symbols are lower (about y 364, 390 and 416) and are not these.
+BOUNDARY_READS = (
+    (
+        "CaO",
+        "shornikov_2011_fig1a_CaO_activity",
+        "0.026",
+        [375.63, 268.24],
+        [2482.8, 2494.8],
+        [375.69, 268.29],
+        None,
+    ),
+    (
+        "TiO2",
+        "shornikov_2011_fig1a_TiO2_activity",
+        "0.26",
+        [375.61, 333.36],
+        [2482.7, 2755.5],
+        [375.69, 333.48],
         "0.001",
     ),
 )
@@ -115,7 +138,7 @@ def test_table_and_figure_reads_are_pinned():
             continue
         points = row["values"].get("points") or []
         activity_points.extend(points)
-    assert len(activity_points) == 67
+    assert len(activity_points) == 69
     for (
         formula,
         observation_id,
@@ -138,6 +161,46 @@ def test_table_and_figure_reads_are_pinned():
             assert "read_uncertainty_dex" not in point
         else:
             assert point["read_uncertainty_dex"] == uncertainty
+        assert point.get("read_uncertainty_dex") not in {"0", "0.0", "0.000"}
+
+    for formula, observation_id, activity, embedded, page, embedded_2, uncertainty in BOUNDARY_READS:
+        match = next(
+            item
+            for item in document["species"][formula]["observations"]
+            if item["observation_id"] == observation_id
+        )
+        point = next(item for item in match["values"]["points"] if item["embedded_px_read_1"] == embedded)
+        assert point["activity"] == activity
+        assert point["T_K"] == "2050"
+        assert point["page_600dpi_px_read_1"] == page
+        assert point["embedded_px_read_2"] == embedded_2
+        assert point["locator"]["panel"] == "a"
+        if uncertainty is None:
+            assert "read_uncertainty_dex" not in point
+        else:
+            assert point["read_uncertainty_dex"] == uncertainty
+
+
+def test_residue_disagreement_matches_the_stored_coordinates():
+    document = _load()
+    points = [
+        point
+        for block in document["species"].values()
+        for row in block.get("context") or []
+        for point in (row.get("values") or {}).get("points") or []
+        if "marker_y_disagreement_px" in point
+    ]
+    assert len(points) == 59
+    bad = [
+        point
+        for point in points
+        if abs(
+            abs(point["embedded_px_read_1"][1] - point["embedded_px_read_2"][1])
+            - point["marker_y_disagreement_px"]
+        )
+        > 0.015
+    ]
+    assert bad == []
 
 
 def test_mutating_the_consumed_gibbs_value_or_deleting_a_row_fails_the_pin():
@@ -181,7 +244,7 @@ def test_isolated_migration_reaches_temperature_on_every_row():
         for row in result.observations.values()
         if row.source_id == document["source_id"]
     ]
-    assert len(migrated) == 112
+    assert len(migrated) == 114
     assert not result.registry_issues
     assert not result.validation.hard_issues
 
@@ -200,7 +263,7 @@ def test_isolated_migration_reaches_temperature_on_every_row():
     ]
     pressures = [row for row in migrated if row.identity.quantity.value.value == "p_partial"]
     assert len(gibbs) == 32
-    assert len(activities) == 67
+    assert len(activities) == 69
     assert len(curves) == 12
     assert len(pressures) == 1
 

@@ -4,7 +4,7 @@ Born-digital, 4 PDF pages. No published page number (article NZ6101). Locators u
 
 ## Table (one Gibbs-energy table, PDF page 1)
 
-Printed body: 11 solid, 7 liquid, 14 gas. Ten dashed liquid or solid cells are empty and were skipped. O2 solid-reference `0.000` is a printed zero and is stored.
+Printed body: 11 solid, 7 liquid, 14 gas. Ten dashed liquid or solid cells are empty and were skipped. Gas O2 `0.000` is a printed zero and is stored. The phase on that row is `g`.
 
 MinerU `p001-t01` and pdftotext agree on every stored digit, sign and exponent. MinerU writes an ASCII hyphen (U+002D). The page glyph is an en-dash (U+2013). No `needs_render_check` flag. One layout check of the 600 dpi page-1 render against the CSV: row and column assignment matches the printed solid / liquid / gas columns.
 
@@ -14,7 +14,16 @@ MinerU `p001-t01` and pdftotext agree on every stored digit, sign and exponent. 
 
 Page pixels are the PDF image matrix times 600/72. Fig. 1 image: width 360.898 pt, height 373.26 pt, lower-left (117.66, 298.22) pt. Fig. 2 image: width 352.713 pt, height 345.48 pt, lower-left (121.44, 376.58) pt. Embedded-JPEG pixels are the read frame. Page x = x0 + embedded_x * sx, page y from the top = y0 + embedded_y * sy.
 
-Tick pixels are the outward tick strokes on the embedded JPEG. Linear fit residual is the largest miss of a labelled tick.
+Tick pixels are the outward tick strokes on the embedded JPEG. The fit is `pixel = intercept + slope * label`. Residual is the largest miss of a labelled tick.
+
+| axis | slope px per label unit | intercept px |
+| --- | --- | --- |
+| Fig. 1a x | 6.8700 | 32.3000 |
+| Fig. 1b x | -9.1300 | 832.3000 |
+| Fig. 1a y, −log a | -65.8000 | 372.4000 |
+| Fig. 1b y, −log a | -66.2000 | 373.0000 |
+| Fig. 1c y, −ΔG/RT | -51.3714 | 658.4286 |
+| Fig. 1d y, −ΔG/RT | -51.4143 | 658.6190 |
 
 | axis | labels | pixels | max residual px |
 | --- | --- | --- | --- |
@@ -35,11 +44,13 @@ Fig. 2 activity panels have no x tick at 0. The corner 0 is the activity ordinat
 
 ## Marker reads
 
-Read 1 is the distance-transform peak of the colour mask, checked on a 25 px window and on the red-column run through each circle. Read 2 is a separate centre: the centroid of that symbol's pixels inside one marker radius, not a fixed offset of read 1. Where the radius also covered the next circle (Fig. 1a TiO2 index 15), read 2 is the midpoint of this circle's own contiguous run. That re-read lands on the same pixel as the peak, (307, 322). `read_uncertainty_dex` is half the ordinate difference. Where the two reads coincide, the key is omitted rather than stored as zero. No activity pair exceeds 0.02 dex.
+Read 1 is the centre of the thick part of the marker on the embedded JPEG. Read 2 is a fresh crop of the 600 dpi page render: the centroid of the strict interior (black below 40, red above 180 and 60 above green, blue above 160 and 40 above red) inside a disk that contains that one marker. The page raster is not the embedded JPEG, and the interior threshold is not the mask that found the marker. It is not a fixed pixel offset of read 1. `read_uncertainty_dex` is half the ordinate difference. Where that half rounds to 0.000 at three decimals, the key is omitted rather than stored as zero. No activity pair exceeds 0.02 dex, so none was replaced by a third crop. No activity pair has identical read-1 and read-2 coordinates.
 
-Fig. 1 symbols 1–3 (KEMS markers, Shornikov et al. 2000 and Shornikov and Archakov 2003): black square CaO, red circle TiO2, blue triangle SiO2. Stored once as linear activity. Panel a 12 + 19 + 15 points. Panel b 7 + 7 + 7 points. Legend keys at the centre divider were not stored.
+Fig. 1 symbols 1–3 (KEMS markers, Shornikov et al. 2000 and Shornikov and Archakov 2003): black square CaO, red circle TiO2, blue triangle SiO2. Stored once as linear activity. Panel a is 13 + 20 + 15 points. Panel b is 7 + 7 + 7 points. The two extra panel-a points are the shared 50 mole % endpoints on the divider: a black CaO square at embedded (375.63, 268.24) and a red TiO2 circle at (375.61, 333.36). Each is stored once, on panel a. The legend symbols are lower, at about (369, 363), (369, 390) and (369, 416), and are not stored. There is no SiO2 data marker on that divider.
 
-Fig. 1 symbol 4, magenta open squares, ordinate −ΔG_T/RT: 10 points in panel c and 6 in panel d, context only.
+Fig. 2 panels c and d: read 2 uses the same page-crop interior. `marker_y_disagreement_px` is the absolute difference of the stored embedded y coordinates. The mole-percent and q read-2 strings are recalculated from that read.
+
+Fig. 1 symbol 4, magenta open squares, ordinate −ΔG_T/RT: 10 points in panel c and 6 in panel d, context only. Those open squares were not re-read. The page-crop interior used for filled markers is the white hole of an open square, so it is not a centre. Their stored context values are unchanged.
 
 Fig. 2 panels c and d symbols 1–3: CaO 10 and 11, TiO2 11 and 11, SiO2 8 and 8, context only. One blue detection on the panel-d curve and one unpaired black pixel were dropped. Panels a and b have calculated lines only.
 
