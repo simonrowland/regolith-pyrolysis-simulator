@@ -1300,6 +1300,189 @@ def _source_polymorph_is_rejected(source_polymorph: State | None) -> bool:
     )
 
 
+def _fusion_energy_when_polymorph_absent(
+    reference: Observation,
+    formula: str,
+    temperature_K: Decimal,
+) -> tuple[Observation, object, Notice | None, Notice | None]:
+    """JANAF fusion for a pure-solid identity that never named a polymorph.
+
+    A migrated source that omits the polymorph is ``PolymorphRejectionKind.OMITTED``
+    and is refused before this runs (d-165). ``polymorph is None`` is the
+    melt-activity benchmark's pure-solid standard: the stable JANAF crystal at
+    T supplies the fusion pair, and a stability-bound notice records the
+    inference. Returns ``(reference, fusion, refusal, inference)``. A refusal
+    notice means the value must stay on the solid number.
+    """
+
+    from simulator.battery.generators.janaf import (
+        _JANAF_POLYMORPH_BY_TABLE,
+        JANAF_R_J_PER_MOL_K,
+        JANAFFusionPolymorphUnavailable,
+        _janaf_eligible_pure_crystal_tables,
+        _janaf_fusion_energy_for_pair,
+        _janaf_stable_crystal_set,
+        janaf_fusion_energy,
+    )
+
+    fusion = janaf_fusion_energy(formula, temperature_K)
+    expected_polymorph = _JANAF_POLYMORPH_BY_TABLE.get(fusion.crystal_table)
+    observed_polymorph = None
+    identity = reference.identity
+    if isinstance(identity, Identity) and identity.reference_state is not None:
+        observed_polymorph = polymorph_token(identity.reference_state.value.endmember)
+    if expected_polymorph is None or observed_polymorph is expected_polymorph:
+        return reference, fusion, None, None
+
+    inferred_reference_notice: Notice | None = None
+    unique_unknown_polymorph_table = False
+    try:
+        eligible_solid_tables = _janaf_eligible_pure_crystal_tables(
+            formula, temperature_K
+        )
+        stability = None
+        if len(eligible_solid_tables) > 1:
+            stability = _janaf_stable_crystal_set(
+                formula, temperature_K, eligible_solid_tables
+            )
+    except JANAFFusionPolymorphUnavailable as exc:
+        return (
+            reference,
+            fusion,
+            Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    f"fusion conversion missing input for {formula}: "
+                    f"incomplete JANAF stability candidate set: {exc}"
+                ),
+                origin=reference.observation_id,
+                band=f"JANAF stability data for {formula}: {exc}",
+            ),
+            None,
+        )
+
+    if len(eligible_solid_tables) == 1:
+        unique_unknown_polymorph_table = (
+            eligible_solid_tables[0][0] == fusion.crystal_table
+        )
+    elif len(eligible_solid_tables) > 1:
+        assert stability is not None
+        stable_table = stability.selected.table_id
+        stable_polymorph = stability.selected.polymorph
+        stable_gibbs_kJ_per_mol = stability.selected.gibbs_kJ_per_mol
+        alternatives = tuple(
+            (item.table_id, item.polymorph, item.gibbs_kJ_per_mol)
+            for item in stability.alternatives
+        )
+        if alternatives:
+            # Equal chemical potential: changing the pure-solid standard shifts
+            # activity by exp(dG/RT), so d log10(a) = dG / (R T ln 10).
+            bound_by_alternative = tuple(
+                (
+                    abs(gibbs_kJ_per_mol - stable_gibbs_kJ_per_mol)
+                    * Decimal(1000)
+                    / (
+                        JANAF_R_J_PER_MOL_K
+                        * temperature_K
+                        * Decimal(10).ln()
+                    ),
+                    table_id,
+                    polymorph,
+                    gibbs_kJ_per_mol,
+                )
+                for table_id, polymorph, gibbs_kJ_per_mol in alternatives
+            )
+            bound_dex, max_table, max_polymorph, _max_gibbs = max(
+                bound_by_alternative, key=lambda item: item[0]
+            )
+            assert reference.value.point is not None
+            row_band = _printed_uncertainty_band(
+                Quantity.ACTIVITY,
+                reference.uncertainty,
+                reference.value.point,
+                source_observation=reference,
+            )
+            if row_band.notice is not None:
+                reference = replace(
+                    reference,
+                    notices=union_notices(reference.notices, (row_band.notice,)),
+                )
+            bound_exceeds_row_band = (
+                None
+                if row_band.band is None
+                else bound_dex > row_band.band.value
+            )
+            inference_detail = {
+                "oxide": formula,
+                "temperature_K": str(temperature_K),
+                "chosen_polymorph": stable_polymorph.value,
+                "chosen_table": stable_table,
+                "alternatives": [
+                    {"polymorph": polymorph.value, "table": table_id}
+                    for table_id, polymorph, _gibbs in alternatives
+                ],
+                "bound_dex": str(bound_dex),
+                "maximum_alternative": {
+                    "polymorph": max_polymorph.value,
+                    "table": max_table,
+                },
+                "row_decision_band_dex": (
+                    None if row_band.band is None else str(row_band.band.value)
+                ),
+                "row_decision_band_refusal": (
+                    None if row_band.refusal is None else dict(row_band.refusal)
+                ),
+                "bound_exceeds_row_band": bound_exceeds_row_band,
+                "authority": Authority.CERTIFIED.value,
+            }
+            inferred_reference_notice = Notice(
+                kind=NoticeKind.DERIVATION_USES_COMPILATION,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    "reference_polymorph_inferred_from_stability: "
+                    + json.dumps(inference_detail, sort_keys=True)
+                ),
+                origin=reference.observation_id,
+                band=f"JANAF stability bound {bound_dex} dex",
+                authority=Authority.CERTIFIED,
+                certification=(
+                    "NIST-JANAF solid formation Gibbs energies compared at T"
+                ),
+            )
+        unique_unknown_polymorph_table = True
+        if stable_table != fusion.crystal_table:
+            fusion = _janaf_fusion_energy_for_pair(
+                formula, stable_table, fusion.liquid_table, temperature_K
+            )
+
+    if not unique_unknown_polymorph_table:
+        observed = (
+            "unknown" if observed_polymorph is None else observed_polymorph.value
+        )
+        return (
+            reference,
+            fusion,
+            Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    "fusion conversion missing input: JANAF solid table "
+                    f"{fusion.crystal_table} represents polymorph "
+                    f"{expected_polymorph.value}, but measured reference polymorph "
+                    f"is {observed}"
+                ),
+                origin=reference.observation_id,
+                band=(
+                    f"JANAF {fusion.crystal_table} requires "
+                    f"{expected_polymorph.value} solid reference"
+                ),
+            ),
+            inferred_reference_notice,
+        )
+    return reference, fusion, None, inferred_reference_notice
+
+
 def _janaf_fusion_energy_for_reference(
     reference: Observation,
     temperature_K: Decimal,
@@ -2073,8 +2256,13 @@ def fusion_comparison_reference(
         janaf_fusion_energy,
     )
 
+    # d-165: a source that records the solid but not its polymorph stays on the
+    # printed number. polymorph is None is not that record — the melt-activity
+    # benchmark's pure-solid identity never set the axis, and the stable JANAF
+    # crystal still converts it onto the liquid basis.
     if (
         observed_reference_phase is Phase.CR
+        and standard_state.endmember.polymorph is not None
         and _source_polymorph_is_unspecified(standard_state.endmember.polymorph)
     ):
         notice = Notice(
@@ -2129,6 +2317,7 @@ def fusion_comparison_reference(
             band=f"JANAF fusion data for {formula}: {reason}",
         )
 
+    inferred_reference_notice: Notice | None = None
     try:
         if engine is Engine.MAGEMIN:
             # The MAGEMin adapter resolves the source and target crystal
@@ -2136,6 +2325,23 @@ def fusion_comparison_reference(
             # reference names no crystal polymorph, so the source-named lookup
             # cannot supply that table.
             fusion = janaf_fusion_energy(formula, temperature_K)
+        elif standard_state.endmember.polymorph is None:
+            (
+                reference,
+                fusion,
+                absent_polymorph_refusal,
+                inferred_reference_notice,
+            ) = _fusion_energy_when_polymorph_absent(
+                reference, formula, temperature_K
+            )
+            if absent_polymorph_refusal is not None:
+                extra = (absent_polymorph_refusal,)
+                if inferred_reference_notice is not None:
+                    extra = (inferred_reference_notice, absent_polymorph_refusal)
+                return replace(
+                    reference,
+                    notices=union_notices(reference.notices, extra),
+                )
         else:
             fusion = _janaf_fusion_energy_for_reference(reference, temperature_K)
     except ValueError as exc:
@@ -2485,6 +2691,8 @@ def fusion_comparison_reference(
         origin=reference.observation_id,
     )
     notices = (notice,)
+    if inferred_reference_notice is not None:
+        notices = (inferred_reference_notice,) + notices
     if magemin_above_crossing_notice is not None:
         notices = (magemin_above_crossing_notice,) + notices
     if melts_notice is not None:
