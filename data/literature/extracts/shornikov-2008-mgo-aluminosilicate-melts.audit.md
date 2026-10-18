@@ -70,7 +70,7 @@ Each axis was calibrated from the labelled ticks below. Fitted maps are pixel-to
 | c, -log10(activity) | 0.2, 0.4, 0.6, 0.8 | 1363, 1568, 1774, 1979 | -log10(a) = 0.000973708911 py - 1.12706759 |
 | d, -ΔfG kJ/mole | 26, 24, 22, 20, 18 | 1330, 1518, 1705, 1892, 2079 | -ΔfG = -0.0106837485 py + 40.2136544 |
 
-Marker centers are read twice. R1 is the initial crop from the page image at origin (150, 400). R2 is the centre of the filled mark on the same 600 dpi page, measured again in its own crop. A 3 px opening removes curves, grid lines and error bars. Squares and triangles use the bounding-box centre of that body. Panel d uses a circle fit to the edge, except marker 3, whose cap inflates the fit, so that marker uses the deepest interior pixel. Marker a1 is a square cut by the axis, so its abscissa stays on the axis and its ordinate is the vertical middle of the square. Markers b1 and d1 are whole symbols whose centres are not on the axis; they are not snapped. Each crop has a unique id `lmax-r2-<panel><marker>`. Pixel-to-axis values use the fitted maps above. The stored x(SiO2) and activity are the means of the two calibrated reads rounded to two significant figures. Panel d stores the negative mean of the two plotted -ΔfG reads. Read uncertainty is half the absolute difference of the two ordinate reads when those reads do not share an integer page ordinate, and the axis width of half a pixel when they do. The key is present and positive on every marker. A measured pair may land on the same pixel; the cross is not moved off the centre to open a gap.
+Marker centers are read twice. R1 is the initial crop from the page image at origin (150, 400). R2 is the centre of the filled mark on the same 600 dpi page, measured again in its own crop. A 3 px opening removes curves, grid lines and error bars. Squares and triangles use the bounding-box centre of that body. Panel d uses a circle fit to the edge, except marker 3, whose cap inflates the fit, so that marker uses the deepest interior pixel. Marker a1 is a square cut by the axis, so its abscissa stays on the axis and its ordinate is the vertical middle of the square. Markers b1 and d1 are whole symbols. Both reads sit on the measured centre, and the stored x is two significant figures of that centre (1.7 and 0.71), not a mean with the axis tick. Each crop has a unique id `lmax-r2-<panel><marker>`. Pixel-to-axis values use the fitted maps above. The stored x(SiO2) and activity are the means of the two calibrated reads rounded to two significant figures. Panel d stores the negative mean of the two plotted -ΔfG reads. Read uncertainty is half the absolute difference of the two ordinate reads when those reads do not share an integer page ordinate, and the axis width of half a pixel when they do. The key is present and positive on every marker. A measured pair may land on the same pixel; the cross is not moved off the centre to open a gap.
 
 | Panel | Marker | Stored x(SiO2) mol% | R1 pixel / ordinate | R2 crop origin (page px) | R2 pixel / ordinate | Stored value | Read uncertainty |
 |---|---:|---:|---|---|---|---:|---:|
@@ -80,7 +80,7 @@ Marker centers are read twice. R1 is the initial crop from the page image at ori
 | a | 4 | 56 | `[1089, 382]` / 0.761698 | `[1166, 756]` | `[71, 28]` / 0.765017 | `0.17` | 0.001660 dex |
 | a | 5 | 65 | `[1189, 481]` / 0.925156 | `[1295, 828]` | `[44, 53]` / 0.925985 | `0.12` | 0.000830 dex |
 | a | 6 | 75 | `[1296, 600]` / 1.123462 | `[1379, 961]` | `[67, 39]` / 1.123462 | `0.075` | 0.000830 dex |
-| b | 1 | 0.87 | `[1557, 342]` / 0.705727 | `[1697, 686]` | `[29, 58]` / 0.709888 | `0.20` | 0.002081 dex |
+| b | 1 | 1.7 | `[1576, 344]` / 0.709888 | `[1697, 686]` | `[29, 58]` / 0.709888 | `0.20` | 0.000832 dex |
 | b | 2 | 19 | `[1756, 341]` / 0.704063 | `[1859, 707]` | `[51, 34]` / 0.704895 | `0.20` | 0.000832 dex |
 | b | 3 | 53 | `[2118, 570]` / 1.086054 | `[2208, 925]` | `[63, 46]` / 1.087718 | `0.082` | 0.000832 dex |
 | b | 4 | 56 | `[2153, 624]` / 1.175102 | `[2269, 956]` | `[38, 69]` / 1.177599 | `0.067` | 0.001249 dex |
@@ -91,7 +91,7 @@ Marker centers are read twice. R1 is the initial crop from the page image at ori
 | c | 3 | 55 | `[1093, 1579]` / 0.409932 | `[1217, 1928]` | `[26, 48]` / 0.407498 | `0.39` | 0.001217 dex |
 | c | 4 | 65 | `[1193, 1426]` / 0.260954 | `[1275, 1787]` | `[68, 35]` / 0.257546 | `0.55` | 0.001704 dex |
 | c | 5 | 75 | `[1299, 1299]` / 0.137293 | `[1399, 1623]` | `[49, 72]` / 0.133885 | `0.73` | 0.001704 dex |
-| d | 1 | 0.35 | `[1566, 1628]` / 22.825850 | `[1699, 1982]` | `[31, 44]` / 22.841879 | `-23` | 0.008015 kJ/mol |
+| d | 1 | 0.71 | `[1580, 1626]` / 22.841879 | `[1699, 1982]` | `[31, 44]` / 22.841879 | `-23` | 0.005342 kJ/mol |
 | d | 2 | 18 | `[1764, 1403]` / 25.229700 | `[1848, 1777]` | `[66, 25]` / 25.235039 | `-25` | 0.002670 kJ/mol |
 | d | 3 | 52 | `[2119, 1277]` / 26.575850 | `[2227, 1617]` | `[43, 59]` / 26.581191 | `-27` | 0.002671 kJ/mol |
 | d | 4 | 55 | `[2155, 1338]` / 25.924140 | `[2252, 1700]` | `[54, 37]` / 25.929483 | `-26` | 0.002672 kJ/mol |
