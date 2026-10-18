@@ -27,8 +27,21 @@ fidelity_samples:
       table: '2'
       published_page: '172'
       row: 'LW_− 20'
-  - path: species.Fe.observations[cottrell_2009_basalt_centroid_calibration].values.fit.centroid_a_as_published
-    value: '22.99081'
+  - species: Fe
+    observation_id: cottrell_2009_basalt_centroid_calibration
+    observable: recalculation_table
+    field: fit
+    value:
+      x_as_published: cross-session drift-corrected centroid energy (eV)
+      mu_eV_as_published: '7112.45876'
+      centroid_a_as_published: '22.99081'
+      centroid_b_as_published: '43.91273'
+      centroid_c_as_published: '14.68104'
+      centroid_a_sigma_1sigma_as_published: '0.4075'
+      centroid_b_sigma_1sigma_as_published: '1.3163'
+      centroid_c_sigma_1sigma_as_published: '2.6737'
+      average_1sigma_Fe3_sumFe_times_100_as_published: '0.45'
+      equation_as_published: 'Fe3+/SumFe = a + b(x − μ) + c(x − μ)^2'
     locator:
       page: 9
       table: '3'
@@ -2198,6 +2211,7 @@ species:
                     tag: unknown
                     reason: not_published
                   locator: *rhyolite_conditions_locator
+    context:
       - observation_id: cottrell_2009_basalt_centroid_calibration
         type: recalculation_table
         locator:

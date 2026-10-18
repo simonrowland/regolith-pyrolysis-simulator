@@ -17,6 +17,8 @@ from simulator.battery.migrate import (
 REPO = Path(__file__).resolve().parents[2]
 EXTRACT = REPO / "data/literature/extracts/cottrell-2009-iron-xanes.yaml"
 SOURCE_ID = "cottrell-2009-iron-xanes"
+BASALT_FIT_ID = "cottrell_2009_basalt_centroid_calibration"
+RHYOLITE_FIT_ID = "cottrell_2009_rhyolite_centroid_calibration"
 
 
 def _migrate():
@@ -26,16 +28,18 @@ def _migrate():
     return migrator.result
 
 
-def _observations_by_id(doc: dict) -> dict[str, dict]:
+def _rows_by_id(doc: dict) -> dict[str, dict]:
+    species = doc["species"]["Fe"]
     return {
         row["observation_id"]: row
-        for row in doc["species"]["Fe"]["observations"]
+        for container in ("observations", "context")
+        for row in species.get(container, [])
     }
 
 
 def test_table_cells_match_render_and_cover_all_23_glasses() -> None:
     doc = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
-    rows = _observations_by_id(doc)
+    rows = _rows_by_id(doc)
 
     # PDF p. 6 / published p. 172, Table 2, LW_-20 row.
     basalt_moss = rows["cottrell_2009_basalt_mossbauer"]["values"]["series"]
@@ -50,7 +54,7 @@ def test_table_cells_match_render_and_cover_all_23_glasses() -> None:
     assert moore_dt39["sigma"] == "0.08"
 
     # PDF p. 9 / published p. 175, Table 3, basalt centroid fit.
-    basalt_fit = rows["cottrell_2009_basalt_centroid_calibration"]["values"]["fit"]
+    basalt_fit = rows[BASALT_FIT_ID]["values"]["fit"]
     assert basalt_fit["centroid_a_as_published"] == "22.99081"
 
     # PDF p. 2 / published p. 168, Table 1, AII SiO2 column.
@@ -70,7 +74,7 @@ def test_table_cells_match_render_and_cover_all_23_glasses() -> None:
 def test_real_migration_preserves_fe_ratio_lineage_and_row_conditions() -> None:
     result = _migrate()
     prefix = f"{SOURCE_ID}::"
-    assert len(result.observations) == 43
+    assert len(result.observations) == 41
     ratios = {
         oid: obs
         for oid, obs in result.observations.items()
@@ -140,12 +144,30 @@ def test_real_migration_preserves_fe_ratio_lineage_and_row_conditions() -> None:
     assert lw_conditions["composition"].state.value["SiO2"] == Decimal("49.42")
     assert lw_conditions["composition"].locator.page == 2
 
-    # The paper identifies 13 basalt and seven rhyolite calibration glasses.
-    basalt_fit = result.observations[f"{prefix}cottrell_2009_basalt_centroid_calibration"]
-    rhyolite_fit = result.observations[f"{prefix}cottrell_2009_rhyolite_centroid_calibration"]
-    assert len(basalt_fit.derived_from or ()) == 13
-    assert set(basalt_fit.derived_from or ()).issubset(result.observations)
-    assert not set(basalt_fit.derived_from or ()) & {
+    # Table 3's calibration fits are unscored context. Their source payloads,
+    # including the input-observation references, survive migration unchanged.
+    source_rows = _rows_by_id(yaml.safe_load(EXTRACT.read_text(encoding="utf-8")))
+    calibration_ids = {BASALT_FIT_ID, RHYOLITE_FIT_ID}
+    calibration_rows = {
+        row["observation_id"]: row
+        for rows in result.context_by_work.values()
+        for row in rows
+        if row.get("source_id") == SOURCE_ID
+        and row.get("observation_id") in calibration_ids
+    }
+    assert set(calibration_rows) == calibration_ids
+    for observation_id, row in calibration_rows.items():
+        assert row["context_id"] == f"{SOURCE_ID}::context::{observation_id}"
+        assert (
+            {key: row[key] for key in source_rows[observation_id]}
+            == source_rows[observation_id]
+        )
+    basalt_fit = calibration_rows[BASALT_FIT_ID]
+    rhyolite_fit = calibration_rows[RHYOLITE_FIT_ID]
+    assert basalt_fit["type"] == "recalculation_table"
+    assert len(basalt_fit["derived_from"]) == 13
+    assert set(basalt_fit["derived_from"]).issubset(result.observations)
+    assert not set(basalt_fit["derived_from"]) & {
         oid for oid in ratios if any(tag in oid for tag in ("row=aii_-35", "row=lw_-30", "row=aii_-25"))
     }
     rhyolite_parents = {
@@ -157,8 +179,8 @@ def test_real_migration_preserves_fe_ratio_lineage_and_row_conditions() -> None:
         f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:4",
         f"{prefix}cottrell_2009_moore_wet_chemistry_quotes::point:5",
     }
-    assert len(rhyolite_fit.derived_from or ()) == 7
-    assert set(rhyolite_fit.derived_from or ()) == rhyolite_parents
+    assert len(rhyolite_fit["derived_from"]) == 7
+    assert set(rhyolite_fit["derived_from"]) == rhyolite_parents
     assert rhyolite_parents.issubset(result.observations)
     printed_rhyolite_fractions = {
         parent_id: dict(result.observations[parent_id].derivation.parameters)[
@@ -202,11 +224,11 @@ def test_real_migration_preserves_fe_ratio_lineage_and_row_conditions() -> None:
         "b.d. (below detection)" in (obs.value.unavailable_reason or "")
         for obs in below_detection
     )
-    assert rhyolite_fit.evidence.class_.value is EvidenceClass.MODEL_DERIVED
-    assert set(rhyolite_fit.derivation.inputs) == rhyolite_parents
+    assert rhyolite_fit["values"]["method_class"] == EvidenceClass.MODEL_DERIVED.value
+    assert set(rhyolite_fit["derivation"]["inputs"]) == rhyolite_parents
 
     assert not result.validation.hard_issues
     assert sum(
         obs.value.kind is ValueKind.UNAVAILABLE for obs in ratios.values()
     ) == 3
-    assert sum(obs.value.kind is ValueKind.UNAVAILABLE for obs in result.observations.values()) == 5
+    assert sum(obs.value.kind is ValueKind.UNAVAILABLE for obs in result.observations.values()) == 3
