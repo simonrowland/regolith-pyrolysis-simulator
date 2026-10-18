@@ -715,8 +715,8 @@ species:
         pdf_page_index: 1
         published_page: 86
         section: Abstract
-        note: The sentence prints an approximate formation enthalpy for MgTiO3 without an explicit source
-          attribution.
+      phase: g
+      per: mol_species
       units: kJ/mol
       point_conditions:
         temperature_K:
@@ -730,17 +730,15 @@ species:
             pdf_page_index: 1
             published_page: 86
             section: Abstract
-            note: The sentence prints an approximate formation enthalpy for MgTiO3 without an explicit
-              source attribution.
       values:
         quantity: delta_fH
-        method_class: author_estimate
+        method_class: quoted_attributed
         admission_status: admitted
         value: '-856'
         approximate: true
         T_K: '298'
         as_printed: ≈−856 kJ/mol
-        attribution_note: The sentence does not explicitly assign this estimate to a cited work.
+        attribution: Lopatin and Semenov (2001)
     - observation_id: shornikov_2019_mgo_titania_melts_prose_mgtio3_relative_vapour_amount_limit
       type: gas_speciation
       locator:
@@ -2516,7 +2514,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: The curve spans the TiO2 composition axis; no point composition is selected.
+            reason: The curve spans the SiO2 composition axis; no point composition is selected.
           locator:
             page: 4
             pdf_page_index: 3
@@ -2568,7 +2566,7 @@ species:
         composition:
           state:
             tag: unknown
-            reason: The curve spans the TiO2 composition axis; no point composition is selected.
+            reason: The curve spans the SiO2 composition axis; no point composition is selected.
           locator:
             page: 4
             pdf_page_index: 3

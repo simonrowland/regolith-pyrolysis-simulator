@@ -106,6 +106,14 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
         assert row["point_conditions"]["temperature_K"]["locator"] is not None
         assert row["point_conditions"]["composition"]["state"]["tag"] == "unknown"
 
+    fig4_axis_reasons = {
+        row["observation_id"]: row["point_conditions"]["composition"]["state"]["reason"]
+        for _, row in observations
+        if row["observation_id"].endswith(("fig4_curve_1", "fig4_curve_2"))
+    }
+    assert len(fig4_axis_reasons) == 2
+    assert all("SiO2 composition axis" in reason for reason in fig4_axis_reasons.values())
+
     fusion_quote = next(
         row
         for _, row in observations
@@ -121,6 +129,10 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
     )
     assert approximate_estimate["values"]["value"] == "-856"
     assert approximate_estimate["values"]["approximate"] is True
+    assert approximate_estimate["phase"] == "g"
+    assert approximate_estimate["per"] == "mol_species"
+    assert approximate_estimate["values"]["method_class"] == "quoted_attributed"
+    assert approximate_estimate["values"]["attribution"] == "Lopatin and Semenov (2001)"
 
     migrator = Migrator(root=ROOT, index=None, aliases={})
     migrator._migrate_extract(EXTRACT)
