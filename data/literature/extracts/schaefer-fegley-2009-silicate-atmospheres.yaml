@@ -1,0 +1,537 @@
+schema_version: literature_extract.v1
+source_id: schaefer-fegley-2009-silicate-atmospheres
+source:
+  citation: 'Schaefer, L. & Fegley, B., Jr. (2009), "Chemistry of Silicate Atmospheres of Evaporating Super-Earths", Astrophysical Journal Letters 703:L113–L117, DOI 10.1088/0004-637X/703/2/L113.'
+  doi: 10.1088/0004-637X/703/2/L113
+  year: 2009
+extraction:
+  method: >-
+    Manual transcription from the born-digital pdftotext-layout source. Table 1 was
+    checked against a 600 dpi render of PDF page 15. The table tool accepts MinerU
+    content-list tables and refuses a pdftotext-only table, so Table 1 is retained
+    as source-attributed context. Figures 1–3 are model calculations and are recorded
+    without digitised points. The paper reports no new measurements.
+  date: '2026-10-18'
+  worker: fam4-1018
+  provenance_path: raw/schaefer-fegley-2009-silicate-atmospheres/schaefer-fegley-2009-silicate-atmospheres.pdf
+review_status: draft
+corrections: []
+species:
+  SiO2:
+    context:
+      - observation_id: schaefer_fegley_2009_table1_continental_crust
+        type: relation
+        locator:
+          table: '1'
+          page: 15
+          pdf_page_index: 14
+        phase: continental_crust_bulk_composition
+        units: wt% oxides as printed
+        values:
+          quantity_as_printed: composition of planetary analog
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Wedepohl (1995)
+          components:
+            - component: SiO2
+              value_as_printed: '62.93'
+            - component: MgO
+              value_as_printed: '3.79'
+            - component: Al2O3
+              value_as_printed: '15.45'
+            - component: TiO2
+              value_as_printed: '0.70'
+            - component: FeO
+              value_as_printed: '5.78'
+            - component: CaO
+              value_as_printed: '5.63'
+            - component: Na2O
+              value_as_printed: '3.27'
+            - component: K2O
+              value_as_printed: '2.45'
+          total_wt_percent_as_printed: '100.00'
+          note: Table 1 values are attributed to the cited composition source; the authors renormalize starting compositions to 100% on a volatile-free basis for their calculations.
+      - observation_id: schaefer_fegley_2009_table1_oceanic_crust
+        type: relation
+        locator:
+          table: '1'
+          page: 15
+          pdf_page_index: 14
+        phase: oceanic_crust_bulk_composition
+        units: wt% oxides as printed
+        values:
+          quantity_as_printed: composition of planetary analog
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Klein (2005)
+          components:
+            - component: SiO2
+              value_as_printed: '50.36'
+            - component: MgO
+              value_as_printed: '7.61'
+            - component: Al2O3
+              value_as_printed: '15.85'
+            - component: TiO2
+              value_as_printed: '1.48'
+            - component: FeO
+              value_as_printed: '9.56'
+            - component: CaO
+              value_as_printed: '12.24'
+            - component: Na2O
+              value_as_printed: '2.77'
+            - component: K2O
+              value_as_printed: '0.13'
+          total_wt_percent_as_printed: '100.00'
+          note: Table 1 values are attributed to the cited composition source; the authors renormalize starting compositions to 100% on a volatile-free basis for their calculations.
+      - observation_id: schaefer_fegley_2009_table1_bse
+        type: relation
+        locator:
+          table: '1'
+          page: 15
+          pdf_page_index: 14
+        phase: bulk_silicate_earth_composition
+        units: wt% oxides as printed
+        values:
+          quantity_as_printed: composition of planetary analog
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: O’Neill & Palme (1998)
+          components:
+            - component: SiO2
+              value_as_printed: '45.97'
+            - component: MgO
+              value_as_printed: '36.66'
+            - component: Al2O3
+              value_as_printed: '4.77'
+            - component: TiO2
+              value_as_printed: '0.18'
+            - component: FeO
+              value_as_printed: '8.24'
+            - component: CaO
+              value_as_printed: '3.78'
+            - component: Na2O
+              value_as_printed: '0.35'
+            - component: K2O
+              value_as_printed: '0.04'
+          total_wt_percent_as_printed: '99.99'
+          note: Table 1 values are attributed to the cited composition source; the authors renormalize starting compositions to 100% on a volatile-free basis for their calculations.
+      - observation_id: schaefer_fegley_2009_table1_moon
+        type: relation
+        locator:
+          table: '1'
+          page: 15
+          pdf_page_index: 14
+        phase: bulk_silicate_moon_composition
+        units: wt% oxides as printed
+        values:
+          quantity_as_printed: composition of planetary analog
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: Warren (2005)
+          components:
+            - component: SiO2
+              value_as_printed: '47.17'
+            - component: MgO
+              value_as_printed: '36.29'
+            - component: Al2O3
+              value_as_printed: '3.90'
+            - component: TiO2
+              value_as_printed: '0.18'
+            - component: FeO
+              value_as_printed: '9.31'
+            - component: CaO
+              value_as_printed: '3.08'
+            - component: Na2O
+              value_as_printed: '0.05'
+            - component: K2O
+              value_as_printed: '0.005'
+          total_wt_percent_as_printed: '99.985'
+          note: Table 1 values are attributed to the cited composition source; the authors renormalize starting compositions to 100% on a volatile-free basis for their calculations.
+      - observation_id: schaefer_fegley_2009_model_results_as_printed
+        type: relation
+        locator:
+          page: 6
+          pdf_page_index: 5
+          section: Results
+        units: model-derived pressure in bars; vaporized fractions in percent
+        values:
+          method_class: model_derived
+          attribution: Schaefer and Fegley (2009), MAGMA calculations
+          initial_atmospheric_pressure:
+            - temperature_K: 3000
+              value:
+                kind: point
+                point: 0.1
+                approximate: true
+              as_printed: '~10^-1 bars'
+            - temperature_K: 1500
+              value:
+                kind: point
+                point: 0.0000001
+                approximate: true
+              as_printed: '~10^-7 bars'
+            - temperature_K: 2200
+              pressure_endpoints_bar:
+                - role: upper
+                  value:
+                    kind: point
+                    point: 0.001
+                    approximate: true
+                  as_printed: '~1 × 10^-3 bars'
+                - role: lower
+                  value:
+                    kind: point
+                    point: 0.00055
+                    approximate: false
+                  as_printed: '5.5 × 10^-4 bars'
+          bulk_silicate_earth_at_2200K:
+            sodium_loss_fraction:
+              value:
+                kind: point
+                point: 2
+                approximate: false
+              units: '%'
+              as_printed: '2%'
+            potassium_loss_fraction:
+              value:
+                kind: point
+                point: 22
+                approximate: true
+              units: '%'
+              as_printed: '~22%'
+            SiO_peak_fraction:
+              value:
+                kind: point
+                point: 16
+                approximate: true
+              units: '%'
+              as_printed: '~16%'
+            Mg_dominant_from_fraction:
+              value:
+                kind: point
+                point: 27
+                approximate: true
+              units: '%'
+              as_printed: '~27%'
+            refractory_gas_regime_from_fraction:
+              value:
+                kind: bound
+                bound_operator: '>'
+                bound_value: 90
+                approximate: false
+              units: '%'
+              as_printed: '>90%'
+            refractory_gases_as_printed: [Al, Ca, AlO, TiO2]
+            Fe_most_abundant_at_fraction:
+              value:
+                kind: point
+                point: 2
+                approximate: true
+              units: '%'
+              as_printed: '~2%'
+            Fe_loss_fraction:
+              value:
+                kind: point
+                point: 90
+                approximate: true
+              units: '%'
+              as_printed: '~90%'
+            pressure_after_sodium_loss_bar:
+              -
+                value:
+                  kind: point
+                  point: 0.001
+                  approximate: true
+                as_printed: '~10^-3 bars'
+              -
+                value:
+                  kind: point
+                  point: 0.0001
+                  approximate: true
+                as_printed: '~10^-4 bars'
+            pressure_after_90_percent_vaporized_bar:
+              -
+                value:
+                  kind: point
+                  point: 0.000001
+                  approximate: true
+                as_printed: '~10^-6 bars'
+              -
+                value:
+                  kind: point
+                  point: 0.0000001
+                  approximate: true
+                as_printed: '~10^-7 bars'
+          bulk_silicate_earth_temperature_dependence:
+            sodium_loss_fraction:
+              - temperature_K: 1800
+                value:
+                  kind: point
+                  point: 1
+                  approximate: false
+                units: '%'
+                as_printed: '1%'
+              - temperature_K: 2600
+                value:
+                  kind: point
+                  point: 11
+                  approximate: false
+                units: '%'
+                as_printed: '11%'
+            at_1800K:
+              Fe_dominant_until_fraction:
+                value:
+                  kind: point
+                  point: 8
+                  approximate: true
+                units: '%'
+                as_printed: '~8%'
+              Mg_dominant_from_fraction:
+                value:
+                  kind: point
+                  point: 22
+                  approximate: true
+                units: '%'
+                as_printed: '~22%'
+          crust_at_2200K:
+            Na_dominant_until_fraction:
+              value:
+                kind: point
+                point: 11
+                approximate: true
+              units: '%'
+              as_printed: '~11%'
+            sodium_persists_until_fraction:
+              value:
+                kind: point
+                point: 50
+                approximate: true
+              units: '%'
+              as_printed: '~50%'
+            pressure_drop_by_fraction:
+              value:
+                kind: point
+                point: 63
+                approximate: false
+              units: '%'
+              as_printed: '63%'
+            continental_crust_potassium_peak_fraction:
+              value:
+                kind: point
+                point: 67
+                approximate: true
+              units: '%'
+              as_printed: '~67%'
+            continental_crust_potassium_loss_fraction:
+              value:
+                kind: point
+                point: 74
+                approximate: true
+              units: '%'
+              as_printed: '~74%'
+            note: Total pressure drops by one order of magnitude by 63% vaporization; the oceanic crust contains less K than the continental crust.
+      - observation_id: schaefer_fegley_2009_figure_1
+        type: figure_only
+        locator:
+          figure: '1'
+          page: 16
+          pdf_page_index: 15
+        units: log10 pressure (bars)
+        values:
+          method_class: model_derived
+          typed_quantity: null
+          quantity_as_printed: initial total atmospheric pressure, log P_T (bars)
+          species: continental crust, oceanic crust, bulk silicate Earth, and bulk silicate Moon atmospheres
+          phase: gas
+          temperature_as_printed: 1500–3000 K, varied on the x-axis
+          x_axis_as_printed: Temperature (K)
+          y_axis_as_printed: log P_T (bars)
+          caption_as_printed: >-
+            Figure 1. Initial atmospheric pressure as a function of temperature for planetary analogs
+            (c. crust = continental crust, o. crust = oceanic crust, BSE = bulk silicate Earth, Moon =
+            bulk silicate Moon, see Table 1).
+          panel: single
+          series:
+            - name: continental crust (c. crust)
+              marker: curve
+              marker_count: 0
+            - name: oceanic crust (o. crust)
+              marker: curve
+              marker_count: 0
+            - name: bulk silicate Earth (BSE)
+              marker: curve
+              marker_count: 0
+            - name: bulk silicate Moon (Moon)
+              marker: curve
+              marker_count: 0
+          attribution: Schaefer and Fegley (2009), MAGMA calculation
+          digitisation: deferred to a figure pass
+      - observation_id: schaefer_fegley_2009_figure_2
+        type: figure_only
+        locator:
+          figure: '2'
+          page: 17
+          pdf_page_index: 16
+        units: molecules cm^-2
+        values:
+          method_class: model_derived
+          typed_quantity: null
+          quantity_as_printed: gas species column density
+          species: bulk silicate Earth (BSE) atmosphere
+          phase: gas
+          temperature_as_printed: 1500–3000 K, varied on the x-axis
+          gravity_as_printed: 36.2 m/s^2
+          x_axis_as_printed: Temperature (K)
+          y_axis_as_printed: column density (molecules cm^-2)
+          caption_as_printed: >-
+            Figure 2. Atmospheric composition as a function of temperature for the bulk silicate
+            Earth (BSE) as column densities (molecules/cm2) for a planet with g = 36.2 m/s2.
+          panel: single
+          series:
+            - name: Na
+              marker: curve
+              marker_count: 0
+            - name: O2
+              marker: curve
+              marker_count: 0
+            - name: O
+              marker: curve
+              marker_count: 0
+            - name: SiO
+              marker: curve
+              marker_count: 0
+            - name: Mg
+              marker: curve
+              marker_count: 0
+            - name: Fe
+              marker: curve
+              marker_count: 0
+            - name: FeO
+              marker: curve
+              marker_count: 0
+            - name: SiO2
+              marker: curve
+              marker_count: 0
+            - name: Na+
+              marker: curve
+              marker_count: 0
+            - name: K
+              marker: curve
+              marker_count: 0
+            - name: NaO
+              marker: curve
+              marker_count: 0
+            - name: MgO
+              marker: curve
+              marker_count: 0
+            - name: AlO
+              marker: curve
+              marker_count: 0
+          attribution: Schaefer and Fegley (2009), MAGMA calculation
+          digitisation: deferred to a figure pass
+      - observation_id: schaefer_fegley_2009_figure_3
+        type: figure_only
+        locator:
+          figure: '3'
+          page: 18
+          pdf_page_index: 17
+        units: dimensionless mole fraction
+        values:
+          method_class: model_derived
+          typed_quantity: null
+          quantity_as_printed: atmospheric gas mole fraction versus fraction vaporized
+          species: bulk silicate Earth (BSE) and continental crust atmospheres
+          phase: gas
+          temperature_as_printed: 2200 K
+          x_axis_as_printed: Fraction Vaporized (fraction vaporized is given by mole)
+          y_axis_as_printed: log Mole Fraction (Xi)
+          caption_as_printed: >-
+            Figure 3. Composition of the atmosphere of (a) the bulk silicate Earth (BSE) and (b) the
+            continental crust in mole fractions during fractional vaporization at 2200 K. The fraction
+            vaporized is given by mole.
+          panel: a and b
+          series:
+            - panel: a
+              name: Na
+              marker: curve
+              marker_count: 0
+            - panel: a
+              name: SiO
+              marker: curve
+              marker_count: 0
+            - panel: a
+              name: O
+              marker: curve
+              marker_count: 0
+            - panel: a
+              name: Mg
+              marker: curve
+              marker_count: 0
+            - panel: a
+              name: O2
+              marker: curve
+              marker_count: 0
+            - panel: a
+              name: FeO
+              marker: curve
+              marker_count: 0
+              note: First of two curves carrying the printed label FeO in panel a
+            - panel: a
+              name: Fe
+              marker: curve
+              marker_count: 0
+            - panel: a
+              name: SiO2
+              marker: curve
+              marker_count: 0
+            - panel: a
+              name: MgO
+              marker: curve
+              marker_count: 0
+            - panel: a
+              name: FeO
+              marker: curve
+              marker_count: 0
+              note: Second of two curves carrying the printed label FeO in panel a
+            - panel: b
+              name: Na
+              marker: curve
+              marker_count: 0
+            - panel: b
+              name: SiO
+              marker: curve
+              marker_count: 0
+            - panel: b
+              name: O2
+              marker: curve
+              marker_count: 0
+            - panel: b
+              name: O
+              marker: curve
+              marker_count: 0
+            - panel: b
+              name: Fe
+              marker: curve
+              marker_count: 0
+            - panel: b
+              name: SiO2
+              marker: curve
+              marker_count: 0
+            - panel: b
+              name: K
+              marker: curve
+              marker_count: 0
+            - panel: b
+              name: FeO
+              marker: curve
+              marker_count: 0
+            - panel: b
+              name: Mg
+              marker: curve
+              marker_count: 0
+            - panel: b
+              name: MgO
+              marker: curve
+              marker_count: 0
+          attribution: Schaefer and Fegley (2009), MAGMA calculation
+          digitisation: deferred to a figure pass
