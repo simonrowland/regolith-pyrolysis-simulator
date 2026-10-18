@@ -2863,7 +2863,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         transition: LedgerTransition,
         *,
         side: str,
-        account: str,
+        account: str | None,
         species: str,
     ) -> float:
         if side not in {'debits', 'credits'}:
@@ -2872,7 +2872,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         formula = resolve_species_formula(species, self.species_formula_registry)
         mol = 0.0
         for lot in lots:
-            if lot.account != account:
+            if account is not None and lot.account != account:
                 continue
             kg = float(lot.species_kg.get(species, 0.0) or 0.0)
             if kg <= 0.0:
@@ -3127,10 +3127,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         if ca_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
             return {}
-        in_situ_al_mol = self._transition_species_mol(
+        al_mol = self._transition_species_mol(
             transition,
             side='debits',
-            account='process.metal_phase',
+            account=None,
             species='Al',
         )
         al2o3 = resolve_species_formula('Al2O3', self.species_formula_registry)
@@ -3138,8 +3138,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             0.5
             * float(al2o3.elements.get('O', 0.0) or 0.0)
             / float(al2o3.elements.get('Al', 1.0) or 1.0)
-            * in_situ_al_mol
+            * al_mol
         )
+        # 2 Al + 3 CaO -> Al2O3 + 3 Ca: oxidizing 2 mol Al consumes
+        # 3 O atoms (1.5 mol O2-equivalent), while releasing 3 mol Ca
+        # frees those same 3 O atoms (1.5 mol O2-equivalent). The O-atom
+        # balance is 3 = 3, so the net melt-reservoir term is zero regardless
+        # of which ledger account supplied the Al.
         o2_equiv_mol = al_oxidation_o2 - (0.5 * ca_mol)
         if abs(o2_equiv_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
             return {}

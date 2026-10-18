@@ -1865,11 +1865,11 @@ def test_c7_external_al_credit_changes_cao_basis_without_fe_redox_step(
     # account for 3 O atoms (1.5 mol O2-equivalent), so this transition
     # contributes no net oxygen to the melt redox reservoir.
     assert 0.75 * external_al_mol == pytest.approx(0.5 * ca_mol)
-    assert breakdown["terms_mol_o2_equiv_by_label"].get(label, 0.0) == pytest.approx(
-        0.0, abs=1.0e-12
-    )
-    assert label not in breakdown["applied_terms_mol_o2_equiv_by_label"]
-    assert label not in breakdown["skipped_reasons_by_label"]
+    assert breakdown.get("terms_mol_o2_equiv_by_label", {}).get(
+        label, 0.0
+    ) == pytest.approx(0.0, abs=1.0e-12)
+    assert label not in breakdown.get("applied_terms_mol_o2_equiv_by_label", {})
+    assert label not in breakdown.get("skipped_reasons_by_label", {})
     assert _transition_account_species_mol(
         sim,
         transition,
@@ -1879,7 +1879,9 @@ def test_c7_external_al_credit_changes_cao_basis_without_fe_redox_step(
     ) == pytest.approx(2.0 * ca_mol)
     after_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
     assert after_mol["FeO"] == pytest.approx(before_mol["FeO"])
-    assert after_mol["Fe2O3"] == pytest.approx(before_mol["Fe2O3"])
+    assert after_mol.get("Fe2O3", 0.0) == pytest.approx(
+        before_mol.get("Fe2O3", 0.0)
+    )
     assert after_mol["CaO"] < before_mol["CaO"]
     transition.validate_conservation(sim.species_formula_registry)
 
@@ -1889,7 +1891,9 @@ def test_c7_external_al_credit_changes_cao_basis_without_fe_redox_step(
     fO2_change = sim._current_melt_redox_fO2_log() - before_fO2
     assert fO2_change >= 0.0
     assert abs(fO2_change) < 0.1
-    assert breakdown["redox_source_delta_ln_fO2"] == pytest.approx(0.0)
+    assert sim.melt.oxygen_reservoir.redox_source_delta_ln_fO2 == pytest.approx(
+        0.0
+    )
 
 
 def test_c7_mixed_in_situ_and_external_al_balances_both_source_accounts(
@@ -1961,9 +1965,9 @@ def test_c7_mixed_in_situ_and_external_al_balances_both_source_accounts(
         credit,
         label=label,
     ) == {}
-    assert label not in breakdown["terms_mol_o2_equiv_by_label"]
-    assert label not in breakdown["applied_terms_mol_o2_equiv_by_label"]
-    assert label not in breakdown["skipped_reasons_by_label"]
+    assert label not in breakdown.get("terms_mol_o2_equiv_by_label", {})
+    assert label not in breakdown.get("applied_terms_mol_o2_equiv_by_label", {})
+    assert label not in breakdown.get("skipped_reasons_by_label", {})
 
 
 def test_c7_in_situ_al_route_has_no_redox_source_term(
