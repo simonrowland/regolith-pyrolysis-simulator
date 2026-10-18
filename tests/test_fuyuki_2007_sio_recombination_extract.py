@@ -35,7 +35,37 @@ def test_text_results_table_and_deferred_figures_migrate_without_observations(
         "unit": "K",
         "approximate": True,
         "condition": "early observation, 10–13 ns after laser irradiation",
+        "locator": {"page": 440, "published_page": 440, "pdf_page_index": 3},
     }
+    temperature_results = by_id[
+        "fuyuki_2007_textual_temperature_and_cooling_results"
+    ]
+    assert temperature_results["locator"]["pdf_page_index"] == 6
+    comparison = temperature_results["values"][
+        "Si_and_SiO_central_temperature_difference"
+    ]
+    assert comparison["value"] == "less than 200"
+    assert comparison["unit"] == "K"
+    assert comparison["observation_period_as_printed"] == "40–80 μs"
+    assert comparison["locator"] == {
+        "page": 443,
+        "published_page": 443,
+        "pdf_page_index": 6,
+    }
+    assert temperature_results["values"][
+        "observation_period_temperature_locator"
+    ]["pdf_page_index"] == 8
+    assert temperature_results["values"][
+        "observation_period_continuation_locator"
+    ]["pdf_page_index"] == 9
+
+    spectral = by_id["fuyuki_2007_model_derived_spectral_parameters"]
+    assert spectral["values"]["initial_vapor_state_estimate"]["locator"][
+        "pdf_page_index"
+    ] == 7
+    assert spectral["values"]["effective_activation_energy_as_printed"][
+        "locator"
+    ]["pdf_page_index"] == 9
 
     table = by_id["fuyuki_2007_table1_effective_collision_cross_sections"]["values"]["rows"]
     assert len(table) == 13
