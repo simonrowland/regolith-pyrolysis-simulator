@@ -346,6 +346,104 @@ def test_sato_1973_independently_pins_all_table_1_cells_and_equation() -> None:
     _assert_sato_1973_table_pins(extract)
 
 
+def test_kems_023_table1_crown_columns_full_cell_count_and_render_pins():
+    """Pin the four requested species to Table I, PDF p. 2 / published p. 176."""
+    path = EXTRACTS / "kems-023-demaria-1973.yaml"
+    doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+
+    cells = {}
+    species_counts = Counter()
+    table_rows = set()
+    for species, block in doc["species"].items():
+        for observation in block.get("observations", []):
+            if (
+                observation.get("type") != "psat_series"
+                or observation.get("locator", {}).get("table") != "1"
+            ):
+                continue
+            values = observation.get("values", {})
+            for point in values.get("series", []):
+                if point.get("p_atm") is None:
+                    continue
+                sample = point.get("run") or values.get("sample")
+                key = (species, int(point["T_K"]), str(sample))
+                assert key not in cells
+                cells[key] = Decimal(str(point["p_atm"]))
+                species_counts[species] += 1
+                table_rows.add((species, int(point["T_K"])))
+
+    assert len(cells) == 61
+    assert len(table_rows) == 17
+    assert species_counts == Counter(
+        {"Na": 9, "Fe": 12, "Mg": 10, "SiO": 12, "Ca": 8, "TiO": 7, "Al": 3}
+    )
+    expected_temperatures = {
+        "Mg": {1700, 1800, 1900},
+        "SiO": {1800, 1900, 2000},
+        "Ca": {1900, 2000},
+        "Al": {2100},
+    }
+    actual_temperatures = {
+        species: {
+            temperature
+            for row_species, temperature, _sample in cells
+            if row_species == species
+        }
+        for species in expected_temperatures
+    }
+    assert actual_temperatures == expected_temperatures
+
+    expected = {
+        ("Mg", 1700, "10017"): Decimal("5.6e-8"),
+        ("SiO", 1800, "10017"): Decimal("3.5e-6"),
+        ("Ca", 1900, "10017"): Decimal("6.2e-8"),
+        ("Al", 2100, "10017"): Decimal("2.3e-7"),
+    }
+    assert {key: cells[key] for key in expected} == expected
+
+    expected_pin_paths = {
+        (
+            "species.Mg.observations[demaria_1973_mg_psat_table1_this_work]"
+            ".values.series[0].p_atm"
+        ): expected[("Mg", 1700, "10017")],
+        (
+            "species.SiO.observations[demaria_1973_sio_psat_table1_this_work]"
+            ".values.series[0].p_atm"
+        ): expected[("SiO", 1800, "10017")],
+        (
+            "species.Ca.observations[demaria_1973_ca_psat_table1_this_work]"
+            ".values.series[0].p_atm"
+        ): expected[("Ca", 1900, "10017")],
+        (
+            "species.Al.observations[demaria_1973_al_psat_table1_this_work]"
+            ".values.series[0].p_atm"
+        ): expected[("Al", 2100, "10017")],
+    }
+    pins = {sample["path"]: sample for sample in doc["fidelity_samples"]}
+    for sample_path, expected_value in expected_pin_paths.items():
+        sample = pins[sample_path]
+        assert Decimal(str(sample["value"])) == expected_value
+        assert sample["locator"]["table"] == "1"
+        assert sample["locator"]["published_page"] == 176
+        assert sample["locator"]["pdf_page_index"] == 2
+        assert vle.check_fidelity_sample_matches(doc, sample) == []
+
+    mutated = copy.deepcopy(doc)
+    mg_pin_path = next(path for path in expected_pin_paths if "species.Mg." in path)
+    mutated_pin = next(
+        sample
+        for sample in mutated["fidelity_samples"]
+        if sample["path"] == mg_pin_path
+    )
+    mutated_observation = next(
+        observation
+        for observation in mutated["species"]["Mg"]["observations"]
+        if observation["observation_id"] == "demaria_1973_mg_psat_table1_this_work"
+    )
+    mutated_observation["values"]["series"][0]["p_atm"] = 5.7e-08
+    assert vle.check_fidelity_sample_matches(mutated, mutated_pin)
+
+
 @pytest.mark.parametrize(
     "mutation",
     [
