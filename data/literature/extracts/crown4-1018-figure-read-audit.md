@@ -1,6 +1,6 @@
 # Crown4 figure-read audit (re-measured 2026-10-18)
 
-Centres were read from the symbol the caption names. Vector markers (1997, 2007) use the path-geometry centre: bounding-box centre for filled circles, filled squares and open triangles, and the vertex centroid for filled triangles. The 2001 scan is measured in native pixels of the embedded image; 600 dpi page pixels are native times 600/72. Read B is a second ink measurement, not an offset from read A: the inner dark core of a filled mark, the bright hole of an open circle, the stroke-box midpoint of an open triangle, or (for the 2001 scan) the same triangle at a darker threshold and a heavier erosion. Where the axis covers half of a marker, read B keeps the path x on the tick and uses the ink's y. `read_uncertainty_dex` is half the centre-to-centre difference in log space. A pair wider than 0.02 dex was not stored. Several filled circles are centred on a whole pixel, so the inner core lands on the same pixel as the path; that agreement is recorded as 0.0000 dex and is not a copied offset.
+Centres were read from the symbol the caption names. Vector markers (1997, 2007) use the path-geometry centre: bounding-box centre for filled circles, filled squares and open triangles, and the vertex centroid for filled triangles. The 2001 scan is measured in native pixels of the embedded image; 600 dpi page pixels are native times 600/72. Read B is a second ink measurement, not an offset from read A: the inner dark core of a filled mark, the bright hole of an open circle, the stroke-box midpoint of an open triangle, or (for the 2001 scan) the same triangle at a darker threshold and a heavier erosion. Where the axis covers half of a marker, read B keeps the path x on the tick and uses the ink's y. `read_uncertainty_dex` is half the centre-to-centre difference in log space. A pair wider than 0.02 dex was not stored. Where the two ink centres land on the same pixel, the stored uncertainty is half a pixel on the log axis (0.5 / px per decade), not zero.
 
 Log direction: 1997 a = 10^(-y); 2007 and 2001 a = 10^y. Figure 3 ΔfG/RT is not an activity and is not converted: the schema has no quantity token for dimensionless ΔfG/RT.
 
@@ -34,55 +34,55 @@ Y labels −1 at native y 130.5, −2 at 231.5, −3 at 333.5. ΔfG/RT = −1 �
 
 | audit_read_id | T_K | component | x | activity | px_A | py_A | px_B | py_B | unc_dex | note |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| shornikov_1997_cao_fig1_series3_sulfide_1773k-01 | 1773 | CaO | 58.13 | 0.2 | 1665.00 | 927.00 | 1665.00 | 927.00 | 0.0000 | inner-core |
-| shornikov_1997_cao_fig1_series3_sulfide_1773k-02 | 1773 | CaO | 60.12 | 0.25 | 1710.00 | 891.00 | 1710.00 | 891.00 | 0.0000 | inner-core |
-| shornikov_1997_cao_fig1_series3_sulfide_1773k-03 | 1773 | CaO | 61.97 | 0.3 | 1752.00 | 855.00 | 1752.00 | 855.00 | 0.0000 | inner-core |
-| shornikov_1997_cao_fig1_series3_sulfide_1773k-04 | 1773 | CaO | 63.82 | 0.37 | 1794.00 | 810.00 | 1794.00 | 810.00 | 0.0000 | inner-core |
-| shornikov_1997_cao_fig1_series3_sulfide_1773k-05 | 1773 | CaO | 65.94 | 0.49 | 1842.00 | 759.00 | 1842.00 | 759.00 | 0.0000 | inner-core |
-| shornikov_1997_cao_fig1_series3_sulfide_1773k-06 | 1773 | CaO | 68.19 | 0.64 | 1893.00 | 705.00 | 1893.00 | 705.00 | 0.0000 | inner-core |
-| shornikov_1997_cao_fig1_series3_sulfide_1773k-07 | 1773 | CaO | 70.97 | 0.9 | 1956.00 | 639.00 | 1956.00 | 639.00 | 0.0000 | inner-core |
-| shornikov_1997_cao_fig1_series4_sulfide_1873k-01 | 1873 | CaO | 14.43 | 0.01 | 674.36 | 1508.36 | 674.37 | 1508.37 | 0.0000 | inner-core |
-| shornikov_1997_cao_fig1_series4_sulfide_1873k-02 | 1873 | CaO | 33.33 | 0.025 | 1102.93 | 1331.50 | 1102.88 | 1331.50 | 0.0000 | inner-core |
-| shornikov_1997_cao_fig1_series4_sulfide_1873k-03 | 1873 | CaO | 50.35 | 0.11 | 1488.65 | 1054.25 | 1488.58 | 1054.23 | 0.0000 | inner-core |
-| shornikov_1997_cao_fig1_series4_sulfide_1873k-04 | 1873 | CaO | 60.12 | 0.33 | 1710.08 | 834.36 | 1710.14 | 834.39 | 0.0000 | inner-core |
+| shornikov_1997_cao_fig1_series3_sulfide_1773k-01 | 1773 | CaO | 58.13 | 0.2 | 1665.00 | 927.00 | 1665.00 | 927.00 | 0.001121 | inner-core |
+| shornikov_1997_cao_fig1_series3_sulfide_1773k-02 | 1773 | CaO | 60.12 | 0.25 | 1710.00 | 891.00 | 1710.00 | 891.00 | 0.001121 | inner-core |
+| shornikov_1997_cao_fig1_series3_sulfide_1773k-03 | 1773 | CaO | 61.97 | 0.3 | 1752.00 | 855.00 | 1752.00 | 855.00 | 0.001121 | inner-core |
+| shornikov_1997_cao_fig1_series3_sulfide_1773k-04 | 1773 | CaO | 63.82 | 0.37 | 1794.00 | 810.00 | 1794.00 | 810.00 | 0.001121 | inner-core |
+| shornikov_1997_cao_fig1_series3_sulfide_1773k-05 | 1773 | CaO | 65.94 | 0.49 | 1842.00 | 759.00 | 1842.00 | 759.00 | 0.001121 | inner-core |
+| shornikov_1997_cao_fig1_series3_sulfide_1773k-06 | 1773 | CaO | 68.19 | 0.64 | 1893.00 | 705.00 | 1893.00 | 705.00 | 0.001121 | inner-core |
+| shornikov_1997_cao_fig1_series3_sulfide_1773k-07 | 1773 | CaO | 70.97 | 0.9 | 1956.00 | 639.00 | 1956.00 | 639.00 | 0.001121 | inner-core |
+| shornikov_1997_cao_fig1_series4_sulfide_1873k-01 | 1873 | CaO | 14.43 | 0.01 | 674.36 | 1508.36 | 674.37 | 1508.37 | 0.000011 | inner-core |
+| shornikov_1997_cao_fig1_series4_sulfide_1873k-02 | 1873 | CaO | 33.33 | 0.025 | 1102.93 | 1331.50 | 1102.88 | 1331.50 | 0.001121 | inner-core |
+| shornikov_1997_cao_fig1_series4_sulfide_1873k-03 | 1873 | CaO | 50.35 | 0.11 | 1488.65 | 1054.25 | 1488.58 | 1054.23 | 0.000022 | inner-core |
+| shornikov_1997_cao_fig1_series4_sulfide_1873k-04 | 1873 | CaO | 60.12 | 0.33 | 1710.08 | 834.36 | 1710.14 | 834.39 | 0.000034 | inner-core |
 | shornikov_1997_cao_fig1_series4_sulfide_1873k-05 | 1873 | CaO | 63.27 | 0.47 | 1781.50 | 767.44 | 1781.50 | 767.50 | 0.0001 | inner-core |
-| shornikov_1997_cao_fig1_series4_sulfide_1873k-06 | 1873 | CaO | 75.04 | 0.91 | 2048.17 | 638.38 | 2048.20 | 638.41 | 0.0000 | inner-core |
+| shornikov_1997_cao_fig1_series4_sulfide_1873k-06 | 1873 | CaO | 75.04 | 0.91 | 2048.17 | 638.38 | 2048.20 | 638.41 | 0.000034 | inner-core |
 | shornikov_1997_cao_fig1_series5_emf_1773k-01 | 1773 | CaO | 14.48 | 0.0057 | 675.55 | 1619.08 | 675.50 | 1620.00 | 0.0010 | stroke-extent |
 | shornikov_1997_cao_fig1_series5_emf_1773k-02 | 1773 | CaO | 33.39 | 0.031 | 1104.13 | 1289.25 | 1104.50 | 1290.00 | 0.0008 | stroke-extent |
 | shornikov_1997_cao_fig1_series5_emf_1773k-03 | 1773 | CaO | 50.30 | 0.089 | 1487.46 | 1088.48 | 1487.50 | 1089.00 | 0.0006 | stroke-extent |
 | shornikov_1997_cao_fig1_series5_emf_1773k-04 | 1773 | CaO | 63.01 | 0.24 | 1775.55 | 894.89 | 1775.50 | 895.00 | 0.0001 | stroke-extent |
 | shornikov_1997_cao_fig1_series5_emf_1773k-05 | 1773 | CaO | 70.78 | 0.56 | 1951.74 | 729.97 | 1952.50 | 730.50 | 0.0006 | stroke-extent |
-| shornikov_2007_figure1_cao_activity_prior_markers-01 | 2033 | CaO | 0.00 | 0.022 | 884.00 | 1224.50 | 884.00 | 1224.50 | 0.0000 | a axis-y log=-1.653 |
+| shornikov_2007_figure1_cao_activity_prior_markers-01 | 2033 | CaO | 0.00 | 0.022 | 884.00 | 1224.50 | 884.00 | 1224.50 | 0.001388 | a axis-y log=-1.653 |
 | shornikov_2007_figure1_cao_activity_prior_markers-02 | 2033 | CaO | 6.89 | 0.021 | 1200.25 | 1236.25 | 1200.34 | 1235.97 | 0.0004 | a inner-core log=-1.686 |
-| shornikov_2007_figure1_cao_activity_prior_markers-03 | 2033 | CaO | 11.68 | 0.015 | 1419.75 | 1284.00 | 1419.75 | 1284.00 | 0.0000 | a inner-core log=-1.819 |
+| shornikov_2007_figure1_cao_activity_prior_markers-03 | 2033 | CaO | 11.68 | 0.015 | 1419.75 | 1284.00 | 1419.75 | 1284.00 | 0.001388 | a inner-core log=-1.819 |
 | shornikov_2007_figure1_cao_activity_prior_markers-04 | 2033 | CaO | 13.00 | 0.013 | 1480.25 | 1311.75 | 1480.32 | 1311.68 | 0.0001 | a inner-core log=-1.896 |
-| shornikov_2007_figure1_cao_activity_prior_markers-05 | 2033 | CaO | 18.99 | 0.0082 | 1755.00 | 1379.75 | 1755.00 | 1379.75 | 0.0000 | a inner-core log=-2.084 |
-| shornikov_2007_figure1_cao_activity_prior_markers-06 | 2033 | CaO | 25.00 | 0.0048 | 2030.00 | 1464.75 | 2030.00 | 1464.75 | 0.0000 | a inner-core log=-2.320 |
-| shornikov_2007_figure1_cao_activity_prior_markers-07 | 2033 | CaO | 29.98 | 0.0063 | 2259.00 | 1421.00 | 2259.00 | 1421.00 | 0.0000 | b inner-core log=-2.199 |
+| shornikov_2007_figure1_cao_activity_prior_markers-05 | 2033 | CaO | 18.99 | 0.0082 | 1755.00 | 1379.75 | 1755.00 | 1379.75 | 0.001388 | a inner-core log=-2.084 |
+| shornikov_2007_figure1_cao_activity_prior_markers-06 | 2033 | CaO | 25.00 | 0.0048 | 2030.00 | 1464.75 | 2030.00 | 1464.75 | 0.001388 | a inner-core log=-2.320 |
+| shornikov_2007_figure1_cao_activity_prior_markers-07 | 2033 | CaO | 29.98 | 0.0063 | 2259.00 | 1421.00 | 2259.00 | 1421.00 | 0.001388 | b inner-core log=-2.199 |
 | shornikov_2007_figure1_cao_activity_prior_markers-08 | 2033 | CaO | 33.32 | 0.0081 | 2411.75 | 1382.75 | 2411.68 | 1382.68 | 0.0001 | b inner-core log=-2.093 |
 | shornikov_2007_figure1_cao_activity_prior_markers-09 | 2033 | CaO | 37.48 | 0.01 | 2602.75 | 1347.75 | 2602.68 | 1347.68 | 0.0001 | b inner-core log=-1.996 |
-| shornikov_2007_figure1_cao_activity_prior_markers-10 | 2033 | CaO | 44.98 | 0.038 | 2946.50 | 1141.50 | 2946.50 | 1141.50 | 0.0000 | b inner-core log=-1.423 |
+| shornikov_2007_figure1_cao_activity_prior_markers-10 | 2033 | CaO | 44.98 | 0.038 | 2946.50 | 1141.50 | 2946.50 | 1141.50 | 0.001388 | b inner-core log=-1.423 |
 | shornikov_2007_figure1_cao_activity_prior_markers-11 | 2033 | CaO | 49.98 | 0.098 | 3175.75 | 992.75 | 3175.75 | 992.12 | 0.0009 | b axis-y log=-1.010 |
-| shornikov_2007_figure1_al2o3_activity_prior_markers-01 | 2033 | Al2O3 | 6.89 | 0.017 | 1200.25 | 1266.00 | 1200.22 | 1266.00 | 0.0000 | a hole log=-1.769 |
-| shornikov_2007_figure1_al2o3_activity_prior_markers-02 | 2033 | Al2O3 | 11.68 | 0.06 | 1419.75 | 1068.25 | 1419.76 | 1068.24 | 0.0000 | a hole log=-1.220 |
-| shornikov_2007_figure1_al2o3_activity_prior_markers-03 | 2033 | Al2O3 | 13.00 | 0.09 | 1480.25 | 1005.50 | 1480.19 | 1005.50 | 0.0000 | a hole log=-1.045 |
-| shornikov_2007_figure1_al2o3_activity_prior_markers-04 | 2033 | Al2O3 | 19.01 | 0.23 | 1755.75 | 857.75 | 1755.75 | 857.76 | 0.0000 | a hole log=-0.635 |
+| shornikov_2007_figure1_al2o3_activity_prior_markers-01 | 2033 | Al2O3 | 6.89 | 0.017 | 1200.25 | 1266.00 | 1200.22 | 1266.00 | 0.001388 | a hole log=-1.769 |
+| shornikov_2007_figure1_al2o3_activity_prior_markers-02 | 2033 | Al2O3 | 11.68 | 0.06 | 1419.75 | 1068.25 | 1419.76 | 1068.24 | 0.000014 | a hole log=-1.220 |
+| shornikov_2007_figure1_al2o3_activity_prior_markers-03 | 2033 | Al2O3 | 13.00 | 0.09 | 1480.25 | 1005.50 | 1480.19 | 1005.50 | 0.001388 | a hole log=-1.045 |
+| shornikov_2007_figure1_al2o3_activity_prior_markers-04 | 2033 | Al2O3 | 19.01 | 0.23 | 1755.75 | 857.75 | 1755.75 | 857.76 | 0.000014 | a hole log=-0.635 |
 | shornikov_2007_figure1_al2o3_activity_prior_markers-05 | 2033 | Al2O3 | 25.00 | 0.43 | 2029.75 | 760.00 | 2029.78 | 760.45 | 0.0006 | a hole log=-0.364 |
 | shornikov_2007_figure1_al2o3_activity_prior_markers-06 | 2033 | Al2O3 | 29.98 | 0.33 | 2259.00 | 801.50 | 2259.50 | 802.00 | 0.0007 | b ring-extent log=-0.479 |
-| shornikov_2007_figure1_al2o3_activity_prior_markers-07 | 2033 | Al2O3 | 33.32 | 0.26 | 2411.75 | 838.75 | 2411.76 | 838.76 | 0.0000 | b hole log=-0.582 |
-| shornikov_2007_figure1_al2o3_activity_prior_markers-08 | 2033 | Al2O3 | 37.48 | 0.24 | 2602.75 | 851.50 | 2602.81 | 851.50 | 0.0000 | b hole log=-0.618 |
-| shornikov_2007_figure1_al2o3_activity_prior_markers-09 | 2033 | Al2O3 | 44.99 | 0.2 | 2946.75 | 880.25 | 2946.76 | 880.24 | 0.0000 | b hole log=-0.698 |
+| shornikov_2007_figure1_al2o3_activity_prior_markers-07 | 2033 | Al2O3 | 33.32 | 0.26 | 2411.75 | 838.75 | 2411.76 | 838.76 | 0.000014 | b hole log=-0.582 |
+| shornikov_2007_figure1_al2o3_activity_prior_markers-08 | 2033 | Al2O3 | 37.48 | 0.24 | 2602.75 | 851.50 | 2602.81 | 851.50 | 0.001388 | b hole log=-0.618 |
+| shornikov_2007_figure1_al2o3_activity_prior_markers-09 | 2033 | Al2O3 | 44.99 | 0.2 | 2946.75 | 880.25 | 2946.76 | 880.24 | 0.000014 | b hole log=-0.698 |
 | shornikov_2007_figure1_al2o3_activity_prior_markers-10 | 2033 | Al2O3 | 49.98 | 0.18 | 3175.75 | 896.00 | 3175.74 | 896.12 | 0.0002 | b hole log=-0.741 |
-| shornikov_2007_figure1_sio2_activity_prior_markers-01 | 2033 | SiO2 | 0.00 | 0.18 | 884.17 | 897.33 | 884.17 | 897.36 | 0.0000 | a axis-y log=-0.745 |
+| shornikov_2007_figure1_sio2_activity_prior_markers-01 | 2033 | SiO2 | 0.00 | 0.18 | 884.17 | 897.33 | 884.17 | 897.36 | 0.000042 | a axis-y log=-0.745 |
 | shornikov_2007_figure1_sio2_activity_prior_markers-02 | 2033 | SiO2 | 6.89 | 0.21 | 1200.33 | 872.83 | 1200.34 | 872.88 | 0.0001 | a inner-core log=-0.677 |
-| shornikov_2007_figure1_sio2_activity_prior_markers-03 | 2033 | SiO2 | 11.69 | 0.27 | 1420.17 | 833.67 | 1420.24 | 833.68 | 0.0000 | a inner-core log=-0.568 |
+| shornikov_2007_figure1_sio2_activity_prior_markers-03 | 2033 | SiO2 | 11.69 | 0.27 | 1420.17 | 833.67 | 1420.24 | 833.68 | 0.000014 | a inner-core log=-0.568 |
 | shornikov_2007_figure1_sio2_activity_prior_markers-04 | 2033 | SiO2 | 13.01 | 0.3 | 1480.67 | 816.33 | 1480.61 | 816.29 | 0.0001 | a inner-core log=-0.520 |
-| shornikov_2007_figure1_sio2_activity_prior_markers-05 | 2033 | SiO2 | 18.99 | 0.39 | 1755.17 | 776.17 | 1755.22 | 776.17 | 0.0000 | a inner-core log=-0.409 |
-| shornikov_2007_figure1_sio2_activity_prior_markers-06 | 2033 | SiO2 | 25.00 | 0.52 | 2030.17 | 730.33 | 2030.28 | 730.31 | 0.0000 | a inner-core log=-0.281 |
-| shornikov_2007_figure1_sio2_activity_prior_markers-07 | 2033 | SiO2 | 29.99 | 0.3 | 2259.17 | 816.33 | 2259.28 | 816.31 | 0.0000 | b inner-core log=-0.520 |
+| shornikov_2007_figure1_sio2_activity_prior_markers-05 | 2033 | SiO2 | 18.99 | 0.39 | 1755.17 | 776.17 | 1755.22 | 776.17 | 0.001388 | a inner-core log=-0.409 |
+| shornikov_2007_figure1_sio2_activity_prior_markers-06 | 2033 | SiO2 | 25.00 | 0.52 | 2030.17 | 730.33 | 2030.28 | 730.31 | 0.000028 | a inner-core log=-0.281 |
+| shornikov_2007_figure1_sio2_activity_prior_markers-07 | 2033 | SiO2 | 29.99 | 0.3 | 2259.17 | 816.33 | 2259.28 | 816.31 | 0.000028 | b inner-core log=-0.520 |
 | shornikov_2007_figure1_sio2_activity_prior_markers-08 | 2033 | SiO2 | 33.33 | 0.15 | 2412.17 | 924.83 | 2412.21 | 924.89 | 0.0001 | b inner-core log=-0.821 |
-| shornikov_2007_figure1_sio2_activity_prior_markers-09 | 2033 | SiO2 | 37.49 | 0.054 | 2603.17 | 1085.33 | 2603.28 | 1085.31 | 0.0000 | b inner-core log=-1.267 |
-| shornikov_2007_figure1_sio2_activity_prior_markers-10 | 2033 | SiO2 | 44.99 | 0.011 | 2946.67 | 1334.17 | 2946.62 | 1334.20 | 0.0000 | b inner-core log=-1.958 |
+| shornikov_2007_figure1_sio2_activity_prior_markers-09 | 2033 | SiO2 | 37.49 | 0.054 | 2603.17 | 1085.33 | 2603.28 | 1085.31 | 0.000028 | b inner-core log=-1.267 |
+| shornikov_2007_figure1_sio2_activity_prior_markers-10 | 2033 | SiO2 | 44.99 | 0.011 | 2946.67 | 1334.17 | 2946.62 | 1334.20 | 0.000042 | b inner-core log=-1.958 |
 | shornikov_2001_f2_mgo_ma_s_2050k-01 | 2050 | MgO | 0.00 | 0.36 | 3394.00 | 998.00 | 3394.25 | 1000.80 | 0.0021 | native A=(407.28,119.76) B=(407.31,120.10) fitted x=0.14 log=-0.441 |
 | shornikov_2001_f2_mgo_ma_s_2050k-02 | 2050 | MgO | 18.18 | 0.34 | 4217.00 | 1011.92 | 4217.34 | 1012.22 | 0.0002 | native A=(506.04,121.43) B=(506.08,121.47) fitted x=18.35 log=-0.463 |
 | shornikov_2001_f2_mgo_ma_s_2050k-03 | 2050 | MgO | 52.21 | 0.18 | 5747.25 | 1191.50 | 5749.09 | 1192.49 | 0.0008 | native A=(689.67,142.98) B=(689.89,143.10) fitted x=52.20 log=-0.736 |
