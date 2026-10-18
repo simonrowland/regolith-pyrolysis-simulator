@@ -140,9 +140,9 @@ species:
         activity_basis_as_published: a_Al2O3
         marker_symbol: '2'
         marker: 1
-        x_SiO2_mol_pct_as_read: 0
+        x_SiO2_mol_pct_as_read: 0.87
         activity: '0.20'
-        read_uncertainty_dex: 0.002912825
+        read_uncertainty_dex: 0.002081
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -151,20 +151,20 @@ species:
           x_SiO2_mol_pct: 0.0
           minus_log10_activity: 0.705727
         read_2:
-          crop_id: review-p2-600dpi-b1
+          crop_id: lmax-r2-b1
           crop_origin_xy_page_px:
-          - 1641
-          - 683
+          - 1697
+          - 686
           pixel_xy_crop:
-          - 65
-          - 62
-          x_SiO2_mol_pct: 0.000000
-          minus_log10_activity: 0.711553
+          - 29
+          - 58
+          x_SiO2_mol_pct: 1.740488
+          minus_log10_activity: 0.709888
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
-          MgAl2O4: '1'
-          SiO2: '0'
+          MgAl2O4: '0.9913'
+          SiO2: '0.0087'
       point_conditions:
         temperature_K:
           state:
@@ -186,9 +186,9 @@ species:
               amount_basis: mole_fraction
               components:
               - - MgAl2O4
-                - '1'
+                - '0.9913'
               - - SiO2
-                - '0'
+                - '0.0087'
           locator:
             page: 2
             pdf_page_index: 1
@@ -218,9 +218,9 @@ species:
         activity_basis_as_published: a_Al2O3
         marker_symbol: '2'
         marker: 2
-        x_SiO2_mol_pct_as_read: 18
+        x_SiO2_mol_pct_as_read: 19
         activity: '0.20'
-        read_uncertainty_dex: 0.0004163
+        read_uncertainty_dex: 0.000832
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -229,20 +229,20 @@ species:
           x_SiO2_mol_pct: 18.6927
           minus_log10_activity: 0.704063
         read_2:
-          crop_id: review-p2-600dpi-b2
+          crop_id: lmax-r2-b2
           crop_origin_xy_page_px:
-          - 1824
-          - 668
+          - 1859
+          - 707
           pixel_xy_crop:
-          - 77
-          - 72
-          x_SiO2_mol_pct: 18.267718
-          minus_log10_activity: 0.703230
+          - 51
+          - 34
+          x_SiO2_mol_pct: 19.117690
+          minus_log10_activity: 0.704895
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
-          MgAl2O4: '0.82'
-          SiO2: '0.18'
+          MgAl2O4: '0.81'
+          SiO2: '0.19'
       point_conditions:
         temperature_K:
           state:
@@ -264,9 +264,9 @@ species:
               amount_basis: mole_fraction
               components:
               - - MgAl2O4
-                - '0.82'
+                - '0.81'
               - - SiO2
-                - '0.18'
+                - '0.19'
           locator:
             page: 2
             pdf_page_index: 1
@@ -298,6 +298,7 @@ species:
         marker: 3
         x_SiO2_mol_pct_as_read: 53
         activity: 0.082
+        read_uncertainty_dex: 0.000832
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -306,15 +307,15 @@ species:
           x_SiO2_mol_pct: 52.88046
           minus_log10_activity: 1.086054
         read_2:
-          crop_id: review-p2-600dpi-b3
+          crop_id: lmax-r2-b3
           crop_origin_xy_page_px:
-          - 2199
-          - 883
+          - 2208
+          - 925
           pixel_xy_crop:
-          - 65
-          - 87
-          x_SiO2_mol_pct: 52.549915
-          minus_log10_activity: 1.086054
+          - 63
+          - 46
+          x_SiO2_mol_pct: 53.211005
+          minus_log10_activity: 1.087718
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
@@ -375,7 +376,7 @@ species:
         marker: 4
         x_SiO2_mol_pct_as_read: 56
         activity: 0.067
-        read_uncertainty_dex: 0.000416
+        read_uncertainty_dex: 0.001249
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -384,15 +385,15 @@ species:
           x_SiO2_mol_pct: 56.18591
           minus_log10_activity: 1.175102
         read_2:
-          crop_id: review-p2-600dpi-b4
+          crop_id: lmax-r2-b4
           crop_origin_xy_page_px:
-          - 2218
-          - 954
+          - 2269
+          - 956
           pixel_xy_crop:
-          - 80
-          - 70
-          x_SiO2_mol_pct: 55.760920
-          minus_log10_activity: 1.175934
+          - 38
+          - 69
+          x_SiO2_mol_pct: 56.610892
+          minus_log10_activity: 1.177599
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
@@ -451,8 +452,9 @@ species:
         activity_basis_as_published: a_Al2O3
         marker_symbol: '2'
         marker: 5
-        x_SiO2_mol_pct_as_read: 65
+        x_SiO2_mol_pct_as_read: 66
         activity: 0.035
+        read_uncertainty_dex: 0.000832
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -461,20 +463,20 @@ species:
           x_SiO2_mol_pct: 65.58282
           minus_log10_activity: 1.458891
         read_2:
-          crop_id: review-p2-600dpi-b5
+          crop_id: lmax-r2-b5
           crop_origin_xy_page_px:
-          - 2330
-          - 1110
+          - 2332
+          - 1167
           pixel_xy_crop:
-          - 67
-          - 84
-          x_SiO2_mol_pct: 65.110610
+          - 74
+          - 27
+          x_SiO2_mol_pct: 65.960582
           minus_log10_activity: 1.458891
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
-          MgAl2O4: '0.35'
-          SiO2: '0.65'
+          MgAl2O4: '0.34'
+          SiO2: '0.66'
       point_conditions:
         temperature_K:
           state:
@@ -496,9 +498,9 @@ species:
               amount_basis: mole_fraction
               components:
               - - MgAl2O4
-                - '0.35'
+                - '0.34'
               - - SiO2
-                - '0.65'
+                - '0.66'
           locator:
             page: 2
             pdf_page_index: 1
@@ -528,9 +530,9 @@ species:
         activity_basis_as_published: a_Al2O3
         marker_symbol: '2'
         marker: 6
-        x_SiO2_mol_pct_as_read: 75
+        x_SiO2_mol_pct_as_read: 76
         activity: 0.015
-        read_uncertainty_dex: 0.00083215
+        read_uncertainty_dex: 0.000832
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -539,20 +541,20 @@ species:
           x_SiO2_mol_pct: 75.49916
           minus_log10_activity: 1.826734
         read_2:
-          crop_id: review-p2-600dpi-b6
+          crop_id: lmax-r2-b6
           crop_origin_xy_page_px:
-          - 2448
-          - 1348
+          - 2470
+          - 1359
           pixel_xy_crop:
-          - 54
-          - 66
-          x_SiO2_mol_pct: 75.026949
+          - 41
+          - 55
+          x_SiO2_mol_pct: 75.876920
           minus_log10_activity: 1.825070
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
-          MgAl2O4: '0.25'
-          SiO2: '0.75'
+          MgAl2O4: '0.24'
+          SiO2: '0.76'
       point_conditions:
         temperature_K:
           state:
@@ -574,9 +576,9 @@ species:
               amount_basis: mole_fraction
               components:
               - - MgAl2O4
-                - '0.25'
+                - '0.24'
               - - SiO2
-                - '0.75'
+                - '0.76'
           locator:
             page: 2
             pdf_page_index: 1
@@ -1426,6 +1428,7 @@ species:
         marker: 1
         x_SiO2_mol_pct_as_read: 0
         activity: 0.34
+        read_uncertainty_dex: 0.000830
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -1434,13 +1437,13 @@ species:
           x_SiO2_mol_pct: 0.0
           minus_log10_activity: 0.467972
         read_2:
-          crop_id: review-p2-600dpi-a1
+          crop_id: lmax-r2-a1
           crop_origin_xy_page_px:
-          - 570
-          - 535
+          - 621
+          - 558
           pixel_xy_crop:
-          - 73
-          - 70
+          - 22
+          - 47
           x_SiO2_mol_pct: 0.000000
           minus_log10_activity: 0.467972
         T_K: '2050'
@@ -1503,6 +1506,7 @@ species:
         marker: 2
         x_SiO2_mol_pct_as_read: 18
         activity: 0.34
+        read_uncertainty_dex: 0.000830
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -1511,13 +1515,13 @@ species:
           x_SiO2_mol_pct: 18.04765
           minus_log10_activity: 0.467972
         read_2:
-          crop_id: review-p2-600dpi-a2
+          crop_id: lmax-r2-a2
           crop_origin_xy_page_px:
-          - 775
-          - 521
+          - 777
+          - 574
           pixel_xy_crop:
-          - 60
-          - 84
+          - 58
+          - 31
           x_SiO2_mol_pct: 18.047647
           minus_log10_activity: 0.467972
         T_K: '2050'
@@ -1580,6 +1584,7 @@ species:
         marker: 3
         x_SiO2_mol_pct_as_read: 52
         activity: 0.19
+        read_uncertainty_dex: 0.000830
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -1588,15 +1593,15 @@ species:
           x_SiO2_mol_pct: 52.47946
           minus_log10_activity: 0.711914
         read_2:
-          crop_id: review-p2-600dpi-a3
+          crop_id: lmax-r2-a3
           crop_origin_xy_page_px:
-          - 1127
-          - 685
+          - 1166
+          - 689
           pixel_xy_crop:
-          - 76
-          - 67
-          x_SiO2_mol_pct: 52.479464
-          minus_log10_activity: 0.711914
+          - 36
+          - 64
+          x_SiO2_mol_pct: 52.385900
+          minus_log10_activity: 0.713573
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
@@ -1657,6 +1662,7 @@ species:
         marker: 4
         x_SiO2_mol_pct_as_read: 56
         activity: 0.17
+        read_uncertainty_dex: 0.001660
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -1665,15 +1671,15 @@ species:
           x_SiO2_mol_pct: 55.84779
           minus_log10_activity: 0.761698
         read_2:
-          crop_id: review-p2-600dpi-a4
+          crop_id: lmax-r2-a4
           crop_origin_xy_page_px:
-          - 1176
-          - 701
+          - 1166
+          - 756
           pixel_xy_crop:
-          - 63
-          - 81
-          x_SiO2_mol_pct: 55.847794
-          minus_log10_activity: 0.761698
+          - 71
+          - 28
+          x_SiO2_mol_pct: 55.660665
+          minus_log10_activity: 0.765017
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
@@ -1734,7 +1740,7 @@ species:
         marker: 5
         x_SiO2_mol_pct_as_read: 65
         activity: 0.12
-        read_uncertainty_dex: 0.00124445
+        read_uncertainty_dex: 0.000830
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -1743,15 +1749,15 @@ species:
           x_SiO2_mol_pct: 65.15748
           minus_log10_activity: 0.925156
         read_2:
-          crop_id: review-p2-600dpi-a5
+          crop_id: lmax-r2-a5
           crop_origin_xy_page_px:
-          - 1260
-          - 817
+          - 1295
+          - 828
           pixel_xy_crop:
-          - 80
-          - 65
-          x_SiO2_mol_pct: 65.297831
-          minus_log10_activity: 0.927645
+          - 44
+          - 53
+          x_SiO2_mol_pct: 65.204266
+          minus_log10_activity: 0.925985
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
@@ -1812,6 +1818,7 @@ species:
         marker: 6
         x_SiO2_mol_pct_as_read: 75
         activity: 0.075
+        read_uncertainty_dex: 0.000830
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -1820,14 +1827,14 @@ species:
           x_SiO2_mol_pct: 75.16891
           minus_log10_activity: 1.123462
         read_2:
-          crop_id: review-p2-600dpi-a6
+          crop_id: lmax-r2-a6
           crop_origin_xy_page_px:
-          - 1380
-          - 922
+          - 1379
+          - 961
           pixel_xy_crop:
-          - 70
-          - 78
-          x_SiO2_mol_pct: 75.589950
+          - 67
+          - 39
+          x_SiO2_mol_pct: 75.215691
           minus_log10_activity: 1.123462
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
@@ -2233,7 +2240,7 @@ species:
         marker: 1
         x_SiO2_mol_pct_as_read: 18
         activity: 0.12
-        read_uncertainty_dex: 0.0026776437
+        read_uncertainty_dex: 0.001217
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -2242,15 +2249,15 @@ species:
           x_SiO2_mol_pct: 17.9255
           minus_log10_activity: 0.908471
         read_2:
-          crop_id: review-p2-600dpi-c1
+          crop_id: lmax-r2-c1
           crop_origin_xy_page_px:
-          - 784
-          - 2412
+          - 810
+          - 2427
           pixel_xy_crop:
-          - 59
-          - 84
+          - 33
+          - 61
           x_SiO2_mol_pct: 17.925504
-          minus_log10_activity: 0.913826
+          minus_log10_activity: 0.906037
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
@@ -2311,7 +2318,7 @@ species:
         marker: 2
         x_SiO2_mol_pct_as_read: 52
         activity: 0.34
-        read_uncertainty_dex: 0.0029213477
+        read_uncertainty_dex: 0.001461
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -2320,15 +2327,15 @@ species:
           x_SiO2_mol_pct: 51.99685
           minus_log10_activity: 0.471762
         read_2:
-          crop_id: review-p2-600dpi-c2
+          crop_id: lmax-r2-c2
           crop_origin_xy_page_px:
-          - 1132
-          - 1980
+          - 1151
+          - 1997
           pixel_xy_crop:
-          - 73
-          - 68
-          x_SiO2_mol_pct: 51.809649
-          minus_log10_activity: 0.477605
+          - 57
+          - 42
+          x_SiO2_mol_pct: 52.090457
+          minus_log10_activity: 0.468841
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
@@ -2389,7 +2396,7 @@ species:
         marker: 3
         x_SiO2_mol_pct_as_read: 55
         activity: 0.39
-        read_uncertainty_dex: 0.0026776625
+        read_uncertainty_dex: 0.001217
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -2398,15 +2405,15 @@ species:
           x_SiO2_mol_pct: 55.31975
           minus_log10_activity: 0.409932
         read_2:
-          crop_id: review-p2-600dpi-c3
+          crop_id: lmax-r2-c3
           crop_origin_xy_page_px:
-          - 1181
-          - 1903
+          - 1217
+          - 1928
           pixel_xy_crop:
-          - 62
-          - 81
+          - 26
+          - 48
           x_SiO2_mol_pct: 55.366548
-          minus_log10_activity: 0.415287
+          minus_log10_activity: 0.407498
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
@@ -2466,8 +2473,8 @@ species:
         marker_symbol: '3'
         marker: 4
         x_SiO2_mol_pct_as_read: 65
-        activity: 0.54
-        read_uncertainty_dex: 0.0026779308
+        activity: 0.55
+        read_uncertainty_dex: 0.001704
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -2476,15 +2483,15 @@ species:
           x_SiO2_mol_pct: 64.72681
           minus_log10_activity: 0.260954
         read_2:
-          crop_id: review-p2-600dpi-c4
+          crop_id: lmax-r2-c4
           crop_origin_xy_page_px:
-          - 1265
-          - 1767
+          - 1275
+          - 1787
           pixel_xy_crop:
-          - 78
-          - 64
+          - 68
+          - 35
           x_SiO2_mol_pct: 64.726809
-          minus_log10_activity: 0.266310
+          minus_log10_activity: 0.257546
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
@@ -2544,8 +2551,8 @@ species:
         marker_symbol: '3'
         marker: 5
         x_SiO2_mol_pct_as_read: 75
-        activity: 0.72
-        read_uncertainty_dex: 0.002677915
+        activity: 0.73
+        read_uncertainty_dex: 0.001704
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -2554,15 +2561,15 @@ species:
           x_SiO2_mol_pct: 74.64869
           minus_log10_activity: 0.137293
         read_2:
-          crop_id: review-p2-600dpi-c5
+          crop_id: lmax-r2-c5
           crop_origin_xy_page_px:
-          - 1384
-          - 1626
+          - 1399
+          - 1623
           pixel_xy_crop:
-          - 65
-          - 78
-          x_SiO2_mol_pct: 74.648686
-          minus_log10_activity: 0.142649
+          - 49
+          - 72
+          x_SiO2_mol_pct: 74.555083
+          minus_log10_activity: 0.133885
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
@@ -2925,9 +2932,9 @@ species:
         system_as_published: MgAl2O4–SiO2
         marker_symbol: '4'
         marker: 1
-        x_SiO2_mol_pct_as_read: 0
+        x_SiO2_mol_pct_as_read: 0.35
         value: '-23'
-        read_uncertainty_kJ_mol: 0.0026727953
+        read_uncertainty_kJ_mol: 0.008015
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -2936,21 +2943,21 @@ species:
           axis_minus_delta_fG_kJ_mol: 22.82585
           x_SiO2_mol_pct: 0.0
         read_2:
-          crop_id: review-p2-600dpi-d1
+          crop_id: lmax-r2-d1
           crop_origin_xy_page_px:
-          - 1635
-          - 1960
+          - 1699
+          - 1982
           pixel_xy_crop:
-          - 78
-          - 67
-          x_SiO2_mol_pct: 0.000000
-          axis_minus_delta_fG_kJ_mol: 22.831196
+          - 31
+          - 44
+          x_SiO2_mol_pct: 0.706822
+          axis_minus_delta_fG_kJ_mol: 22.841879
         note: The plotted ordinate is -ΔfG; the stored delta_fG token is its negative.
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
         composition_mol:
-          MgAl2O4: '1'
-          SiO2: '0'
+          MgAl2O4: '0.9965'
+          SiO2: '0.0035'
       point_conditions:
         temperature_K:
           state:
@@ -2972,9 +2979,9 @@ species:
               amount_basis: mole_fraction
               components:
               - - MgAl2O4
-                - '1'
+                - '0.9965'
               - - SiO2
-                - '0'
+                - '0.0035'
           locator:
             page: 2
             pdf_page_index: 1
@@ -3005,7 +3012,7 @@ species:
         marker: 2
         x_SiO2_mol_pct_as_read: 18
         value: '-25'
-        read_uncertainty_kJ_mol: 0.008014247
+        read_uncertainty_kJ_mol: 0.002670
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -3014,15 +3021,15 @@ species:
           axis_minus_delta_fG_kJ_mol: 25.2297
           x_SiO2_mol_pct: 18.12396
         read_2:
-          crop_id: review-p2-600dpi-d2
+          crop_id: lmax-r2-d2
           crop_origin_xy_page_px:
-          - 1846
-          - 1721
+          - 1848
+          - 1777
           pixel_xy_crop:
-          - 69
-          - 83
-          x_SiO2_mol_pct: 18.266330
-          axis_minus_delta_fG_kJ_mol: 25.213672
+          - 66
+          - 25
+          x_SiO2_mol_pct: 18.171414
+          axis_minus_delta_fG_kJ_mol: 25.235039
         note: The plotted ordinate is -ΔfG; the stored delta_fG token is its negative.
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
@@ -3092,15 +3099,15 @@ species:
           axis_minus_delta_fG_kJ_mol: 26.57585
           x_SiO2_mol_pct: 51.86669
         read_2:
-          crop_id: review-p2-600dpi-d3
+          crop_id: lmax-r2-d3
           crop_origin_xy_page_px:
-          - 2185
-          - 1612
+          - 2227
+          - 1617
           pixel_xy_crop:
-          - 84
-          - 65
-          x_SiO2_mol_pct: 51.866686
-          axis_minus_delta_fG_kJ_mol: 26.570508
+          - 43
+          - 59
+          x_SiO2_mol_pct: 51.961603
+          axis_minus_delta_fG_kJ_mol: 26.581191
         note: The plotted ordinate is -ΔfG; the stored delta_fG token is its negative.
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
@@ -3161,7 +3168,7 @@ species:
         marker: 4
         x_SiO2_mol_pct_as_read: 55
         value: '-26'
-        read_uncertainty_kJ_mol: 0.0080124207
+        read_uncertainty_kJ_mol: 0.002672
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -3170,15 +3177,15 @@ species:
           axis_minus_delta_fG_kJ_mol: 25.92414
           x_SiO2_mol_pct: 55.28367
         read_2:
-          crop_id: review-p2-600dpi-d4
+          crop_id: lmax-r2-d4
           crop_origin_xy_page_px:
-          - 2234
-          - 1659
+          - 2252
+          - 1700
           pixel_xy_crop:
-          - 72
-          - 80
+          - 54
+          - 37
           x_SiO2_mol_pct: 55.378588
-          axis_minus_delta_fG_kJ_mol: 25.908115
+          axis_minus_delta_fG_kJ_mol: 25.929483
         note: The plotted ordinate is -ΔfG; the stored delta_fG token is its negative.
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
@@ -3239,7 +3246,7 @@ species:
         marker: 5
         x_SiO2_mol_pct_as_read: 65
         value: '-23'
-        read_uncertainty_kJ_mol: 0.0053409772
+        read_uncertainty_kJ_mol: 0.005342
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -3248,15 +3255,15 @@ species:
           axis_minus_delta_fG_kJ_mol: 23.16239
           x_SiO2_mol_pct: 64.72784
         read_2:
-          crop_id: review-p2-600dpi-d5
+          crop_id: lmax-r2-d5
           crop_origin_xy_page_px:
-          - 2347
-          - 1934
+          - 2328
+          - 1964
           pixel_xy_crop:
-          - 58
-          - 63
+          - 77
+          - 32
           x_SiO2_mol_pct: 64.775298
-          axis_minus_delta_fG_kJ_mol: 23.151708
+          axis_minus_delta_fG_kJ_mol: 23.162392
         note: The plotted ordinate is -ΔfG; the stored delta_fG token is its negative.
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction
@@ -3317,7 +3324,7 @@ species:
         marker: 6
         x_SiO2_mol_pct_as_read: 75
         value: '-19'
-        read_uncertainty_kJ_mol: 0.0000015
+        read_uncertainty_kJ_mol: 0.005341
         read_1:
           crop_id: figure-2-600dpi-r1
           pixel_xy_crop:
@@ -3326,15 +3333,15 @@ species:
           axis_minus_delta_fG_kJ_mol: 18.76069
           x_SiO2_mol_pct: 74.64659
         read_2:
-          crop_id: review-p2-600dpi-d6
+          crop_id: lmax-r2-d6
           crop_origin_xy_page_px:
-          - 2435
-          - 2332
+          - 2474
+          - 2341
           pixel_xy_crop:
-          - 75
-          - 76
-          x_SiO2_mol_pct: 74.741505
-          axis_minus_delta_fG_kJ_mol: 18.760687
+          - 35
+          - 66
+          x_SiO2_mol_pct: 74.646589
+          axis_minus_delta_fG_kJ_mol: 18.771371
         note: The plotted ordinate is -ΔfG; the stored delta_fG token is its negative.
         T_K: '2050'
         composition_mol_basis: printed_mole_fraction

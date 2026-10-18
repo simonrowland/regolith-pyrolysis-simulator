@@ -83,22 +83,22 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
             "activity",
             0.19,
             52,
-            None,
+            0.000830,
             [1053, 352],
-            [76, 67],
-            [1127, 685],
-            "review-p2-600dpi-a3",
+            [36, 64],
+            [1166, 689],
+            "lmax-r2-a3",
         ),
         (
             "shornikov_2008_fig1_b_marker_2",
             "activity",
             "0.20",
-            18,
-            0.0004163,
+            19,
+            0.000832,
             [1756, 341],
-            [77, 72],
-            [1824, 668],
-            "review-p2-600dpi-b2",
+            [51, 34],
+            [1859, 707],
+            "lmax-r2-b2",
         ),
         (
             "shornikov_2008_fig1_d_marker_3",
@@ -107,9 +107,9 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
             52,
             0.002671,
             [2119, 1277],
-            [84, 65],
-            [2185, 1612],
-            "review-p2-600dpi-d3",
+            [43, 59],
+            [2227, 1617],
+            "lmax-r2-d3",
         ),
     )
     for (
@@ -131,11 +131,8 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
         uncertainty_key = (
             "read_uncertainty_kJ_mol" if value_key == "value" else "read_uncertainty_dex"
         )
-        if uncertainty is None:
-            assert uncertainty_key not in values
-        else:
-            assert values[uncertainty_key] == uncertainty
-            assert values[uncertainty_key] > 0
+        assert values[uncertainty_key] == uncertainty
+        assert values[uncertainty_key] > 0
         assert values["read_1"]["pixel_xy_crop"] == pixel_1
         assert values["read_2"]["pixel_xy_crop"] == pixel_2
         assert values["read_2"]["crop_origin_xy_page_px"] == crop_origin
@@ -144,10 +141,29 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
     fresh_crop_ids = [row["values"]["read_2"]["crop_id"] for row in marker_rows]
     assert len(set(fresh_crop_ids)) == 23
     assert all(
-        row["values"].get("read_uncertainty_dex", row["values"].get("read_uncertainty_kJ_mol")) is None
-        or row["values"].get("read_uncertainty_dex", row["values"].get("read_uncertainty_kJ_mol")) > 0
+        row["values"].get("read_uncertainty_dex", row["values"].get("read_uncertainty_kJ_mol", 0)) > 0
         for row in marker_rows
     )
+    # Read 1 was taken in the page crop at (150, 400). A second read records a
+    # different crop origin. Offsets may coincide for a real pair; one shared
+    # offset for a whole panel is a translated copy, not a second read.
+    for panel in ("a", "b", "c", "d"):
+        offsets = []
+        for row in marker_rows:
+            if row["locator"]["panel"] != panel:
+                continue
+            read_1 = row["values"]["read_1"]["pixel_xy_crop"]
+            read_2 = row["values"]["read_2"]
+            crop = read_2["crop_origin_xy_page_px"]
+            pixel = read_2["pixel_xy_crop"]
+            assert crop != [150, 400]
+            offsets.append(
+                (
+                    crop[0] + pixel[0] - 150 - read_1[0],
+                    crop[1] + pixel[1] - 400 - read_1[1],
+                )
+            )
+        assert len(set(offsets)) > 1
 
     prose_row = next(
         row for _, row in observations
