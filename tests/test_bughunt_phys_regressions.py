@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-import ast
 import copy
 import gc
 import inspect
 import math
 import pickle
-import subprocess
 from collections import deque
-from pathlib import Path
 from types import MappingProxyType, SimpleNamespace
 
 import pytest
@@ -892,7 +889,8 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
     sim._pending_shuttle_bakeout_cycle_increment = ""
     sim.melt = SimpleNamespace(hour=37)
     sim.record = BatchRecord(snapshots=[committed])
-    yield_disposition_history = {"committed": {"hour": 37}}
+    yield_disposition_row = {"hour": 37}
+    yield_disposition_history = {"committed": yield_disposition_row}
     sim._yield_disposition_ledger_snapshots = yield_disposition_history
     operating_prefix = {"pressures": {"Na": 1.0}}
     operating_tail = {"pressures": {"Na": 2.0}}
@@ -928,7 +926,10 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
 
     assert raised.value is refusal
     assert sim.runtime_state["nested"] == {"temperature_C": 25.0}
-    assert sim._yield_disposition_ledger_snapshots is yield_disposition_history
+    restored_yield_history = sim._yield_disposition_ledger_snapshots
+    assert restored_yield_history is not yield_disposition_history
+    assert restored_yield_history == yield_disposition_history
+    assert restored_yield_history["committed"] is yield_disposition_row
     cold_spot_history = sim._condensation_model.cold_spot_history
     assert cold_spot_history == [cold_spot_prefix]
     assert cold_spot_history[0] is not cold_spot_prefix
@@ -947,29 +948,8 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
     )
 
 
-def test_real_refusal_guard(monkeypatch) -> None:
+def test_real_refusal_shallow_copies_yield_disposition_rows(monkeypatch) -> None:
     from simulator.runner import PyrolysisRun
-
-    class WriteTrackingDict(dict):
-        def __init__(self, *args, **kwargs) -> None:
-            super().__init__(*args, **kwargs)
-            self.writes = []
-
-        def __setitem__(self, key, value) -> None:
-            self.writes.append("__setitem__")
-            super().__setitem__(key, value)
-
-        def update(self, *args, **kwargs) -> None:
-            self.writes.append("update")
-            super().update(*args, **kwargs)
-
-        def pop(self, key, *args):
-            self.writes.append("pop")
-            return super().pop(key, *args)
-
-        def clear(self) -> None:
-            self.writes.append("clear")
-            super().clear()
 
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
@@ -981,10 +961,10 @@ def test_real_refusal_guard(monkeypatch) -> None:
     sim = session.simulator
     assert sim._step_one_hour.__func__ is PyrolysisSimulator._step_one_hour
 
-    yield_disposition_history = WriteTrackingDict(
-        {"committed": {"hour": sim.melt.hour}},
-    )
-    yield_disposition_contents = copy.deepcopy(yield_disposition_history)
+    committed_row = {"hour": sim.melt.hour, "ledger": {"Fe": 0.1}}
+    replacement_row = {"hour": sim.melt.hour, "ledger": {"Fe": 0.9}}
+    inserted_row = {"hour": sim.melt.hour + 1, "ledger": {"Fe": 0.2}}
+    yield_disposition_history = {"committed": committed_row}
     sim._yield_disposition_ledger_snapshots = yield_disposition_history
 
     refusal = EvaporationFluxRefusal(
@@ -995,6 +975,8 @@ def test_real_refusal_guard(monkeypatch) -> None:
 
     def refuse_equilibrium(**_kwargs):
         backend_calls.append(None)
+        sim._yield_disposition_ledger_snapshots["committed"] = replacement_row
+        sim._yield_disposition_ledger_snapshots["refused-hour"] = inserted_row
         raise refusal
 
     monkeypatch.setattr(sim.backend, "is_available", lambda: True)
@@ -1005,148 +987,14 @@ def test_real_refusal_guard(monkeypatch) -> None:
 
     assert raised.value is refusal
     assert backend_calls == [None]
-    assert sim._yield_disposition_ledger_snapshots is yield_disposition_history
-    assert dict(sim._yield_disposition_ledger_snapshots) == yield_disposition_contents
-    assert yield_disposition_history.writes == []
-
-
-def test_yield_writer_guard() -> None:
-    invariant = (
-        "terminal-refusal snapshots retain the yield-disposition table by "
-        "identity, so _step_one_hour must not call its writer or mutate it"
-    )
-    repository_root = Path(__file__).resolve().parents[1]
-    tracked_sources = subprocess.run(
-        [
-            "git", "ls-files", "-z", "--cached", "--others",
-            "--exclude-standard", "--", "simulator", "engines",
-        ],
-        cwd=repository_root,
-        check=True,
-        capture_output=True,
-    ).stdout.split(b"\0")
-    capture_call_sites = []
-    table_assignment_sites = []
-    table_attribute_setter_sites = []
-    cli_snapshot_sites = []
-    table_name = "_yield_disposition_ledger_snapshots"
-
-    class SiteScan(ast.NodeVisitor):
-        def __init__(self, relative_path: str) -> None:
-            self.relative_path = relative_path
-            self.functions = []
-
-        def visit_FunctionDef(self, node) -> None:
-            self.functions.append(node.name)
-            self.generic_visit(node)
-            self.functions.pop()
-
-        visit_AsyncFunctionDef = visit_FunctionDef
-
-        def visit_Call(self, node) -> None:
-            function = node.func.id if isinstance(node.func, ast.Name) else (
-                node.func.attr if isinstance(node.func, ast.Attribute) else ""
-            )
-            site = (self.relative_path, self.functions[-1] if self.functions else "")
-            if function == "capture_ledger_snapshot":
-                capture_call_sites.append(site)
-            if (
-                function == "setattr"
-                and len(node.args) >= 2
-                and isinstance(node.args[1], ast.Constant)
-                and node.args[1].value == table_name
-            ):
-                table_attribute_setter_sites.append(site)
-            if (
-                self.relative_path == "simulator/session_cli.py"
-                and function == "build_per_hour_summary"
-                and site[1] == "_snapshot"
-            ):
-                cli_snapshot_sites.append(site)
-            if (
-                isinstance(node.func, ast.Attribute)
-                and node.func.attr in {
-                    "__delitem__",
-                    "__ior__",
-                    "__setitem__",
-                    "clear",
-                    "pop",
-                    "popitem",
-                    "setdefault",
-                    "update",
-                }
-                and self.targets_table(node.func.value)
-            ):
-                table_assignment_sites.append(site)
-            if (
-                isinstance(node.func, ast.Attribute)
-                and node.func.attr in {"__delitem__", "__setitem__"}
-                and node.args
-                and self.targets_table(node.args[0])
-            ):
-                table_assignment_sites.append(site)
-            self.generic_visit(node)
-
-        def visit_Assign(self, node) -> None:
-            if any(self.targets_table(target) for target in node.targets):
-                table_assignment_sites.append(
-                    (self.relative_path, self.functions[-1] if self.functions else "")
-                )
-            self.generic_visit(node)
-
-        def visit_AnnAssign(self, node) -> None:
-            if self.targets_table(node.target):
-                table_assignment_sites.append(
-                    (self.relative_path, self.functions[-1] if self.functions else "")
-                )
-            self.generic_visit(node)
-
-        def visit_AugAssign(self, node) -> None:
-            if self.targets_table(node.target):
-                table_assignment_sites.append(
-                    (self.relative_path, self.functions[-1] if self.functions else "")
-                )
-            self.generic_visit(node)
-
-        def visit_Delete(self, node) -> None:
-            if any(self.targets_table(target) for target in node.targets):
-                table_assignment_sites.append(
-                    (self.relative_path, self.functions[-1] if self.functions else "")
-                )
-            self.generic_visit(node)
-
-        @staticmethod
-        def targets_table(node) -> bool:
-            return any(
-                isinstance(candidate, ast.Attribute)
-                and candidate.attr == table_name
-                for candidate in ast.walk(node)
-            )
-
-    for encoded_path in tracked_sources:
-        if not encoded_path:
-            continue
-        relative_path = encoded_path.decode()
-        if not relative_path.endswith(".py"):
-            continue
-        source = (repository_root / relative_path).read_text(encoding="utf-8")
-        SiteScan(relative_path).visit(ast.parse(source, filename=relative_path))
-
-    assert capture_call_sites == [
-        ("simulator/runner/__init__.py", "build_per_hour_summary"),
-    ], f"{invariant}; unexpected capture_ledger_snapshot callers: {capture_call_sites}"
-    assert table_assignment_sites == [
-        ("simulator/core.py", "load_batch"),
-    ], f"{invariant}; unexpected table assignments: {table_assignment_sites}"
-    assert table_attribute_setter_sites == [
-        ("simulator/accounting/yield_disposition.py", "capture_ledger_snapshot"),
-    ], (
-        f"{invariant}; unexpected table attribute setters: "
-        f"{table_attribute_setter_sites}"
-    )
-    assert cli_snapshot_sites == [
-        ("simulator/session_cli.py", "_snapshot"),
-    ], f"{invariant}; unexpected session snapshot routes: {cli_snapshot_sites}"
+    assert yield_disposition_history == {
+        "committed": replacement_row,
+        "refused-hour": inserted_row,
+    }
+    restored_history = sim._yield_disposition_ledger_snapshots
+    assert restored_history is not yield_disposition_history
+    assert set(restored_history) == {"committed"}
+    assert restored_history["committed"] is committed_row
 
 
 def test_unsupported_refusal_snapshot_graph_raises_typed_error() -> None:

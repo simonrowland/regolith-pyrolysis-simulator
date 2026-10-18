@@ -13694,11 +13694,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self, '_yield_disposition_ledger_snapshots', None,
         )
         if defer_committed_history and isinstance(yield_disposition_history, dict):
-            # In-hour writes violate test_yield_writer_guard and test_real_refusal_guard.
-            # Accounting captures this table after a successful step. A failed
-            # core hour cannot mutate it, so retain the committed rows by
-            # identity instead of copying the full run history every hour.
-            memo[id(yield_disposition_history)] = yield_disposition_history
+            # capture_ledger_snapshot replaces rows[key] with a new dict and
+            # never mutates existing rows in place. A shallow copy restores
+            # pre-hour keys and row objects in O(entries), about 212 current
+            # entries at lunar-run completion; in-place row edits need a deep
+            # copy.
+            memo[id(yield_disposition_history)] = dict(yield_disposition_history)
         state_source = {
             name: value
             for name, value in self.__dict__.items()
