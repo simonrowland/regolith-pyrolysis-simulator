@@ -2631,17 +2631,30 @@ def gate_curve_memo_producer_configuration(
 class GateCurveProviderOutcome(str, Enum):
     NO_PROVIDER = "no_provider"
     PRODUCED = "produced"
+    STABLE_REFUSAL = "stable_refusal"
     FAILED = "failed"
 
 
 def gate_curve_provider_outcome_for_status(
     status: str,
+    diagnostic: Mapping[str, Any] | None = None,
 ) -> GateCurveProviderOutcome:
-    """Treat only a produced provider result as reusable evidence."""
+    """Classify outcomes by whether the cache key determines the result."""
 
     normalized_status = str(status).strip().lower()
     if normalized_status == "ok":
         return GateCurveProviderOutcome.PRODUCED
+    if normalized_status in {"out_of_domain", "unsupported"}:
+        return GateCurveProviderOutcome.STABLE_REFUSAL
+    if normalized_status == "refused" and isinstance(diagnostic, Mapping):
+        reason = str(
+            diagnostic.get("reason")
+            or diagnostic.get("reason_refused")
+            or diagnostic.get("backend_status_reason")
+            or ""
+        ).strip().lower()
+        if reason in {"invalid_input", "out_of_domain", "unsupported_input"}:
+            return GateCurveProviderOutcome.STABLE_REFUSAL
     return GateCurveProviderOutcome.FAILED
 
 
@@ -2674,7 +2687,11 @@ def gate_curve_provider_outcome_is_reusable(
         typed_outcome = GateCurveProviderOutcome(outcome)
     except (TypeError, ValueError):
         return False
-    return typed_outcome is not GateCurveProviderOutcome.FAILED
+    return typed_outcome in {
+        GateCurveProviderOutcome.NO_PROVIDER,
+        GateCurveProviderOutcome.PRODUCED,
+        GateCurveProviderOutcome.STABLE_REFUSAL,
+    }
 
 
 def gate_curve_memo_record(

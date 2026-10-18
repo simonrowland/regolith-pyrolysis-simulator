@@ -2109,9 +2109,7 @@ class EvaporationMixin:
 
         self._reduced_real_uncacheable_reasons = []
         self._last_reduced_real_replay_notices = None
-        self._freeze_gate_provider_outcome = (
-            GateCurveProviderOutcome.NO_PROVIDER
-        )
+        self._freeze_gate_provider_outcome = None
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
         fO2_log = self._freeze_gate_liquidus_fO2_log(
             float(self._current_melt_redox_fO2_log())
@@ -2424,8 +2422,11 @@ class EvaporationMixin:
                 evidence=evidence,
                 **redox_state_kwargs,
             )
-            record['provider_outcome'] = GateCurveProviderOutcome(
-                self._freeze_gate_provider_outcome
+            provider_outcome = self._freeze_gate_provider_outcome
+            record['provider_outcome'] = (
+                GateCurveProviderOutcome(provider_outcome)
+                if provider_outcome is not None
+                else None
             )
             origin = record['origin']
             if cache_eligible:
@@ -2694,7 +2695,10 @@ class EvaporationMixin:
         if fallback_provider:
             source = f'gate_liquid_fraction:fallback:{fallback_provider}'
         if status != 'ok':
-            status_outcome = gate_curve_provider_outcome_for_status(status)
+            status_outcome = gate_curve_provider_outcome_for_status(
+                status,
+                diagnostic,
+            )
             record_gate_curve_provider_outcome(self, status_outcome)
             projected = self._composition_projected_freeze_gate_curve(
                 diagnostic,
@@ -2818,7 +2822,11 @@ class EvaporationMixin:
             reasons.append(f'backend liquidus finder failed: {exc}')
             return None
         status = str(getattr(result, 'status', 'unavailable'))
-        status_outcome = gate_curve_provider_outcome_for_status(status)
+        diagnostics = getattr(result, 'diagnostics', None)
+        status_outcome = gate_curve_provider_outcome_for_status(
+            status,
+            diagnostics if isinstance(diagnostics, Mapping) else None,
+        )
         record_gate_curve_provider_outcome(self, status_outcome)
         curve = self._freeze_gate_curve_from_liquidus_result(
             result,
@@ -2855,6 +2863,17 @@ class EvaporationMixin:
             fO2_log,
             redox_state,
         )
+        # Missing authority is known from registry configuration; an
+        # attempted dispatch would turn that stable absence into an error.
+        if self._chem_registry.authoritative_for(
+            ChemistryIntent.SILICATE_LIQUIDUS
+        ) is None:
+            record_gate_curve_provider_outcome(
+                self,
+                GateCurveProviderOutcome.NO_PROVIDER,
+            )
+            reasons.append('kernel liquidus provider is not configured')
+            return None
         composition_derived = bool(composition_mol_by_account)
         try:
             if composition_derived:
@@ -2904,7 +2923,10 @@ class EvaporationMixin:
             or diagnostic.get('backend_status')
             or 'unavailable'
         )
-        status_outcome = gate_curve_provider_outcome_for_status(status)
+        status_outcome = gate_curve_provider_outcome_for_status(
+            status,
+            diagnostic,
+        )
         record_gate_curve_provider_outcome(self, status_outcome)
         if status != 'ok':
             reasons.append(f'kernel liquidus unavailable: status={status}')
