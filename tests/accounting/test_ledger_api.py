@@ -6,6 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.ledger import AccountPolicy, KNOWN_LEDGER_ACCOUNTS, AtomLedger
 from simulator.accounting.ledger_api import LEDGER_SCHEMA_VERSION, LedgerAPI
 
@@ -36,6 +37,27 @@ def _api() -> LedgerAPI:
         },
     )
     return LedgerAPI(sim)
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="initial balance cleaning currently drops positive sub-tolerance mass",
+)
+def test_initial_balance_preserves_positive_sub_tolerance_mass():
+    ledger = AtomLedger(initial_balances={"initial": {"Si": 3e-13}})
+
+    assert ledger.project_account_kg("initial") == {"Si": pytest.approx(3e-13)}
+
+
+def test_initial_balance_clips_negative_tolerance_dust_to_zero():
+    ledger = AtomLedger(initial_balances={"initial": {"Si": -5e-13}})
+
+    assert ledger.kg_by_account("initial").get("Si", 0.0) == 0.0
+
+
+def test_initial_balance_refuses_negative_mass_below_tolerance():
+    with pytest.raises(AccountingError):
+        AtomLedger(initial_balances={"initial": {"Si": -2e-12}})
 
 
 def test_account_discovery_is_registry_complete_and_requires_zero_plumbing(monkeypatch):
