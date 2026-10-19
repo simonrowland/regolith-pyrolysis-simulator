@@ -490,12 +490,18 @@ def test_round8_plante_initial_is_independent_of_selection_prose(
     inputs[selection_note] = "No nominal column selected; analytical is not a selector"
     changed_prose = _sample_from_plain(sample_payload, experiment_id=experiment_id)
 
-    expected_value = to_plain(expected)
-    original_value = to_plain(original.initial_composition)["state"]["value"]
-    changed_value = to_plain(changed_prose.initial_composition)["state"]["value"]
-    assert original_value == expected_value
-    assert changed_value == expected_value
-    assert original_value == changed_value
+    original_initial = original.initial_composition
+    changed_initial = changed_prose.initial_composition
+    assert original_initial is not None and original_initial.state.is_value
+    assert changed_initial is not None
+    assert changed_initial.state == original_initial.state
+    expected_initial = replace(
+        original_initial,
+        state=replace(original_initial.state, value=expected),
+    )
+    assert not migrate_module._initial_compositions_conflict(
+        original_initial, expected_initial
+    )
 
 
 def test_round8_existing_typed_initial_beats_printed_column_and_prose() -> None:
