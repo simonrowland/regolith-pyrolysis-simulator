@@ -3767,10 +3767,20 @@ def test_alphamelts_intrinsic_none_still_refuses_without_redox_mode():
 def test_alphamelts_not_an_input_na_silica_below_crash_floor_refuses_before_binary(
     monkeypatch,
 ):
+    import simulator.melt_backend.alphamelts as alphamelts_module
+
     backend = AlphaMELTSBackend()
     backend._mode = 'subprocess'
     backend._binary_path = Path('/tmp/fake-alphamelts')
     launches = []
+    monkeypatch.setattr(
+        alphamelts_module,
+        'engine_commissioning',
+        lambda *_args, **_kwargs: pytest.fail(
+            'subprocess preflight must reuse the commissioning assessment'
+        ),
+        raising=False,
+    )
 
     def fake_run(*args, **kwargs):
         launches.append((args, kwargs))
