@@ -24,6 +24,7 @@ from pathlib import Path
 from typing import Any, Callable, Optional
 
 ENGINE_WORKER_CANCEL_POLL_S = 0.05
+ENGINE_WORKER_WATCHDOG_GRACE_S = 0.25
 ENGINE_POOL_AUTOMATIC_PER_POOL_BUDGET_S = 3.0
 ENGINE_POOL_AUTOMATIC_TOTAL_BUDGET_S = 5.0
 # _stop_pair on the start() handshake-timeout path (diagnostic=False):
@@ -302,6 +303,44 @@ def _run_engine_worker(
 class WarmEngineWorker:
     """Persistent spawned worker with deadlines and crash/hang replacement."""
 
+    @staticmethod
+    def _caller_future_timeout_s(
+        call_timeout_s: float,
+        startup_timeout_s: float,
+        watchdog_grace_s: float = ENGINE_WORKER_WATCHDOG_GRACE_S,
+    ) -> float:
+        """Bound a caller wait across cold start, call, and timeout cleanup.
+
+        Premise: ``start()`` spawns before its handshake wall begins, the job
+        wall begins after READY, and a job timeout is reported only after the
+        watchdog grace and bounded stop joins. In seconds, the caller envelope
+        is call + startup + healthy-spawn slack + watchdog grace + stop joins
+        + one consumer poll tick. Default MAGEMin is 15 + 30 + 1 + 0.25 +
+        1.1 + 0.05 = 47.4 seconds. The adapter may cap this by its remaining
+        aggregate budget, which remains the stronger deadline.
+        """
+        call_s = float(call_timeout_s)
+        startup_s = float(startup_timeout_s)
+        grace_s = float(watchdog_grace_s)
+        if not math.isfinite(call_s) or call_s <= 0.0:
+            raise ValueError('worker call timeout must be finite and positive')
+        if not math.isfinite(startup_s) or startup_s <= 0.0:
+            raise ValueError(
+                'worker startup timeout must be finite and positive'
+            )
+        if not math.isfinite(grace_s) or grace_s < 0.0:
+            raise ValueError(
+                'worker watchdog grace must be finite and nonnegative'
+            )
+        return (
+            call_s
+            + startup_s
+            + ENGINE_WORKER_SPAWN_SLACK_S
+            + grace_s
+            + ENGINE_WORKER_STOP_PAIR_JOIN_S
+            + ENGINE_WORKER_CANCEL_POLL_S
+        )
+
     def __init__(
         self,
         *,
@@ -313,7 +352,7 @@ class WarmEngineWorker:
         call_timeout_s: float = 60.0,
         diagnostic_log_path: str | os.PathLike[str] | None = None,
         diagnostic_signal: int = signal.SIGUSR1,
-        watchdog_grace_s: float = 0.25,
+        watchdog_grace_s: float = ENGINE_WORKER_WATCHDOG_GRACE_S,
         daemon: bool = True,
     ) -> None:
         self.name = str(name)

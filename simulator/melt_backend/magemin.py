@@ -1128,9 +1128,17 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     raise ValueError(f'MAGEMin {field_name} must be numeric')
             warm_timeout_s = float(raw_warm_timeout_s)
             pool_size = int(raw_pool_size)
+            startup_timeout_s = float(raw_startup_timeout_s)
             if not math.isfinite(warm_timeout_s) or warm_timeout_s <= 0.0:
                 raise ValueError(
                     'MAGEMin warm_call_timeout_s must be finite and positive'
+                )
+            if (
+                not math.isfinite(startup_timeout_s)
+                or startup_timeout_s <= 0.0
+            ):
+                raise ValueError(
+                    'MAGEMin worker_startup_timeout_s must be finite and positive'
                 )
             if pool_size <= 0:
                 raise ValueError('MAGEMin warm_pool_size must be positive')
@@ -1145,7 +1153,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         self._database,
                         self._config,
                     ),
-                    startup_timeout_s=float(raw_startup_timeout_s),
+                    startup_timeout_s=startup_timeout_s,
                     call_timeout_s=warm_timeout_s,
                     diagnostic_log_path=diagnostic_path.with_name(
                         f'{diagnostic_path.stem}-{index}{diagnostic_path.suffix}'
@@ -2459,7 +2467,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 startup_timeout_s = float(self._config.get(
                     'worker_startup_timeout_s', 30.0
                 ))
-                future_timeout_s = timeout_s + startup_timeout_s
+                future_timeout_s = WarmEngineWorker._caller_future_timeout_s(
+                    timeout_s,
+                    startup_timeout_s,
+                )
                 if call_timeout_s is not None:
                     future_timeout_s = min(
                         future_timeout_s,
