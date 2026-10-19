@@ -8135,6 +8135,8 @@ def _residue_component_field_sets(
     for field in ordered_fields:
         if not isinstance(field, str) or not field.endswith("_wt_pct"):
             continue
+        if field not in payload:
+            continue
         if field in seen:
             continue
         seen.add(field)
@@ -14722,23 +14724,19 @@ class Migrator:
                     for field in _residue_component_field_sets(item)[0]
                 )
             )
-            residue_fields = (
-                "residue_ppm",
-                *_RESIDUE_COMPONENT_SLOT_FIELDS,
-                *(
-                    field
-                    for field in series_oxide_fields
-                    if field not in _RESIDUE_COMPONENT_SLOT_FIELDS
-                ),
-            )
             appended_oxide_fields = tuple(
                 field
                 for field in series_oxide_fields
                 if field not in _RESIDUE_COMPONENT_SLOT_FIELDS
             )
-            point_stride = len(_RESIDUE_COMPONENT_SLOT_FIELDS) + 1 + len(
-                appended_oxide_fields
+            residue_fields = (
+                "residue_ppm",
+                *_RESIDUE_COMPONENT_SLOT_FIELDS,
+                *appended_oxide_fields,
             )
+            # This is the historical six-slot ordinal space. New columns get
+            # field-and-row ids below so they cannot shift any existing slot.
+            point_stride = len(_RESIDUE_COMPONENT_SLOT_FIELDS) + 1
             for point in exploded:
                 raw_item = point.get("item")
                 if not isinstance(raw_item, Mapping):
@@ -14770,9 +14768,7 @@ class Migrator:
                     elif field in _RESIDUE_COMPONENT_SLOT_FIELDS:
                         component_index = _RESIDUE_COMPONENT_SLOT_FIELDS.index(field)
                     else:
-                        component_index = len(_RESIDUE_COMPONENT_SLOT_FIELDS) + (
-                            appended_oxide_fields.index(field)
-                        )
+                        component_index = len(_RESIDUE_COMPONENT_SLOT_FIELDS)
                     cell_units = str(obs.get("units") or "")
                     if (
                         field.endswith("_wt_pct")
@@ -14829,6 +14825,15 @@ class Migrator:
                         parent_point_conditions=point_conditions,
                         source_point_oxide_map=_mass_loss_oxide_map_from_mapping(
                             raw_item
+                        ),
+                        ordinal_point_id=(
+                            series_point_id(
+                                obs_id,
+                                field=field.removesuffix("_wt_pct"),
+                                extra=f"row:{point_index}",
+                            )
+                            if field not in _RESIDUE_COMPONENT_SLOT_FIELDS
+                            else None
                         ),
                     )
             return
@@ -15241,6 +15246,7 @@ class Migrator:
         parent_point_conditions: Mapping[str, Located[Any]] | None = None,
         source_point_oxide_map: Mapping[str, Decimal] | None = None,
         content_stable_id: bool = False,
+        ordinal_point_id: str | None = None,
         use_printed_point_species: bool = False,
     ) -> None:
         raw_item = item.get("item")
@@ -15436,7 +15442,9 @@ class Migrator:
             row_extra = series_row_extra(
                 raw_item, include_locator=content_stable_id
             )
-            if content_stable_id:
+            if coord is None and ordinal_point_id is not None:
+                point_id = ordinal_point_id
+            elif content_stable_id:
                 point_id = _exploded_point_id(
                     parent_id, item, coord, raw_item, row_extra
                 )

@@ -13647,6 +13647,92 @@ def test_ivanova_residue_ordinal_ids_keep_their_printed_components(
     assert by_id(actual) == expected_by_id
 
 
+def test_appended_residue_oxide_does_not_move_ordinal_component_ids(
+    tmp_path: Path,
+) -> None:
+    source_id = "ivanova-2018-spinel-rich-cai-evaporation"
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts" / f"{source_id}.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    row = next(
+        observation
+        for observation in source["species"]["CaO"]["observations"]
+        if observation.get("observation_id")
+        == "ivanova_2018_table1_residue_composition"
+    )
+    for point in row["values"]["series"]:
+        point["TiO2_wt_pct"] = "1.11"
+    migrated = _migrate_real_extract(
+        tmp_path, f"{source_id}.yaml", extract_doc=source
+    )
+    stored_payload = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts-v2" / f"{source_id}.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    stored_silica = {
+        row["observation_id"]: (
+            row["identity"]["species"]["formula"],
+            Decimal(row["value"]["point"]),
+        )
+        for row in stored_payload["observations"]
+        if row["identity"]["quantity"].get("value")
+        == "residue_component_composition"
+        and row["identity"]["species"]["formula"] == "SiO2"
+    }
+    migrated_silica = {
+        observation.observation_id: (
+            observation.identity.species.formula,
+            observation.value.point,
+        )
+        for observation in migrated.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and observation.identity.species.formula == "SiO2"
+    }
+    migrated_titania = [
+        observation
+        for observation in migrated.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and observation.identity.species.formula == "TiO2"
+    ]
+    assert len(stored_silica) == 8
+    assert migrated_silica == stored_silica
+    assert len(migrated_titania) == 8
+    assert all(obs.value.point == Decimal("1.11") for obs in migrated_titania)
+    assert len({obs.observation_id for obs in migrated_titania}) == 8
+    assert all(
+        "::field:TiO2:row:" in obs.observation_id for obs in migrated_titania
+    )
+    assert not (set(stored_silica) & {obs.observation_id for obs in migrated_titania})
+
+
+def test_quantity_absent_activity_row_is_not_misclassified_as_residue(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import AdmissionStatus
+
+    source_id = "kang-2007-sio2-activity-cas-low-silica"
+    migrated = _migrate_real_extract(tmp_path, f"{source_id}.yaml")
+    activity = [
+        observation
+        for observation in migrated.observations.values()
+        if observation.observation_id.endswith(
+            "::kang_2007_t2_sample_301_sio2_activity"
+        )
+    ]
+    assert len(activity) == 1
+    assert activity[0].identity.quantity.is_value
+    assert activity[0].identity.quantity.value is Quantity.ACTIVITY
+    assert activity[0].value.point == Decimal("0.00102")
+    assert activity[0].admission.status is AdmissionStatus.ADMITTED
+
+
 def test_markova_residue_default_admission_survives_printed_composition_maps(
     tmp_path: Path,
 ) -> None:
