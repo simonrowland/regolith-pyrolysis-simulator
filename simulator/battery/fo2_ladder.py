@@ -38,7 +38,7 @@ from simulator.battery.enums import (
 )
 from simulator.battery.composition import composition_wt_pct
 from simulator.battery.identity import Identity, quantity_token
-from simulator.battery.migrate import (
+from simulator.battery.redox_fields import (
     FE3_FE2_RATIO_PRINTED_FIELDS,
     FERRIC_FRACTION_FIELDS,
 )

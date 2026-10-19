@@ -9,6 +9,9 @@ fO2 differ from the others.
 from __future__ import annotations
 
 import inspect
+import os
+import subprocess
+import sys
 from dataclasses import replace
 from decimal import Decimal
 
@@ -54,6 +57,29 @@ _COMPARABLE = (
     "openimcc",
     "internal-analytical",
 )
+
+
+def test_fo2_ladder_and_migrate_share_redox_fields_in_fresh_interpreter() -> None:
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import simulator.battery.fo2_ladder as ladder; "
+            "import simulator.battery.migrate as migrate; "
+            "from simulator.battery.redox_fields import "
+            "FE3_FE2_RATIO_PRINTED_FIELDS, FERRIC_FRACTION_FIELDS; "
+            "assert ladder.FE3_FE2_RATIO_PRINTED_FIELDS is "
+            "migrate.FE3_FE2_RATIO_PRINTED_FIELDS is "
+            "FE3_FE2_RATIO_PRINTED_FIELDS; "
+            "assert ladder.FERRIC_FRACTION_FIELDS is "
+            "migrate.FERRIC_FRACTION_FIELDS is FERRIC_FRACTION_FIELDS",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+        env=os.environ.copy(),
+    )
+    assert result.returncode == 0, result.stderr
 
 
 def _assert_same_fo2(results):

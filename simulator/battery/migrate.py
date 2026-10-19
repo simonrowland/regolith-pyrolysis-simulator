@@ -58,7 +58,12 @@ from simulator.battery.polymorph_dictionary import (
     polymorph_matches_formula,
     resolve_formula_polymorph,
 )
+from simulator.battery.composition import parse_species_formula
 from simulator.battery.extract_context import iter_extract_context_containers
+from simulator.battery.redox_fields import (
+    FE3_FE2_RATIO_PRINTED_FIELDS,
+    FERRIC_FRACTION_FIELDS,
+)
 from simulator.battery.source_lineage import _is_unknown_source_asset
 from simulator.battery.enums import (
     AdmissionStatus,
@@ -3873,8 +3878,6 @@ def _mole_fraction_composition_from_values(
 
     if not isinstance(values, Mapping):
         return None, ()
-    from simulator.battery.score import parse_species_formula
-
     raw = values.get("composition_mol")
     kume_mole_fraction = False
     if not isinstance(raw, Mapping):
@@ -8883,8 +8886,6 @@ def _interval_selection(
 # Model-specific recastings (e.g. Kress 1991's oxide-mole-fraction ratio)
 # belong on the prediction side, never here.
 # ---------------------------------------------------------------------------
-FE3_FE2_RATIO_PRINTED_FIELDS: tuple[str, ...] = ("fe3_fe2_ratio", "Fe3_over_Fe2")
-FERRIC_FRACTION_FIELDS: tuple[str, ...] = ("Fe3_over_FeT", "Fe3_over_sum_Fe")
 KRESS_FE2O3_WT_PCT_FIELD = "Fe2O3_wt_pct"
 KRESS_FEO_WT_PCT_FIELD = "FeO_wt_pct"
 FERRIC_FRACTION_RELATION = "Fe3+/Fe2+ = r / (1 - r); r = Fe3+/sumFe as printed"
