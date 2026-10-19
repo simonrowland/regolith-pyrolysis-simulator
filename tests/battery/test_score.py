@@ -4975,6 +4975,48 @@ def test_battery_hero_deck_scores_polymerisation_and_delta_iw() -> None:
     assert float(redox["x_value"]).hex() == expected_delta_iw.hex()
 
 
+def test_battery_hero_nbo_t_refuses_free_oxygen_beyond_four() -> None:
+    def composition(cao: str, sio2: str) -> dict[str, object]:
+        return {
+            "amount_basis": AmountBasis.MOLE_FRACTION.value,
+            "components": [["CaO", cao], ["SiO2", sio2]],
+        }
+
+    below_limit = score_mod._battery_hero_nbo_t(composition("0.5", "0.5"))
+    orthosilicate = score_mod._battery_hero_nbo_t(
+        composition(
+            "0.6666666666666666666666666667",
+            "0.3333333333333333333333333333",
+        )
+    )
+    beyond_limit = score_mod._battery_hero_nbo_t(composition("0.75", "0.25"))
+
+    assert below_limit == Decimal("2")
+    assert orthosilicate == Decimal("4")
+    assert beyond_limit.reason == "free_oxygen_beyond_orthosilicate"
+    assert beyond_limit.detail == {"computed_value": Decimal("6")}
+
+    over_orthosilicate_row = _hero_deck_score_row(
+        rail=Rail.VAPOUR.value,
+        formula="Fe",
+        quantity="p_partial",
+        composition=composition("0.75", "0.25"),
+        residual_dex=Decimal("0.2"),
+        candidate_value="2.5",
+    )
+    records = score_mod._battery_hero_deck_records([over_orthosilicate_row])
+    assert not any(
+        point["chart"] == "polymerisation" for point in records["points"]
+    )
+    assert records["axis_refusals"][
+        (
+            "polymerisation",
+            "openimcc",
+            "free_oxygen_beyond_orthosilicate",
+        )
+    ] == 1
+
+
 def test_battery_hero_deck_scores_pO2_decade_and_measured_redox() -> None:
     from simulator.battery.score import compute_metric
     from simulator.fe_redox import feo_iw_log10_fO2_bar
