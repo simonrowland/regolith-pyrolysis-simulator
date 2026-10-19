@@ -1,0 +1,232 @@
+schema_version: literature_extract.v1
+source_id: baldwin-2001-metal-oxide-mitigation-sodium
+source:
+  citation: >-
+    Baldwin, David L., Glenn W. Hollenberg, and Stanley J. Bos (2001). Novel
+    hydrogen-free treatment of sodium metal mixed waste by metal oxide
+    mitigation of sodium (MOMS) process. WM'01 Conference, February 25-March 1,
+    2001, Tucson, Arizona.
+  year: 2001
+extraction:
+  method: >-
+    Born-digital conference paper; MinerU tables were not present and the table
+    tool refuses pdftotext-only drafts. Tables were transcribed by hand and
+    checked against 600 dpi PDF renders.
+  date: '2026-10-18'
+  worker: fam1-1018
+review_status: draft
+species:
+  Na2O:
+    observations: []
+    context:
+      - observation_id: baldwin_2001_table1_doe_sodium_inventories
+        type: engineering_inventory_table
+        locator: {page: 2, pdf_page_index: 1, table: 'I'}
+        units: kg sodium; nCi/g activity
+        values:
+          quantity: DOE radioactive sodium inventories
+          method_class: quoted_attributed
+          admission_status: typed_unavailable
+          attribution: Refs. 3 and 4, as cited with Table I
+          reason: inventory mass and radioactivity have no matching store quantity token
+          prose_summary_as_printed: over 1.8 million kg (nearly 500,000 gal) in the DOE complex
+          rows_as_printed: |-
+            Origin | Location | Amount (kg) | Activity (nCi/g)
+            FERMI | ANL-W | 290000 | <1
+            EBR-II | ANL-W | 347000 | 50
+            FFTF | Hanford | 905000 | 20
+            SRE | Hanford | 37000 | <1
+            HALLAM | Hanford | 275000 | <0.5
+      - observation_id: baldwin_2001_table2_baseline_sodium_treatment_approaches
+        type: reaction_table
+        locator: {page: 3, pdf_page_index: 2, table: 'II'}
+        units: reaction equations as printed
+        values:
+          quantity: baseline or developmental sodium-treatment reactions
+          method_class: quoted_attributed
+          admission_status: typed_unavailable
+          attribution: Refs. 3 and 5-8, as cited in the surrounding discussion
+          reason: qualitative process reactions are not scored thermodynamic measurements
+          rows_as_printed: |-
+            Method | Description
+            Reaction with steam, water vapor, or water | Na + H2O -> NaOH + 1/2 H2
+            Reaction with alcohol-based organic | Na + R-OH -> NaO-R + 1/2 H2
+            Reaction with molten NaOH, followed by steam purge | 2Na + NaOH -> Na2O + NaH; NaH + Na2O + 2H2O -> 3NaOH + H2
+            Combustion or calcining in air | 4Na + O2 -> 2Na2O
+            Reaction with CO2 gas, with optional added water vapor | 2Na + CO2 + H2O -> Na2CO3 + H2
+      - observation_id: baldwin_2001_table3_candidate_feed_material_test_results
+        type: candidate_feed_material_test_results
+        locator: {page: 9, pdf_page_index: 8, table: 'III'}
+        units: temperatures in °C
+        values:
+          quantity: measured candidate metal-oxide test results
+          method_class: measured_direct
+          admission_status: typed_unavailable
+          reason: reaction temperatures have no matching store quantity token
+          rows_as_printed: |-
+            Oxide | Start Temp (C) | Max Temp (C) | Products Identified (XRD) | Comments
+            Fe2O3 | 420 to 540 | >1000 | Fe + Na4FeO3 | Very exothermic; with spitting, too reactive.
+            SnO2 | 300 to 400 | >700 | Sn + Na2SnO3 + Na4SnO3 | Too vigorous, with spitting; wets and reacts on contact.
+            Fe3O4 | 350 to 370 | 700-800 | Fe + NaFe2O3 + Na4FeO3 + Na2O | Controlled reaction; wets then later reacts.
+            ZnO | NA | 350 | NaZn13 + Na6ZnO4 | Incomplete reaction; wetting and initiation occur at 200 C; major product is NaZn13.
+            Cr2O3 | 450 to 500 | >700 | Cr + NaCr2O3 + Na2CrO2 | Difficult to initiate; reaction too exothermic.
+            MnO | NA | 320 | None | No reaction, wetting only.
+            SiO2 | 500 | 700-800 | Si + Na2SiO3 | Controlled reaction, not too vigorous.
+          additional_test_result_as_printed: 30 to 80% of sodium in ZnO experiments was unreacted
+      - observation_id: baldwin_2001_table3_published_free_energy_values
+        type: thermodynamic_data
+        locator: {page: 9, pdf_page_index: 8, table: 'III'}
+        units: kcal/mol
+        values:
+          quantity: published standard free energies of formation used to select feed materials
+          admission_status: typed_unavailable
+          reason: >-
+            Table III gives no temperature, reaction basis, or row-level source
+            attribution for these published values; they are not scored as
+            formation free energies.
+          rows_as_printed: |-
+            Oxide | ΔG° (kcal/mole)
+            Fe2O3 | 90
+            SnO2 | 63
+            Fe3O4 | 57
+            ZnO | 25
+            Cr2O3 | 11
+            MnO | 2
+            SiO2 | neg
+      - observation_id: baldwin_2001_table4_mixing_temperature_series
+        type: process_test_table
+        locator: {page: 11, pdf_page_index: 10, table: 'IV'}
+        units: mixing and initiation temperatures in °C; time to initiation in sec or min
+        values:
+          quantity: mixing temperature and time to reaction initiation
+          method_class: measured_direct
+          admission_status: typed_unavailable
+          reason: reaction temperature and elapsed-time quantities have no matching store tokens
+          test_conditions_as_printed: four-test series of 1:1 stoichiometric Fe3O4 tests
+          rows_as_printed: |-
+            Mixing temperature (C) | Time to initiation | Initiation temperature (C) | Maximum temperature (C)
+            325 | 10 sec | ~400 | 715
+            300 | 25 sec | ~400 | 650
+            250 | 95 sec | ~300-400 | 720
+            200 | 7.5 min | ~300-400 | 680
+          prose_result_as_printed: mixing temperatures from 325 C to 200 C produced initiation times from 10 sec to 7.5 min
+          maximum_temperature_approximate_as_printed: about 800 C
+      - observation_id: baldwin_2001_table5_reactant_mass_ratio_and_products
+        type: product_identification_table
+        locator: {page: 11, pdf_page_index: 10, table: 'V'}
+        units: reactant mass ratio as defined in the paper; reactions as printed
+        values:
+          quantity: reactant mass ratio and XRD product composition
+          method_class: measured_direct
+          admission_status: typed_unavailable
+          reason: >-
+            The table reports reaction recipes and qualitative products, not a
+            composition quantity supported by the store.
+          definition_as_printed: molar amount of feed oxide divided by the stoichiometric amount required to oxidize sodium to Na2O
+          rows_as_printed: |-
+            Test case | Reactant mass ratio | Reaction
+            1 | 1 | 4 Na + SiO2 -> 2 Na2O + Si
+            2 | 3 | 4 Na + 3 SiO2 -> 2 Na2SiO3 + Si
+            3 | 1 | 8 Na + Fe3O4 -> 4 Na2O + 3 Fe
+            4 | 2 | 8 Na + 2 Fe3O4 -> 4 Na2FeO2 + 2 Fe
+          prose_result_as_printed: ratios greater than 2.6 consistently eliminated all trace residual metallic sodium
+      - observation_id: baldwin_2001_table6_calculated_adiabatic_temperatures
+        type: calculated_process_table
+        locator: {page: 12, pdf_page_index: 11, table: 'VI'}
+        units: temperature increases and final temperatures in °C
+        values:
+          quantity: calculated adiabatic temperatures for potential MOMS processes
+          method_class: model_derived
+          admission_status: typed_unavailable
+          attribution: Refs. 9 and 10, as cited with Table VI
+          reason: calculated process temperatures have no matching store quantity token
+          calculation_basis: products and enthalpies from Barin; reactants referenced to 527 C
+          rows_as_printed: |-
+            Reaction | Ratio | Adiabatic temperature increase
+            4 Na + SiO2 -> 2 Na2O + Si | 1:1 | No reaction expected
+            4 Na + 3 SiO2 -> 2 Na2SiO3 + Si | 1:3 | 745 C rise to 1272 C
+            3 Na + 2 Al2O3 -> 3 NaAlO2 + Al | 1:4 | 51 C rise, no reaction expected
+            8 Na + Fe3O4 -> 4 Na2O + Fe | 1:1 | 646 C rise to 1173 C
+      - observation_id: baldwin_2001_figure1_scoping_test
+        type: figure
+        locator: {page: 6, pdf_page_index: 5, figure: '1'}
+        units: not applicable (photograph)
+        values:
+          quantity: process photograph
+          method_class: figure_only
+          admission_status: figure_only
+          species: sodium beads and MnO feed material
+          phase: liquid sodium beads on solid MnO bed
+          temperature: not stated in caption
+          axes: {x: not applicable, y: not applicable}
+          panel: none
+          caption: Typical scoping test of sodium beads heated on a bed of MnO.
+          series:
+            - {name: photograph, marker_count: 0}
+          points: []
+          attribution: this work
+          digitisation: deferred to a figure pass
+      - observation_id: baldwin_2001_figure2_mixing
+        type: figure
+        locator: {page: 7, pdf_page_index: 6, figure: '2'}
+        units: not applicable (photograph)
+        values:
+          quantity: process photograph
+          method_class: figure_only
+          admission_status: figure_only
+          species: sodium and metal-oxide feed material
+          phase: molten sodium and solid feed material
+          temperature: mixing temperature; numeric value not stated in caption
+          axes: {x: not applicable, y: not applicable}
+          panel: none
+          caption: >-
+            Shows 1:1 stoichiometric ratio mixture of sodium with feed material
+            at mixing temperature, slowing ramping to initiation temperature.
+          series:
+            - {name: photograph, marker_count: 0}
+          points: []
+          attribution: this work
+          digitisation: deferred to a figure pass
+      - observation_id: baldwin_2001_figure3_magnetite_product
+        type: figure
+        locator: {page: 8, pdf_page_index: 7, figure: '3'}
+        units: not applicable (photograph)
+        values:
+          quantity: process photograph
+          method_class: figure_only
+          admission_status: figure_only
+          species: sodium and magnetite reaction product
+          phase: solid product with Fe, Na2FeO3, Na2O, and excess Fe3O4 as captioned
+          temperature: not stated in caption
+          axes: {x: not applicable, y: not applicable}
+          panel: none
+          caption: >-
+            Shows the final product, "hockey puck" formed by magnetite in a 3:1
+            stoichiometric mixture with 35g sodium, cracked to show the interior
+            of metallic Fe, Na2FeO3, Na2O, and excess Fe3O4.
+          series:
+            - {name: photograph, marker_count: 0}
+          points: []
+          attribution: this work
+          digitisation: deferred to a figure pass
+      - observation_id: baldwin_2001_figure4_silica_product
+        type: figure
+        locator: {page: 10, pdf_page_index: 9, figure: '4'}
+        units: not applicable (photograph)
+        values:
+          quantity: process photograph
+          method_class: figure_only
+          admission_status: figure_only
+          species: sodium and silica reaction product
+          phase: solid product containing Si, Na2SiO3, and excess SiO2 as captioned
+          temperature: not stated in caption
+          axes: {x: not applicable, y: not applicable}
+          panel: none
+          caption: >-
+            The crumbly disposal product of silica reacted with sodium,
+            containing elemental Si, Na2SiO3, and excess SiO2.
+          series:
+            - {name: photograph, marker_count: 0}
+          points: []
+          attribution: this work
+          digitisation: deferred to a figure pass
