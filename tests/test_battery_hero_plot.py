@@ -15,6 +15,7 @@ from scripts.battery_hero_plot import (
     HERO_MINOR_FACETS,
     HERO_RAILS,
     _draw_hero_current,
+    _draw_hero_refusals,
     _draw_hero_sweet_spot,
     _history_record,
     _hero_engine_colors,
@@ -42,6 +43,7 @@ from scripts.battery_hero_plot import (
 from matplotlib.colors import Normalize, to_rgba
 from matplotlib.figure import Figure
 from matplotlib.text import Text
+from matplotlib.ticker import MaxNLocator
 import matplotlib.pyplot as plt
 
 
@@ -892,6 +894,25 @@ def test_sweet_spot_panels_show_shared_cell_counts_and_hatch_sparse_cells(
     melt_svg = files["hero:melt_activity:svg"].read_text(encoding="utf-8").casefold()
     assert "140/147 rows" in melt_svg
     assert "main's fix is pending" in melt_svg
+
+
+def test_refusal_strip_uses_integer_unique_ticks() -> None:
+    fig, axis = plt.subplots()
+    _draw_hero_refusals(
+        axis,
+        [
+            ("openimcc", "unsupported", 37),
+            ("magemin", "unsupported", 22),
+            ("openimcc", "out_of_basis", 11),
+        ],
+        engine_colors={"openimcc": "#2244aa", "magemin": "#888888"},
+    )
+
+    assert isinstance(axis.xaxis.get_major_locator(), MaxNLocator)
+    assert all(float(tick).is_integer() for tick in axis.get_xticks())
+    labels = [label.get_text() for label in axis.get_xticklabels()]
+    assert len(labels) == len(set(labels))
+    plt.close(fig)
 
 
 def test_hero_flagged_points_are_hollow_and_benchmark_uses_shared_rows(

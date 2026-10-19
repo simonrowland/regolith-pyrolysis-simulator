@@ -59,7 +59,7 @@ from matplotlib.axes import Axes
 from matplotlib.colors import Normalize
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
-from matplotlib.ticker import FuncFormatter, FormatStrFormatter
+from matplotlib.ticker import FuncFormatter, FormatStrFormatter, MaxNLocator
 
 from simulator.battery.enums import (  # noqa: E402
     NoticeKind,
@@ -1915,6 +1915,7 @@ def _draw_hero_refusals(
     axis.set_yticklabels(reasons, fontsize=4.8)
     axis.invert_yaxis()
     axis.set_xlabel("refusal rows", fontsize=5.5)
+    axis.xaxis.set_major_locator(MaxNLocator(integer=True))
     axis.xaxis.set_major_formatter(
         FuncFormatter(lambda value, _position: _compact_count(round(value)))
     )
