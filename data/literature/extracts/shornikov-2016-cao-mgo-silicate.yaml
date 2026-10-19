@@ -1,0 +1,3941 @@
+"schema_version": "literature_extract.v1"
+"source_id": "shornikov-2016-cao-mgo-silicate"
+"source":
+  "citation": "Shornikov, S. I. (2016), Thermodynamic properties of the CaO–MgO–SiO2 melts, Experiment\
+    \ in Geosciences, vol. 22, no. 1, pp. 40–42."
+  "year": 2016
+"extraction":
+  "method": "mineru_table_draft emit"
+  "date": "2026-10-18"
+  "worker": "trial-grok-1018"
+"review_status": "draft"
+"skipped_empty_or_dash":
+  "total": 13
+  "tables":
+  - "page": 2
+    "table_index": 2
+    "count": 13
+"species":
+  "CaO":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r03_c02"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "CaO"
+        "column_header": "Condensed phases  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-421.511"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "cr"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": &id001
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "column_header": "ΔfG°2000, kJ/mole"
+            "note": "The temperature is the 2000 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 41."
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r03_c04"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "CaO"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-409.450"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "l"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id001
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r05_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "CaO"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-74.308"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": &id006
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "column_header": "ΔfG°2000, kJ/mole"
+            "note": "The temperature is the 2000 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 41."
+    - "observation_id": "shornikov_2016_fig1a_CaO_activity"
+      "type": "activity_coefficient"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "panel": "a"
+        "marker": "black open square"
+        "note": "Figure 1 panel a. Symbol 1 is black open square, the CaO activity. The axis is lg a_i,\
+          \ which is log10(activity). The stored activity is 10 raised to the read ordinate. The ordinate\
+          \ is stored with the sign printed on the axis. Model curve; numeric samples are not stored."
+      "phase": "l"
+      "units": "dimensionless"
+      "standard_state": &id002
+        "state":
+          "tag": "unknown"
+          "reason": "The caption does not state the activity standard state (pure oxide or a stated reference)."
+        "locator":
+          "page": 2
+          "pdf_page_index": 1
+          "figure": "1"
+          "note": "The caption does not state the activity standard state (pure oxide or a stated reference)."
+      "values":
+        "quantity": "activity"
+        "method_class": "quoted_attributed"
+        "formula": "CaO"
+        "activity_name_as_reported": "CaO activity"
+        "plot_ordinate_as_printed": "lg a_i"
+        "status": "typed_refusal"
+        "reason": "Symbols 1-3 are calculated oxide activities of the present study. The curve is a model\
+          \ curve, so its markers are not stored as numeric figure evidence."
+        "unavailable_reason": "model_curve_not_sampled"
+        "attribution": "Figure 1 caption: symbols 1-3 were obtained in the present study. The text says\
+          \ the activities come from the Gibbs energies in Table 1. Those parents are the table rows already\
+          \ stored; the per-point minimizer inputs are not itemized, so this curve is not given model_derived\
+          \ lineage. No numeric points are stored."
+      "T_K": "1873"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "1873"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "note": "Figure 1 caption: activities in both joins at 1873 K."
+    - "observation_id": "shornikov_2016_fig1b_CaO_activity"
+      "type": "activity_coefficient"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "panel": "b"
+        "marker": "black open square"
+        "note": "Figure 1 panel b. Symbol 1 is black open square, the CaO activity. The axis is lg a_i,\
+          \ which is log10(activity). The stored activity is 10 raised to the read ordinate. The ordinate\
+          \ is stored with the sign printed on the axis. Model curve; numeric samples are not stored."
+      "phase": "l"
+      "units": "dimensionless"
+      "standard_state": *id002
+      "values":
+        "quantity": "activity"
+        "method_class": "quoted_attributed"
+        "formula": "CaO"
+        "activity_name_as_reported": "CaO activity"
+        "plot_ordinate_as_printed": "lg a_i"
+        "status": "typed_refusal"
+        "reason": "Symbols 1-3 are calculated oxide activities of the present study. The curve is a model\
+          \ curve, so its markers are not stored as numeric figure evidence."
+        "unavailable_reason": "model_curve_not_sampled"
+        "attribution": "Figure 1 caption: symbols 1-3 were obtained in the present study. The text says\
+          \ the activities come from the Gibbs energies in Table 1. Those parents are the table rows already\
+          \ stored; the per-point minimizer inputs are not itemized, so this curve is not given model_derived\
+          \ lineage. No numeric points are stored."
+      "T_K": "1873"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "1873"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "note": "Figure 1 caption: activities in both joins at 1873 K."
+    - "observation_id": "shornikov_2016_fig1b_CaO_rein1965_activity"
+      "type": "activity_coefficient"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "panel": "b"
+        "marker": "black filled circle"
+        "note": "Figure 1 panel b. Symbol 4 is black filled circle, the CaO activity. The axis is lg a_i,\
+          \ which is log10(activity). The stored activity is 10 raised to the read ordinate. The ordinate\
+          \ is stored with the sign printed on the axis."
+      "phase": "l"
+      "units": "dimensionless"
+      "standard_state": *id002
+      "values":
+        "quantity": "activity"
+        "method_class": "figure_only"
+        "formula": "CaO"
+        "activity_name_as_reported": "CaO activity"
+        "plot_ordinate_as_printed": "lg a_i"
+        "attribution": "Figure 1 caption: symbols 4-6 are Rein and Chipman, 1965. This paper does not\
+          \ reprint their numbers."
+        "points":
+        - "activity": "0.04"
+          "log10_activity_ordinate": "-1.396"
+          "log10_activity_ordinate_read_2": "-1.395"
+          "x_mole_pct_read": "36.25"
+          "x_mole_pct_read_2": "36.26"
+          "embedded_px_read_1":
+          - 868.0
+          - 179.0
+          "embedded_px_read_2":
+          - 868.07
+          - 178.78
+          "page_600dpi_px_read_1":
+          - 3196.3
+          - 5121.2
+          "page_600dpi_px_read_2":
+          - 3196.5
+          - 5120.5
+          "read_disagreement_dex": "0.002"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "read_uncertainty_dex": "0.001"
+          "printed_composition_mole_pct": "SiO2 = 36.25 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": &id003
+              "state":
+                "tag": "value"
+                "value":
+                  "kind": "point"
+                  "point": "1873"
+              "locator":
+                "page": 2
+                "pdf_page_index": 1
+                "figure": "1"
+                "note": "Figure 1 caption: activities in both joins at 1873 K."
+            "composition": &id004
+              "state":
+                "tag": "unknown"
+                "reason": "Printed composition is mole percent. AmountBasis has no mole-percent token,\
+                  \ so these mole percents are not stored as a mole fraction."
+              "locator":
+                "page": 2
+                "pdf_page_index": 1
+                "figure": "1"
+                "note": "Printed composition is mole percent. AmountBasis has no mole-percent token, so\
+                  \ these mole percents are not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "black filled circle"
+            "note": "Figure 1 panel b, symbol 4 (black filled circle)."
+        - "activity": "0.021"
+          "log10_activity_ordinate": "-1.684"
+          "log10_activity_ordinate_read_2": "-1.688"
+          "x_mole_pct_read": "40.00"
+          "x_mole_pct_read_2": "40.08"
+          "embedded_px_read_1":
+          - 928.0
+          - 213.0
+          "embedded_px_read_2":
+          - 929.21
+          - 213.44
+          "page_600dpi_px_read_1":
+          - 3376.4
+          - 5223.2
+          "page_600dpi_px_read_2":
+          - 3380.0
+          - 5224.5
+          "read_disagreement_dex": "0.004"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "SiO2 = 40.00 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K":
+              "state":
+                "tag": "value"
+                "value":
+                  "kind": "point"
+                  "point": "1873"
+              "locator":
+                "page": 2
+                "pdf_page_index": 1
+                "figure": "1"
+                "note": "Figure 1 caption: activities in both joins at 1873 K."
+            "composition":
+              "state":
+                "tag": "unknown"
+                "reason": "Printed composition is mole percent. AmountBasis has no mole-percent token,\
+                  \ so these mole percents are not stored as a mole fraction."
+              "locator":
+                "page": 2
+                "pdf_page_index": 1
+                "figure": "1"
+                "note": "Printed composition is mole percent. AmountBasis has no mole-percent token, so\
+                  \ these mole percents are not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "black filled circle"
+            "note": "Figure 1 panel b, symbol 4 (black filled circle)."
+          "read_uncertainty_dex": "0.002"
+        - "activity": "0.01"
+          "log10_activity_ordinate": "-1.997"
+          "log10_activity_ordinate_read_2": "-1.998"
+          "x_mole_pct_read": "44.06"
+          "x_mole_pct_read_2": "44.07"
+          "embedded_px_read_1":
+          - 993.0
+          - 250.0
+          "embedded_px_read_2":
+          - 993.17
+          - 250.11
+          "page_600dpi_px_read_1":
+          - 3571.5
+          - 5334.2
+          "page_600dpi_px_read_2":
+          - 3572.0
+          - 5334.5
+          "read_disagreement_dex": "0.001"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "SiO2 = 44.06 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "black filled circle"
+            "note": "Figure 1 panel b, symbol 4 (black filled circle)."
+        - "activity": "0.005"
+          "log10_activity_ordinate": "-2.301"
+          "log10_activity_ordinate_read_2": "-2.298"
+          "x_mole_pct_read": "48.62"
+          "x_mole_pct_read_2": "48.62"
+          "embedded_px_read_1":
+          - 1066.0
+          - 286.0
+          "embedded_px_read_2":
+          - 1066.13
+          - 285.61
+          "page_600dpi_px_read_1":
+          - 3790.6
+          - 5442.2
+          "page_600dpi_px_read_2":
+          - 3791.0
+          - 5441.0
+          "read_disagreement_dex": "0.003"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "SiO2 = 48.62 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "black filled circle"
+            "note": "Figure 1 panel b, symbol 4 (black filled circle)."
+          "read_uncertainty_dex": "0.002"
+        - "activity": "0.004"
+          "log10_activity_ordinate": "-2.394"
+          "log10_activity_ordinate_read_2": "-2.395"
+          "x_mole_pct_read": "53.11"
+          "x_mole_pct_read_2": "53.11"
+          "embedded_px_read_1":
+          - 1138.0
+          - 297.0
+          "embedded_px_read_2":
+          - 1137.92
+          - 297.11
+          "page_600dpi_px_read_1":
+          - 4006.7
+          - 5475.2
+          "page_600dpi_px_read_2":
+          - 4006.5
+          - 5475.5
+          "read_disagreement_dex": "0.001"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "SiO2 = 53.11 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "black filled circle"
+            "note": "Figure 1 panel b, symbol 4 (black filled circle)."
+    - "observation_id": "shornikov_2016_fig1a_CaO_rein1965_activity"
+      "type": "activity_coefficient"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "panel": "a"
+        "marker": "black filled circle"
+        "note": "Figure 1 panel a. Symbol 4 is black filled circle, the CaO activity. The axis is lg a_i,\
+          \ which is log10(activity). The stored activity is 10 raised to the read ordinate. The ordinate\
+          \ is stored with the sign printed on the axis."
+      "phase": "l"
+      "units": "dimensionless"
+      "standard_state": *id002
+      "values":
+        "quantity": "activity"
+        "method_class": "figure_only"
+        "formula": "CaO"
+        "activity_name_as_reported": "CaO activity"
+        "plot_ordinate_as_printed": "lg a_i"
+        "attribution": "Figure 1 caption: symbols 4-6 are Rein and Chipman, 1965. This paper does not\
+          \ reprint their numbers."
+        "points":
+        - "activity": "0.0038"
+          "log10_activity_ordinate": "-2.419"
+          "log10_activity_ordinate_read_2": "-2.422"
+          "x_mole_pct_read": "17.14"
+          "x_mole_pct_read_2": "17.16"
+          "embedded_px_read_1":
+          - 283.0
+          - 300.0
+          "embedded_px_read_2":
+          - 283.23
+          - 300.28
+          "page_600dpi_px_read_1":
+          - 1440.3
+          - 5484.2
+          "page_600dpi_px_read_2":
+          - 1441.0
+          - 5485.0
+          "read_disagreement_dex": "0.002"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "CaO = 17.14 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "black filled circle"
+            "note": "Figure 1 panel a, symbol 4 (black filled circle)."
+          "read_uncertainty_dex": "0.001"
+        - "activity": "0.0056"
+          "log10_activity_ordinate": "-2.250"
+          "log10_activity_ordinate_read_2": "-2.253"
+          "x_mole_pct_read": "21.61"
+          "x_mole_pct_read_2": "21.60"
+          "embedded_px_read_1":
+          - 333.0
+          - 280.0
+          "embedded_px_read_2":
+          - 332.87
+          - 280.28
+          "page_600dpi_px_read_1":
+          - 1590.4
+          - 5424.2
+          "page_600dpi_px_read_2":
+          - 1590.0
+          - 5425.0
+          "read_disagreement_dex": "0.002"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "CaO = 21.61 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "black filled circle"
+            "note": "Figure 1 panel a, symbol 4 (black filled circle)."
+          "read_uncertainty_dex": "0.001"
+        - "activity": "0.0099"
+          "log10_activity_ordinate": "-2.005"
+          "log10_activity_ordinate_read_2": "-2.007"
+          "x_mole_pct_read": "27.05"
+          "x_mole_pct_read_2": "27.05"
+          "embedded_px_read_1":
+          - 394.0
+          - 251.0
+          "embedded_px_read_2":
+          - 394.00
+          - 251.28
+          "page_600dpi_px_read_1":
+          - 1773.5
+          - 5337.2
+          "page_600dpi_px_read_2":
+          - 1773.5
+          - 5338.0
+          "read_disagreement_dex": "0.002"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "CaO = 27.05 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "black filled circle"
+            "note": "Figure 1 panel a, symbol 4 (black filled circle)."
+          "read_uncertainty_dex": "0.001"
+        - "activity": "0.018"
+          "log10_activity_ordinate": "-1.735"
+          "log10_activity_ordinate_read_2": "-1.728"
+          "x_mole_pct_read": "32.32"
+          "x_mole_pct_read_2": "32.33"
+          "embedded_px_read_1":
+          - 453.0
+          - 219.0
+          "embedded_px_read_2":
+          - 453.14
+          - 218.28
+          "page_600dpi_px_read_1":
+          - 1950.6
+          - 5241.2
+          "page_600dpi_px_read_2":
+          - 1951.0
+          - 5239.0
+          "read_disagreement_dex": "0.006"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "CaO = 32.32 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "black filled circle"
+            "note": "Figure 1 panel a, symbol 4 (black filled circle)."
+          "read_uncertainty_dex": "0.003"
+        - "activity": "0.042"
+          "log10_activity_ordinate": "-1.375"
+          "log10_activity_ordinate_read_2": "-1.382"
+          "x_mole_pct_read": "38.13"
+          "x_mole_pct_read_2": "38.02"
+          "embedded_px_read_1":
+          - 518.0
+          - 176.5
+          "embedded_px_read_2":
+          - 516.77
+          - 177.28
+          "page_600dpi_px_read_1":
+          - 2145.7
+          - 5113.7
+          "page_600dpi_px_read_2":
+          - 2142.0
+          - 5116.0
+          "read_disagreement_dex": "0.007"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "read_uncertainty_dex": "0.003"
+          "printed_composition_mole_pct": "CaO = 38.13 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K":
+              "state":
+                "tag": "value"
+                "value":
+                  "kind": "point"
+                  "point": "1873"
+              "locator":
+                "page": 2
+                "pdf_page_index": 1
+                "figure": "1"
+                "note": "Figure 1 caption: activities in both joins at 1873 K."
+            "composition":
+              "state":
+                "tag": "unknown"
+                "reason": "Printed composition is mole percent. AmountBasis has no mole-percent token,\
+                  \ so these mole percents are not stored as a mole fraction."
+              "locator":
+                "page": 2
+                "pdf_page_index": 1
+                "figure": "1"
+                "note": "Printed composition is mole percent. AmountBasis has no mole-percent token, so\
+                  \ these mole percents are not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "black filled circle"
+            "note": "Figure 1 panel a, symbol 4 (black filled circle)."
+  "Ca":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r03_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "Ca"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-21.080"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id001
+  "CaSiO3":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r04_c02"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$CaSiO_3$"
+        "column_header": "Condensed phases  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-1058.628"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "cr"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": &id005
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "column_header": "ΔfG°2000, kJ/mole"
+            "note": "The temperature is the 2000 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 41."
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r04_c04"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$CaSiO_3$"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-1064.401"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "l"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id005
+  "Ca2":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r04_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$Ca_2$"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "77.075"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id005
+  "Ca2SiO4":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r05_c02"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$Ca_2SiO_4$"
+        "column_header": "Condensed phases  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-1531.242"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "cr"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id006
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r05_c04"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$Ca_2SiO_4$"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-1522.120"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "l"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id006
+  "Ca3SiO5":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r06_c02"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$Ca_3SiO_5$"
+        "column_header": "Condensed phases  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-1945.934"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "cr"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": &id007
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "column_header": "ΔfG°2000, kJ/mole"
+            "note": "The temperature is the 2000 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 41."
+  "Mg":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r06_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "Mg"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-57.263"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id007
+  "Ca3Si2O7":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r07_c02"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$Ca_3Si_2O_7$"
+        "column_header": "Condensed phases  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-2577.486"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "cr"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": &id008
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "column_header": "ΔfG°2000, kJ/mole"
+            "note": "The temperature is the 2000 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 41."
+  "Mg2":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r07_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$Mg_2$"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "34.314"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id008
+  "MgO":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r08_c02"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "MgO"
+        "column_header": "Condensed phases  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-376.430"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "cr"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": &id009
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "column_header": "ΔfG°2000, kJ/mole"
+            "note": "The temperature is the 2000 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 41."
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r08_c04"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "MgO"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-345.380"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "l"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id009
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r08_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "MgO"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-108.759"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id009
+    - "observation_id": "shornikov_2016_fig1a_MgO_activity"
+      "type": "activity_coefficient"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "panel": "a"
+        "marker": "red open square"
+        "note": "Figure 1 panel a. Symbol 2 is red open square, the MgO activity. The axis is lg a_i,\
+          \ which is log10(activity). The stored activity is 10 raised to the read ordinate. The ordinate\
+          \ is stored with the sign printed on the axis. Model curve; numeric samples are not stored."
+      "phase": "l"
+      "units": "dimensionless"
+      "standard_state": *id002
+      "values":
+        "quantity": "activity"
+        "method_class": "quoted_attributed"
+        "formula": "MgO"
+        "activity_name_as_reported": "MgO activity"
+        "plot_ordinate_as_printed": "lg a_i"
+        "status": "typed_refusal"
+        "reason": "Symbols 1-3 are calculated oxide activities of the present study. The curve is a model\
+          \ curve, so its markers are not stored as numeric figure evidence."
+        "unavailable_reason": "model_curve_not_sampled"
+        "attribution": "Figure 1 caption: symbols 1-3 were obtained in the present study. The text says\
+          \ the activities come from the Gibbs energies in Table 1. Those parents are the table rows already\
+          \ stored; the per-point minimizer inputs are not itemized, so this curve is not given model_derived\
+          \ lineage. No numeric points are stored."
+      "T_K": "1873"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "1873"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "note": "Figure 1 caption: activities in both joins at 1873 K."
+    - "observation_id": "shornikov_2016_fig1b_MgO_activity"
+      "type": "activity_coefficient"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "panel": "b"
+        "marker": "red open square"
+        "note": "Figure 1 panel b. Symbol 2 is red open square, the MgO activity. The axis is lg a_i,\
+          \ which is log10(activity). The stored activity is 10 raised to the read ordinate. The ordinate\
+          \ is stored with the sign printed on the axis. Model curve; numeric samples are not stored."
+      "phase": "l"
+      "units": "dimensionless"
+      "standard_state": *id002
+      "values":
+        "quantity": "activity"
+        "method_class": "quoted_attributed"
+        "formula": "MgO"
+        "activity_name_as_reported": "MgO activity"
+        "plot_ordinate_as_printed": "lg a_i"
+        "status": "typed_refusal"
+        "reason": "Symbols 1-3 are calculated oxide activities of the present study. The curve is a model\
+          \ curve, so its markers are not stored as numeric figure evidence."
+        "unavailable_reason": "model_curve_not_sampled"
+        "attribution": "Figure 1 caption: symbols 1-3 were obtained in the present study. The text says\
+          \ the activities come from the Gibbs energies in Table 1. Those parents are the table rows already\
+          \ stored; the per-point minimizer inputs are not itemized, so this curve is not given model_derived\
+          \ lineage. No numeric points are stored."
+      "T_K": "1873"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "1873"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "note": "Figure 1 caption: activities in both joins at 1873 K."
+    - "observation_id": "shornikov_2016_fig1b_MgO_rein1965_activity"
+      "type": "activity_coefficient"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "panel": "b"
+        "marker": "red filled circle"
+        "note": "Figure 1 panel b. Symbol 5 is red filled circle, the MgO activity. The axis is lg a_i,\
+          \ which is log10(activity). The stored activity is 10 raised to the read ordinate. The ordinate\
+          \ is stored with the sign printed on the axis."
+      "phase": "l"
+      "units": "dimensionless"
+      "standard_state": *id002
+      "values":
+        "quantity": "activity"
+        "method_class": "figure_only"
+        "formula": "MgO"
+        "activity_name_as_reported": "MgO activity"
+        "plot_ordinate_as_printed": "lg a_i"
+        "attribution": "Figure 1 caption: symbols 4-6 are Rein and Chipman, 1965. This paper does not\
+          \ reprint their numbers."
+        "points":
+        - "activity": "0.5"
+          "log10_activity_ordinate": "-0.298"
+          "log10_activity_ordinate_read_2": "-0.294"
+          "x_mole_pct_read": "37.25"
+          "x_mole_pct_read_2": "37.32"
+          "embedded_px_read_1":
+          - 884.0
+          - 49.0
+          "embedded_px_read_2":
+          - 885.06
+          - 48.61
+          "page_600dpi_px_read_1":
+          - 3244.3
+          - 4731.2
+          "page_600dpi_px_read_2":
+          - 3247.5
+          - 4730.0
+          "read_disagreement_dex": "0.003"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "SiO2 = 37.25 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "red filled circle"
+            "note": "Figure 1 panel b, symbol 5 (red filled circle)."
+          "read_uncertainty_dex": "0.002"
+        - "activity": "0.1"
+          "log10_activity_ordinate": "-0.991"
+          "log10_activity_ordinate_read_2": "-0.997"
+          "x_mole_pct_read": "48.80"
+          "x_mole_pct_read_2": "48.86"
+          "embedded_px_read_1":
+          - 1069.0
+          - 131.0
+          "embedded_px_read_2":
+          - 1069.96
+          - 131.78
+          "page_600dpi_px_read_1":
+          - 3799.6
+          - 4977.2
+          "page_600dpi_px_read_2":
+          - 3802.5
+          - 4979.5
+          "read_disagreement_dex": "0.007"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "SiO2 = 48.80 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "red filled circle"
+            "note": "Figure 1 panel b, symbol 5 (red filled circle)."
+          "read_uncertainty_dex": "0.003"
+        - "activity": "0.06"
+          "log10_activity_ordinate": "-1.219"
+          "log10_activity_ordinate_read_2": "-1.221"
+          "x_mole_pct_read": "55.17"
+          "x_mole_pct_read_2": "55.24"
+          "embedded_px_read_1":
+          - 1171.0
+          - 158.0
+          "embedded_px_read_2":
+          - 1172.07
+          - 158.28
+          "page_600dpi_px_read_1":
+          - 4105.8
+          - 5058.2
+          "page_600dpi_px_read_2":
+          - 4109.0
+          - 5059.0
+          "read_disagreement_dex": "0.002"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "SiO2 = 55.17 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "red filled circle"
+            "note": "Figure 1 panel b, symbol 5 (red filled circle)."
+          "read_uncertainty_dex": "0.001"
+    - "observation_id": "shornikov_2016_fig1a_MgO_rein1965_activity"
+      "type": "activity_coefficient"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "panel": "a"
+        "marker": "red filled circle"
+        "note": "Figure 1 panel a. Symbol 5 is red filled circle, the MgO activity. The axis is lg a_i,\
+          \ which is log10(activity). The stored activity is 10 raised to the read ordinate. The ordinate\
+          \ is stored with the sign printed on the axis."
+      "phase": "l"
+      "units": "dimensionless"
+      "standard_state": *id002
+      "values":
+        "quantity": "activity"
+        "method_class": "figure_only"
+        "formula": "MgO"
+        "activity_name_as_reported": "MgO activity"
+        "plot_ordinate_as_printed": "lg a_i"
+        "attribution": "Figure 1 caption: symbols 4-6 are Rein and Chipman, 1965. This paper does not\
+          \ reprint their numbers."
+        "points":
+        - "activity": "0.096"
+          "log10_activity_ordinate": "-1.016"
+          "log10_activity_ordinate_read_2": "-1.021"
+          "x_mole_pct_read": "18.13"
+          "x_mole_pct_read_2": "18.20"
+          "embedded_px_read_1":
+          - 294.0
+          - 134.0
+          "embedded_px_read_2":
+          - 294.89
+          - 134.61
+          "page_600dpi_px_read_1":
+          - 1473.3
+          - 4986.2
+          "page_600dpi_px_read_2":
+          - 1476.0
+          - 4988.0
+          "read_disagreement_dex": "0.005"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "CaO = 18.13 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "red filled circle"
+            "note": "Figure 1 panel a, symbol 5 (red filled circle)."
+          "read_uncertainty_dex": "0.003"
+        - "activity": "0.57"
+          "log10_activity_ordinate": "-0.247"
+          "log10_activity_ordinate_read_2": "-0.244"
+          "x_mole_pct_read": "38.75"
+          "x_mole_pct_read_2": "38.70"
+          "embedded_px_read_1":
+          - 525.0
+          - 43.0
+          "embedded_px_read_2":
+          - 524.43
+          - 42.61
+          "page_600dpi_px_read_1":
+          - 2166.7
+          - 4713.2
+          "page_600dpi_px_read_2":
+          - 2165.0
+          - 4712.0
+          "read_disagreement_dex": "0.003"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "CaO = 38.75 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "red filled circle"
+            "note": "Figure 1 panel a, symbol 5 (red filled circle)."
+          "read_uncertainty_dex": "0.002"
+        - "activity": "0.94"
+          "log10_activity_ordinate": "-0.027"
+          "log10_activity_ordinate_read_2": "-0.035"
+          "x_mole_pct_read": "42.95"
+          "x_mole_pct_read_2": "43.07"
+          "embedded_px_read_1":
+          - 572.0
+          - 17.0
+          "embedded_px_read_2":
+          - 573.40
+          - 17.94
+          "page_600dpi_px_read_1":
+          - 2307.8
+          - 4635.2
+          "page_600dpi_px_read_2":
+          - 2312.0
+          - 4638.0
+          "read_disagreement_dex": "0.008"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "CaO = 42.95 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "red filled circle"
+            "note": "Figure 1 panel a, symbol 5 (red filled circle)."
+          "read_uncertainty_dex": "0.004"
+  "MgSiO3":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r09_c02"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$MgSiO_3$"
+        "column_header": "Condensed phases  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-956.936"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "cr"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": &id010
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "column_header": "ΔfG°2000, kJ/mole"
+            "note": "The temperature is the 2000 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 41."
+  "Si":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r09_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "Si"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "167.228"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id010
+  "Mg2SiO4":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r10_c02"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$Mg_2SiO_4$"
+        "column_header": "Condensed phases  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-1360.399"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "cr"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": &id011
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "column_header": "ΔfG°2000, kJ/mole"
+            "note": "The temperature is the 2000 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 41."
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r10_c04"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$Mg_2SiO_4$"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-1351.811"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "l"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id011
+  "Si2":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r10_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$Si_2$"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "216.304"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id011
+  "CaMgSiO4":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r11_c02"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$CaMgSiO_4$"
+        "column_header": "Condensed phases  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-1461.894"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "cr"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": &id012
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "column_header": "ΔfG°2000, kJ/mole"
+            "note": "The temperature is the 2000 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 41."
+  "Si3":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r11_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$Si_3$"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "265.892"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id012
+  "CaMgSi2O6":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r12_c02"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$CaMgSi_2O_6$"
+        "column_header": "Condensed phases  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-2038.188"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "cr"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": &id013
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "column_header": "ΔfG°2000, kJ/mole"
+            "note": "The temperature is the 2000 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 41."
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r12_c04"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$CaMgSi_2O_6$"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-2065.893"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "l"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id013
+  "Si4":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r12_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$Si_4$"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "409.396"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id013
+  "Ca2MgSi2O7":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r13_c02"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$Ca_2MgSi_2O_7$"
+        "column_header": "Condensed phases  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-2478.460"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "cr"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": &id014
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "column_header": "ΔfG°2000, kJ/mole"
+            "note": "The temperature is the 2000 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 41."
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r13_c04"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$Ca_2MgSi_2O_7$"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-2498.156"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "l"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id014
+  "SiO":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r13_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "SiO"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-248.438"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id014
+  "Ca3MgSi2O8":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r14_c02"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$Ca_3MgSi_2O_8$"
+        "column_header": "Condensed phases  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-2976.156"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "cr"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": &id015
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "column_header": "ΔfG°2000, kJ/mole"
+            "note": "The temperature is the 2000 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 41."
+  "SiO2":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r14_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$SiO_2$"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-314.875"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id015
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r15_c02"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$SiO_2$"
+        "column_header": "Condensed phases  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-550.476"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "cr"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": &id016
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "column_header": "ΔfG°2000, kJ/mole"
+            "note": "The temperature is the 2000 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 41."
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r15_c04"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$SiO_2$"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-550.520"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "l"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id016
+    - "observation_id": "shornikov_2016_fig1a_SiO2_activity"
+      "type": "activity_coefficient"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "panel": "a"
+        "marker": "blue open square"
+        "note": "Figure 1 panel a. Symbol 3 is blue open square, the SiO2 activity. The axis is lg a_i,\
+          \ which is log10(activity). The stored activity is 10 raised to the read ordinate. The ordinate\
+          \ is stored with the sign printed on the axis. Model curve; numeric samples are not stored."
+      "phase": "l"
+      "units": "dimensionless"
+      "standard_state": *id002
+      "values":
+        "quantity": "activity"
+        "method_class": "quoted_attributed"
+        "formula": "SiO2"
+        "activity_name_as_reported": "SiO2 activity"
+        "plot_ordinate_as_printed": "lg a_i"
+        "status": "typed_refusal"
+        "reason": "Symbols 1-3 are calculated oxide activities of the present study. The curve is a model\
+          \ curve, so its markers are not stored as numeric figure evidence."
+        "unavailable_reason": "model_curve_not_sampled"
+        "attribution": "Figure 1 caption: symbols 1-3 were obtained in the present study. The text says\
+          \ the activities come from the Gibbs energies in Table 1. Those parents are the table rows already\
+          \ stored; the per-point minimizer inputs are not itemized, so this curve is not given model_derived\
+          \ lineage. No numeric points are stored."
+      "T_K": "1873"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "1873"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "note": "Figure 1 caption: activities in both joins at 1873 K."
+    - "observation_id": "shornikov_2016_fig1b_SiO2_activity"
+      "type": "activity_coefficient"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "panel": "b"
+        "marker": "blue open square"
+        "note": "Figure 1 panel b. Symbol 3 is blue open square, the SiO2 activity. The axis is lg a_i,\
+          \ which is log10(activity). The stored activity is 10 raised to the read ordinate. The ordinate\
+          \ is stored with the sign printed on the axis. Model curve; numeric samples are not stored."
+      "phase": "l"
+      "units": "dimensionless"
+      "standard_state": *id002
+      "values":
+        "quantity": "activity"
+        "method_class": "quoted_attributed"
+        "formula": "SiO2"
+        "activity_name_as_reported": "SiO2 activity"
+        "plot_ordinate_as_printed": "lg a_i"
+        "status": "typed_refusal"
+        "reason": "Symbols 1-3 are calculated oxide activities of the present study. The curve is a model\
+          \ curve, so its markers are not stored as numeric figure evidence."
+        "unavailable_reason": "model_curve_not_sampled"
+        "attribution": "Figure 1 caption: symbols 1-3 were obtained in the present study. The text says\
+          \ the activities come from the Gibbs energies in Table 1. Those parents are the table rows already\
+          \ stored; the per-point minimizer inputs are not itemized, so this curve is not given model_derived\
+          \ lineage. No numeric points are stored."
+      "T_K": "1873"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "1873"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "note": "Figure 1 caption: activities in both joins at 1873 K."
+    - "observation_id": "shornikov_2016_fig1a_SiO2_rein1965_activity"
+      "type": "activity_coefficient"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "panel": "a"
+        "marker": "blue filled circle"
+        "note": "Figure 1 panel a. Symbol 6 is blue filled circle, the SiO2 activity. The axis is lg a_i,\
+          \ which is log10(activity). The stored activity is 10 raised to the read ordinate. The ordinate\
+          \ is stored with the sign printed on the axis."
+      "phase": "l"
+      "units": "dimensionless"
+      "standard_state": *id002
+      "values":
+        "quantity": "activity"
+        "method_class": "figure_only"
+        "formula": "SiO2"
+        "activity_name_as_reported": "SiO2 activity"
+        "plot_ordinate_as_printed": "lg a_i"
+        "attribution": "Figure 1 caption: symbols 4-6 are Rein and Chipman, 1965. This paper does not\
+          \ reprint their numbers."
+        "points":
+        - "activity": "1"
+          "log10_activity_ordinate": "-0.002"
+          "log10_activity_ordinate_read_2": "-0.004"
+          "x_mole_pct_read": "3.13"
+          "x_mole_pct_read_2": "3.11"
+          "embedded_px_read_1":
+          - 126.0
+          - 14.0
+          "embedded_px_read_2":
+          - 125.82
+          - 14.28
+          "page_600dpi_px_read_1":
+          - 969.0
+          - 4626.2
+          "page_600dpi_px_read_2":
+          - 968.5
+          - 4627.0
+          "read_disagreement_dex": "0.002"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "CaO = 3.13 mole % on the 2MgO·3SiO2–CaO join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K":
+              "state":
+                "tag": "value"
+                "value":
+                  "kind": "point"
+                  "point": "1873"
+              "locator":
+                "page": 2
+                "pdf_page_index": 1
+                "figure": "1"
+                "note": "Figure 1 caption: activities in both joins at 1873 K."
+            "composition":
+              "state":
+                "tag": "unknown"
+                "reason": "Printed composition is mole percent. AmountBasis has no mole-percent token,\
+                  \ so these mole percents are not stored as a mole fraction."
+              "locator":
+                "page": 2
+                "pdf_page_index": 1
+                "figure": "1"
+                "note": "Printed composition is mole percent. AmountBasis has no mole-percent token, so\
+                  \ these mole percents are not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel a, symbol 6 (blue filled circle)."
+          "read_uncertainty_dex": "0.001"
+        - "activity": "0.9"
+          "log10_activity_ordinate": "-0.044"
+          "log10_activity_ordinate_read_2": "-0.034"
+          "x_mole_pct_read": "7.68"
+          "x_mole_pct_read_2": "7.56"
+          "embedded_px_read_1":
+          - 177.0
+          - 19.0
+          "embedded_px_read_2":
+          - 175.62
+          - 17.78
+          "page_600dpi_px_read_1":
+          - 1122.1
+          - 4641.2
+          "page_600dpi_px_read_2":
+          - 1118.0
+          - 4637.5
+          "read_disagreement_dex": "0.010"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "CaO = 7.68 mole % on the 2MgO·3SiO2–CaO join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel a, symbol 6 (blue filled circle)."
+          "read_uncertainty_dex": "0.005"
+        - "activity": "0.82"
+          "log10_activity_ordinate": "-0.086"
+          "log10_activity_ordinate_read_2": "-0.090"
+          "x_mole_pct_read": "11.43"
+          "x_mole_pct_read_2": "11.53"
+          "embedded_px_read_1":
+          - 219.0
+          - 24.0
+          "embedded_px_read_2":
+          - 220.10
+          - 24.44
+          "page_600dpi_px_read_1":
+          - 1248.2
+          - 4656.2
+          "page_600dpi_px_read_2":
+          - 1251.5
+          - 4657.5
+          "read_disagreement_dex": "0.004"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "CaO = 11.43 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel a, symbol 6 (blue filled circle)."
+          "read_uncertainty_dex": "0.002"
+        - "activity": "0.67"
+          "log10_activity_ordinate": "-0.171"
+          "log10_activity_ordinate_read_2": "-0.170"
+          "x_mole_pct_read": "14.64"
+          "x_mole_pct_read_2": "14.72"
+          "embedded_px_read_1":
+          - 255.0
+          - 34.0
+          "embedded_px_read_2":
+          - 255.91
+          - 33.94
+          "page_600dpi_px_read_1":
+          - 1356.3
+          - 4686.2
+          "page_600dpi_px_read_2":
+          - 1359.0
+          - 4686.0
+          "read_disagreement_dex": "0.000"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "CaO = 14.64 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel a, symbol 6 (blue filled circle)."
+        - "activity": "0.59"
+          "log10_activity_ordinate": "-0.230"
+          "log10_activity_ordinate_read_2": "-0.225"
+          "x_mole_pct_read": "17.41"
+          "x_mole_pct_read_2": "17.33"
+          "embedded_px_read_1":
+          - 286.0
+          - 41.0
+          "embedded_px_read_2":
+          - 285.06
+          - 40.44
+          "page_600dpi_px_read_1":
+          - 1449.3
+          - 4707.2
+          "page_600dpi_px_read_2":
+          - 1446.5
+          - 4705.5
+          "read_disagreement_dex": "0.005"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "CaO = 17.41 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel a, symbol 6 (blue filled circle)."
+          "read_uncertainty_dex": "0.002"
+        - "activity": "0.51"
+          "log10_activity_ordinate": "-0.289"
+          "log10_activity_ordinate_read_2": "-0.284"
+          "x_mole_pct_read": "19.20"
+          "x_mole_pct_read_2": "19.17"
+          "embedded_px_read_1":
+          - 306.0
+          - 48.0
+          "embedded_px_read_2":
+          - 305.72
+          - 47.44
+          "page_600dpi_px_read_1":
+          - 1509.3
+          - 4728.2
+          "page_600dpi_px_read_2":
+          - 1508.5
+          - 4726.5
+          "read_disagreement_dex": "0.005"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "CaO = 19.20 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel a, symbol 6 (blue filled circle)."
+          "read_uncertainty_dex": "0.002"
+        - "activity": "0.4"
+          "log10_activity_ordinate": "-0.399"
+          "log10_activity_ordinate_read_2": "-0.387"
+          "x_mole_pct_read": "22.14"
+          "x_mole_pct_read_2": "22.09"
+          "embedded_px_read_1":
+          - 339.0
+          - 61.0
+          "embedded_px_read_2":
+          - 338.37
+          - 59.61
+          "page_600dpi_px_read_1":
+          - 1608.4
+          - 4767.2
+          "page_600dpi_px_read_2":
+          - 1606.5
+          - 4763.0
+          "read_disagreement_dex": "0.012"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "CaO = 22.14 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel a, symbol 6 (blue filled circle)."
+          "read_uncertainty_dex": "0.006"
+        - "activity": "0.31"
+          "log10_activity_ordinate": "-0.509"
+          "log10_activity_ordinate_read_2": "-0.508"
+          "x_mole_pct_read": "24.82"
+          "x_mole_pct_read_2": "24.72"
+          "embedded_px_read_1":
+          - 369.0
+          - 74.0
+          "embedded_px_read_2":
+          - 367.85
+          - 73.94
+          "page_600dpi_px_read_1":
+          - 1698.4
+          - 4806.2
+          "page_600dpi_px_read_2":
+          - 1695.0
+          - 4806.0
+          "read_disagreement_dex": "0.000"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "CaO = 24.82 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel a, symbol 6 (blue filled circle)."
+        - "activity": "0.25"
+          "log10_activity_ordinate": "-0.610"
+          "log10_activity_ordinate_read_2": "-0.614"
+          "x_mole_pct_read": "26.88"
+          "x_mole_pct_read_2": "26.82"
+          "embedded_px_read_1":
+          - 392.0
+          - 86.0
+          "embedded_px_read_2":
+          - 391.34
+          - 86.44
+          "page_600dpi_px_read_1":
+          - 1767.5
+          - 4842.2
+          "page_600dpi_px_read_2":
+          - 1765.5
+          - 4843.5
+          "read_disagreement_dex": "0.004"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "CaO = 26.88 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel a, symbol 6 (blue filled circle)."
+          "read_uncertainty_dex": "0.002"
+        - "activity": "0.2"
+          "log10_activity_ordinate": "-0.703"
+          "log10_activity_ordinate_read_2": "-0.700"
+          "x_mole_pct_read": "28.48"
+          "x_mole_pct_read_2": "28.44"
+          "embedded_px_read_1":
+          - 410.0
+          - 97.0
+          "embedded_px_read_2":
+          - 409.50
+          - 96.61
+          "page_600dpi_px_read_1":
+          - 1821.5
+          - 4875.2
+          "page_600dpi_px_read_2":
+          - 1820.0
+          - 4874.0
+          "read_disagreement_dex": "0.003"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "read_uncertainty_dex": "0.002"
+          "printed_composition_mole_pct": "CaO = 28.48 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel a, symbol 6 (blue filled circle)."
+        - "activity": "0.096"
+          "log10_activity_ordinate": "-1.016"
+          "log10_activity_ordinate_read_2": "-1.011"
+          "x_mole_pct_read": "33.21"
+          "x_mole_pct_read_2": "33.17"
+          "embedded_px_read_1":
+          - 463.0
+          - 134.0
+          "embedded_px_read_2":
+          - 462.47
+          - 133.44
+          "page_600dpi_px_read_1":
+          - 1980.6
+          - 4986.2
+          "page_600dpi_px_read_2":
+          - 1979.0
+          - 4984.5
+          "read_disagreement_dex": "0.005"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "CaO = 33.21 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel a, symbol 6 (blue filled circle)."
+          "read_uncertainty_dex": "0.002"
+        - "activity": "0.052"
+          "log10_activity_ordinate": "-1.287"
+          "log10_activity_ordinate_read_2": "-1.285"
+          "x_mole_pct_read": "36.61"
+          "x_mole_pct_read_2": "36.57"
+          "embedded_px_read_1":
+          - 501.0
+          - 166.0
+          "embedded_px_read_2":
+          - 500.61
+          - 165.78
+          "page_600dpi_px_read_1":
+          - 2094.7
+          - 5082.2
+          "page_600dpi_px_read_2":
+          - 2093.5
+          - 5081.5
+          "read_disagreement_dex": "0.002"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "CaO = 36.61 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel a, symbol 6 (blue filled circle)."
+          "read_uncertainty_dex": "0.001"
+        - "activity": "0.017"
+          "log10_activity_ordinate": "-1.768"
+          "log10_activity_ordinate_read_2": "-1.775"
+          "x_mole_pct_read": "41.88"
+          "x_mole_pct_read_2": "41.87"
+          "embedded_px_read_1":
+          - 560.0
+          - 223.0
+          "embedded_px_read_2":
+          - 559.91
+          - 223.78
+          "page_600dpi_px_read_1":
+          - 2271.8
+          - 5253.2
+          "page_600dpi_px_read_2":
+          - 2271.5
+          - 5255.5
+          "read_disagreement_dex": "0.007"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "CaO = 41.88 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "a"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel a, symbol 6 (blue filled circle)."
+          "read_uncertainty_dex": "0.003"
+    - "observation_id": "shornikov_2016_fig1b_SiO2_rein1965_activity"
+      "type": "activity_coefficient"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "panel": "b"
+        "marker": "blue filled circle"
+        "note": "Figure 1 panel b. Symbol 6 is blue filled circle, the SiO2 activity. The axis is lg a_i,\
+          \ which is log10(activity). The stored activity is 10 raised to the read ordinate. The ordinate\
+          \ is stored with the sign printed on the axis."
+      "phase": "l"
+      "units": "dimensionless"
+      "standard_state": *id002
+      "values":
+        "quantity": "activity"
+        "method_class": "figure_only"
+        "formula": "SiO2"
+        "activity_name_as_reported": "SiO2 activity"
+        "plot_ordinate_as_printed": "lg a_i"
+        "attribution": "Figure 1 caption: symbols 4-6 are Rein and Chipman, 1965. This paper does not\
+          \ reprint their numbers."
+        "points":
+        - "activity": "0.017"
+          "log10_activity_ordinate": "-1.768"
+          "log10_activity_ordinate_read_2": "-1.767"
+          "x_mole_pct_read": "35.01"
+          "x_mole_pct_read_2": "34.97"
+          "embedded_px_read_1":
+          - 848.0
+          - 223.0
+          "embedded_px_read_2":
+          - 847.42
+          - 222.78
+          "page_600dpi_px_read_1":
+          - 3136.2
+          - 5253.2
+          "page_600dpi_px_read_2":
+          - 3134.5
+          - 5252.5
+          "read_disagreement_dex": "0.002"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "SiO2 = 35.01 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel b, symbol 6 (blue filled circle)."
+          "read_uncertainty_dex": "0.001"
+        - "activity": "0.05"
+          "log10_activity_ordinate": "-1.303"
+          "log10_activity_ordinate_read_2": "-1.300"
+          "x_mole_pct_read": "37.81"
+          "x_mole_pct_read_2": "37.78"
+          "embedded_px_read_1":
+          - 893.0
+          - 168.0
+          "embedded_px_read_2":
+          - 892.39
+          - 167.61
+          "page_600dpi_px_read_1":
+          - 3271.3
+          - 5088.2
+          "page_600dpi_px_read_2":
+          - 3269.5
+          - 5087.0
+          "read_disagreement_dex": "0.003"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "SiO2 = 37.81 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel b, symbol 6 (blue filled circle)."
+          "read_uncertainty_dex": "0.002"
+        - "activity": "0.1"
+          "log10_activity_ordinate": "-0.999"
+          "log10_activity_ordinate_read_2": "-0.999"
+          "x_mole_pct_read": "40.12"
+          "x_mole_pct_read_2": "40.11"
+          "embedded_px_read_1":
+          - 930.0
+          - 132.0
+          "embedded_px_read_2":
+          - 929.71
+          - 131.94
+          "page_600dpi_px_read_1":
+          - 3382.4
+          - 4980.2
+          "page_600dpi_px_read_2":
+          - 3381.5
+          - 4980.0
+          "read_disagreement_dex": "0.000"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "SiO2 = 40.12 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel b, symbol 6 (blue filled circle)."
+        - "activity": "0.2"
+          "log10_activity_ordinate": "-0.695"
+          "log10_activity_ordinate_read_2": "-0.697"
+          "x_mole_pct_read": "43.31"
+          "x_mole_pct_read_2": "43.28"
+          "embedded_px_read_1":
+          - 981.0
+          - 96.0
+          "embedded_px_read_2":
+          - 980.51
+          - 96.28
+          "page_600dpi_px_read_1":
+          - 3535.5
+          - 4872.2
+          "page_600dpi_px_read_2":
+          - 3534.0
+          - 4873.0
+          "read_disagreement_dex": "0.002"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "SiO2 = 43.31 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel b, symbol 6 (blue filled circle)."
+          "read_uncertainty_dex": "0.001"
+        - "activity": "0.3"
+          "log10_activity_ordinate": "-0.526"
+          "log10_activity_ordinate_read_2": "-0.520"
+          "x_mole_pct_read": "45.68"
+          "x_mole_pct_read_2": "45.67"
+          "embedded_px_read_1":
+          - 1019.0
+          - 76.0
+          "embedded_px_read_2":
+          - 1018.82
+          - 75.28
+          "page_600dpi_px_read_1":
+          - 3649.5
+          - 4812.2
+          "page_600dpi_px_read_2":
+          - 3649.0
+          - 4810.0
+          "read_disagreement_dex": "0.006"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "SiO2 = 45.68 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel b, symbol 6 (blue filled circle)."
+          "read_uncertainty_dex": "0.003"
+        - "activity": "0.4"
+          "log10_activity_ordinate": "-0.399"
+          "log10_activity_ordinate_read_2": "-0.394"
+          "x_mole_pct_read": "47.80"
+          "x_mole_pct_read_2": "47.78"
+          "embedded_px_read_1":
+          - 1053.0
+          - 61.0
+          "embedded_px_read_2":
+          - 1052.64
+          - 60.44
+          "page_600dpi_px_read_1":
+          - 3751.6
+          - 4767.2
+          "page_600dpi_px_read_2":
+          - 3750.5
+          - 4765.5
+          "read_disagreement_dex": "0.005"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "SiO2 = 47.80 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel b, symbol 6 (blue filled circle)."
+          "read_uncertainty_dex": "0.002"
+        - "activity": "0.49"
+          "log10_activity_ordinate": "-0.306"
+          "log10_activity_ordinate_read_2": "-0.297"
+          "x_mole_pct_read": "49.68"
+          "x_mole_pct_read_2": "49.67"
+          "embedded_px_read_1":
+          - 1083.0
+          - 50.0
+          "embedded_px_read_2":
+          - 1082.96
+          - 48.94
+          "page_600dpi_px_read_1":
+          - 3841.6
+          - 4734.2
+          "page_600dpi_px_read_2":
+          - 3841.5
+          - 4731.0
+          "read_disagreement_dex": "0.009"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "SiO2 = 49.68 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel b, symbol 6 (blue filled circle)."
+          "read_uncertainty_dex": "0.004"
+        - "activity": "0.6"
+          "log10_activity_ordinate": "-0.221"
+          "log10_activity_ordinate_read_2": "-0.217"
+          "x_mole_pct_read": "51.24"
+          "x_mole_pct_read_2": "51.19"
+          "embedded_px_read_1":
+          - 1108.0
+          - 40.0
+          "embedded_px_read_2":
+          - 1107.28
+          - 39.44
+          "page_600dpi_px_read_1":
+          - 3916.7
+          - 4704.2
+          "page_600dpi_px_read_2":
+          - 3914.5
+          - 4702.5
+          "read_disagreement_dex": "0.005"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "SiO2 = 51.24 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel b, symbol 6 (blue filled circle)."
+          "read_uncertainty_dex": "0.002"
+        - "activity": "0.7"
+          "log10_activity_ordinate": "-0.154"
+          "log10_activity_ordinate_read_2": "-0.149"
+          "x_mole_pct_read": "53.11"
+          "x_mole_pct_read_2": "53.05"
+          "embedded_px_read_1":
+          - 1138.0
+          - 32.0
+          "embedded_px_read_2":
+          - 1137.09
+          - 31.44
+          "page_600dpi_px_read_1":
+          - 4006.7
+          - 4680.2
+          "page_600dpi_px_read_2":
+          - 4004.0
+          - 4678.5
+          "read_disagreement_dex": "0.005"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "SiO2 = 53.11 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel b, symbol 6 (blue filled circle)."
+          "read_uncertainty_dex": "0.002"
+        - "activity": "0.82"
+          "log10_activity_ordinate": "-0.086"
+          "log10_activity_ordinate_read_2": "-0.091"
+          "x_mole_pct_read": "55.67"
+          "x_mole_pct_read_2": "55.68"
+          "embedded_px_read_1":
+          - 1179.0
+          - 24.0
+          "embedded_px_read_2":
+          - 1179.07
+          - 24.61
+          "page_600dpi_px_read_1":
+          - 4129.8
+          - 4656.2
+          "page_600dpi_px_read_2":
+          - 4130.0
+          - 4658.0
+          "read_disagreement_dex": "0.005"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "printed_composition_mole_pct": "SiO2 = 55.67 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel b, symbol 6 (blue filled circle)."
+          "read_uncertainty_dex": "0.003"
+        - "activity": "0.9"
+          "log10_activity_ordinate": "-0.044"
+          "log10_activity_ordinate_read_2": "-0.041"
+          "x_mole_pct_read": "58.86"
+          "x_mole_pct_read_2": "58.87"
+          "embedded_px_read_1":
+          - 1230.0
+          - 19.0
+          "embedded_px_read_2":
+          - 1230.21
+          - 18.61
+          "page_600dpi_px_read_1":
+          - 4282.9
+          - 4641.2
+          "page_600dpi_px_read_2":
+          - 4283.5
+          - 4640.0
+          "read_disagreement_dex": "0.003"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "read_uncertainty_dex": "0.002"
+          "printed_composition_mole_pct": "SiO2 = 58.86 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id003
+            "composition": *id004
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel b, symbol 6 (blue filled circle)."
+        - "activity": "1"
+          "log10_activity_ordinate": "0.003"
+          "log10_activity_ordinate_read_2": "0.006"
+          "x_mole_pct_read": "62.48"
+          "x_mole_pct_read_2": "62.50"
+          "embedded_px_read_1":
+          - 1288.0
+          - 13.5
+          "embedded_px_read_2":
+          - 1288.34
+          - 13.11
+          "page_600dpi_px_read_1":
+          - 4457.0
+          - 4624.7
+          "page_600dpi_px_read_2":
+          - 4458.0
+          - 4623.5
+          "read_disagreement_dex": "0.003"
+          "disagreement_exceeds_2pct_of_a_decade": false
+          "read_uncertainty_dex": "0.002"
+          "printed_composition_mole_pct": "SiO2 = 62.48 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K":
+              "state":
+                "tag": "value"
+                "value":
+                  "kind": "point"
+                  "point": "1873"
+              "locator":
+                "page": 2
+                "pdf_page_index": 1
+                "figure": "1"
+                "note": "Figure 1 caption: activities in both joins at 1873 K."
+            "composition":
+              "state":
+                "tag": "unknown"
+                "reason": "Printed composition is mole percent. AmountBasis has no mole-percent token,\
+                  \ so these mole percents are not stored as a mole fraction."
+              "locator":
+                "page": 2
+                "pdf_page_index": 1
+                "figure": "1"
+                "note": "Printed composition is mole percent. AmountBasis has no mole-percent token, so\
+                  \ these mole percents are not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "panel": "b"
+            "marker": "blue filled circle"
+            "note": "Figure 1 panel b, symbol 6 (blue filled circle)."
+  "Si2O2":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r15_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$Si_2O_2$"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "-546.135"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator": *id016
+  "O":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r16_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "O"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "121.662"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "column_header": "ΔfG°2000, kJ/mole"
+            "note": "The temperature is the 2000 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 41."
+  "O2":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r17_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$O_2$"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "0.000"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "column_header": "ΔfG°2000, kJ/mole"
+            "note": "The temperature is the 2000 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 41."
+  "O3":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r18_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$O_3$"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "273.851"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "column_header": "ΔfG°2000, kJ/mole"
+            "note": "The temperature is the 2000 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 41."
+  "O4":
+    "observations":
+    - "observation_id": "shornikov_2016_cao_mgo_silicate_p002_t02_r19_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "2"
+        "row_label": "$O_4$"
+        "column_header": "Gas phase  $\\Delta_f G^{\\circ}_{2000},$  kJ/mole"
+        "published_page": 41
+      "units": "kJ/mole"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2000"
+        "value": "193.351"
+        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
+          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
+          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2000"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "column_header": "ΔfG°2000, kJ/mole"
+            "note": "The temperature is the 2000 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 41."
+  "CaO-MgO-SiO2":
+    "observations": []
+    "context":
+    - "observation_id": "shornikov_2016_fig2a_series1_mixing_energy"
+      "type": "figure_mixing_energy"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "a"
+        "marker": "black open square"
+        "note": "Figure 2 panel a, the 2MgO·3SiO2–CaO join. Symbol 1 is black open square at 1873 K. Ordinate\
+          \ is the mixing energy, kJ/mole, on a linear axis. Model curve. Numeric samples are not stored."
+      "units": "kJ/mole"
+      "values":
+        "quantity_as_printed": "ΔG^m, kJ/mole"
+        "method_class": "figure_only"
+        "temperature_K_as_printed": "1873"
+        "join_as_printed": "2MgO·3SiO2–CaO"
+        "attribution": "Figure 2 caption: symbols 1-3 were obtained in the present study. The text compares\
+          \ these curves with Rein and Chipman, 1965 and with Shornikov et al., 1997. The plotted mixing\
+          \ energy is not a formation energy."
+        "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+          \ token, so the read is context and is not stored as delta_fG. The model curve was not sampled,\
+          \ so this record has no numeric points."
+        "points": []
+    - "observation_id": "shornikov_2016_fig2a_series2_mixing_energy"
+      "type": "figure_mixing_energy"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "a"
+        "marker": "red open circle"
+        "note": "Figure 2 panel a, the 2MgO·3SiO2–CaO join. Symbol 2 is red open circle at 1973 K. Ordinate\
+          \ is the mixing energy, kJ/mole, on a linear axis. Model curve. Numeric samples are not stored."
+      "units": "kJ/mole"
+      "values":
+        "quantity_as_printed": "ΔG^m, kJ/mole"
+        "method_class": "figure_only"
+        "temperature_K_as_printed": "1973"
+        "join_as_printed": "2MgO·3SiO2–CaO"
+        "attribution": "Figure 2 caption: symbols 1-3 were obtained in the present study. The text compares\
+          \ these curves with Rein and Chipman, 1965 and with Shornikov et al., 1997. The plotted mixing\
+          \ energy is not a formation energy."
+        "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+          \ token, so the read is context and is not stored as delta_fG. The model curve was not sampled,\
+          \ so this record has no numeric points."
+        "points": []
+    - "observation_id": "shornikov_2016_fig2a_series3_mixing_energy"
+      "type": "figure_mixing_energy"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "a"
+        "marker": "blue open triangle"
+        "note": "Figure 2 panel a, the 2MgO·3SiO2–CaO join. Symbol 3 is blue open triangle at 2073 K.\
+          \ Ordinate is the mixing energy, kJ/mole, on a linear axis. Model curve. Numeric samples are\
+          \ not stored."
+      "units": "kJ/mole"
+      "values":
+        "quantity_as_printed": "ΔG^m, kJ/mole"
+        "method_class": "figure_only"
+        "temperature_K_as_printed": "2073"
+        "join_as_printed": "2MgO·3SiO2–CaO"
+        "attribution": "Figure 2 caption: symbols 1-3 were obtained in the present study. The text compares\
+          \ these curves with Rein and Chipman, 1965 and with Shornikov et al., 1997. The plotted mixing\
+          \ energy is not a formation energy."
+        "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+          \ token, so the read is context and is not stored as delta_fG. The model curve was not sampled,\
+          \ so this record has no numeric points."
+        "points": []
+    - "observation_id": "shornikov_2016_fig2a_series4_mixing_energy"
+      "type": "figure_mixing_energy"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "a"
+        "marker": "black filled circle"
+        "note": "Figure 2 panel a, the 2MgO·3SiO2–CaO join. Symbol 4 is black filled circle at 1873 K.\
+          \ Ordinate is the mixing energy, kJ/mole, on a linear axis."
+      "units": "kJ/mole"
+      "values":
+        "quantity_as_printed": "ΔG^m, kJ/mole"
+        "method_class": "figure_only"
+        "temperature_K_as_printed": "1873"
+        "join_as_printed": "2MgO·3SiO2–CaO"
+        "attribution": "Figure 2 caption: symbol 4 is Rein and Chipman, 1965, at 1873 K. This paper does\
+          \ not reprint their numbers."
+        "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+          \ token, so the read is context and is not stored as delta_fG."
+        "points":
+        - "delta_Gm_kJ_per_mole_read": "-31"
+          "delta_Gm_kJ_per_mole_read_2": "-31"
+          "read_disagreement_kJ_per_mole": "0.014"
+          "read_uncertainty_kJ_per_mole": "0.007"
+          "x_mole_pct_read": "17.02"
+          "x_mole_pct_read_2": "16.98"
+          "embedded_px_read_1":
+          - 299.0
+          - 264.0
+          "embedded_px_read_2":
+          - 298.60
+          - 264.15
+          "page_600dpi_px_read_1":
+          - 1204.7
+          - 1260.1
+          "page_600dpi_px_read_2":
+          - 1203.5
+          - 1260.5
+          "printed_composition_mole_pct": "CaO = 17.02 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": &id017
+              "state":
+                "tag": "value"
+                "value":
+                  "kind": "point"
+                  "point": "1873"
+              "locator":
+                "page": 3
+                "pdf_page_index": 2
+                "figure": "2"
+                "note": "Figure 2 caption: 1873 K for symbols 1 and 4, 1973 K for symbol 2, 2073 K for\
+                  \ symbol 3."
+            "composition": &id018
+              "state":
+                "tag": "unknown"
+                "reason": "Printed composition is mole percent. AmountBasis has no mole-percent token,\
+                  \ so these mole percents are not stored as a mole fraction."
+              "locator":
+                "page": 3
+                "pdf_page_index": 2
+                "figure": "2"
+                "note": "Printed composition is mole percent. AmountBasis has no mole-percent token, so\
+                  \ these mole percents are not stored as a mole fraction."
+          "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+            \ token, so the read is context and is not stored as delta_fG."
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "marker": "black filled circle"
+            "note": "Figure 2 panel a, symbol 4 (black filled circle)."
+        - "delta_Gm_kJ_per_mole_read": "-33"
+          "delta_Gm_kJ_per_mole_read_2": "-33"
+          "read_disagreement_kJ_per_mole": "0.004"
+          "read_uncertainty_kJ_per_mole": "0.002"
+          "x_mole_pct_read": "19.94"
+          "x_mole_pct_read_2": "19.99"
+          "embedded_px_read_1":
+          - 332.0
+          - 286.0
+          "embedded_px_read_2":
+          - 332.58
+          - 285.96
+          "page_600dpi_px_read_1":
+          - 1303.8
+          - 1326.1
+          "page_600dpi_px_read_2":
+          - 1305.5
+          - 1326.0
+          "printed_composition_mole_pct": "CaO = 19.94 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id017
+            "composition": *id018
+          "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+            \ token, so the read is context and is not stored as delta_fG."
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "marker": "black filled circle"
+            "note": "Figure 2 panel a, symbol 4 (black filled circle)."
+        - "delta_Gm_kJ_per_mole_read": "-35"
+          "delta_Gm_kJ_per_mole_read_2": "-35"
+          "read_disagreement_kJ_per_mole": "0.021"
+          "read_uncertainty_kJ_per_mole": "0.011"
+          "x_mole_pct_read": "22.95"
+          "x_mole_pct_read_2": "22.98"
+          "embedded_px_read_1":
+          - 366.0
+          - 306.0
+          "embedded_px_read_2":
+          - 366.39
+          - 305.77
+          "page_600dpi_px_read_1":
+          - 1405.8
+          - 1386.2
+          "page_600dpi_px_read_2":
+          - 1407.0
+          - 1385.5
+          "printed_composition_mole_pct": "CaO = 22.95 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id017
+            "composition": *id018
+          "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+            \ token, so the read is context and is not stored as delta_fG."
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "marker": "black filled circle"
+            "note": "Figure 2 panel a, symbol 4 (black filled circle)."
+        - "delta_Gm_kJ_per_mole_read": "-37"
+          "delta_Gm_kJ_per_mole_read_2": "-37"
+          "read_disagreement_kJ_per_mole": "0.008"
+          "read_uncertainty_kJ_per_mole": "0.004"
+          "x_mole_pct_read": "25.96"
+          "x_mole_pct_read_2": "26.01"
+          "embedded_px_read_1":
+          - 400.0
+          - 324.0
+          "embedded_px_read_2":
+          - 400.54
+          - 323.91
+          "page_600dpi_px_read_1":
+          - 1507.9
+          - 1440.3
+          "page_600dpi_px_read_2":
+          - 1509.5
+          - 1440.0
+          "printed_composition_mole_pct": "CaO = 25.96 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id017
+            "composition": *id018
+          "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+            \ token, so the read is context and is not stored as delta_fG."
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "marker": "black filled circle"
+            "note": "Figure 2 panel a, symbol 4 (black filled circle)."
+        - "delta_Gm_kJ_per_mole_read": "-38"
+          "delta_Gm_kJ_per_mole_read_2": "-38"
+          "read_disagreement_kJ_per_mole": "0.035"
+          "read_uncertainty_kJ_per_mole": "0.018"
+          "x_mole_pct_read": "28.97"
+          "x_mole_pct_read_2": "29.00"
+          "embedded_px_read_1":
+          - 434.0
+          - 339.0
+          "embedded_px_read_2":
+          - 434.35
+          - 339.39
+          "page_600dpi_px_read_1":
+          - 1610.0
+          - 1485.3
+          "page_600dpi_px_read_2":
+          - 1611.0
+          - 1486.5
+          "printed_composition_mole_pct": "CaO = 28.97 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id017
+            "composition": *id018
+          "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+            \ token, so the read is context and is not stored as delta_fG."
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "marker": "black filled circle"
+            "note": "Figure 2 panel a, symbol 4 (black filled circle)."
+        - "delta_Gm_kJ_per_mole_read": "-39"
+          "delta_Gm_kJ_per_mole_read_2": "-39"
+          "read_disagreement_kJ_per_mole": "0.019"
+          "read_uncertainty_kJ_per_mole": "0.009"
+          "x_mole_pct_read": "31.98"
+          "x_mole_pct_read_2": "32.01"
+          "embedded_px_read_1":
+          - 468.0
+          - 351.0
+          "embedded_px_read_2":
+          - 468.32
+          - 351.21
+          "page_600dpi_px_read_1":
+          - 1712.0
+          - 1521.4
+          "page_600dpi_px_read_2":
+          - 1713.0
+          - 1522.0
+          "printed_composition_mole_pct": "CaO = 31.98 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id017
+            "composition": *id018
+          "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+            \ token, so the read is context and is not stored as delta_fG."
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "marker": "black filled circle"
+            "note": "Figure 2 panel a, symbol 4 (black filled circle)."
+        - "delta_Gm_kJ_per_mole_read": "-40"
+          "delta_Gm_kJ_per_mole_read_2": "-40"
+          "read_disagreement_kJ_per_mole": "0.078"
+          "read_uncertainty_kJ_per_mole": "0.039"
+          "x_mole_pct_read": "34.99"
+          "x_mole_pct_read_2": "35.02"
+          "embedded_px_read_1":
+          - 502.0
+          - 358.0
+          "embedded_px_read_2":
+          - 502.30
+          - 358.87
+          "page_600dpi_px_read_1":
+          - 1814.1
+          - 1542.4
+          "page_600dpi_px_read_2":
+          - 1815.0
+          - 1545.0
+          "printed_composition_mole_pct": "CaO = 34.99 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K":
+              "state":
+                "tag": "value"
+                "value":
+                  "kind": "point"
+                  "point": "1873"
+              "locator":
+                "page": 3
+                "pdf_page_index": 2
+                "figure": "2"
+                "note": "Figure 2 caption: 1873 K for symbols 1 and 4, 1973 K for symbol 2, 2073 K for\
+                  \ symbol 3."
+            "composition":
+              "state":
+                "tag": "unknown"
+                "reason": "Printed composition is mole percent. AmountBasis has no mole-percent token,\
+                  \ so these mole percents are not stored as a mole fraction."
+              "locator":
+                "page": 3
+                "pdf_page_index": 2
+                "figure": "2"
+                "note": "Printed composition is mole percent. AmountBasis has no mole-percent token, so\
+                  \ these mole percents are not stored as a mole fraction."
+          "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+            \ token, so the read is context and is not stored as delta_fG."
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "marker": "black filled circle"
+            "note": "Figure 2 panel a, symbol 4 (black filled circle)."
+        - "delta_Gm_kJ_per_mole_read": "-40"
+          "delta_Gm_kJ_per_mole_read_2": "-40"
+          "read_disagreement_kJ_per_mole": "0.078"
+          "read_uncertainty_kJ_per_mole": "0.039"
+          "x_mole_pct_read": "38.00"
+          "x_mole_pct_read_2": "37.82"
+          "embedded_px_read_1":
+          - 536.0
+          - 363.0
+          "embedded_px_read_2":
+          - 533.95
+          - 363.86
+          "page_600dpi_px_read_1":
+          - 1916.2
+          - 1557.4
+          "page_600dpi_px_read_2":
+          - 1910.0
+          - 1560.0
+          "printed_composition_mole_pct": "CaO = 38.00 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id017
+            "composition": *id018
+          "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+            \ token, so the read is context and is not stored as delta_fG."
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "marker": "black filled circle"
+            "note": "Figure 2 panel a, symbol 4 (black filled circle)."
+        - "delta_Gm_kJ_per_mole_read": "-40"
+          "delta_Gm_kJ_per_mole_read_2": "-40"
+          "read_disagreement_kJ_per_mole": "0.108"
+          "read_uncertainty_kJ_per_mole": "0.054"
+          "x_mole_pct_read": "41.01"
+          "x_mole_pct_read_2": "40.92"
+          "embedded_px_read_1":
+          - 570.0
+          - 361.0
+          "embedded_px_read_2":
+          - 568.92
+          - 362.20
+          "page_600dpi_px_read_1":
+          - 2018.2
+          - 1551.4
+          "page_600dpi_px_read_2":
+          - 2015.0
+          - 1555.0
+          "printed_composition_mole_pct": "CaO = 41.01 mole % on the 2MgO·3SiO2–CaO join. The caption\
+            \ prints this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id017
+            "composition": *id018
+          "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+            \ token, so the read is context and is not stored as delta_fG."
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "marker": "black filled circle"
+            "note": "Figure 2 panel a, symbol 4 (black filled circle)."
+    - "observation_id": "shornikov_2016_fig2b_series1_mixing_energy"
+      "type": "figure_mixing_energy"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "b"
+        "marker": "black open square"
+        "note": "Figure 2 panel b, the CaO·MgO–SiO2 join. Symbol 1 is black open square at 1873 K. Ordinate\
+          \ is the mixing energy, kJ/mole, on a linear axis. Model curve. Numeric samples are not stored."
+      "units": "kJ/mole"
+      "values":
+        "quantity_as_printed": "ΔG^m, kJ/mole"
+        "method_class": "figure_only"
+        "temperature_K_as_printed": "1873"
+        "join_as_printed": "CaO·MgO–SiO2"
+        "attribution": "Figure 2 caption: symbols 1-3 were obtained in the present study. The text compares\
+          \ these curves with Rein and Chipman, 1965 and with Shornikov et al., 1997. The plotted mixing\
+          \ energy is not a formation energy."
+        "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+          \ token, so the read is context and is not stored as delta_fG. The model curve was not sampled,\
+          \ so this record has no numeric points."
+        "points": []
+    - "observation_id": "shornikov_2016_fig2b_series2_mixing_energy"
+      "type": "figure_mixing_energy"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "b"
+        "marker": "red open circle"
+        "note": "Figure 2 panel b, the CaO·MgO–SiO2 join. Symbol 2 is red open circle at 1973 K. Ordinate\
+          \ is the mixing energy, kJ/mole, on a linear axis. Model curve. Numeric samples are not stored."
+      "units": "kJ/mole"
+      "values":
+        "quantity_as_printed": "ΔG^m, kJ/mole"
+        "method_class": "figure_only"
+        "temperature_K_as_printed": "1973"
+        "join_as_printed": "CaO·MgO–SiO2"
+        "attribution": "Figure 2 caption: symbols 1-3 were obtained in the present study. The text compares\
+          \ these curves with Rein and Chipman, 1965 and with Shornikov et al., 1997. The plotted mixing\
+          \ energy is not a formation energy."
+        "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+          \ token, so the read is context and is not stored as delta_fG. The model curve was not sampled,\
+          \ so this record has no numeric points."
+        "points": []
+    - "observation_id": "shornikov_2016_fig2b_series3_mixing_energy"
+      "type": "figure_mixing_energy"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "b"
+        "marker": "blue open triangle"
+        "note": "Figure 2 panel b, the CaO·MgO–SiO2 join. Symbol 3 is blue open triangle at 2073 K. Ordinate\
+          \ is the mixing energy, kJ/mole, on a linear axis. Model curve. Numeric samples are not stored."
+      "units": "kJ/mole"
+      "values":
+        "quantity_as_printed": "ΔG^m, kJ/mole"
+        "method_class": "figure_only"
+        "temperature_K_as_printed": "2073"
+        "join_as_printed": "CaO·MgO–SiO2"
+        "attribution": "Figure 2 caption: symbols 1-3 were obtained in the present study. The text compares\
+          \ these curves with Rein and Chipman, 1965 and with Shornikov et al., 1997. The plotted mixing\
+          \ energy is not a formation energy."
+        "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+          \ token, so the read is context and is not stored as delta_fG. The model curve was not sampled,\
+          \ so this record has no numeric points."
+        "points": []
+    - "observation_id": "shornikov_2016_fig2b_series4_mixing_energy"
+      "type": "figure_mixing_energy"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "b"
+        "marker": "black filled circle"
+        "note": "Figure 2 panel b, the CaO·MgO–SiO2 join. Symbol 4 is black filled circle at 1873 K. Ordinate\
+          \ is the mixing energy, kJ/mole, on a linear axis."
+      "units": "kJ/mole"
+      "values":
+        "quantity_as_printed": "ΔG^m, kJ/mole"
+        "method_class": "figure_only"
+        "temperature_K_as_printed": "1873"
+        "join_as_printed": "CaO·MgO–SiO2"
+        "attribution": "Figure 2 caption: symbol 4 is Rein and Chipman, 1965, at 1873 K. This paper does\
+          \ not reprint their numbers."
+        "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+          \ token, so the read is context and is not stored as delta_fG."
+        "points":
+        - "delta_Gm_kJ_per_mole_read": "-37"
+          "delta_Gm_kJ_per_mole_read_2": "-37"
+          "read_disagreement_kJ_per_mole": "0.005"
+          "read_uncertainty_kJ_per_mole": "0.002"
+          "x_mole_pct_read": "33.96"
+          "x_mole_pct_read_2": "33.96"
+          "embedded_px_read_1":
+          - 862.0
+          - 204.0
+          "embedded_px_read_2":
+          - 862.06
+          - 203.89
+          "page_600dpi_px_read_1":
+          - 2894.8
+          - 1079.8
+          "page_600dpi_px_read_2":
+          - 2895.0
+          - 1079.5
+          "printed_composition_mole_pct": "SiO2 = 33.96 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id017
+            "composition": *id018
+          "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+            \ token, so the read is context and is not stored as delta_fG."
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "b"
+            "marker": "black filled circle"
+            "note": "Figure 2 panel b, symbol 4 (black filled circle)."
+        - "delta_Gm_kJ_per_mole_read": "-39"
+          "delta_Gm_kJ_per_mole_read_2": "-39"
+          "read_disagreement_kJ_per_mole": "0.008"
+          "read_uncertainty_kJ_per_mole": "0.004"
+          "x_mole_pct_read": "36.98"
+          "x_mole_pct_read_2": "36.97"
+          "embedded_px_read_1":
+          - 911.0
+          - 229.0
+          "embedded_px_read_2":
+          - 910.86
+          - 229.19
+          "page_600dpi_px_read_1":
+          - 3041.9
+          - 1154.9
+          "page_600dpi_px_read_2":
+          - 3041.5
+          - 1155.5
+          "printed_composition_mole_pct": "SiO2 = 36.98 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id017
+            "composition": *id018
+          "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+            \ token, so the read is context and is not stored as delta_fG."
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "b"
+            "marker": "black filled circle"
+            "note": "Figure 2 panel b, symbol 4 (black filled circle)."
+        - "delta_Gm_kJ_per_mole_read": "-39"
+          "delta_Gm_kJ_per_mole_read_2": "-39"
+          "read_disagreement_kJ_per_mole": "0.020"
+          "read_uncertainty_kJ_per_mole": "0.010"
+          "x_mole_pct_read": "39.94"
+          "x_mole_pct_read_2": "39.94"
+          "embedded_px_read_1":
+          - 959.0
+          - 232.0
+          "embedded_px_read_2":
+          - 958.99
+          - 231.52
+          "page_600dpi_px_read_1":
+          - 3186.0
+          - 1163.9
+          "page_600dpi_px_read_2":
+          - 3186.0
+          - 1162.5
+          "printed_composition_mole_pct": "SiO2 = 39.94 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id017
+            "composition": *id018
+          "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+            \ token, so the read is context and is not stored as delta_fG."
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "b"
+            "marker": "black filled circle"
+            "note": "Figure 2 panel b, symbol 4 (black filled circle)."
+        - "delta_Gm_kJ_per_mole_read": "-38"
+          "delta_Gm_kJ_per_mole_read_2": "-38"
+          "read_disagreement_kJ_per_mole": "0.002"
+          "read_uncertainty_kJ_per_mole": "0.001"
+          "x_mole_pct_read": "42.97"
+          "x_mole_pct_read_2": "42.95"
+          "embedded_px_read_1":
+          - 1008.0
+          - 218.0
+          "embedded_px_read_2":
+          - 1007.79
+          - 218.04
+          "page_600dpi_px_read_1":
+          - 3333.1
+          - 1121.9
+          "page_600dpi_px_read_2":
+          - 3332.5
+          - 1122.0
+          "printed_composition_mole_pct": "SiO2 = 42.97 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id017
+            "composition": *id018
+          "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+            \ token, so the read is context and is not stored as delta_fG."
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "b"
+            "marker": "black filled circle"
+            "note": "Figure 2 panel b, symbol 4 (black filled circle)."
+        - "delta_Gm_kJ_per_mole_read": "-37"
+          "delta_Gm_kJ_per_mole_read_2": "-37"
+          "read_disagreement_kJ_per_mole": "0.003"
+          "read_uncertainty_kJ_per_mole": "0.002"
+          "x_mole_pct_read": "45.93"
+          "x_mole_pct_read_2": "45.93"
+          "embedded_px_read_1":
+          - 1056.0
+          - 192.0
+          "embedded_px_read_2":
+          - 1056.09
+          - 192.07
+          "page_600dpi_px_read_1":
+          - 3477.2
+          - 1043.8
+          "page_600dpi_px_read_2":
+          - 3477.5
+          - 1044.0
+          "printed_composition_mole_pct": "SiO2 = 45.93 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id017
+            "composition": *id018
+          "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+            \ token, so the read is context and is not stored as delta_fG."
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "b"
+            "marker": "black filled circle"
+            "note": "Figure 2 panel b, symbol 4 (black filled circle)."
+        - "delta_Gm_kJ_per_mole_read": "-35"
+          "delta_Gm_kJ_per_mole_read_2": "-35"
+          "read_disagreement_kJ_per_mole": "0.002"
+          "read_uncertainty_kJ_per_mole": "0.001"
+          "x_mole_pct_read": "48.95"
+          "x_mole_pct_read_2": "48.92"
+          "embedded_px_read_1":
+          - 1105.0
+          - 157.0
+          "embedded_px_read_2":
+          - 1104.56
+          - 156.95
+          "page_600dpi_px_read_1":
+          - 3624.3
+          - 938.7
+          "page_600dpi_px_read_2":
+          - 3623.0
+          - 938.5
+          "printed_composition_mole_pct": "SiO2 = 48.95 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id017
+            "composition": *id018
+          "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+            \ token, so the read is context and is not stored as delta_fG."
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "b"
+            "marker": "black filled circle"
+            "note": "Figure 2 panel b, symbol 4 (black filled circle)."
+        - "delta_Gm_kJ_per_mole_read": "-34"
+          "delta_Gm_kJ_per_mole_read_2": "-34"
+          "read_disagreement_kJ_per_mole": "0.000"
+          "x_mole_pct_read": "51.91"
+          "x_mole_pct_read_2": "51.91"
+          "embedded_px_read_1":
+          - 1153.0
+          - 116.0
+          "embedded_px_read_2":
+          - 1153.03
+          - 116.00
+          "page_600dpi_px_read_1":
+          - 3768.4
+          - 815.5
+          "page_600dpi_px_read_2":
+          - 3768.5
+          - 815.5
+          "printed_composition_mole_pct": "SiO2 = 51.91 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id017
+            "composition": *id018
+          "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+            \ token, so the read is context and is not stored as delta_fG."
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "b"
+            "marker": "black filled circle"
+            "note": "Figure 2 panel b, symbol 4 (black filled circle)."
+        - "delta_Gm_kJ_per_mole_read": "-32"
+          "delta_Gm_kJ_per_mole_read_2": "-32"
+          "read_disagreement_kJ_per_mole": "0.002"
+          "read_uncertainty_kJ_per_mole": "0.001"
+          "x_mole_pct_read": "54.87"
+          "x_mole_pct_read_2": "54.90"
+          "embedded_px_read_1":
+          - 1201.0
+          - 69.0
+          "embedded_px_read_2":
+          - 1201.50
+          - 69.05
+          "page_600dpi_px_read_1":
+          - 3912.5
+          - 674.3
+          "page_600dpi_px_read_2":
+          - 3914.0
+          - 674.5
+          "printed_composition_mole_pct": "SiO2 = 54.87 mole % on the CaO·MgO–SiO2 join. The caption prints\
+            \ this axis only."
+          "T_K": "1873"
+          "point_conditions":
+            "temperature_K": *id017
+            "composition": *id018
+          "schema_gap": "The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy\
+            \ token, so the read is context and is not stored as delta_fG."
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "b"
+            "marker": "black filled circle"
+            "note": "Figure 2 panel b, symbol 4 (black filled circle)."
+    - "observation_id": "shornikov_2016_prose_4kJ_per_mole"
+      "type": "prose_mixing_energy_comparison"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "note": "Right column, the sentence comparing the calculated mixing energy with Shornikov et al.,\
+          \ 1997. PDF page 2, published page 41."
+      "units": "kJ/mole"
+      "values":
+        "quantity_as_printed": "mixing energy difference"
+        "value_as_printed": "4 kJ/mole approximately"
+        "method_class": "quoted_attributed"
+        "schema_gap": "The sentence gives an approximate difference of mixing energies. Quantity has no\
+          \ mixing-energy token, so the printed 4 kJ/mole is context and is not stored as delta_fG."
+        "attribution": "Printed sentence: the values differ from data obtained by the Knudsen mass-spectrometric\
+          \ effusion method [Shornikov et al., 1997] by on 4 kJ/mole approximately."
+"fidelity_samples":
+- "path": "species.CaO.observations[shornikov_2016_cao_mgo_silicate_p002_t02_r03_c02].values.value"
+  "value": "-421.511"
+  "locator":
+    "page": 2
+    "pdf_page_index": 1
+    "table": "1"
+    "note": "Solid CaO. The pinned spelling is the MinerU cell, ASCII hyphen U+002D. The page glyph is\
+      \ an en-dash. PDF page 2, published page 41."
+- "path": "species.CaO.observations[shornikov_2016_cao_mgo_silicate_p002_t02_r03_c04].values.value"
+  "value": "-409.450"
+  "locator":
+    "page": 2
+    "pdf_page_index": 1
+    "table": "1"
+    "note": "Liquid CaO. MinerU ASCII hyphen. PDF page 2, published page 41."
+- "path": "species.Ca.observations[shornikov_2016_cao_mgo_silicate_p002_t02_r03_c06].values.value"
+  "value": "-21.080"
+  "locator":
+    "page": 2
+    "pdf_page_index": 1
+    "table": "1"
+    "note": "Gas Ca. MinerU ASCII hyphen. PDF page 2, published page 41."

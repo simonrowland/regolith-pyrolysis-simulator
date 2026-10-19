@@ -1,0 +1,4362 @@
+"schema_version": "literature_extract.v1"
+"source_id": "shornikov-2020-cao-mgo-thermodynamics"
+"source":
+  "citation": "Shornikov, S. I. (2020), Thermodynamic properties of the CaO–MgO melts, Experiment in Geosciences,\
+    \ vol. 26, no. 1, pp. 77–80."
+  "year": 2020
+"extraction":
+  "method": "mineru_table_draft emit"
+  "date": "2026-10-18"
+  "worker": "trial-grok-1018"
+"review_status": "draft"
+"skipped_empty_or_dash":
+  "total": 16
+  "tables":
+  - "page": 2
+    "table_index": 1
+    "count": 0
+  - "page": 2
+    "table_index": 1
+    "count": 1
+  - "page": 3
+    "table_index": 2
+    "count": 15
+"species":
+  "CaO":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r03_c02"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "2900"
+        "column_header": "CaO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "2900"
+        "value": "52.000"
+        "attribution": "Glushko et al., 1978–1982. Table 1 melting enthalpy. The cited source is not stored\
+          \ in this extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2900"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "2900"
+            "column_header": "CaO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r05_c02"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3173"
+        "column_header": "CaO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3173"
+        "value": "59.050"
+        "attribution": "Howald, 1992. Table 1 melting enthalpy. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3173"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3173"
+            "column_header": "CaO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r06_c02"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3200"
+        "column_header": "CaO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3200"
+        "value": "79.496"
+        "attribution": "Barin, 1995. Table 1 melting enthalpy. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3200"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3200"
+            "column_header": "CaO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r07_c02"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3200"
+        "column_header": "CaO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3200"
+        "value": "79.496"
+        "attribution": "Chase, 1998. Table 1 melting enthalpy. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3200"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3200"
+            "column_header": "CaO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r09_c02"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "2845"
+        "column_header": "CaO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "2845"
+        "value": "79.496"
+        "attribution": "Bale et al., 2016. Table 1 melting enthalpy. The cited source is not stored in\
+          \ this extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2845"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "2845"
+            "column_header": "CaO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r10_c02"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3214"
+        "column_header": "CaO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3214"
+        "value": "62.881"
+        "attribution": "The present study. Table 1 melting enthalpy. The cited source is not stored in\
+          \ this extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3214"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3214"
+            "column_header": "CaO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c02"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "CaO"
+        "column_header": "Condensed phases  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-284.532"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "cr"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator": &id001
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c04"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "CaO"
+        "column_header": "Condensed phases  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-279.824"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "l"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator": *id001
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r05_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "CaO"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-111.162"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator": &id012
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r04_c02"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "-"
+        "column_header": "CaO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+        "note": "The Tm cell of this row is a dash. Temperature is not invented."
+      "units": "kJ/mol"
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "value": "68.000"
+        "attribution": "Eliezer et al., 1981. Table 1 melting enthalpy. The Tm cell is a dash, so no temperature\
+          \ is stored. The cited source is not stored in this extract."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 prints a dash for the Eliezer et al., 1981 CaO melting temperature. No\
+              \ temperature is invented."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "-"
+            "column_header": "CaO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_tm_cao_r03"
+      "type": "transition_point"
+      "locator": &id002
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "2900"
+        "column_header": "CaO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "2900"
+        "T_m_K": "2900"
+        "attribution": "Glushko et al., 1978–1982. Table 1 melting temperature. The cited source is not\
+          \ stored in this extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id002
+    - "observation_id": "shornikov_2020_tm_cao_r05"
+      "type": "transition_point"
+      "locator": &id003
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3173"
+        "column_header": "CaO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3173"
+        "T_m_K": "3173"
+        "attribution": "Howald, 1992. Table 1 melting temperature. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id003
+    - "observation_id": "shornikov_2020_tm_cao_r06"
+      "type": "transition_point"
+      "locator": &id004
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3200"
+        "column_header": "CaO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3200"
+        "T_m_K": "3200"
+        "attribution": "Barin, 1995. Table 1 melting temperature. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id004
+    - "observation_id": "shornikov_2020_tm_cao_r07"
+      "type": "transition_point"
+      "locator": &id005
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3200"
+        "column_header": "CaO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3200"
+        "T_m_K": "3200"
+        "attribution": "Chase, 1998. Table 1 melting temperature. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id005
+    - "observation_id": "shornikov_2020_tm_cao_r08"
+      "type": "transition_point"
+      "locator": &id006
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3222"
+        "column_header": "CaO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3222"
+        "T_m_K": "3222"
+        "attribution": "Manara et al., 2014. Table 1 melting temperature. The cited source is not stored\
+          \ in this extract, so the row is quoted_attributed."
+        "T_m_uncertainty_K": "25"
+        "uncertainty_note": "The table cell does not print ±. The introduction prints 3222±25 K for Manara\
+          \ et al., 2014."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id006
+    - "observation_id": "shornikov_2020_tm_cao_r09"
+      "type": "transition_point"
+      "locator": &id007
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "2845"
+        "column_header": "CaO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "2845"
+        "T_m_K": "2845"
+        "attribution": "Bale et al., 2016. Table 1 melting temperature. The cited source is not stored\
+          \ in this extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id007
+    - "observation_id": "shornikov_2020_tm_cao_r10"
+      "type": "transition_point"
+      "locator": &id008
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3214"
+        "column_header": "CaO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3214"
+        "T_m_K": "3214"
+        "attribution": "The present study. Table 1 melting temperature. The cited source is not stored\
+          \ in this extract, so the row is quoted_attributed."
+        "T_m_uncertainty_K": "12"
+        "uncertainty_note": "The table cell does not print ±. The introduction prints 3214±12 K for the\
+          \ present study."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id008
+    - "observation_id": "shornikov_2020_fig2a_line1_CaO_not_sampled"
+      "type": "activity_coefficient"
+      "locator": &id009
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "a"
+        "published_page": 79
+        "note": "Figure 2 panel a series 1 (CaO). Calculated curve. No data markers. Not sampled."
+      "phase": "l"
+      "units": "dimensionless"
+      "T_K": "2973"
+      "standard_state":
+        "state":
+          "tag": "unknown"
+          "reason": "The caption does not state the activity standard state."
+        "locator": *id009
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "published_page": 79
+            "note": "Figure 2 caption: series 1 at 2973 K."
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token,\
+              \ so the read mole percent is not stored as a mole fraction."
+          "locator": *id009
+      "values":
+        "quantity": "activity"
+        "method_class": "quoted_attributed"
+        "formula": "CaO"
+        "T_K": "2973"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "reason": "Calculated curve without data markers. The caption identifies series 1 as present study.\
+          \ No numeric points were read."
+        "attribution": "Figure 2 caption: activities calculated in the present study (1, 2, 4, 5) or by\
+          \ Wu et al. (1993) (3, 6). The minimizer inputs are not itemized, so the curve is not model_derived."
+    - "observation_id": "shornikov_2020_fig2a_line2_CaO_not_sampled"
+      "type": "activity_coefficient"
+      "locator": &id010
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "a"
+        "published_page": 79
+        "note": "Figure 2 panel a series 2 (CaO). Calculated curve. No data markers. Not sampled."
+      "phase": "l"
+      "units": "dimensionless"
+      "T_K": "3173"
+      "standard_state":
+        "state":
+          "tag": "unknown"
+          "reason": "The caption does not state the activity standard state."
+        "locator": *id010
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3173"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "published_page": 79
+            "note": "Figure 2 caption: series 2 at 3173 K."
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token,\
+              \ so the read mole percent is not stored as a mole fraction."
+          "locator": *id010
+      "values":
+        "quantity": "activity"
+        "method_class": "quoted_attributed"
+        "formula": "CaO"
+        "T_K": "3173"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "reason": "Calculated curve without data markers. The caption identifies series 2 as present study.\
+          \ No numeric points were read."
+        "attribution": "Figure 2 caption: activities calculated in the present study (1, 2, 4, 5) or by\
+          \ Wu et al. (1993) (3, 6). The minimizer inputs are not itemized, so the curve is not model_derived."
+    - "observation_id": "shornikov_2020_fig2a_line3_CaO_not_sampled"
+      "type": "activity_coefficient"
+      "locator": &id011
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "a"
+        "published_page": 79
+        "note": "Figure 2 panel a series 3 (CaO). Calculated curve. No data markers. Not sampled."
+      "phase": "l"
+      "units": "dimensionless"
+      "T_K": "2973"
+      "standard_state":
+        "state":
+          "tag": "unknown"
+          "reason": "The caption does not state the activity standard state."
+        "locator": *id011
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "published_page": 79
+            "note": "Figure 2 caption: series 3 at 2973 K."
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token,\
+              \ so the read mole percent is not stored as a mole fraction."
+          "locator": *id011
+      "values":
+        "quantity": "activity"
+        "method_class": "quoted_attributed"
+        "formula": "CaO"
+        "T_K": "2973"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "reason": "Calculated curve without data markers. The caption identifies series 3 as Wu et al.\
+          \ (1993). No numeric points were read."
+        "attribution": "Figure 2 caption: activities calculated in the present study (1, 2, 4, 5) or by\
+          \ Wu et al. (1993) (3, 6). The minimizer inputs are not itemized, so the curve is not model_derived."
+  "MgO":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r03_c05"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3100"
+        "column_header": "MgO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3100"
+        "value": "77.000"
+        "attribution": "Glushko et al., 1978–1982. Table 1 melting enthalpy. The cited source is not stored\
+          \ in this extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3100"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3100"
+            "column_header": "MgO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r04_c05"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3105"
+        "column_header": "MgO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3105"
+        "value": "57.650"
+        "attribution": "Howald & Roy, 1991. Table 1 melting enthalpy. The cited source is not stored in\
+          \ this extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3105"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3105"
+            "column_header": "MgO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r05_c05"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3105"
+        "column_header": "MgO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3105"
+        "value": "74.200"
+        "attribution": "Howald, 1992. Table 1 melting enthalpy. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3105"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3105"
+            "column_header": "MgO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r06_c05"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3105"
+        "column_header": "MgO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3105"
+        "value": "77.822"
+        "attribution": "Barin, 1995. Table 1 melting enthalpy. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3105"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3105"
+            "column_header": "MgO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r07_c05"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3105"
+        "column_header": "MgO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3105"
+        "value": "77.822"
+        "attribution": "Chase, 1998. Table 1 melting enthalpy. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3105"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3105"
+            "column_header": "MgO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r09_c05"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3098"
+        "column_header": "MgO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3098"
+        "value": "77.402"
+        "attribution": "Bale et al., 2016. Table 1 melting enthalpy. The cited source is not stored in\
+          \ this extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3098"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3098"
+            "column_header": "MgO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r10_c05"
+      "type": "heat_capacity_and_heat_content_series"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3246"
+        "column_header": "MgO  $\\Delta H_m,$  kJ/mol"
+        "published_page": 78
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "heat_of_fusion"
+        "method_class": "quoted_attributed"
+        "T_K": "3246"
+        "value": "63.718"
+        "attribution": "The present study. Table 1 melting enthalpy. The cited source is not stored in\
+          \ this extract, so the row is quoted_attributed."
+      "phase": "cr"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3246"
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "table": "1"
+            "row_label": "3246"
+            "column_header": "MgO  $T_m, K$"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r05_c02"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "MgO"
+        "column_header": "Condensed phases  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-298.386"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "cr"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator": *id012
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r05_c04"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "MgO"
+        "column_header": "Condensed phases  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-293.027"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "l"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator": *id012
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r08_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "MgO"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-172.921"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+    - "observation_id": "shornikov_2020_tm_mgo_r03"
+      "type": "transition_point"
+      "locator": &id013
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3100"
+        "column_header": "MgO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3100"
+        "T_m_K": "3100"
+        "attribution": "Glushko et al., 1978–1982. Table 1 melting temperature. The cited source is not\
+          \ stored in this extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id013
+    - "observation_id": "shornikov_2020_tm_mgo_r04"
+      "type": "transition_point"
+      "locator": &id014
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3105"
+        "column_header": "MgO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3105"
+        "T_m_K": "3105"
+        "attribution": "Howald & Roy, 1991. Table 1 melting temperature. The cited source is not stored\
+          \ in this extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id014
+    - "observation_id": "shornikov_2020_tm_mgo_r05"
+      "type": "transition_point"
+      "locator": &id015
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3105"
+        "column_header": "MgO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3105"
+        "T_m_K": "3105"
+        "attribution": "Howald, 1992. Table 1 melting temperature. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id015
+    - "observation_id": "shornikov_2020_tm_mgo_r06"
+      "type": "transition_point"
+      "locator": &id016
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3105"
+        "column_header": "MgO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3105"
+        "T_m_K": "3105"
+        "attribution": "Barin, 1995. Table 1 melting temperature. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id016
+    - "observation_id": "shornikov_2020_tm_mgo_r07"
+      "type": "transition_point"
+      "locator": &id017
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3105"
+        "column_header": "MgO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3105"
+        "T_m_K": "3105"
+        "attribution": "Chase, 1998. Table 1 melting temperature. The cited source is not stored in this\
+          \ extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id017
+    - "observation_id": "shornikov_2020_tm_mgo_r08"
+      "type": "transition_point"
+      "locator": &id018
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3250"
+        "column_header": "MgO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3250"
+        "T_m_K": "3250"
+        "attribution": "Ronchi & Sheindlin, 2001. Table 1 melting temperature. The cited source is not\
+          \ stored in this extract, so the row is quoted_attributed."
+        "T_m_uncertainty_K": "20"
+        "uncertainty_note": "The table cell does not print ±. The introduction prints 3250±20 K for Ronchi\
+          \ & Sheindlin, 2001."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id018
+    - "observation_id": "shornikov_2020_tm_mgo_r09"
+      "type": "transition_point"
+      "locator": &id019
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3098"
+        "column_header": "MgO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3098"
+        "T_m_K": "3098"
+        "attribution": "Bale et al., 2016. Table 1 melting temperature. The cited source is not stored\
+          \ in this extract, so the row is quoted_attributed."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id019
+    - "observation_id": "shornikov_2020_tm_mgo_r10"
+      "type": "transition_point"
+      "locator": &id020
+        "page": 2
+        "pdf_page_index": 1
+        "table": "1"
+        "row_label": "3246"
+        "column_header": "MgO  $T_m, K$"
+        "published_page": 78
+      "phase": "cr"
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "quoted_attributed"
+        "property_kind": "melting_point"
+        "T_K": "3246"
+        "T_m_K": "3246"
+        "attribution": "The present study. Table 1 melting temperature. The cited source is not stored\
+          \ in this extract, so the row is quoted_attributed."
+        "T_m_uncertainty_K": "13"
+        "uncertainty_note": "The table cell does not print ±. The introduction prints 3246±13 K for the\
+          \ present study."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Table 1 does not print a total pressure for this melting temperature."
+          "locator": *id020
+    - "observation_id": "shornikov_2020_fig2a_line4_MgO_not_sampled"
+      "type": "activity_coefficient"
+      "locator": &id021
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "a"
+        "published_page": 79
+        "note": "Figure 2 panel a series 4 (MgO). Calculated curve. No data markers. Not sampled."
+      "phase": "l"
+      "units": "dimensionless"
+      "T_K": "2973"
+      "standard_state":
+        "state":
+          "tag": "unknown"
+          "reason": "The caption does not state the activity standard state."
+        "locator": *id021
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "published_page": 79
+            "note": "Figure 2 caption: series 4 at 2973 K."
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token,\
+              \ so the read mole percent is not stored as a mole fraction."
+          "locator": *id021
+      "values":
+        "quantity": "activity"
+        "method_class": "quoted_attributed"
+        "formula": "MgO"
+        "T_K": "2973"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "reason": "Calculated curve without data markers. The caption identifies series 4 as present study.\
+          \ No numeric points were read."
+        "attribution": "Figure 2 caption: activities calculated in the present study (1, 2, 4, 5) or by\
+          \ Wu et al. (1993) (3, 6). The minimizer inputs are not itemized, so the curve is not model_derived."
+    - "observation_id": "shornikov_2020_fig2a_line5_MgO_not_sampled"
+      "type": "activity_coefficient"
+      "locator": &id022
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "a"
+        "published_page": 79
+        "note": "Figure 2 panel a series 5 (MgO). Calculated curve. No data markers. Not sampled."
+      "phase": "l"
+      "units": "dimensionless"
+      "T_K": "3173"
+      "standard_state":
+        "state":
+          "tag": "unknown"
+          "reason": "The caption does not state the activity standard state."
+        "locator": *id022
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "3173"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "published_page": 79
+            "note": "Figure 2 caption: series 5 at 3173 K."
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token,\
+              \ so the read mole percent is not stored as a mole fraction."
+          "locator": *id022
+      "values":
+        "quantity": "activity"
+        "method_class": "quoted_attributed"
+        "formula": "MgO"
+        "T_K": "3173"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "reason": "Calculated curve without data markers. The caption identifies series 5 as present study.\
+          \ No numeric points were read."
+        "attribution": "Figure 2 caption: activities calculated in the present study (1, 2, 4, 5) or by\
+          \ Wu et al. (1993) (3, 6). The minimizer inputs are not itemized, so the curve is not model_derived."
+    - "observation_id": "shornikov_2020_fig2a_line6_MgO_not_sampled"
+      "type": "activity_coefficient"
+      "locator": &id023
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "panel": "a"
+        "published_page": 79
+        "note": "Figure 2 panel a series 6 (MgO). Calculated curve. No data markers. Not sampled."
+      "phase": "l"
+      "units": "dimensionless"
+      "T_K": "2973"
+      "standard_state":
+        "state":
+          "tag": "unknown"
+          "reason": "The caption does not state the activity standard state."
+        "locator": *id023
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "figure": "2"
+            "panel": "a"
+            "published_page": 79
+            "note": "Figure 2 caption: series 6 at 2973 K."
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token,\
+              \ so the read mole percent is not stored as a mole fraction."
+          "locator": *id023
+      "values":
+        "quantity": "activity"
+        "method_class": "quoted_attributed"
+        "formula": "MgO"
+        "T_K": "2973"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "reason": "Calculated curve without data markers. The caption identifies series 6 as Wu et al.\
+          \ (1993). No numeric points were read."
+        "attribution": "Figure 2 caption: activities calculated in the present study (1, 2, 4, 5) or by\
+          \ Wu et al. (1993) (3, 6). The minimizer inputs are not itemized, so the curve is not model_derived."
+  "Ca":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "Ca"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-106.479"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator": *id001
+  "CaMgO2":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r04_c02"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "$CaMgO_{2}$"
+        "column_header": "Condensed phases  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-592.680"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "cr"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator": &id024
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+  "Ca2":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r04_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "$Ca_{2}$"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-25.522"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator": *id024
+  "Mg":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r06_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "Mg"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-139.971"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+  "Mg2":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r07_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "$Mg_{2}$"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "-38.102"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+  "O":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r09_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "O"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "56.337"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+  "O2":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r10_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "$O_{2}$"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "0.000"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+  "O3":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r11_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "$O_{3}$"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "320.027"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+  "O4":
+    "observations":
+    - "observation_id": "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r12_c06"
+      "type": "gibbs_table"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "table": "2"
+        "row_label": "$O_{4}$"
+        "column_header": "Gas phase  $\\Delta {G}^{ \\circ }_{2973}$ , kJ/mol"
+        "published_page": 79
+      "units": "kJ/mol"
+      "mineru_flags": []
+      "values":
+        "quantity": "delta_fG"
+        "method_class": "quoted_attributed"
+        "T_K": "2973"
+        "value": "284.677"
+        "attribution": "Table 2 caption: calculated in the present study at 2973 K. The text cites the\
+          \ melting temperatures and other inputs, but those parents are not stored in this extract, so\
+          \ the rows are quoted_attributed."
+      "phase": "g"
+      "per": "mol_species"
+      "point_conditions":
+        "temperature_K":
+          "state":
+            "tag": "value"
+            "value":
+              "kind": "point"
+              "point": "2973"
+          "locator":
+            "page": 3
+            "pdf_page_index": 2
+            "table": "2"
+            "column_header": "ΔG°2973, kJ/mol"
+            "note": "The temperature is the 2973 printed in each Gibbs-energy column header and in the\
+              \ table caption. Published page 79. The model domain 2600-3300 K is not this table's temperature."
+  "CaO-MgO":
+    "observations":
+    - "observation_id": "shornikov_2020_fig1_s1_01"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 1 left-half teal"
+        "note": "Figure 1 symbol 1 (left-half teal), Ruff et al., 1933. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.96e3"
+        "T_K_read_2": "2960.9"
+        "cao_mol_pct_read": "20.1"
+        "cao_mol_pct_read_2": "20.1"
+        "embedded_px_read_1":
+        - 206.0
+        - 136.5
+        "embedded_px_read_2":
+        - 206.78
+        - 136.39
+        "page_600dpi_px_read_1":
+        - 925.7
+        - 2536.8
+        "page_600dpi_px_read_2":
+        - 928.0
+        - 2536.5
+        "read_uncertainty_K": "0.9"
+        "read_uncertainty_mol_pct": "0.10"
+        "read_1_method": "jpeg_vertical_diameter"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2960.7"
+        "cao_mol_pct_read_1": "20.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s1_02"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 1 left-half teal"
+        "note": "Figure 1 symbol 1 (left-half teal), Ruff et al., 1933. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.86e3"
+        "T_K_read_2": "2858.8"
+        "cao_mol_pct_read": "30.1"
+        "cao_mol_pct_read_2": "30.0"
+        "embedded_px_read_1":
+        - 262.0
+        - 182.5
+        "embedded_px_read_2":
+        - 261.56
+        - 182.7
+        "page_600dpi_px_read_1":
+        - 1093.8
+        - 2674.9
+        "page_600dpi_px_read_2":
+        - 1092.5
+        - 2675.5
+        "read_uncertainty_K": "1.2"
+        "read_uncertainty_mol_pct": "0.10"
+        "read_1_method": "jpeg_vertical_diameter"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2859.3"
+        "cao_mol_pct_read_1": "30.1"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s1_03"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 1 left-half teal"
+        "note": "Figure 1 symbol 1 (left-half teal), Ruff et al., 1933. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.78e3"
+        "T_K_read_2": "2780.2"
+        "cao_mol_pct_read": "35.1"
+        "cao_mol_pct_read_2": "35.1"
+        "embedded_px_read_1":
+        - 289.0
+        - 218.5
+        "embedded_px_read_2":
+        - 290.03
+        - 218.35
+        "page_600dpi_px_read_1":
+        - 1174.9
+        - 2783.0
+        "page_600dpi_px_read_2":
+        - 1178.0
+        - 2782.5
+        "read_uncertainty_K": "0.2"
+        "read_uncertainty_mol_pct": "0.10"
+        "read_1_method": "jpeg_vertical_diameter"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2779.9"
+        "cao_mol_pct_read_1": "35.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s1_04"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 1 left-half teal"
+        "note": "Figure 1 symbol 1 (left-half teal), Ruff et al., 1933. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.72e3"
+        "T_K_read_2": "2724.0"
+        "cao_mol_pct_read": "40.1"
+        "cao_mol_pct_read_2": "40.1"
+        "embedded_px_read_1":
+        - 317.0
+        - 244.0
+        "embedded_px_read_2":
+        - 317.67
+        - 243.83
+        "page_600dpi_px_read_1":
+        - 1259.0
+        - 2859.5
+        "page_600dpi_px_read_2":
+        - 1261.0
+        - 2859.0
+        "read_uncertainty_K": "4.0"
+        "read_uncertainty_mol_pct": "0.10"
+        "read_1_method": "jpeg_vertical_diameter"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2723.7"
+        "cao_mol_pct_read_1": "40.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s1_05"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 1 left-half teal"
+        "note": "Figure 1 symbol 1 (left-half teal), Ruff et al., 1933. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.63e3"
+        "T_K_read_2": "2634.3"
+        "cao_mol_pct_read": "45.1"
+        "cao_mol_pct_read_2": "45.1"
+        "embedded_px_read_1":
+        - 345.0
+        - 284.5
+        "embedded_px_read_2":
+        - 345.65
+        - 284.48
+        "page_600dpi_px_read_1":
+        - 1343.1
+        - 2981.1
+        "page_600dpi_px_read_2":
+        - 1345.0
+        - 2981.0
+        "read_uncertainty_K": "4.4"
+        "read_uncertainty_mol_pct": "0.10"
+        "read_1_method": "jpeg_vertical_diameter"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2634.4"
+        "cao_mol_pct_read_1": "45.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s1_06"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 1 left-half teal"
+        "note": "Figure 1 symbol 1 (left-half teal), Ruff et al., 1933. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.82e3"
+        "T_K_read_2": "2816.9"
+        "cao_mol_pct_read": "60.1"
+        "cao_mol_pct_read_2": "60.1"
+        "embedded_px_read_1":
+        - 428.0
+        - 201.5
+        "embedded_px_read_2":
+        - 428.73
+        - 201.69
+        "page_600dpi_px_read_1":
+        - 1592.3
+        - 2731.9
+        "page_600dpi_px_read_2":
+        - 1594.5
+        - 2732.5
+        "read_uncertainty_K": "3.1"
+        "read_uncertainty_mol_pct": "0.10"
+        "read_1_method": "jpeg_vertical_diameter"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2817.4"
+        "cao_mol_pct_read_1": "60.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s1_07"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 1 left-half teal"
+        "note": "Figure 1 symbol 1 (left-half teal), Ruff et al., 1933. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.90e3"
+        "T_K_read_2": "2897.0"
+        "cao_mol_pct_read": "70.2"
+        "cao_mol_pct_read_2": "70.2"
+        "embedded_px_read_1":
+        - 484.0
+        - 165.5
+        "embedded_px_read_2":
+        - 484.85
+        - 165.38
+        "page_600dpi_px_read_1":
+        - 1760.5
+        - 2623.9
+        "page_600dpi_px_read_2":
+        - 1763.0
+        - 2623.5
+        "read_uncertainty_K": "3.2"
+        "read_uncertainty_mol_pct": "0.10"
+        "read_1_method": "jpeg_vertical_diameter"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2896.8"
+        "cao_mol_pct_read_1": "70.1"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s2_06"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.65e3"
+        "T_K_read_2": "2653.1"
+        "cao_mol_pct_read": "40.0"
+        "cao_mol_pct_read_2": "40.0"
+        "embedded_px_read_1":
+        - 317.0
+        - 276.0
+        "embedded_px_read_2":
+        - 317.17
+        - 275.98
+        "page_600dpi_px_read_1":
+        - 1259.0
+        - 2955.6
+        "page_600dpi_px_read_2":
+        - 1259.5
+        - 2955.5
+        "read_uncertainty_K": "3.1"
+        "read_uncertainty_mol_pct": "0.03"
+        "read_1_method": "jpeg_hole_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2653.1"
+        "cao_mol_pct_read_1": "40.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s2_07"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.64e3"
+        "T_K_read_2": "2635.1"
+        "cao_mol_pct_read": "42.6"
+        "cao_mol_pct_read_2": "42.5"
+        "embedded_px_read_1":
+        - 331.27
+        - 284.07
+        "embedded_px_read_2":
+        - 331.16
+        - 284.14
+        "page_600dpi_px_read_1":
+        - 1301.8
+        - 2979.8
+        "page_600dpi_px_read_2":
+        - 1301.5
+        - 2980.0
+        "read_uncertainty_K": "4.9"
+        "read_uncertainty_mol_pct": "0.10"
+        "read_1_method": "jpeg_hole_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2635.3"
+        "cao_mol_pct_read_1": "42.6"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s3_06"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.89e3"
+        "T_K_read_2": "2892.2"
+        "cao_mol_pct_read": "32.5"
+        "cao_mol_pct_read_2": "32.5"
+        "embedded_px_read_1":
+        - 275.21
+        - 167.55
+        "embedded_px_read_2":
+        - 275.38
+        - 167.54
+        "page_600dpi_px_read_1":
+        - 1133.5
+        - 2630.0
+        "page_600dpi_px_read_2":
+        - 1134.0
+        - 2630.0
+        "read_uncertainty_K": "2.3"
+        "read_uncertainty_mol_pct": "0.03"
+        "read_1_method": "jpeg_interior_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2892.3"
+        "cao_mol_pct_read_1": "32.5"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s3_07"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.64e3"
+        "T_K_read_2": "2642.8"
+        "cao_mol_pct_read": "59.3"
+        "cao_mol_pct_read_2": "59.3"
+        "embedded_px_read_1":
+        - 424.38
+        - 280.65
+        "embedded_px_read_2":
+        - 424.74
+        - 280.64
+        "page_600dpi_px_read_1":
+        - 1581.4
+        - 2969.5
+        "page_600dpi_px_read_2":
+        - 1582.5
+        - 2969.5
+        "read_uncertainty_K": "2.9"
+        "read_uncertainty_mol_pct": "0.03"
+        "read_1_method": "jpeg_interior_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2642.9"
+        "cao_mol_pct_read_1": "59.3"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s4_01"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 4 half-red disk, maroon on the upper half"
+        "note": "Figure 1 symbol 4 (half-red disk, maroon fill on the upper half), Foex, 1968. The centre is the marker body, not the red open circle that overlaps it near 50 mol% CaO. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "3.03e3"
+        "T_K_read_2": "3029.6"
+        "cao_mol_pct_read": "20.0"
+        "cao_mol_pct_read_2": "20.0"
+        "embedded_px_read_1":
+        - 206.0
+        - 105.0
+        "embedded_px_read_2":
+        - 205.94
+        - 105.25
+        "page_600dpi_px_read_1":
+        - 925.7
+        - 2442.3
+        "page_600dpi_px_read_2":
+        - 925.5
+        - 2443.0
+        "read_uncertainty_K": "0.4"
+        "read_uncertainty_mol_pct": "0.01"
+        "read_1_method": "jpeg_horizontal_diameter"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "3030.2"
+        "cao_mol_pct_read_1": "20.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s4_02"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 4 half-red disk, maroon on the upper half"
+        "note": "Figure 1 symbol 4 (half-red disk, maroon fill on the upper half), Foex, 1968. The centre is the marker body, not the red open circle that overlaps it near 50 mol% CaO. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.91e3"
+        "T_K_read_2": "2909.8"
+        "cao_mol_pct_read": "30.0"
+        "cao_mol_pct_read_2": "30.0"
+        "embedded_px_read_1":
+        - 261.5
+        - 159.0
+        "embedded_px_read_2":
+        - 261.56
+        - 159.55
+        "page_600dpi_px_read_1":
+        - 1092.3
+        - 2604.4
+        "page_600dpi_px_read_2":
+        - 1092.5
+        - 2606.0
+        "read_uncertainty_K": "1.1"
+        "read_uncertainty_mol_pct": "0.01"
+        "read_1_method": "jpeg_horizontal_diameter"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2911.1"
+        "cao_mol_pct_read_1": "30.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s4_03"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 4 half-red disk, maroon on the upper half"
+        "note": "Figure 1 symbol 4 (half-red disk, maroon fill on the upper half), Foex, 1968. The centre is the marker body, not the red open circle that overlaps it near 50 mol% CaO. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.82e3"
+        "T_K_read_2": "2814.3"
+        "cao_mol_pct_read": "40.0"
+        "cao_mol_pct_read_2": "40.0"
+        "embedded_px_read_1":
+        - 317.0
+        - 202.0
+        "embedded_px_read_2":
+        - 317.17
+        - 202.86
+        "page_600dpi_px_read_1":
+        - 1259.0
+        - 2733.4
+        "page_600dpi_px_read_2":
+        - 1259.5
+        - 2736.0
+        "read_uncertainty_K": "5.7"
+        "read_uncertainty_mol_pct": "0.03"
+        "read_1_method": "jpeg_horizontal_diameter"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2816.3"
+        "cao_mol_pct_read_1": "40.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s4_04"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 4 half-red disk, maroon on the upper half"
+        "note": "Figure 1 symbol 4 (half-red disk, maroon fill on the upper half), Foex, 1968. The centre is the marker body, not the red open circle that overlaps it near 50 mol% CaO. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.70e3"
+        "T_K_read_2": "2696.4"
+        "cao_mol_pct_read": "50.0"
+        "cao_mol_pct_read_2": "50.0"
+        "embedded_px_read_1":
+        - 372.5
+        - 256.0
+        "embedded_px_read_2":
+        - 372.79
+        - 256.33
+        "page_600dpi_px_read_1":
+        - 1425.6
+        - 2895.5
+        "page_600dpi_px_read_2":
+        - 1426.5
+        - 2896.5
+        "read_uncertainty_K": "3.6"
+        "read_uncertainty_mol_pct": "0.03"
+        "read_1_method": "jpeg_horizontal_diameter"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2697.2"
+        "cao_mol_pct_read_1": "50.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s4_05"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 4 half-red disk, maroon on the upper half"
+        "note": "Figure 1 symbol 4 (half-red disk, maroon fill on the upper half), Foex, 1968. The centre is the marker body, not the red open circle that overlaps it near 50 mol% CaO. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.72e3"
+        "T_K_read_2": "2720.7"
+        "cao_mol_pct_read": "59.9"
+        "cao_mol_pct_read_2": "59.9"
+        "embedded_px_read_1":
+        - 427.5
+        - 245.0
+        "embedded_px_read_2":
+        - 428.07
+        - 245.33
+        "page_600dpi_px_read_1":
+        - 1590.8
+        - 2862.5
+        "page_600dpi_px_read_2":
+        - 1592.5
+        - 2863.5
+        "read_uncertainty_K": "1.5"
+        "read_uncertainty_mol_pct": "0.02"
+        "read_1_method": "jpeg_horizontal_diameter"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2721.5"
+        "cao_mol_pct_read_1": "59.9"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s4_06"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 4 half-red disk, maroon on the upper half"
+        "note": "Figure 1 symbol 4 (half-red disk, maroon fill on the upper half), Foex, 1968. The centre is the marker body, not the red open circle that overlaps it near 50 mol% CaO. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.84e3"
+        "T_K_read_2": "2844.1"
+        "cao_mol_pct_read": "70.1"
+        "cao_mol_pct_read_2": "70.0"
+        "embedded_px_read_1":
+        - 484.0
+        - 189.0
+        "embedded_px_read_2":
+        - 484.02
+        - 189.36
+        "page_600dpi_px_read_1":
+        - 1760.5
+        - 2694.4
+        "page_600dpi_px_read_2":
+        - 1760.5
+        - 2695.5
+        "read_uncertainty_K": "5.0"
+        "read_uncertainty_mol_pct": "0.10"
+        "read_1_method": "jpeg_horizontal_diameter"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2845.0"
+        "cao_mol_pct_read_1": "70.1"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s4_07"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 4 half-red disk, maroon on the upper half"
+        "note": "Figure 1 symbol 4 (half-red disk, maroon fill on the upper half), Foex, 1968. The centre is the marker body, not the red open circle that overlaps it near 50 mol% CaO. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.97e3"
+        "T_K_read_2": "2971.5"
+        "cao_mol_pct_read": "80.1"
+        "cao_mol_pct_read_2": "80.0"
+        "embedded_px_read_1":
+        - 539.5
+        - 131.0
+        "embedded_px_read_2":
+        - 539.46
+        - 131.56
+        "page_600dpi_px_read_1":
+        - 1927.1
+        - 2520.3
+        "page_600dpi_px_read_2":
+        - 1927.0
+        - 2522.0
+        "read_uncertainty_K": "2.9"
+        "read_uncertainty_mol_pct": "0.10"
+        "read_1_method": "jpeg_horizontal_diameter"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2972.9"
+        "cao_mol_pct_read_1": "80.1"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s4_08"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 4 half-red disk, maroon on the upper half"
+        "note": "Figure 1 symbol 4 (half-red disk, maroon fill on the upper half), Foex, 1968. The centre is the marker body, not the red open circle that overlaps it near 50 mol% CaO. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "3.09e3"
+        "T_K_read_2": "3087.2"
+        "cao_mol_pct_read": "90.0"
+        "cao_mol_pct_read_2": "90.0"
+        "embedded_px_read_1":
+        - 594.5
+        - 79.0
+        "embedded_px_read_2":
+        - 595.24
+        - 79.09
+        "page_600dpi_px_read_1":
+        - 2092.3
+        - 2364.2
+        "page_600dpi_px_read_2":
+        - 2094.5
+        - 2364.5
+        "read_uncertainty_K": "2.8"
+        "read_uncertainty_mol_pct": "0.01"
+        "read_1_method": "jpeg_horizontal_diameter"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "3087.5"
+        "cao_mol_pct_read_1": "90.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s2_01"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "3.07e3"
+        "T_K_read_2": "3072.9"
+        "cao_mol_pct_read": "-5.00e-2"
+        "cao_mol_pct_read_2": "-0.0"
+        "embedded_px_read_1":
+        - 94.69
+        - 85.61
+        "embedded_px_read_2":
+        - 94.72
+        - 85.59
+        "page_600dpi_px_read_1":
+        - 591.4
+        - 2384.1
+        "page_600dpi_px_read_2":
+        - 591.5
+        - 2384.0
+        "read_uncertainty_K": "3.0"
+        "read_uncertainty_mol_pct": "0.05"
+        "read_1_method": "jpeg_hole_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "3073.0"
+        "cao_mol_pct_read_1": "-0.1"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s2_02"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "3.00e3"
+        "T_K_read_2": "2999.1"
+        "cao_mol_pct_read": "10.0"
+        "cao_mol_pct_read_2": "10.0"
+        "embedded_px_read_1":
+        - 150.29
+        - 119.21
+        "embedded_px_read_2":
+        - 150.33
+        - 119.07
+        "page_600dpi_px_read_1":
+        - 758.4
+        - 2484.9
+        "page_600dpi_px_read_2":
+        - 758.5
+        - 2484.5
+        "read_uncertainty_K": "1.1"
+        "read_uncertainty_mol_pct": "0.01"
+        "read_1_method": "jpeg_hole_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2998.9"
+        "cao_mol_pct_read_1": "10.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s2_10"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.76e3"
+        "T_K_read_2": "2757.0"
+        "cao_mol_pct_read": "60.0"
+        "cao_mol_pct_read_2": "60.0"
+        "embedded_px_read_1":
+        - 428.0
+        - 229.0
+        "embedded_px_read_2":
+        - 428.23
+        - 228.84
+        "page_600dpi_px_read_1":
+        - 1592.3
+        - 2814.5
+        "page_600dpi_px_read_2":
+        - 1593.0
+        - 2814.0
+        "read_uncertainty_K": "3.2"
+        "read_uncertainty_mol_pct": "0.01"
+        "read_1_method": "jpeg_hole_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2756.8"
+        "cao_mol_pct_read_1": "60.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s3_01"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "3.10e3"
+        "T_K_read_2": "3103.4"
+        "cao_mol_pct_read": "-4.00e-1"
+        "cao_mol_pct_read_2": "-0.4"
+        "embedded_px_read_1":
+        - 92.9
+        - 71.63
+        "embedded_px_read_2":
+        - 92.88
+        - 71.76
+        "page_600dpi_px_read_1":
+        - 586.0
+        - 2342.1
+        "page_600dpi_px_read_2":
+        - 586.0
+        - 2342.5
+        "read_uncertainty_K": "3.8"
+        "read_uncertainty_mol_pct": "0.01"
+        "read_1_method": "jpeg_interior_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "3103.8"
+        "cao_mol_pct_read_1": "-0.4"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s3_02"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.91e3"
+        "T_K_read_2": "2908.0"
+        "cao_mol_pct_read": "4.10"
+        "cao_mol_pct_read_2": "4.1"
+        "embedded_px_read_1":
+        - 117.7
+        - 160.23
+        "embedded_px_read_2":
+        - 117.86
+        - 160.38
+        "page_600dpi_px_read_1":
+        - 660.5
+        - 2608.0
+        "page_600dpi_px_read_2":
+        - 661.0
+        - 2608.5
+        "read_uncertainty_K": "2.0"
+        "read_uncertainty_mol_pct": "0.02"
+        "read_1_method": "jpeg_interior_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2908.4"
+        "cao_mol_pct_read_1": "4.1"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s3_03"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.81e3"
+        "T_K_read_2": "2805.5"
+        "cao_mol_pct_read": "5.50"
+        "cao_mol_pct_read_2": "5.5"
+        "embedded_px_read_1":
+        - 125.39
+        - 206.84
+        "embedded_px_read_2":
+        - 125.52
+        - 206.85
+        "page_600dpi_px_read_1":
+        - 683.6
+        - 2748.0
+        "page_600dpi_px_read_2":
+        - 684.0
+        - 2748.0
+        "read_uncertainty_K": "4.5"
+        "read_uncertainty_mol_pct": "0.02"
+        "read_1_method": "jpeg_interior_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2805.6"
+        "cao_mol_pct_read_1": "5.5"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s3_05"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "liquidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "3.00e3"
+        "T_K_read_2": "3002.8"
+        "cao_mol_pct_read": "15.2"
+        "cao_mol_pct_read_2": "15.2"
+        "embedded_px_read_1":
+        - 179.26
+        - 117.26
+        "embedded_px_read_2":
+        - 179.3
+        - 117.4
+        "page_600dpi_px_read_1":
+        - 845.4
+        - 2479.1
+        "page_600dpi_px_read_2":
+        - 845.5
+        - 2479.5
+        "read_uncertainty_K": "3.2"
+        "read_uncertainty_mol_pct": "0.03"
+        "read_1_method": "jpeg_interior_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "3003.2"
+        "cao_mol_pct_read_1": "15.2"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    - "observation_id": "shornikov_2020_fig1_s3_10"
+      "type": "transition_point"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.71e3"
+        "T_K_read_2": "2705.6"
+        "cao_mol_pct_read": "84.3"
+        "cao_mol_pct_read_2": "84.3"
+        "embedded_px_read_1":
+        - 562.78
+        - 252.05
+        "embedded_px_read_2":
+        - 563.27
+        - 252.16
+        "page_600dpi_px_read_1":
+        - 1997.0
+        - 2883.7
+        "page_600dpi_px_read_2":
+        - 1998.5
+        - 2884.0
+        "read_uncertainty_K": "4.4"
+        "read_uncertainty_mol_pct": "0.01"
+        "read_1_method": "jpeg_interior_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2706.0"
+        "cao_mol_pct_read_1": "84.3"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+      "point_conditions":
+        "total_pressure_Pa":
+          "state":
+            "tag": "unknown"
+            "reason": "Figure 1 does not print a total pressure."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+        "composition":
+          "state":
+            "tag": "unknown"
+            "reason": "Printed composition is mole percent CaO. AmountBasis has no mole-percent token, so\
+              \ the read mole percent is not stored as a mole fraction."
+          "locator":
+            "page": 2
+            "pdf_page_index": 1
+            "figure": "1"
+            "published_page": 78
+    "context":
+    - "observation_id": "shornikov_2020_fig2b_series1_mixing_energy"
+      "type": "figure_mixing_energy"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "published_page": 79
+        "note": "Figure 2 panel b series 1 at 2973 K, present study. Calculated curve. No data markers.\
+          \ Not sampled."
+      "units": "kJ/mol"
+      "values":
+        "quantity_as_printed": "ΔG^m, kJ/mol"
+        "method_class": "figure_only"
+        "temperature_K_as_printed": "2973"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "value_as_printed": "not sampled"
+        "schema_gap": "The ordinate is the mixing energy ΔG^m in kJ/mol. Quantity has no mixing-energy\
+          \ token, so the curve is context and is not stored as delta_fG."
+        "attribution": "Figure 2 caption: mixing energies; series 1 is present study at 2973 K. Panel\
+          \ b shows curves, not markers."
+    - "observation_id": "shornikov_2020_fig2b_series2_mixing_energy"
+      "type": "figure_mixing_energy"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "published_page": 79
+        "note": "Figure 2 panel b series 2 at 3173 K, present study. Calculated curve. No data markers.\
+          \ Not sampled."
+      "units": "kJ/mol"
+      "values":
+        "quantity_as_printed": "ΔG^m, kJ/mol"
+        "method_class": "figure_only"
+        "temperature_K_as_printed": "3173"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "value_as_printed": "not sampled"
+        "schema_gap": "The ordinate is the mixing energy ΔG^m in kJ/mol. Quantity has no mixing-energy\
+          \ token, so the curve is context and is not stored as delta_fG."
+        "attribution": "Figure 2 caption: mixing energies; series 2 is present study at 3173 K. Panel\
+          \ b shows curves, not markers."
+    - "observation_id": "shornikov_2020_fig2b_series3_mixing_energy"
+      "type": "figure_mixing_energy"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "published_page": 79
+        "note": "Figure 2 panel b series 3 at 2973 K, Wu et al. (1993). Calculated curve. No data markers.\
+          \ Not sampled."
+      "units": "kJ/mol"
+      "values":
+        "quantity_as_printed": "ΔG^m, kJ/mol"
+        "method_class": "figure_only"
+        "temperature_K_as_printed": "2973"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "value_as_printed": "not sampled"
+        "schema_gap": "The ordinate is the mixing energy ΔG^m in kJ/mol. Quantity has no mixing-energy\
+          \ token, so the curve is context and is not stored as delta_fG."
+        "attribution": "Figure 2 caption: mixing energies; series 3 is Wu et al. (1993) at 2973 K. Panel\
+          \ b shows curves, not markers."
+    - "observation_id": "shornikov_2020_fig2b_series7_mixing_energy"
+      "type": "figure_mixing_energy"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "published_page": 79
+        "note": "Figure 2 panel b series 7 at 3173 K, Wu et al. (1993). Calculated curve. No data markers.\
+          \ Not sampled."
+      "units": "kJ/mol"
+      "values":
+        "quantity_as_printed": "ΔG^m, kJ/mol"
+        "method_class": "figure_only"
+        "temperature_K_as_printed": "3173"
+        "status": "typed_refusal"
+        "unavailable_reason": "model_curve_not_sampled"
+        "value_as_printed": "not sampled"
+        "schema_gap": "The ordinate is the mixing energy ΔG^m in kJ/mol. Quantity has no mixing-energy\
+          \ token, so the curve is context and is not stored as delta_fG."
+        "attribution": "Figure 2 caption: mixing energies; series 7 is Wu et al. (1993) at 3173 K. Panel\
+          \ b shows curves, not markers."
+    - "observation_id": "shornikov_2020_prose_mixing_minimum"
+      "type": "prose_mixing_energy_comparison"
+      "locator":
+        "page": 3
+        "pdf_page_index": 2
+        "figure": "2"
+        "published_page": 79
+        "note": "Prose under Figure 2. Not a sampled curve."
+      "units": "kJ/mol"
+      "values":
+        "value_as_printed": "its minimum value is in the range from –10 kJ/mol (at 2973 K) to –14 kJ/mol\
+          \ (at 3173 K). The ΔGm minimum value is in the concentration range of 50–55 mol. % CaO."
+        "schema_gap": "The ordinate is the mixing energy ΔG^m in kJ/mol. Quantity has no mixing-energy\
+          \ token, so the sentence is context and is not stored as delta_fG."
+        "attribution": "Page 79 prose. The numbers are the author's description of Figure 2b, not a table\
+          \ cell."
+    - "observation_id": "shornikov_2020_prose_rankin_merwin_eutectic"
+      "type": "quoted_prose_schema_gap"
+      "locator":
+        "page": 1
+        "pdf_page_index": 0
+        "published_page": 77
+        "note": "Right-hand column, published page 77."
+      "units": "as printed"
+      "values":
+        "value_as_printed": "59 mol. % CaO at 2573±50 K"
+        "attribution": "Rankin & Merwin (1916), quoted by Shornikov."
+        "conditions_as_printed": "eutectic composition in the CaO–MgO system"
+        "uncertainty_as_printed": "±50 K"
+        "phase_as_printed": "eutectic"
+        "schema_gap": "OBSERVATION_TYPES has no formation-enthalpy or entropy type, and AmountBasis has no\
+          \ mole-percent token. The printed sentence is context. It is not a scored observation."
+    - "observation_id": "shornikov_2020_prose_eutectic_range"
+      "type": "quoted_prose_schema_gap"
+      "locator":
+        "page": 1
+        "pdf_page_index": 0
+        "published_page": 77
+        "note": "Right-hand column, published page 77."
+      "units": "as printed"
+      "values":
+        "value_as_printed": "from 45 (Afanasjev & Saldau, 1950) to 59 mol. % CaO (Doman et al., 1963) and\
+          \ from 2553 (Wartenberg & Prophet, 1932; Wartenberg et al., 1937) to 2643 K (Ruff et al., 1933;\
+          \ Doman et al., 1963)"
+        "attribution": "Shornikov's summary of the eutectic literature on published page 77."
+        "conditions_as_printed": "eutectic positions in the CaO–MgO system"
+        "uncertainty_as_printed": "the sentence prints the range, not a single ±"
+        "phase_as_printed": "eutectic"
+        "schema_gap": "OBSERVATION_TYPES has no formation-enthalpy or entropy type, and AmountBasis has no\
+          \ mole-percent token. The printed sentence is context. It is not a scored observation."
+    - "observation_id": "shornikov_2020_prose_liquidus_sources"
+      "type": "quoted_prose_schema_gap"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "published_page": 78
+        "note": "The sentence begins at the bottom of published page 77 and ends on page 78."
+      "units": "as printed"
+      "values":
+        "value_as_printed": "the liquidus line in the phase diagram of the CaO–MgO system in Fig. 1 was constructed\
+          \ based on the agreed data obtained in (Foex, 1968; Ronchi & Sheindlin, 2001; Manara et al., 2014)"
+        "attribution": "Shornikov, published pages 77–78. This is the stated source of the Fig. 1 liquidus."
+        "schema_gap": "The sentence names the parents of the liquidus and does not add a table cell. Those\
+          \ parents are not stored."
+    - "observation_id": "shornikov_2020_prose_kubaschewski_camgo2"
+      "type": "quoted_prose_schema_gap"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "published_page": 78
+        "note": "Prose under Fig. 1, published page 78."
+      "units": "as printed"
+      "values":
+        "value_as_printed": "Kubaschewski (1972) reported of CaMgO2 decomposing at 2573 K. The enthalpy of\
+          \ formation (ΔfH298) of this compound calculated by Kubashevsky was –3.77±0.62 kJ/mol."
+        "attribution": "Kubaschewski (1972), quoted by Shornikov. The paper spells Kubashevsky in that sentence."
+        "conditions_as_printed": "ΔfH298; decomposition of CaMgO2 at 2573 K"
+        "uncertainty_as_printed": "±0.62 kJ/mol on ΔfH298; 2573 K is printed without a ±"
+        "phase_as_printed": "CaMgO2"
+        "source_criticism": "No compounds or solid-solution regions were detected in the CaO–MgO system at\
+          \ 1173–1273 K (Fletcher et al., 1970; Terpstra et al., 1984), so Shornikov says the compound decomposes\
+          \ at a significantly lower temperature than Kubaschewski reports."
+        "schema_gap": "OBSERVATION_TYPES has no formation-enthalpy or entropy type, and AmountBasis has no\
+          \ mole-percent token. The printed sentence is context. It is not a scored observation."
+    - "observation_id": "shornikov_2020_prose_powell_searcy"
+      "type": "quoted_prose_schema_gap"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "published_page": 78
+        "note": "Prose under Fig. 1, published page 78."
+      "units": "as printed"
+      "values":
+        "value_as_printed": "dolomite decomposes into gaseous CO2 and glassy CaMgO2, for which ΔfH850 = 78.65\
+          \ kJ/mol and ΔfS850 =36.82 J/mol/K"
+        "attribution": "Powell & Searcy (1978), quoted by Shornikov."
+        "conditions_as_printed": "850 K; dolomite decomposition in vacuum at 770–900 K by the torsion method"
+        "uncertainty_as_printed": "the quotation prints neither a ± on 78.65 kJ/mol nor on 36.82 J/mol/K"
+        "phase_as_printed": "glassy CaMgO2 and gaseous CO2"
+        "source_criticism": "Shornikov says the glassy CaMgO2 claim rests on broad x-ray peaks that could\
+          \ be an oxide mixture, and that the torsion data disagree because condensation and self-cooling\
+          \ were not taken into account (Lvov & Ugolkov, 2003). That is his explanation of the difference\
+          \ from Kubaschewski (1972) and Barin (1995)."
+        "schema_gap": "OBSERVATION_TYPES has no formation-enthalpy or entropy type, and AmountBasis has no\
+          \ mole-percent token. The printed sentence is context. It is not a scored observation."
+    - "observation_id": "shornikov_2020_fig1_s2_03"
+      "type": "figure_boundary_schema_gap"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "not_a_liquidus_or_solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.90e3"
+        "T_K_read_2": "2902.1"
+        "cao_mol_pct_read": "20.0"
+        "cao_mol_pct_read_2": "20.0"
+        "embedded_px_read_1":
+        - 205.94
+        - 163.04
+        "embedded_px_read_2":
+        - 205.94
+        - 163.05
+        "page_600dpi_px_read_1":
+        - 925.5
+        - 2616.5
+        "page_600dpi_px_read_2":
+        - 925.5
+        - 2616.5
+        "read_uncertainty_K": "2.2"
+        "read_uncertainty_mol_pct": "0.03"
+        "read_1_method": "jpeg_hole_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2902.2"
+        "cao_mol_pct_read_1": "20.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+        "schema_gap": "The marker is inside a phase field or on an overlap whose centre is not the liquidus\
+          \ or the solidus line. It is not given either of those identities. identity.py requires composition\
+          \ only for solidus, liquidus, and glass. No other subtype keeps composition required, and a generic\
+          \ subtype would mark it not applicable. The point stays in context. The read width is the difference\
+          \ of two digitised centre reads, not a number the paper prints. observation.uncertainty and T_m_uncertainty_K\
+          \ both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.\
+          \ The marker is typed-refused so that width is not stored as a printed band."
+    - "observation_id": "shornikov_2020_fig1_s2_04"
+      "type": "figure_boundary_schema_gap"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "not_a_liquidus_or_solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.77e3"
+        "T_K_read_2": "2773.9"
+        "cao_mol_pct_read": "30.0"
+        "cao_mol_pct_read_2": "30.0"
+        "embedded_px_read_1":
+        - 261.5
+        - 221.11
+        "embedded_px_read_2":
+        - 261.56
+        - 221.18
+        "page_600dpi_px_read_1":
+        - 1092.3
+        - 2790.8
+        "page_600dpi_px_read_2":
+        - 1092.5
+        - 2791.0
+        "read_uncertainty_K": "4.2"
+        "read_uncertainty_mol_pct": "0.01"
+        "read_1_method": "jpeg_hole_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2774.2"
+        "cao_mol_pct_read_1": "30.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+        "schema_gap": "The marker is inside a phase field or on an overlap whose centre is not the liquidus\
+          \ or the solidus line. It is not given either of those identities. identity.py requires composition\
+          \ only for solidus, liquidus, and glass. No other subtype keeps composition required, and a generic\
+          \ subtype would mark it not applicable. The point stays in context. The read width is the difference\
+          \ of two digitised centre reads, not a number the paper prints. observation.uncertainty and T_m_uncertainty_K\
+          \ both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.\
+          \ The marker is typed-refused so that width is not stored as a printed band."
+    - "observation_id": "shornikov_2020_fig1_s2_05"
+      "type": "figure_boundary_schema_gap"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "not_a_liquidus_or_solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.71e3"
+        "T_K_read_2": "2708.2"
+        "cao_mol_pct_read": "35.0"
+        "cao_mol_pct_read_2": "35.0"
+        "embedded_px_read_1":
+        - 289.0
+        - 251.0
+        "embedded_px_read_2":
+        - 289.2
+        - 251.0
+        "page_600dpi_px_read_1":
+        - 1174.9
+        - 2880.5
+        "page_600dpi_px_read_2":
+        - 1175.5
+        - 2880.5
+        "read_uncertainty_K": "1.8"
+        "read_uncertainty_mol_pct": "0.03"
+        "read_1_method": "jpeg_hole_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2708.3"
+        "cao_mol_pct_read_1": "35.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+        "schema_gap": "The marker is inside a phase field or on an overlap whose centre is not the liquidus\
+          \ or the solidus line. It is not given either of those identities. identity.py requires composition\
+          \ only for solidus, liquidus, and glass. No other subtype keeps composition required, and a generic\
+          \ subtype would mark it not applicable. The point stays in context. The read width is the difference\
+          \ of two digitised centre reads, not a number the paper prints. observation.uncertainty and T_m_uncertainty_K\
+          \ both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.\
+          \ The marker is typed-refused so that width is not stored as a printed band."
+    - "observation_id": "shornikov_2020_fig1_s2_08"
+      "type": "figure_boundary_schema_gap"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "not_a_liquidus_or_solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.60e3"
+        "T_K_read_2": "2600.2"
+        "cao_mol_pct_read": "45.5"
+        "cao_mol_pct_read_2": "45.5"
+        "embedded_px_read_1":
+        - 347.56
+        - 300.03
+        "embedded_px_read_2":
+        - 347.81
+        - 299.97
+        "page_600dpi_px_read_1":
+        - 1350.7
+        - 3027.7
+        "page_600dpi_px_read_2":
+        - 1351.5
+        - 3027.5
+        "read_uncertainty_K": "0.4"
+        "read_uncertainty_mol_pct": "0.03"
+        "read_1_method": "jpeg_hole_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2600.2"
+        "cao_mol_pct_read_1": "45.5"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+        "schema_gap": "The marker is inside a phase field or on an overlap whose centre is not the liquidus\
+          \ or the solidus line. It is not given either of those identities. identity.py requires composition\
+          \ only for solidus, liquidus, and glass. No other subtype keeps composition required, and a generic\
+          \ subtype would mark it not applicable. The point stays in context. The read width is the difference\
+          \ of two digitised centre reads, not a number the paper prints. observation.uncertainty and T_m_uncertainty_K\
+          \ both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.\
+          \ The marker is typed-refused so that width is not stored as a printed band."
+    - "observation_id": "shornikov_2020_fig1_s2_09"
+      "type": "figure_boundary_schema_gap"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "not_a_liquidus_or_solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.68e3"
+        "T_K_read_2": "2683.6"
+        "cao_mol_pct_read": "50.1"
+        "cao_mol_pct_read_2": "50.0"
+        "embedded_px_read_1":
+        - 373.0
+        - 263.0
+        "embedded_px_read_2":
+        - 372.62
+        - 262.16
+        "page_600dpi_px_read_1":
+        - 1427.1
+        - 2916.5
+        "page_600dpi_px_read_2":
+        - 1426.0
+        - 2914.0
+        "read_uncertainty_K": "3.6"
+        "read_uncertainty_mol_pct": "0.10"
+        "read_1_method": "jpeg_ring_centre"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2681.8"
+        "cao_mol_pct_read_1": "50.1"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+        "schema_gap": "The marker is inside a phase field or on an overlap whose centre is not the liquidus\
+          \ or the solidus line. It is not given either of those identities. identity.py requires composition\
+          \ only for solidus, liquidus, and glass. No other subtype keeps composition required, and a generic\
+          \ subtype would mark it not applicable. The point stays in context. The read width is the difference\
+          \ of two digitised centre reads, not a number the paper prints. observation.uncertainty and T_m_uncertainty_K\
+          \ both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.\
+          \ The marker is typed-refused so that width is not stored as a printed band."
+    - "observation_id": "shornikov_2020_fig1_s2_11"
+      "type": "figure_boundary_schema_gap"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "not_a_liquidus_or_solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.80e3"
+        "T_K_read_2": "2802.9"
+        "cao_mol_pct_read": "70.0"
+        "cao_mol_pct_read_2": "70.0"
+        "embedded_px_read_1":
+        - 483.59
+        - 208.08
+        "embedded_px_read_2":
+        - 483.85
+        - 208.02
+        "page_600dpi_px_read_1":
+        - 1759.2
+        - 2751.7
+        "page_600dpi_px_read_2":
+        - 1760.0
+        - 2751.5
+        "read_uncertainty_K": "2.9"
+        "read_uncertainty_mol_pct": "0.02"
+        "read_1_method": "jpeg_hole_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2802.9"
+        "cao_mol_pct_read_1": "70.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+        "schema_gap": "The marker is inside a phase field or on an overlap whose centre is not the liquidus\
+          \ or the solidus line. It is not given either of those identities. identity.py requires composition\
+          \ only for solidus, liquidus, and glass. No other subtype keeps composition required, and a generic\
+          \ subtype would mark it not applicable. The point stays in context. The read width is the difference\
+          \ of two digitised centre reads, not a number the paper prints. observation.uncertainty and T_m_uncertainty_K\
+          \ both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.\
+          \ The marker is typed-refused so that width is not stored as a printed band."
+    - "observation_id": "shornikov_2020_fig1_s2_12"
+      "type": "figure_boundary_schema_gap"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "not_a_liquidus_or_solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.82e3"
+        "T_K_read_2": "2823.9"
+        "cao_mol_pct_read": "80.0"
+        "cao_mol_pct_read_2": "80.0"
+        "embedded_px_read_1":
+        - 539.11
+        - 198.5
+        "embedded_px_read_2":
+        - 539.3
+        - 198.53
+        "page_600dpi_px_read_1":
+        - 1925.9
+        - 2722.9
+        "page_600dpi_px_read_2":
+        - 1926.5
+        - 2723.0
+        "read_uncertainty_K": "4.0"
+        "read_uncertainty_mol_pct": "0.03"
+        "read_1_method": "jpeg_hole_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2824.0"
+        "cao_mol_pct_read_1": "80.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+        "schema_gap": "The marker is inside a phase field or on an overlap whose centre is not the liquidus\
+          \ or the solidus line. It is not given either of those identities. identity.py requires composition\
+          \ only for solidus, liquidus, and glass. No other subtype keeps composition required, and a generic\
+          \ subtype would mark it not applicable. The point stays in context. The read width is the difference\
+          \ of two digitised centre reads, not a number the paper prints. observation.uncertainty and T_m_uncertainty_K\
+          \ both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.\
+          \ The marker is typed-refused so that width is not stored as a printed band."
+    - "observation_id": "shornikov_2020_fig1_s2_13"
+      "type": "figure_boundary_schema_gap"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "not_a_liquidus_or_solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.84e3"
+        "T_K_read_2": "2836.7"
+        "cao_mol_pct_read": "90.0"
+        "cao_mol_pct_read_2": "90.0"
+        "embedded_px_read_1":
+        - 594.75
+        - 192.62
+        "embedded_px_read_2":
+        - 595.08
+        - 192.7
+        "page_600dpi_px_read_1":
+        - 2093.0
+        - 2705.3
+        "page_600dpi_px_read_2":
+        - 2094.0
+        - 2705.5
+        "read_uncertainty_K": "3.3"
+        "read_uncertainty_mol_pct": "0.03"
+        "read_1_method": "jpeg_hole_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2837.0"
+        "cao_mol_pct_read_1": "90.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+        "schema_gap": "The marker is inside a phase field or on an overlap whose centre is not the liquidus\
+          \ or the solidus line. It is not given either of those identities. identity.py requires composition\
+          \ only for solidus, liquidus, and glass. No other subtype keeps composition required, and a generic\
+          \ subtype would mark it not applicable. The point stays in context. The read width is the difference\
+          \ of two digitised centre reads, not a number the paper prints. observation.uncertainty and T_m_uncertainty_K\
+          \ both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.\
+          \ The marker is typed-refused so that width is not stored as a printed band."
+    - "observation_id": "shornikov_2020_fig1_s2_14"
+      "type": "figure_boundary_schema_gap"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 2 red open circle"
+        "note": "Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "not_a_liquidus_or_solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.84e3"
+        "T_K_read_2": "2843.0"
+        "cao_mol_pct_read": "1.00e2"
+        "cao_mol_pct_read_2": "100.0"
+        "embedded_px_read_1":
+        - 650.23
+        - 189.87
+        "embedded_px_read_2":
+        - 650.52
+        - 189.86
+        "page_600dpi_px_read_1":
+        - 2259.6
+        - 2697.0
+        "page_600dpi_px_read_2":
+        - 2260.5
+        - 2697.0
+        "read_uncertainty_K": "3.1"
+        "read_uncertainty_mol_pct": "0.04"
+        "read_1_method": "jpeg_hole_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2843.1"
+        "cao_mol_pct_read_1": "100.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+        "schema_gap": "The marker is inside a phase field or on an overlap whose centre is not the liquidus\
+          \ or the solidus line. It is not given either of those identities. identity.py requires composition\
+          \ only for solidus, liquidus, and glass. No other subtype keeps composition required, and a generic\
+          \ subtype would mark it not applicable. The point stays in context. The read width is the difference\
+          \ of two digitised centre reads, not a number the paper prints. observation.uncertainty and T_m_uncertainty_K\
+          \ both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.\
+          \ The marker is typed-refused so that width is not stored as a printed band."
+    - "observation_id": "shornikov_2020_fig1_s3_04"
+      "type": "figure_boundary_schema_gap"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "not_a_liquidus_or_solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.60e3"
+        "T_K_read_2": "2604.2"
+        "cao_mol_pct_read": "6.45"
+        "cao_mol_pct_read_2": "6.4"
+        "embedded_px_read_1":
+        - 130.82
+        - 298.34
+        "embedded_px_read_2":
+        - 130.68
+        - 298.13
+        "page_600dpi_px_read_1":
+        - 699.9
+        - 3022.6
+        "page_600dpi_px_read_2":
+        - 699.5
+        - 3022.0
+        "read_uncertainty_K": "4.2"
+        "read_uncertainty_mol_pct": "0.05"
+        "read_1_method": "jpeg_interior_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2603.9"
+        "cao_mol_pct_read_1": "6.5"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+        "schema_gap": "The marker sits on a solid-solution boundary (regions I/II, I/III, or IV). The caption's\
+          \ regions I and II contain no liquid. It is not a liquidus or a solidus. identity.py requires composition\
+          \ only for solidus, liquidus, and glass. No other subtype keeps composition required, and a generic\
+          \ subtype would mark it not applicable. The point stays in context. The read width is the difference\
+          \ of two digitised centre reads, not a number the paper prints. observation.uncertainty and T_m_uncertainty_K\
+          \ both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.\
+          \ The marker is typed-refused so that width is not stored as a printed band."
+    - "observation_id": "shornikov_2020_fig1_s3_08"
+      "type": "figure_boundary_schema_gap"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "not_a_liquidus_or_solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.74e3"
+        "T_K_read_2": "2742.7"
+        "cao_mol_pct_read": "74.3"
+        "cao_mol_pct_read_2": "74.2"
+        "embedded_px_read_1":
+        - 507.32
+        - 235.22
+        "embedded_px_read_2":
+        - 507.16
+        - 235.34
+        "page_600dpi_px_read_1":
+        - 1830.5
+        - 2833.1
+        "page_600dpi_px_read_2":
+        - 1830.0
+        - 2833.5
+        "read_uncertainty_K": "3.1"
+        "read_uncertainty_mol_pct": "0.10"
+        "read_1_method": "jpeg_interior_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2743.1"
+        "cao_mol_pct_read_1": "74.3"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+        "schema_gap": "The marker is inside a phase field or on an overlap whose centre is not the liquidus\
+          \ or the solidus line. It is not given either of those identities. identity.py requires composition\
+          \ only for solidus, liquidus, and glass. No other subtype keeps composition required, and a generic\
+          \ subtype would mark it not applicable. The point stays in context. The read width is the difference\
+          \ of two digitised centre reads, not a number the paper prints. observation.uncertainty and T_m_uncertainty_K\
+          \ both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.\
+          \ The marker is typed-refused so that width is not stored as a printed band."
+    - "observation_id": "shornikov_2020_fig1_s3_09"
+      "type": "figure_boundary_schema_gap"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "not_a_liquidus_or_solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.61e3"
+        "T_K_read_2": "2609.0"
+        "cao_mol_pct_read": "80.7"
+        "cao_mol_pct_read_2": "80.7"
+        "embedded_px_read_1":
+        - 543.09
+        - 295.81
+        "embedded_px_read_2":
+        - 543.29
+        - 295.97
+        "page_600dpi_px_read_1":
+        - 1937.9
+        - 3015.0
+        "page_600dpi_px_read_2":
+        - 1938.5
+        - 3015.5
+        "read_uncertainty_K": "1.0"
+        "read_uncertainty_mol_pct": "0.03"
+        "read_1_method": "jpeg_interior_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2609.5"
+        "cao_mol_pct_read_1": "80.7"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+        "schema_gap": "The marker sits on a solid-solution boundary (regions I/II, I/III, or IV). The caption's\
+          \ regions I and II contain no liquid. It is not a liquidus or a solidus. identity.py requires composition\
+          \ only for solidus, liquidus, and glass. No other subtype keeps composition required, and a generic\
+          \ subtype would mark it not applicable. The point stays in context. The read width is the difference\
+          \ of two digitised centre reads, not a number the paper prints. observation.uncertainty and T_m_uncertainty_K\
+          \ both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.\
+          \ The marker is typed-refused so that width is not stored as a printed band."
+    - "observation_id": "shornikov_2020_fig1_s3_11"
+      "type": "figure_boundary_schema_gap"
+      "locator":
+        "page": 2
+        "pdf_page_index": 1
+        "figure": "1"
+        "published_page": 78
+        "marker": "symbol 3 blue filled circle"
+        "note": "Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol 3 is 1965; the reference list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid). The two rasters are separate measurements."
+      "units": "K"
+      "values":
+        "quantity": "transition_temperature"
+        "method_class": "figure_only"
+        "property_kind": "not_a_liquidus_or_solidus"
+        "status": "typed_refusal"
+        "reason": "The read width is the difference of two digitised centre reads, not a number the paper\
+          \ prints. observation.uncertainty and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED,\
+          \ and no extract field stores UncertaintyKind.DERIVED. The marker is typed-refused so that width\
+          \ is not stored as a printed band."
+        "T_K": "2.90e3"
+        "T_K_read_2": "2898.1"
+        "cao_mol_pct_read": "1.00e2"
+        "cao_mol_pct_read_2": "100.0"
+        "embedded_px_read_1":
+        - 650.21
+        - 164.91
+        "embedded_px_read_2":
+        - 650.52
+        - 164.88
+        "page_600dpi_px_read_1":
+        - 2259.6
+        - 2622.1
+        "page_600dpi_px_read_2":
+        - 2260.5
+        - 2622.0
+        "read_uncertainty_K": "1.9"
+        "read_uncertainty_mol_pct": "0.03"
+        "read_1_method": "jpeg_interior_centroid"
+        "read_2_method": "visual_page_grid"
+        "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
+          \ Afanasjev & Saldau, 1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the\
+          \ marker is figure_only."
+        "T_K_read_1": "2898.1"
+        "cao_mol_pct_read_1": "100.0"
+        "read_2_evidence": "Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre,\
+          \ with a 10 px grid. The centre was estimated on that crop, not by a second segmentation."
+        "schema_gap": "The marker is inside a phase field or on an overlap whose centre is not the liquidus\
+          \ or the solidus line. It is not given either of those identities. identity.py requires composition\
+          \ only for solidus, liquidus, and glass. No other subtype keeps composition required, and a generic\
+          \ subtype would mark it not applicable. The point stays in context. The read width is the difference\
+          \ of two digitised centre reads, not a number the paper prints. observation.uncertainty and T_m_uncertainty_K\
+          \ both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.\
+          \ The marker is typed-refused so that width is not stored as a printed band."
+"fidelity_samples":
+- "path": "species.CaO.observations[shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c02].values.value"
+  "value": "-284.532"
+  "locator":
+    "page": 3
+    "pdf_page_index": 2
+    "table": "2"
+    "note": "Solid CaO. The pinned spelling is the MinerU cell, ASCII hyphen U+002D. PDF page 3, published\
+      \ page 79."
+- "path": "species.CaO.observations[shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c04].values.value"
+  "value": "-279.824"
+  "locator":
+    "page": 3
+    "pdf_page_index": 2
+    "table": "2"
+    "note": "Liquid CaO. MinerU ASCII hyphen. PDF page 3, published page 79."
+- "path": "species.O2.observations[shornikov_2020_cao_mgo_thermodynamics_p003_t02_r10_c06].values.value"
+  "value": "0.000"
+  "locator":
+    "page": 3
+    "pdf_page_index": 2
+    "table": "2"
+    "note": "Gas O2. Printed zero, stored. PDF page 3, published page 79."
