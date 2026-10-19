@@ -2133,6 +2133,7 @@ def test_cached_real_misconfig_over_socket_is_input_not_backend_unavailable(
     with app.app_context():
         result = web_events._registered_start_handler(
             {
+                "payload_version": 4,
                 "backend": "cached-real",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
@@ -2181,6 +2182,7 @@ def test_missing_stage0_reductant_is_input_error_not_backend_unavailable(
     with app.app_context():
         result = web_events._registered_start_handler(
             {
+                "payload_version": 4,
                 "backend": "internal-analytical",
                 "feedstock": "mars_basalt",
                 "mass_kg": 1000,
@@ -2232,6 +2234,7 @@ def test_unknown_feedstock_is_typed_unknown_feedstock_not_backend_unavailable(
     with app.app_context():
         result = web_events._registered_start_handler(
             {
+                "payload_version": 4,
                 "backend": "internal-analytical",
                 "feedstock": "__no_such_feedstock_for_typing_test__",
                 "mass_kg": 1000,
@@ -2279,6 +2282,7 @@ def test_socket_start_rejection_echoes_status_strip_lifecycle_generation(
     with app.app_context():
         result = web_events._registered_start_handler(
             {
+                "payload_version": 4,
                 "backend": "internal-analytical",
                 "feedstock": "lunar_mare_low_ti",
                 "mass_kg": 1000,
