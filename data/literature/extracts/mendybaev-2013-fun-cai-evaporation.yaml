@@ -13,7 +13,7 @@ extraction:
   worker: fam10-1019
 review_status: draft
 fidelity_samples:
-- path: species.SiO2.observations[mendybaev_2013_table1_residue_composition_series].values.series[0].MgO_wt_pct
+- path: species.SiO2.observations[mendybaev_2013_table1_fun1_residue_composition_series].values.series[0].MgO_wt_pct
   value: '50.01'
   locator:
     page: 5
@@ -115,7 +115,7 @@ experiments:
 species:
   SiO2:
     observations:
-    - observation_id: mendybaev_2013_table1_residue_composition_series
+    - observation_id: mendybaev_2013_table1_fun1_residue_composition_series
       experiment: mendybaev-fun1-vacuum-evaporation
       type: composition_series
       locator:
@@ -413,6 +413,33 @@ species:
             Al2O3: '0.17'
             SiO2: '0.11'
             CaO: '0.16'
+    - observation_id: mendybaev_2013_table1_fun2_residue_composition_series
+      experiment: mendybaev-fun2-vacuum-evaporation
+      type: composition_series
+      locator:
+        page: 5
+        published_page: 372
+        pdf_page_index: 4
+        table: '1'
+      units: wt%
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: bound
+              bound_operator: <
+              bound_value: '0.0001'
+          locator:
+            page: 4
+            published_page: 371
+            pdf_page_index: 3
+            section: Experimental
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        note: Printed FUN2 evaporation-residue composition (post-quench); FUN2-6 through FUN2-10 use spot analyses.
+        series:
         - run_id: FUN2-4
           sample: FUN2-4
           T_C: '1900'
@@ -603,6 +630,7 @@ species:
             Al2O3: '0.07'
             SiO2: '0.04'
             CaO: '0.10'
+
     context:
     - observation_id: mendybaev_2013_table2_isotope_fractions_and_compositions
       type: printed_data_context
@@ -896,7 +924,8 @@ species:
           T_as_printed: 1900 °C for evaporation experiments; starting-material panels as captioned
           sample: whole-rock and mineral samples
         axes_as_printed: as printed in caption and panel labels
-        caption_as_printed: ''
+        caption_as_printed: >-
+          Fig. 1. Oxygen isotopic compositions of whole-rock and individual minerals from FUN inclusions: (a) Vigarano 1623-5 (Davis et al., 2000) and (b) Allende C1 (Clayton et al., 1977; Krot et al., 2008). Various lines are shown: TFL is the terrestrial fractionation line with slope approximately one half defined by the mass-dependent oxygen isotopic fractionation of terrestrial samples; the CAI line with a slope of approximately one as defined by the oxygen isotopic composition of whole-rock CAIs and their mineral separates (e.g., Clayton et al., 1977). FUN FL is the mass-dependent fractionation line with slope 1/2 defined by forsterite, spinel and pyroxene in 1623-5, and by spinel and pyroxene in C1. The FUN FL line for both 1623-5 and C1 intersects the CAI line at point A with d17O = −49‰ and d18O = −49‰ (Δ17O ~ −24‰), but position of FUN FL could vary for individual inclusions (e.g., Δ17O ~ −16‰ for TE FUN CAI, Krot et al., 2008, 2010). Melilite in both 1623-5 and C1 (and anorthite in C1) plot close to the intersection of CAI line and TFL (point B). The intersection of the dashed line drawn from the melilite values (point B) through the whole-rock values of the FUN inclusion with the FUN FL line (point C) gives our estimate of the average oxygen isotopic composition of the FUN inclusion prior to the oxygen exchange that affected the isotopic composition of melilite and anorthite. The difference between points A and C is our best estimate of the degree of mass-dependent oxygen isotope fractionation due to evaporation (change in d18O of ~35‰) for both C1 and 1623-5.
         panel_series_marker_counts:
         - series: whole-rock and mineral samples
           marker_count: not enumerated; numeric points deferred
@@ -998,7 +1027,8 @@ species:
           T_as_printed: 1900 °C for evaporation experiments; starting-material panels as captioned
           sample: FUN1 evaporation residues
         axes_as_printed: as printed in caption and panel labels
-        caption_as_printed: ''
+        caption_as_printed: >-
+          Fig. 3. Backscattered electron images of typical evaporation residues run at 1900 °C in vacuum. FUN1-15 was evaporated for 5 min and FUN1-18 for 40 min before quenching. Forsterite appears dark and glass appears light.
         panel_series_marker_counts:
         - series: FUN1 evaporation residues
           marker_count: not enumerated; numeric points deferred
@@ -1180,7 +1210,8 @@ species:
           T_as_printed: 1900 °C for evaporation experiments; starting-material panels as captioned
           sample: FUN1/FUN2 evaporation samples
         axes_as_printed: as printed in caption and panel labels
-        caption_as_printed: Fig. 7. Rayleigh plot of the magnesium isotopic fractionation of the
+        caption_as_printed: >-
+          Fig. 7. Rayleigh plot of the magnesium isotopic fractionation of the FUN1 and FUN2 evaporation residues as a function of the amount of 24Mg remaining in the residue. R = 25Mg/24Mg of a residue, R0 = 25Mg/24Mg of the zero-time residue, and f24Mg is the fraction of the initial 24Mg remaining in the residue. The slope of the best fitting line through the data of a set of evaporation residues from a common initial composition is a measure of 1 − a25,24, where a25,24 is the kinetic isotope fractionation factor defined as the isotopic ratio of the evaporation flux to that of the evaporating source. The FUN1 and FUN2 residues containing more than 15 wt% MgO (solid line) result in an estimate of a25,24 = 0.98380 ± 0.00039; the most evaporated FUN2 residues (<15 wt% MgO, dashed line) result in an estimate of a25,24 = 0.98567 ± 0.00046, close to a25,24 = 0.98607 ± 0.00017 of residues from a Type B CAI-like melt evaporated at 1900 °C (Richter et al., 2007). Also shown for comparison are experimental data on molten Mg2SiO4 at 1900 °C reported by Davis et al. (1990).
         panel_series_marker_counts:
         - series: FUN1/FUN2 evaporation samples
           marker_count: not enumerated; numeric points deferred
@@ -1239,7 +1270,8 @@ species:
           T_as_printed: 1900 °C for evaporation experiments; starting-material panels as captioned
           sample: FUN1/FUN2 experiments
         axes_as_printed: as printed in caption and panel labels
-        caption_as_printed: ''
+        caption_as_printed: >-
+          Fig. 10. Relationship between d29Si and d25Mg (panel a), and between d18O and d25Mg (panel b) for all the FUN1 and FUN2 forsterite-rich residues with MgO >15 wt%. The solid lines are best fits to the d29Si versus d25Mg data (slope = 0.50 ± 0.01) and for the d18O versus d25Mg data (slope = 1.14 ± 0.05). The dashed line in panel b is an extrapolation of the d18O–d25Mg correlation line. Also shown in panel a are the isotopic compositions of FUN inclusions for which d25Mg and d29Si values have been reported (Clayton et al., 1988; Davis et al., 1991). The d18O values used for the FUN inclusion in panel b are our estimates of the oxygen isotopic fractionation caused by evaporation (see Section 2.3 and Fig. 1 for details regarding these estimates). Data for KT-1 are from Thrane et al. (2008).
         panel_series_marker_counts:
         - series: FUN1/FUN2 experiments
           marker_count: not enumerated; numeric points deferred
@@ -1261,7 +1293,8 @@ species:
           T_as_printed: 1900 °C for evaporation experiments; starting-material panels as captioned
           sample: FUN1/FUN2 experiments
         axes_as_printed: as printed in caption and panel labels
-        caption_as_printed: ''
+        caption_as_printed: >-
+          Fig. 11. Correlations between the isotopic composition of magnesium, silicon and oxygen with: (a) the fraction of magnesium remaining in the evaporation residue, expressed as −ln(f24Mg); and (b) the fraction of silicon remaining in the evaporation residue, expressed as −ln(f28Si). The data used in these figures are from all the FUN1 residues and from FUN2 residues with MgO >15 wt%. The solid lines are the best fit to the d25Mg (open circles), d29Si (open squares), and d18O (open diamonds) as a function of −ln(f24Mg) or −ln(f28Si). The dashed lines show the amount of magnesium evaporated from Vigarano 1623-5 and Allende C1 FUN CAIs as estimated from their d25Mg, d29Si and d18O. In the case of C1, all three isotopic systems give a very similar estimate of original magnesium (~18%, from panel a) and silicon (~25%, from panel b) remaining. In the case of 1623-5, the oxygen and magnesium isotopes give a similar estimate of ~18% for the magnesium remaining, while the silicon isotopic composition suggests that a larger fraction of magnesium (~29%) did not evaporate (panel a). As for amounts of silicon remaining in 1623-5 (panel b), the magnesium and oxygen isotopic composition suggests that ~18% of original silicon remains, but the silicon isotopic composition indicates that as much as 37% of silicon still remains.
         panel_series_marker_counts:
         - series: FUN1/FUN2 experiments
           marker_count: not enumerated; numeric points deferred
@@ -1283,30 +1316,8 @@ species:
           T_as_printed: 1900 °C for evaporation experiments; starting-material panels as captioned
           sample: FUN1/FUN2 evaporation samples
         axes_as_printed: as printed in caption and panel labels
-        caption_as_printed: "Fig. 12. The composition of the FUN1 and FUN2 evaporation panel b) remaining. In the\
-          \ case of 1623-5, the oxygen and                                                                     \
-          \     residues are shown in SiO2–MgO space. The ﬁlled stars shows the magnesium isotopes give a similar\
-          \ estimate of \x0218% for the                                                                        \
-          \  composition of Vigarano 1623-5 as estimated by modal recombi- magnesium remaining, while the silicon\
-          \ isotopic composition                                                                          nation\
-          \ (Davis et al., 1991) and Allende C1 as measured by INAA suggests that a larger fraction of magnesium\
-          \ (\x0229%) did not                                                                          on a \x02\
-          12 mg fragment (Conard, 1976). Also shown are the evaporate (panel a). As for amounts of silicon remaining\
-          \ in 1623-5                                                                          composition of the\
-          \ precursor to 1623-5 and C1 calculated by (panel b), the magnesium and oxygen isotopic composition of\
-          \ 1623-                                                                          adding MgO and SiO2 to\
-          \ the reported bulk composition in an 5 suggests that \x0218% of original silicon remains, but the silicon\
-          \                                                                          amount corresponding to how\
-          \ much silicon and magnesium must isotopic composition indicates that as much as 37% of silicon still\
-          \                                                                          have evaporated given by isotopic\
-          \ fractionation. If C1 had a remains.                                                                \
-          \          slightly diﬀerent bulk composition (large square) than the mea-                           \
-          \                                               sured one, then its precursor, as calculated from the\
-          \ silicon and was evaporated. We have no speciﬁc explanation for why                   magnesium isotopic\
-          \ fractionation, would have had a composition the isotopic fractionations in 1623-5 are not consistent\
-          \ with            close to that of a condensate from a solar composition gas (large the expectation derived\
-          \ from the laboratory experiments or               diamond). \f382                         R.A. Mendybaev\
-          \ et al. / Geochimica et Cosmochimica Acta 123 (2013) 368–384"
+        caption_as_printed: >-
+          Fig. 12. The composition of the FUN1 and FUN2 evaporation residues are shown in SiO2–MgO space. The filled stars shows the composition of Vigarano 1623-5 as estimated by modal recombination (Davis et al., 1991) and Allende C1 as measured by INAA on a ~12 mg fragment (Conard, 1976). Also shown are the composition of the precursor to 1623-5 and C1 calculated by adding MgO and SiO2 to the reported bulk composition in an amount corresponding to how much silicon and magnesium must have evaporated given by isotopic fractionation. If C1 had a slightly different bulk composition (large square) than the measured one, then its precursor, as calculated from the silicon and magnesium isotopic fractionation, would have had a composition close to that of a condensate from a solar composition gas (large diamond).
         panel_series_marker_counts:
         - series: FUN1/FUN2 evaporation samples
           marker_count: not enumerated; numeric points deferred
@@ -1327,23 +1338,8 @@ species:
           phase: olivine and glass
           T_as_printed: 1900 °C for experiments; cited molten Mg2SiO4 comparisons as captioned
         axes_as_printed: 29Si/28Si Rayleigh plot against fraction of silicon remaining
-        caption_as_printed: "Fig. 8. Same as Fig. 7 but for 29Si/28Si. The silicon isotopic FUN1 and FUN2 evaporation\
-          \ residues as a function of the amount             composition of all FUN1 and FUN2 residues plot along\
-          \ a single of 24Mg remaining in the residue. R = 25Mg/24Mg of a residue,              line ﬁt by a29,28\
-          \ = 0.9899 ± 0.0004, which is the same as R0 = 25Mg/24Mg of the zero-time residue, and f24 Mg is the fraction\
-          \ of     0.9899 ± 0.0004 obtained for residues of a Type B CAI-like melt the initial 24Mg remaining in\
-          \ the residue. The slope of the best ﬁtting    by Knight et al. (2009). The data for molten Mg2SiO4 evaporated\
-          \ line through the data of a set of evaporation residues from a common       at 1900 °C plot along a line\
-          \ with slope a29,28 = 0.9925 ± 0.0001 initial composition is a measure of 1 \x03 a25,24, where a25,24\
-          \ is the        (Davis et al., 1990). The reason why molten Mg2SiO4 is charac- kinetic isotope fractionation\
-          \ factor deﬁned as the isotopic ratio of the   terized by diﬀerent silicon fractionation factor than other\
-          \ compo- evaporation ﬂux to that of the evaporating source. The FUN1 and            sitions studied remains\
-          \ unclear. FUN2 residues containing more than 15 wt% MgO (solid line) result in an estimate of a25,24\
-          \ = 0.98380 ± 0.00039; the most evaporated FUN2 residues (<15 wt% MgO, dashed line) result in an estimate\
-          \ of a25,24 = 0.98567 ± 0.00046,          which       is       close       to a25,24 = 0.98607 ± 0.00017\
-          \ of residues form Type B CAI-like melt (labeled as CAIB) evaporated at 1900 °C (Richter et al., 2007).\
-          \ Also shown for comparison are experimental data on molten Mg2SiO4 at 1900 °C reported by Davis et al.\
-          \ (1990)."
+        caption_as_printed: >-
+          Fig. 8. Same as Fig. 7 but for 29Si/28Si. The silicon isotopic composition of all FUN1 and FUN2 residues plots along a single line fit by a29,28 = 0.9899 ± 0.0004, which is the same as 0.9899 ± 0.0004 obtained for residues of a Type B CAI-like melt by Knight et al. (2009). The data for molten Mg2SiO4 evaporated at 1900 °C plot along a line with slope a29,28 = 0.9925 ± 0.0001 (Davis et al., 1990). The reason why molten Mg2SiO4 is characterized by a different silicon fractionation factor than other compositions studied remains unclear.
         panel_series_marker_counts:
         - series: FUN1 and FUN2 evaporation residues; cited molten Mg2SiO4 comparison
           marker_count: not enumerated; numeric points deferred

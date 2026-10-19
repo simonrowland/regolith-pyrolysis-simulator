@@ -25,8 +25,11 @@ def test_table_1_fun1_3_residue_composition_and_conditions_migrate() -> None:
     ]
     assert len(row) == 4
     assert all(o.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION for o in row)
-    assert {o.value.point for o in row} == {
-        Decimal("50.01"), Decimal("4.04"), Decimal("42.99"), Decimal("2.96")
+    assert {o.identity.species.formula: o.value.point for o in row} == {
+        "MgO": Decimal("50.01"),
+        "Al2O3": Decimal("4.04"),
+        "SiO2": Decimal("42.99"),
+        "CaO": Decimal("2.96"),
     }
     assert all(o.identity.temperature_K.value == Decimal("2173.15") for o in row)
     assert all(
@@ -38,6 +41,29 @@ def test_table_1_fun1_3_residue_composition_and_conditions_migrate() -> None:
     assert not migrator.result.validation.hard_issues
 
 
+def test_table_1_fun2_residues_migrate_to_the_fun2_experiment() -> None:
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+
+    observations = tuple(migrator.result.observations.values())
+    fun1 = [o for o in observations if o.locator.note and o.locator.note.startswith("row=FUN1-")]
+    fun2 = [o for o in observations if o.locator.note and o.locator.note.startswith("row=FUN2-")]
+    assert len(fun1) == 56
+    assert len(fun2) == 40
+    assert all(o.experiment_id.endswith("mendybaev-fun1-vacuum-evaporation") for o in fun1)
+    assert all(o.experiment_id.endswith("mendybaev-fun2-vacuum-evaporation") for o in fun2)
+    fun2_10_mgo = [
+        o for o in fun2
+        if o.locator.note == "row=FUN2-10"
+        and o.identity.species.formula == "MgO"
+    ]
+    assert len(fun2_10_mgo) == 1
+    assert fun2_10_mgo[0].value.point == Decimal("1.55")
+    assert sum(o.experiment_id == fun2_10_mgo[0].experiment_id for o in observations) == 40
+    assert not migrator.result.validation.hard_issues
+
+
 def test_all_deferred_figure_records_have_separate_captions() -> None:
     extract = yaml.safe_load(EXTRACT.read_text())
     figures = [
@@ -46,5 +72,12 @@ def test_all_deferred_figure_records_have_separate_captions() -> None:
     ]
     assert len(figures) == 12
     figure7 = next(row for row in figures if row["locator"]["figure"] == "7")
+    figure8 = next(row for row in figures if row["locator"]["figure"] == "8")
     assert "Fig. 8." not in figure7["values"]["caption_as_printed"]
+    assert "as a function of the amount of 24Mg remaining" in figure7["values"]["caption_as_printed"]
+    assert "Fig. 7." not in figure8["values"]["caption_as_printed"]
+    assert "Same as Fig. 7 but for 29Si/28Si" in figure8["values"]["caption_as_printed"]
+    for number in (1, 3, 10, 11, 12):
+        figure = next(row for row in figures if row["locator"]["figure"] == str(number))
+        assert figure["values"]["caption_as_printed"].startswith(f"Fig. {number}.")
     assert all(row["values"]["digitisation"] == "deferred to a figure pass" for row in figures)
