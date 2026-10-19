@@ -11,6 +11,7 @@ real MAGEMin binary runs end to end when one is built locally.
 
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 import sys
@@ -57,6 +58,15 @@ from simulator.melt_backend.magemin import (
 # not assert a latency. Any test that means to claim "within N seconds" should
 # use its own explicit figure and say so, rather than borrowing this one.
 _RENDEZVOUS_TIMEOUT_S = 30.0
+
+
+def _bootstrap_sleeping_magemin_worker():
+    return None, 'sleeping-worker-ready'
+
+
+def _handle_sleeping_magemin_request(_resource, _request, _errlog):
+    while True:
+        time.sleep(0.05)
 
 
 class _RegisteredMageminPool:
@@ -333,6 +343,64 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted():
         if waiter.is_alive():
             pending.set_result({'phases': {'liq': {'mass_kg': 1.0}}})
             waiter.join(timeout=1.0)
+
+
+def test_magemin_timeout_kills_and_reaps_a_hung_worker():
+    pool = engine_pool.EngineWorkerPool(
+        lambda index: engine_pool.WarmEngineWorker(
+            name=f'fake MAGEMin slot {index}',
+            bootstrap=_bootstrap_sleeping_magemin_worker,
+            handler=_handle_sleeping_magemin_request,
+            startup_timeout_s=2.0,
+            call_timeout_s=30.0,
+        ),
+        size=1,
+    )
+    worker = pool.workers[0]
+    original_call = worker.call
+
+    def call_with_long_worker_wall(request, *, timeout_s=None):
+        return original_call(request, timeout_s=30.0)
+
+    worker.call = call_with_long_worker_wall
+    backend = _make_pooled_subprocess_backend(None)
+    backend._subprocess_pool = pool
+    backend._config = {
+        'warm_call_timeout_s': 0.05,
+        'worker_startup_timeout_s': 2.0,
+    }
+    projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
+    worker_pid = worker.process.pid
+    outcomes = []
+
+    def call():
+        try:
+            backend._call_magemin(
+                projection,
+                temperature_C=1200.0,
+                pressure_bar=1.0,
+                fO2_log=-8.0,
+            )
+        except BaseException as exc:  # returned to the asserting thread
+            outcomes.append(exc)
+
+    started_at = time.monotonic()
+    waiter = threading.Thread(target=call, daemon=True)
+    waiter.start()
+    try:
+        waiter.join(timeout=3.0)
+        assert not waiter.is_alive(), 'MAGEMin did not bound its pool future'
+        assert len(outcomes) == 1
+        assert isinstance(outcomes[0], EngineWorkerTimeout)
+        assert outcomes[0].phase == 'job'
+        assert outcomes[0].timeout_s == pytest.approx(2.05)
+        assert time.monotonic() - started_at < 2.5
+        assert worker.process is None
+        with pytest.raises(ProcessLookupError):
+            os.kill(worker_pid, 0)
+    finally:
+        pool.close(cancel_pending=True, timeout_s=3.0)
+        waiter.join(timeout=1.0)
 
 
 def _assert_magemin_bulk_drop_projected(
