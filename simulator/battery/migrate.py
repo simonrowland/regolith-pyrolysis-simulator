@@ -567,6 +567,7 @@ LOCATOR_FIELDS = {
     "pdf_page_index",
     "page_verification",
     "table_caption_page",
+    "table_continued",
     "table",
     "figure",
     "paragraph",

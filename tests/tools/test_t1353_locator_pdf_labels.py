@@ -54,6 +54,7 @@ TOUCHED_EXTRACTS = (
     "data/literature/extracts/oneill-2002-feo-activity-coefficients-cmas.yaml",
     "data/literature/extracts/reiss-2019-thermal-extraction-nulht2m.yaml",
     "data/literature/extracts/robinot-2025-promes-review.yaml",
+    "data/literature/extracts/ivtan-cro2-g.yaml",
     "data/literature/extracts/schaefer-and-fegley-2007-icarus-outgassing-of-oc.yaml",
     "data/literature/extracts/seki-2011-ca-o-solubility-fe-cao-al2o3.yaml",
     "data/literature/extracts/shornikov-1994-mullite-kems.yaml",
@@ -372,12 +373,16 @@ def _assert_observation_value(page_text, observation_values):
 def _assert_label_and_data(locator, locator_path, page_text, caption_page_text=None, observation_values=()):
     label_pattern = _label_pattern(locator)
     caption_page = locator.get("table_caption_page")
+    if locator.get("table_continued") is True:
+        if type(locator.get("page")) is not int or locator["page"] < 2:
+            raise AssertionError("continued table requires a physical data page after page 1")
+        caption_page = locator["page"] - 1
     if caption_page is not None:
         if type(caption_page) is not int or not isinstance(locator.get("page"), int):
             raise AssertionError("table caption and data pages must be physical page integers")
         if caption_page >= locator["page"]:
             raise AssertionError("table caption page must precede the data page")
-        match = re.search(r"data cell:\s*([^.;]+)", locator.get("note", ""), re.I)
+        match = re.search(r"data cell:\s*([^\n]+?)\s*\.?$", locator.get("note", ""), re.I)
         if match:
             record = match.group(1)
         elif "species" in locator_path:
@@ -423,8 +428,10 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
         pdf = _pdf_path(current.get("source_id"), current.get("source", {}).get("corpus_source_id"))
         for locator_path, locator in after.items():
             prior = before.get(locator_path)
-            if prior is None or not any(prior.get(key) != locator.get(key)
-                                        for key in ("page", "published_page", "pdf_page_index", "table_caption_page")):
+            if prior is None or not any(
+                prior.get(key) != locator.get(key)
+                for key in ("page", "published_page", "pdf_page_index", "table_caption_page", "table_continued")
+            ):
                 continue
             if not ("page" in locator and "pdf_page_index" in locator):
                 continue
@@ -438,6 +445,8 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
                 skipped += 1
                 continue
             caption_page = locator.get("table_caption_page")
+            if locator.get("table_continued") is True:
+                caption_page = page_number - 1
             caption_text = _page_text(str(pdf), caption_page) if caption_page is not None else None
             printed_values = tuple(_observation_values(current, locator_path))
             try:
@@ -476,7 +485,7 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
                     continue
                 key = (relative, locator_path, page_number, label)
                 justification = justifications.get(key)
-                note_cell = re.search(r"data cell:\s*([^.;]+)", locator.get("note", ""), re.I)
+                note_cell = re.search(r"data cell:\s*([^\n]+?)\s*\.?$", locator.get("note", ""), re.I)
                 label_failure = str(exc) in {
                     "table caption label is absent from caption page",
                     "table/figure label is absent from cited page",
@@ -569,8 +578,9 @@ def test_continued_table_checks_caption_page_and_data_page():
     locator = {
         "table": "877",
         "page": 4,
-        "table_caption_page": 3,
-        "note": "Table 877 continues; data cell: 3300.000 64.806.",
+        "table_continued": True,
+        "record": "3300.000 64.806",
+        "note": "Table 877 continues; data cell shown in record.",
     }
     _assert_label_and_data(
         locator,
@@ -578,6 +588,24 @@ def test_continued_table_checks_caption_page_and_data_page():
         "T (K)  F°(T)\n3300.000 64.806 346.974",
         "Class accuracy\nTable 877",
     )
+
+
+def test_continued_table_requires_label_on_preceding_physical_page():
+    import pytest
+
+    locator = {
+        "table": "877",
+        "page": 4,
+        "table_continued": True,
+        "record": "3300.000 64.806",
+    }
+    with pytest.raises(AssertionError, match="caption label is absent"):
+        _assert_label_and_data(
+            locator,
+            (),
+            "Table 877\n3300.000 64.806 346.974",
+            "Class accuracy",
+        )
 
 
 def test_zigo_table_1_prose_mention_does_not_satisfy_data_locator():

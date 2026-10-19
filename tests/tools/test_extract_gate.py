@@ -262,6 +262,24 @@ def test_table_caption_page_migrates_as_locator_field_not_note():
     assert locator.note is None
 
 
+def test_table_continued_migrates_as_locator_field_not_note():
+    from simulator.battery.migrate import locator_from_mapping
+
+    locator = locator_from_mapping(
+        {
+            "page": 4,
+            "pdf_page_index": 3,
+            "table": "877",
+            "table_continued": True,
+            "record": "3300.000 64.806",
+        }
+    )
+
+    assert locator is not None
+    assert locator.table_continued is True
+    assert locator.note is None
+
+
 def test_table_caption_page_must_precede_data_page():
     import pytest
     from simulator.battery.records import Locator

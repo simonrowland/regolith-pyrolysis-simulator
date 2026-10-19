@@ -426,6 +426,11 @@ containing the cited data, and `table_caption_page` must be an integer earlier
 than `page`. This verification metadata is not a location key. The label test
 checks the caption on `table_caption_page` and the cited data cell on `page`.
 
+For a continued table whose label appears on the immediately preceding
+physical page, set `table_continued: true`. The locator's `page` and
+`pdf_page_index` still identify the page containing the cited data; the label
+test checks the label on `page - 1` and the cited data cell on `page`.
+
 Every **observation** requires a `locator`.  
 Every **equipment-metadata field** that is present requires its **own** `locator`
 (often experimental-section prose or apparatus figures, not result tables).  
