@@ -843,8 +843,8 @@ def test_production_phosphorus_carriers_use_cea_reaction_thermo() -> None:
         assert evaluator.evaluator_family == "nasa_cea_9"
         assert evaluator.pO2_exponent == pytest.approx(pO2_exponent)
         assert evaluator.activity_exponent == pytest.approx(activity_exponent)
-        assert species.code_metadata.request_rule == "stage0_only"
-        assert species.code_metadata.hot_train_applicability == "stage0_only"
+        assert species.code_metadata.request_rule == "source_inventory_present"
+        assert species.code_metadata.hot_train_applicability == "source_inventory_present"
         assert species.validation_status.value == "pending_validation"
 
         at_reference = evaluator.evaluate(

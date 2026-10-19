@@ -65,6 +65,26 @@ def _flux(total_kg_hr: float = 0.0, **species_kg_hr: float) -> EvaporationFlux:
     )
 
 
+def test_c0b_counts_configured_hold_only_at_target_temperature():
+    setpoints = _setpoints()
+    manager = CampaignManager(setpoints)
+    melt = _melt(CampaignPhase.C0B, 10, temperature_C=1040.0)
+    target_C, _ = manager.get_temp_target(CampaignPhase.C0B, 10, melt)
+    hold_hr = int(setpoints["campaigns"]["C0b_p_cleanup"]["max_hold_hr"])
+    record = BatchRecord(snapshots=[
+        HourSnapshot(campaign=CampaignPhase.C0B, temperature_C=1040.0),
+    ])
+    assert not manager.check_endpoint(melt, _flux(), CondensationTrain(), record)
+    melt.temperature_C = target_C
+    for elapsed in range(hold_hr):
+        assert manager.check_endpoint(melt, _flux(), CondensationTrain(), record) is (
+            elapsed + 1 == hold_hr
+        )
+        record.snapshots.append(HourSnapshot(
+            campaign=CampaignPhase.C0B, temperature_C=target_C,
+        ))
+
+
 def test_t155_delta_materializes_once_at_phase_entry_and_defaults_stay_equal():
     defaults = _setpoints()
     manager = CampaignManager(copy.deepcopy(defaults))
@@ -141,8 +161,8 @@ def test_c2a_staged_endpoint_prevalidates_all_species_before_yield_mutation():
         (CampaignPhase.C0, 9, 940.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, False),
         (CampaignPhase.C0, 10, 940.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, True),
         (CampaignPhase.C0, 25, 25.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, True),
-        (CampaignPhase.C0B, 3, 1199.9, _flux(), BatchRecord(), None, 0.0, 100.0, 0, True),
-        (CampaignPhase.C0B, 3, 1200.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, True),
+        (CampaignPhase.C0B, 3, 1199.9, _flux(), BatchRecord(), None, 0.0, 100.0, 0, False),
+        (CampaignPhase.C0B, 3, 1200.0, _flux(), BatchRecord(), None, 0.0, 100.0, 0, False),
         (CampaignPhase.C2A, 18, 25.0, _flux(0.1), BatchRecord(), None, 0.0, 100.0, 0, False),
         # SC-109: unarmed sub-threshold flux must NOT soft-complete (was True).
         (CampaignPhase.C2A, 18, 25.0, _flux(0.099), BatchRecord(), None, 0.0, 100.0, 0, False),

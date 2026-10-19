@@ -1038,7 +1038,7 @@ def test_phosphorus_hot_train_scope_survives_compatibility_projection(
 ):
     oxide_vapors = vapor_pressure_data["oxide_vapors"]
     for carrier in ("PO", "PO2", "P2", "P4", "P4O6", "P4O10"):
-        assert oxide_vapors[carrier]["hot_train_applicability"] == "stage0_only"
+        assert oxide_vapors[carrier]["hot_train_applicability"] == "source_inventory_present"
 
     # 2026-08-05 b-133 adjudication: the P2O5_gas tombstone is RESTORED
     # (the MC-4 wave-1B reactivation was wrong); the exact-key tombstone
@@ -1052,6 +1052,28 @@ def test_phosphorus_hot_train_scope_survives_compatibility_projection(
     assert legacy_locations == ["retired_tombstones"]
     retired = vapor_pressure_data["retired_tombstones"]["P2O5_gas"]
     assert retired["hot_train_applicability"] == "not_applicable"
+
+
+@pytest.mark.parametrize("carrier", ["PO", "PO2", "P2"])
+def test_present_phosphate_is_priced_in_c2a(
+    vapor_pressure_data, feedstocks_data, setpoints_data, carrier,
+):
+    sim = _build_sim(
+        "mars_basalt", vapor_pressure_data, feedstocks_data, setpoints_data,
+        additives_kg={"C": 60.0},
+    )
+    sim.start_campaign(CampaignPhase.C2A)
+    sim.melt.temperature_C = 1700.0
+    sim.melt.melt_fO2_log = -11.0
+    equilibrium = sim._internal_analytical_equilibrium()
+    assert equilibrium.vapor_pressures_Pa[carrier] > 0.0
+    flux = sim._calculate_evaporation(equilibrium)
+    assert flux.species_kg_hr[carrier] > 0.0
+    row = vapor_pressure_data["oxide_vapors"][carrier]
+    # The production resolver validates both mass and atoms for P2O5 ->
+    # carrier + O2. Keep the existing CEA reaction and melt activity basis.
+    assert sim._evaporation_stoich(carrier, row)["parent_oxide"] == "P2O5"
+    assert row["source_activity_basis"] == "parent_oxide"
 
 
 def test_compiled_p_carrier_provenance_records_intrinsic_melt_fo2(
