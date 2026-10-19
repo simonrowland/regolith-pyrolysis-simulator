@@ -372,8 +372,33 @@ def test_deck_renderer_emits_all_panels_and_missing_axis_labels(
     residuals = tmp_path / "residuals.jsonl"
     _score_file(residuals)
     data = read_scores(residuals)
+    history = tmp_path / "history.jsonl"
+    history.write_text(
+        json.dumps(
+            {
+                "kind": "battery_hero_history",
+                "schema_version": 1,
+                "store_sha": "old-store",
+                "commit_date": "2026-10-18T10:27:53-04:00",
+                "metrics": [
+                    {
+                        "rail": "vapour",
+                        "engine": "openimcc",
+                        "n": 1,
+                        "rms_dex": "0.2",
+                        "median_abs_dex": "0.1",
+                    }
+                ],
+                "benchmarks": [],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
 
-    files = hero_plot.render_hero_deck_charts(data, tmp_path / "deck")
+    files = hero_plot.render_hero_deck_charts(
+        data, tmp_path / "deck", history_path=history
+    )
 
     for chart in (
         "polymerisation",
@@ -387,6 +412,9 @@ def test_deck_renderer_emits_all_panels_and_missing_axis_labels(
     cross_svg = Path(files["deck:fo2-cross-comparison:svg"]).read_text(
         encoding="utf-8"
     )
+    polymerisation_svg = Path(files["deck:polymerisation:svg"]).read_text(
+        encoding="utf-8"
+    )
     residue_svg = Path(files["deck:residue-composition:svg"]).read_text(
         encoding="utf-8"
     )
@@ -395,6 +423,7 @@ def test_deck_renderer_emits_all_panels_and_missing_axis_labels(
     assert "No typed mass-loss fraction matches these residue rows" in residue_svg
     assert "no history rows" in sio_svg
     assert "1970-01-01" not in sio_svg
+    assert "Green landing date" not in polymerisation_svg
 
 
 def test_deck_refusal_strip_includes_missing_scorer_axis(tmp_path: Path) -> None:
