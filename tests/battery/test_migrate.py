@@ -7190,6 +7190,41 @@ def test_b718_partial_pressure_point_composition_stays_on_own_point(
     )
 
 
+def test_nonyield_point_without_numeric_value_is_queued_not_emitted(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="partial_pressure",
+        units="atm",
+        values={
+            "quantity": "partial_pressure",
+            "method_class": "measured_direct",
+            "points": [
+                {"T_K": 1300, "pressure_atm": 1},
+                {
+                    "T_K": 1400,
+                    "omitted_reason": "source omitted numeric cell",
+                },
+            ],
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    parent_id = "fixture-source::na_psat"
+    points = [
+        obs for oid, obs in result.observations.items()
+        if oid.startswith(parent_id + "::")
+    ]
+
+    assert len(points) == 1
+    assert points[0].value.kind is ValueKind.POINT
+    assert points[0].value.point == Decimal("101325")
+    assert any(
+        entry.why == "source omitted numeric cell"
+        and entry.observation_id == f"{parent_id}::point:points:1"
+        for entry in result.queue
+    )
+
+
 def test_series_unavailable_value_is_queued_once_with_selector_reason(
     tmp_path: Path,
 ) -> None:
