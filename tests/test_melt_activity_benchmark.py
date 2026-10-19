@@ -1430,6 +1430,10 @@ def test_generate_report_states_measured_unlatched_coverage_when_supplied():
     assert "produced 1/1 usable predictions (Yamaguchi: 1/1)" in report
     assert "2/3" in report
     assert "not taken from the latched CSV" in report
+    assert (
+        "ThermoEngine isolated-mode ceiling narrative condition: "
+        "met (adapter latch and measured isolated results)"
+    ) in report
     assert "isolated-mode ceiling" in report
     assert "isolated retry remains required" in report
     assert "ThermoEngineFO2UndefinedError" in report
