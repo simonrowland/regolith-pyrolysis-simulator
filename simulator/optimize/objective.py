@@ -4192,6 +4192,10 @@ def _wall_deposit_by_segment_species_summary(
     })
 
 
+def _ungrounded_campaigns_to_resinter(load_kg_per_campaign: float) -> str:
+    return f"resinter_threshold_kg / {load_kg_per_campaign:.12g}"
+
+
 def _campaigns_to_resinter(
     wall_deposit_by_segment_species: Mapping[tuple[str, str], float],
     *,
@@ -4213,7 +4217,7 @@ def _campaigns_to_resinter(
     controlling_load_kg_per_campaign = max(segment_loads_kg_per_campaign)
     threshold = _wall_resinter_threshold_kg()
     if threshold is None:
-        return f"resinter_threshold_kg / {controlling_load_kg_per_campaign:.12g}"
+        return _ungrounded_campaigns_to_resinter(controlling_load_kg_per_campaign)
     return threshold / controlling_load_kg_per_campaign
 
 
@@ -4231,7 +4235,7 @@ def _aggregate_campaigns_to_resinter(
     aggregate_load_kg_per_campaign = sum(by_species.values()) / elapsed
     threshold = _wall_resinter_threshold_kg()
     if threshold is None:
-        return f"resinter_threshold_kg / {aggregate_load_kg_per_campaign:.12g}"
+        return _ungrounded_campaigns_to_resinter(aggregate_load_kg_per_campaign)
     return threshold / aggregate_load_kg_per_campaign
 
 
