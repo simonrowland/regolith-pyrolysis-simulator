@@ -3697,6 +3697,61 @@ def test_alphamelts_python_api_keeps_activity_when_fO2_is_not_an_input(
     assert vapor_calls == []
 
 
+def test_alphamelts_subprocess_keeps_activity_when_fO2_is_not_an_input(
+    monkeypatch,
+):
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    backend._binary_path = Path('/fake/alphamelts')
+    launches = []
+
+    def fake_run(args, *, cwd, **kwargs):
+        launches.append((args, kwargs))
+        return types.SimpleNamespace(returncode=0, stdout='', stderr='')
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
+        fake_run,
+    )
+    monkeypatch.setattr(
+        backend,
+        '_parse_single_point_stdout',
+        lambda _output, **kwargs: EquilibriumResult(
+            temperature_C=kwargs['requested_temperature_C'],
+            pressure_bar=kwargs['pressure_bar'],
+            fO2_log=kwargs['fO2_log'],
+            status='ok',
+            liquid_fraction=1.0,
+            liquid_composition_wt_pct={
+                'SiO2': 50.0,
+                'CaO': 25.0,
+                'Al2O3': 25.0,
+            },
+            activity_coefficients={'SiO2': 0.4},
+        ),
+    )
+
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg={'SiO2': 0.5, 'CaO': 0.25, 'Al2O3': 0.25},
+        fO2_log=None,
+        pressure_bar=1.0,
+        redox_mode='not_an_input',
+        subprocess_run_mode='isothermal',
+    )
+
+    assert len(launches) == 1
+    assert result.status == 'ok'
+    assert result.liquid_fraction == 1.0
+    assert result.activity_coefficients == {'SiO2': 0.4}
+    assert result.fO2_log is None
+    assert result.vapor_pressures_Pa == {}
+    assert result.diagnostics['vapor_pressure_backend_status'] == 'not_attempted'
+    assert result.diagnostics['vapor_pressure_backend_status_reason'] == (
+        'fO2_not_an_input'
+    )
+
+
 def test_alphamelts_intrinsic_none_still_refuses_without_redox_mode():
     backend = AlphaMELTSBackend()
 
