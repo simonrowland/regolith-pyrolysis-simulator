@@ -232,10 +232,6 @@ def test_c2a_staged_k_shuttle_and_conservation_remain_visible(
 # physics rather than resurrecting the old ceiling; do not retune.
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="C2A staged silica and SiO pins are stale on the current green",
-)
 def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     first = _run_staged()
     second = _run_staged()
@@ -286,10 +282,14 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # material reaches the DESIGNATED Stage 3 trap as disproportionation
     # products; the continuous probe still never reaches the hot capture
     # window. Values pinned from the executable under the quiesced gate.
-    # regenerated 2026-08-02 under REPAIRED MAGEMin config per the train13
-    # adjudication; prior value was generated against the broken-liquidus job
-    # tree (0.10246923985526701). docs-private/research/2026-08-02-train13-adjudication.md
-    assert staged_silica == pytest.approx(0.10262754045813638, rel=1e-9)
+    # The 2026-08-02 pins persisted through an f7bcbf79c..b24e17095
+    # transport excursion (fabricated 100 Pa -> refusal -> flagged
+    # extrapolation; net +0.0097%), then 82599cf81 (-0.17%), 03616bb20
+    # (-0.98%), and b99fc004f (-32%). D066's package change is separate:
+    # silica 0.06935019686949548 -> 0.06889793680807693 and product SiO
+    # 0.0077315513914454756 -> 0.007681113790282872 (-0.652%). These pins
+    # are rerun from the current 62d9d561a green.
+    assert staged_silica == pytest.approx(0.06888507997517511, rel=1e-9)
     assert continuous_silica == pytest.approx(0.0, abs=1.0e-15)
     assert set(staged_sio_stage) == {"Si", "SiO2", "Fe"}
     assert staged_sio_stage["Fe"] > 0.0
@@ -297,10 +297,7 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
         staged_silica, rel=1e-12
     )
     assert continuous_sio_stage == {}
-    # regenerated 2026-08-02 under REPAIRED MAGEMin config per the train13
-    # adjudication; prior value was generated against the broken-liquidus job
-    # tree (0.01143878479198185). docs-private/research/2026-08-02-train13-adjudication.md
-    assert staged_products["SiO"] == pytest.approx(0.011456288948423666)
+    assert staged_products["SiO"] == pytest.approx(0.0076796816652895455)
 
 
 def test_c2a_staged_respeciates_evaporative_metal_loss_internal_o():
