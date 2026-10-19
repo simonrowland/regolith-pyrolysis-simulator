@@ -104,6 +104,9 @@ def test_aithala_s1_rows_migrate_to_fe3_fe2_ratio_measured_reduced() -> None:
         assert name == "original_Fe3_over_FeT", oid
         assert printed.state.value == r, oid
         assert printed.locator.table == "S-1", oid
+        quench_state = obs.point_conditions["quench_state"]
+        assert quench_state.state.value == "not_stated", oid
+        assert quench_state.locator.page == 10, oid
         assert obs.derived_from == obs.derivation.inputs, oid
         assert obs.derived_from and set(obs.derived_from).issubset(asset_ids), oid
         assert not [
