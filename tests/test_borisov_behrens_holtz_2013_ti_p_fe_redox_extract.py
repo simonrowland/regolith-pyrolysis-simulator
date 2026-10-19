@@ -256,6 +256,12 @@ def test_migration_types_every_quantity_and_keeps_conditions_and_quench() -> Non
     phosphorus = [r for r in records if r.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION]
     assert len(phosphorus) == 13
     assert all(r.identity.species.formula == "P2O5" for r in phosphorus)
+    assert all(
+        r.identity.subtype is not None
+        and r.identity.subtype.is_value
+        and r.identity.subtype.value == "oxide_wt_percent"
+        for r in phosphorus
+    )
     assert all(r.point_conditions["T_C"].locator is not None for r in phosphorus)
     assert all(r.identity.temperature_K.is_value for r in phosphorus)
 

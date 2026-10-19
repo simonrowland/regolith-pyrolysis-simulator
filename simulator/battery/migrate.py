@@ -3336,6 +3336,16 @@ _RESIDUE_COMPONENT_SLOT_FIELDS = (
     "MgO_wt_pct",
     "CaO_wt_pct",
 )
+
+
+def _residue_component_subtype(field_name: str) -> str | None:
+    if field_name == "residue_ppm":
+        return "element_ppm_by_mass"
+    if field_name.endswith("_wt_pct"):
+        return "oxide_wt_percent"
+    return None
+
+
 _COMPOSITION_CONDITION_KEYS = frozenset(
     {
         "T_C",
@@ -14724,6 +14734,13 @@ class Migrator:
             values, obs_type, obs.get("units"), quantity=quantity
         )
         if (
+            q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and value_sel.field_name is not None
+        ):
+            subtype = _residue_component_subtype(value_sel.field_name)
+            if subtype is not None:
+                ident_kwargs["subtype"] = State.of(subtype)
+        if (
             admission.reason.startswith(_ADMISSION_DEFAULTED_PREFIX)
             and not _value_has_numeric_value(value)
         ):
@@ -16751,10 +16768,9 @@ class Migrator:
             and value_sel is not None
             and value_sel.field_name is not None
         ):
-            if value_sel.field_name == "residue_ppm":
-                ident_kwargs["subtype"] = State.of("element_ppm_by_mass")
-            elif value_sel.field_name.endswith("_wt_pct"):
-                ident_kwargs["subtype"] = State.of("oxide_wt_percent")
+            subtype = _residue_component_subtype(value_sel.field_name)
+            if subtype is not None:
+                ident_kwargs["subtype"] = State.of(subtype)
         if q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION:
             if source_id == "kems-015-hashimoto-1983":
                 # Hashimoto Table 3 (p. 116) is the recovered spherule's bulk composition;
