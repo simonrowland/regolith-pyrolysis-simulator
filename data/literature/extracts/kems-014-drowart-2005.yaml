@@ -6,10 +6,10 @@ source:
   url: https://doi.org/10.1351/pac200577040683
   year: 2005
 extraction:
-  method: RH-46 official De Gruyter PDF URL text (byte fetch WAF-blocked) plus prior Table 2 subset; Table 1 H-row and Tables 3–5 captions from publisher PDF snippets; no pdftotext (PDF absent); historical ocr-repair pointer still missing
+  method: RH-46 official De Gruyter PDF URL text (byte fetch WAF-blocked) plus prior Table 2 subset; Table 1 H-row and Tables 3–5 captions from publisher PDF snippets; no pdftotext (PDF absent); historical ocr-repair pointer still missing; validated in an internal review, 2026-09-06, hunts
   date: '2026-09-06'
   worker: hunt-RH-46
-  provenance_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/
+  provenance_path: raw/kems-014-drowart-2005/kems-014-drowart-2005.pdf
 review_status: draft
 fidelity_samples:
   - species: Na
@@ -45,7 +45,7 @@ species:
     - observation_id: drowart_2005_table2_atomic_ionization_cross_sections
       type: gibbs_table
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-014-drowart-2005/tables.md
+        source_path: text/kems-014-drowart-2005/ocr-repair/kems-014-drowart-2005.md
         table: '2'
         page: 705
       T_range_K: null
@@ -127,7 +127,7 @@ species:
     - observation_id: drowart_2005_kems_reporting_requirements
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-014-drowart-2005/tables.md
+        source_path: text/kems-014-drowart-2005/ocr-repair/kems-014-drowart-2005.md
         page: 685
         section: '2. PRINCIPLES OF THE METHOD'
         note: also §4.3a p. 687–688 and §9 p. 728
@@ -157,7 +157,7 @@ species:
     - observation_id: drowart_2005_table1_mann_fit_coefficients
       type: gibbs_table
       locator:
-        source_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/tables.md
+        source_path: text/kems-014-drowart-2005/ocr-repair/kems-014-drowart-2005.md
         table: '1'
         page: 702
         note: remainder of coefficient grid unseen without PDF bytes
@@ -185,7 +185,7 @@ species:
     - observation_id: drowart_2005_table3_relative_atomic_sigma
       type: gibbs_table
       locator:
-        source_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/tables.md
+        source_path: text/kems-014-drowart-2005/ocr-repair/kems-014-drowart-2005.md
         table: '3'
         page: 708
       T_range_K: null
@@ -207,7 +207,7 @@ species:
     - observation_id: drowart_2005_table5_polyatomic_sigma_unseen_body
       type: gibbs_table
       locator:
-        source_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/tables.md
+        source_path: text/kems-014-drowart-2005/ocr-repair/kems-014-drowart-2005.md
         table: '5'
         page: 715
         note: caption and header only from official PDF URL text
@@ -227,7 +227,7 @@ species:
     - observation_id: drowart_2005_fig1_fig2_sigma_E_figure_only
       type: gibbs_table
       locator:
-        source_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/tables.md
+        source_path: text/kems-014-drowart-2005/ocr-repair/kems-014-drowart-2005.md
         figure: '1'
         page: 701
         note: also Fig. 2 p. 709; Ag σ(E) calculated and experimental curves
@@ -249,7 +249,7 @@ species:
     - observation_id: drowart_2005_hunt_targets_true_absence
       type: rate_series
       locator:
-        source_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/completeness-ledger.md
+        source_path: raw/kems-014-drowart-2005/kems-014-drowart-2005.pdf
         page: 683
         note: full paper 683–737; Tables 1–5 and Figs 1–2 from official PDF text
       T_range_K: null
@@ -284,7 +284,7 @@ species:
     - observation_id: drowart_2005_table4_sio_relative_sigma_vs_ag
       type: gibbs_table
       locator:
-        source_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/tables.md
+        source_path: text/kems-014-drowart-2005/ocr-repair/kems-014-drowart-2005.md
         table: '4'
         page: 714
       T_range_K: null

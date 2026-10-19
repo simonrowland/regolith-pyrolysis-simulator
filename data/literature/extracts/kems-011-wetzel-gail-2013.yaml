@@ -5,10 +5,10 @@ source:
   doi: 10.1051/0004-6361/201220803
   year: 2013
 extraction:
-  method: OCR-artifact transcription (MinerU vlm) + phase-2 geometry/alpha extract
+  method: OCR-artifact transcription (MinerU vlm) + phase-2 geometry/alpha extract; validated in an internal review, 2026-08-03, ocr-artifacts
   date: '2026-08-03'
   worker: ocr-phase2b-gk
-  provenance_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/
+  provenance_path: raw/kems-011-wetzel-gail-2013/kems-011-wetzel-gail-2013.pdf
 review_status: draft
 deepening:
   date: '2026-09-06'
@@ -111,7 +111,7 @@ species:
       experiment: sio-film-measurement-series
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+        source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
         equation: '8'
         line_range: 317-329
         note: growth coefficient α(T) for solid SiO condensation/growth from lab measurements
@@ -149,7 +149,7 @@ species:
         cell_material:
           value: Ta Knudsen cell (electron-bombardment heated) for commercial SiO evaporation under UHV
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+            source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
             paragraph: evaporated from a tantalum Knudsen cell heated by electron bombardment
             line_range: '53'
         chamber_pressure:
@@ -157,14 +157,14 @@ species:
           units: mbar
           note: background pressure during evaporation did not exceed 1e-9 mbar; base UHV <1e-10 mbar
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+            source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
             paragraph: background pressure measured during evaporation
             line_range: 51-53
     - observation_id: wetzel_gail_2013_sio_ta_knudsen_geometry_partial
       experiment: sio-film-measurement-series
       type: rate_series
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+        source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
         section: 2.1. Experimental setup
         line_range: 49-53
       phase: solid_SiO_source
@@ -182,14 +182,14 @@ species:
         cell_material:
           value: Ta Knudsen cell
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+            source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
             paragraph: tantalum Knudsen cell heated by electron bombardment
             line_range: '53'
     - observation_id: wetzel_gail_2013_sio_growth_class_b1
       experiment: sio-film-measurement-series
       type: alpha
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+        source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
         figure: 4a
         paragraph: SiO film growth Arrhenius α(T)
       T_range_K:
@@ -221,13 +221,13 @@ species:
         cell_material:
           value: Ta Knudsen cell (source); UHV film growth
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+            source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
             paragraph: Ta Knudsen cell
         chamber_pressure:
           value: 1.0e-09
           units: mbar
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+            source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
             paragraph: UHV
     - observation_id: wetzel_gail_2013_sio_alpha_fit_quoted
       experiment: sio-film-measurement-series
@@ -2148,7 +2148,7 @@ fidelity_samples:
     A: 0.52
     B_K: 3685.0
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+    source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
     equation: '8'
     line_range: 323-326
 - species: SiO
@@ -2157,7 +2157,7 @@ fidelity_samples:
   field: alpha_at_1000K_extrapolated
   value: 0.013
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+    source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
     paragraph: Extrapolating these results down to a temperature of 1000K results in α ≈ 0.013
     line_range: '329'
 - species: SiO
@@ -2166,5 +2166,5 @@ fidelity_samples:
   field: system_class
   value: solid_film_growth
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+    source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
     note: class pin
