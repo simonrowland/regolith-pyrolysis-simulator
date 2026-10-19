@@ -9343,6 +9343,59 @@ def test_reference_prose_rejects_ambiguous_or_negated_raoult_conventions() -> No
     assert typed.value.endmember.phase.value is Phase.L
 
 
+def test_demaria_1973_table1_temperature_and_conditions_reach_every_row(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-023-demaria-1973.yaml")
+    assert result.validation is not None
+    assert result.validation.hard_issues == ()
+    rows = [
+        obs
+        for obs in result.observations.values()
+        if obs.source_id == "kems-023-demaria-1973"
+        and "table1" in obs.observation_id
+    ]
+    assert len(rows) == 61
+    expected_row_counts = Counter(
+        {
+            ("Na", 1300): 2,
+            ("Na", 1400): 4,
+            ("Na", 1500): 3,
+            ("Fe", 1400): 4,
+            ("Fe", 1500): 4,
+            ("Fe", 1600): 4,
+            ("Mg", 1700): 2,
+            ("Mg", 1800): 4,
+            ("Mg", 1900): 4,
+            ("SiO", 1800): 4,
+            ("SiO", 1900): 4,
+            ("SiO", 2000): 4,
+            ("Ca", 1900): 4,
+            ("Ca", 2000): 4,
+            ("TiO", 2100): 4,
+            ("TiO", 2200): 3,
+            ("Al", 2100): 3,
+        }
+    )
+    actual_row_counts = Counter(
+        (obs.identity.species.formula, int(obs.identity.temperature_K.value))
+        for obs in rows
+    )
+    assert actual_row_counts == expected_row_counts
+
+    for obs in rows:
+        temperature = obs.identity.temperature_K
+        assert temperature is not None and temperature.is_value
+        condition = (obs.point_conditions or {}).get("temperature_K")
+        assert condition is not None and condition.state.is_value
+        assert condition.state.value == temperature.value
+        assert condition.locator is not None
+        assert condition.locator.table == "1"
+        assert condition.locator.published_page == 176
+        assert condition.locator.pdf_page_index == 2
+        assert obs.locator is not None and obs.locator.table == "1"
+
+
 def test_demaria_fe_rows_use_the_pure_iron_reference_state(tmp_path: Path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-022-demaria-1971.yaml")
     assert result.validation is not None
