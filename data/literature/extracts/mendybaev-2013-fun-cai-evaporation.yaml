@@ -1,0 +1,77 @@
+schema_version: literature_extract.v1
+source_id: mendybaev-2013-fun-cai-evaporation
+source:
+  citation: "Mendybaev, R. A. et al. (2013). Experimental evaporation of Mg- and Si-rich melts: Implications for the origin and evolution of FUN CAIs. Geochimica et Cosmochimica Acta 123, 368–384."
+  doi: 10.1016/j.gca.2013.06.044
+  year: 2013
+  corpus_asset: raw/mendybaev-2013-fun-cai-evaporation/mendybaev-2013-fun-cai-evaporation.pdf
+  corpus_sha256: 10505b3802f450eecf478d238c44a537000f676a9b14c2867825a889dfdc8c46
+extraction:
+  method: Manual transcription from pdftotext-layout.txt; Table 1 rendered at 600 dpi for cell verification.
+  date: "2026-10-18"
+  worker: fam10-1019
+review_status: draft
+fidelity_samples:
+  - path: species.SiO2.observations[mendybaev_2013_table1_residue_composition_series].values.series[0].MgO_wt_pct
+    value: "50.01"
+    locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN1-3}
+experiments:
+  - experiment_id: mendybaev-fun1-vacuum-evaporation
+    method: vacuum_evaporation
+    locator: {page: 4, published_page: 371, pdf_page_index: 3, section: Experimental}
+    sample:
+      printed_composition:
+        state: {tag: value, value: {MgO: "53.14", Al2O3: "2.97", SiO2: "41.27", CaO: "2.36"}}
+        locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN1 starting}
+    conditions:
+      temperature_C: {state: {tag: value, value: "1900"}, locator: {page: 4, published_page: 371, pdf_page_index: 3, section: Experimental}}
+      total_pressure_Pa: &mendy_pressure {state: {tag: value, value: {kind: bound, bound_operator: "<", bound_value: "0.0001"}}, locator: {page: 4, published_page: 371, pdf_page_index: 3, section: Experimental, note: Pressure fell below 10^-9 bar before the temperature was raised to 1900 °C.}}
+  - experiment_id: mendybaev-fun2-vacuum-evaporation
+    method: vacuum_evaporation
+    locator: {page: 4, published_page: 371, pdf_page_index: 3, section: Experimental}
+    sample:
+      printed_composition:
+        state: {tag: value, value: {MgO: "33.03", Al2O3: "15.18", SiO2: "38.39", CaO: "13.40"}}
+        locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN2 starting}
+    conditions:
+      temperature_C: {state: {tag: value, value: "1900"}, locator: {page: 4, published_page: 371, pdf_page_index: 3, section: Experimental}}
+      total_pressure_Pa: {state: {tag: value, value: {kind: bound, bound_operator: "<", bound_value: "0.0001"}}, locator: {page: 4, published_page: 371, pdf_page_index: 3, section: Experimental, note: Pressure fell below 10^-9 bar before the temperature was raised to 1900 °C.}}
+species:
+  SiO2:
+    observations:
+      - observation_id: mendybaev_2013_table1_residue_composition_series
+        experiment: mendybaev-fun1-vacuum-evaporation
+        type: composition_series
+        locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1"}
+        units: wt%
+        point_conditions:
+          total_pressure_Pa: {state: {tag: value, value: {kind: bound, bound_operator: "<", bound_value: "0.0001"}}, locator: {page: 4, published_page: 371, pdf_page_index: 3, section: Experimental}}
+        values:
+          quantity: residue_composition_vs_time
+          method_class: measured_direct
+          note: Printed evaporation-residue composition (post-quench); not the starting material. FUN2-6 through FUN2-10 use spot analyses; the other samples use area averages.
+          series:
+            - {run_id: FUN1-3, sample: FUN1-3, T_C: "1900", t_min: "0", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN1-3}, point_conditions: {total_pressure_Pa: *mendy_pressure}, MgO_wt_pct: "50.01", Al2O3_wt_pct: "4.04", SiO2_wt_pct: "42.99", CaO_wt_pct: "2.96", uncertainty_wt_pct: {MgO: "0.31", Al2O3: "0.21", SiO2: "0.11", CaO: "0.15"}}
+            - {run_id: FUN1-12, sample: FUN1-12, T_C: "1900", t_min: "0", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN1-12}, point_conditions: {total_pressure_Pa: *mendy_pressure}, MgO_wt_pct: "50.73", Al2O3_wt_pct: "4.19", SiO2_wt_pct: "42.05", CaO_wt_pct: "3.03", uncertainty_wt_pct: {MgO: "0.45", Al2O3: "0.27", SiO2: "0.09", CaO: "0.22"}}
+            - {run_id: FUN1-15, sample: FUN1-15, T_C: "1900", t_min: "5", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN1-15}, MgO_wt_pct: "49.25", Al2O3_wt_pct: "4.42", SiO2_wt_pct: "43.04", CaO_wt_pct: "3.29", uncertainty_wt_pct: {MgO: "0.15", Al2O3: "0.08", SiO2: "0.06", CaO: "0.06"}}
+            - {run_id: FUN1-13, sample: FUN1-13, T_C: "1900", t_min: "10", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN1-13}, MgO_wt_pct: "49.03", Al2O3_wt_pct: "4.39", SiO2_wt_pct: "43.16", CaO_wt_pct: "3.43", uncertainty_wt_pct: {MgO: "0.32", Al2O3: "0.15", SiO2: "0.08", CaO: "0.14"}}
+            - {run_id: FUN1-1, sample: FUN1-1, T_C: "1900", t_min: "15", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN1-1}, MgO_wt_pct: "45.80", Al2O3_wt_pct: "6.74", SiO2_wt_pct: "42.20", CaO_wt_pct: "5.27", uncertainty_wt_pct: {MgO: "0.22", Al2O3: "0.18", SiO2: "0.17", CaO: "0.11"}}
+            - {run_id: FUN1-10, sample: FUN1-10, T_C: "1900", t_min: "15", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN1-10}, MgO_wt_pct: "46.01", Al2O3_wt_pct: "6.77", SiO2_wt_pct: "42.29", CaO_wt_pct: "4.93", uncertainty_wt_pct: {MgO: "0.32", Al2O3: "0.17", SiO2: "0.11", CaO: "0.16"}}
+            - {run_id: FUN1-5, sample: FUN1-5, T_C: "1900", t_min: "20", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN1-5}, MgO_wt_pct: "41.39", Al2O3_wt_pct: "10.17", SiO2_wt_pct: "40.21", CaO_wt_pct: "8.19", uncertainty_wt_pct: {MgO: "0.19", Al2O3: "0.09", SiO2: "0.09", CaO: "0.13"}}
+            - {run_id: FUN1-11, sample: FUN1-11, T_C: "1900", t_min: "25", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN1-11}, MgO_wt_pct: "43.37", Al2O3_wt_pct: "8.98", SiO2_wt_pct: "41.02", CaO_wt_pct: "6.63", uncertainty_wt_pct: {MgO: "0.26", Al2O3: "0.19", SiO2: "0.08", CaO: "0.12"}}
+            - {run_id: FUN1-16, sample: FUN1-16, T_C: "1900", t_min: "25", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN1-16}, MgO_wt_pct: "43.25", Al2O3_wt_pct: "8.82", SiO2_wt_pct: "41.39", CaO_wt_pct: "6.54", uncertainty_wt_pct: {MgO: "0.65", Al2O3: "0.39", SiO2: "0.07", CaO: "0.31"}}
+            - {run_id: FUN1-4, sample: FUN1-4, T_C: "1900", t_min: "30", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN1-4}, MgO_wt_pct: "26.93", Al2O3_wt_pct: "20.88", SiO2_wt_pct: "33.91", CaO_wt_pct: "18.29", uncertainty_wt_pct: {MgO: "0.37", Al2O3: "0.20", SiO2: "0.15", CaO: "0.30"}}
+            - {run_id: FUN1-14, sample: FUN1-14, T_C: "1900", t_min: "30", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN1-14}, MgO_wt_pct: "41.40", Al2O3_wt_pct: "10.72", SiO2_wt_pct: "39.92", CaO_wt_pct: "7.95", uncertainty_wt_pct: {MgO: "0.19", Al2O3: "0.12", SiO2: "0.07", CaO: "0.11"}}
+            - {run_id: FUN1-9, sample: FUN1-9, T_C: "1900", t_min: "35", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN1-9}, MgO_wt_pct: "42.79", Al2O3_wt_pct: "9.44", SiO2_wt_pct: "40.74", CaO_wt_pct: "7.03", uncertainty_wt_pct: {MgO: "1.00", Al2O3: "0.68", SiO2: "0.19", CaO: "0.50"}}
+            - {run_id: FUN1-17, sample: FUN1-17, T_C: "1900", t_min: "35", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN1-17}, MgO_wt_pct: "34.53", Al2O3_wt_pct: "15.38", SiO2_wt_pct: "37.39", CaO_wt_pct: "12.70", uncertainty_wt_pct: {MgO: "0.16", Al2O3: "0.11", SiO2: "0.11", CaO: "0.12"}}
+            - {run_id: FUN1-18, sample: FUN1-18, T_C: "1900", t_min: "40", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN1-18}, MgO_wt_pct: "33.22", Al2O3_wt_pct: "16.30", SiO2_wt_pct: "36.83", CaO_wt_pct: "13.65", uncertainty_wt_pct: {MgO: "0.23", Al2O3: "0.17", SiO2: "0.11", CaO: "0.16"}}
+            - {run_id: FUN2-4, sample: FUN2-4, T_C: "1900", t_min: "0", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN2-4}, MgO_wt_pct: "30.97", Al2O3_wt_pct: "17.50", SiO2_wt_pct: "37.00", CaO_wt_pct: "14.52", uncertainty_wt_pct: {MgO: "0.24", Al2O3: "0.15", SiO2: "0.08", CaO: "0.15"}}
+            - {run_id: FUN2-5, sample: FUN2-5, T_C: "1900", t_min: "10", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN2-5}, MgO_wt_pct: "27.00", Al2O3_wt_pct: "20.42", SiO2_wt_pct: "34.67", CaO_wt_pct: "17.91", uncertainty_wt_pct: {MgO: "0.29", Al2O3: "0.25", SiO2: "0.19", CaO: "0.22"}}
+            - {run_id: FUN2-1, sample: FUN2-1, T_C: "1900", t_min: "20", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN2-1}, MgO_wt_pct: "25.68", Al2O3_wt_pct: "21.78", SiO2_wt_pct: "33.51", CaO_wt_pct: "19.03", uncertainty_wt_pct: {MgO: "0.14", Al2O3: "0.11", SiO2: "0.10", CaO: "0.08"}}
+            - {run_id: FUN2-2, sample: FUN2-2, T_C: "1900", t_min: "20", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN2-2}, MgO_wt_pct: "24.21", Al2O3_wt_pct: "22.79", SiO2_wt_pct: "32.91", CaO_wt_pct: "20.09", uncertainty_wt_pct: {MgO: "0.10", Al2O3: "0.11", SiO2: "0.11", CaO: "0.09"}}
+            - {run_id: FUN2-3, sample: FUN2-3, T_C: "1900", t_min: "25", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN2-3}, MgO_wt_pct: "19.25", Al2O3_wt_pct: "26.76", SiO2_wt_pct: "30.24", CaO_wt_pct: "23.74", uncertainty_wt_pct: {MgO: "0.14", Al2O3: "0.17", SiO2: "0.13", CaO: "0.22"}}
+            - {run_id: FUN2-8, sample: FUN2-8, T_C: "1900", t_min: "30", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN2-8}, MgO_wt_pct: "11.21", Al2O3_wt_pct: "33.77", SiO2_wt_pct: "25.53", CaO_wt_pct: "29.49", uncertainty_wt_pct: {MgO: "0.03", Al2O3: "0.04", SiO2: "0.04", CaO: "0.06"}}
+            - {run_id: FUN2-7, sample: FUN2-7, T_C: "1900", t_min: "35", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN2-7}, MgO_wt_pct: "12.71", Al2O3_wt_pct: "32.34", SiO2_wt_pct: "26.60", CaO_wt_pct: "28.35", uncertainty_wt_pct: {MgO: "0.06", Al2O3: "0.06", SiO2: "0.05", CaO: "0.08"}}
+            - {run_id: FUN2-6, sample: FUN2-6, T_C: "1900", t_min: "40", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN2-6}, MgO_wt_pct: "4.86", Al2O3_wt_pct: "39.51", SiO2_wt_pct: "20.96", CaO_wt_pct: "34.67", uncertainty_wt_pct: {MgO: "0.12", Al2O3: "0.20", SiO2: "0.19", CaO: "0.16"}}
+            - {run_id: FUN2-9, sample: FUN2-9, T_C: "1900", t_min: "50", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN2-9}, MgO_wt_pct: "5.71", Al2O3_wt_pct: "38.72", SiO2_wt_pct: "21.79", CaO_wt_pct: "33.78", uncertainty_wt_pct: {MgO: "0.02", Al2O3: "0.05", SiO2: "0.05", CaO: "0.07"}}
+            - {run_id: FUN2-10, sample: FUN2-10, T_C: "1900", t_min: "55", locator: {page: 5, published_page: 372, pdf_page_index: 4, table: "1", row: FUN2-10}, MgO_wt_pct: "1.55", Al2O3_wt_pct: "43.60", SiO2_wt_pct: "17.11", CaO_wt_pct: "37.74", uncertainty_wt_pct: {MgO: "0.01", Al2O3: "0.07", SiO2: "0.04", CaO: "0.10"}}
