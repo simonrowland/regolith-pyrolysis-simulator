@@ -948,6 +948,12 @@ class EngineWorkerPool:
             Future,
             tuple[WarmEngineWorker, threading.Event, threading.Event],
         ] = {}
+        self._request_workers: weakref.WeakKeyDictionary[
+            Future, WarmEngineWorker
+        ] = weakref.WeakKeyDictionary()
+        self._diagnostic_written_futures: weakref.WeakSet[Future] = (
+            weakref.WeakSet()
+        )
         self._active_requests_lock = threading.Lock()
         self._closed = False
         self._lifecycle_lock = threading.Lock()
@@ -1093,32 +1099,40 @@ class EngineWorkerPool:
 
         The active-request lock prevents the consumer from releasing this
         worker for its next request until the current process has been killed
-        and reaped. Diagnostic detail is appended to that worker's existing
-        diagnostic log; a pending request uses the first slot's log. Pending
-        futures have no assigned worker and return False.
+        and reaped. Diagnostic detail is appended to the assigned worker's
+        existing diagnostic log after the lock is released. Pending futures
+        have no assigned worker and return False.
         """
+        diagnostic_path = None
+        should_log = False
+        aborted = False
         with self._active_requests_lock:
             active = self._active_requests.get(future)
-            worker = active[0] if active is not None else self._workers[0]
-            diagnostic_path = worker.diagnostic_log_path
-            if diagnostic_detail is not None and diagnostic_path is not None:
-                try:
-                    diagnostic_path.parent.mkdir(parents=True, exist_ok=True)
-                    with diagnostic_path.open('a', encoding='utf-8') as log:
-                        log.write(
-                            'MAGEMin timed-out request: '
-                            f'{diagnostic_detail}\n'
-                        )
-                except OSError:
-                    # Logging must not prevent worker cleanup or replace the
-                    # typed timeout returned to the caller.
-                    pass
             if active is None:
-                return False
-            worker, call_finished, abort_event = active
-            if call_finished.is_set():
-                return False
-            return worker._abort_current_call(abort_event)
+                worker = self._request_workers.get(future)
+            else:
+                worker, call_finished, abort_event = active
+                if not call_finished.is_set():
+                    aborted = worker._abort_current_call(abort_event)
+            if (
+                diagnostic_detail is not None
+                and worker is not None
+                and future not in self._diagnostic_written_futures
+            ):
+                self._diagnostic_written_futures.add(future)
+                diagnostic_path = worker.diagnostic_log_path
+                should_log = diagnostic_path is not None
+
+        if should_log and diagnostic_path is not None:
+            try:
+                diagnostic_path.parent.mkdir(parents=True, exist_ok=True)
+                with diagnostic_path.open('a', encoding='utf-8') as log:
+                    log.write(f'{diagnostic_detail}\n')
+            except OSError:
+                # Logging must not prevent worker cleanup or replace the
+                # typed timeout returned to the caller.
+                pass
+        return aborted
 
     def _start_and_consume(
         self,
@@ -1161,6 +1175,7 @@ class EngineWorkerPool:
                     else:
                         call_finished = threading.Event()
                         abort_event = worker._begin_pool_call()
+                        self._request_workers[future] = worker
                         self._active_requests[future] = (
                             worker,
                             call_finished,
