@@ -1990,6 +1990,29 @@ def _system_main_fixture(
     )
 
 
+def _assert_no_fo2_or_qfm_publication(result, *, reason: str) -> None:
+    payload = dataclasses.asdict(result)
+
+    def check(value, *, key: str = "") -> None:
+        key_folded = key.casefold()
+        if key in {"fO2_output_status", "fO2_output_status_reason"}:
+            return
+        if any(token in key_folded for token in ("fo2", "qfm", "buffer")):
+            assert value is None, f"published {key}={value!r}"
+            return
+        if isinstance(value, dict):
+            for nested_key, nested_value in value.items():
+                check(nested_value, key=str(nested_key))
+        elif isinstance(value, (list, tuple)):
+            for nested_value in value:
+                check(nested_value, key=key)
+
+    check(payload)
+    check(result.diagnostics)
+    assert result.diagnostics["fO2_output_status"] == "not_reported"
+    assert result.diagnostics["fO2_output_status_reason"] == reason
+
+
 def _parse_subprocess_fixture(
     backend: AlphaMELTSBackend,
     output: str,
@@ -3648,33 +3671,16 @@ def test_alphamelts_python_api_keeps_activity_when_fO2_is_not_an_input(
     monkeypatch.setattr(backend, '_require_petthermotools_runtime', lambda: object())
     monkeypatch.setattr(backend, '_to_petthermotools_liq_comp', lambda comp: comp)
     monkeypatch.setattr(backend, '_melts_model_code', lambda: 1)
+    native_result = {
+        'Conditions': {'mass': 100.0, 'P_bar': 1.0, 'logfO2': 0.0},
+        'liquid1': {'SiO2_Liq': 70.0, 'CaO_Liq': 30.0},
+        'liquid1_prop': {'mass': 100.0},
+        'Activities': {'liquid1': {'SiO2_Liq': 0.4}},
+    }
     monkeypatch.setattr(
         backend,
         '_run_petthermotools_isolated',
-        lambda *_args, **_kwargs: object(),
-    )
-
-    def successful_parse(
-        _results,
-        *,
-        temperature_C,
-        pressure_bar,
-        fO2_log,
-        **_kwargs,
-    ):
-        return EquilibriumResult(
-            temperature_C=temperature_C,
-            pressure_bar=pressure_bar,
-            fO2_log=fO2_log,
-            liquid_fraction=1.0,
-            liquid_composition_wt_pct={'SiO2': 70.0, 'CaO': 30.0},
-            activity_coefficients={'SiO2': 0.4},
-        )
-
-    monkeypatch.setattr(
-        backend,
-        '_parse_petthermotools_result',
-        successful_parse,
+        lambda *_args, **_kwargs: native_result,
     )
 
     result = backend.equilibrate(
@@ -3686,8 +3692,12 @@ def test_alphamelts_python_api_keeps_activity_when_fO2_is_not_an_input(
     )
 
     assert result.status == 'ok'
-    assert result.activity_coefficients == {'SiO2': 0.4}
+    assert result.activity_coefficients == {'SiO2_Liq': 0.4}
     assert result.vapor_pressures_Pa == {}
+    _assert_no_fo2_or_qfm_publication(
+        result,
+        reason='not_an_input_default_column',
+    )
     assert result.diagnostics['vapor_pressure_backend_status'] == 'not_attempted'
     assert result.diagnostics['vapor_pressure_backend_status_reason'] == (
         'fO2_not_an_input'
@@ -3713,13 +3723,15 @@ def test_alphamelts_subprocess_keeps_activity_when_fO2_is_not_an_input(
         'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
         fake_run,
     )
-    monkeypatch.setattr(
-        backend,
-        '_parse_single_point_stdout',
-        lambda _output, **kwargs: EquilibriumResult(
+
+    def parsed_native_echo(_output, **kwargs):
+        return EquilibriumResult(
             temperature_C=kwargs['requested_temperature_C'],
             pressure_bar=kwargs['pressure_bar'],
-            fO2_log=kwargs['fO2_log'],
+            fO2_log=0.0,
+            requested_fO2_log=0.0,
+            printed_fO2_echo_log=0.0,
+            system_fO2_delta_QFM=5.118,
             status='ok',
             liquid_fraction=1.0,
             liquid_composition_wt_pct={
@@ -3728,7 +3740,21 @@ def test_alphamelts_subprocess_keeps_activity_when_fO2_is_not_an_input(
                 'Al2O3': 25.0,
             },
             activity_coefficients={'SiO2': 0.4},
-        ),
+            diagnostics={
+                'engine_reported_fO2_log': 0.0,
+                'printed_fO2_echo_log': 0.0,
+                'system_fO2_delta_QFM': 5.118,
+                'fO2_buffer': 'QFM',
+                'fO2_offset': 5.118,
+                'fO2_output_status': 'not_reported',
+                'fO2_output_status_reason': 'not_an_input_default_column',
+            },
+        )
+
+    monkeypatch.setattr(
+        backend,
+        '_parse_single_point_stdout',
+        parsed_native_echo,
     )
 
     result = backend.equilibrate(
@@ -3746,6 +3772,10 @@ def test_alphamelts_subprocess_keeps_activity_when_fO2_is_not_an_input(
     assert result.activity_coefficients == {'SiO2': 0.4}
     assert result.fO2_log is None
     assert result.vapor_pressures_Pa == {}
+    _assert_no_fo2_or_qfm_publication(
+        result,
+        reason='not_an_input_default_column',
+    )
     assert result.diagnostics['vapor_pressure_backend_status'] == 'not_attempted'
     assert result.diagnostics['vapor_pressure_backend_status_reason'] == (
         'fO2_not_an_input'
