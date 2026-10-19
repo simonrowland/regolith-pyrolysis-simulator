@@ -10,11 +10,15 @@ source:
   corpus_asset: raw/kress-carmichael-1991-iron-redox-calibration/kress-carmichael-1991-iron-redox-calibration.pdf
   corpus_sha256: b83bae1fc83450a2d0cb3b4e21a38da5f50c462a7a422fd2abe4b046ef6279cf
 extraction:
-  method: Scanned PDF. MinerU cell drafts are the character source. pdftotext commas in Table 5 logs were
-    not stored. A 600 dpi render confirmed Table 4 Q01-Q12, all 13 Table 5 rows, Table 2 runs 113, 145,
-    165-213, and the Table 2 footnote. Run 145 alpha is stored as the printed 100 640). Acoustic velocity
-    and the fit tables have no quantity token and are context. Table 4 does not receive the Table 5 air
-    log. Figures are deferred.
+  method: >-
+    Scanned PDF; MinerU table drafts supplied the cell source. Physical pages 3-7 and 10 were rendered
+    at 600 dpi and checked against the draft values; pages 8-9 were rendered for deferred figure records.
+    Table 2 has 83 printed rows although the prose reports 86 measurements. Run 145 alpha is stored as
+    printed, 100 (640). Table 5 prints decimal commas in the B105 and B120 log-fO2 cells; the numeric
+    values are normalized for migration and the exact spellings are retained as published. Table 2
+    acoustic velocity, frequency, and absorption values have no quantity token; fit tables 6-9 and A1
+    have model/fit parameters and no store quantity token. Table 4 does not inherit Table 5's fO2 values.
+    Figures 1-3 are deferred.
   date: '2026-10-19'
   worker: fam14-1019
 review_status: draft
@@ -737,7 +741,7 @@ species:
         text: Melts were sampled at high temperature with a Pt loop quenched into ice-water before and
           after each set. Micron-scale quench crystals in many of the Pt-loop samples reduced the precision
           of bulk-composition analyses to about 0.7 wt% absolute. The analyzed quench is the liquid composition.
-        preservation: asserted_preserved
+        preservation: not_stated
         quench_direction: not_stated
         locator:
           page: 3
@@ -771,15 +775,14 @@ species:
             column: log fO2
         total_pressure_Pa:
           state:
-            tag: value
-            value: '101325'
+            tag: unknown
+            reason: Table 3 reports measurements in air but no numeric total pressure. The one-atmosphere statement on page 3 is about ferric/ferrous partitioning and is not assigned to these ultrasonic runs.
           locator: &id004
             page: 3
             pdf_page_index: 2
             published_page: 84
             section: Ferric/ferrous partitioning at one atmosphere
-            note: Ferric/ferrous partitioning at one atmosphere (PDF page 3). Ultrasonic measurements
-              were performed in air. 1 atm = 101325 Pa.
+            note: This section states one atmosphere for ferric/ferrous partitioning. Table 3's ultrasonic measurements are reported as performed in air, with no numeric total pressure.
           units: Pa
         t_buffer_h:
           state:
@@ -881,8 +884,8 @@ species:
             column: log fO2
         total_pressure_Pa:
           state:
-            tag: value
-            value: '101325'
+            tag: unknown
+            reason: Table 3 reports measurements in air but no numeric total pressure. The one-atmosphere statement on page 3 is about ferric/ferrous partitioning and is not assigned to these ultrasonic runs.
           locator: *id004
           units: Pa
         t_buffer_h:
@@ -985,8 +988,8 @@ species:
             column: log fO2
         total_pressure_Pa:
           state:
-            tag: value
-            value: '101325'
+            tag: unknown
+            reason: Table 3 reports measurements in air but no numeric total pressure. The one-atmosphere statement on page 3 is about ferric/ferrous partitioning and is not assigned to these ultrasonic runs.
           locator: *id004
           units: Pa
         t_buffer_h:
@@ -1089,8 +1092,8 @@ species:
             column: log fO2
         total_pressure_Pa:
           state:
-            tag: value
-            value: '101325'
+            tag: unknown
+            reason: Table 3 reports measurements in air but no numeric total pressure. The one-atmosphere statement on page 3 is about ferric/ferrous partitioning and is not assigned to these ultrasonic runs.
           locator: *id004
           units: Pa
         t_buffer_h:
@@ -1193,8 +1196,8 @@ species:
             column: log fO2
         total_pressure_Pa:
           state:
-            tag: value
-            value: '101325'
+            tag: unknown
+            reason: Table 3 reports measurements in air but no numeric total pressure. The one-atmosphere statement on page 3 is about ferric/ferrous partitioning and is not assigned to these ultrasonic runs.
           locator: *id004
           units: Pa
         t_buffer_h:
@@ -1297,8 +1300,8 @@ species:
             column: log fO2
         total_pressure_Pa:
           state:
-            tag: value
-            value: '101325'
+            tag: unknown
+            reason: Table 3 reports measurements in air but no numeric total pressure. The one-atmosphere statement on page 3 is about ferric/ferrous partitioning and is not assigned to these ultrasonic runs.
           locator: *id004
           units: Pa
         t_buffer_h:
@@ -1401,8 +1404,8 @@ species:
             column: log fO2
         total_pressure_Pa:
           state:
-            tag: value
-            value: '101325'
+            tag: unknown
+            reason: Table 3 reports measurements in air but no numeric total pressure. The one-atmosphere statement on page 3 is about ferric/ferrous partitioning and is not assigned to these ultrasonic runs.
           locator: *id004
           units: Pa
         t_buffer_h:
@@ -1505,8 +1508,8 @@ species:
             column: log fO2
         total_pressure_Pa:
           state:
-            tag: value
-            value: '101325'
+            tag: unknown
+            reason: Table 3 reports measurements in air but no numeric total pressure. The one-atmosphere statement on page 3 is about ferric/ferrous partitioning and is not assigned to these ultrasonic runs.
           locator: *id004
           units: Pa
         t_buffer_h:
@@ -1609,8 +1612,8 @@ species:
             column: log fO2
         total_pressure_Pa:
           state:
-            tag: value
-            value: '101325'
+            tag: unknown
+            reason: Table 3 reports measurements in air but no numeric total pressure. The one-atmosphere statement on page 3 is about ferric/ferrous partitioning and is not assigned to these ultrasonic runs.
           locator: *id004
           units: Pa
         t_buffer_h:
@@ -1713,8 +1716,8 @@ species:
             column: log fO2
         total_pressure_Pa:
           state:
-            tag: value
-            value: '101325'
+            tag: unknown
+            reason: Table 3 reports measurements in air but no numeric total pressure. The one-atmosphere statement on page 3 is about ferric/ferrous partitioning and is not assigned to these ultrasonic runs.
           locator: *id004
           units: Pa
         t_buffer_h:
@@ -1817,8 +1820,8 @@ species:
             column: log fO2
         total_pressure_Pa:
           state:
-            tag: value
-            value: '101325'
+            tag: unknown
+            reason: Table 3 reports measurements in air but no numeric total pressure. The one-atmosphere statement on page 3 is about ferric/ferrous partitioning and is not assigned to these ultrasonic runs.
           locator: *id004
           units: Pa
         t_buffer_h:
@@ -1921,8 +1924,8 @@ species:
             column: log fO2
         total_pressure_Pa:
           state:
-            tag: value
-            value: '101325'
+            tag: unknown
+            reason: Table 3 reports measurements in air but no numeric total pressure. The one-atmosphere statement on page 3 is about ferric/ferrous partitioning and is not assigned to these ultrasonic runs.
           locator: *id004
           units: Pa
         t_buffer_h:
@@ -2025,8 +2028,8 @@ species:
             column: log fO2
         total_pressure_Pa:
           state:
-            tag: value
-            value: '101325'
+            tag: unknown
+            reason: Table 3 reports measurements in air but no numeric total pressure. The one-atmosphere statement on page 3 is about ferric/ferrous partitioning and is not assigned to these ultrasonic runs.
           locator: *id004
           units: Pa
         t_buffer_h:
@@ -2129,8 +2132,8 @@ species:
             column: log fO2
         total_pressure_Pa:
           state:
-            tag: value
-            value: '101325'
+            tag: unknown
+            reason: Table 3 reports measurements in air but no numeric total pressure. The one-atmosphere statement on page 3 is about ferric/ferrous partitioning and is not assigned to these ultrasonic runs.
           locator: *id004
           units: Pa
         t_buffer_h:
@@ -2233,8 +2236,8 @@ species:
             column: log fO2
         total_pressure_Pa:
           state:
-            tag: value
-            value: '101325'
+            tag: unknown
+            reason: Table 3 reports measurements in air but no numeric total pressure. The one-atmosphere statement on page 3 is about ferric/ferrous partitioning and is not assigned to these ultrasonic runs.
           locator: *id004
           units: Pa
         t_buffer_h:
@@ -2337,8 +2340,8 @@ species:
             column: log fO2
         total_pressure_Pa:
           state:
-            tag: value
-            value: '101325'
+            tag: unknown
+            reason: Table 3 reports measurements in air but no numeric total pressure. The one-atmosphere statement on page 3 is about ferric/ferrous partitioning and is not assigned to these ultrasonic runs.
           locator: *id004
           units: Pa
         t_buffer_h:
@@ -2441,8 +2444,8 @@ species:
             column: log fO2
         total_pressure_Pa:
           state:
-            tag: value
-            value: '101325'
+            tag: unknown
+            reason: Table 3 reports measurements in air but no numeric total pressure. The one-atmosphere statement on page 3 is about ferric/ferrous partitioning and is not assigned to these ultrasonic runs.
           locator: *id004
           units: Pa
         t_buffer_h:
@@ -2545,8 +2548,8 @@ species:
             column: log fO2
         total_pressure_Pa:
           state:
-            tag: value
-            value: '101325'
+            tag: unknown
+            reason: Table 3 reports measurements in air but no numeric total pressure. The one-atmosphere statement on page 3 is about ferric/ferrous partitioning and is not assigned to these ultrasonic runs.
           locator: *id004
           units: Pa
         t_buffer_h:
@@ -2649,8 +2652,8 @@ species:
             column: log fO2
         total_pressure_Pa:
           state:
-            tag: value
-            value: '101325'
+            tag: unknown
+            reason: Table 3 reports measurements in air but no numeric total pressure. The one-atmosphere statement on page 3 is about ferric/ferrous partitioning and is not assigned to these ultrasonic runs.
           locator: *id004
           units: Pa
         t_buffer_h:
@@ -2730,7 +2733,7 @@ species:
           chemistry (Wilson 1960) corrected for ferric interference (Lange and Carmichael 1989). Fe2O3
           was estimated by subtracting FeO from total iron. Micron-scale quench crystals reduced precision
           to about 0.7 wt% absolute.
-        preservation: asserted_preserved
+        preservation: not_stated
         quench_direction: not_stated
         locator:
           page: 3
@@ -4424,7 +4427,7 @@ species:
       quench_statement: &id042
         text: Table 5 is a re-analysis of experiments first published in Kress and Carmichael (1988).
           FeO contents are revised between -0.09 and +0.74 wt% absolute. These are the 1991 printed numbers.
-        preservation: asserted_preserved
+        preservation: not_stated
         quench_direction: not_stated
         locator:
           page: 4
@@ -4459,10 +4462,8 @@ species:
             table: '5'
             row: B27
             column: log(fO2)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
-          units: log10(bar)
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
+          units: log10
       values:
         quantity: equilibrium_phase_composition
         basis_as_published: oxide wt%
@@ -4516,10 +4517,8 @@ species:
             table: '5'
             row: B34
             column: log(fO2)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
-          units: log10(bar)
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
+          units: log10
       values:
         quantity: equilibrium_phase_composition
         basis_as_published: oxide wt%
@@ -4573,10 +4572,8 @@ species:
             table: '5'
             row: B44
             column: log(fO2)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
-          units: log10(bar)
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
+          units: log10
       values:
         quantity: equilibrium_phase_composition
         basis_as_published: oxide wt%
@@ -4630,10 +4627,8 @@ species:
             table: '5'
             row: B54
             column: log(fO2)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
-          units: log10(bar)
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
+          units: log10
       values:
         quantity: equilibrium_phase_composition
         basis_as_published: oxide wt%
@@ -4687,10 +4682,8 @@ species:
             table: '5'
             row: B64
             column: log(fO2)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
-          units: log10(bar)
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
+          units: log10
       values:
         quantity: equilibrium_phase_composition
         basis_as_published: oxide wt%
@@ -4744,10 +4737,8 @@ species:
             table: '5'
             row: B74
             column: log(fO2)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
-          units: log10(bar)
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
+          units: log10
       values:
         quantity: equilibrium_phase_composition
         basis_as_published: oxide wt%
@@ -4801,10 +4792,8 @@ species:
             table: '5'
             row: B76
             column: log(fO2)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
-          units: log10(bar)
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
+          units: log10
       values:
         quantity: equilibrium_phase_composition
         basis_as_published: oxide wt%
@@ -4858,10 +4847,8 @@ species:
             table: '5'
             row: B79
             column: log(fO2)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
-          units: log10(bar)
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
+          units: log10
       values:
         quantity: equilibrium_phase_composition
         basis_as_published: oxide wt%
@@ -4915,10 +4902,8 @@ species:
             table: '5'
             row: B82
             column: log(fO2)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
-          units: log10(bar)
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
+          units: log10
       values:
         quantity: equilibrium_phase_composition
         basis_as_published: oxide wt%
@@ -4972,10 +4957,9 @@ species:
             table: '5'
             row: B105
             column: log(fO2)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
-          units: log10(bar)
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
+          units: log10
+          as_published: '-6,29'
       values:
         quantity: equilibrium_phase_composition
         basis_as_published: oxide wt%
@@ -5029,10 +5013,8 @@ species:
             table: '5'
             row: B108
             column: log(fO2)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
-          units: log10(bar)
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
+          units: log10
       values:
         quantity: equilibrium_phase_composition
         basis_as_published: oxide wt%
@@ -5086,10 +5068,8 @@ species:
             table: '5'
             row: B118
             column: log(fO2)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
-          units: log10(bar)
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
+          units: log10
       values:
         quantity: equilibrium_phase_composition
         basis_as_published: oxide wt%
@@ -5143,10 +5123,9 @@ species:
             table: '5'
             row: B120
             column: log(fO2)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
-          units: log10(bar)
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
+          units: log10
+          as_published: '-4,74'
       values:
         quantity: equilibrium_phase_composition
         basis_as_published: oxide wt%
@@ -5186,8 +5165,10 @@ species:
         stored_rows: '83'
         reason: The text says 86 acoustic velocity measurements. The printed Table 2 has 83 rows. Run-number
           gaps are absent from the page. The missing runs were not invented.
-        schema_gap: No quantity token for longitudinal acoustic velocity, absorption coefficient, or frequency.
-          Stored in context with the printed units. Not typed as density.
+        schema_gap: >-
+          No quantity token for longitudinal acoustic velocity, absorption coefficient, or frequency.
+          Stored in context with the printed units. Candidate tokens checked: density, viscosity, cp, and
+          electrical_conductivity; none types these quantities.
     - observation_id: kc91_t2_0012
       type: acoustic_velocity_row
       locator:
@@ -5200,8 +5181,10 @@ species:
       units: m/s, m^-1, MHz, h, as printed
       values:
         printed_quantity: longitudinal acoustic velocity
-        schema_gap: No quantity token for longitudinal acoustic velocity, absorption coefficient, or frequency.
-          Stored in context with the printed units. Not typed as density.
+        schema_gap: >-
+          No quantity token for longitudinal acoustic velocity, absorption coefficient, or frequency.
+          Stored in context with the printed units. Candidate tokens checked: density, viscosity, cp, and
+          electrical_conductivity; none types these quantities.
         run: '0012'
         T_C: '1260'
         frequency_MHz: '2.403'
@@ -7784,8 +7767,12 @@ species:
           \text{Pa}^{-1}$
         column_2_as_published: -1.73 (0.08)
         column_2_value: '-1.73'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: -1.89 (0.04)
         column_3_value: '-1.89'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1}$
     - observation_id: kc91_t9_bar_v_text_TiO_2
       type: fit_coefficient_row
@@ -7808,8 +7795,12 @@ species:
           \text{Pa}^{-1}$
         column_2_as_published: -2.20 (0.44)
         column_2_value: '-2.20'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: -2.31 (0.11)
         column_3_value: '-2.31'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1}$
     - observation_id: kc91_t9_bar_v_text_Al_2_text_O_3
       type: fit_coefficient_row
@@ -7832,8 +7823,12 @@ species:
           \text{mol}^{-1} \text{Pa}^{-1}$
         column_2_as_published: -1.82 (0.22)
         column_2_value: '-1.82'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: -2.26 (0.17)
         column_3_value: '-2.26'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1}$
     - observation_id: kc91_t9_bar_v_text_Fe_2_text_O_3
       type: fit_coefficient_row
@@ -7858,6 +7853,8 @@ species:
         column_2_unavailable: dash is not zero
         column_3_as_published: -2.53 (0.18)
         column_3_value: '-2.53'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1}$
     - observation_id: kc91_t9_bar_v_text_FeO
       type: fit_coefficient_row
@@ -7880,8 +7877,12 @@ species:
           \text{Pa}^{-1}$
         column_2_as_published: -0.54 (0.16)
         column_2_value: '-0.54'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: -0.45 (0.06)
         column_3_value: '-0.45'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1}$
     - observation_id: kc91_t9_bar_v_text_MgO
       type: fit_coefficient_row
@@ -7904,8 +7905,12 @@ species:
           \text{Pa}^{-1}$
         column_2_as_published: 0.20 (0.28)
         column_2_value: '0.20'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: 0.27 (0.14)
         column_3_value: '0.27'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1}$
     - observation_id: kc91_t9_bar_v_text_CaO
       type: fit_coefficient_row
@@ -7928,8 +7933,12 @@ species:
           \text{Pa}^{-1}$
         column_2_as_published: 0.08 (0.18)
         column_2_value: '0.08'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: 0.34 (0.09)
         column_3_value: '0.34'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1}$
     - observation_id: kc91_t9_bar_v_text_Na_2_text_O
       type: fit_coefficient_row
@@ -7952,8 +7961,12 @@ species:
           \text{mol}^{-1} \text{Pa}^{-1}$
         column_2_as_published: -2.59 (0.20)
         column_2_value: '-2.59'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: -2.40 (0.10)
         column_3_value: '-2.40'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1}$
     - observation_id: kc91_t9_bar_v_text_K_2_text_O
       type: fit_coefficient_row
@@ -7976,8 +7989,12 @@ species:
           \text{mol}^{-1} \text{Pa}^{-1}$
         column_2_as_published: -8.79 (0.20)
         column_2_value: '-8.79'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: -6.75 (0.28)
         column_3_value: '-6.75'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1}$
     - observation_id: kc91_t9_bar_v_text_Li_2_text_O
       type: fit_coefficient_row
@@ -8000,8 +8017,12 @@ species:
           \text{mol}^{-1} \text{Pa}^{-1}$
         column_2_as_published: -0.90 (0.20)
         column_2_value: '-0.90'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: -1.02 (0.12)
         column_3_value: '-1.02'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1}$
         unit_note: MinerU units for this Li2O derivative omit K^-1. Stored as printed.
     - observation_id: kc91_t9_v_text_xs
@@ -8026,6 +8047,8 @@ species:
         column_2_unavailable: dash is not zero
         column_3_as_published: 10.18 (1.00)
         column_3_value: '10.18'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1}$
     - observation_id: kc91_t9_dot_bar_v_text_Al_2_text_O_3_text_Na_2_text_O
       type: fit_coefficient_row
@@ -8048,8 +8071,12 @@ species:
           | $1.3 (0.3) \times 10^{-3}$ | $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1} \text{K}^{-1}$
         column_2_as_published: $0.4 \times 10^{-3}$
         column_2_value: '0.0004'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: $1.3 (0.3) \times 10^{-3}$
         column_3_value: '0.0013'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1} \text{K}^{-1}$
     - observation_id: kc91_t9_dot_bar_v_text_SiO_2
       type: fit_coefficient_row
@@ -8072,6 +8099,8 @@ species:
           \text{Pa}^{-1} \text{K}^{-1}$
         column_2_as_published: $-0.3 \times 10^{-3}$
         column_2_value: '-0.0003'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: '-'
         column_3_unavailable: dash is not zero
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1} \text{K}^{-1}$
@@ -8096,8 +8125,12 @@ species:
           | $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1} \text{K}^{-1}$
         column_2_as_published: $3.4 \times 10^{-3}$
         column_2_value: '0.0034'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: $2.7 (1.0) \times 10^{-3}$
         column_3_value: '0.0027'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1} \text{K}^{-1}$
     - observation_id: kc91_t9_dot_bar_v_text_Al_2_text_O_3
       type: fit_coefficient_row
@@ -8122,6 +8155,8 @@ species:
         column_2_unavailable: dash is not zero
         column_3_as_published: $3.1 (0.9) \times 10^{-3}$
         column_3_value: '0.0031'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1} \text{K}^{-1}$
     - observation_id: kc91_t9_dot_bar_v_text_Fe_2_text_O_3
       type: fit_coefficient_row
@@ -8144,8 +8179,12 @@ species:
           \times 10^{-3}$ | $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1} \text{K}^{-1}$
         column_2_as_published: $-1.3 \times 10^{-3}$
         column_2_value: '-0.0013'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: $-1.8 (0.7) \times 10^{-3}$
         column_3_value: '-0.0018'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1} \text{K}^{-1}$
     - observation_id: kc91_t9_dot_bar_v_text_FeO
       type: fit_coefficient_row
@@ -8168,8 +8207,12 @@ species:
           | $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1} \text{K}^{-1}$
         column_2_as_published: $-3.3 \times 10^{-3}$
         column_2_value: '-0.0033'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: $-1.3 (0.7) \times 10^{-3}$
         column_3_value: '-0.0013'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1} \text{K}^{-1}$
     - observation_id: kc91_t9_dot_bar_v_text_MgO
       type: fit_coefficient_row
@@ -8192,8 +8235,12 @@ species:
           | $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1} \text{K}^{-1}$
         column_2_as_published: $-1.2 \times 10^{-3}$
         column_2_value: '-0.0012'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: $-2.9 (0.6) \times 10^{-3}$
         column_3_value: '-0.0029'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1} \text{K}^{-1}$
     - observation_id: kc91_t9_dot_bar_v_text_CaO
       type: fit_coefficient_row
@@ -8216,8 +8263,12 @@ species:
           | $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1} \text{K}^{-1}$
         column_2_as_published: $-4.1 \times 10^{-3}$
         column_2_value: '-0.0041'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: $-6.6 (0.7) \times 10^{-3}$
         column_3_value: '-0.0066'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1} \text{K}^{-1}$
     - observation_id: kc91_t9_dot_bar_v_text_Na_2_text_O
       type: fit_coefficient_row
@@ -8240,8 +8291,12 @@ species:
           \times 10^{-3}$ | $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1} \text{K}^{-1}$
         column_2_as_published: $-10.7 \times 10^{-3}$
         column_2_value: '-0.0107'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: $-14.5 (3.1) \times 10^{-3}$
         column_3_value: '-0.0145'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1} \text{K}^{-1}$
     - observation_id: kc91_t9_dot_bar_v_text_K_2_text_O
       type: fit_coefficient_row
@@ -8264,8 +8319,12 @@ species:
           \times 10^{-3}$ | $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1} \text{K}^{-1}$
         column_2_as_published: $-2.2 \times 10^{-3}$
         column_2_value: '-0.0022'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: $-4.6 (0.9) \times 10^{-3}$
         column_3_value: '-0.0046'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1} \text{K}^{-1}$
     - observation_id: kc91_t9_dot_bar_v_text_Li_2_text_O
       type: fit_coefficient_row
@@ -8288,8 +8347,12 @@ species:
           \text{Pa}^{-1}$
         column_2_as_published: '0.08'
         column_2_value: '0.08'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: '0.04'
         column_3_value: '0.04'
+        column_3_evidence_class: model_derived
+        column_3_attribution: This study
         column_4_as_published: $\text{m}^3 \text{mol}^{-1} \text{Pa}^{-1}$
         unit_note: MinerU units for this Li2O derivative omit K^-1. Stored as printed.
     - observation_id: kc91_t9_SE
@@ -8312,6 +8375,8 @@ species:
         as_published_row: 'SE | 0.08 |  | '
         column_2_as_published: '0.08'
         column_2_value: '0.08'
+        column_2_evidence_class: quoted_attributed
+        column_2_attribution: Lange and Carmichael (1987)
         column_3_as_published: ''
         column_3_unavailable: dash is not zero
         column_4_as_published: ''
@@ -8328,13 +8393,16 @@ species:
         method_class: figure_only
         quantity_as_printed: Partial molar volume derivative v' for oxide components divided by the number
           of cations, versus cation field strength (Whittaker and Muntus 1970). 2 sigma error shown.
+        species_as_printed: Na+, Li+, Ca2+, Mg2+, Fe2+, Fe3+, Al3+, Si4+, Ti4+ cations
+        phase_as_printed: oxide components in silicate liquid
+        temperature_as_printed: not stated on the figure
         axes_as_printed: v' per cation versus cation field strength
         caption: Partial molar volume derivative v' for oxide components divided by the number of cations,
           versus cation field strength (Whittaker and Muntus 1970). 2 sigma error shown.
         panel: single
         series:
         - label: oxide components
-          marker_count: not counted
+          marker_count: '12 plotted cation markers, including four Fe3+ coordination states'
         numeric_points: none
         digitisation: deferred to a figure pass
         attribution: Kress and Carmichael (1991)
@@ -15613,7 +15681,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1448'
         Fe2O3_wt_pct: '16.93'
         FeO_wt_pct: '5.41'
@@ -15647,7 +15715,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1448'
         Fe2O3_wt_pct: '16.81'
         FeO_wt_pct: '5.41'
@@ -15681,7 +15749,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1448'
         Fe2O3_wt_pct: '16.73'
         FeO_wt_pct: '5.29'
@@ -15715,7 +15783,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1448'
         Fe2O3_wt_pct: '16.61'
         FeO_wt_pct: '5.29'
@@ -15749,7 +15817,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1300'
         Fe2O3_wt_pct: '20.45'
         FeO_wt_pct: '1.58'
@@ -15783,7 +15851,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1300'
         Fe2O3_wt_pct: '20.08'
         FeO_wt_pct: '1.83'
@@ -15817,7 +15885,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1435'
         Fe2O3_wt_pct: '19.46'
         FeO_wt_pct: '2.70'
@@ -15851,7 +15919,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1435'
         Fe2O3_wt_pct: '19.07'
         FeO_wt_pct: '2.69'
@@ -15885,7 +15953,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1435'
         Fe2O3_wt_pct: '19.06'
         FeO_wt_pct: '2.87'
@@ -15919,7 +15987,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1435'
         Fe2O3_wt_pct: '17.45'
         FeO_wt_pct: '2.84'
@@ -15953,7 +16021,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1435'
         Fe2O3_wt_pct: '19.40'
         FeO_wt_pct: '2.89'
@@ -15987,7 +16055,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1435'
         Fe2O3_wt_pct: '22.08'
         FeO_wt_pct: '3.39'
@@ -16021,7 +16089,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1435'
         Fe2O3_wt_pct: '19.63'
         FeO_wt_pct: '2.45'
@@ -16055,7 +16123,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '996'
         Fe2O3_wt_pct: '22.10'
         FeO_wt_pct: '0.14'
@@ -16089,7 +16157,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '996'
         Fe2O3_wt_pct: '21.99'
         FeO_wt_pct: '0.23'
@@ -16123,7 +16191,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '996'
         Fe2O3_wt_pct: '21.44'
         FeO_wt_pct: '0.34'
@@ -16157,7 +16225,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '996'
         Fe2O3_wt_pct: '37.58'
         FeO_wt_pct: '0.28'
@@ -16191,7 +16259,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '996'
         Fe2O3_wt_pct: '22.06'
         FeO_wt_pct: '0.27'
@@ -16225,7 +16293,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1288'
         Fe2O3_wt_pct: '33.31'
         FeO_wt_pct: '1.98'
@@ -16259,7 +16327,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1288'
         Fe2O3_wt_pct: '19.38'
         FeO_wt_pct: '2.77'
@@ -16293,7 +16361,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1288'
         Fe2O3_wt_pct: '22.58'
         FeO_wt_pct: '2.91'
@@ -16327,7 +16395,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1541'
         Fe2O3_wt_pct: '28.73'
         FeO_wt_pct: '5.98'
@@ -16361,7 +16429,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1541'
         Fe2O3_wt_pct: '16.46'
         FeO_wt_pct: '7.20'
@@ -16395,7 +16463,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1541'
         Fe2O3_wt_pct: '14.84'
         FeO_wt_pct: '6.69'
@@ -16429,7 +16497,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1541'
         Fe2O3_wt_pct: '17.34'
         FeO_wt_pct: '7.69'
@@ -16463,7 +16531,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1354'
         Fe2O3_wt_pct: '17.05'
         FeO_wt_pct: '5.10'
@@ -16497,7 +16565,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1354'
         Fe2O3_wt_pct: '13.75'
         FeO_wt_pct: '5.05'
@@ -16531,7 +16599,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1354'
         Fe2O3_wt_pct: '16.72'
         FeO_wt_pct: '5.00'
@@ -16565,7 +16633,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1451'
         Fe2O3_wt_pct: '15.50'
         FeO_wt_pct: '6.97'
@@ -16599,7 +16667,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1451'
         Fe2O3_wt_pct: '11.89'
         FeO_wt_pct: '6.33'
@@ -16633,7 +16701,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1451'
         Fe2O3_wt_pct: '12.44'
         FeO_wt_pct: '6.36'
@@ -16667,7 +16735,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1451'
         Fe2O3_wt_pct: '11.30'
         FeO_wt_pct: '5.82'
@@ -16701,7 +16769,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1451'
         Fe2O3_wt_pct: '10.59'
         FeO_wt_pct: '5.83'
@@ -16735,7 +16803,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1437'
         Fe2O3_wt_pct: '9.54'
         FeO_wt_pct: '3.42'
@@ -16749,10 +16817,8 @@ species:
           FeO_wt_pct: '3.42'
           log_fO2:
             value: '-0.68'
-            units: log10(bar)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
+            units: log10
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
     - observation_id: kc91_fe3_t5_B34
       experiment: kc91_t5_B34
       type: concentration_series
@@ -16779,7 +16845,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1388'
         Fe2O3_wt_pct: '10.01'
         FeO_wt_pct: '2.83'
@@ -16793,10 +16859,8 @@ species:
           FeO_wt_pct: '2.83'
           log_fO2:
             value: '-0.68'
-            units: log10(bar)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
+            units: log10
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
     - observation_id: kc91_fe3_t5_B44
       experiment: kc91_t5_B44
       type: concentration_series
@@ -16823,7 +16887,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1485'
         Fe2O3_wt_pct: '8.39'
         FeO_wt_pct: '4.45'
@@ -16837,10 +16901,8 @@ species:
           FeO_wt_pct: '4.45'
           log_fO2:
             value: '-0.68'
-            units: log10(bar)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
+            units: log10
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
     - observation_id: kc91_fe3_t5_B54
       experiment: kc91_t5_B54
       type: concentration_series
@@ -16867,7 +16929,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1535'
         Fe2O3_wt_pct: '8.41'
         FeO_wt_pct: '4.43'
@@ -16881,10 +16943,8 @@ species:
           FeO_wt_pct: '4.43'
           log_fO2:
             value: '-0.68'
-            units: log10(bar)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
+            units: log10
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
     - observation_id: kc91_fe3_t5_B64
       experiment: kc91_t5_B64
       type: concentration_series
@@ -16911,7 +16971,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1584'
         Fe2O3_wt_pct: '7.59'
         FeO_wt_pct: '5.13'
@@ -16925,10 +16985,8 @@ species:
           FeO_wt_pct: '5.13'
           log_fO2:
             value: '-0.68'
-            units: log10(bar)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
+            units: log10
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
     - observation_id: kc91_fe3_t5_B74
       experiment: kc91_t5_B74
       type: concentration_series
@@ -16955,7 +17013,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1635'
         Fe2O3_wt_pct: '6.82'
         FeO_wt_pct: '5.56'
@@ -16969,10 +17027,8 @@ species:
           FeO_wt_pct: '5.56'
           log_fO2:
             value: '-0.68'
-            units: log10(bar)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
+            units: log10
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
     - observation_id: kc91_fe3_t5_B76
       experiment: kc91_t5_B76
       type: concentration_series
@@ -16999,7 +17055,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1342'
         Fe2O3_wt_pct: '7.56'
         FeO_wt_pct: '5.14'
@@ -17013,10 +17069,8 @@ species:
           FeO_wt_pct: '5.14'
           log_fO2:
             value: '-2.88'
-            units: log10(bar)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
+            units: log10
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
     - observation_id: kc91_fe3_t5_B79
       experiment: kc91_t5_B79
       type: concentration_series
@@ -17043,7 +17097,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1296'
         Fe2O3_wt_pct: '8.18'
         FeO_wt_pct: '4.71'
@@ -17057,10 +17111,8 @@ species:
           FeO_wt_pct: '4.71'
           log_fO2:
             value: '-3.06'
-            units: log10(bar)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
+            units: log10
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
     - observation_id: kc91_fe3_t5_B82
       experiment: kc91_t5_B82
       type: concentration_series
@@ -17087,7 +17139,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1249'
         Fe2O3_wt_pct: '8.91'
         FeO_wt_pct: '3.99'
@@ -17101,10 +17153,8 @@ species:
           FeO_wt_pct: '3.99'
           log_fO2:
             value: '-3.26'
-            units: log10(bar)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
+            units: log10
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
     - observation_id: kc91_fe3_t5_B105
       experiment: kc91_t5_B105
       type: concentration_series
@@ -17131,7 +17181,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1636'
         Fe2O3_wt_pct: '0.52'
         FeO_wt_pct: '10.89'
@@ -17145,10 +17195,9 @@ species:
           FeO_wt_pct: '10.89'
           log_fO2:
             value: '-6.29'
-            units: log10(bar)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
+            units: log10
+            as_published: '-6,29'
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
     - observation_id: kc91_fe3_t5_B108
       experiment: kc91_t5_B108
       type: concentration_series
@@ -17175,7 +17224,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1548'
         Fe2O3_wt_pct: '2.11'
         FeO_wt_pct: '12.61'
@@ -17189,10 +17238,8 @@ species:
           FeO_wt_pct: '12.61'
           log_fO2:
             value: '-5.40'
-            units: log10(bar)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
+            units: log10
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
     - observation_id: kc91_fe3_t5_B118
       experiment: kc91_t5_B118
       type: concentration_series
@@ -17219,7 +17266,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1544'
         Fe2O3_wt_pct: '1.82'
         FeO_wt_pct: '10.39'
@@ -17233,10 +17280,8 @@ species:
           FeO_wt_pct: '10.39'
           log_fO2:
             value: '-5.42'
-            units: log10(bar)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
+            units: log10
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
     - observation_id: kc91_fe3_t5_B120
       experiment: kc91_t5_B120
       type: concentration_series
@@ -17263,7 +17308,7 @@ species:
         output_unit: dimensionless
       values:
         quantity: fe3_fe2_ratio
-        method_class: measured_direct
+        method_class: measured_reduced
         T_C: '1632'
         Fe2O3_wt_pct: '1.80'
         FeO_wt_pct: '10.38'
@@ -17277,10 +17322,9 @@ species:
           FeO_wt_pct: '10.38'
           log_fO2:
             value: '-4.74'
-            units: log10(bar)
-            note: Column header is log(fO2) and does not name bar or atm. A bare printed log uses the
-              migrator bar reference (1 bar = 100000 Pa). At the printed precision -0.68 is the same in
-              bar and atm.
+            units: log10
+            as_published: '-4,74'
+            note: The table header is log(fO2) and prints no pressure reference. The migrator's unqualified-log convention interprets it as log10(bar); the paper does not specify that reference.
     context:
     - observation_id: kc91_t6_a
       type: fit_coefficient_row
@@ -17608,7 +17652,8 @@ species:
         schema_gap: Best-fit coefficients of Eq. 7 for natural liquids. model_derived from a weighted
           regression of 228 quench data, except e, which was adopted from Stebbins et al. (1984) and held
           fixed. No store token for these coefficients.
-        evidence_class: model_derived
+        evidence_class: quoted_attributed
+        attribution: Stebbins et al. (1984)
         as_published_row: '$e$ | $-3.36$ | '
         column_2_as_published: $-3.36$
         column_2_value: '-3.36'
@@ -17934,14 +17979,21 @@ species:
         quantity_as_printed: Calculated equilibrium oxygen fugacity for a melt ascending as a closed system
           along an adiabatic gradient, showing the effect of third-order volume derivatives. Curves use
           the K' values in the legend.
-        axes_as_printed: oxygen fugacity versus pressure along an adiabat
+        species_as_printed: iron redox in silicate melt
+        phase_as_printed: liquid
+        temperature_as_printed: T (°C) on the top axis
+        axes_as_printed: log10(fO2) versus P (GPa), with T (°C) on the top axis
         caption: Calculated equilibrium oxygen fugacity for a melt ascending as a closed system along
           an adiabatic gradient, showing the effect of third-order volume derivatives. Curves use the
           K' values in the legend.
         panel: single
         series:
-        - label: K' curves in the legend
-          marker_count: not counted
+        - label: K' = 8 for Fe2O3 and 3 for FeO, solid curve
+          marker_count: '0 discrete markers; continuous line'
+        - label: K' = 4 for Fe2O3 and 4 for FeO, dotted curve
+          marker_count: '21 circular plotted markers'
+        - label: K' = 3 for Fe2O3 and 8 for FeO, dashed curve
+          marker_count: '0 discrete markers; dashed line'
         numeric_points: none
         digitisation: deferred to a figure pass
         attribution: Kress and Carmichael (1991)
@@ -17956,22 +18008,27 @@ species:
       values:
         method_class: figure_only
         quantity_as_printed: Oxygen fugacity along an adiabatic gradient from 1350 C at one atmosphere.
-        axes_as_printed: log oxygen fugacity versus pressure
-        caption: Oxygen fugacity along an adiabatic gradient from 1350 C at one atmosphere.
+        species_as_printed: iron redox in a mid-ocean ridge basalt melt
+        phase_as_printed: liquid
+        temperature_as_printed: starts at 1350 °C and 1 atm; T (°C) varies on the top axis
+        axes_as_printed: log10(fO2) versus P (GPa), with T (°C) on the top axis
+        caption: Oxygen fugacity along an adiabatic gradient from 1350°C at one atmosphere. Curves include
+          a mid-ocean ridge basalt ascending as a closed system. Melt1 was calculated on the basis of
+          Eqs. A-6 and A-7; Melt2 is estimated from Eq. 7. Also plotted are oxygen fugacities defined
+          by the metastable fayalite-magnetite-beta quartz (FMQ), fayalite-magnetite-ferrosilite (FMFs),
+          and Ni+NiO (NNO) assemblages.
         panel: single
         series:
-        - label: MORB closed system
-          marker_count: not counted
         - label: Melt1 (Eqs. A-6 and A-7)
-          marker_count: not counted
+          marker_count: '31 open-square markers'
         - label: Melt2 (Eq. 7)
-          marker_count: not counted
+          marker_count: '0 discrete markers; continuous line'
         - label: FMQ
-          marker_count: not counted
-        - label: FMFs
-          marker_count: not counted
+          marker_count: '31 circular markers'
         - label: NNO
-          marker_count: not counted
+          marker_count: '0 discrete markers; dashed line'
+        - label: FMFs
+          marker_count: '0 discrete markers; dashed line'
         numeric_points: none
         digitisation: deferred to a figure pass
         attribution: Kress and Carmichael (1991)
