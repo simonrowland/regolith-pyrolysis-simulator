@@ -419,8 +419,8 @@ def test_c2a_staged_freeze_gate_on_closes_mass_balance(
     # prefix still has to close on both freeze-gate paths.
     # Both configurations complete 13 ledger-authorized hours, then refuse
     # before committing the first unsupported transitional-Kn hour.
-    assert steps == 13
-    assert refusal is not None
+    assert steps == 13, f"b-823 pin: staged route ran {steps} steps instead of 13"
+    assert refusal is not None, "b-823 pin: expected transitional refusal"
     assert refusal.reason == "viscous_p_bulk_transport_out_of_domain"
     assert refusal.diagnostic["evaporation_flux_status"] == "not_evaluated"
     assert refusal.diagnostic["evaporation_flux_kg_hr"] is None
@@ -516,7 +516,7 @@ def test_cumulative_transition_mass_closure_bounded_at_transitional_refusal():
             break
         steps += 1
 
-    assert refusal is not None
+    assert refusal is not None, "b-823 pin: no-MRE run expected transitional refusal"
     assert refusal.reason == "viscous_p_bulk_transport_out_of_domain"
     assert refusal.diagnostic["evaporation_flux_status"] == "not_evaluated"
     assert refusal.diagnostic["evaporation_flux_kg_hr"] is None
