@@ -53,6 +53,7 @@ from simulator.battery.migrate import (
     DuplicateContextIdError,
     QUEUE_SCHEMA_VERSION,
     DuplicateObservationIdError,
+    _convert_compilation_amount,
     MigrationResult,
     Migrator,
     UnknownRailSpellingError,
@@ -6138,6 +6139,7 @@ _CENSUS_QUANTITY_ALIASES = {
     "deltafG": "delta_fG",
     "delta_fG": "delta_fG",
     "delta_fG_kJ_mol": "delta_fG",
+    "log10_Ce4plus_over_Ce3plus": "valence_ratio",
     "log10_Kf": "log10_Kf",
     "log10_kf": "log10_Kf",
     "log10_K_star_equilibrium_fit": "log10_K_star",
@@ -6164,6 +6166,8 @@ _CENSUS_CLOSED_QUANTITIES = {
     "p_reference",
     "fugacity",
     "log10_Kf",
+    "delta_fH",
+    "valence_ratio",
     "log10_K_star",
     "activity",
     "activity_coefficient",
@@ -6409,14 +6413,42 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
                 return amount / as_decimal("1000")
             if unit in {"kj/mol", "kjmol-1", "kjmol^-1", "kj_per_mol"}:
                 return amount
+            if unit in {"kcal/mol", "kcal/mole"}:
+                converted = _convert_compilation_amount(
+                    amount, Quantity.H_MINUS_H298, units
+                )
+                return converted[0] if converted is not None else None
             return None
         return None
     if q_token == "delta_fG":
-        if "delta_fG" in item:
-            return _num(item.get("delta_fG"))
-        if "value" in item:
-            return _num(item.get("value"))
-        return None
+        amount = _num(item.get("delta_fG", item.get("value")))
+        if amount is None:
+            return None
+        if str(units or "").strip().lower() in {"kcal/mol", "kcal/mole"}:
+            converted = _convert_compilation_amount(amount, Quantity.DELTA_FG, units)
+            return converted[0] if converted is not None else None
+        return amount
+    if q_token == "delta_fH":
+        amount = _num(item.get("delta_fH", item.get("value")))
+        if amount is None:
+            return None
+        if str(units or "").strip().lower() in {"kcal/mol", "kcal/mole"}:
+            converted = _convert_compilation_amount(amount, Quantity.DELTA_FH, units)
+            return converted[0] if converted is not None else None
+        return amount
+    if q_token == "log10_Kf":
+        return _num(item.get("log10_Kf"))
+    if q_token == "fe3_fe2_ratio":
+        ratio = _num(item.get("Fe3_over_FeT"))
+        if ratio is None:
+            return None
+        if str(units or "").strip().lower() == "fraction (fe3+/sumfe)":
+            if ratio == 1:
+                return None
+            return ratio / (as_decimal("1") - ratio)
+        return ratio
+    if q_token == "valence_ratio":
+        return _num(item.get("value"))
     if q_token == "fugacity":
         return _num(item.get("fugacity_Pa")) if "fugacity_Pa" in item else None
     if q_token in {"p_sat", "p_partial"}:
@@ -6572,6 +6604,11 @@ def _series_census(
                     expected = _census_expected_point(item, q_token, units)
                     stored_obs = by_id.get(oid)
                     if stored_obs is None:
+                        if expected is None:
+                            # A nonnumeric printed cell cannot identify one of
+                            # the store's locator-based stable IDs by value.
+                            n_unavailable += 1
+                            continue
                         stable_points = [
                             observation
                             for observation in stored_observations
@@ -6581,22 +6618,19 @@ def _series_census(
                             and str(observation.get("observation_id") or "")
                             not in used_stable_ids
                         ]
-                        if expected is not None:
-                            stored_obs = next(
-                                (
-                                    observation
-                                    for observation in stable_points
-                                    if (observation.get("value") or {}).get("kind")
-                                    == "point"
-                                    and Decimal(
-                                        str((observation.get("value") or {}).get("point"))
-                                    )
-                                    == expected
-                                ),
-                                None,
-                            )
-                        elif stable_points:
-                            stored_obs = stable_points[0]
+                        stored_obs = next(
+                            (
+                                observation
+                                for observation in stable_points
+                                if (observation.get("value") or {}).get("kind")
+                                == "point"
+                                and Decimal(
+                                    str((observation.get("value") or {}).get("point"))
+                                )
+                                == expected
+                            ),
+                            None,
+                        )
                     if stored_obs is None:
                         mismatches.append(f"missing stored point {oid}")
                         continue
@@ -6739,7 +6773,8 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # cells: four components across eight evaporated samples. The count moved
     # because the data was added, not because a check was relaxed; mismatches
     # stays 0.
-    assert census.get("residue_component_composition") == 1314
+    # kems-010 adds 51 rows × 4 residue cells = 204; every cell matches.
+    assert census.get("residue_component_composition") == 1518
     assert per_source.get("kems-012-sossi-2019") == {"residue_component_composition": 516}
     assert per_source.get("kems-015-hashimoto-1983") == {"residue_component_composition": 648}
     assert per_source.get("kems-024-gibson-hubbard-1972") == {
@@ -6758,17 +6793,15 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # belite 6); Sugawara & Akaogi adds six measured heat-content cells, including
     # the Table 1 series. Per-source deltas: Abdul 0->13, Sugawara 0->6.
     # The independent census checks all six source cells; mismatches stay 0.
-    assert census.get("H_minus_H298") == 19
+    # Beyer adds 117 printed kcal heat-content cells now checked after conversion.
+    assert census.get("H_minus_H298") == 136
     assert per_source.get("abdul-2023-cao-sio2-calphad") == {"H_minus_H298": 13}
     assert per_source.get("sugawara-akaogi-2004-liquid-calorimetry") == {
         "H_minus_H298": 6
     }
-    # Fresh regeneration restores 33 missing extract siblings. Three add numeric
-    # series cells: Gaillard (82 activity), Ivanova (32 residue oxides), and
-    # Tsuchiyama (18 areal mass-loss cells). Their 132 cells have zero mismatches;
-    # the merged numeric-series count moves 2071->2203 because the data became
-    # visible, not because a check was relaxed.
-    assert n_numeric == 2203, (n_numeric, census, n_unavailable)
+    # Fresh regeneration restores 33 missing extract siblings (+132); this fix
+    # checks all 433 existing converted cells, moving 2681->3114 with no exceptions.
+    assert n_numeric == 3114, (n_numeric, census, n_unavailable)
 
 
 def test_residue_point_condition_values_keep_their_printed_types() -> None:
