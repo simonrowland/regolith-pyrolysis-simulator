@@ -9,6 +9,7 @@ input is refused rather than defaulted.
 
 from dataclasses import replace
 from decimal import Decimal
+from types import SimpleNamespace
 
 import pytest
 
@@ -190,6 +191,51 @@ def _case(
 
 def _melt(experiment, bench, observation):
     return melt_activity_requests(collect_consumer_inputs(experiment, bench, observation))
+
+
+def _install_scoring_cell(
+    monkeypatch,
+    *,
+    melt_activities=None,
+    gas_pressures=None,
+):
+    seen = {"cell_calls": []}
+
+    def _open(name):
+        return SimpleNamespace(
+            name=name,
+            available=True,
+            unavailable_reason=None,
+            supports_intrinsic_fO2=False,
+        )
+
+    def _cell(_handle, _pot, *, po2, **_kwargs):
+        seen["cell_calls"].append(
+            {"mode": po2.mode, "po2_bar": po2.po2_bar}
+        )
+        return SimpleNamespace(
+            status="ok",
+            refusal_reason=None,
+            melt_activities=dict(melt_activities or {}),
+            melt_activity_coefficients={},
+            gas_partial_pressures_Pa=dict(gas_pressures or {}),
+            hostname="test",
+            exit_code=0,
+            exit_signal=None,
+            notices=[],
+            authority=None,
+            certified_band=None,
+        )
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    return seen
 
 
 def test_requirement_tuple_does_not_include_pressure_or_oxygen():
@@ -555,40 +601,9 @@ def test_scorer_refuses_a_multivalent_gap_before_the_engine_default(monkeypatch)
 
 
 def test_redox_free_activity_is_scored_without_an_oxygen_input(monkeypatch):
-    seen = {}
-
-    def _open(name):
-        return type("Handle", (), {
-            "name": name,
-            "available": True,
-            "unavailable_reason": None,
-            "supports_intrinsic_fO2": False,
-        })()
-
-    def _cell(_handle, _pot, *, po2, **_kwargs):
-        seen['mode'] = po2.mode
-        seen['po2_bar'] = po2.po2_bar
-        return type("Cell", (), {
-            "status": "ok",
-            "refusal_reason": None,
-            "melt_activities": {"SiO2": 0.4},
-            "melt_activity_coefficients": {},
-            "gas_partial_pressures_Pa": {},
-            "hostname": "test",
-            "exit_code": 0,
-            "exit_signal": None,
-            "notices": [],
-            "authority": None,
-            "certified_band": None,
-        })()
-
-    monkeypatch.setattr(
-        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
-        _open,
-    )
-    monkeypatch.setattr(
-        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
-        _cell,
+    seen = _install_scoring_cell(
+        monkeypatch,
+        melt_activities={"SiO2": 0.4},
     )
     from simulator.battery.enums import Engine
     from simulator.battery.score import predict_with_engine
@@ -603,8 +618,80 @@ def test_redox_free_activity_is_scored_without_an_oxygen_input(monkeypatch):
         Engine.ALPHAMELTS, observation, experiment=experiment, isolated=False,
     )
 
-    assert seen == {'mode': 'not_an_input', 'po2_bar': None}
+    assert seen["cell_calls"] == [{"mode": "not_an_input", "po2_bar": None}]
     assert prediction.value == Decimal('0.4')
+
+
+def test_multivalent_psat_without_oxygen_is_a_typed_scorer_refusal(monkeypatch):
+    seen = _install_scoring_cell(monkeypatch, gas_pressures={"FeO": 3.0})
+    from simulator.battery.enums import Engine, RefusalReason
+    from simulator.battery.score import predict_with_engine
+
+    experiment = f.tabulation_experiment()
+    observation = f.observation(
+        "feo-psat",
+        experiment.experiment_id,
+        f.psat_identity("FeO"),
+        Decimal("1"),
+    )
+    prediction = predict_with_engine(
+        Engine.ALPHAMELTS,
+        observation,
+        experiment=experiment,
+        isolated=False,
+    )
+
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail["reason"] == "missing_fO2"
+    assert prediction.refusal_detail["quantity"] == Quantity.P_SAT.value
+    assert prediction.refusal_detail["multivalent"] == ["FeO"]
+    assert seen["cell_calls"] == []
+
+
+def test_fe_free_psat_numeric_residual_keeps_omitted_oxygen_mode(monkeypatch):
+    seen = _install_scoring_cell(monkeypatch, gas_pressures={"Na": 4.0})
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import (
+        ScoreContext,
+        predict_with_engine,
+        score_store,
+    )
+
+    work = f.work()
+    experiment = f.tabulation_experiment()
+    observation = f.observation(
+        "na-psat",
+        experiment.experiment_id,
+        f.psat_identity("Na"),
+        Decimal("2"),
+        source_id="janaf-4th",
+    )
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={observation.observation_id: observation},
+        extract_review={"janaf-4th": "reviewed"},
+        hostname="test",
+    )
+
+    def predict(engine, candidate, *, handles=None, experiment=None):
+        return predict_with_engine(
+            engine,
+            candidate,
+            experiment=experiment,
+            isolated=False,
+        )
+
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.ALPHAMELTS,),
+        predict=predict,
+    )
+
+    assert seen["cell_calls"] == [{"mode": "not_an_input", "po2_bar": None}]
+    assert residuals[0].numeric is not None
+    assert residuals[0].numeric.value == Decimal("0.3010299956639812")
 
 
 def test_redox_active_no_input_refuses_as_typed_scorer_input_error():
