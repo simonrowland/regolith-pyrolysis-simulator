@@ -2505,20 +2505,25 @@ def render_hero_charts(
             benchmark = data.hero_benchmarks[(rail, engine)]
             metric = data.hero_all_numeric_metrics.get((rail, engine))
             all_numeric_rms = _format_dex(None if metric is None else metric.get("rms_dex"))
+            all_numeric_rms_label = (
+                all_numeric_rms
+                if all_numeric_rms == "unavailable"
+                else f"{all_numeric_rms} dex"
+            )
             all_numeric_count = _compact_count(
                 0 if metric is None else metric.get("n_dex", 0)
             )
             if benchmark.get("benchmark_engine") is None:
                 status_lines.append(
                     f"{engine}: benchmark unavailable (same-row n=0) · "
-                    f"all-numeric RMS {all_numeric_rms} dex (n={all_numeric_count})"
+                    f"all-numeric RMS {all_numeric_rms_label} (n={all_numeric_count})"
                 )
             else:
                 status_lines.append(
                     f"{engine}: same-row RMS {_format_dex(benchmark.get('primary_rms_dex'))} dex "
                     f"(n={_compact_count(benchmark.get('n'))}) vs "
                     f"{benchmark.get('benchmark_engine')} {_format_dex(benchmark.get('benchmark_rms_dex'))} dex · "
-                    f"all-numeric RMS {all_numeric_rms} dex (n={all_numeric_count})"
+                    f"all-numeric RMS {all_numeric_rms_label} (n={all_numeric_count})"
                 )
         not_observable = [
             f"{engine} {_compact_count(diagnostic.get('not_observable_count'))}"
