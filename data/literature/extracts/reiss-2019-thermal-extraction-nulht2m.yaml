@@ -124,7 +124,7 @@ species:
       type: rate_series
       locator:
         table: '1'
-        pdf_page_index: 10
+        pdf_page_index: 9
         page: 10
         note: Table 1 Test parameters for the volatiles extraction; 350 dpi pdftoppm of PDF page 10
       T_range_K:
@@ -187,7 +187,7 @@ species:
       type: gibbs_table
       locator:
         table: '2'
-        pdf_page_index: 18
+        pdf_page_index: 17
         page: 18
         note: Table 2 Major mineral phase abundances in NU-LHT-2M according to Rickman and Lowers (2012)
       phase: NU-LHT-2M_single_phase_particles
@@ -241,7 +241,8 @@ species:
       type: rate_series
       locator:
         pdf_page_index: 5
-        page: 5
+        page: 6
+        published_page: 5
         section: '2.2'
         figure: 2-4
         note: Volatiles extraction system; 350 dpi renders of PDF pages 4-7 and 11
@@ -319,7 +320,7 @@ species:
       type: rate_series
       locator:
         figure: '5'
-        pdf_page_index: 10
+        pdf_page_index: 9
         page: 10
         note: Type I and Type II coefficients printed on Fig. 5 plate; curve itself not digitised
       phase: NU-LHT-2M_humidified_nitrogen
@@ -394,7 +395,7 @@ species:
       type: transition_point
       locator:
         pdf_page_index: 12
-        page: 12
+        page: 13
         figure: '6'
         paragraph: 201-207
         note: Printed peak-band temperatures in prose, not read off Fig. 6
@@ -441,7 +442,7 @@ species:
       type: rate_series
       locator:
         pdf_page_index: 17
-        page: 17
+        page: 18
         paragraph: 297-318
         note: §Volatiles yield; integrals of RGA p(t) with assumed q_pump, not a balance measurement
       T_range_K:
