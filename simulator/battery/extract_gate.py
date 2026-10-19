@@ -375,108 +375,6 @@ def _composition_basis_issues(doc: object) -> list[str]:
     return issues
 
 
-def _single_oxide(species: object) -> bool:
-    if not isinstance(species, str):
-        return False
-    parsed = parse_species_formula(species)
-    if parsed is None:
-        return False
-    elements = {element for element, _count in parsed}
-    return len(elements) == 2 and "O" in elements
-
-
-def _has_multicomponent_composition(node: object, parent_species: str) -> bool:
-    for mapping, _path in _mappings(node):
-        for key, value in mapping.items():
-            key_text = str(key).lower()
-            if "composition" not in key_text:
-                continue
-            if _formula_count(value) >= 2:
-                return True
-        if "components" in mapping and _formula_count(mapping) >= 2:
-            return True
-        for key, value in mapping.items():
-            match = re.fullmatch(
-                r"x_([A-Za-z][A-Za-z0-9]*)_(?:mol|mass|wt)_percent_as_printed",
-                str(key),
-            )
-            amount = _as_decimal(value)
-            if (
-                match
-                and amount is not None
-                and amount > 0
-                and match.group(1) != parent_species
-            ):
-                return True
-    return False
-
-
-def _is_transition_observation(observation: Mapping[str, Any]) -> bool:
-    values = observation.get("values")
-    if not isinstance(values, Mapping):
-        return False
-    if str(values.get("property_kind") or "").strip().casefold() == "liquidus":
-        return False
-    labels = " ".join(
-        str(value or "").lower()
-        for value in (
-            values.get("quantity"),
-            values.get("property_kind"),
-            observation.get("type"),
-        )
-    )
-    return re.search(
-        r"(?:transition_temperature|heat_of_fusion|melting_point)(?:s|_|\b)",
-        labels,
-    ) is not None
-
-
-def _transition_composition_issues(doc: object) -> list[str]:
-    if not isinstance(doc, Mapping):
-        return []
-    species_blocks = doc.get("species")
-    if not isinstance(species_blocks, Mapping):
-        return []
-    experiment_rows = doc.get("experiments")
-    if isinstance(experiment_rows, Mapping):
-        experiment_rows = list(experiment_rows.values())
-    experiments = (
-        {
-            str(row.get("experiment_id")): row
-            for row in experiment_rows
-            if isinstance(row, Mapping) and row.get("experiment_id")
-        }
-        if isinstance(experiment_rows, list)
-        else {}
-    )
-    issues: list[str] = []
-    for species, block in species_blocks.items():
-        if not _single_oxide(str(species)) or not isinstance(block, Mapping):
-            continue
-        observations = block.get("observations")
-        if not isinstance(observations, list):
-            continue
-        for observation in observations:
-            if not isinstance(observation, Mapping) or not _is_transition_observation(
-                observation
-            ):
-                continue
-            experiment = experiments.get(str(observation.get("experiment_id")))
-            sample = (
-                experiment.get("sample") if isinstance(experiment, Mapping) else None
-            )
-            if _has_multicomponent_composition(
-                [observation, sample], str(species)
-            ):
-                issues.append(
-                    f"species.{species}.observations["
-                    f"{observation.get('observation_id', '?')}] "
-                    "files a transition property under one oxide despite a "
-                    "multi-component sample composition"
-                )
-    return issues
-
-
 def _uncertainty_zero_paths(node: object, path: str) -> list[str]:
     issues: list[str] = []
 
@@ -1026,7 +924,6 @@ def evaluate_extract(
     _add(report, "locator-pdf", "SOFT", locator_pdf_soft)
     _add(report, "locator-legacy", "SOFT", locator_legacy_soft)
     _add(report, "composition", "HARD", _composition_basis_issues(doc))
-    _add(report, "transition-composition", "HARD", _transition_composition_issues(doc))
     _add(report, "zero-uncertainty", "HARD", _uncertainty_issues(doc))
 
     report.tables = _capture_report(doc, corpus)

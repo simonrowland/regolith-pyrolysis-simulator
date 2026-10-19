@@ -243,7 +243,7 @@ def test_fraction_sum_uses_numeric_siblings_and_rounding_band():
     assert not any("percent-as-fraction" in issue for issue in gate._composition_basis_issues(doc))
 
 
-def test_transition_composition_flags_nonliquidus_but_allows_liquidus(
+def test_unbound_transition_composition_is_rejected_by_identity_profile(
     tmp_path: Path,
 ):
     doc = _document()
@@ -280,24 +280,35 @@ def test_transition_composition_flags_nonliquidus_but_allows_liquidus(
     doc["fidelity_samples"][0]["value"] = 1800
     report = _run_gate(tmp_path, doc)
 
-    assert "transition-composition" in _checks(report)
-    assert next(item for item in report.findings if item.check == "transition-composition").severity == "HARD"
+    assert "isolated-migration" in _checks(report)
+    assert report.migration_hard_issues > 0
+    assert "composition" in next(
+        item.detail for item in report.findings if item.check == "isolated-migration"
+    ).lower()
 
-    doc["experiments"][0]["sample"]["printed_composition"]["state"]["value"]["components"][0][1] = "0"
-    assert "transition-composition" not in _checks(_run_gate(tmp_path, doc))
-    doc["experiments"][0]["sample"]["printed_composition"]["state"]["value"]["components"][0][1] = "0.7"
 
-    row["values"]["property_kind"] = "liquidus"
-    report = _run_gate(tmp_path, doc)
+def test_profile_bound_transition_extracts_pass_migration_gate():
+    extracts = Path(__file__).resolve().parents[2] / "data/literature/extracts"
+    for source_id, expected_observations in (
+        ("rys-2007-alkali-oxide-thermodynamics", 1001),
+        ("costa-2025-ree-cmas-glass-melt-thermochemistry", 28),
+    ):
+        path = extracts / f"{source_id}.yaml"
+        doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+        report = gate.GateReport()
 
-    assert "transition-composition" not in _checks(report)
+        assert gate._migrate_one(path, doc, report) == []
+        assert report.migration_hard_issues == 0
+        assert sum(report.value_kinds.values()) == expected_observations
 
 
 def test_zero_components_in_shornikov_rows_do_not_make_transition_mixtures():
     path = Path(__file__).resolve().parents[2] / "data/literature/extracts/shornikov-2000-aluminosilicate-vaporization.yaml"
     doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
-    issues = gate._transition_composition_issues(doc)
-    assert not any(f"shornikov_2000_table1_row_{row:02d}" in issue for issue in issues for row in range(1, 6))
+    report = gate.GateReport()
+
+    assert gate._migrate_one(path, doc, report) == []
+    assert report.migration_hard_issues == 0
 
 
 def test_evidence_classification_is_owned_by_migration_and_validation(tmp_path: Path):
