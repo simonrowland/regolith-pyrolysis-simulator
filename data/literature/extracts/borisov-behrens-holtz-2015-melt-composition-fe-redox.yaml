@@ -15,8 +15,8 @@ extraction:
     text layer and all 871 table cells were checked against 600 dpi renders of physical PDF pages 4 and 5. Tables
     2 and 3 model coefficients were transcribed and checked against the 600 dpi render of physical PDF page 10.
     Figures 1–7 were inspected on 600 dpi renders and recorded without numeric points. Table 1 prints −log fO2 without
-    an atm/bar reference; values are retained as printed and canonical absolute fO2 remains unknown pending a reference
-    ruling.
+    an atm/bar reference; the printed value and form are retained in raw fields, and canonical log10 fO2 uses the
+    controller's bar-convention ruling.
   date: '2026-10-19'
   worker: fam16-1019
   audit_files:
@@ -547,6 +547,7 @@ species:
         T_C: '1450'
         T_cell_as_published: '1450'
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: '0.68'
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '15.0'
@@ -586,15 +587,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '1'
-            note: null
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -675,6 +676,7 @@ species:
         T_C: '1450'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '15.0'
@@ -714,15 +716,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '2'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -803,6 +805,7 @@ species:
         T_C: '1450'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '15.0'
@@ -843,15 +846,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '3'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -932,6 +935,7 @@ species:
         T_C: '1450'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '15.0'
@@ -972,15 +976,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '4'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -1061,6 +1065,7 @@ species:
         T_C: '1450'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '15.0'
@@ -1100,15 +1105,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '5'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -1189,6 +1194,7 @@ species:
         T_C: '1450'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '15.0'
@@ -1228,15 +1234,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '6'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -1317,6 +1323,7 @@ species:
         T_C: '1501'
         T_cell_as_published: '1501'
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: '0.68'
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '7.0'
@@ -1356,15 +1363,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '7'
-            note: null
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -1445,6 +1452,7 @@ species:
         T_C: '1501'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '7.0'
@@ -1484,15 +1492,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '8'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -1573,6 +1581,7 @@ species:
         T_C: '1501'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '7.0'
@@ -1612,15 +1621,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '9'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -1701,6 +1710,7 @@ species:
         T_C: '1501'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '7.0'
@@ -1740,15 +1750,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '10'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -1829,6 +1839,7 @@ species:
         T_C: '1501'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '7.0'
@@ -1868,15 +1879,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '11'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -1957,6 +1968,7 @@ species:
         T_C: '1501'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '7.0'
@@ -1996,15 +2008,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '12'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -2085,6 +2097,7 @@ species:
         T_C: '1551'
         T_cell_as_published: '1551'
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: '0.68'
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '6.0'
@@ -2124,15 +2137,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '13'
-            note: null
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -2213,6 +2226,7 @@ species:
         T_C: '1551'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '6.0'
@@ -2252,15 +2266,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '14'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -2341,6 +2355,7 @@ species:
         T_C: '1551'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '6.0'
@@ -2380,15 +2395,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '15'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -2469,6 +2484,7 @@ species:
         T_C: '1551'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '6.0'
@@ -2508,15 +2524,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '16'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -2597,6 +2613,7 @@ species:
         T_C: '1551'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '6.0'
@@ -2636,15 +2653,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '17'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -2725,6 +2742,7 @@ species:
         T_C: '1551'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '6.0'
@@ -2764,15 +2782,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '18'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -2853,6 +2871,7 @@ species:
         T_C: '1399'
         T_cell_as_published: '1399'
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: '0.68'
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '23.0'
@@ -2892,15 +2911,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '19'
-            note: null
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -2981,6 +3000,7 @@ species:
         T_C: '1399'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '23.0'
@@ -3020,15 +3040,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '20'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -3109,6 +3129,7 @@ species:
         T_C: '1399'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '23.0'
@@ -3148,15 +3169,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '21'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -3237,6 +3258,7 @@ species:
         T_C: '1450'
         T_cell_as_published: '1450'
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: '0.68'
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '14.3'
@@ -3276,15 +3298,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '22'
-            note: null
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -3365,6 +3387,7 @@ species:
         T_C: '1450'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '14.3'
@@ -3404,15 +3427,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '23'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -3493,6 +3516,7 @@ species:
         T_C: '1450'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '14.3'
@@ -3532,15 +3556,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '24'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -3621,6 +3645,7 @@ species:
         T_C: '1450'
         T_cell_as_published: '1450'
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: '0.68'
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '16.5'
@@ -3660,15 +3685,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '25'
-            note: null
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -3749,6 +3774,7 @@ species:
         T_C: '1450'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '16.5'
@@ -3788,15 +3814,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '26'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -3877,6 +3903,7 @@ species:
         T_C: '1501'
         T_cell_as_published: '1501'
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: '0.68'
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '7.0'
@@ -3916,15 +3943,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '27'
-            note: null
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -4005,6 +4032,7 @@ species:
         T_C: '1501'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '7.0'
@@ -4044,15 +4072,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '28'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -4133,6 +4161,7 @@ species:
         T_C: '1501'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '7.0'
@@ -4172,15 +4201,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '29'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -4261,6 +4290,7 @@ species:
         T_C: '1501'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '7.0'
@@ -4300,15 +4330,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '30'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -4389,6 +4419,7 @@ species:
         T_C: '1501'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '7.0'
@@ -4428,15 +4459,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '31'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -4517,6 +4548,7 @@ species:
         T_C: '1550'
         T_cell_as_published: '1550'
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: '0.68'
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '6.0'
@@ -4556,15 +4588,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '32'
-            note: null
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -4645,6 +4677,7 @@ species:
         T_C: '1550'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '6.0'
@@ -4684,15 +4717,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '33'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -4773,6 +4806,7 @@ species:
         T_C: '1550'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '6.0'
@@ -4812,15 +4846,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '34'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -4901,6 +4935,7 @@ species:
         T_C: '1550'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '6.0'
@@ -4940,15 +4975,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '35'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -5029,6 +5064,7 @@ species:
         T_C: '1550'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '6.0'
@@ -5068,15 +5104,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '36'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -5157,6 +5193,7 @@ species:
         T_C: '1501'
         T_cell_as_published: '1501'
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: '0.68'
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '8.0'
@@ -5196,15 +5233,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '37'
-            note: null
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -5285,6 +5322,7 @@ species:
         T_C: '1501'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '8.0'
@@ -5324,15 +5362,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '38'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -5413,6 +5451,7 @@ species:
         T_C: '1501'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '8.0'
@@ -5452,15 +5491,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '39'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -5541,6 +5580,7 @@ species:
         T_C: '1501'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '8.0'
@@ -5580,15 +5620,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '40'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -5669,6 +5709,7 @@ species:
         T_C: '1501'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '8.0'
@@ -5708,15 +5749,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '41'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -5797,6 +5838,7 @@ species:
         T_C: '1501'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '8.0'
@@ -5836,15 +5878,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '42'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -5925,6 +5967,7 @@ species:
         T_C: '1551'
         T_cell_as_published: '1551'
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: '0.68'
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '6.0'
@@ -5964,15 +6007,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '43'
-            note: null
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -6053,6 +6096,7 @@ species:
         T_C: '1551'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '6.0'
@@ -6092,15 +6136,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '44'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -6181,6 +6225,7 @@ species:
         T_C: '1551'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '6.0'
@@ -6220,15 +6265,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '45'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -6309,6 +6354,7 @@ species:
         T_C: '1551'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '6.0'
@@ -6348,15 +6394,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '46'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -6437,6 +6483,7 @@ species:
         T_C: '1551'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '6.0'
@@ -6476,15 +6523,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '47'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -6565,6 +6612,7 @@ species:
         T_C: '1551'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '6.0'
@@ -6604,15 +6652,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 4
             pdf_page_index: 3
             table: '1'
             row: '48'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -6687,6 +6735,7 @@ species:
         T_C: '1399'
         T_cell_as_published: '1399'
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: '0.68'
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '27.0'
@@ -6727,15 +6776,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 5
             pdf_page_index: 4
             table: '1'
             row: '49'
-            note: null
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -6833,6 +6882,7 @@ species:
         T_C: '1399'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '27.0'
@@ -6873,15 +6923,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 5
             pdf_page_index: 4
             table: '1'
             row: '50'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -6979,6 +7029,7 @@ species:
         T_C: '1399'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '27.0'
@@ -7019,15 +7070,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 5
             pdf_page_index: 4
             table: '1'
             row: '51'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -7125,6 +7176,7 @@ species:
         T_C: '1399'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '27.0'
@@ -7165,15 +7217,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 5
             pdf_page_index: 4
             table: '1'
             row: '52'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -7271,6 +7323,7 @@ species:
         T_C: '1399'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '27.0'
@@ -7311,15 +7364,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 5
             pdf_page_index: 4
             table: '1'
             row: '53'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -7417,6 +7470,7 @@ species:
         T_C: '1399'
         T_cell_as_published: a
         minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '27.0'
@@ -7457,15 +7511,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -0.68
           locator:
             page: 5
             pdf_page_index: 4
             table: '1'
             row: '54'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -7563,6 +7617,7 @@ species:
         T_C: '1450'
         T_cell_as_published: '1450'
         minus_log_fO2_as_published: '2.9'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: '2.9'
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '8.5'
@@ -7602,15 +7657,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -2.9
           locator:
             page: 5
             pdf_page_index: 4
             table: '1'
             row: '55'
-            note: null
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -7691,6 +7746,7 @@ species:
         T_C: '1450'
         T_cell_as_published: a
         minus_log_fO2_as_published: '2.9'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '8.5'
@@ -7730,15 +7786,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -2.9
           locator:
             page: 5
             pdf_page_index: 4
             table: '1'
             row: '56'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -7819,6 +7875,7 @@ species:
         T_C: '1450'
         T_cell_as_published: a
         minus_log_fO2_as_published: '2.9'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '8.5'
@@ -7858,15 +7915,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -2.9
           locator:
             page: 5
             pdf_page_index: 4
             table: '1'
             row: '57'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -7947,6 +8004,7 @@ species:
         T_C: '1498'
         T_cell_as_published: '1498'
         minus_log_fO2_as_published: '2.75'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: '2.75'
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '3.0'
@@ -7986,15 +8044,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -2.75
           locator:
             page: 5
             pdf_page_index: 4
             table: '1'
             row: '58'
-            note: null
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -8075,6 +8133,7 @@ species:
         T_C: '1498'
         T_cell_as_published: a
         minus_log_fO2_as_published: '2.75'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '3.0'
@@ -8114,15 +8173,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -2.75
           locator:
             page: 5
             pdf_page_index: 4
             table: '1'
             row: '59'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -8203,6 +8262,7 @@ species:
         T_C: '1498'
         T_cell_as_published: a
         minus_log_fO2_as_published: '2.75'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '3.0'
@@ -8242,15 +8302,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -2.75
           locator:
             page: 5
             pdf_page_index: 4
             table: '1'
             row: '60'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -8331,6 +8391,7 @@ species:
         T_C: '1498'
         T_cell_as_published: a
         minus_log_fO2_as_published: '2.75'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '3.0'
@@ -8370,15 +8431,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -2.75
           locator:
             page: 5
             pdf_page_index: 4
             table: '1'
             row: '61'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -8459,6 +8520,7 @@ species:
         T_C: '1498'
         T_cell_as_published: a
         minus_log_fO2_as_published: '2.75'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '3.0'
@@ -8498,15 +8560,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -2.75
           locator:
             page: 5
             pdf_page_index: 4
             table: '1'
             row: '62'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -8587,6 +8649,7 @@ species:
         T_C: '1550'
         T_cell_as_published: '1550'
         minus_log_fO2_as_published: '2.59'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: '2.59'
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '3.0'
@@ -8626,15 +8689,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -2.59
           locator:
             page: 5
             pdf_page_index: 4
             table: '1'
             row: '63'
-            note: null
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -8715,6 +8778,7 @@ species:
         T_C: '1550'
         T_cell_as_published: a
         minus_log_fO2_as_published: '2.59'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '3.0'
@@ -8754,15 +8818,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -2.59
           locator:
             page: 5
             pdf_page_index: 4
             table: '1'
             row: '64'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -8843,6 +8907,7 @@ species:
         T_C: '1550'
         T_cell_as_published: a
         minus_log_fO2_as_published: '2.59'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '3.0'
@@ -8882,15 +8947,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -2.59
           locator:
             page: 5
             pdf_page_index: 4
             table: '1'
             row: '65'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -8971,6 +9036,7 @@ species:
         T_C: '1550'
         T_cell_as_published: a
         minus_log_fO2_as_published: '2.59'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '3.0'
@@ -9010,15 +9076,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -2.59
           locator:
             page: 5
             pdf_page_index: 4
             table: '1'
             row: '66'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:
@@ -9093,6 +9159,7 @@ species:
         T_C: '1550'
         T_cell_as_published: a
         minus_log_fO2_as_published: '2.59'
+        minus_log_fO2_form_as_published: −log fO2
         minus_log_fO2_cell_as_published: a
         minus_log_fO2_reference_as_published: not stated in the table or text
         duration_h_as_published: '3.0'
@@ -9134,15 +9201,15 @@ species:
             column: Duration (h)
         fO2_log:
           state:
-            tag: unknown
-            reason: Table 1 prints −log fO2 values but gives no atm/bar reference; the printed value is retained
-              verbatim in values, and no absolute fO2 is assigned pending a reference ruling.
+            tag: value
+            value: -2.59
           locator:
             page: 5
             pdf_page_index: 4
             table: '1'
             row: '67'
-            note: The printed cell is a; value inherited from the same-run sample above.
+            note: pressure reference not printed; stored on the bar convention (atm/bar offset log10(1.01325)=0.0057
+              is below printed precision)
             column: −logfO2
         total_pressure_Pa:
           state:

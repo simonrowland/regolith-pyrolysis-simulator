@@ -50,6 +50,7 @@ def _assert_table1_grid(document: dict, expected: list[dict[str, str]]) -> None:
         assert values["sample_as_published"] == expected_row["sample"]
         assert values["sample_footnote_as_published"] == (expected_row["footnote"] or "none")
         assert values["analytical_session_as_published"] == expected_row["session"]
+        assert values["minus_log_fO2_form_as_published"] == "−log fO2"
 
         for cell, value_key, cell_key in (
             ("T_cell", "T_C", "T_cell_as_published"),
@@ -71,6 +72,16 @@ def _assert_table1_grid(document: dict, expected: list[dict[str, str]]) -> None:
             }
         assert values["Total_wt_pct_as_published"] == expected_row["Total"]
         assert values["value"] == expected_row["Fe3+/Fe2+"]
+        fO2_condition = observation["point_conditions"]["fO2_log"]
+        assert fO2_condition["state"]["tag"] == "value"
+        canonical_log_fO2 = -Decimal(
+            values["minus_log_fO2_as_published"]
+        )
+        assert Decimal(str(fO2_condition["state"]["value"])) == canonical_log_fO2
+        assert fO2_condition["locator"]["note"] == (
+            "pressure reference not printed; stored on the bar convention "
+            "(atm/bar offset log10(1.01325)=0.0057 is below printed precision)"
+        )
         assert observation["locator"]["page"] == (4 if int(row_number) <= 48 else 5)
         assert observation["locator"]["pdf_page_index"] == observation["locator"]["page"] - 1
         assert observation["locator"]["row"] == row_number
@@ -95,6 +106,17 @@ def test_render_grid_binds_all_table1_cells_and_catches_both_mutations(
     first_row["values"]["composition_wt_pct_as_published"]["SiO2"] = "45.72"
     with pytest.raises(AssertionError):
         _assert_table1_grid(extract_mutation, expected)
+
+    fO2_sign_mutation = deepcopy(document)
+    first_fO2 = next(
+        item for item in fO2_sign_mutation["species"]["Fe"]["observations"]
+        if item["observation_id"].startswith("borisov_2015_table1_fe3_fe2_row_")
+    )
+    first_fO2["point_conditions"]["fO2_log"]["state"]["value"] = first_fO2[
+        "values"
+    ]["minus_log_fO2_as_published"]
+    with pytest.raises(AssertionError):
+        _assert_table1_grid(fO2_sign_mutation, expected)
 
 
 def test_migration_types_all_rows_and_binds_conditions_quench_and_species(
@@ -131,8 +153,11 @@ def test_migration_types_all_rows_and_binds_conditions_quench_and_species(
             assert key in conditions and conditions[key].locator is not None
         assert record.identity.temperature_K.value == Decimal(values["T_C"]) + Decimal("273.15")
         assert record.identity.total_pressure_Pa.value == Decimal("101325")
-        assert record.identity.fO2_Pa.is_unknown
-        assert conditions["fO2_log"].state.is_unknown
+        assert record.identity.fO2_Pa.is_value
+        assert conditions["fO2_log"].state.is_value
+        assert conditions["fO2_log"].state.value == -Decimal(
+            values["minus_log_fO2_as_published"]
+        )
         assert conditions["quench_state"].state.value is QuenchState.NOT_STATED
         assert record.quench_state is QuenchState.NOT_STATED
         assert record.identity.species.phase.value is Phase.L

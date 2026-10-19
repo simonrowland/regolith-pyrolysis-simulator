@@ -15266,6 +15266,29 @@ class Migrator:
             for item in experiment_provenance
             if any(item.startswith(f"identity.{name}=") for name in inherited_identity_fields)
         )
+        if q_token in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
+            fO2_condition = (point_conditions or {}).get("fO2_log")
+            fO2_note = (
+                fO2_condition.locator.note.casefold()
+                if isinstance(fO2_condition, Located)
+                and fO2_condition.locator is not None
+                and fO2_condition.locator.note is not None
+                else ""
+            )
+            existing_fO2 = ident_kwargs.get("fO2_Pa")
+            if (
+                "stored on the bar convention" in fO2_note
+                and isinstance(fO2_condition, Located)
+                and fO2_condition.state.is_value
+                and isinstance(fO2_condition.state.value, Decimal)
+                and (
+                    existing_fO2 is None
+                    or (isinstance(existing_fO2, State) and existing_fO2.is_unknown)
+                )
+            ):
+                ident_kwargs["fO2_Pa"] = State.of(
+                    _log_fO2_to_pa(fO2_condition.state.value, _BAR_PA)
+                )
         identity = fill_identity(quantity, species, **ident_kwargs)
         partial_total_condition = _partial_pressure_point_condition(
             ident_kwargs, locator
