@@ -4773,6 +4773,7 @@ def test_physics_refused_is_infeasible_trial_with_note() -> None:
         executor=FakeExecutor(
             _execution(
                 status="refused",
+                snapshots=(),
                 error_message="Knudsen refusal",
                 reason="free molecular",
             )
