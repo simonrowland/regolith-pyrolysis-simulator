@@ -3119,6 +3119,13 @@ _PRINTED_COMPOSITION_TOTAL_KEYS = frozenset(
         "sum_as_published",
     }
 )
+_RESIDUE_COMPONENT_SLOT_FIELDS = (
+    "SiO2_wt_pct",
+    "Al2O3_wt_pct",
+    "FeO_wt_pct",
+    "MgO_wt_pct",
+    "CaO_wt_pct",
+)
 _COMPOSITION_CONDITION_KEYS = frozenset(
     {
         "T_C",
@@ -3440,12 +3447,13 @@ def _printed_initial_charge_row_map(
 def _mass_loss_oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
     if not isinstance(obj, Mapping):
         return None
+    fields, _invalid = _residue_component_field_sets(obj)
     components = {
-        oxide: obj[f"{oxide}_wt_pct"]
-        for oxide in ("SiO2", "Al2O3", "FeO", "MgO", "CaO")
-        if f"{oxide}_wt_pct" in obj
+        field.removesuffix("_wt_pct"): amount
+        for field in fields
+        if (amount := _as_dec_or_none(obj.get(field))) is not None
     }
-    return _oxide_map_from_mapping(components, declared_map=True)
+    return components if len(components) >= 2 else None
 
 
 def _initial_oxide_map_from_values(
@@ -4796,6 +4804,9 @@ def _quantities_named_by_payload(
         if isinstance(raw, Mapping) and raw.get("value") is None and "value" in raw:
             continue
         named.add(quantity)
+    residue_fields, _invalid_residue_fields = _residue_component_field_sets(values)
+    if residue_fields:
+        named.add(Quantity.RESIDUE_COMPONENT_COMPOSITION)
     return frozenset(named)
 
 
@@ -5069,6 +5080,14 @@ def _quantity_corroborated(
         return "gamma" in values or "activity_coefficient" in values
     if candidate is Quantity.MASS_LOSS_RATE:
         return "mass_loss_rate" in values
+    if candidate is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        series = values.get("series")
+        if _residue_component_field_sets(values)[0]:
+            return True
+        return isinstance(series, list) and any(
+            isinstance(item, Mapping) and _residue_component_field_sets(item)[0]
+            for item in series
+        )
     if candidate is Quantity.MASS_LOSS_AREAL_DENSITY:
         return values.get("quantity_as_printed") == "delta_q" or any(
             key in values for key in QUANTITY_SOURCE_FIELDS[candidate]
@@ -5198,6 +5217,10 @@ def _historical_prefix_stem(alias: str) -> bool:
 
 
 def _co_present_quantity_field(quantity: Quantity, values: Mapping[str, Any]) -> bool:
+    if quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        return bool(_residue_component_field_sets(values)[0]) or (
+            values.get("residue_ppm") not in (None, "")
+        )
     keys = QUANTITY_SOURCE_FIELDS.get(quantity, ())
     if quantity is Quantity.ACTIVITY:
         keys = ("activity",)
@@ -8092,15 +8115,45 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "T_C",
         "T",
     ),
-    Quantity.RESIDUE_COMPONENT_COMPOSITION: (
-        "residue_ppm",
-        "SiO2_wt_pct",
-        "Al2O3_wt_pct",
-        "FeO_wt_pct",
-        "MgO_wt_pct",
-        "CaO_wt_pct",
-    ),
+    Quantity.RESIDUE_COMPONENT_COMPOSITION: ("residue_ppm",),
 }
+
+
+def _residue_component_field_sets(
+    payload: Mapping[str, Any] | None,
+) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """Return formula-valid residue fields and oxide-looking fields that refuse."""
+
+    if not isinstance(payload, Mapping):
+        return (), ()
+    from simulator.accounting.formulas import resolve_species_formula
+
+    valid: list[str] = []
+    invalid: list[str] = []
+    ordered_fields = (*_RESIDUE_COMPONENT_SLOT_FIELDS, *payload)
+    seen: set[str] = set()
+    for field in ordered_fields:
+        if not isinstance(field, str) or not field.endswith("_wt_pct"):
+            continue
+        if field in seen:
+            continue
+        seen.add(field)
+        if (
+            field in _PRINTED_COMPOSITION_MAP_KEYS
+            or field in _COMPOSITION_CONDITION_KEYS
+            or field.startswith("pin_")
+        ):
+            continue
+        oxide = field.removesuffix("_wt_pct")
+        try:
+            formula = resolve_species_formula(oxide)
+        except ValueError:
+            invalid.append(field)
+            continue
+        if "O" not in formula.elements:
+            continue
+        valid.append(field)
+    return tuple(valid), tuple(invalid)
 
 _CONDITION_RANGE_KEYS = ("T_range_K", "temperature_range_k", "temperature_range_K")
 AXIS_TEMPERATURE_K = "temperature_K"
@@ -9187,6 +9240,31 @@ def select_declared_source(
         )
 
     q_token = _quantity_token(declared)
+    if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        oxide_fields, invalid_fields = _residue_component_field_sets(payload)
+        for field in ("residue_ppm", *oxide_fields):
+            if field not in payload:
+                continue
+            amount = _as_dec_or_none(payload.get(field))
+            if amount is not None:
+                return _point_selection(
+                    amount, field, "identity:as_published", payload, condition_ranges
+                )
+            return _unavailable_selection(
+                (
+                    f"{field} is null; absence is not a measured zero"
+                    if payload.get(field) is None or payload.get(field) == ""
+                    else f"{field} is not numeric: {payload.get(field)!r}"
+                ),
+                condition_ranges=condition_ranges,
+                field_name=field,
+            )
+        if invalid_fields:
+            return _unavailable_selection(
+                "unrecognized residue oxide field(s): " + ", ".join(invalid_fields),
+                condition_ranges=condition_ranges,
+                field_name=invalid_fields[0],
+            )
     if (
         q_token is Quantity.H_MINUS_H298
         and "minus_delta_H_cool_kJ_mol-1" in payload
@@ -14634,21 +14712,67 @@ class Migrator:
             and isinstance(values.get("series"), list)
             and values["series"]
         ):
-            residue_fields = QUANTITY_SOURCE_FIELDS[q_token]
-            oxide_fields = tuple(
-                field for field in residue_fields if field.endswith("_wt_pct")
+            series_items = [
+                item for item in values["series"] if isinstance(item, Mapping)
+            ]
+            series_oxide_fields = tuple(
+                dict.fromkeys(
+                    field
+                    for item in series_items
+                    for field in _residue_component_field_sets(item)[0]
+                )
+            )
+            residue_fields = (
+                "residue_ppm",
+                *_RESIDUE_COMPONENT_SLOT_FIELDS,
+                *(
+                    field
+                    for field in series_oxide_fields
+                    if field not in _RESIDUE_COMPONENT_SLOT_FIELDS
+                ),
+            )
+            appended_oxide_fields = tuple(
+                field
+                for field in series_oxide_fields
+                if field not in _RESIDUE_COMPONENT_SLOT_FIELDS
+            )
+            point_stride = len(_RESIDUE_COMPONENT_SLOT_FIELDS) + 1 + len(
+                appended_oxide_fields
             )
             for point in exploded:
                 raw_item = point.get("item")
                 if not isinstance(raw_item, Mapping):
                     continue
+                _valid_fields, invalid_fields = _residue_component_field_sets(raw_item)
+                for field in invalid_fields:
+                    self.result.registry_issues.append(
+                        ValidationIssue(
+                            path=(
+                                f"observations.{obs_id}.values.series"
+                                f"[{point.get('index', 0)}].{field}"
+                            ),
+                            reason=RefusalReason.INVALID_SOURCE,
+                            detail=(
+                                f"residue component field {field!r} does not name "
+                                "a parseable oxide formula"
+                            ),
+                        )
+                    )
                 component_fields = (
-                    oxide_fields
-                    if any(field in raw_item for field in oxide_fields)
+                    tuple(field for field in series_oxide_fields if field in raw_item)
+                    if any(field in raw_item for field in series_oxide_fields)
                     else (("residue_ppm",) if "residue_ppm" in raw_item else ())
                 )
                 point_index = int(point.get("index", 0))
-                for component_index, field in enumerate(component_fields):
+                for field in component_fields:
+                    if field == "residue_ppm":
+                        component_index = 0
+                    elif field in _RESIDUE_COMPONENT_SLOT_FIELDS:
+                        component_index = _RESIDUE_COMPONENT_SLOT_FIELDS.index(field)
+                    else:
+                        component_index = len(_RESIDUE_COMPONENT_SLOT_FIELDS) + (
+                            appended_oxide_fields.index(field)
+                        )
                     cell_units = str(obs.get("units") or "")
                     if (
                         field.endswith("_wt_pct")
@@ -14676,7 +14800,7 @@ class Migrator:
                     self._emit_exploded_point(
                         parent_id=obs_id,
                         item={
-                            "index": point_index * len(residue_fields) + component_index,
+                            "index": point_index * point_stride + component_index,
                             "item": cell_item,
                             "units": cell_units,
                         },
