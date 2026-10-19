@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import gzip
+import io
 import json
+import tarfile
 from dataclasses import replace
 from pathlib import Path
 
@@ -8,11 +11,19 @@ import pytest
 
 from simulator.battery.enums import NoticeKind
 from scripts.battery_hero_plot import (
+    HERO_MINOR_FACETS,
+    HERO_RAILS,
+    _draw_hero_current,
+    _history_record,
+    _hero_facets,
+    _hero_refusal_entries,
+    append_history,
     draw_panel,
     element_tier,
     element_view_series,
     load_element_abundance,
     read_scores,
+    render_hero_charts,
     render_plots,
     species_tier,
     stamp_text,
@@ -472,6 +483,293 @@ def test_lunar_feedstock_abundance_drives_plot_styling() -> None:
     assert style_for_tier(TIER_MINOR)["linewidth"] == 1.2
     assert style_for_tier(TIER_TRACE)["color"] == "#b9b9b9"
     assert style_for_tier(TIER_TRACE)["linewidth"] == 0.5
+
+
+def test_hero_series_keep_composition_and_count_refusals_by_reason(
+    tmp_path: Path,
+) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    first = _record(
+        engine="internal-analytical",
+        experiment="same-a",
+        formula="SiO",
+        temperature_K=1200,
+        residual=0.2,
+        rail="vapour",
+    )
+    second = _record(
+        engine="internal-analytical",
+        experiment="same-b",
+        formula="SiO",
+        temperature_K=1200,
+        residual=0.4,
+        rail="vapour",
+    )
+    first["candidate_observation"]["identity"]["composition"] = {
+        "tag": "value",
+        "value": {"amount_basis": "mole_fraction", "components": [["CaO", "0.4"]]},
+    }
+    second["candidate_observation"]["identity"]["composition"] = {
+        "tag": "value",
+        "value": {"amount_basis": "mole_fraction", "components": [["CaO", "0.7"]]},
+    }
+    refused = _record(
+        engine="magemin",
+        experiment="refused-P",
+        formula="P2O5",
+        temperature_K=1200,
+        residual=None,
+        rail="vapour",
+        status="refused",
+    )
+    refused["refusal"] = {"reason": "identity_incomplete"}
+    residuals.write_text(
+        "".join(
+            json.dumps(row) + "\n"
+            for row in (
+                {"kind": "battery_store_stamp", "revision": "hero-test"},
+                first,
+                second,
+                refused,
+            )
+        ),
+        encoding="utf-8",
+    )
+
+    data = read_scores(residuals, rails=HERO_RAILS)
+
+    composition_keys = {
+        composition
+        for rail, facet, engine, composition in data.hero_series
+        if (rail, facet, engine) == ("vapour", "SiO", "internal-analytical")
+    }
+    assert len(composition_keys) == 2
+    assert all(key != "unknown" for key in composition_keys)
+    element_points = element_view_series(data)[
+        ("internal-analytical", "Si")
+    ]
+    assert {point.composition_key for point in element_points} == composition_keys
+    assert data.hero_refusal_totals[("vapour", "magemin", "identity_incomplete")] == 1
+    assert data.hero_diagnostics[("vapour", "magemin")]["refused_count"] == 1
+    assert data.hero_diagnostics[("vapour", "magemin")]["refused_by_reason"] == {
+        "identity_incomplete": 1
+    }
+    assert _hero_refusal_entries(data, "vapour", "minor:P") == (
+        ("magemin", "identity_incomplete", 1),
+    )
+    assert set(_hero_facets(data, "vapour")) >= {
+        "SiO",
+        "P2O5",
+        *(facet for facet, _label in HERO_MINOR_FACETS),
+    }
+
+
+def test_hero_flagged_points_are_hollow_and_benchmark_uses_shared_rows(
+    tmp_path: Path,
+) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    rows: list[dict[str, object]] = [
+        {"kind": "battery_store_stamp", "revision": "hero-test"}
+    ]
+    for engine, experiment, value, authority in (
+        ("internal-analytical", "shared", 3.0, "extrapolated"),
+        ("internal-analytical", "internal-only", 100.0, "certified"),
+        ("openimcc", "shared", 1.0, "certified"),
+        ("openimcc", "comparison-only", 100.0, "certified"),
+        ("thermoengine", "shared", 2.0, "certified"),
+    ):
+        row = _record(
+            engine=engine,
+            experiment=experiment,
+            formula="FeO",
+            temperature_K=1300,
+            residual=value,
+            rail="redox",
+            authority=authority,
+        )
+        row["reference"] = experiment
+        row["candidate_observation"]["identity"]["quantity"] = {
+            "tag": "value",
+            "value": "fe3_fe2_ratio",
+        }
+        if engine == "internal-analytical" and authority == "extrapolated":
+            row["notices"] = [
+                {
+                    "kind": NoticeKind.OUT_OF_CERTIFIED_BAND.value,
+                    "reason": "extrapolated beyond certified band",
+                }
+            ]
+        rows.append(row)
+    residuals.write_text(
+        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
+    )
+    data = read_scores(residuals, rails=HERO_RAILS)
+
+    benchmark = data.hero_benchmarks["redox"]
+    assert benchmark["benchmark_engine"] == "openimcc"
+    assert benchmark["n"] == 1
+    assert benchmark["primary_rms_dex"] == "3.0"
+    assert benchmark["benchmark_rms_dex"] == "1.0"
+    assert data.hero_diagnostics[("redox", "internal-analytical")][
+        "open_predict_and_flag_notice_counts_by_kind"
+    ] == {NoticeKind.OUT_OF_CERTIFIED_BAND.value: 1}
+    assert "Fe3+/Fe2+ ratio" in _hero_facets(data, "redox")
+
+    figure, axis = plt.subplots()
+    try:
+        _draw_hero_current(
+            axis,
+            data,
+            "redox",
+            "Fe3+/Fe2+ ratio",
+            engine_colors={"internal-analytical": "#111111"},
+        )
+        flagged = [
+            artist
+            for artist in axis.collections
+            if (artist.get_gid() or "").endswith(":flagged")
+        ]
+        assert len(flagged) == 1
+        assert len(flagged[0].get_facecolors()) == 0
+    finally:
+        plt.close(figure)
+
+
+def test_history_appends_without_rewriting_existing_bytes(tmp_path: Path) -> None:
+    history = tmp_path / "scoreboard-history.jsonl"
+    history.write_text('{"store_sha":"old"}\n', encoding="utf-8")
+    previous = history.read_bytes()
+    record = {
+        "kind": "battery_scoreboard_history",
+        "store_sha": "new",
+        "commit_date": "2026-10-18T10:27:53-04:00",
+        "metrics": [],
+        "benchmarks": [],
+    }
+
+    assert append_history(history, record)
+    assert history.read_bytes().startswith(previous)
+    assert not append_history(history, record)
+    assert len(history.read_text(encoding="utf-8").splitlines()) == 2
+
+
+def test_history_schema_keeps_scorer_metrics_and_per_rail_counts() -> None:
+    record = _history_record(
+        {
+            "store": {"revision": "redox-test"},
+            "records": [
+                {
+                    "tier": "all_numeric",
+                    "rail": "redox",
+                    "engine": "internal-analytical",
+                    "n": 7,
+                    "rms_dex": "0.4",
+                    "median_abs_dex": "0.3",
+                }
+            ],
+        },
+        landing_sha="green-test",
+        commit_date="2026-10-18T10:27:53-04:00",
+        benchmarks={},
+        diagnostics={
+            ("redox", "internal-analytical"): {
+                "refused_count": 2,
+                "refused_by_reason": {"unsupported": 2},
+                "open_predict_and_flag_notice_counts_by_kind": {
+                    "out_of_certified_band": 1
+                },
+            }
+        },
+    )
+
+    assert record["schema_version"] == 1
+    metric = record["metrics"][0]
+    assert metric["numeric_count"] == 7
+    assert metric["rms_dex"] == "0.4"
+    assert metric["median_abs_dex"] == "0.3"
+    assert metric["refused_count"] == 2
+    assert metric["refused_by_reason"] == {"unsupported": 2}
+    assert metric["open_predict_and_flag_notice_counts_by_kind"] == {
+        "out_of_certified_band": 1
+    }
+
+
+def test_read_scores_streams_residuals_from_archive_member(tmp_path: Path) -> None:
+    rows = [
+        {"kind": "battery_store_stamp", "revision": "archive-test"},
+        _record(
+            engine="internal-analytical",
+            experiment="archive-row",
+            formula="SiO",
+            temperature_K=1200,
+            residual=0.25,
+            rail="vapour",
+        ),
+    ]
+    payload = "".join(json.dumps(row) + "\n" for row in rows).encode("utf-8")
+    archive_path = tmp_path / "battery.tgz"
+    with tarfile.open(archive_path, "w:gz") as archive:
+        member = tarfile.TarInfo("data/battery/residuals.jsonl")
+        member.size = len(payload)
+        archive.addfile(member, io.BytesIO(payload))
+
+    data = read_scores(archive_path, rails=HERO_RAILS)
+
+    assert data.hero_series[("vapour", "SiO", "internal-analytical", "unknown")][0].residual_dex == 0.25
+
+    compact_path = tmp_path / "compact-residuals.jsonl.gz"
+    with gzip.open(compact_path, "wb") as compact:
+        compact.write(payload)
+    compact_data = read_scores(compact_path, rails=HERO_RAILS)
+    assert compact_data.hero_series == data.hero_series
+
+
+def test_hero_svg_is_byte_identical_for_the_same_input(tmp_path: Path) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    rows: list[dict[str, object]] = [
+        {"kind": "battery_store_stamp", "revision": "hero-test"},
+        _record(
+            engine="internal-analytical",
+            experiment="hero-1",
+            formula="SiO",
+            temperature_K=1200,
+            residual=0.2,
+            rail="vapour",
+        ),
+    ]
+    residuals.write_text(
+        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
+    )
+    history = tmp_path / "scoreboard-history.jsonl"
+    history.write_text(
+        json.dumps(
+            {
+                "kind": "battery_scoreboard_history",
+                "store_sha": "hero-test",
+                "store_revision": "hero-test",
+                "commit_date": "2026-10-18T10:27:53-04:00",
+                "metrics": [
+                    {
+                        "rail": "vapour",
+                        "engine": "internal-analytical",
+                        "rms_dex": "0.2",
+                        "median_abs_dex": "0.2",
+                    }
+                ],
+                "benchmarks": [],
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    data = read_scores(residuals, rails=HERO_RAILS)
+
+    first = render_hero_charts(data, tmp_path / "first", history_path=history)
+    second = render_hero_charts(data, tmp_path / "second", history_path=history)
+
+    for rail in HERO_RAILS:
+        assert first[f"hero:{rail}:svg"].read_bytes() == second[f"hero:{rail}:svg"].read_bytes()
 
 
 def test_stamp_contents_and_png_output(tmp_path: Path) -> None:

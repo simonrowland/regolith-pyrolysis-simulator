@@ -9,17 +9,28 @@ Example::
 
 The JSONL is read one line at a time. A temporary SQLite file collapses
 same-experiment duplicates without retaining the input rows in memory.
+
+Hero history is one append-only row per green store in
+``data/battery/scoreboard-history.jsonl``. Each row has ``schema_version`` and,
+per rail and engine, the scorer's numeric count, RMS and median |dex|, refusal
+count and scorer-reason counts from residual rows, and open predict-and-flag
+notice counts by kind. Same-row benchmark RMS is stored alongside those metrics.
 """
 
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
+import gzip
+import hashlib
 import json
 import math
 import os
 import re
 import sqlite3
+import subprocess
 import sys
+import tarfile
 import tempfile
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
@@ -27,7 +38,7 @@ from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, BinaryIO, Iterator, Mapping, Sequence
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -38,6 +49,7 @@ import matplotlib  # noqa: E402
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 from matplotlib.axes import Axes
 from matplotlib.lines import Line2D
 
@@ -54,6 +66,10 @@ from simulator.diagnostic_helpers.species_rail import (  # noqa: E402
     parse_formula_elements,
 )
 from simulator.feedstock_composition import resolve_feedstock_composition  # noqa: E402
+from simulator.battery.score import (  # noqa: E402
+    _flagged_payload_strata,
+    _paired_engine_rail_benchmarks,
+)
 
 
 DEFAULT_BIN_WIDTH_K = 100.0
@@ -63,6 +79,15 @@ DEFAULT_RAILS = (
     Rail.MELT_ACTIVITY.value,
     Rail.SIO_EVOLUTION.value,
 )
+HERO_RAILS = (Rail.VAPOUR.value, Rail.REDOX.value, Rail.MELT_ACTIVITY.value)
+HERO_MINOR_FACETS = (
+    ("minor:P", "P"),
+    ("minor:S", "S"),
+    ("minor:Cl", "Cl"),
+    ("minor:C", "C"),
+    ("minor:alkali_salts", "Alkali salts"),
+)
+HISTORY_PATH = ROOT / "data" / "battery" / "scoreboard-history.jsonl"
 DEFAULT_GROUP_BY = ("species", "element")
 DEFAULT_ABUNDANCE_FEEDSTOCK = "lunar_mare_low_ti"
 Y_LIMITS = (-3.0, 3.0)
@@ -110,6 +135,9 @@ class BinPoint:
     residual_dex: float
     n: int
     flagged: bool = False
+    composition_key: str = "unknown"
+    composition_label: str = "unknown composition"
+    observable: str = "unknown"
 
 
 @dataclass(frozen=True)
@@ -120,6 +148,9 @@ class PanelSeries:
     tier: str
     gid: str
     major_elements: tuple[str, ...]
+    composition_key: str = "unknown"
+    composition_label: str = "unknown composition"
+    observable: str = "unknown"
 
 
 @dataclass(frozen=True)
@@ -130,6 +161,11 @@ class ScorePlotData:
     selected_rails: tuple[str, ...]
     summaries: Mapping[str, EngineSummary]
     series: Mapping[tuple[str, str, str], tuple[BinPoint, ...]]
+    hero_series: Mapping[tuple[str, str, str, str], tuple[BinPoint, ...]]
+    hero_refusals: Mapping[tuple[str, str, str, str, str], int]
+    hero_refusal_totals: Mapping[tuple[str, str, str], int]
+    hero_diagnostics: Mapping[tuple[str, str], Mapping[str, object]]
+    hero_benchmarks: Mapping[str, Mapping[str, object]]
     x_limits: tuple[float, float]
     bin_width_K: float
 
@@ -155,6 +191,134 @@ def _state_value(value: object) -> object | None:
             return None
         return value.get("value")
     return value
+
+
+@contextmanager
+def _open_residual_jsonl(path: Path) -> Iterator[BinaryIO]:
+    """Open residuals directly, or stream the residual member from a battery archive."""
+
+    if path.name.endswith(".tgz"):
+        with tarfile.open(path, "r:gz") as archive:
+            try:
+                member = archive.getmember("data/battery/residuals.jsonl")
+            except KeyError as exc:
+                raise ValueError(f"{path}: missing data/battery/residuals.jsonl") from exc
+            source = archive.extractfile(member)
+            if source is None:
+                raise ValueError(f"{path}: cannot read data/battery/residuals.jsonl")
+            try:
+                yield source
+            finally:
+                source.close()
+    elif path.suffix == ".gz":
+        with gzip.open(path, "rb") as source:
+            yield source
+    else:
+        with path.open("rb") as source:
+            yield source
+
+
+def _identity_from_observation(
+    observation: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    identity = observation.get("identity")
+    return identity if isinstance(identity, Mapping) else {}
+
+
+def _species_formula(identity: Mapping[str, Any]) -> str:
+    species_value = identity.get("species")
+    species = (
+        _state_value(species_value)
+        if isinstance(species_value, Mapping) and "tag" in species_value
+        else species_value
+    )
+    if isinstance(species, Mapping):
+        return str(species.get("formula") or "")
+    return ""
+
+
+def _composition_fields(identity: Mapping[str, Any]) -> tuple[str, str]:
+    composition = _state_value(identity.get("composition"))
+    if composition is None:
+        return "unknown", "unknown composition"
+    key = json.dumps(composition, sort_keys=True, separators=(",", ":"))
+    if isinstance(composition, Mapping):
+        components = composition.get("components")
+        if isinstance(components, Sequence) and not isinstance(components, (str, bytes)):
+            labels = [
+                f"{item[0]}={item[1]}"
+                for item in components
+                if isinstance(item, Sequence)
+                and not isinstance(item, (str, bytes))
+                and len(item) == 2
+            ]
+            if labels:
+                basis = composition.get("amount_basis") or composition.get("basis")
+                prefix = f"{basis}: " if basis else ""
+                return key, prefix + "; ".join(labels)
+    return key, str(composition)
+
+
+def _observable(identity: Mapping[str, Any]) -> str:
+    value = _state_value(identity.get("quantity"))
+    return str(value) if value is not None else "unknown"
+
+
+def _row_identity(row: Mapping[str, Any]) -> Mapping[str, Any]:
+    observation = row.get("candidate_observation")
+    if isinstance(observation, Mapping):
+        identity = observation.get("identity")
+        if isinstance(identity, Mapping):
+            return identity
+    return {}
+
+
+def _row_formula(row: Mapping[str, Any]) -> str:
+    formula = _species_formula(_row_identity(row))
+    if formula:
+        return formula
+    refusal = row.get("refusal")
+    detail = refusal.get("detail") if isinstance(refusal, Mapping) else None
+    if isinstance(detail, Mapping) and detail.get("formula"):
+        return str(detail["formula"])
+    request = row.get("candidate_request")
+    if isinstance(request, Mapping):
+        species = request.get("species")
+        if isinstance(species, Mapping) and species.get("formula"):
+            return str(species["formula"])
+        if request.get("formula"):
+            return str(request["formula"])
+    return ""
+
+
+def _row_observable(row: Mapping[str, Any]) -> str:
+    value = _observable(_row_identity(row))
+    if value == "unknown":
+        request = row.get("candidate_request")
+        if isinstance(request, Mapping) and request.get("quantity") is not None:
+            value = str(request["quantity"])
+    normalized = re.sub(r"[^a-z0-9]+", "", value.casefold())
+    if "fo2" in normalized or "oxygenfugacity" in normalized:
+        return "log fO2"
+    if normalized == "fe3fe2ratio":
+        return "Fe3+/Fe2+ ratio"
+    if "fe3" in normalized and ("sumfe" in normalized or "totalfe" in normalized):
+        return "Fe3+/sumFe"
+    return value
+
+
+def _hero_facet(rail: str, formula: str, observable: str) -> str:
+    if rail == Rail.REDOX.value:
+        return observable if observable != "unknown" else "unknown observable"
+    return formula if formula else "unknown species"
+
+
+def _minor_foulant_facets(formula: str) -> tuple[str, ...]:
+    elements = set(parse_formula_elements(formula) or ())
+    facets = [f"minor:{element}" for element in ("P", "S", "Cl", "C") if element in elements]
+    if elements.intersection({"Na", "K"}):
+        facets.append("minor:alkali_salts")
+    return tuple(facets)
 
 
 def _finite_float(value: object) -> float | None:
@@ -239,6 +403,80 @@ def _requested_rails(values: Sequence[str] | None) -> tuple[str, ...]:
     if not rails:
         raise ValueError("at least one non-empty --rail value is required")
     return tuple(sorted(rails))
+
+
+def _record_hero_diagnostic(
+    diagnostics: dict[tuple[str, str], dict[str, object]],
+    row: Mapping[str, Any],
+    *,
+    rail: str,
+    engine: str,
+    status: ResidualStatus,
+) -> None:
+    bucket = diagnostics.setdefault(
+        (rail, engine),
+        {
+            "refused_count": 0,
+            "refused_by_reason": Counter(),
+            "open_predict_and_flag_notice_counts_by_kind": Counter(),
+        },
+    )
+    if status is ResidualStatus.REFUSED:
+        reason = _refusal_reason(row)
+        bucket["refused_count"] = int(bucket["refused_count"]) + 1
+        refusal_counts = bucket["refused_by_reason"]
+        assert isinstance(refusal_counts, Counter)
+        refusal_counts[reason] += 1
+        return
+
+    numeric = row.get("numeric")
+    if (
+        not isinstance(numeric, Mapping)
+        or numeric.get("operation") != "dex"
+        or numeric.get("value") is None
+    ):
+        return
+    notice_counts = bucket["open_predict_and_flag_notice_counts_by_kind"]
+    assert isinstance(notice_counts, Counter)
+    notices = row.get("notices")
+    if isinstance(notices, Sequence) and not isinstance(notices, (str, bytes)):
+        for notice in notices:
+            if (
+                isinstance(notice, Mapping)
+                and notice.get("kind")
+                and _flagged_payload_strata({"notices": [notice]})
+            ):
+                notice_counts[str(notice["kind"])] += 1
+
+
+def _refusal_reason(row: Mapping[str, Any]) -> str:
+    refusal = row.get("refusal")
+    return (
+        str(refusal.get("reason") or "untyped_refusal")
+        if isinstance(refusal, Mapping)
+        else "untyped_refusal"
+    )
+
+
+def _normalized_hero_diagnostics(
+    diagnostics: Mapping[tuple[str, str], Mapping[str, object]],
+) -> dict[tuple[str, str], Mapping[str, object]]:
+    return {
+        key: {
+            "refused_count": value.get("refused_count", 0),
+            "refused_by_reason": dict(
+                sorted(value.get("refused_by_reason", {}).items())
+            ),
+            "open_predict_and_flag_notice_counts_by_kind": dict(
+                sorted(
+                    value.get(
+                        "open_predict_and_flag_notice_counts_by_kind", {}
+                    ).items()
+                )
+            ),
+        }
+        for key, value in diagnostics.items()
+    }
 
 
 @lru_cache(maxsize=8)
@@ -330,8 +568,13 @@ def read_scores(
         raise ValueError("bin width must be a finite positive number of kelvin")
     selected_rails = _requested_rails(rails)
     selected = set(selected_rails)
+    retained_rails = selected | set(HERO_RAILS)
     summaries: dict[str, EngineSummary] = defaultdict(EngineSummary)
     rails_seen: set[str] = set()
+    benchmark_payloads: list[Mapping[str, object]] = []
+    hero_refusals: Counter[tuple[str, str, str, str, str]] = Counter()
+    hero_refusal_totals: Counter[tuple[str, str, str]] = Counter()
+    hero_diagnostics: dict[tuple[str, str], dict[str, object]] = {}
     stamp: Mapping[str, Any] | None = None
 
     if scratch_dir is None:
@@ -356,12 +599,17 @@ def read_scores(
                 temperature_K REAL NOT NULL,
                 authority TEXT NOT NULL,
                 out_of_band INTEGER NOT NULL,
-                residual_dex REAL NOT NULL
+                residual_dex REAL NOT NULL,
+                composition_key TEXT NOT NULL,
+                composition_label TEXT NOT NULL,
+                observable TEXT NOT NULL
             )"""
         )
 
-        pending: list[tuple[str, str, str, str, str, float, str, int, float]] = []
-        with path.open("r", encoding="utf-8") as source:
+        pending: list[
+            tuple[str, str, str, str, str, float, str, int, float, str, str, str]
+        ] = []
+        with _open_residual_jsonl(path) as source:
             for line_number, line in enumerate(source, start=1):
                 if not line.strip():
                     continue
@@ -395,28 +643,48 @@ def read_scores(
                     rails_seen.add(rail)
 
                 status = residual_status_token(row.get("status"))
-                if status is ResidualStatus.REFUSED:
-                    refusal = row.get("refusal")
-                    reason = (
-                        str(refusal.get("reason") or "untyped_refusal")
-                        if isinstance(refusal, Mapping)
-                        else "untyped_refusal"
+                if rail in HERO_RAILS:
+                    _record_hero_diagnostic(
+                        hero_diagnostics,
+                        row,
+                        rail=rail,
+                        engine=engine,
+                        status=status,
                     )
+                if status is ResidualStatus.REFUSED:
+                    reason = _refusal_reason(row)
                     summary.refusals[reason] += 1
+                    if rail in HERO_RAILS:
+                        formula = _row_formula(row)
+                        identity = _row_identity(row)
+                        composition_key, _composition_label = _composition_fields(identity)
+                        observable = _row_observable(row)
+                        facets = [_hero_facet(rail, formula, observable)]
+                        if rail == Rail.VAPOUR.value:
+                            facets.extend(_minor_foulant_facets(formula))
+                        for facet in facets:
+                            hero_refusals[
+                                (rail, facet, composition_key, engine, reason)
+                            ] += 1
+                        hero_refusal_totals[(rail, engine, reason)] += 1
                     continue
 
                 numeric = row.get("numeric")
                 if not isinstance(numeric, Mapping) or numeric.get("value") is None:
                     continue
-                if rail not in selected:
+                if rail not in retained_rails:
                     continue
                 if numeric.get("operation") != "dex":
-                    summary.non_dex_rows += 1
+                    if rail in selected:
+                        summary.non_dex_rows += 1
                     continue
+                if rail in HERO_RAILS:
+                    benchmark_payloads.append(row)
 
-                identity = candidate_observation.get("identity")
-                if not isinstance(identity, Mapping):
-                    summary.missing_identity_rows += 1
+                identity = _row_identity(row)
+                if not identity:
+                    if rail in selected:
+                        summary.missing_identity_rows += 1
                     continue
                 quantity = _state_value(identity.get("quantity"))
                 if numeric.get("decision_band") is None and quantity == "p_partial":
@@ -436,20 +704,17 @@ def read_scores(
                     )
                     if has_calibration_notice:
                         # Use the scorer's d-139 output marker; do not infer calibration here.
-                        summary.excluded_d139_rows += 1
+                        if rail in selected:
+                            summary.excluded_d139_rows += 1
                         continue
-                species_identity = identity.get("species")
-                formula = (
-                    str(species_identity.get("formula") or "")
-                    if isinstance(species_identity, Mapping)
-                    else ""
-                )
+                formula = _species_formula(identity)
                 temperature_raw = _state_value(identity.get("temperature_K"))
                 temperature = _finite_float(temperature_raw)
                 temperature_key = _decimal_key(temperature_raw)
                 residual = _finite_float(numeric.get("value"))
                 if not formula or temperature is None or temperature_key is None or residual is None:
-                    summary.missing_identity_rows += 1
+                    if rail in selected:
+                        summary.missing_identity_rows += 1
                     continue
 
                 experiment = candidate_observation.get("experiment_id")
@@ -462,19 +727,22 @@ def read_scores(
                 authority = str(candidate_observation.get("authority") or "unknown")
                 out_of_band = _has_out_of_band_flag(row, candidate_observation)
                 source_relation = str(row.get("source_relation") or "unknown")
-                summary.source_relations[source_relation] += 1
-                summary.scored_rows += 1
-                summary.species.add(formula)
-                summary.min_temperature_K = (
-                    temperature
-                    if summary.min_temperature_K is None
-                    else min(summary.min_temperature_K, temperature)
-                )
-                summary.max_temperature_K = (
-                    temperature
-                    if summary.max_temperature_K is None
-                    else max(summary.max_temperature_K, temperature)
-                )
+                if rail in selected:
+                    summary.source_relations[source_relation] += 1
+                    summary.scored_rows += 1
+                    summary.species.add(formula)
+                    summary.min_temperature_K = (
+                        temperature
+                        if summary.min_temperature_K is None
+                        else min(summary.min_temperature_K, temperature)
+                    )
+                    summary.max_temperature_K = (
+                        temperature
+                        if summary.max_temperature_K is None
+                        else max(summary.max_temperature_K, temperature)
+                    )
+                composition_key, composition_label = _composition_fields(identity)
+                observable = _row_observable(row)
                 pending.append(
                     (
                         engine,
@@ -486,46 +754,96 @@ def read_scores(
                         authority,
                         int(out_of_band),
                         residual,
+                        composition_key,
+                        composition_label,
+                        observable,
                     )
                 )
                 if len(pending) >= 5000:
                     database.executemany(
-                        "INSERT INTO scored VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        "INSERT INTO scored VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         pending,
                     )
                     pending.clear()
 
         if pending:
             database.executemany(
-                "INSERT INTO scored VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO scored VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 pending,
             )
         database.commit()
         if stamp is None:
             raise ValueError(f"{path}: empty score file")
 
-        bins: dict[tuple[str, str, str, int], _BinAccumulator] = {}
+        bins: dict[
+            tuple[str, str, str, str, str, str, int], _BinAccumulator
+        ] = {}
+        hero_bins: dict[
+            tuple[str, str, str, str, str, str, int], _BinAccumulator
+        ] = {}
         for row in database.execute(
-            """SELECT engine, species, rail, MIN(temperature_K),
+            """SELECT engine, species, rail, composition_key, composition_label,
+                      observable, MIN(temperature_K),
                       MAX(CASE WHEN authority != ? OR out_of_band = 1 THEN 1 ELSE 0 END),
                       AVG(residual_dex)
                  FROM scored
-                GROUP BY engine, species, rail, experiment, temperature_key
-                ORDER BY engine, species, rail, MIN(temperature_K)""",
+                GROUP BY engine, species, rail, composition_key, composition_label,
+                         observable, experiment, temperature_key
+                ORDER BY engine, species, rail, composition_key, observable,
+                         MIN(temperature_K)""",
             (Authority.CERTIFIED.value,),
         ):
-            engine, formula, rail, temperature, flagged, residual = row
-            summary = summaries[engine]
-            summary.unique_points += 1
-            summary.residual_square_sum += float(residual) ** 2
-            summary.rms_count += 1
+            (
+                engine,
+                formula,
+                rail,
+                composition_key,
+                composition_label,
+                observable,
+                temperature,
+                flagged,
+                residual,
+            ) = row
+            if rail in selected:
+                summary = summaries[engine]
+                summary.unique_points += 1
+                summary.residual_square_sum += float(residual) ** 2
+                summary.rms_count += 1
             bin_index = math.floor(float(temperature) / bin_width_K)
-            key = (engine, formula, rail, bin_index)
-            accumulator = bins.setdefault(key, _BinAccumulator())
-            accumulator.residual_sum += float(residual)
-            accumulator.temperature_sum += float(temperature)
-            accumulator.n += 1
-            accumulator.flagged = accumulator.flagged or bool(flagged)
+            if rail in selected:
+                key = (
+                    engine,
+                    formula,
+                    rail,
+                    composition_key,
+                    composition_label,
+                    observable,
+                    bin_index,
+                )
+                accumulator = bins.setdefault(key, _BinAccumulator())
+                accumulator.residual_sum += float(residual)
+                accumulator.temperature_sum += float(temperature)
+                accumulator.n += 1
+                accumulator.flagged = accumulator.flagged or bool(flagged)
+            if rail in HERO_RAILS:
+                facets = [_hero_facet(rail, formula, observable)]
+                if rail == Rail.VAPOUR.value:
+                    facets.extend(_minor_foulant_facets(formula))
+                for facet in facets:
+                    key = (
+                        rail,
+                        facet,
+                        engine,
+                        composition_key,
+                        composition_label,
+                        observable,
+                        bin_index,
+                    )
+                    accumulator = hero_bins.setdefault(key, _BinAccumulator())
+                    accumulator.residual_sum += float(residual)
+                    accumulator.temperature_sum += float(temperature)
+                    accumulator.n += 1
+                    accumulator.flagged = accumulator.flagged or bool(flagged)
         database.close()
 
     if stamp is None:
@@ -533,7 +851,7 @@ def read_scores(
 
     grouped: dict[tuple[str, str, str], list[BinPoint]] = defaultdict(list)
     for key, accumulator in bins.items():
-        engine, formula, rail, bin_index = key
+        engine, formula, rail, composition_key, composition_label, observable, bin_index = key
         grouped[(engine, formula, rail)].append(
             BinPoint(
                 bin_index=bin_index,
@@ -541,11 +859,33 @@ def read_scores(
                 residual_dex=accumulator.residual_sum / accumulator.n,
                 n=accumulator.n,
                 flagged=accumulator.flagged,
+                composition_key=composition_key,
+                composition_label=composition_label,
+                observable=observable,
             )
         )
     series = {
         key: tuple(sorted(points, key=lambda point: point.bin_index))
         for key, points in grouped.items()
+    }
+    hero_grouped: dict[tuple[str, str, str, str], list[BinPoint]] = defaultdict(list)
+    for key, accumulator in hero_bins.items():
+        rail, facet, engine, composition_key, composition_label, observable, bin_index = key
+        hero_grouped[(rail, facet, engine, composition_key)].append(
+            BinPoint(
+                bin_index=bin_index,
+                temperature_K=accumulator.temperature_sum / accumulator.n,
+                residual_dex=accumulator.residual_sum / accumulator.n,
+                n=accumulator.n,
+                flagged=accumulator.flagged,
+                composition_key=composition_key,
+                composition_label=composition_label,
+                observable=observable,
+            )
+        )
+    hero_series = {
+        key: tuple(sorted(points, key=lambda point: point.bin_index))
+        for key, points in hero_grouped.items()
     }
     engines = tuple(sorted(summaries, key=lambda name: (name != "openimcc", name.casefold())))
     all_temperatures = [
@@ -564,6 +904,14 @@ def read_scores(
     else:
         x_limits = (0.0, bin_width_K)
 
+    hero_benchmarks = {
+        str(record["rail"]): record
+        for record in _paired_engine_rail_benchmarks(
+            benchmark_payloads,
+            primary_engine="internal-analytical",
+        )
+    }
+
     return ScorePlotData(
         stamp=stamp,
         engines=engines,
@@ -571,9 +919,213 @@ def read_scores(
         selected_rails=selected_rails,
         summaries=dict(summaries),
         series=series,
+        hero_series=hero_series,
+        hero_refusals=dict(hero_refusals),
+        hero_refusal_totals=dict(hero_refusal_totals),
+        hero_diagnostics=_normalized_hero_diagnostics(hero_diagnostics),
+        hero_benchmarks=hero_benchmarks,
         x_limits=x_limits,
         bin_width_K=bin_width_K,
     )
+
+
+def _archive_json_member(path: Path, member_name: str) -> Mapping[str, Any]:
+    with tarfile.open(path, "r:gz") as archive:
+        member = archive.getmember(member_name)
+        source = archive.extractfile(member)
+        if source is None:
+            raise ValueError(f"{path}: cannot read {member_name}")
+        with source:
+            value = json.load(source)
+    if not isinstance(value, Mapping):
+        raise ValueError(f"{path}: {member_name} is not a JSON object")
+    return value
+
+
+def _history_fields_from_scores(
+    path: Path,
+) -> tuple[
+    dict[str, Mapping[str, object]],
+    dict[tuple[str, str], Mapping[str, object]],
+]:
+    rows: list[Mapping[str, object]] = []
+    diagnostics: dict[tuple[str, str], dict[str, object]] = {}
+    with _open_residual_jsonl(path) as source:
+        for line in source:
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            if not isinstance(row, Mapping) or row.get("rail") not in HERO_RAILS:
+                continue
+            rail = str(row["rail"])
+            engine = _engine_name(row)
+            if not engine:
+                continue
+            _record_hero_diagnostic(
+                diagnostics,
+                row,
+                rail=rail,
+                engine=engine,
+                status=residual_status_token(row.get("status")),
+            )
+            numeric = row.get("numeric")
+            if (
+                isinstance(numeric, Mapping)
+                and numeric.get("operation") == "dex"
+                and numeric.get("value") is not None
+            ):
+                rows.append(row)
+    benchmarks = {
+        str(record["rail"]): record
+        for record in _paired_engine_rail_benchmarks(rows, primary_engine="internal-analytical")
+    }
+    return benchmarks, _normalized_hero_diagnostics(diagnostics)
+
+
+def _git_commit_date(commit: str) -> str:
+    result = subprocess.run(
+        ["git", "show", "-s", "--format=%cI", commit],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return result.stdout.strip()
+
+
+def _history_record(
+    summary: Mapping[str, Any],
+    *,
+    landing_sha: str,
+    benchmarks: Mapping[str, Mapping[str, object]],
+    diagnostics: Mapping[tuple[str, str], Mapping[str, object]],
+    commit_date: str | None = None,
+) -> dict[str, Any]:
+    records = summary.get("records")
+    if not isinstance(records, Sequence) or isinstance(records, (str, bytes)):
+        raise ValueError("score-summary.json has no records list")
+    metrics_by_key = {
+        (str(record.get("rail")), str(record.get("engine"))): {
+            "rail": record.get("rail"),
+            "engine": record.get("engine"),
+            "n": record.get("n"),
+            "rms_dex": record.get("rms_dex"),
+            "median_abs_dex": record.get("median_abs_dex"),
+        }
+        for record in records
+        if isinstance(record, Mapping)
+        and record.get("tier") == "all_numeric"
+        and record.get("rail") in HERO_RAILS
+    }
+    for rail, engine in set(metrics_by_key) | set(diagnostics):
+        metric = metrics_by_key.setdefault(
+            (rail, engine),
+            {
+                "rail": rail,
+                "engine": engine,
+                "n": 0,
+                "rms_dex": None,
+                "median_abs_dex": None,
+            },
+        )
+        diagnostic = diagnostics.get((rail, engine), {})
+        metric.update(
+            {
+                "numeric_count": metric.get("n") or 0,
+                "refused_count": diagnostic.get("refused_count", 0),
+                "refused_by_reason": diagnostic.get("refused_by_reason", {}),
+                "open_predict_and_flag_notice_counts_by_kind": diagnostic.get(
+                    "open_predict_and_flag_notice_counts_by_kind", {}
+                ),
+            }
+        )
+    metrics = [
+        metrics_by_key[key]
+        for key in sorted(metrics_by_key)
+    ]
+    store = summary.get("store")
+    store = store if isinstance(store, Mapping) else {}
+    return {
+        "kind": "battery_scoreboard_history",
+        "schema_version": 1,
+        "store_sha": landing_sha,
+        "store_revision": store.get("revision"),
+        "commit_date": commit_date or _git_commit_date(landing_sha),
+        "metrics": metrics,
+        "benchmarks": [benchmarks[rail] for rail in sorted(benchmarks)],
+    }
+
+
+def history_record_from_archive(
+    archive_path: Path,
+    *,
+    landing_sha: str,
+    benchmarks: Mapping[str, Mapping[str, object]] | None = None,
+    diagnostics: Mapping[tuple[str, str], Mapping[str, object]] | None = None,
+) -> dict[str, Any]:
+    summary = _archive_json_member(archive_path, "data/battery/score-summary.json")
+    if benchmarks is None or diagnostics is None:
+        streamed_benchmarks, streamed_diagnostics = _history_fields_from_scores(
+            archive_path
+        )
+        benchmarks = benchmarks or streamed_benchmarks
+        diagnostics = diagnostics or streamed_diagnostics
+    return _history_record(
+        summary,
+        landing_sha=landing_sha,
+        benchmarks=benchmarks,
+        diagnostics=diagnostics,
+    )
+
+
+def append_history(path: Path, record: Mapping[str, Any]) -> bool:
+    """Append a store row once, preserving every byte already in the JSONL."""
+
+    store_sha = str(record.get("store_sha") or "")
+    if not store_sha:
+        raise ValueError("history row needs store_sha")
+    if path.exists():
+        with path.open("r", encoding="utf-8") as source:
+            for line in source:
+                if line.strip() and json.loads(line).get("store_sha") == store_sha:
+                    return False
+        if path.stat().st_size:
+            with path.open("rb") as source:
+                source.seek(-1, os.SEEK_END)
+                if source.read(1) != b"\n":
+                    raise ValueError(f"{path}: existing JSONL must end with a newline")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8", newline="\n") as target:
+        target.write(json.dumps(record, sort_keys=True, separators=(",", ":")))
+        target.write("\n")
+    return True
+
+
+def append_archive_history(
+    history_path: Path,
+    archive_path: Path,
+    *,
+    landing_sha: str,
+) -> bool:
+    return append_history(
+        history_path,
+        history_record_from_archive(archive_path, landing_sha=landing_sha),
+    )
+
+
+def read_history(path: Path | None) -> tuple[Mapping[str, Any], ...]:
+    if path is None or not path.is_file():
+        return ()
+    rows: list[Mapping[str, Any]] = []
+    with path.open("r", encoding="utf-8") as source:
+        for line_number, line in enumerate(source, start=1):
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            if not isinstance(row, Mapping):
+                raise ValueError(f"{path}:{line_number}: history row is not an object")
+            rows.append(row)
+    return tuple(rows)
 
 
 def species_tier(formula: str, abundance: ElementAbundance) -> str:
@@ -631,13 +1183,20 @@ def element_view_series(
 ) -> dict[tuple[str, str], tuple[BinPoint, ...]]:
     """Pool deduplicated species observations by each element they carry."""
 
-    bins: dict[tuple[str, str, int], _ElementAccumulator] = {}
+    bins: dict[tuple[str, str, str, str, int], _ElementAccumulator] = {}
     for (engine, formula, _rail), points in data.series.items():
         elements = parse_formula_elements(formula) or ()
         for element in set(elements):
             for point in points:
                 accumulator = bins.setdefault(
-                    (engine, element, point.bin_index), _ElementAccumulator()
+                    (
+                        engine,
+                        element,
+                        point.composition_key,
+                        point.composition_label,
+                        point.bin_index,
+                    ),
+                    _ElementAccumulator(),
                 )
                 accumulator.residual_sum += point.residual_dex * point.n
                 accumulator.temperature_sum += point.temperature_K * point.n
@@ -645,7 +1204,7 @@ def element_view_series(
                 accumulator.flagged = accumulator.flagged or point.flagged
 
     grouped: dict[tuple[str, str], list[BinPoint]] = defaultdict(list)
-    for (engine, element, bin_index), accumulator in bins.items():
+    for (engine, element, composition_key, composition_label, bin_index), accumulator in bins.items():
         grouped[(engine, element)].append(
             BinPoint(
                 bin_index=bin_index,
@@ -653,6 +1212,9 @@ def element_view_series(
                 residual_dex=accumulator.residual_sum / accumulator.n,
                 n=accumulator.n,
                 flagged=accumulator.flagged,
+                composition_key=composition_key,
+                composition_label=composition_label,
+                observable="pooled",
             )
         )
     return {
@@ -669,6 +1231,31 @@ def _major_elements(formula: str, abundance: ElementAbundance) -> tuple[str, ...
     )
 
 
+def _composition_slug(composition_key: str) -> str:
+    return hashlib.sha1(composition_key.encode("utf-8")).hexdigest()[:10]
+
+
+def _composition_groups(
+    points: Sequence[BinPoint],
+) -> tuple[tuple[str, str, str, tuple[BinPoint, ...]], ...]:
+    groups: dict[tuple[str, str, str], list[BinPoint]] = defaultdict(list)
+    for point in points:
+        groups[(point.composition_key, point.composition_label, point.observable)].append(
+            point
+        )
+    return tuple(
+        (
+            composition_key,
+            composition_label,
+            observable,
+            tuple(sorted(group, key=lambda point: point.bin_index)),
+        )
+        for (composition_key, composition_label, observable), group in sorted(
+            groups.items()
+        )
+    )
+
+
 def _panel_series(
     data: ScorePlotData,
     engine: str,
@@ -681,34 +1268,60 @@ def _panel_series(
             if key[0] != engine:
                 continue
             _engine, formula, rail = key
-            items.append(
-                PanelSeries(
-                    subject=formula,
-                    rail=rail,
-                    points=points,
-                    tier=species_tier(formula, abundance),
-                    gid=f"series:{engine}:{formula}:{rail}",
-                    major_elements=_major_elements(formula, abundance),
+            for (
+                composition_key,
+                composition_label,
+                observable,
+                composition_points,
+            ) in _composition_groups(points):
+                gid = f"series:{engine}:{formula}:{rail}"
+                if composition_key != "unknown":
+                    gid += f":composition:{_composition_slug(composition_key)}"
+                items.append(
+                    PanelSeries(
+                        subject=formula,
+                        rail=rail,
+                        points=tuple(
+                            sorted(composition_points, key=lambda point: point.bin_index)
+                        ),
+                        tier=species_tier(formula, abundance),
+                        gid=gid,
+                        major_elements=_major_elements(formula, abundance),
+                        composition_key=composition_key,
+                        composition_label=composition_label,
+                        observable=observable,
+                    )
                 )
-            )
     elif view == "element":
         for (series_engine, element), points in element_view_series(data).items():
             if series_engine != engine:
                 continue
-            items.append(
-                PanelSeries(
-                    subject=element,
-                    rail="pooled",
-                    points=points,
-                    tier=element_tier(element, abundance),
-                    gid=f"series:{engine}:{element}:pooled:element",
-                    major_elements=(
-                        (element,)
-                        if element_tier(element, abundance) == TIER_MAJOR
-                        else ()
-                    ),
+            for (
+                composition_key,
+                composition_label,
+                observable,
+                composition_points,
+            ) in _composition_groups(points):
+                gid = f"series:{engine}:{element}:pooled:element"
+                if composition_key != "unknown":
+                    gid += f":composition:{_composition_slug(composition_key)}"
+                items.append(
+                    PanelSeries(
+                        subject=element,
+                        rail="pooled",
+                        points=composition_points,
+                        tier=element_tier(element, abundance),
+                        gid=gid,
+                        major_elements=(
+                            (element,)
+                            if element_tier(element, abundance) == TIER_MAJOR
+                            else ()
+                        ),
+                        composition_key=composition_key,
+                        composition_label=composition_label,
+                        observable=observable,
+                    )
                 )
-            )
     else:
         raise ValueError(f"unknown plot view {view!r}")
     return sorted(items, key=lambda item: (item.subject, item.rail, item.gid))
@@ -749,9 +1362,16 @@ def draw_panel(
     major_formula_counts = Counter(
         item.subject for item in items if item.tier == TIER_MAJOR
     )
+    composition_markers = {
+        composition: _HERO_MARKERS[index % len(_HERO_MARKERS)]
+        for index, composition in enumerate(
+            sorted({item.composition_key for item in items})
+        )
+    }
 
     for item in items:
         style = style_for_tier(item.tier)
+        marker_style = composition_markers[item.composition_key]
         base_linestyle = "--" if item.rail == Rail.MELT_ACTIVITY.value else "-"
         for previous, point in zip(item.points, item.points[1:]):
             if (
@@ -793,7 +1413,7 @@ def draw_panel(
                         [point.temperature_K],
                         [y_visible],
                         s=style["markersize"] ** 2 * 2.0,
-                        marker="o",
+                        marker=marker_style,
                         facecolors="none",
                         edgecolors=style["color"],
                         linewidths=max(0.45, style["linewidth"] * 0.55),
@@ -809,7 +1429,7 @@ def draw_panel(
                 [point.temperature_K],
                 [y_visible],
                 s=style["markersize"] ** 2 * 2.0,
-                marker="o",
+                marker=marker_style,
                 facecolors="none" if point.flagged else style["color"],
                 edgecolors=style["color"],
                 linewidths=max(0.45, style["linewidth"] * 0.55),
@@ -1029,6 +1649,447 @@ def _no_scored_rows_note(data: ScorePlotData, engines: Sequence[str]) -> str:
     return "no scored rows: " + ", ".join(entries)
 
 
+_HERO_TITLES = {
+    Rail.VAPOUR.value: "Vaporisation",
+    Rail.REDOX.value: "Redox convergence",
+    Rail.MELT_ACTIVITY.value: "Melt activity",
+}
+_HERO_MARKERS = ("o", "s", "^", "D", "v", "P", "X", "<", ">", "*")
+
+
+def _hero_facets(data: ScorePlotData, rail: str) -> tuple[str, ...]:
+    facets = {
+        facet
+        for series_rail, facet, _engine, _composition in data.hero_series
+        if series_rail == rail
+    }
+    facets.update(
+        facet
+        for refusal_rail, facet, _composition, _engine, _reason in data.hero_refusals
+        if refusal_rail == rail
+    )
+    if rail == Rail.VAPOUR.value:
+        minor = [facet for facet, _label in HERO_MINOR_FACETS]
+        return tuple(sorted(facets - set(minor))) + tuple(minor)
+    if rail == Rail.REDOX.value:
+        preferred = ("Fe3+/Fe2+ ratio", "Fe3+/sumFe", "log fO2")
+        return tuple(facet for facet in preferred if facet in facets) + tuple(
+            sorted(facets - set(preferred))
+        )
+    return tuple(sorted(facets)) or ("unknown species",)
+
+
+def _hero_refusal_entries(
+    data: ScorePlotData,
+    rail: str,
+    facet: str,
+) -> tuple[tuple[str, str, int], ...]:
+    counts: Counter[tuple[str, str]] = Counter()
+    for (series_rail, series_facet, _composition, engine, reason), count in (
+        data.hero_refusals.items()
+    ):
+        if series_rail == rail and series_facet == facet:
+            counts[(engine, reason)] += count
+    return tuple(
+        (engine, reason, count)
+        for (engine, reason), count in sorted(
+            counts.items(), key=lambda item: (item[0][1], item[0][0])
+        )
+    )
+
+
+def _short_composition(label: str, composition_key: str) -> str:
+    if composition_key == "unknown":
+        return "unknown composition"
+    if len(label) <= 44:
+        return label
+    return label[:41] + "…"
+
+
+def _draw_hero_current(
+    axis: Axes,
+    data: ScorePlotData,
+    rail: str,
+    facet: str,
+    *,
+    engine_colors: Mapping[str, Any],
+) -> None:
+    series = [
+        (engine, composition, points)
+        for (series_rail, series_facet, engine, composition), points in data.hero_series.items()
+        if series_rail == rail and series_facet == facet
+    ]
+    series.sort(
+        key=lambda item: (
+            item[0],
+            item[2][0].composition_label if item[2] else "",
+            item[1],
+        )
+    )
+    composition_markers = {
+        composition: _HERO_MARKERS[index % len(_HERO_MARKERS)]
+        for index, composition in enumerate(sorted({item[1] for item in series}))
+    }
+    handles: list[Line2D] = []
+    for engine, composition, points in series:
+        if not points:
+            continue
+        color = engine_colors.get(engine, "#555555")
+        marker = composition_markers[composition]
+        point = points[0]
+        label = f"{engine} · {_short_composition(point.composition_label, composition)}"
+        line, = axis.plot(
+            [item.temperature_K for item in points],
+            [item.residual_dex for item in points],
+            color=color,
+            linewidth=1.0,
+            alpha=0.85,
+            zorder=2,
+        )
+        line.set_gid(f"hero-series:{rail}:{facet}:{engine}:{_composition_slug(composition)}")
+        for flagged in (False, True):
+            flagged_points = [item for item in points if item.flagged is flagged]
+            if not flagged_points:
+                continue
+            artist = axis.scatter(
+                [item.temperature_K for item in flagged_points],
+                [item.residual_dex for item in flagged_points],
+                marker=marker,
+                s=22,
+                facecolors="none" if flagged else color,
+                edgecolors=color,
+                linewidths=0.8,
+                zorder=3,
+            )
+            artist.set_gid(
+                f"hero-marker:{rail}:{facet}:{engine}:{_composition_slug(composition)}:"
+                f"{'flagged' if flagged else 'ordinary'}"
+            )
+        handles.append(
+            Line2D(
+                [0],
+                [0],
+                color=color,
+                linewidth=1.0,
+                marker=marker,
+                markerfacecolor=color,
+                label=label,
+            )
+        )
+    axis.axhline(0.0, color="#666666", linewidth=0.7, zorder=1)
+    axis.set_ylabel("signed dex", fontsize=7)
+    axis.set_xlabel("Temperature (K)", fontsize=7)
+    axis.tick_params(labelsize=6)
+    axis.grid(True, color="#999999", alpha=0.18, linewidth=0.5)
+    if handles:
+        if any(point.flagged for _engine, _composition, points in series for point in points):
+            handles.append(
+                Line2D(
+                    [0],
+                    [0],
+                    color="#444444",
+                    linewidth=0.0,
+                    marker="o",
+                    markerfacecolor="none",
+                    label="flagged / extrapolated",
+                )
+            )
+        axis.legend(handles=handles, loc="best", fontsize=5.5, frameon=False)
+    else:
+        axis.text(
+            0.5,
+            0.5,
+            "no numeric predictions",
+            transform=axis.transAxes,
+            ha="center",
+            va="center",
+            fontsize=7,
+        )
+
+
+def _draw_hero_refusals(axis: Axes, entries: Sequence[tuple[str, str, int]]) -> None:
+    if not entries:
+        axis.text(0.01, 0.55, "refusals: 0", transform=axis.transAxes, fontsize=5.5)
+        axis.set_axis_off()
+        return
+    reasons = sorted({reason for _engine, reason, _count in entries})
+    palette = plt.get_cmap("tab20")
+    reason_colors = {reason: palette(i % 20) for i, reason in enumerate(reasons)}
+    positions = list(range(len(entries)))
+    axis.barh(
+        positions,
+        [count for _engine, _reason, count in entries],
+        color=[reason_colors[reason] for _engine, reason, _count in entries],
+        height=0.78,
+    )
+    axis.set_yticks(positions)
+    axis.set_yticklabels(
+        [f"{engine} · {reason}" for engine, reason, _count in entries],
+        fontsize=5,
+    )
+    axis.invert_yaxis()
+    axis.set_xlabel("refusal rows", fontsize=5.5)
+    axis.tick_params(axis="x", labelsize=5)
+    axis.tick_params(axis="y", length=0)
+    axis.grid(axis="x", color="#999999", alpha=0.18, linewidth=0.5)
+    axis.set_axisbelow(True)
+
+
+def _history_date(entry: Mapping[str, Any]) -> float | None:
+    raw = entry.get("commit_date")
+    if not isinstance(raw, str):
+        return None
+    try:
+        parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return mdates.date2num(parsed)
+
+
+def _draw_hero_history(axis: Axes, rail: str, history: Sequence[Mapping[str, Any]]) -> None:
+    metrics_by_engine: dict[str, dict[str, list[tuple[float, float]]]] = defaultdict(
+        lambda: {"rms_dex": [], "median_abs_dex": []}
+    )
+    paired_primary_points: list[tuple[float, float]] = []
+    benchmark_points: list[tuple[float, float]] = []
+    for entry in history:
+        date = _history_date(entry)
+        if date is None:
+            continue
+        metrics = entry.get("metrics")
+        if isinstance(metrics, Sequence) and not isinstance(metrics, (str, bytes)):
+            for metric in metrics:
+                if not isinstance(metric, Mapping) or metric.get("rail") != rail:
+                    continue
+                engine = str(metric.get("engine") or "unknown")
+                for field_name in ("rms_dex", "median_abs_dex"):
+                    value = _finite_float(metric.get(field_name))
+                    if value is not None:
+                        metrics_by_engine[engine][field_name].append((date, value))
+        benchmarks = entry.get("benchmarks")
+        if isinstance(benchmarks, Sequence) and not isinstance(benchmarks, (str, bytes)):
+            for benchmark in benchmarks:
+                if not isinstance(benchmark, Mapping) or benchmark.get("rail") != rail:
+                    continue
+                primary_value = _finite_float(benchmark.get("primary_rms_dex"))
+                if primary_value is not None:
+                    paired_primary_points.append((date, primary_value))
+                value = _finite_float(benchmark.get("benchmark_rms_dex"))
+                if value is not None:
+                    benchmark_points.append((date, value))
+
+    engine_names = sorted(metrics_by_engine)
+    palette = plt.get_cmap("tab10")
+    engine_colors = {engine: palette(i % 10) for i, engine in enumerate(engine_names)}
+    for engine in engine_names:
+        color = engine_colors[engine]
+        for field_name, linestyle, label in (
+            ("rms_dex", "-", "RMS"),
+            ("median_abs_dex", "--", "median |dex|"),
+        ):
+            points = sorted(metrics_by_engine[engine][field_name])
+            if not points:
+                continue
+            axis.plot(
+                [date for date, _value in points],
+                [value for _date, value in points],
+                color=color,
+                linestyle=linestyle,
+                marker="o",
+                markersize=3,
+                linewidth=0.9,
+                label=f"{engine} {label}",
+            )
+    if paired_primary_points:
+        paired_primary_points.sort()
+        axis.plot(
+            [date for date, _value in paired_primary_points],
+            [value for _date, value in paired_primary_points],
+            color=engine_colors.get("internal-analytical", "#333333"),
+            linestyle="-.",
+            marker="s",
+            markersize=3,
+            linewidth=1.0,
+            label="internal RMS (same rows)",
+        )
+    if benchmark_points:
+        benchmark_points.sort()
+        axis.plot(
+            [date for date, _value in benchmark_points],
+            [value for _date, value in benchmark_points],
+            color="#111111",
+            linestyle=":",
+            marker="D",
+            markersize=3,
+            linewidth=1.1,
+            label="best comparison RMS (same rows)",
+        )
+    if not metrics_by_engine and not paired_primary_points and not benchmark_points:
+        axis.text(
+            0.5,
+            0.5,
+            "no history rows",
+            transform=axis.transAxes,
+            ha="center",
+            va="center",
+            fontsize=7,
+        )
+    axis.set_title("History by green landing", loc="left", fontsize=8)
+    axis.set_ylabel("RMS / median |dex|", fontsize=7)
+    axis.set_xlabel("Green landing date", fontsize=7)
+    axis.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
+    axis.tick_params(axis="x", rotation=30, labelsize=6)
+    axis.tick_params(axis="y", labelsize=6)
+    axis.grid(True, color="#999999", alpha=0.18, linewidth=0.5)
+    if metrics_by_engine or paired_primary_points or benchmark_points:
+        axis.legend(loc="best", fontsize=5.5, frameon=False, ncol=2)
+
+
+def _current_history_entry(
+    history: Sequence[Mapping[str, Any]], revision: object
+) -> Mapping[str, Any]:
+    for entry in reversed(history):
+        if entry.get("store_revision") == revision:
+            return entry
+    return history[-1] if history else {}
+
+
+def _current_primary_metric(
+    history: Sequence[Mapping[str, Any]], rail: str, revision: object
+) -> Mapping[str, Any] | None:
+    entry = _current_history_entry(history, revision)
+    metrics = entry.get("metrics")
+    if not isinstance(metrics, Sequence) or isinstance(metrics, (str, bytes)):
+        return None
+    return next(
+        (
+            metric
+            for metric in metrics
+            if isinstance(metric, Mapping)
+            and metric.get("rail") == rail
+            and metric.get("engine") == "internal-analytical"
+        ),
+        None,
+    )
+
+
+def _hero_summary_payload(
+    data: ScorePlotData,
+    history: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    charts: dict[str, Any] = {}
+    for rail in HERO_RAILS:
+        rows_by_engine: Counter[str] = Counter()
+        for (series_rail, facet, engine, _composition), points in data.hero_series.items():
+            if series_rail == rail and not (
+                rail == Rail.VAPOUR.value and facet.startswith("minor:")
+            ):
+                rows_by_engine[engine] += sum(point.n for point in points)
+        refusals: dict[str, dict[str, int]] = defaultdict(dict)
+        for (refusal_rail, engine, reason), count in data.hero_refusal_totals.items():
+            if refusal_rail == rail:
+                refusals[engine][reason] = count
+        current = _current_primary_metric(history, rail, data.stamp.get("revision"))
+        charts[rail] = {
+            "plotted_observations_by_engine": dict(sorted(rows_by_engine.items())),
+            "refused_by_engine_reason": {
+                engine: dict(sorted(reasons.items()))
+                for engine, reasons in sorted(refusals.items())
+            },
+            "current_internal_rms_dex": (
+                data.hero_benchmarks[rail].get("primary_rms_dex")
+                if rail in data.hero_benchmarks
+                else None if current is None else current.get("rms_dex")
+            ),
+            "current_all_numeric_internal_rms_dex": (
+                None if current is None else current.get("rms_dex")
+            ),
+            "same_row_benchmark": data.hero_benchmarks.get(rail),
+        }
+    return charts
+
+
+def render_hero_charts(
+    data: ScorePlotData,
+    output_dir: Path,
+    *,
+    history_path: Path | None = None,
+) -> dict[str, Path]:
+    """Render the vaporisation, redox, and melt activity current/history charts."""
+
+    history = read_history(history_path)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    files: dict[str, Path] = {}
+    colors = plt.get_cmap("tab10")
+    engine_colors = {engine: colors(i % 10) for i, engine in enumerate(data.engines)}
+    for rail in HERO_RAILS:
+        facets = _hero_facets(data, rail)
+        refusal_entries = {
+            facet: _hero_refusal_entries(data, rail, facet) for facet in facets
+        }
+        ratios: list[float] = []
+        for facet in facets:
+            ratios.extend((2.0, max(0.45, len(refusal_entries[facet]) * 0.18)))
+        ratios.append(2.4)
+        figure = plt.figure(figsize=(14.0, max(5.0, len(facets) * 2.8 + 2.4)))
+        grid = figure.add_gridspec(
+            nrows=2 * len(facets) + 1,
+            ncols=1,
+            height_ratios=ratios,
+            hspace=0.18,
+        )
+        for index, facet in enumerate(facets):
+            current_axis = figure.add_subplot(grid[2 * index])
+            refusal_axis = figure.add_subplot(grid[2 * index + 1])
+            _draw_hero_current(
+                current_axis,
+                data,
+                rail,
+                facet,
+                engine_colors=engine_colors,
+            )
+            current_axis.set_title(facet, loc="left", fontsize=8)
+            _draw_hero_refusals(refusal_axis, refusal_entries[facet])
+        history_axis = figure.add_subplot(grid[-1])
+        _draw_hero_history(history_axis, rail, history)
+
+        primary = _current_primary_metric(history, rail, data.stamp.get("revision"))
+        benchmark = data.hero_benchmarks.get(rail)
+        if isinstance(primary, Mapping) and isinstance(benchmark, Mapping):
+            status = (
+                f"same-row internal RMS {benchmark.get('primary_rms_dex')} dex · "
+                f"{benchmark.get('benchmark_engine')} same-row RMS "
+                f"{benchmark.get('benchmark_rms_dex')} dex (n={benchmark.get('n')}) · "
+                f"all-numeric internal RMS {primary.get('rms_dex')} dex"
+            )
+        elif isinstance(primary, Mapping):
+            status = "current internal RMS " + str(primary.get("rms_dex")) + " dex · no paired comparison rows"
+        else:
+            status = "current benchmark unavailable"
+        figure.suptitle(f"{_HERO_TITLES[rail]} · {status}", fontsize=10, y=0.997)
+        figure.text(
+            0.5,
+            0.002,
+            "Lines separate engine and composition; hollow markers are flagged or extrapolated predictions.",
+            ha="center",
+            va="bottom",
+            fontsize=6,
+        )
+        path = output_dir / f"battery-hero-{rail}.svg"
+        with matplotlib.rc_context({"svg.hashsalt": "battery-hero"}):
+            figure.savefig(
+                path,
+                format="svg",
+                bbox_inches="tight",
+                metadata={"Date": None, "Creator": "battery_hero_plot"},
+            )
+        plt.close(figure)
+        files[f"hero:{rail}:svg"] = path
+    return files
+
+
 def render_plots(
     data: ScorePlotData,
     output_dir: Path,
@@ -1039,6 +2100,7 @@ def render_plots(
     group_by: Sequence[str] = DEFAULT_GROUP_BY,
     abundance_feedstock: str = DEFAULT_ABUNDANCE_FEEDSTOCK,
     omit_empty_engines: bool | None = None,
+    history_path: Path | None = None,
 ) -> dict[str, Path]:
     """Write shared-scale species/element tiles and one PNG per engine/view."""
 
@@ -1162,6 +2224,8 @@ def render_plots(
             figure.savefig(engine_png, dpi=120, bbox_inches="tight")
             plt.close(figure)
             files[f"{view}:engine:{engine}"] = engine_png
+    if history_path is not None:
+        files.update(render_hero_charts(data, output_dir, history_path=history_path))
     return files
 
 
@@ -1171,6 +2235,7 @@ def _summary_payload(
     abundance: ElementAbundance,
     *,
     omitted_engines: Sequence[str] = (),
+    history: Sequence[Mapping[str, Any]] = (),
 ) -> dict[str, Any]:
     engines: dict[str, Any] = {}
     for engine in data.engines:
@@ -1198,13 +2263,19 @@ def _summary_payload(
         "element_abundance_classes": abundance_class_table(data, abundance),
         "omitted_empty_engines": list(omitted_engines),
         "no_scored_rows_footer": _no_scored_rows_note(data, omitted_engines),
+        "hero_charts": _hero_summary_payload(data, history),
         "files": {name: str(path) for name, path in files.items()},
     }
 
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", type=Path, required=True, help="scorer residuals.jsonl")
+    parser.add_argument(
+        "--input",
+        type=Path,
+        required=True,
+        help="scorer residuals.jsonl, compact .jsonl.gz, or battery .tgz archive",
+    )
     parser.add_argument(
         "--output-dir",
         type=Path,
@@ -1245,6 +2316,21 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--simulator-commit", required=True)
     parser.add_argument("--openimcc-commit", required=True)
     parser.add_argument("--render-date", help="UTC date for stamps and filenames (default: today)")
+    parser.add_argument(
+        "--history-path",
+        type=Path,
+        default=HISTORY_PATH,
+        help="append-only hero chart history JSONL",
+    )
+    parser.add_argument(
+        "--append-history",
+        action="store_true",
+        help="append this archive's scorer summary as one history row",
+    )
+    parser.add_argument(
+        "--landing-sha",
+        help="green landing commit for --append-history (date is read from git)",
+    )
     return parser
 
 
@@ -1255,6 +2341,17 @@ def main(argv: Sequence[str] | None = None) -> int:
         bin_width_K=args.bin_width_k,
         rails=args.rail,
     )
+    if args.append_history:
+        if not args.landing_sha:
+            raise SystemExit("--append-history requires --landing-sha")
+        summary = _archive_json_member(args.input, "data/battery/score-summary.json")
+        record = _history_record(
+            summary,
+            landing_sha=args.landing_sha,
+            benchmarks=data.hero_benchmarks,
+            diagnostics=data.hero_diagnostics,
+        )
+        append_history(args.history_path, record)
     abundance = load_element_abundance(args.abundance_feedstock)
     files = render_plots(
         data,
@@ -1265,15 +2362,23 @@ def main(argv: Sequence[str] | None = None) -> int:
         group_by=args.group_by,
         abundance_feedstock=args.abundance_feedstock,
         omit_empty_engines=args.omit_empty_engines,
+        history_path=args.history_path,
     )
     omitted_engines = (
         _empty_engine_names(data)
         if args.omit_empty_engines is not False
         else ()
     )
+    history = read_history(args.history_path)
     print(
         json.dumps(
-            _summary_payload(data, files, abundance, omitted_engines=omitted_engines),
+            _summary_payload(
+                data,
+                files,
+                abundance,
+                omitted_engines=omitted_engines,
+                history=history,
+            ),
             indent=2,
             sort_keys=True,
         )
