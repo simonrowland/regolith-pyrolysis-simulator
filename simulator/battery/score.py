@@ -9679,6 +9679,48 @@ def _engine_from_payload(row: Mapping[str, object]) -> str:
     return "unknown"
 
 
+def _residual_engine_observable(row: Mapping[str, object]) -> bool:
+    """Whether a refused row is an observable that this engine can report."""
+
+    rail = str(row.get("rail") or "")
+    engine = _engine_from_payload(row)
+    if rail == Rail.VAPOUR.value and engine == Engine.MAGEMIN.value:
+        return False
+    if rail == Rail.MELT_ACTIVITY.value:
+        from simulator.battery.waypoints import MELT_ACTIVITY_ENGINES
+
+        if engine not in MELT_ACTIVITY_ENGINES:
+            return False
+
+    refusal = row.get("refusal")
+    if not isinstance(refusal, Mapping):
+        return True
+    reason = str(refusal.get("reason") or "")
+    detail = refusal.get("detail")
+    detail_reason = str(detail.get("reason") or "") if isinstance(detail, Mapping) else ""
+    if rail == Rail.REDOX.value and reason == RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX.value:
+        return False
+    if (
+        rail == Rail.THERMOCHEMISTRY.value
+        and reason == RefusalReason.UNSUPPORTED.value
+        and detail_reason == "quantity_not_predicted"
+    ):
+        request = row.get("candidate_request")
+        raw_quantity = request.get("quantity") if isinstance(request, Mapping) else None
+        try:
+            quantity = Quantity(str(raw_quantity))
+            engine_value = Engine(engine)
+        except ValueError:
+            return True
+        from simulator.battery.compilation_tier import _engine_thermo_quantities
+
+        return (
+            quantity in _engine_thermo_quantities(engine_value)
+            or quantity in FUSION_QUANTITIES
+        )
+    return True
+
+
 def candidate_rail_census(
     context: ScoreContext,
 ) -> tuple[tuple[dict[str, object], ...], tuple[dict[str, object], ...]]:

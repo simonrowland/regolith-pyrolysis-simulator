@@ -89,6 +89,7 @@ from simulator.battery.score import (
     SINGLE_CATION_COEFFICIENT_BASIS,
     SINGLE_LIQUID_ENGINES,
     _paired_engine_rail_benchmarks,
+    _residual_engine_observable,
     compile_residual,
     compute_metric,
     dumps_residual_line,
@@ -4766,6 +4767,69 @@ def test_paired_engine_rail_benchmarks_choose_best_comparison_per_primary() -> N
             "primary_rms_dex": None,
             "benchmark_rms_dex": None,
         }
+
+
+def test_residual_engine_observability_uses_scorer_domain_decisions() -> None:
+    from simulator.battery.compilation_tier import _engine_thermo_quantities
+
+    unsupported_thermo = {
+        "rail": Rail.THERMOCHEMISTRY.value,
+        "candidate_request": {
+            "engine": Engine.ALPHAMELTS.value,
+            "quantity": Quantity.H_MINUS_H298.value,
+        },
+        "refusal": {
+            "reason": RefusalReason.UNSUPPORTED.value,
+            "detail": {"reason": "quantity_not_predicted"},
+        },
+    }
+    assert Quantity.H_MINUS_H298 not in _engine_thermo_quantities(Engine.ALPHAMELTS)
+    assert not _residual_engine_observable(unsupported_thermo)
+
+    supported_thermo = {
+        "rail": Rail.THERMOCHEMISTRY.value,
+        "candidate_request": {
+            "engine": Engine.THERMOENGINE.value,
+            "quantity": Quantity.CP.value,
+        },
+        "refusal": {
+            "reason": RefusalReason.UNSUPPORTED.value,
+            "detail": {"reason": "quantity_not_predicted"},
+        },
+    }
+    assert Quantity.CP in _engine_thermo_quantities(Engine.THERMOENGINE)
+    assert _residual_engine_observable(supported_thermo)
+
+    assert not _residual_engine_observable(
+        {
+            "rail": Rail.VAPOUR.value,
+            "candidate_request": {"engine": Engine.MAGEMIN.value},
+            "refusal": {"reason": RefusalReason.UNSUPPORTED.value},
+        }
+    )
+    assert not _residual_engine_observable(
+        {
+            "rail": Rail.MELT_ACTIVITY.value,
+            "candidate_request": {"engine": Engine.MAGEMIN.value},
+            "refusal": {"reason": RefusalReason.UNSUPPORTED.value},
+        }
+    )
+    assert not _residual_engine_observable(
+        {
+            "rail": Rail.REDOX.value,
+            "candidate_request": {"engine": Engine.ALPHAMELTS.value},
+            "refusal": {
+                "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX.value
+            },
+        }
+    )
+    assert _residual_engine_observable(
+        {
+            "rail": Rail.VAPOUR.value,
+            "candidate_request": {"engine": Engine.VAPOROCK.value},
+            "refusal": {"reason": RefusalReason.UNSUPPORTED.value},
+        }
+    )
 
 
 def test_measured_headline_mode_serializes_typed_residuals_end_to_end(
