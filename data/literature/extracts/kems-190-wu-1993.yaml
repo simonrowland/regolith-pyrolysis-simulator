@@ -6,10 +6,10 @@ source:
   url: https://www.jstage.jst.go.jp/article/isijinternational1989/33/1/33_1_26/_pdf
   year: 1993
 extraction:
-  method: manual transcription from 301 dpi J-STAGE scan with local Tesseract OCR used only as a reading aid; all table cells visually checked
+  method: manual transcription from 301 dpi J-STAGE scan with local Tesseract OCR used only as a reading aid; all table cells visually checked; validated in an internal review, 2026-09-06, wave-3
   date: '2026-09-06'
   worker: wave-W3-wu-1993-r3
-  provenance_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/
+  provenance_path: raw/kems-190-wu-1993/kems-190-wu-1993.pdf
 review_status: draft
 corrections:
   - observation_id: wu_1993_reported_ternary_peritectic
@@ -159,7 +159,7 @@ species:
       - observation_id: wu_1993_table1_mgo_compiled_thermochemistry
         type: gibbs_table
         locator:
-          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
+          source_path: tables/kems-190-wu-1993/t1.csv
           published_page: 28
           table: '1'
           note: MgO liquid and solid rows
@@ -208,7 +208,7 @@ species:
       - observation_id: wu_1993_table2_mgo_sio2_mgo_model_rtln_gamma
         type: gibbs_table
         locator:
-          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t2.csv
+          source_path: tables/kems-190-wu-1993/t2.csv
           published_page: 32
           table: '2'
           note: MgO-SiO2 system, RT ln gamma_MgO columns
@@ -267,7 +267,7 @@ species:
       - observation_id: wu_1993_table1_feo_compiled_thermochemistry
         type: gibbs_table
         locator:
-          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
+          source_path: tables/kems-190-wu-1993/t1.csv
           published_page: 28
           table: '1'
           note: FeO liquid and solid rows
@@ -322,7 +322,7 @@ species:
       - observation_id: wu_1993_table2_feo_sio2_feo_model_rtln_gamma
         type: gibbs_table
         locator:
-          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t2.csv
+          source_path: tables/kems-190-wu-1993/t2.csv
           published_page: 32
           table: '2'
           note: FeO-SiO2 system, RT ln gamma_FeO columns
@@ -483,7 +483,7 @@ species:
       - observation_id: wu_1993_table1_sio2_compiled_thermochemistry
         type: gibbs_table
         locator:
-          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
+          source_path: tables/kems-190-wu-1993/t1.csv
           published_page: 28
           table: '1'
           note: SiO2 liquid, tridymite, and cristobalite rows
@@ -540,7 +540,7 @@ species:
       - observation_id: wu_1993_table2_mgo_sio2_sio2_model_rtln_gamma
         type: gibbs_table
         locator:
-          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t2.csv
+          source_path: tables/kems-190-wu-1993/t2.csv
           published_page: 32
           table: '2'
           note: MgO-SiO2 system, RT ln gamma_SiO2 columns
@@ -595,7 +595,7 @@ species:
       - observation_id: wu_1993_table2_feo_sio2_sio2_model_rtln_gamma
         type: gibbs_table
         locator:
-          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t2.csv
+          source_path: tables/kems-190-wu-1993/t2.csv
           published_page: 32
           table: '2'
           note: FeO-SiO2 system, RT ln gamma_SiO2 columns
@@ -699,7 +699,7 @@ species:
       - observation_id: wu_1993_table1_mg2sio4_optimized_thermochemistry
         type: gibbs_table
         locator:
-          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
+          source_path: tables/kems-190-wu-1993/t1.csv
           published_page: 28
           table: '1'
           row: Mg2SiO4(s)
@@ -731,7 +731,7 @@ species:
       - observation_id: wu_1993_table1_fe2sio4_optimized_thermochemistry
         type: gibbs_table
         locator:
-          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
+          source_path: tables/kems-190-wu-1993/t1.csv
           published_page: 28
           table: '1'
           row: Fe2SiO4(s)
@@ -759,7 +759,7 @@ species:
       - observation_id: wu_1993_table3_reported_solidus_points
         type: transition_point
         locator:
-          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t3.csv
+          source_path: tables/kems-190-wu-1993/t3.csv
           published_page: 33
           table: '3'
           note: Reported column, wt% Fe2SiO4 along Mg2SiO4-Fe2SiO4 pseudobinary join
@@ -785,7 +785,7 @@ species:
       - observation_id: wu_1993_table3_calculated_solidus_points
         type: transition_point
         locator:
-          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t3.csv
+          source_path: tables/kems-190-wu-1993/t3.csv
           published_page: 33
           table: '3'
           note: Calculated column, wt% Fe2SiO4 along Mg2SiO4-Fe2SiO4 pseudobinary join
@@ -813,7 +813,7 @@ species:
       - observation_id: wu_1993_table1_mgsio3_optimized_thermochemistry
         type: gibbs_table
         locator:
-          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
+          source_path: tables/kems-190-wu-1993/t1.csv
           published_page: 28
           table: '1'
           row: MgSiO3(s)
@@ -844,7 +844,7 @@ species:
       - observation_id: wu_1993_table1_fesio3_optimized_thermochemistry
         type: gibbs_table
         locator:
-          source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
+          source_path: tables/kems-190-wu-1993/t1.csv
           published_page: 28
           table: '1'
           row: FeSiO3(s)
