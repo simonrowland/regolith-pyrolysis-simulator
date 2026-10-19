@@ -120,6 +120,10 @@ from simulator.battery.records import (
     StandardState,
     union_notices,
 )
+from simulator.melt_backend.base import (
+    MULTIVALENT_MELT_ELEMENTS,
+    multivalent_components,
+)
 from simulator.battery.oxygen_balance import (
     IMCC_ENGINES,
     OXYGEN_BALANCE_EFFUSION_ENGINES,
@@ -3579,59 +3583,6 @@ def cell_notices(
     return tuple(notices)
 
 
-# More than one oxidation state in silicate melts over the fO2 range these
-# engines are asked to run. The generator owns the table; scorer and contract
-# use that same mapping so redox admission cannot drift between consumers.
-
-
-def _oxide_lookup_key(name: str) -> str:
-    key = str(name).strip()
-    if key.endswith("_Liq"):
-        key = key[:-4]
-    if key.endswith("*"):
-        key = key[:-1]
-    return key
-
-
-def _elements_of_component(name: str) -> frozenset[str]:
-    from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
-
-    key = _oxide_lookup_key(name)
-    canonical = MELTS_OXIDE_ALIASES.get(key.lower())
-    formula = "FeO" if canonical == "FeO_total" else (canonical or key)
-    parsed = formula_composition(formula)
-    if not parsed:
-        return frozenset()
-    return frozenset(element for element, _count in parsed)
-
-
-def _is_multivalent_name(name: str) -> bool:
-    from simulator.battery.generators.bench import MULTIVALENT_MELT_ELEMENTS
-
-    return any(
-        element in MULTIVALENT_MELT_ELEMENTS for element in _elements_of_component(name)
-    )
-
-
-def multivalent_components(
-    composition: Composition | None,
-    species: str | None,
-) -> tuple[str, ...]:
-    """Names that hold a multivalent element at a positive amount, plus the species.
-
-    A printed zero does not count, so FeO = 0 cannot hide TiO2.
-    """
-
-    present: list[str] = []
-    if composition is not None:
-        for name, amount in composition.components:
-            if amount > 0 and _is_multivalent_name(str(name)):
-                present.append(str(name))
-    if species and _is_multivalent_name(species) and species not in present:
-        present.append(species)
-    return tuple(sorted(set(present)))
-
-
 def stated_pure_substance_reservoir(identity: Identity) -> tuple[str, str] | None:
     """Pot formula and phase when the row states a pure condensed reservoir.
 
@@ -3665,15 +3616,19 @@ def oxygen_is_scorer_input(
     """
 
     quantity = quantity_token(identity)
-    redox = multivalent_components(composition, identity.species.formula)
+    from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
+
+    redox = multivalent_components(
+        composition,
+        identity.species.formula,
+        oxide_aliases=MELTS_OXIDE_ALIASES,
+    )
     if quantity in MELT_ACTIVITY_QUANTITIES:
         if redox:
             return True, "melt contains multivalent " + ", ".join(redox), redox
         # fO2 changes melt activity through redox speciation. With no
         # multivalent element in this fixed oxide composition, there is no
         # redox pair for oxygen potential to shift, so fO2 is not an input.
-        from simulator.battery.generators.bench import MULTIVALENT_MELT_ELEMENTS
-
         return (
             False,
             "melt has no multivalent element "

@@ -658,16 +658,20 @@ def test_alphamelts_cell_passes_isothermal_subprocess_run_mode() -> None:
     "oxide",
     ("FeO", "Fe2O3", "TiO2", "Cr2O3", "MnO", "FeOT"),
 )
-def test_scorer_and_bench_share_the_pinned_multivalent_rule(oxide: str) -> None:
-    from simulator.battery.generators.bench import _redox_components
-    from simulator.battery.score import multivalent_components
+def test_backend_owned_multivalent_rule_keeps_pinned_results(oxide: str) -> None:
+    from simulator.melt_backend.alphamelts import MELTS_OXIDE_ALIASES
+    from simulator.melt_backend.base import multivalent_components
 
     composition = {oxide: 1.0, "SiO2": 0.0}
     expected = (oxide,)
 
-    assert _redox_components(composition) == expected
     assert multivalent_components(
-        SimpleNamespace(components=tuple(composition.items())), None
+        composition,
+        oxide_aliases=MELTS_OXIDE_ALIASES,
+    ) == expected
+    assert multivalent_components(
+        SimpleNamespace(components=tuple(composition.items())),
+        oxide_aliases=MELTS_OXIDE_ALIASES,
     ) == expected
 
 
