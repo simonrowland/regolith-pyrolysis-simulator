@@ -56,6 +56,17 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 _RECIPE_DIR = _REPO_ROOT / "data" / "recipes"
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason="product-story species rounded to zero are still emitted as keys",
+)
+def test_product_story_bucket_omits_species_rounded_to_zero() -> None:
+    bucket = web_events._product_story_bucket({"Fe": 3e-13})
+
+    assert bucket["species_kg"] == {}
+    assert bucket["class_total_kg"] == 0.0
+
+
 def _identified_socket_client(app):
     http_client = app.test_client()
     assert http_client.get("/").status_code == 200
