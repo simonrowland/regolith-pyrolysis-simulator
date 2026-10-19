@@ -241,6 +241,7 @@ def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> 
         bench=bench,
         isolated=False,
     )
+    assert prediction.value is not None, prediction.refusal_detail
     context = ScoreContext(
         works=_works,
         experiments=experiments,
