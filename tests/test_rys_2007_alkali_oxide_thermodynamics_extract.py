@@ -4,6 +4,7 @@ from decimal import Decimal
 from pathlib import Path
 from collections import Counter
 
+from simulator.battery.enums import Phase, Quantity
 from simulator.battery.migrate import Migrator
 from simulator.yaml_cache import YAML12SafeLoader
 from tests.test_yaml_flow_scalar_commas import _walk_mapping_source_issues
@@ -37,6 +38,8 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
     assert table7_first["T_C"] == 1080
     assert table7_first["composition_mol"] == {"Na2O": "0.9598", "SiO2": "0.0401"}
     assert table7_first["composition_mol_basis"] == "printed_mole_fraction"
+    assert table7_first["locator"]["page"] == 82
+    assert table7_first["locator"]["published_page"] == 70
 
     table9_first = _point_by_observation_id(document, "rys_2007_table9_liquidus", 0)
     assert table9_first["T_C"] == 1089
@@ -46,18 +49,35 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
     )
     assert appendix_na["pressure_Pa"] == 3.966701
     assert appendix_na["T_K"] == 1137.158
+    assert appendix_na["locator"]["page"] == 137
+    assert appendix_na["locator"]["published_page"] == 125
 
     table1_nao = _point_by_observation_id(
         document, "rys_2007_appendix_nao_partial_pressures_table1", 0
     )
     assert table1_nao["pressure_Pa"] == "0.000414"
     assert table1_nao["locator"]["pdf_page_index"] == 136
+    assert table1_nao["locator"]["page"] == 137
+    assert table1_nao["locator"]["published_page"] == 125
 
     table2_na2o = _point_by_observation_id(
         document, "rys_2007_appendix_na2o_partial_pressures_table2", 0
     )
     assert table2_na2o["pressure_Pa"] == "0.00019"
-    assert table2_na2o["locator"]["page"] == 125
+    assert table2_na2o["locator"]["page"] == 137
+    assert table2_na2o["locator"]["published_page"] == 125
+
+    table1_na2o = _point_by_observation_id(
+        document, "rys_2007_appendix_na2o_partial_pressures_table1", 0
+    )
+    assert table1_na2o["T_K"] == "1137.158"
+    assert table1_na2o["pressure_Pa"] == "0.000176"
+
+    k_pressure = _point_by_observation_id(
+        document, "rys_2007_appendix_k_partial_pressures_table10a", 0
+    )
+    assert k_pressure["gas_species"] == "K"
+    assert k_pressure["pressure_Pa"] == "0.057713"
 
     table4_na = _point_by_observation_id(
         document, "rys_2007_appendix_na_partial_pressures_table4", 0
@@ -75,6 +95,40 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
         document, "rys_2007_appendix_k2o_activity_table10a", 0
     )
     assert table10_k2o_activity["activity"] == "3.85E-16"
+
+    table12_context = next(
+        observation
+        for species in document["species"].values()
+        for observation in species.get("context", [])
+        if observation["observation_id"]
+        == "rys_2007_tables12_13_14_na2o_vaporization_enthalpies"
+    )
+    assert table12_context["locator"] == {
+        "page": 112,
+        "published_page": 100,
+        "pdf_page_index": 111,
+        "table": "12",
+    }
+
+    locators = []
+
+    def collect_locators(value: object) -> None:
+        if isinstance(value, dict):
+            if "page" in value and "pdf_page_index" in value:
+                locators.append(value)
+            for item in value.values():
+                collect_locators(item)
+        elif isinstance(value, list):
+            for item in value:
+                collect_locators(item)
+
+    collect_locators(document)
+    assert len(locators) == 2068
+    assert all(
+        locator["page"] == locator["pdf_page_index"] + 1
+        and "published_page" in locator
+        for locator in locators
+    )
 
     appendix_rows = Counter()
     for species in document["species"].values():
@@ -103,8 +157,6 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
             "12b": 48,
         }
     )
-    assert sum([19, 10, 14, 17, 17, 18, 20, 19, 18, 14, 14, 16, 16, 15, 12]) == 239
-
     table16_activity = _point_by_observation_id(
         document, "rys_2007_tables16_17_19_na2o_activity_1750k", 2
     )
@@ -135,6 +187,57 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
     result = migrator.result
     assert result.validation.hard_issues == ()
     assert len(result.observations) == 928
+
+    partial_pressures = [
+        row
+        for row in result.observations.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.P_PARTIAL
+    ]
+    assert len(partial_pressures) == 516
+    assert Counter(row.identity.species.formula for row in partial_pressures) == Counter(
+        {"Na": 329, "K": 86, "NaO": 33, "O2": 31, "Na2O": 37}
+    )
+
+    na_pressure = next(
+        row
+        for row in partial_pressures
+        if "rys_2007_appendix_na_partial_pressures::T=1137.158"
+        in row.observation_id
+    )
+    assert na_pressure.identity.species.formula == "Na"
+    assert na_pressure.identity.species.phase.value is Phase.G
+    assert na_pressure.value.point == Decimal("3.966701")
+
+    k_pressure = next(
+        row
+        for row in partial_pressures
+        if "::rys_2007_appendix_k_partial_pressures_table10a::"
+        in row.observation_id
+    )
+    assert k_pressure.identity.species.formula == "K"
+    assert k_pressure.value.point == Decimal("0.057713")
+
+    na2o_pressure = next(
+        row
+        for row in partial_pressures
+        if "::rys_2007_appendix_na2o_partial_pressures_table1::"
+        in row.observation_id
+    )
+    assert na2o_pressure.identity.species.formula == "Na2O"
+    assert na2o_pressure.value.point == Decimal("0.000176")
+
+    pure_oxide_rows = [
+        row
+        for row in partial_pressures
+        if row.identity.composition.is_value
+        and row.identity.composition.value.basis == "pure_oxide_system"
+    ]
+    assert len(pure_oxide_rows) == 144
+    assert all(
+        row.point_conditions["composition"].state.is_value
+        for row in pure_oxide_rows
+    )
 
     for observation in result.observations.values():
         point_conditions = observation.point_conditions or {}
