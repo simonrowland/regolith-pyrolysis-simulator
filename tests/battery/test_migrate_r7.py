@@ -386,6 +386,17 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
         any(notice.band == bulk_band for notice in observation.notices)
         for observation in defaulted
     ) == 59
+    for observation in defaulted:
+        composition_condition = (observation.point_conditions or {}).get("composition")
+        assert composition_condition is not None and composition_condition.state.is_value
+        source_row = _extract_observation(
+            "kems-042-plante-1979.yaml",
+            observation.observation_id.split("::", 1)[1],
+        )
+        role = source_row["values"]["composition_role"]
+        assert role["value"] == "datum_state"
+        assert role["locator"] == source_row["locator"]
+        assert role["quote"] == source_row["quote"]
     assert all(
         any(notice.band == bulk_band for notice in observation.notices)
         for observation in defaulted

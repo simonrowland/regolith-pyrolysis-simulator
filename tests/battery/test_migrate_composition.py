@@ -636,6 +636,39 @@ def test_round10_datum_state_role_admits_measured_composition_without_proxy() ->
     assert result.state.value.proxy_flag is None
 
 
+@pytest.mark.parametrize(
+    ("oxide_map", "relation"),
+    (
+        (
+            {"K2O": "43.94", "SiO2": "56.06"},
+            "SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction",
+        ),
+        ({"K2O": "43.94", "SiO2": "56.05"}, "wt_pct_to_mole_fraction"),
+        (
+            {"K2O": "43.94", "SiO2": "56.06", "MgO": "0"},
+            "wt_pct_to_mole_fraction",
+        ),
+    ),
+)
+def test_datum_state_binary_complement_relation_uses_decimal_structure(
+    oxide_map, relation
+) -> None:
+    result = _composition_located_from_values(
+        {
+            "composition_role": "datum_state",
+            "composition_wt_pct": oxide_map,
+            "composition_derivation": (
+                "SiO2 and K2O are not complements to 100; prose is provenance only"
+            ),
+        },
+        None,
+    )
+
+    assert result is not None and result.state.is_value
+    assert result.inference is not None
+    assert result.inference.relation == relation
+
+
 def test_round10_plante_1979_table_row_keeps_datum_state_composition(
     tmp_path: Path,
 ) -> None:
