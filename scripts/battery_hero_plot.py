@@ -408,15 +408,16 @@ def read_scores(
                 numeric = row.get("numeric")
                 if not isinstance(numeric, Mapping) or numeric.get("value") is None:
                     continue
-                if rail not in selected:
-                    continue
+                selected_rail = rail in selected
                 if numeric.get("operation") != "dex":
-                    summary.non_dex_rows += 1
+                    if selected_rail:
+                        summary.non_dex_rows += 1
                     continue
 
                 identity = candidate_observation.get("identity")
                 if not isinstance(identity, Mapping):
-                    summary.missing_identity_rows += 1
+                    if selected_rail:
+                        summary.missing_identity_rows += 1
                     continue
                 quantity = _state_value(identity.get("quantity"))
                 if numeric.get("decision_band") is None and quantity == "p_partial":
@@ -438,6 +439,8 @@ def read_scores(
                         # Use the scorer's d-139 output marker; do not infer calibration here.
                         summary.excluded_d139_rows += 1
                         continue
+                if not selected_rail:
+                    continue
                 species_identity = identity.get("species")
                 formula = (
                     str(species_identity.get("formula") or "")
