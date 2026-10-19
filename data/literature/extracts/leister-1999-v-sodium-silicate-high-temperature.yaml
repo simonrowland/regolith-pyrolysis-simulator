@@ -1,0 +1,1353 @@
+schema_version: literature_extract.v1
+source_id: leister-1999-v-sodium-silicate-high-temperature
+source:
+  citation: >-
+    Leister, M., Ehrt, D., von der Goenna, G., Ruessel, C. and Breitbarth, F. W.
+    (1999). Redox states and coordination of vanadium in sodium silicates melted
+    at high temperatures. Physics and Chemistry of Glasses, 40(6), 319–325.
+  year: 1999
+extraction:
+  method: >-
+    Born-digital pdftotext-layout transcription, checked against the publisher
+    PDF at 600 dpi. Tables 1–4 were checked against rendered pages 322 and 324;
+    figures 1–10 are retained as figure-only context records with no digitised
+    points. Table 2's Na2O.5·67SiO2 reducing row is printed as 1600°C, while the
+    Experimental procedure gives 1500°C for that composition; the table's
+    coordinate is retained as printed and the disagreement is recorded in the
+    audit. Table 2 SWV columns are author-calculated equilibrium values and are
+    retained in context. Host glass compositions are the declared binary
+    Na2O-SiO2 compositions; vanadium dopant is recorded separately and is not
+    added to a reconstructed ternary composition.
+  date: '2026-10-18'
+  worker: codex
+  provenance_path: text/leister-1999-v-sodium-silicate-high-temperature/pdftotext-layout.txt
+review_status: draft
+fidelity_samples:
+  - path: species.V.observations[leister99_disilicate_optical_v5].values.points[0].value
+    value: '52'
+    note: Table 2, Na2O.2SiO2, 1300°C reducing, optical V5+ = 52%.
+    locator:
+      page: 322
+      pdf_page_index: 3
+      table: '2'
+      row: Na2O.2SiO2, 1300 red.
+      column: Optical spectroscopy V5+
+  - path: species.V.observations[leister99_disilicate_esr_v4].values.points[2].value
+    value: '3'
+    note: Table 2, Na2O.2SiO2, 1600°C air, ESR V4+ = 3%.
+    locator:
+      page: 322
+      pdf_page_index: 3
+      table: '2'
+      row: Na2O.2SiO2, 1600 air
+      column: ESR V4+
+  - path: species.V.observations[leister99_silica_rich_optical_v3].values.points[0].value
+    value: '72'
+    note: Table 2, Na2O.5·67SiO2, 1600°C reducing, optical V3+ = 72%.
+    locator:
+      page: 322
+      pdf_page_index: 3
+      table: '2'
+      row: Na2O.5·67SiO2, 1600 red.
+      column: Optical spectroscopy V3+
+experiments:
+  - experiment_id: leister99_disilicate_quenched_glasses
+    method: spectroscopy
+    method_as_printed: Optical absorption spectroscopy and ESR spectroscopy of quenched glasses.
+    locator:
+      page: 320
+      pdf_page_index: 1
+      section: Experimental procedure
+    conditions:
+      composition:
+        state:
+          tag: value
+          value: &leister99_disilicate_host
+            basis: printed_mole_fraction
+            amount_basis: mole_fraction
+            components:
+              - [Na2O, '0.33']
+              - [SiO2, '0.67']
+        as_printed: 33 mol% Na2O and 67 mol% SiO2 (Na2O.2SiO2)
+        locator:
+          page: 320
+          pdf_page_index: 1
+          section: Experimental procedure
+      vanadium_dopant_as_printed:
+        state:
+          tag: value
+          value: 0.5 wt% V (5000 ppm) as V2O5
+        locator:
+          page: 320
+          pdf_page_index: 1
+          section: Experimental procedure
+      quench_state:
+        state:
+          tag: value
+          value: quenched glass
+        locator:
+          page: 320
+          pdf_page_index: 1
+          section: Experimental procedure
+      spectroscopic_measurement_temperature:
+        state: {tag: value, value: room temperature}
+        locator: {page: 319, pdf_page_index: 0, section: Abstract}
+  - experiment_id: leister99_silica_rich_quenched_glasses
+    method: spectroscopy
+    method_as_printed: Optical absorption spectroscopy and ESR spectroscopy of quenched glasses.
+    locator:
+      page: 320
+      pdf_page_index: 1
+      section: Experimental procedure
+    conditions:
+      composition:
+        state:
+          tag: value
+          value: &leister99_silica_rich_host
+            basis: printed_mole_fraction
+            amount_basis: mole_fraction
+            components:
+              - [Na2O, '0.15']
+              - [SiO2, '0.85']
+        as_printed: 15 mol% Na2O and 85 mol% SiO2 (Na2O.5·67SiO2)
+        locator:
+          page: 320
+          pdf_page_index: 1
+          section: Experimental procedure
+      vanadium_dopant_as_printed:
+        state:
+          tag: value
+          value: 0.5 wt% V (5000 ppm) as V2O5
+        locator:
+          page: 320
+          pdf_page_index: 1
+          section: Experimental procedure
+      quench_state:
+        state:
+          tag: value
+          value: quenched glass
+        locator:
+          page: 320
+          pdf_page_index: 1
+          section: Experimental procedure
+      spectroscopic_measurement_temperature:
+        state: {tag: value, value: room temperature}
+        locator: {page: 319, pdf_page_index: 0, section: Abstract}
+species:
+  V:
+    observations:
+      - observation_id: leister99_disilicate_optical_v5
+        type: concentration_series
+        experiment: leister99_disilicate_quenched_glasses
+        locator:
+          page: 322
+          pdf_page_index: 3
+          table: '2'
+        phase: glass
+        regime: quench_equilibration
+        method_as_printed: Optical absorption spectroscopy
+        uncertainty:
+          value: '10'
+          units: '%'
+          as_printed: ±10%
+          confidence_level: not_stated
+          notice: confidence level not stated
+          locator: {page: 320, pdf_page_index: 1, section: Optical absorption spectroscopy, note: 'The relative error Δc was calculated to be ±10% which is mainly caused by the error of the determined extinction coefficient, Δε. Confidence level not stated.'}
+        units: '%'
+        values:
+          quantity: valence_ratio
+          valence_basis:
+            numerator_oxidation_states: [5]
+            denominator_kind: total_element
+            denominator_oxidation_state: null
+            value_form: fraction
+          method_class: measured_reduced
+          derivation:
+            relation: >-
+              Optical absorption intensities are interpreted with the
+              Lambert-Beer equation E(λ)=ε(λ)c d and extinction coefficients
+              from Table 1 to determine valence fractions.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 321, pdf_page_index: 2, figure: '1', note: 'The numerical optical absorption intensities used to determine the Table 2 fractions are not tabulated; Figure 1 shows the spectra.'}
+            output_unit: fraction
+          admission_status: admitted
+          points:
+            - label: 1300°C reducing
+              value: '52'
+              as_printed: 52%
+              T_C: '1300'
+              quench_status:
+                state: {tag: value, value: asserted_preserved}
+                as_printed: 'To freeze the redox ratios the melts were quenched by casting on a copper block.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1300 red.', column: 'Optical spectroscopy V5+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_disilicate_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: red.}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1300 red.', column: 'atmosphere'}
+            - label: 1300°C air
+              value: '99'
+              as_printed: 99%
+              T_C: '1300'
+              quench_status:
+                state: {tag: value, value: asserted_preserved}
+                as_printed: 'To freeze the redox ratios the melts were quenched by casting on a copper block.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1300 air', column: 'Optical spectroscopy V5+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_disilicate_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: air}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1300 air', column: 'atmosphere'}
+            - label: 1600°C air
+              value: '95'
+              as_printed: 95%
+              T_C: '1600'
+              quench_status:
+                state: {tag: value, value: asserted_preserved}
+                as_printed: 'To freeze the redox ratios the melts were quenched by casting on a copper block.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1600 air', column: 'Optical spectroscopy V5+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_disilicate_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: air}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1600 air', column: 'atmosphere'}
+            - label: 1600°C nitrogen
+              value: '89'
+              as_printed: 89%
+              T_C: '1600'
+              quench_status:
+                state: {tag: value, value: not_stated}
+                as_printed: 'The melts were quenched by centrifugal casting in a cold graphite mould.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                status_note: Preservation of the high-temperature ratios during quench is not stated.
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1600 N2', column: 'Optical spectroscopy V5+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_disilicate_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: N2}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1600 N2', column: 'atmosphere'}
+            - label: 1800°C nitrogen
+              value: '81'
+              as_printed: 81%
+              T_C: '1800'
+              quench_status:
+                state: {tag: value, value: not_stated}
+                as_printed: 'The melts were quenched by centrifugal casting in a cold graphite mould.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                status_note: Preservation of the high-temperature ratios during quench is not stated.
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1800 N2', column: 'Optical spectroscopy V5+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_disilicate_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: N2}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1800 N2', column: 'atmosphere'}
+            - label: 2000°C nitrogen
+              value: '63'
+              as_printed: 63%
+              T_C: '2000'
+              quench_status:
+                state: {tag: value, value: not_stated}
+                as_printed: 'The melts were quenched by centrifugal casting in a cold graphite mould.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                status_note: Preservation of the high-temperature ratios during quench is not stated.
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 2000 N2', column: 'Optical spectroscopy V5+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_disilicate_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: N2}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 2000 N2', column: 'atmosphere'}
+      - observation_id: leister99_disilicate_optical_v4
+        type: concentration_series
+        experiment: leister99_disilicate_quenched_glasses
+        locator: {page: 322, pdf_page_index: 3, table: '2'}
+        phase: glass
+        regime: quench_equilibration
+        method_as_printed: Optical absorption spectroscopy
+        uncertainty:
+          value: '10'
+          units: '%'
+          as_printed: ±10%
+          confidence_level: not_stated
+          notice: confidence level not stated
+          locator: {page: 320, pdf_page_index: 1, section: Optical absorption spectroscopy, note: 'The relative error Δc was calculated to be ±10% which is mainly caused by the error of the determined extinction coefficient, Δε. Confidence level not stated.'}
+        units: '%'
+        values:
+          quantity: valence_ratio
+          valence_basis:
+            numerator_oxidation_states: [4]
+            denominator_kind: total_element
+            denominator_oxidation_state: null
+            value_form: fraction
+          method_class: measured_reduced
+          derivation:
+            relation: >-
+              Optical absorption intensities are interpreted with the
+              Lambert-Beer equation E(λ)=ε(λ)c d and extinction coefficients
+              from Table 1 to determine valence fractions.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 321, pdf_page_index: 2, figure: '1', note: 'The numerical optical absorption intensities used to determine the Table 2 fractions are not tabulated; Figure 1 shows the spectra.'}
+            output_unit: fraction
+          admission_status: admitted
+          points:
+            - label: 1300°C reducing
+              value: '48'
+              as_printed: 48%
+              T_C: '1300'
+              quench_status:
+                state: {tag: value, value: asserted_preserved}
+                as_printed: 'To freeze the redox ratios the melts were quenched by casting on a copper block.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1300 red.', column: 'Optical spectroscopy V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_disilicate_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: red.}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1300 red.', column: 'atmosphere'}
+            - label: 1300°C air
+              value: '1'
+              as_printed: 1%
+              T_C: '1300'
+              quench_status:
+                state: {tag: value, value: asserted_preserved}
+                as_printed: 'To freeze the redox ratios the melts were quenched by casting on a copper block.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1300 air', column: 'Optical spectroscopy V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_disilicate_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: air}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1300 air', column: 'atmosphere'}
+            - label: 1600°C air
+              value: '5'
+              as_printed: 5%
+              T_C: '1600'
+              quench_status:
+                state: {tag: value, value: asserted_preserved}
+                as_printed: 'To freeze the redox ratios the melts were quenched by casting on a copper block.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1600 air', column: 'Optical spectroscopy V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_disilicate_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: air}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1600 air', column: 'atmosphere'}
+            - label: 1600°C nitrogen
+              value: '11'
+              as_printed: 11%
+              T_C: '1600'
+              quench_status:
+                state: {tag: value, value: not_stated}
+                as_printed: 'The melts were quenched by centrifugal casting in a cold graphite mould.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                status_note: Preservation of the high-temperature ratios during quench is not stated.
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1600 N2', column: 'Optical spectroscopy V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_disilicate_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: N2}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1600 N2', column: 'atmosphere'}
+            - label: 1800°C nitrogen
+              value: '19'
+              as_printed: 19%
+              T_C: '1800'
+              quench_status:
+                state: {tag: value, value: not_stated}
+                as_printed: 'The melts were quenched by centrifugal casting in a cold graphite mould.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                status_note: Preservation of the high-temperature ratios during quench is not stated.
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1800 N2', column: 'Optical spectroscopy V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_disilicate_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: N2}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1800 N2', column: 'atmosphere'}
+            - label: 2000°C nitrogen
+              value: '27'
+              as_printed: 27%
+              T_C: '2000'
+              quench_status:
+                state: {tag: value, value: not_stated}
+                as_printed: 'The melts were quenched by centrifugal casting in a cold graphite mould.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                status_note: Preservation of the high-temperature ratios during quench is not stated.
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 2000 N2', column: 'Optical spectroscopy V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_disilicate_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: N2}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 2000 N2', column: 'atmosphere'}
+      - observation_id: leister99_disilicate_esr_v4
+        type: concentration_series
+        experiment: leister99_disilicate_quenched_glasses
+        locator: {page: 322, pdf_page_index: 3, table: '2'}
+        phase: glass
+        regime: quench_equilibration
+        method_as_printed: Electron spin resonance spectroscopy
+        uncertainty:
+          form: relative_bound
+          bound_value: '≤15%'
+          confidence_level: not_stated
+          notice: confidence level not stated
+          locator: {page: 320, pdf_page_index: 1, section: Electron spin resonance spectroscopy, note: 'The V4+ concentrations were determined quantitatively (relative error ≤15%) from the intensities of the paramagnetic signal. Confidence level not stated.'}
+        units: '%'
+        values:
+          quantity: valence_ratio
+          valence_basis:
+            numerator_oxidation_states: [4]
+            denominator_kind: total_element
+            denominator_oxidation_state: null
+            value_form: fraction
+          method_class: measured_reduced
+          derivation:
+            relation: >-
+              V4+ is quantified from the integrated ESR signal relative to the
+              CuSO4·5H2O standard, then expressed as a fraction of total V.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 322, pdf_page_index: 3, figure: '5', note: 'The numerical ESR signal integrals used to determine the Table 2 fractions are not tabulated; Figure 5 shows the spectrum.'}
+            output_unit: fraction
+          admission_status: admitted
+          points:
+            - label: 1300°C reducing
+              value: '48'
+              as_printed: 48%
+              T_C: '1300'
+              quench_status:
+                state: {tag: value, value: asserted_preserved}
+                as_printed: 'To freeze the redox ratios the melts were quenched by casting on a copper block.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1300 red.', column: 'ESR V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_disilicate_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: red.}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1300 red.', column: 'atmosphere'}
+            - label: 1300°C air
+              value: '1'
+              as_printed: 1%
+              T_C: '1300'
+              quench_status:
+                state: {tag: value, value: asserted_preserved}
+                as_printed: 'To freeze the redox ratios the melts were quenched by casting on a copper block.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1300 air', column: 'ESR V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_disilicate_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: air}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1300 air', column: 'atmosphere'}
+            - label: 1600°C air
+              value: '3'
+              as_printed: 3%
+              T_C: '1600'
+              quench_status:
+                state: {tag: value, value: asserted_preserved}
+                as_printed: 'To freeze the redox ratios the melts were quenched by casting on a copper block.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1600 air', column: 'ESR V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_disilicate_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: air}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1600 air', column: 'atmosphere'}
+            - label: 1600°C nitrogen
+              value: '14'
+              as_printed: 14%
+              T_C: '1600'
+              quench_status:
+                state: {tag: value, value: not_stated}
+                as_printed: 'The melts were quenched by centrifugal casting in a cold graphite mould.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                status_note: Preservation of the high-temperature ratios during quench is not stated.
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1600 N2', column: 'ESR V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_disilicate_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: N2}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1600 N2', column: 'atmosphere'}
+            - label: 1800°C nitrogen
+              value: '18'
+              as_printed: 18%
+              T_C: '1800'
+              quench_status:
+                state: {tag: value, value: not_stated}
+                as_printed: 'The melts were quenched by centrifugal casting in a cold graphite mould.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                status_note: Preservation of the high-temperature ratios during quench is not stated.
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1800 N2', column: 'ESR V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_disilicate_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: N2}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 1800 N2', column: 'atmosphere'}
+            - label: 2000°C nitrogen
+              value: '33'
+              as_printed: 33%
+              T_C: '2000'
+              quench_status:
+                state: {tag: value, value: not_stated}
+                as_printed: 'The melts were quenched by centrifugal casting in a cold graphite mould.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                status_note: Preservation of the high-temperature ratios during quench is not stated.
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 2000 N2', column: 'ESR V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_disilicate_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: N2}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.2SiO2, 2000 N2', column: 'atmosphere'}
+      - observation_id: leister99_silica_rich_optical_v5
+        type: concentration_series
+        experiment: leister99_silica_rich_quenched_glasses
+        locator: {page: 322, pdf_page_index: 3, table: '2'}
+        phase: glass
+        regime: quench_equilibration
+        method_as_printed: Optical absorption spectroscopy
+        uncertainty:
+          value: '10'
+          units: '%'
+          as_printed: ±10%
+          confidence_level: not_stated
+          notice: confidence level not stated
+          locator: {page: 320, pdf_page_index: 1, section: Optical absorption spectroscopy, note: 'The relative error Δc was calculated to be ±10% which is mainly caused by the error of the determined extinction coefficient, Δε. Confidence level not stated.'}
+        units: '%'
+        values:
+          quantity: valence_ratio
+          valence_basis:
+            numerator_oxidation_states: [5]
+            denominator_kind: total_element
+            denominator_oxidation_state: null
+            value_form: fraction
+          method_class: measured_reduced
+          derivation:
+            relation: >-
+              Optical absorption intensities are interpreted with the
+              Lambert-Beer equation E(λ)=ε(λ)c d and extinction coefficients
+              from Table 1 to determine valence fractions.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 321, pdf_page_index: 2, figure: '2–3', note: 'The numerical optical absorption intensities used to determine the Table 2 fractions are not tabulated; Figures 2 and 3 show spectra.'}
+            output_unit: fraction
+          admission_status: admitted
+          points:
+            - label: 1600°C air
+              value: '93'
+              as_printed: 93%
+              T_C: '1600'
+              quench_status:
+                state: {tag: value, value: asserted_preserved}
+                as_printed: 'To freeze the redox ratios the melts were quenched by casting on a copper block.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1600 air', column: 'Optical spectroscopy V5+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_silica_rich_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: air}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1600 air', column: 'atmosphere'}
+            - label: 1600°C nitrogen
+              value: '79'
+              as_printed: 79%
+              T_C: '1600'
+              quench_status:
+                state: {tag: value, value: not_stated}
+                as_printed: 'The melts were quenched by centrifugal casting in a cold graphite mould.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                status_note: Preservation of the high-temperature ratios during quench is not stated.
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1600 N2', column: 'Optical spectroscopy V5+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_silica_rich_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: N2}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1600 N2', column: 'atmosphere'}
+            - label: 1800°C nitrogen
+              value: '65'
+              as_printed: 65%
+              T_C: '1800'
+              quench_status:
+                state: {tag: value, value: not_stated}
+                as_printed: 'The melts were quenched by centrifugal casting in a cold graphite mould.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                status_note: Preservation of the high-temperature ratios during quench is not stated.
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1800 N2', column: 'Optical spectroscopy V5+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_silica_rich_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: N2}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1800 N2', column: 'atmosphere'}
+            - label: 2000°C nitrogen
+              value: '47'
+              as_printed: 47%
+              T_C: '2000'
+              quench_status:
+                state: {tag: value, value: not_stated}
+                as_printed: 'The melts were quenched by centrifugal casting in a cold graphite mould.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                status_note: Preservation of the high-temperature ratios during quench is not stated.
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 2000 N2', column: 'Optical spectroscopy V5+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_silica_rich_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: N2}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 2000 N2', column: 'atmosphere'}
+      - observation_id: leister99_silica_rich_optical_v4
+        type: concentration_series
+        experiment: leister99_silica_rich_quenched_glasses
+        locator: {page: 322, pdf_page_index: 3, table: '2'}
+        phase: glass
+        regime: quench_equilibration
+        method_as_printed: Optical absorption spectroscopy
+        uncertainty:
+          value: '10'
+          units: '%'
+          as_printed: ±10%
+          confidence_level: not_stated
+          notice: confidence level not stated
+          locator: {page: 320, pdf_page_index: 1, section: Optical absorption spectroscopy, note: 'The relative error Δc was calculated to be ±10% which is mainly caused by the error of the determined extinction coefficient, Δε. Confidence level not stated.'}
+        units: '%'
+        values:
+          quantity: valence_ratio
+          valence_basis:
+            numerator_oxidation_states: [4]
+            denominator_kind: total_element
+            denominator_oxidation_state: null
+            value_form: fraction
+          method_class: measured_reduced
+          derivation:
+            relation: >-
+              Optical absorption intensities are interpreted with the
+              Lambert-Beer equation E(λ)=ε(λ)c d and extinction coefficients
+              from Table 1 to determine valence fractions.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 321, pdf_page_index: 2, figure: '2–3', note: 'The numerical optical absorption intensities used to determine the Table 2 fractions are not tabulated; Figures 2 and 3 show spectra.'}
+            output_unit: fraction
+          admission_status: admitted
+          points:
+            - label: 1600°C air
+              value: '7'
+              as_printed: 7%
+              T_C: '1600'
+              quench_status:
+                state: {tag: value, value: asserted_preserved}
+                as_printed: 'To freeze the redox ratios the melts were quenched by casting on a copper block.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1600 air', column: 'Optical spectroscopy V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_silica_rich_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: air}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1600 air', column: 'atmosphere'}
+            - label: 1600°C reducing
+              value: '28'
+              as_printed: 28%
+              T_C: '1600'
+              quench_status:
+                state: {tag: value, value: asserted_preserved}
+                as_printed: 'To freeze the redox ratios the melts were quenched by casting on a copper block.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1600 red.', column: 'Optical spectroscopy V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_silica_rich_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: red.}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1600 red.', column: 'atmosphere'}
+            - label: 1600°C nitrogen
+              value: '21'
+              as_printed: 21%
+              T_C: '1600'
+              quench_status:
+                state: {tag: value, value: not_stated}
+                as_printed: 'The melts were quenched by centrifugal casting in a cold graphite mould.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                status_note: Preservation of the high-temperature ratios during quench is not stated.
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1600 N2', column: 'Optical spectroscopy V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_silica_rich_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: N2}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1600 N2', column: 'atmosphere'}
+            - label: 1800°C nitrogen
+              value: '35'
+              as_printed: 35%
+              T_C: '1800'
+              quench_status:
+                state: {tag: value, value: not_stated}
+                as_printed: 'The melts were quenched by centrifugal casting in a cold graphite mould.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                status_note: Preservation of the high-temperature ratios during quench is not stated.
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1800 N2', column: 'Optical spectroscopy V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_silica_rich_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: N2}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1800 N2', column: 'atmosphere'}
+            - label: 2000°C nitrogen
+              value: '53'
+              as_printed: 53%
+              T_C: '2000'
+              quench_status:
+                state: {tag: value, value: not_stated}
+                as_printed: 'The melts were quenched by centrifugal casting in a cold graphite mould.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                status_note: Preservation of the high-temperature ratios during quench is not stated.
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 2000 N2', column: 'Optical spectroscopy V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_silica_rich_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: N2}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 2000 N2', column: 'atmosphere'}
+      - observation_id: leister99_silica_rich_optical_v3
+        type: concentration_series
+        experiment: leister99_silica_rich_quenched_glasses
+        locator: {page: 322, pdf_page_index: 3, table: '2'}
+        phase: glass
+        regime: quench_equilibration
+        method_as_printed: Optical absorption spectroscopy
+        uncertainty:
+          value: '10'
+          units: '%'
+          as_printed: ±10%
+          confidence_level: not_stated
+          notice: confidence level not stated
+          locator: {page: 320, pdf_page_index: 1, section: Optical absorption spectroscopy, note: 'The relative error Δc was calculated to be ±10% which is mainly caused by the error of the determined extinction coefficient, Δε. Confidence level not stated.'}
+        units: '%'
+        values:
+          quantity: valence_ratio
+          valence_basis:
+            numerator_oxidation_states: [3]
+            denominator_kind: total_element
+            denominator_oxidation_state: null
+            value_form: fraction
+          method_class: measured_reduced
+          derivation:
+            relation: >-
+              Optical absorption intensities are interpreted with the
+              Lambert-Beer equation E(λ)=ε(λ)c d and extinction coefficients
+              from Table 1 to determine valence fractions.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 321, pdf_page_index: 2, figure: '2–3', note: 'The numerical optical absorption intensities used to determine the Table 2 fractions are not tabulated; Figures 2 and 3 show spectra.'}
+            output_unit: fraction
+          admission_status: admitted
+          points:
+            - label: 1600°C reducing
+              value: '72'
+              as_printed: 72%
+              T_C: '1600'
+              quench_status:
+                state: {tag: value, value: asserted_preserved}
+                as_printed: 'To freeze the redox ratios the melts were quenched by casting on a copper block.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1600 red.', column: 'Optical spectroscopy V3+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_silica_rich_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: red.}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1600 red.', column: 'atmosphere'}
+      - observation_id: leister99_silica_rich_esr_v4
+        type: concentration_series
+        experiment: leister99_silica_rich_quenched_glasses
+        locator: {page: 322, pdf_page_index: 3, table: '2'}
+        phase: glass
+        regime: quench_equilibration
+        method_as_printed: Electron spin resonance spectroscopy
+        uncertainty:
+          form: relative_bound
+          bound_value: '≤15%'
+          confidence_level: not_stated
+          notice: confidence level not stated
+          locator: {page: 320, pdf_page_index: 1, section: Electron spin resonance spectroscopy, note: 'The V4+ concentrations were determined quantitatively (relative error ≤15%) from the intensities of the paramagnetic signal. Confidence level not stated.'}
+        units: '%'
+        values:
+          quantity: valence_ratio
+          valence_basis:
+            numerator_oxidation_states: [4]
+            denominator_kind: total_element
+            denominator_oxidation_state: null
+            value_form: fraction
+          method_class: measured_reduced
+          derivation:
+            relation: >-
+              V4+ is quantified from the integrated ESR signal relative to the
+              CuSO4·5H2O standard, then expressed as a fraction of total V.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 323, pdf_page_index: 4, figure: '6', note: 'The numerical ESR signal integrals used to determine the Table 2 fractions are not tabulated; Figure 6 shows the spectrum.'}
+            output_unit: fraction
+          admission_status: admitted
+          points:
+            - label: 1600°C reducing
+              value: '30'
+              as_printed: 30%
+              T_C: '1600'
+              quench_status:
+                state: {tag: value, value: asserted_preserved}
+                as_printed: 'To freeze the redox ratios the melts were quenched by casting on a copper block.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1600 red.', column: 'ESR V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_silica_rich_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: red.}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1600 red.', column: 'atmosphere'}
+            - label: 1600°C nitrogen
+              value: '20'
+              as_printed: 20%
+              T_C: '1600'
+              quench_status:
+                state: {tag: value, value: not_stated}
+                as_printed: 'The melts were quenched by centrifugal casting in a cold graphite mould.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                status_note: Preservation of the high-temperature ratios during quench is not stated.
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1600 N2', column: 'ESR V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_silica_rich_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: N2}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1600 N2', column: 'atmosphere'}
+            - label: 1800°C nitrogen
+              value: '33'
+              as_printed: 33%
+              T_C: '1800'
+              quench_status:
+                state: {tag: value, value: not_stated}
+                as_printed: 'The melts were quenched by centrifugal casting in a cold graphite mould.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                status_note: Preservation of the high-temperature ratios during quench is not stated.
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1800 N2', column: 'ESR V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_silica_rich_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: N2}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 1800 N2', column: 'atmosphere'}
+            - label: 2000°C nitrogen
+              value: '52'
+              as_printed: 52%
+              T_C: '2000'
+              quench_status:
+                state: {tag: value, value: not_stated}
+                as_printed: 'The melts were quenched by centrifugal casting in a cold graphite mould.'
+                locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                status_note: Preservation of the high-temperature ratios during quench is not stated.
+              locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 2000 N2', column: 'ESR V4+'}
+              point_conditions:
+                composition:
+                  state: {tag: value, value: *leister99_silica_rich_host}
+                  locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+                atmosphere:
+                  state: {tag: value, value: N2}
+                  locator: {page: 322, pdf_page_index: 3, table: '2', row: 'Na2O.5·67SiO2, 2000 N2', column: 'atmosphere'}
+    context:
+      - observation_id: leister99_textual_melting_and_method_conditions
+        type: text_context
+        locator: {page: 320, pdf_page_index: 1, section: Experimental procedure}
+        units: as printed by row
+        values:
+          quantity: unavailable
+          printed_quantity: melt schedules and spectroscopy method precision
+          method_class: measured_tabulated
+          admission_status: typed_unavailable
+          units: '°C, min, h, g, wt%, GHz, µm, %'
+          note: 'These text-reported method and precision values are retained as context. The optical ±10% relative error is stored on its observations; ESR relative error ≤15% remains an upper bound and is not converted into a symmetric uncertainty band.'
+          rows:
+            - {method: high-temperature melting, temperature_C_range: '1600–2000', duration_min: '45', atmosphere: N2, crucible: iridium}
+            - {condition: '2000°C', glass_mass_g: '100', sodium_oxide_relative_loss_pct: '10', measurement_method: emission spectroscopy}
+            - {method: air melting, temperatures_C: '1300 and 1600', duration_as_printed: '12 h at 1300°C; 45 min at 1600°C', crucible: platinum}
+            - {method: reducing melting, carbon_addition_wt_pct: '0.5', temperature_as_printed: '1300°C for Na2O.2SiO2 or 1500°C for Na2O.5·67SiO2', duration_min: '60', crucible: silica}
+            - {method: ESR, particle_size_um: {value: '100', approximate: true, as_printed: '≈100 µm'}, frequency_GHz: '9.44', relative_error_as_printed: '≤15%'}
+            - {method: optical absorption, instrument_relative_error_as_printed: '<1%'}
+            - {method: square-wave voltammetry, Na2O.2SiO2_temperature_C_range: '1200–1500', Na2O.5·67SiO2_temperature_C_range: '1200–1550'}
+            - {method: beam-bending viscometry, viscosity_range_dPa_s: '10^9–10^11'}
+            - {method: rotational viscometry, viscosity_range_dPa_s: '10^1.5–10^5', maximum_temperature_C: '1475'}
+      - observation_id: leister99_textual_melt_oxygen_partial_pressures
+        type: text_context
+        locator: {page: 323, pdf_page_index: 4, section: Discussion}
+        units: kPa
+        values:
+          quantity: unavailable
+          printed_quantity: oxygen partial pressure p(O2) during melting
+          method_class: model_derived
+          admission_status: typed_unavailable
+          units: kPa
+          note: 'The paper gives p(O2)=21 kPa for air and says exact inert and reducing values were unknown. The 0.5–1.5 kPa inert range is calculated from other experiments. No printed p(O2) maps directly to the valence-ratio fO2 identity.'
+          rows:
+            - {atmosphere: air, p_O2_kPa_as_printed: '21'}
+            - {atmosphere: inert nitrogen, p_O2_kPa_range_as_printed: '0.5–1.5', status: calculated from other experiments}
+            - {atmosphere: reducing, p_O2: unavailable, reason: exact value unknown}
+      - observation_id: leister99_table2_unreported_optical_cells
+        type: table_context
+        locator: {page: 322, pdf_page_index: 3, table: '2'}
+        units: percent of total V
+        values:
+          quantity: unavailable
+          printed_quantity: unreported optical valence cells
+          method_class: measured_tabulated
+          admission_status: typed_unavailable
+          units: percent of total V
+          note: 'Table 2 prints ten optical V3+ cells as n.d., one silica-rich reducing V5+ cell as <0.5%, and one silica-rich air ESR cell as a dash; these remain context because the existing migrator does not emit them as scored point rows.'
+          rows:
+            - {glass: Na2O.2SiO2, host_composition: {Na2O: '0.33', SiO2: '0.67'}, T_C: '1300', atmosphere: red., optical_V3_as_printed: n.d., status: not_detected}
+            - {glass: Na2O.2SiO2, host_composition: {Na2O: '0.33', SiO2: '0.67'}, T_C: '1300', atmosphere: air, optical_V3_as_printed: n.d., status: not_detected}
+            - {glass: Na2O.2SiO2, host_composition: {Na2O: '0.33', SiO2: '0.67'}, T_C: '1600', atmosphere: air, optical_V3_as_printed: n.d., status: not_detected}
+            - {glass: Na2O.2SiO2, host_composition: {Na2O: '0.33', SiO2: '0.67'}, T_C: '1600', atmosphere: N2, optical_V3_as_printed: n.d., status: not_detected}
+            - {glass: Na2O.2SiO2, host_composition: {Na2O: '0.33', SiO2: '0.67'}, T_C: '1800', atmosphere: N2, optical_V3_as_printed: n.d., status: not_detected}
+            - {glass: Na2O.2SiO2, host_composition: {Na2O: '0.33', SiO2: '0.67'}, T_C: '2000', atmosphere: N2, optical_V3_as_printed: n.d., status: not_detected}
+            - {glass: Na2O.5·67SiO2, host_composition: {Na2O: '0.15', SiO2: '0.85'}, T_C: '1600', atmosphere: red., optical_V5_as_printed: '<0.5%', status: below_detection_limit}
+            - {glass: Na2O.5·67SiO2, host_composition: {Na2O: '0.15', SiO2: '0.85'}, T_C: '1600', atmosphere: air, optical_V3_as_printed: n.d., ESR_V4_as_printed: '—', status: not_detected}
+            - {glass: Na2O.5·67SiO2, host_composition: {Na2O: '0.15', SiO2: '0.85'}, T_C: '1600', atmosphere: N2, optical_V3_as_printed: n.d., status: not_detected}
+            - {glass: Na2O.5·67SiO2, host_composition: {Na2O: '0.15', SiO2: '0.85'}, T_C: '1800', atmosphere: N2, optical_V3_as_printed: n.d., status: not_detected}
+            - {glass: Na2O.5·67SiO2, host_composition: {Na2O: '0.15', SiO2: '0.85'}, T_C: '2000', atmosphere: N2, optical_V3_as_printed: n.d., status: not_detected}
+      - observation_id: leister99_table1_absorption_maxima
+        type: table_context
+        locator: {page: 322, pdf_page_index: 3, table: '1'}
+        units: wavelength nm; wavenumber cm-1; extinction coefficient as separately retained
+        values:
+          quantity: unavailable
+          printed_quantity: absorption-band wavelengths and wavenumbers
+          method_class: measured_reduced
+          admission_status: typed_unavailable
+          units: wavelength nm; wavenumber cm-1
+          rows:
+            - {glass: Na2O.2SiO2, ion: V5+, transition: charge transfer, wavelength_nm: {value: '265', approximate: true, as_printed: '≈265'}, wavenumber_cm-1: {value: '38000', approximate: true, as_printed: '≈38000'}, extinction_times_1e4: '—'}
+            - {glass: Na2O.2SiO2, ion: V5+, transition: charge transfer, wavelength_nm: {value: '315', approximate: true, as_printed: '≈315'}, wavenumber_cm-1: {value: '32000', approximate: true, as_printed: '≈32000'}, extinction_times_1e4: '—'}
+            - {glass: Na2O.2SiO2, ion: V4+, transition: 2T1→2A1, wavelength_nm: '430', wavenumber_cm-1: '23255', extinction_times_1e4: '3.8'}
+            - {glass: Na2O.2SiO2, ion: V4+, transition: 2T1→2E, wavelength_nm: '624', wavenumber_cm-1: '16025', extinction_times_1e4: '3.2'}
+            - {glass: Na2O.2SiO2, ion: V4+, transition: 2T1→2T2, wavelength_nm: '1068', wavenumber_cm-1: '9360', extinction_times_1e4: '7.6'}
+            - {glass: Na2O.2SiO2, ion: V3+, transition: 3T1g→3T1g(P), wavelength_nm: '440–460', wavenumber_cm-1: {value: '15000', approximate: true, as_printed: '≈15000'}, extinction_times_1e4: '—'}
+            - {glass: Na2O.2SiO2, ion: V3+, transition: 3T1g→3T2g, wavelength_nm: '650–680', wavenumber_cm-1: {value: '15000', approximate: true, as_printed: '≈15000'}, extinction_times_1e4: '—'}
+            - {glass: Na2O.5·67SiO2, ion: V5+, transition: charge transfer, wavelength_nm: '265', wavenumber_cm-1: '37600', extinction_times_1e4: {value: '300', approximate: true, as_printed: '≈300'}}
+            - {glass: Na2O.5·67SiO2, ion: V5+, transition: charge transfer, wavelength_nm: '315', wavenumber_cm-1: '31800', extinction_times_1e4: {value: '100', approximate: true, as_printed: '≈100'}}
+            - {glass: Na2O.5·67SiO2, ion: V4+, transition: 2T1→2A1, wavelength_nm: {value: '417', approximate: true, as_printed: '≈417'}, wavenumber_cm-1: '24000', extinction_times_1e4: '3.6'}
+            - {glass: Na2O.5·67SiO2, ion: V4+, transition: 2T1→2E, wavelength_nm: '622', wavenumber_cm-1: '16070', extinction_times_1e4: '3.0'}
+            - {glass: Na2O.5·67SiO2, ion: V4+, transition: 2T1→2T2, wavelength_nm: '1020', wavenumber_cm-1: '9820', extinction_times_1e4: '7.3'}
+            - {glass: Na2O.5·67SiO2, ion: V3+, transition: 3T1g→3T1g(P), wavelength_nm: '450', wavenumber_cm-1: '22200', extinction_times_1e4: '5.8'}
+            - {glass: Na2O.5·67SiO2, ion: V3+, transition: 3T1g→3T2g, wavelength_nm: '695', wavenumber_cm-1: '14400', extinction_times_1e4: '3.6'}
+      - observation_id: leister99_table1_extinction_coefficients
+        type: table_context
+        locator: {page: 322, pdf_page_index: 3, table: '1'}
+        units: ppm-1 cm-1 as scaled in the printed header
+        values:
+          quantity: unavailable
+          printed_quantity: attributed extinction coefficients ελ × 10^4
+          method_class: model_derived
+          admission_status: typed_unavailable
+          units: ppm-1 cm-1 as scaled in the printed header
+          note: V4+ coefficients were estimated from fitted spectra using ESR concentrations; V3+ coefficients from deconvoluted spectra; V5+ coefficients from fitted low-doped spectra assuming equal redox ratios in high- and low-doped glasses.
+          rows:
+            - {glass: Na2O.2SiO2, ion: V4+, wavelength_nm: '430', extinction_times_1e4: '3.8'}
+            - {glass: Na2O.2SiO2, ion: V4+, wavelength_nm: '624', extinction_times_1e4: '3.2'}
+            - {glass: Na2O.2SiO2, ion: V4+, wavelength_nm: '1068', extinction_times_1e4: '7.6'}
+            - {glass: Na2O.5·67SiO2, ion: V5+, wavelength_nm: '265', extinction_times_1e4: {value: '300', approximate: true, as_printed: '≈300'}}
+            - {glass: Na2O.5·67SiO2, ion: V5+, wavelength_nm: '315', extinction_times_1e4: {value: '100', approximate: true, as_printed: '≈100'}}
+            - {glass: Na2O.5·67SiO2, ion: V4+, wavelength_nm: {value: '417', approximate: true, as_printed: '≈417'}, extinction_times_1e4: '3.6'}
+            - {glass: Na2O.5·67SiO2, ion: V4+, wavelength_nm: '622', extinction_times_1e4: '3.0'}
+            - {glass: Na2O.5·67SiO2, ion: V4+, wavelength_nm: '1020', extinction_times_1e4: '7.3'}
+            - {glass: Na2O.5·67SiO2, ion: V3+, wavelength_nm: '450', extinction_times_1e4: '5.8'}
+            - {glass: Na2O.5·67SiO2, ion: V3+, wavelength_nm: '695', extinction_times_1e4: '3.6'}
+      - observation_id: leister99_table2_swv_equilibrium_percentages
+        type: table_context
+        locator: {page: 322, pdf_page_index: 3, table: '2'}
+        units: percent of total V
+        values:
+          quantity: unavailable
+          printed_quantity: SWV equilibrium vanadium valence percentages
+          method_class: model_derived
+          admission_status: typed_unavailable
+          units: percent of total V
+          note: SWV values assume equilibrium with air; asterisk means extrapolated data. The eight non-air rows print dashes in all three SWV columns. The optical and ESR values are separately scored as measured-reduced observations.
+          rows:
+            - {glass: Na2O.2SiO2, T_C: '1300', atmosphere: air, V5_pct: '96.1', V4_pct: '3.8', V3_pct: '0.1', extrapolated: false}
+            - {glass: Na2O.2SiO2, T_C: '1600', atmosphere: air, V5_pct: '83.1*', V4_pct: '16.6*', V3_pct: '0.3*', extrapolated: true}
+            - {glass: Na2O.2SiO2, T_C: '1800', atmosphere: air, V5_pct: '67.7*', V4_pct: '30.9*', V3_pct: '1.4*', extrapolated: true}
+            - {glass: Na2O.2SiO2, T_C: '2000', atmosphere: air, V5_pct: '50.0*', V4_pct: '45.6*', V3_pct: '4.4*', extrapolated: true}
+            - {glass: Na2O.5·67SiO2, T_C: '1600', atmosphere: air, V5_pct: '84.6*', V4_pct: '15.0*', V3_pct: '0.4*', extrapolated: true}
+            - {glass: Na2O.5·67SiO2, T_C: '1800', atmosphere: air, V5_pct: '72.8*', V4_pct: '25.2*', V3_pct: '2.0*', extrapolated: true}
+            - {glass: Na2O.5·67SiO2, T_C: '2000', atmosphere: air, V5_pct: '58.4*', V4_pct: '35.2*', V3_pct: '6.4*', extrapolated: true}
+          unreported_rows:
+            - {glass: Na2O.2SiO2, T_C: '1300', atmosphere: red., V5_pct: '—', V4_pct: '—', V3_pct: '—'}
+            - {glass: Na2O.2SiO2, T_C: '1600', atmosphere: N2, V5_pct: '—', V4_pct: '—', V3_pct: '—'}
+            - {glass: Na2O.2SiO2, T_C: '1800', atmosphere: N2, V5_pct: '—', V4_pct: '—', V3_pct: '—'}
+            - {glass: Na2O.2SiO2, T_C: '2000', atmosphere: N2, V5_pct: '—', V4_pct: '—', V3_pct: '—'}
+            - {glass: Na2O.5·67SiO2, T_C: '1600', atmosphere: red., V5_pct: '—', V4_pct: '—', V3_pct: '—'}
+            - {glass: Na2O.5·67SiO2, T_C: '1600', atmosphere: N2, V5_pct: '—', V4_pct: '—', V3_pct: '—'}
+            - {glass: Na2O.5·67SiO2, T_C: '1800', atmosphere: N2, V5_pct: '—', V4_pct: '—', V3_pct: '—'}
+            - {glass: Na2O.5·67SiO2, T_C: '2000', atmosphere: N2, V5_pct: '—', V4_pct: '—', V3_pct: '—'}
+      - observation_id: leister99_table3_esr_parameters
+        type: table_context
+        locator: {page: 324, pdf_page_index: 5, table: '3'}
+        units: g dimensionless; A cm-1; Kv unit not stated
+        values:
+          quantity: unavailable
+          printed_quantity: calculated ESR g factors, hyperfine splitting constants, and Fermi contact term Kv
+          method_class: model_derived
+          admission_status: typed_unavailable
+          units: A values cm-1; units for Kv not stated
+          rows:
+            - {glass: Na2O.2SiO2, g_parallel: '1.9357', g_perpendicular: '1.9644', A_parallel_cm-1: '-0.01699', A_perpendicular_cm-1: '-0.00524', Kv: '0.663'}
+            - {glass: Na2O.5·67SiO2, g_parallel: '1.9302', g_perpendicular: '1.9639', A_parallel_cm-1: '-0.01717', A_perpendicular_cm-1: '-0.00537', Kv: '0.672'}
+      - observation_id: leister99_table4_redox_thermodynamics
+        type: table_context
+        locator: {page: 324, pdf_page_index: 5, table: '4'}
+        units: delta-H kJ mol-1; delta-S J mol-1 K-1
+        values:
+          quantity: unavailable
+          printed_quantity: standard enthalpy and entropy of vanadium redox equilibria
+          method_class: model_derived
+          admission_status: typed_unavailable
+          units: delta-H kJ mol-1; delta-S J mol-1 K-1
+          note: Derived from square-wave voltammetric standard potentials and their temperature dependence; these are redox-reaction thermodynamic quantities, not formation enthalpy or absolute entropy.
+          rows:
+            - {glass: Na2O.2SiO2, redox_transition: V5+/V4+, delta_H: '138', delta_S: '58'}
+            - {glass: Na2O.2SiO2, redox_transition: V4+/V3+, delta_H: '152', delta_S: '45'}
+            - {glass: Na2O.5·67SiO2, redox_transition: V5+/V4+, delta_H: '100', delta_S: '36'}
+            - {glass: Na2O.5·67SiO2, redox_transition: V4+/V3+, delta_H: '158', delta_S: '52'}
+      - observation_id: leister99_swv_peak_potentials
+        type: text_context
+        locator: {page: 322, pdf_page_index: 3, section: Square-wave voltammetry}
+        units: mV
+        values:
+          quantity: unavailable
+          printed_quantity: square-wave voltammetry peak potentials
+          method_class: measured_reduced
+          admission_status: typed_unavailable
+          units: mV
+          note: Prose reports both voltammograms at 1000°C; Figure 8 caption reports 1300°C for Na2O.5·67SiO2. Temperature retained as conflicting in-text/caption evidence; figure points remain deferred.
+          rows:
+            - {glass: Na2O.2SiO2, peak_mV: '-435', redox_transition: V5+/V4+, prose_temperature_C: '1000', figure: '7'}
+            - {glass: Na2O.2SiO2, peak_mV: '-785', redox_transition: V4+/V3+, prose_temperature_C: '1000', figure: '7'}
+            - {glass: Na2O.5·67SiO2, peak_mV: '-360', redox_transition: V5+/V4+, prose_temperature_C: '1000', figure_caption_temperature_C: '1300', figure: '8'}
+            - {glass: Na2O.5·67SiO2, peak_mV: '-680', redox_transition: V4+/V3+, prose_temperature_C: '1000', figure_caption_temperature_C: '1300', figure: '8'}
+      - observation_id: leister99_vft_viscosity_values
+        type: text_context
+        locator: {page: 322, pdf_page_index: 3, section: Viscometry}
+        units: dPa s as printed
+        values:
+          quantity: viscosity
+          method_class: model_derived
+          admission_status: typed_unavailable
+          units: dPa s as printed
+          note: Viscosity-temperature curves were derived from VFT parameters based on measurements and extrapolated above the 1475°C maximum measured temperature. The 1400°C values also come from these fitted curves.
+          rows:
+            - {glass: Na2O.2SiO2, T_C: '1400', viscosity_dPa_s: '52', status: VFT-derived}
+            - {glass: Na2O.5·67SiO2, T_C: '1400', viscosity_dPa_s: '400', status: VFT-derived}
+            - {glass: Na2O.2SiO2, T_C: '1800', viscosity_dPa_s: '7.3', status: extrapolated VFT-derived}
+            - {glass: Na2O.5·67SiO2, T_C: '1800', viscosity_dPa_s: '22.1', status: extrapolated VFT-derived}
+      - observation_id: leister99_other_author_model_calculations
+        type: text_context
+        locator: {page: 323, pdf_page_index: 4, section: Discussion}
+        units: valence percentages; equilibrium constant dimensionless
+        values:
+          quantity: unavailable
+          printed_quantity: redox equilibrium values calculated from Table 4
+          method_class: model_derived
+          admission_status: typed_unavailable
+          rows:
+            - {glass: Na2O.2SiO2, condition: 1600°C and air equilibrium, V3_pct: '0.3'}
+            - {glass: Na2O.5·67SiO2, condition: 1600°C and air equilibrium, V3_pct: '0.4'}
+            - {glass: Na2O.5·67SiO2, condition: '2000°C and nitrogen with V5_pct: 47', calculated_V3_pct: '12'}
+            - {glass: Na2O.5·67SiO2, condition: 2000°C and Tg=485°C, equilibrium_constant: '3.14'}
+            - {glass: Na2O.5·67SiO2, condition: Tg=485°C, equilibrium_constant: '1447'}
+            - {glass: Na2O.5·67SiO2, condition: room temperature after cooling, calculated_V3_pct: '0.04', as_printed: 0.04%}
+      - observation_id: leister99_cited_fluorophosphate_viscosity
+        type: text_context
+        locator: {page: 324, pdf_page_index: 5, section: Discussion}
+        units: dPa s; equilibrium time minutes
+        values:
+          quantity: viscosity
+          method_class: quoted_attributed
+          attribution: reference [16]
+          admission_status: typed_unavailable
+          units: dPa s as printed
+          rows:
+            - {material: fluoride phosphate glasses, T_C: '1000', viscosity_dPa_s: '0.16', equilibrium_time_min: '30'}
+      - observation_id: leister99_figure1_optical_spectra
+        type: figure
+        locator: {page: 321, published_page: 321, pdf_page_index: 2, figure: '1'}
+        units: Eλ/d cm-1 as printed
+        values:
+          quantity: unavailable
+          printed_quantity: optical absorption spectra
+          method_class: figure_only
+          admission_status: figure_only
+          species: V
+          phase: glass
+          temperature: various melting conditions from 1300 to 2000°C
+          axes: {x: 'Wavenumber (cm-1); secondary wavelength axis (nm)', y: 'Eλ/d (cm-1)'}
+          panel: single panel
+          caption: Optical absorption spectra of Na2O.2SiO2 glass doped with 5000 ppm V melted under various conditions in the range 1300–2000°C.
+          series:
+            - {name: '1300°C, reducing', marker_count: 0}
+            - {name: '2000°C, N2', marker_count: 0}
+            - {name: '1800°C, N2', marker_count: 0}
+            - {name: '1600°C, N2', marker_count: 0}
+            - {name: '1600°C, air', marker_count: 0}
+            - {name: '1300°C, air, 12 h', marker_count: 0}
+          points: []
+          attribution: this work
+          digitisation: deferred to a figure pass
+      - observation_id: leister99_figure2_optical_spectra
+        type: figure
+        locator: {page: 321, published_page: 321, pdf_page_index: 2, figure: '2'}
+        units: absorbance cm-1 as printed
+        values:
+          quantity: unavailable
+          printed_quantity: optical absorption spectra
+          method_class: figure_only
+          admission_status: figure_only
+          species: V
+          phase: glass
+          temperature: various melting conditions from 1600 to 2000°C
+          axes: {x: 'Wavenumber (cm-1); secondary wavelength axis (nm)', y: 'Absorbance (cm-1)'}
+          panel: single panel
+          caption: Optical absorption spectra of Na2O.5·67SiO2 glass doped with 5000 ppm V melted under various conditions in the range 1600–2000°C.
+          series:
+            - {name: '1600°C, reducing', marker_count: 0}
+            - {name: '2000°C, N2', marker_count: 0}
+            - {name: '1800°C, N2', marker_count: 0}
+            - {name: '1600°C, N2', marker_count: 0}
+            - {name: '1600°C, air', marker_count: 0}
+          points: []
+          attribution: this work
+          digitisation: deferred to a figure pass
+      - observation_id: leister99_figure3_fitted_spectra
+        type: figure
+        locator: {page: 321, published_page: 321, pdf_page_index: 2, figure: '3'}
+        units: E/d cm-1 as printed
+        values:
+          quantity: unavailable
+          printed_quantity: fitted optical absorption spectra
+          method_class: figure_only
+          admission_status: figure_only
+          species: V
+          phase: glass
+          temperature: 1600°C under air
+          axes: {x: 'Wavenumber (cm-1); secondary wavelength axis (nm)', y: 'E/d (cm-1)'}
+          panel: single panel
+          caption: Fitted optical absorption spectra of Na2O.5·67SiO2 glass doped with 5000 ppm V melted at 1600°C under air atmosphere.
+          series:
+            - {name: experimental spectrum, marker_count: 0}
+            - {name: calculated spectrum, marker_count: 0}
+            - {name: fitted V3+ bands, marker_count: 0}
+            - {name: fitted V4+ bands, marker_count: 0}
+            - {name: fitted V5+ bands, marker_count: 0}
+          points: []
+          attribution: this work; fitted and calculated spectral components
+          digitisation: deferred to a figure pass
+      - observation_id: leister99_figure4_low_doped_fitted_spectra
+        type: figure
+        locator: {page: 322, published_page: 322, pdf_page_index: 3, figure: '4'}
+        units: Eλ/d cm-1 as printed
+        values:
+          quantity: unavailable
+          printed_quantity: fitted optical absorption spectra
+          method_class: figure_only
+          admission_status: figure_only
+          species: V
+          phase: glass
+          temperature: 1600°C under reducing conditions
+          axes: {x: 'Wavenumber (cm-1); secondary wavelength axis (nm)', y: 'Eλ/d (cm-1)'}
+          panel: single panel
+          caption: Fitted optical absorption spectra of Na2O.5·67SiO2 glass doped with 50 ppm V melted at 1600°C under reducing conditions.
+          series:
+            - {name: experimental spectrum, marker_count: 0}
+            - {name: calculated spectrum, marker_count: 0}
+            - {name: fitted V5+ charge-transfer bands, marker_count: 0}
+            - {name: fitted absorption edge, marker_count: 0}
+          points: []
+          attribution: this work; fitted and calculated spectral components
+          digitisation: deferred to a figure pass
+      - observation_id: leister99_figure5_disilicate_esr
+        type: figure
+        locator: {page: 322, published_page: 322, pdf_page_index: 3, figure: '5'}
+        units: intensity as plotted
+        values:
+          quantity: unavailable
+          printed_quantity: ESR spectrum versus magnetic induction
+          method_class: figure_only
+          admission_status: figure_only
+          species: V
+          phase: glass
+          temperature: not stated; 5000 ppm V doped glass
+          axes: {x: 'Magnetic induction (mT)', y: Intensity}
+          panel: single panel
+          caption: ESR spectrum of Na2O.2SiO2 glass doped with 5000 ppm V.
+          series:
+            - {name: measured ESR spectrum, marker_count: 0}
+            - {name: stick-diagram line positions, marker_count: 0}
+          points: []
+          attribution: this work
+          digitisation: deferred to a figure pass
+      - observation_id: leister99_figure6_silica_rich_esr
+        type: figure
+        locator: {page: 323, published_page: 323, pdf_page_index: 4, figure: '6'}
+        units: intensity as plotted
+        values:
+          quantity: unavailable
+          printed_quantity: ESR spectrum versus magnetic induction
+          method_class: figure_only
+          admission_status: figure_only
+          species: V
+          phase: glass
+          temperature: not stated; 5000 ppm V doped glass
+          axes: {x: 'Magnetic induction (mT)', y: Intensity}
+          panel: single panel
+          caption: ESR spectrum of Na2O.5·67SiO2 glass doped with 5000 ppm V.
+          series:
+            - {name: measured ESR spectrum, marker_count: 0}
+            - {name: stick-diagram line positions, marker_count: 0}
+          points: []
+          attribution: this work
+          digitisation: deferred to a figure pass
+      - observation_id: leister99_figure7_disilicate_swv
+        type: figure
+        locator: {page: 323, published_page: 323, pdf_page_index: 4, figure: '7'}
+        units: current mA versus potential mV as printed
+        values:
+          quantity: unavailable
+          printed_quantity: square-wave voltammogram
+          method_class: figure_only
+          admission_status: figure_only
+          species: V
+          phase: liquid
+          temperature: 1000°C
+          axes: {x: 'Potential E (mV)', y: 'Current difference ΔI (mA)'}
+          panel: single panel
+          caption: Square wave voltammogram of a Na2O.2SiO2 melt doped with 5000 ppm V at 1000°C (τ=100 ms, ΔE=100 mV).
+          series:
+            - {name: experimental curve, marker_count: 0}
+            - {name: calculated curve, marker_count: 0}
+            - {name: fitted bands, marker_count: 0}
+          points: []
+          attribution: this work
+          digitisation: deferred to a figure pass
+      - observation_id: leister99_figure8_silica_rich_swv
+        type: figure
+        locator: {page: 323, published_page: 323, pdf_page_index: 4, figure: '8'}
+        units: current mA versus potential mV as printed
+        values:
+          quantity: unavailable
+          printed_quantity: square-wave voltammogram
+          method_class: figure_only
+          admission_status: figure_only
+          species: V
+          phase: liquid
+          temperature: 1300°C in caption; prose says 1000°C for both voltammograms
+          axes: {x: 'Potential E (mV)', y: 'Current I (mA)'}
+          panel: single panel
+          caption: Square wave voltammogram of a Na2O.5·67SiO2 melt doped with 5000 ppm V at 1300°C (τ=100 ms, ΔE=100 mV).
+          series:
+            - {name: experimental curve, marker_count: 0}
+            - {name: calculated curve, marker_count: 0}
+            - {name: fitted bands, marker_count: 0}
+          points: []
+          attribution: this work
+          digitisation: deferred to a figure pass
+      - observation_id: leister99_figure9_redox_equilibria
+        type: figure
+        locator: {page: 323, published_page: 323, pdf_page_index: 4, figure: '9'}
+        units: log redox ratio as plotted
+        values:
+          quantity: unavailable
+          printed_quantity: temperature dependence of vanadium redox equilibria
+          method_class: figure_only
+          admission_status: figure_only
+          species: V
+          phase: liquid
+          temperature: 1200–1500°C for Na2O.2SiO2 and 1200–1550°C for Na2O.5·67SiO2; curves extend over plotted range
+          axes: {x: 'Reciprocal of absolute temperature × 10^4; top axis Temperature (°C)', y: 'log([Ox.]/[Red.])'}
+          panel: single panel
+          caption: Temperature dependence of the vanadium redox equilibria in Na2O.2SiO2 and Na2O.5·67SiO2 in air.
+          series:
+            - {name: 'V4+/V3+, Na2O.2SiO2, open circles', marker_count: 4}
+            - {name: 'V5+/V4+, Na2O.2SiO2, open squares', marker_count: 4}
+            - {name: 'V4+/V3+, Na2O.5·67SiO2, filled circles', marker_count: 5}
+            - {name: 'V5+/V4+, Na2O.5·67SiO2, filled squares', marker_count: 5}
+          points: []
+          attribution: this work; equilibrium ratios calculated from square-wave voltammetric standard potentials
+          digitisation: deferred to a figure pass
+      - observation_id: leister99_figure10_viscosity
+        type: figure
+        locator: {page: 324, published_page: 324, pdf_page_index: 5, figure: '10'}
+        units: log(dPa s) as plotted
+        values:
+          quantity: viscosity
+          method_class: figure_only
+          admission_status: figure_only
+          species: Na2O-SiO2 glass melts
+          phase: liquid
+          temperature: 1000–1800°C plotted; curves extrapolated to 2000°C
+          axes: {x: 'Temperature (°C)', y: 'log(η/dPa s)'}
+          panel: single panel
+          caption: Viscosity curves of Na2O.2SiO2 and Na2O.5·67SiO2.
+          series:
+            - {name: Na2O.2SiO2, marker_count: 0}
+            - {name: Na2O.5·67SiO2, marker_count: 0}
+          points: []
+          attribution: this work; VFT parameter curves based on viscometry measurements
+          digitisation: deferred to a figure pass
