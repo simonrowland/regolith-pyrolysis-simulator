@@ -37,6 +37,26 @@ EXPECTED_RATIOS = {
 
 def test_all_six_tables_and_deferred_figure_are_retained_from_rendered_pages():
     extract = yaml.safe_load(EXTRACT.read_text())
+    assert "70(3), 360-370" in extract["source"]["citation"]
+    assert "original pages 386-398" in extract["source"]["citation"]
+    fidelity = extract["fidelity_samples"]
+    assert [sample["path"] for sample in fidelity] == [
+        "species.SiO2.observations[shornikov_2000_table3_ratio_sio2_sio].values.ion_intensity_ratio",
+        "species.MoO.observations[shornikov_2000_text_ratio_moo_moo2].values.ion_intensity_ratio",
+    ]
+    assert [sample["value"] for sample in fidelity] == [1.13e-3, 0.04]
+    assert fidelity[0]["locator"] == {
+        "table": "3",
+        "row": "Mo cell, 1950 K, this work",
+        "published_page": 363,
+        "pdf_page_index": 3,
+    }
+    assert fidelity[1]["locator"] == {
+        "published_page": 363,
+        "pdf_page_index": 3,
+        "section": "mass spectra discussion",
+        "paragraph": "ion-current ratios for molybdenum oxide species",
+    }
     context = _context_by_id(extract)
     observations = _observations_by_id(extract)
 
