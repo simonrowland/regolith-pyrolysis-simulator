@@ -5,10 +5,10 @@ source:
   year: 1991
   url: https://lunar-consortium.astrogeology.usgs.gov/data/chem_min/tab8_1.pdf
 extraction:
-  method: 'pdftotext -layout transcription of the three-page Table A8.1 PDF; values retained in printed wt% and statistic columns; blank cells remain absent'
+  method: 'pdftotext -layout transcription of the three-page Table A8.1 PDF; values retained in printed wt% and statistic columns; blank cells remain absent; validated in an internal review, 2026-09-19, usgs-tab8-1'
   date: '2026-09-19'
   worker: w3-usgs-lunar-sourcebook-tab8-1
-  provenance_path: docs-private/research/2026-09-19-usgs-tab8-1/
+  provenance_path: raw/usgs-lunar-sourcebook-tab8-1/usgs-lunar-sourcebook-tab8-1.pdf
 review_status: draft
 fidelity_samples:
 - path: species.lunar_sample_major_oxides.observations[usgs_tab8_1_apollo11_mbas].values.SiO2.average
