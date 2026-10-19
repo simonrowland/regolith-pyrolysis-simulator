@@ -125,12 +125,37 @@ def test_isolated_migration_has_no_hard_issues_and_reaches_temperature_and_fugac
     )
     metal = result.observations[
         "pretorius-muan-1992-chromium-oxide-activities::"
-        "pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_11_metal_cr"
+        "pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_12_metal_cr"
     ]
     assert metal.identity.species.phase.is_unknown
     assert metal.identity.species.phase.reason == (
         "phase string 'Metal' is not in the closed automatic map"
     )
+    prefix = "pretorius-muan-1992-chromium-oxide-activities::pretorius_muan_1992_chromium_oxide_activities_"
+    formulas = {
+        row.identity.species.formula for row in result.observations.values()
+    }
+    assert formulas >= {"CrO", "CrO1.5"}
+    by_formula = {}
+    for row in result.observations.values():
+        by_formula.setdefault(row.identity.species.formula, 0)
+        by_formula[row.identity.species.formula] += 1
+    assert by_formula["CrO1.5"] == 193
+    assert by_formula["CrO"] == 193
+    expected_formula = {
+        "tii_r01_cro1_5_activity": "CrO1.5",
+        "tii_r01_cro1_5_mole_fraction": "CrO1.5",
+        "tii_r01_cro1_5_gamma": "CrO1.5",
+        "tii_r01_cro_activity": "CrO",
+        "tii_r01_cro_mole_fraction": "CrO",
+        "tii_r01_cro_gamma": "CrO",
+        "tiii_r01_cro1_5_activity": "CrO1.5",
+        "tiii_r01_cro_activity": "CrO",
+        "tIV_cacrs_4_cro1_5_alloy": "CrO1.5",
+        "tIV_cacrs_4_cro_alloy": "CrO",
+    }
+    for suffix, formula in expected_formula.items():
+        assert result.observations[prefix + suffix].identity.species.formula == formula
     sesquioxide = result.observations[
         "pretorius-muan-1992-chromium-oxide-activities::"
         "pretorius_muan_1992_chromium_oxide_activities_appendixc_cacrs_4_ses_al2o3"
