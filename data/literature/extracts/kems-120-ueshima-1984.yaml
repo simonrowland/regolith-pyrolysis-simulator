@@ -303,6 +303,45 @@ species:
         - 0.7
       uncertainty:
         note: figure-only; tabulated values in Tables 1-2
+    - observation_id: ueshima_1984_quoted_nesmeyanov_a_Fe
+      experiment: cited-results
+      type: activity_coefficient
+      locator:
+        published_page: 555
+        pdf_page_index: 7
+        page: 8
+        section: '4.3'
+        note: Nesmeyanov Knudsen a_Fe=0.865 at 0.345 at% W and 1500 K in gamma-Fe-W
+      T_range_K:
+      - 1500.0
+      - 1500.0
+      phase: gamma_Fe-W
+      standard_state: as in Nesmeyanov; quoted
+      regime: quoted_compilation
+      units: dimensionless a_Fe
+      values:
+        quantity: activity
+        method_class: quoted_measurement
+        attribution: 'A. N. Nesmeyanov and G. Trapp, Russ. Journal of Phys. Chem., 39 (1965) 2, p. 183 (ref 1)'
+        authors_comment: strong negative deviation from ideal; this work finds positive deviation in alpha
+          and liquid Fe
+        points:
+        - activity: 0.865
+          T_K: 1500.0
+          locator:
+            page: 8
+            published_page: 555
+            pdf_page_index: 7
+            section: '4.3'
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: 1500.0}
+              locator: {page: 8, published_page: 555, pdf_page_index: 7, section: '4.3'}
+            W_at_percent:
+              state: {tag: value, value: 0.345}
+              locator: {page: 8, published_page: 555, pdf_page_index: 7, section: '4.3'}
+      uncertainty:
+        note: quoted; no +/- printed here
   W:
     observations:
     - observation_id: ueshima_1984_table1_activity_equations
@@ -539,32 +578,6 @@ species:
         T_K: 1873.0
       uncertainty:
         as_printed: 7.6(+/-1.1); -2.2(+/-0.8)
-    - observation_id: ueshima_1984_quoted_nesmeyanov_a_Fe
-      experiment: cited-results
-      type: activity_coefficient
-      locator:
-        published_page: 555
-        pdf_page_index: 7
-        section: '4.3'
-        note: Nesmeyanov Knudsen a_Fe=0.865 at 0.345 at% W, 1500 K in gamma-Fe-W
-      T_range_K:
-      - 1500.0
-      - 1500.0
-      phase: gamma_Fe-W
-      standard_state: as in Nesmeyanov; quoted
-      regime: quoted_compilation
-      units: dimensionless a_Fe; at% W
-      values:
-        quantity: activity
-        method_class: quoted_measurement
-        cited: A. N. Nesmeyanov and G. Trapp, Russ. Journal of Phys. Chem., 39 (1965) 2, p. 183 (ref 1)
-        a_Fe: 0.865
-        W_at_percent: 0.345
-        T_K: 1500.0
-        authors_comment: strong negative deviation from ideal; this work finds positive deviation in alpha
-          and liquid Fe
-      uncertainty:
-        note: quoted; no +/- printed here
   Mo:
     observations:
     - observation_id: ueshima_1984_table4_fe_mo_revised
