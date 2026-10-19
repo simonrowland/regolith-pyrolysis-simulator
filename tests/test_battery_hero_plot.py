@@ -966,6 +966,76 @@ def test_history_appends_without_rewriting_existing_bytes(tmp_path: Path) -> Non
     assert len(history.read_text(encoding="utf-8").splitlines()) == 2
 
 
+def test_current_hero_summary_uses_input_metrics_when_history_is_stale(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    residuals = tmp_path / "new-residuals.jsonl"
+    row = _record(
+        engine="openimcc",
+        experiment="new-current-row",
+        formula="SiO2",
+        temperature_K=1200,
+        residual=0.75,
+    )
+    residuals.write_text(
+        "".join(
+            json.dumps(item) + "\n"
+            for item in (
+                {"kind": "battery_store_stamp", "revision": "new-store"},
+                row,
+            )
+        ),
+        encoding="utf-8",
+    )
+    history = tmp_path / "old-history.jsonl"
+    history.write_text(
+        json.dumps(
+            {
+                "kind": "battery_hero_history",
+                "store_revision": "old-store",
+                "commit_date": "2026-10-18T10:27:53-04:00",
+                "metrics": [
+                    {
+                        "rail": "vapour",
+                        "engine": "openimcc",
+                        "numeric_count": 1,
+                        "n": 1,
+                        "rms_dex": "0.01",
+                        "median_abs_dex": "0.01",
+                    }
+                ],
+                "benchmarks": [],
+            },
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    figures: list[Figure] = []
+    original_savefig = Figure.savefig
+
+    def capture_figure(self: Figure, *args: object, **kwargs: object) -> object:
+        result = original_savefig(self, *args, **kwargs)
+        if kwargs.get("format") == "svg":
+            figures.append(self)
+        return result
+
+    monkeypatch.setattr(Figure, "savefig", capture_figure)
+    data = read_scores(residuals, rails=HERO_RAILS)
+    render_hero_charts(data, tmp_path / "new-render", history_path=history)
+
+    labels = [
+        artist.get_text()
+        for figure in figures
+        for artist in figure.findobj(match=Text)
+        if artist.get_text()
+    ]
+    assert any("all-numeric RMS 0.75 dex (n=1)" in label for label in labels)
+    assert all("all-numeric RMS 0.01 dex" not in label for label in labels)
+
+
 def test_history_schema_keeps_scorer_metrics_and_per_rail_counts() -> None:
     record = _history_record(
         {
@@ -1357,7 +1427,7 @@ def test_hero_legend_is_bounded_and_numeric_labels_use_three_significant_figures
         for artist in figure.findobj(match=Text)
         if artist.get_text()
     ]
-    assert any("0.31 dex" in label and "n=147" in label for label in labels)
+    assert any("0.33 dex" in label and "n=1" in label for label in labels)
     assert all("0.30636297707166455257" not in label for label in labels)
     for label in labels:
         without_dates = re.sub(r"\b\d{4}-\d{2}(?:-\d{2})?\b", "", label)

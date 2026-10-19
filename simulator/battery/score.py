@@ -9766,6 +9766,87 @@ def _payload_measured_reference(
     return member
 
 
+class _AllNumericPayloadAccumulator:
+    """Stream payload rows into the scorer-owned all-numeric headline."""
+
+    def __init__(
+        self,
+        *,
+        engines: Sequence[Engine],
+        observations: Mapping[str, Observation] | None = None,
+        origins: Mapping[str, str] | None = None,
+        retain_report_facts: bool = True,
+    ) -> None:
+        from simulator.battery.compilation_tier import reference_observation
+
+        self._engines = tuple(engines)
+        self._observations = observations
+        self._reference_observation = reference_observation
+        self._measured_reference = _payload_measured_reference(observations, origins)
+        self._headline = _AllNumericHeadline() if retain_report_facts else None
+        self._rms_squares: dict[tuple[str, str], Decimal] = defaultdict(Decimal)
+        self._rms_counts: dict[tuple[str, str], int] = defaultdict(int)
+
+    def add(self, row: Mapping[str, object]) -> None:
+        reference = str(row.get("reference") or "")
+        engine = _ScorePayloadAccumulator._engine(row)
+        fact = _all_numeric_fact(
+            row,
+            engine=engine,
+            observation=(
+                None
+                if self._observations is None
+                else self._reference_observation(self._observations, reference)
+            ),
+            certified=(
+                self._measured_reference(row)
+                and _headline_payload_admits(row, tier="measured")
+                if self._headline is not None
+                else False
+            ),
+        )
+        if fact is None:
+            return
+        if fact.operation == MetricOperation.DEX.value:
+            key = (fact.rail, fact.engine)
+            self._rms_squares[key] += fact.value * fact.value
+            self._rms_counts[key] += 1
+        if self._headline is not None:
+            self._headline.add(fact)
+
+    def records(self) -> list[dict[str, object]]:
+        if self._headline is None:
+            raise RuntimeError("report facts were not retained")
+        return self._headline.records(engine.value for engine in self._engines)
+
+    def rms_records(self) -> list[dict[str, object]]:
+        engines = {engine.value for engine in self._engines}
+        engines.update(engine for _rail, engine in self._rms_counts)
+        records: list[dict[str, object]] = []
+        for rail in Rail:
+            for engine in sorted(engines):
+                count = self._rms_counts[(rail.value, engine)]
+                rms = (
+                    None
+                    if count == 0
+                    else str(
+                        (
+                            self._rms_squares[(rail.value, engine)]
+                            / Decimal(count)
+                        ).sqrt()
+                    )
+                )
+                records.append(
+                    {
+                        "rail": rail.value,
+                        "engine": engine,
+                        "n_dex": count,
+                        "rms_dex": rms,
+                    }
+                )
+        return records
+
+
 def all_numeric_payload_records(
     rows: Iterable[Mapping[str, object]],
     *,
@@ -9779,26 +9860,14 @@ def all_numeric_payload_records(
     membership plus the measured headline row filter.
     """
 
-    from simulator.battery.compilation_tier import reference_observation
-
-    measured_reference = _payload_measured_reference(observations, origins)
-    owner = _AllNumericHeadline()
+    owner = _AllNumericPayloadAccumulator(
+        engines=engines,
+        observations=observations,
+        origins=origins,
+    )
     for row in rows:
-        reference = str(row.get("reference") or "")
-        owner.add(
-            _all_numeric_fact(
-                row,
-                engine=_ScorePayloadAccumulator._engine(row),
-                observation=(
-                    None
-                    if observations is None
-                    else reference_observation(observations, reference)
-                ),
-                certified=measured_reference(row)
-                and _headline_payload_admits(row, tier="measured"),
-            )
-        )
-    return owner.records(engine.value for engine in engines)
+        owner.add(row)
+    return owner.records()
 
 
 def _all_numeric_markdown_lines(

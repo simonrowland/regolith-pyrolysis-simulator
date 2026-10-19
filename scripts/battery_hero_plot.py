@@ -74,6 +74,8 @@ from simulator.diagnostic_helpers.species_rail import (  # noqa: E402
 )
 from simulator.feedstock_composition import resolve_feedstock_composition  # noqa: E402
 from simulator.battery.score import (  # noqa: E402
+    SCORE_ENGINE_SET,
+    _AllNumericPayloadAccumulator,
     _battery_hero_binned_score_records,
     _battery_hero_facet,
     _battery_hero_minor_foulant_facets,
@@ -174,6 +176,7 @@ class ScorePlotData:
     hero_sweet_spot_cells: Mapping[
         tuple[str, str], tuple[Mapping[str, object], ...]
     ]
+    hero_all_numeric_metrics: Mapping[tuple[str, str], Mapping[str, object]]
     element_series: Mapping[tuple[str, str], tuple[BinPoint, ...]]
     x_limits: tuple[float, float]
     bin_width_K: float
@@ -587,6 +590,10 @@ def read_scores(
     hero_refusals: Counter[tuple[str, str, str, str, str]] = Counter()
     hero_refusal_totals: Counter[tuple[str, str, str]] = Counter()
     hero_diagnostics: dict[tuple[str, str], dict[str, object]] = {}
+    all_numeric_payloads = _AllNumericPayloadAccumulator(
+        engines=SCORE_ENGINE_SET,
+        retain_report_facts=False,
+    )
     stamp: Mapping[str, Any] | None = None
 
     if scratch_dir is None:
@@ -630,6 +637,7 @@ def read_scores(
                     raise ValueError(f"{path}:{line_number}: invalid JSON") from exc
                 if not isinstance(row, Mapping):
                     continue
+                all_numeric_payloads.add(row)
                 if stamp is None:
                     if row.get("kind") != "battery_store_stamp":
                         raise ValueError(f"{path}: line 1 is not a battery_store_stamp")
@@ -806,6 +814,12 @@ def read_scores(
         database.commit()
         if stamp is None:
             raise ValueError(f"{path}: empty score file")
+        hero_all_numeric_metrics = {
+            (str(record["rail"]), str(record["engine"])): record
+            for record in all_numeric_payloads.rms_records()
+            if record["rail"] in HERO_RAILS
+            and record["engine"] in HERO_PRIMARY_ENGINES
+        }
         binned_records = _battery_hero_binned_score_records(
             database,
             selected_rails=selected_rails,
@@ -874,6 +888,7 @@ def read_scores(
             key: tuple(cells)
             for key, cells in sorted(hero_sweet_spot_groups.items())
         },
+        hero_all_numeric_metrics=hero_all_numeric_metrics,
         element_series=element_series,
         x_limits=x_limits,
         bin_width_K=bin_width_K,
@@ -2128,37 +2143,8 @@ def _draw_hero_history(
     axis.grid(True, color="#999999", alpha=0.18, linewidth=0.5)
 
 
-def _current_history_entry(
-    history: Sequence[Mapping[str, Any]], revision: object
-) -> Mapping[str, Any]:
-    for entry in reversed(history):
-        if entry.get("store_revision") == revision:
-            return entry
-    return history[-1] if history else {}
-
-
-def _current_engine_metric(
-    history: Sequence[Mapping[str, Any]], rail: str, revision: object, engine: str
-) -> Mapping[str, Any] | None:
-    entry = _current_history_entry(history, revision)
-    metrics = entry.get("metrics")
-    if not isinstance(metrics, Sequence) or isinstance(metrics, (str, bytes)):
-        return None
-    return next(
-        (
-            metric
-            for metric in metrics
-            if isinstance(metric, Mapping)
-            and metric.get("rail") == rail
-            and metric.get("engine") == engine
-        ),
-        None,
-    )
-
-
 def _hero_summary_payload(
     data: ScorePlotData,
-    history: Sequence[Mapping[str, Any]],
 ) -> dict[str, Any]:
     charts: dict[str, Any] = {}
     for rail in HERO_RAILS:
@@ -2173,9 +2159,7 @@ def _hero_summary_payload(
             if refusal_rail == rail:
                 refusals[engine][reason] = count
         current_metrics = {
-            engine: _current_engine_metric(
-                history, rail, data.stamp.get("revision"), engine
-            )
+            engine: data.hero_all_numeric_metrics.get((rail, engine))
             for engine in HERO_PRIMARY_ENGINES
         }
         charts[rail] = {
@@ -2442,12 +2426,10 @@ def render_hero_charts(
         status_lines: list[str] = []
         for engine in HERO_PRIMARY_ENGINES:
             benchmark = data.hero_benchmarks[(rail, engine)]
-            metric = _current_engine_metric(
-                history, rail, data.stamp.get("revision"), engine
-            )
+            metric = data.hero_all_numeric_metrics.get((rail, engine))
             all_numeric_rms = _format_dex(None if metric is None else metric.get("rms_dex"))
             all_numeric_count = _compact_count(
-                0 if metric is None else metric.get("numeric_count", metric.get("n", 0))
+                0 if metric is None else metric.get("n_dex", 0)
             )
             if benchmark.get("benchmark_engine") is None:
                 status_lines.append(
@@ -2712,7 +2694,7 @@ def _summary_payload(
         "element_abundance_classes": abundance_class_table(data, abundance),
         "omitted_empty_engines": list(omitted_engines),
         "no_scored_rows_footer": _no_scored_rows_note(data, omitted_engines),
-        "hero_charts": _hero_summary_payload(data, history),
+        "hero_charts": _hero_summary_payload(data),
         "files": {name: str(path) for name, path in files.items()},
     }
 
