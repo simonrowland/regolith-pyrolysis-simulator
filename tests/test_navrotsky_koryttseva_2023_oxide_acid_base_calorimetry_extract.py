@@ -39,6 +39,36 @@ TABLE1_PINS = {
     "WO3": ("62.15", "73.61"),
     "SO3": ("45.43", "53.11"),
 }
+# Table 1 heat contents outside reference [28], read from the 600 dpi renders.
+# A missing second value means the 800 °C cell is blank. ZnO's 800 °C cell
+# prints 37.66 and no reference.
+OUTSIDE_28 = {
+    "La2O3": ("83.73", "97.43", "[30]", "[30]"),
+    "CeO2": ("49.19", "57.33", "[31]", "[31]"),
+    "Nd2O3": ("88.09", "102.78", "[30]", "[30]"),
+    "Sm2O3": ("91.15", "106.17", "[30]", "[30]"),
+    "Gd2O3": ("82.58", "95.86", "[30]", "[30]"),
+    "Dy2O3": ("86.70", "100.39", "[30]", "[30]"),
+    "Y2O3": ("81.19", "94.11", "[30]", "[30]"),
+    "Ho2O3": ("84.13", "97.35", "[30]", "[30]"),
+    "Er2O3": ("82.91", "96.13", "[30]", "[30]"),
+    "Tm2O3": ("85.71", "99.06", "[30]", "[30]"),
+    "Lu2O3": ("80.40", "93.61", "[30]", "[30]"),
+    "ThO2": ("49.50", "57.5", "[33]", "[34]"),
+    "HfO2": ("49.56", "57.78", "[30]", "[30]"),
+    "Sc2O3": ("78.25", "91.21", "[30]", "[30]"),
+    "Np2O5": ("109.26", None, "[33]", None),
+    "UO3": ("64.22", None, "[33]", None),
+    "Mn2O3": ("81.10", "94.75", "[31]", "[31]"),
+    "ZnO": ("32.40", "37.66", "[31]", "not printed"),
+    "CdO": ("33.64", "39.00", "[39]", "[39]"),
+    "In2O3": ("81.11", "93.98", "[39]", "[39]"),
+    "Ga2O3": ("77.45", "90.11", "[30]", "[30]"),
+    "NiO": ("36.60", "42.10", "[31]", "[31]"),
+    "SnO2": ("49.52", "57.78", "[31]", "[31]"),
+    "GeO2": ("44.76", "52.29", "[30]", "[30]"),
+    "Bi2O3": ("84.23", "96.89", "[31]", "[31]"),
+}
 
 
 def _document():
@@ -47,7 +77,7 @@ def _document():
 
 def test_table1_reference28_heat_contents_match_600dpi_render():
     document = _document()
-    assert len(document["fidelity_samples"]) == 44
+    assert len(document["fidelity_samples"]) == 94
 
     for formula, expected in TABLE1_PINS.items():
         rows = document["species"][formula]["observations"]
@@ -72,13 +102,38 @@ def test_table1_reference28_heat_contents_match_600dpi_render():
     assert check_all_fidelity_samples_match(mutated)
 
 
-def test_isolated_migration_has_45_points_and_temperature_on_every_row():
+def test_table1_heat_contents_outside_reference_28_match_the_render():
+    document = _document()
+    for formula, (at_700, at_800, ref_700, ref_800) in OUTSIDE_28.items():
+        rows = document["species"][formula]["observations"]
+        assert len(rows) == 1
+        series = rows[0]["values"]["series"]
+        assert rows[0]["values"]["quantity"] == "H_minus_H298"
+        assert rows[0]["values"]["method_class"] == "quoted_attributed"
+        assert [point["enthalpy_increment"] for point in series] == [
+            value for value in (at_700, at_800) if value is not None
+        ]
+        assert [point["reference"] for point in series] == [
+            value for value in (ref_700, ref_800) if value is not None
+        ]
+    tho2 = document["species"]["ThO2"]["observations"][0]["values"]["series"][1]
+    assert tho2["enthalpy_increment"] == "57.5"
+    assert tho2["sigma"] == "1.7"
+    teo2 = document["species"]["TeO2"]["observations"]
+    assert [(row["phase"], row["values"]["series"][0]["enthalpy_increment"], row["values"]["series"][0]["state_as_published"]) for row in teo2] == [
+        ("cr", "48.84", "solid"),
+        ("l", "88.37", "liquid"),
+    ]
+    assert all(row["values"]["series"][0]["reference"] == "[39]" for row in teo2)
+
+
+def test_isolated_migration_has_95_points_and_temperature_on_every_row():
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
     result = migrator.result
 
-    assert len(result.observations) == 45
+    assert len(result.observations) == 95
     assert result.validation is not None
     assert result.validation.hard_issues == ()
     temperatures = {Decimal("973.15"), Decimal("1073.15")}
@@ -93,7 +148,7 @@ def test_isolated_migration_has_45_points_and_temperature_on_every_row():
         assert row.locator.pdf_page_index == row.locator.page - 1
         assert row.locator.published_page == row.locator.page
         counts[row.identity.temperature_K.value] += 1
-    assert counts == {Decimal("973.15"): 23, Decimal("1073.15"): 22}
+    assert counts == {Decimal("973.15"): 49, Decimal("1073.15"): 46}
 
 
 def test_tables_figures_and_all_nested_locators_are_preserved():

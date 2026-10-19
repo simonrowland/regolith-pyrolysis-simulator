@@ -6,9 +6,10 @@ source:
   doi: 10.3390/molecules28124623
   year: 2023
 extraction:
-  method: Born-digital pdftotext-layout transcription; all 45 Table 1 heat-content cells
-    attributed to reference [28] were checked against 600 dpi renders of physical pages 5–7.
-    Figures retained without numeric points.
+  method: Born-digital pdftotext-layout transcription; every Table 1 heat-content cell
+    was checked against 600 dpi renders of physical pages 5-7, including cells outside
+    reference [28]. Solution and drop-solution columns stay in context. Figures retained
+    without numeric points.
   date: '2026-10-19'
   worker: fam13-1019
   provenance_path: text/navrotsky-koryttseva-2023-oxide-acid-base-calorimetry/pdftotext-layout.txt
@@ -439,6 +440,456 @@ fidelity_samples:
     published_page: 7
     pdf_page_index: 6
     row: SO3 (g)
+    column: 800 °C heat content
+- path: species.La2O3.observations[nav23_t1_la2o3_heat_content].values.series[0].enthalpy_increment
+  value: '83.73'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: La2 O3 (s, A-type)
+    column: 700 °C heat content
+- path: species.La2O3.observations[nav23_t1_la2o3_heat_content].values.series[1].enthalpy_increment
+  value: '97.43'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: La2 O3 (s, A-type)
+    column: 800 °C heat content
+- path: species.CeO2.observations[nav23_t1_ceo2_heat_content].values.series[0].enthalpy_increment
+  value: '49.19'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: CeO2 (s, cub)
+    column: 700 °C heat content
+- path: species.CeO2.observations[nav23_t1_ceo2_heat_content].values.series[1].enthalpy_increment
+  value: '57.33'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: CeO2 (s, cub)
+    column: 800 °C heat content
+- path: species.Nd2O3.observations[nav23_t1_nd2o3_heat_content].values.series[0].enthalpy_increment
+  value: '88.09'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Nd2 O3 (s, A-type, hex)
+    column: 700 °C heat content
+- path: species.Nd2O3.observations[nav23_t1_nd2o3_heat_content].values.series[1].enthalpy_increment
+  value: '102.78'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Nd2 O3 (s, A-type, hex)
+    column: 800 °C heat content
+- path: species.Sm2O3.observations[nav23_t1_sm2o3_heat_content].values.series[0].enthalpy_increment
+  value: '91.15'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Sm2 O3 (s, B-type, mon.)
+    column: 700 °C heat content
+- path: species.Sm2O3.observations[nav23_t1_sm2o3_heat_content].values.series[1].enthalpy_increment
+  value: '106.17'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Sm2 O3 (s, B-type, mon.)
+    column: 800 °C heat content
+- path: species.Gd2O3.observations[nav23_t1_gd2o3_heat_content].values.series[0].enthalpy_increment
+  value: '82.58'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Gd2 O3 (s, C-type, cubic)
+    column: 700 °C heat content
+- path: species.Gd2O3.observations[nav23_t1_gd2o3_heat_content].values.series[1].enthalpy_increment
+  value: '95.86'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Gd2 O3 (s, C-type, cubic)
+    column: 800 °C heat content
+- path: species.Dy2O3.observations[nav23_t1_dy2o3_heat_content].values.series[0].enthalpy_increment
+  value: '86.70'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Dy2 O3 (s, C-type, cub)
+    column: 700 °C heat content
+- path: species.Dy2O3.observations[nav23_t1_dy2o3_heat_content].values.series[1].enthalpy_increment
+  value: '100.39'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Dy2 O3 (s, C-type, cub)
+    column: 800 °C heat content
+- path: species.Y2O3.observations[nav23_t1_y2o3_heat_content].values.series[0].enthalpy_increment
+  value: '81.19'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Y2 O3 (s, C-type, cub)
+    column: 700 °C heat content
+- path: species.Y2O3.observations[nav23_t1_y2o3_heat_content].values.series[1].enthalpy_increment
+  value: '94.11'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Y2 O3 (s, C-type, cub)
+    column: 800 °C heat content
+- path: species.Ho2O3.observations[nav23_t1_ho2o3_heat_content].values.series[0].enthalpy_increment
+  value: '84.13'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Ho2 O3 (s, C-type, cub)
+    column: 700 °C heat content
+- path: species.Ho2O3.observations[nav23_t1_ho2o3_heat_content].values.series[1].enthalpy_increment
+  value: '97.35'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Ho2 O3 (s, C-type, cub)
+    column: 800 °C heat content
+- path: species.Er2O3.observations[nav23_t1_er2o3_heat_content].values.series[0].enthalpy_increment
+  value: '82.91'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Er2 O3 (s, C-type, cub)
+    column: 700 °C heat content
+- path: species.Er2O3.observations[nav23_t1_er2o3_heat_content].values.series[1].enthalpy_increment
+  value: '96.13'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Er2 O3 (s, C-type, cub)
+    column: 800 °C heat content
+- path: species.Tm2O3.observations[nav23_t1_tm2o3_heat_content].values.series[0].enthalpy_increment
+  value: '85.71'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Tm2 O3 (s)
+    column: 700 °C heat content
+- path: species.Tm2O3.observations[nav23_t1_tm2o3_heat_content].values.series[1].enthalpy_increment
+  value: '99.06'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Tm2 O3 (s)
+    column: 800 °C heat content
+- path: species.Lu2O3.observations[nav23_t1_lu2o3_heat_content].values.series[0].enthalpy_increment
+  value: '80.40'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Lu2 O3 (s, C-type, cub)
+    column: 700 °C heat content
+- path: species.Lu2O3.observations[nav23_t1_lu2o3_heat_content].values.series[1].enthalpy_increment
+  value: '93.61'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Lu2 O3 (s, C-type, cub)
+    column: 800 °C heat content
+- path: species.ThO2.observations[nav23_t1_tho2_heat_content].values.series[0].enthalpy_increment
+  value: '49.50'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: ThO2 (s)
+    column: 700 °C heat content
+- path: species.ThO2.observations[nav23_t1_tho2_heat_content].values.series[1].enthalpy_increment
+  value: '57.5'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: ThO2 (s)
+    column: 800 °C heat content
+- path: species.HfO2.observations[nav23_t1_hfo2_heat_content].values.series[0].enthalpy_increment
+  value: '49.56'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: HfO2 (s, monocl)
+    column: 700 °C heat content
+- path: species.HfO2.observations[nav23_t1_hfo2_heat_content].values.series[1].enthalpy_increment
+  value: '57.78'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: HfO2 (s, monocl)
+    column: 800 °C heat content
+- path: species.Sc2O3.observations[nav23_t1_sc2o3_heat_content].values.series[0].enthalpy_increment
+  value: '78.25'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: Sc2 O3 (s)
+    column: 700 °C heat content
+- path: species.Sc2O3.observations[nav23_t1_sc2o3_heat_content].values.series[1].enthalpy_increment
+  value: '91.21'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: Sc2 O3 (s)
+    column: 800 °C heat content
+- path: species.Np2O5.observations[nav23_t1_np2o5_heat_content].values.series[0].enthalpy_increment
+  value: '109.26'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: Np2 O5 (s)
+    column: 700 °C heat content
+- path: species.UO3.observations[nav23_t1_uo3_heat_content].values.series[0].enthalpy_increment
+  value: '64.22'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: γ-UO3 (s)
+    column: 700 °C heat content
+- path: species.Mn2O3.observations[nav23_t1_mn2o3_heat_content].values.series[0].enthalpy_increment
+  value: '81.10'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: Mn2 O3 (s, cub)
+    column: 700 °C heat content
+- path: species.Mn2O3.observations[nav23_t1_mn2o3_heat_content].values.series[1].enthalpy_increment
+  value: '94.75'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: Mn2 O3 (s, cub)
+    column: 800 °C heat content
+- path: species.ZnO.observations[nav23_t1_zno_heat_content].values.series[0].enthalpy_increment
+  value: '32.40'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: ZnO (s, hex.)
+    column: 700 °C heat content
+- path: species.ZnO.observations[nav23_t1_zno_heat_content].values.series[1].enthalpy_increment
+  value: '37.66'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: ZnO (s, hex.)
+    column: 800 °C heat content
+- path: species.CdO.observations[nav23_t1_cdo_heat_content].values.series[0].enthalpy_increment
+  value: '33.64'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: CdO (s)
+    column: 700 °C heat content
+- path: species.CdO.observations[nav23_t1_cdo_heat_content].values.series[1].enthalpy_increment
+  value: '39.00'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: CdO (s)
+    column: 800 °C heat content
+- path: species.In2O3.observations[nav23_t1_in2o3_heat_content].values.series[0].enthalpy_increment
+  value: '81.11'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: In2 O3 (s)
+    column: 700 °C heat content
+- path: species.In2O3.observations[nav23_t1_in2o3_heat_content].values.series[1].enthalpy_increment
+  value: '93.98'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: In2 O3 (s)
+    column: 800 °C heat content
+- path: species.Ga2O3.observations[nav23_t1_ga2o3_heat_content].values.series[0].enthalpy_increment
+  value: '77.45'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: Ga2 O3 (s)
+    column: 700 °C heat content
+- path: species.Ga2O3.observations[nav23_t1_ga2o3_heat_content].values.series[1].enthalpy_increment
+  value: '90.11'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: Ga2 O3 (s)
+    column: 800 °C heat content
+- path: species.NiO.observations[nav23_t1_nio_heat_content].values.series[0].enthalpy_increment
+  value: '36.60'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: NiO (s)
+    column: 700 °C heat content
+- path: species.NiO.observations[nav23_t1_nio_heat_content].values.series[1].enthalpy_increment
+  value: '42.10'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: NiO (s)
+    column: 800 °C heat content
+- path: species.SnO2.observations[nav23_t1_sno2_heat_content].values.series[0].enthalpy_increment
+  value: '49.52'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: SnO2 (s)
+    column: 700 °C heat content
+- path: species.SnO2.observations[nav23_t1_sno2_heat_content].values.series[1].enthalpy_increment
+  value: '57.78'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: SnO2 (s)
+    column: 800 °C heat content
+- path: species.GeO2.observations[nav23_t1_geo2_heat_content].values.series[0].enthalpy_increment
+  value: '44.76'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: GeO2 (s, quartz)
+    column: 700 °C heat content
+- path: species.GeO2.observations[nav23_t1_geo2_heat_content].values.series[1].enthalpy_increment
+  value: '52.29'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: GeO2 (s, quartz)
+    column: 800 °C heat content
+- path: species.Bi2O3.observations[nav23_t1_bi2o3_heat_content].values.series[0].enthalpy_increment
+  value: '84.23'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: Bi2 O3 (s)
+    column: 700 °C heat content
+- path: species.Bi2O3.observations[nav23_t1_bi2o3_heat_content].values.series[1].enthalpy_increment
+  value: '96.89'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: Bi2 O3 (s)
+    column: 800 °C heat content
+- path: species.TeO2.observations[nav23_t1_teo2_700_heat_content].values.series[0].enthalpy_increment
+  value: '48.84'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: TeO2
+    column: 700 °C heat content
+- path: species.TeO2.observations[nav23_t1_teo2_800_heat_content].values.series[0].enthalpy_increment
+  value: '88.37'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: TeO2
     column: 800 °C heat content
 species:
   K2O:
@@ -1375,6 +1826,1118 @@ species:
             pdf_page_index: 6
             row: SO3 (g)
             column: 800 °C heat content
+  La2O3:
+    observations:
+    - observation_id: nav23_t1_la2o3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        row: La2 O3 (s, A-type)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [30], as cited in Table 1.
+        printed_species: La2 O3 (s, A-type)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '83.73'
+          state_as_published: solid, A-type
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: La2 O3 (s, A-type)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '97.43'
+          state_as_published: solid, A-type
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: La2 O3 (s, A-type)
+            column: 800 °C heat content
+  CeO2:
+    observations:
+    - observation_id: nav23_t1_ceo2_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        row: CeO2 (s, cub)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [31], as cited in Table 1.
+        printed_species: CeO2 (s, cub)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '49.19'
+          state_as_published: solid, cubic
+          reference: '[31]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: CeO2 (s, cub)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '57.33'
+          state_as_published: solid, cubic
+          reference: '[31]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: CeO2 (s, cub)
+            column: 800 °C heat content
+  Nd2O3:
+    observations:
+    - observation_id: nav23_t1_nd2o3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        row: Nd2 O3 (s, A-type, hex)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [30], as cited in Table 1.
+        printed_species: Nd2 O3 (s, A-type, hex)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '88.09'
+          state_as_published: solid, A-type hexagonal
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Nd2 O3 (s, A-type, hex)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '102.78'
+          state_as_published: solid, A-type hexagonal
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Nd2 O3 (s, A-type, hex)
+            column: 800 °C heat content
+  Sm2O3:
+    observations:
+    - observation_id: nav23_t1_sm2o3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        row: Sm2 O3 (s, B-type, mon.)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [30], as cited in Table 1.
+        printed_species: Sm2 O3 (s, B-type, mon.)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '91.15'
+          state_as_published: solid, B-type monoclinic
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Sm2 O3 (s, B-type, mon.)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '106.17'
+          state_as_published: solid, B-type monoclinic
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Sm2 O3 (s, B-type, mon.)
+            column: 800 °C heat content
+  Gd2O3:
+    observations:
+    - observation_id: nav23_t1_gd2o3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        row: Gd2 O3 (s, C-type, cubic)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [30], as cited in Table 1.
+        printed_species: Gd2 O3 (s, C-type, cubic)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '82.58'
+          state_as_published: solid, C-type cubic
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Gd2 O3 (s, C-type, cubic)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '95.86'
+          state_as_published: solid, C-type cubic
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Gd2 O3 (s, C-type, cubic)
+            column: 800 °C heat content
+  Dy2O3:
+    observations:
+    - observation_id: nav23_t1_dy2o3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        row: Dy2 O3 (s, C-type, cub)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [30], as cited in Table 1.
+        printed_species: Dy2 O3 (s, C-type, cub)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '86.70'
+          state_as_published: solid, C-type cubic
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Dy2 O3 (s, C-type, cub)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '100.39'
+          state_as_published: solid, C-type cubic
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Dy2 O3 (s, C-type, cub)
+            column: 800 °C heat content
+  Y2O3:
+    observations:
+    - observation_id: nav23_t1_y2o3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        row: Y2 O3 (s, C-type, cub)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [30], as cited in Table 1.
+        printed_species: Y2 O3 (s, C-type, cub)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '81.19'
+          state_as_published: solid, C-type cubic
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Y2 O3 (s, C-type, cub)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '94.11'
+          state_as_published: solid, C-type cubic
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Y2 O3 (s, C-type, cub)
+            column: 800 °C heat content
+  Ho2O3:
+    observations:
+    - observation_id: nav23_t1_ho2o3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        row: Ho2 O3 (s, C-type, cub)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [30], as cited in Table 1.
+        printed_species: Ho2 O3 (s, C-type, cub)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '84.13'
+          state_as_published: solid, C-type cubic
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Ho2 O3 (s, C-type, cub)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '97.35'
+          state_as_published: solid, C-type cubic
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Ho2 O3 (s, C-type, cub)
+            column: 800 °C heat content
+  Er2O3:
+    observations:
+    - observation_id: nav23_t1_er2o3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        row: Er2 O3 (s, C-type, cub)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [30], as cited in Table 1.
+        printed_species: Er2 O3 (s, C-type, cub)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '82.91'
+          state_as_published: solid, C-type cubic
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Er2 O3 (s, C-type, cub)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '96.13'
+          state_as_published: solid, C-type cubic
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Er2 O3 (s, C-type, cub)
+            column: 800 °C heat content
+  Tm2O3:
+    observations:
+    - observation_id: nav23_t1_tm2o3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        row: Tm2 O3 (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [30], as cited in Table 1.
+        printed_species: Tm2 O3 (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '85.71'
+          state_as_published: solid
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Tm2 O3 (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '99.06'
+          state_as_published: solid
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Tm2 O3 (s)
+            column: 800 °C heat content
+  Lu2O3:
+    observations:
+    - observation_id: nav23_t1_lu2o3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        row: Lu2 O3 (s, C-type, cub)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [30], as cited in Table 1.
+        printed_species: Lu2 O3 (s, C-type, cub)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '80.40'
+          state_as_published: solid, C-type cubic
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Lu2 O3 (s, C-type, cub)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '93.61'
+          state_as_published: solid, C-type cubic
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Lu2 O3 (s, C-type, cub)
+            column: 800 °C heat content
+  ThO2:
+    observations:
+    - observation_id: nav23_t1_tho2_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: ThO2 (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: References [33] and [34], as cited in Table 1.
+        printed_species: ThO2 (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '49.50'
+          state_as_published: solid
+          reference: '[33]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: ThO2 (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '57.5'
+          sigma: '1.7'
+          state_as_published: solid
+          reference: '[34]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: ThO2 (s)
+            column: 800 °C heat content
+  HfO2:
+    observations:
+    - observation_id: nav23_t1_hfo2_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: HfO2 (s, monocl)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [30], as cited in Table 1.
+        printed_species: HfO2 (s, monocl)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '49.56'
+          state_as_published: solid, monoclinic
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: HfO2 (s, monocl)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '57.78'
+          state_as_published: solid, monoclinic
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: HfO2 (s, monocl)
+            column: 800 °C heat content
+  Sc2O3:
+    observations:
+    - observation_id: nav23_t1_sc2o3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: Sc2 O3 (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [30], as cited in Table 1.
+        printed_species: Sc2 O3 (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '78.25'
+          state_as_published: solid
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: Sc2 O3 (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '91.21'
+          state_as_published: solid
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: Sc2 O3 (s)
+            column: 800 °C heat content
+  Np2O5:
+    observations:
+    - observation_id: nav23_t1_np2o5_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: Np2 O5 (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [33], as cited in Table 1.
+        printed_species: Np2 O5 (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '109.26'
+          state_as_published: solid
+          reference: '[33]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: Np2 O5 (s)
+            column: 700 °C heat content
+  UO3:
+    observations:
+    - observation_id: nav23_t1_uo3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: γ-UO3 (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [33], as cited in Table 1.
+        printed_species: γ-UO3 (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '64.22'
+          state_as_published: solid, gamma
+          reference: '[33]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: γ-UO3 (s)
+            column: 700 °C heat content
+  Mn2O3:
+    observations:
+    - observation_id: nav23_t1_mn2o3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: Mn2 O3 (s, cub)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [31], as cited in Table 1.
+        printed_species: Mn2 O3 (s, cub)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '81.10'
+          state_as_published: solid, cubic
+          reference: '[31]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: Mn2 O3 (s, cub)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '94.75'
+          state_as_published: solid, cubic
+          reference: '[31]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: Mn2 O3 (s, cub)
+            column: 800 °C heat content
+  ZnO:
+    observations:
+    - observation_id: nav23_t1_zno_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: ZnO (s, hex.)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: 700 °C cites reference [31]. The 800 °C cell prints 37.66 with no reference.
+        printed_species: ZnO (s, hex.)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '32.40'
+          state_as_published: solid, hexagonal
+          reference: '[31]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: ZnO (s, hex.)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '37.66'
+          state_as_published: solid, hexagonal
+          reference: 'not printed'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: ZnO (s, hex.)
+            column: 800 °C heat content
+  CdO:
+    observations:
+    - observation_id: nav23_t1_cdo_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: CdO (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [39], as cited in Table 1.
+        printed_species: CdO (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '33.64'
+          state_as_published: solid
+          reference: '[39]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: CdO (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '39.00'
+          state_as_published: solid
+          reference: '[39]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: CdO (s)
+            column: 800 °C heat content
+  In2O3:
+    observations:
+    - observation_id: nav23_t1_in2o3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: In2 O3 (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [39], as cited in Table 1.
+        printed_species: In2 O3 (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '81.11'
+          state_as_published: solid
+          reference: '[39]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: In2 O3 (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '93.98'
+          state_as_published: solid
+          reference: '[39]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: In2 O3 (s)
+            column: 800 °C heat content
+  Ga2O3:
+    observations:
+    - observation_id: nav23_t1_ga2o3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: Ga2 O3 (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [30], as cited in Table 1.
+        printed_species: Ga2 O3 (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '77.45'
+          state_as_published: solid
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: Ga2 O3 (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '90.11'
+          state_as_published: solid
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: Ga2 O3 (s)
+            column: 800 °C heat content
+  NiO:
+    observations:
+    - observation_id: nav23_t1_nio_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 7
+        published_page: 7
+        pdf_page_index: 6
+        row: NiO (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [31], as cited in Table 1.
+        printed_species: NiO (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '36.60'
+          state_as_published: solid, cubic
+          reference: '[31]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: NiO (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '42.10'
+          state_as_published: solid, cubic
+          reference: '[31]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: NiO (s)
+            column: 800 °C heat content
+  SnO2:
+    observations:
+    - observation_id: nav23_t1_sno2_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 7
+        published_page: 7
+        pdf_page_index: 6
+        row: SnO2 (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [31], as cited in Table 1.
+        printed_species: SnO2 (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '49.52'
+          state_as_published: solid, tetragonal
+          reference: '[31]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: SnO2 (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '57.78'
+          state_as_published: solid, tetragonal
+          reference: '[31]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: SnO2 (s)
+            column: 800 °C heat content
+  GeO2:
+    observations:
+    - observation_id: nav23_t1_geo2_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 7
+        published_page: 7
+        pdf_page_index: 6
+        row: GeO2 (s, quartz)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [30], as cited in Table 1.
+        printed_species: GeO2 (s, quartz)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '44.76'
+          state_as_published: solid, quartz
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: GeO2 (s, quartz)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '52.29'
+          state_as_published: solid, quartz
+          reference: '[30]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: GeO2 (s, quartz)
+            column: 800 °C heat content
+  Bi2O3:
+    observations:
+    - observation_id: nav23_t1_bi2o3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 7
+        published_page: 7
+        pdf_page_index: 6
+        row: Bi2 O3 (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [31], as cited in Table 1.
+        printed_species: Bi2 O3 (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '84.23'
+          state_as_published: solid
+          reference: '[31]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: Bi2 O3 (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '96.89'
+          state_as_published: solid
+          reference: '[31]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: Bi2 O3 (s)
+            column: 800 °C heat content
+  TeO2:
+    observations:
+    - observation_id: nav23_t1_teo2_700_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 7
+        published_page: 7
+        pdf_page_index: 6
+        row: TeO2
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [39], as cited in Table 1.
+        printed_species: TeO2
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '48.84'
+          state_as_published: solid
+          reference: '[39]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: TeO2
+            column: 700 °C heat content
+    - observation_id: nav23_t1_teo2_800_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 7
+        published_page: 7
+        pdf_page_index: 6
+        row: TeO2
+        column: 800 °C heat content
+      phase: l
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [39], as cited in Table 1.
+        printed_species: TeO2
+        series:
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '88.37'
+          state_as_published: liquid
+          reference: '[39]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: TeO2
+            column: 800 °C heat content
   SiO2:
     observations:
       - observation_id: nav23_t1_sio2_heat_content
@@ -1806,7 +3369,7 @@ species:
           \ in basic\n                                    properties in this direction,\
           \ and is consistent with the general trends in properties in the\n     \
           \                               periodic table."
-        schema_gap: Table 1 heat-content cells attributed to reference [28] are typed. Cells attributed to other references and the drop/solution enthalpies remain context; no enthalpy-of-solution token exists.
+        schema_gap: Table 1 heat-content cells are typed, including cells outside reference [28]. Drop-solution and solution enthalpies remain context; no enthalpy-of-solution token exists. The ZnO 800 °C heat-content cell prints 37.66 with no reference.
     - observation_id: navrotsky_koryttseva_2023_table_2_context
       type: table_context
       units: kJ/mol or kJ/mol of oxygen atoms as labeled in table
