@@ -676,11 +676,11 @@ def test_magemin_blocked_send_timeout_reaps_and_restarts_worker_slot():
     release_send = threading.Event()
     send_unblocked = threading.Event()
     real_send = connection.send
+    original_abort = worker._abort_current_call
 
     def blocked_send(request):
         send_entered.set()
-        if not release_send.wait(timeout=_RENDEZVOUS_TIMEOUT_S):
-            raise TimeoutError('test send was not released')
+        release_send.wait()
         send_unblocked.set()
         if process.is_alive():
             return real_send(request)
@@ -688,16 +688,13 @@ def test_magemin_blocked_send_timeout_reaps_and_restarts_worker_slot():
 
     connection.send = blocked_send
 
-    def release_send_after_worker_exit():
-        process.join(timeout=_RENDEZVOUS_TIMEOUT_S)
-        if not process.is_alive():
+    def abort_and_release_send(abort_event=None):
+        try:
+            return original_abort(abort_event)
+        finally:
             release_send.set()
 
-    exit_watcher = threading.Thread(
-        target=release_send_after_worker_exit,
-        daemon=True,
-    )
-    exit_watcher.start()
+    worker._abort_current_call = abort_and_release_send
 
     backend = _make_pooled_subprocess_backend(None)
     backend._subprocess_pool = pool
@@ -764,8 +761,8 @@ def test_magemin_blocked_send_timeout_reaps_and_restarts_worker_slot():
     finally:
         release_send.set()
         caller.join(timeout=5.0)
-        exit_watcher.join(timeout=5.0)
         connection.send = real_send
+        worker._abort_current_call = original_abort
         pool.close(cancel_pending=True, timeout_s=3.0)
 
 
