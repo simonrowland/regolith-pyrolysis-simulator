@@ -88,6 +88,7 @@ from simulator.battery.score import (
     ScoreContext,
     SINGLE_CATION_COEFFICIENT_BASIS,
     SINGLE_LIQUID_ENGINES,
+    _battery_hero_sio2_mole_fraction,
     _battery_hero_sweet_spot_records,
     _paired_engine_rail_benchmarks,
     _residual_engine_observable,
@@ -4838,6 +4839,19 @@ def test_battery_hero_sweet_spot_scores_shared_mole_fraction_bins() -> None:
         "amount_basis": AmountBasis.MOLE_FRACTION.value,
         "components": [["SiO2", "0.02"]],
     }
+    assert _battery_hero_sio2_mole_fraction(mole_composition) == Decimal("0.02")
+    assert _battery_hero_sio2_mole_fraction(
+        {
+            "amount_basis": AmountBasis.MASS_PERCENT.value,
+            "components": [["SiO2", "2"]],
+        }
+    ) is None
+    assert _battery_hero_sio2_mole_fraction(
+        {
+            "amount_basis": AmountBasis.MOLE_FRACTION.value,
+            "components": [["SiO2", "1.01"]],
+        }
+    ) is None
     samples = [
         (Rail.VAPOUR.value, "openimcc", "100", mole_composition, "-1"),
         (Rail.VAPOUR.value, "openimcc", "199.9", mole_composition, "3"),

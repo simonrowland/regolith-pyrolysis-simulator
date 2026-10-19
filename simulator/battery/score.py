@@ -9095,6 +9095,38 @@ def _paired_engine_rail_benchmarks(
     return records
 
 
+def _battery_hero_sio2_mole_fraction(composition_raw: object) -> Decimal | None:
+    """Return the scorer-declared SiO2 mole fraction, or None when unavailable."""
+
+    if not isinstance(composition_raw, Mapping):
+        return None
+    if composition_raw.get("amount_basis") != AmountBasis.MOLE_FRACTION.value:
+        return None
+    components = composition_raw.get("components")
+    if (
+        not isinstance(components, Sequence)
+        or isinstance(components, (str, bytes))
+        or not components
+    ):
+        return None
+    sio2_fraction = Decimal(0)
+    try:
+        for component in components:
+            if (
+                isinstance(component, Sequence)
+                and not isinstance(component, (str, bytes))
+                and len(component) == 2
+                and component[0] == "SiO2"
+            ):
+                sio2_fraction = as_decimal(component[1])
+                break
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not sio2_fraction.is_finite() or sio2_fraction < 0 or sio2_fraction > 1:
+        return None
+    return sio2_fraction
+
+
 def _battery_hero_sweet_spot_records(
     samples: Iterable[tuple[str, str, object, object, object]],
 ) -> list[dict[str, object]]:
@@ -9116,16 +9148,10 @@ def _battery_hero_sweet_spot_records(
     engines_by_rail: dict[str, set[str]] = defaultdict(set)
 
     for rail, engine, temperature_raw, composition_raw, dex_raw in samples:
-        if not rail or not engine or not isinstance(composition_raw, Mapping):
+        if not rail or not engine:
             continue
-        if composition_raw.get("amount_basis") != AmountBasis.MOLE_FRACTION.value:
-            continue
-        components = composition_raw.get("components")
-        if (
-            not isinstance(components, Sequence)
-            or isinstance(components, (str, bytes))
-            or not components
-        ):
+        sio2_fraction = _battery_hero_sio2_mole_fraction(composition_raw)
+        if sio2_fraction is None:
             continue
         try:
             temperature = as_decimal(temperature_raw)
@@ -9133,26 +9159,6 @@ def _battery_hero_sweet_spot_records(
         except (TypeError, ValueError, ArithmeticError):
             continue
         if not temperature.is_finite() or not dex.is_finite():
-            continue
-
-        sio2_fraction = Decimal(0)
-        try:
-            for component in components:
-                if (
-                    isinstance(component, Sequence)
-                    and not isinstance(component, (str, bytes))
-                    and len(component) == 2
-                    and component[0] == "SiO2"
-                ):
-                    sio2_fraction = as_decimal(component[1])
-                    break
-        except (TypeError, ValueError, ArithmeticError):
-            continue
-        if (
-            not sio2_fraction.is_finite()
-            or sio2_fraction < 0
-            or sio2_fraction > 1
-        ):
             continue
 
         temperature_bin = math.floor(temperature / temperature_width)
