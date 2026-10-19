@@ -1,0 +1,27 @@
+source_id: xiao-2002-chromium-oxide-activities
+source:
+  citation: >-
+    Xiao, Y., Holappa, L. & Reuter, M.A. (2002), Oxidation State and Activities of Chromium Oxides in
+    CaO-SiO2-CrOx Slag System, Metallurgical and Materials Transactions B 33:595-603.
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-19'
+  worker: fam15-1019
+review_status: draft
+tables:
+  - page: 5
+    table_index: 2
+    type: concentration_series
+    quantity: valence_ratio
+    evidence_class: measured_direct
+    unit: fraction of total Cr (Cr2+/T_Cr)
+    phase: l
+    published_page: 599
+    rows: all
+    temperature:
+      as_printed: '1863'
+      unit: K
+      locator: {page: 5, pdf_page_index: 4, published_page: 599, table: 'II', row: table title}
+    values:
+      - column: 6
+        species: Cr
