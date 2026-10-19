@@ -3566,6 +3566,75 @@ def test_alphamelts_python_api_not_an_input_omits_configured_buffer(monkeypatch)
     assert captured['fO2_offset'] is None
 
 
+def test_alphamelts_python_api_keeps_activity_when_fO2_is_not_an_input(
+    monkeypatch,
+):
+    backend = AlphaMELTSBackend()
+    _select_python_api_for_test(backend)
+    vapor_calls = []
+
+    class VapoRockSpy:
+        def is_available(self):
+            return True
+
+        def equilibrate(self, **kwargs):
+            vapor_calls.append(kwargs)
+            return SimpleNamespace(status='ok', vapor_pressures_Pa={'SiO': 1.0})
+
+    backend._vaporock_available = True
+    backend._vaporock_helper = VapoRockSpy()
+    monkeypatch.setattr(backend, '_require_petthermotools_runtime', lambda: object())
+    monkeypatch.setattr(backend, '_to_petthermotools_liq_comp', lambda comp: comp)
+    monkeypatch.setattr(backend, '_melts_model_code', lambda: 1)
+    monkeypatch.setattr(
+        backend,
+        '_run_petthermotools_isolated',
+        lambda *_args, **_kwargs: object(),
+    )
+
+    def successful_parse(
+        _results,
+        *,
+        temperature_C,
+        pressure_bar,
+        fO2_log,
+        **_kwargs,
+    ):
+        return EquilibriumResult(
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            liquid_fraction=1.0,
+            liquid_composition_wt_pct={'SiO2': 70.0, 'CaO': 30.0},
+            activity_coefficients={'SiO2': 0.4},
+        )
+
+    monkeypatch.setattr(
+        backend,
+        '_parse_petthermotools_result',
+        successful_parse,
+    )
+
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg={'SiO2': 0.7, 'CaO': 0.3},
+        fO2_log=None,
+        pressure_bar=1.0,
+        redox_mode='not_an_input',
+    )
+
+    assert result.status == 'ok'
+    assert result.activity_coefficients == {'SiO2': 0.4}
+    assert result.vapor_pressures_Pa == {}
+    assert result.diagnostics['vapor_pressure_backend_status'] == 'not_attempted'
+    assert result.diagnostics['vapor_pressure_backend_status_reason'] == (
+        'fO2_not_an_input'
+    )
+    assert result.diagnostics['authoritative_for_requested_vapor_pressure'] is False
+    assert backend._mode == 'python_api'
+    assert vapor_calls == []
+
+
 def test_alphamelts_intrinsic_none_still_refuses_without_redox_mode():
     backend = AlphaMELTSBackend()
 
