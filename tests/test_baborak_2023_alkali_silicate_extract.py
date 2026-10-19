@@ -127,22 +127,36 @@ def test_baborak_page_pins_compound_identity_and_quench_conditions() -> None:
 
     expected_compositions = {
         "baborak_2023_ls2_t_liquidus_table1": {
-            "Li2O": Decimal("1"),
-            "SiO2": Decimal("2"),
+            "Li2O": Decimal("1") / Decimal("3"),
+            "SiO2": Decimal("2") / Decimal("3"),
         },
         "baborak_2023_ns2_t_liquidus_table1": {
-            "Na2O": Decimal("1"),
-            "SiO2": Decimal("2"),
+            "Na2O": Decimal("1") / Decimal("3"),
+            "SiO2": Decimal("2") / Decimal("3"),
         },
         "baborak_2023_ks2_t_liquidus_table1": {
-            "K2O": Decimal("1"),
-            "SiO2": Decimal("2"),
+            "K2O": Decimal("1") / Decimal("3"),
+            "SiO2": Decimal("2") / Decimal("3"),
         },
+    }
+    printed_formulas = {
+        "baborak_2023_ls2_t_liquidus_table1": "Li2O·2SiO2",
+        "baborak_2023_ns2_t_liquidus_table1": "Na2O·2SiO2",
+        "baborak_2023_ks2_t_liquidus_table1": "K2O·2SiO2",
     }
     for observation_id, expected_composition in expected_compositions.items():
         composition = _migrated_observation(migrator, observation_id).identity.composition
         assert composition.is_value
-        assert composition.value.as_map() == expected_composition
+        migrated = composition.value.as_map()
+        assert set(migrated) == set(expected_composition)
+        assert abs(sum(migrated.values()) - Decimal("1")) < Decimal("1e-15")
+        assert all(
+            abs(migrated[oxide] - expected_ratio) < Decimal("1e-15")
+            for oxide, expected_ratio in expected_composition.items()
+        )
+        source_row = _row(document, observation_id)
+        assert source_row["values"]["composition_as_published"] == printed_formulas[observation_id]
+        assert source_row["values"]["composition_mol"]["basis"] == "printed_mole_fraction"
 
     for observation_id in (
         "baborak_2023_ls2_tg_table1",
