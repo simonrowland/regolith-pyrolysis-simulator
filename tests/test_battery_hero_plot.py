@@ -1369,8 +1369,74 @@ def test_non_observable_rows_are_separate_from_refusals_and_history(
         for item in record["refusal_coverage"]
     )
 
+
+def test_melt_activity_refusals_and_diagnostics_are_collected(
+    tmp_path: Path,
+) -> None:
+    scored = _record(
+        engine="openimcc",
+        experiment="ordinary",
+        formula="SiO2",
+        temperature_K=1800,
+        residual=0.2,
+        rail="melt_activity",
+    )
+    scored["notices"] = [
+        {
+            "kind": NoticeKind.OUT_OF_CERTIFIED_BAND.value,
+            "reason": "extrapolated beyond certified band",
+        }
+    ]
+    metric_domain = _record(
+        engine="openimcc",
+        experiment="refused",
+        formula="SiO2",
+        temperature_K=1800,
+        residual=None,
+        status="refused",
+        rail="melt_activity",
+    )
+    metric_domain["refusal"] = {"reason": "metric_domain"}
+    not_observable = _record(
+        engine="magemin",
+        experiment="unobservable",
+        formula="SiO2",
+        temperature_K=1800,
+        residual=None,
+        status="refused",
+        rail="melt_activity",
+    )
+    residuals = tmp_path / "melt-activity.jsonl"
+    residuals.write_text(
+        "".join(
+            json.dumps(row) + "\n"
+            for row in (
+                {"kind": "battery_store_stamp", "revision": "melt-activity-test"},
+                scored,
+                metric_domain,
+                not_observable,
+            )
+        ),
+        encoding="utf-8",
+    )
+
+    data = read_scores(residuals)
+
+    assert data.hero_refusal_totals == {
+        ("melt_activity", "openimcc", "metric_domain"): 1
+    }
+    assert _hero_refusal_entries(data, "melt_activity", "SiO2") == (
+        ("openimcc", "metric_domain", 1),
+    )
+    assert data.hero_diagnostics[("melt_activity", "magemin")][
+        "not_observable_count"
+    ] == 1
+    assert data.hero_diagnostics[("melt_activity", "openimcc")][
+        "open_predict_and_flag_notice_counts_by_kind"
+    ] == {NoticeKind.OUT_OF_CERTIFIED_BAND.value: 1}
+
     files = render_hero_charts(data, tmp_path / "rendered")
-    svg = files["hero:vapour:svg"].read_text(encoding="utf-8").casefold()
+    svg = files["hero:melt_activity:svg"].read_text(encoding="utf-8").casefold()
     assert "not an observable of this engine" in svg
     assert "magemin 1" in svg
 
