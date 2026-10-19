@@ -10,6 +10,7 @@ from pathlib import Path
 
 import pytest
 
+import scripts.battery_hero_plot as hero_plot
 from simulator.battery.enums import NoticeKind
 from scripts.battery_hero_plot import (
     HERO_MINOR_FACETS,
@@ -40,7 +41,7 @@ from scripts.battery_hero_plot import (
     TIER_MINOR,
     TIER_TRACE,
 )
-from matplotlib.colors import Normalize, to_rgba
+from matplotlib.colors import ListedColormap, Normalize, to_rgba
 from matplotlib.figure import Figure
 from matplotlib.text import Text
 from matplotlib.ticker import MaxNLocator
@@ -621,6 +622,12 @@ def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
         "excluded under d-139: openimcc 1 uncalibrated KEMS p_partial, "
         "thermoengine 1 uncalibrated KEMS p_partial"
     ) in footer
+    hero_files = render_hero_charts(data, tmp_path / "hero-images")
+    hero_caption = hero_files["hero:vapour:svg"].read_text(encoding="utf-8").casefold()
+    assert (
+        "vapour scatter excludes uncalibrated kems p_partial rows under d-139: "
+        "openimcc 1, thermoengine 1; scorer all-numeric and same-row rms include them."
+    ) in hero_caption
 
 
 def test_lunar_feedstock_abundance_drives_plot_styling() -> None:
@@ -960,27 +967,23 @@ def test_sweet_spot_plot_uses_scorer_color_eligibility() -> None:
 
 
 def test_sweet_spot_count_text_contrasts_with_viridis_fill() -> None:
+    viridis = plt.get_cmap("viridis")
+    fills = [viridis(index / 10) for index in range(11)] + [
+        (0.395, 0.797, 0.368, 1.0)
+    ]
+    colormap = ListedColormap(fills)
     cells = [
         {
-            "sio2_lower": "0.0",
-            "sio2_upper": "0.05",
+            "sio2_lower": str(index * 0.05),
+            "sio2_upper": str((index + 1) * 0.05),
             "temperature_lower_K": "1000",
             "temperature_upper_K": "1100",
             "n": 3,
             "color_eligible": True,
-            "median_abs_dex": "0.0",
-        },
-        {
-            "sio2_lower": "0.05",
-            "sio2_upper": "0.1",
-            "temperature_lower_K": "1000",
-            "temperature_upper_K": "1100",
-            "n": 4,
-            "color_eligible": True,
-            "median_abs_dex": "1.0",
-        },
+            "median_abs_dex": str(index),
+        }
+        for index in range(len(fills))
     ]
-    colormap = plt.get_cmap("viridis")
     figure, axis = plt.subplots()
     try:
         assert _draw_hero_sweet_spot(
@@ -988,16 +991,49 @@ def test_sweet_spot_count_text_contrasts_with_viridis_fill() -> None:
             "openimcc",
             cells,
             colormap=colormap,
-            normalization=Normalize(vmin=0, vmax=1),
-            x_limits=(0, 0.1),
+            normalization=Normalize(vmin=0, vmax=len(fills) - 1),
+            x_limits=(0, len(fills) * 0.05),
             temperature_limits=(1000, 1100),
         )
-        assert axis.patches[0].get_facecolor() == pytest.approx(colormap(0.0))
-        assert axis.patches[1].get_facecolor() == pytest.approx(colormap(1.0))
+        assert [patch.get_facecolor() for patch in axis.patches] == pytest.approx(
+            fills
+        )
+        # WCAG contrast winners for viridis at 0.0 through 1.0, followed by
+        # the review's actual mid-tone green cell. At 0.5 neither candidate
+        # reaches 4.5:1, so the higher-contrast dark text is expected.
         assert [text.get_color() for text in axis.texts] == [
             "#f7f7f7",
+            "#f7f7f7",
+            "#f7f7f7",
+            "#f7f7f7",
+            "#f7f7f7",
+            "#222222",
+            "#222222",
+            "#222222",
+            "#222222",
+            "#222222",
+            "#222222",
             "#222222",
         ]
+        assert hero_plot._wcag_contrast_ratio("#000000", "#ffffff") == pytest.approx(
+            21.0
+        )
+        assert hero_plot._wcag_contrast_ratio(
+            fills[-1], "#222222"
+        ) == pytest.approx(7.785, abs=0.001)
+        assert hero_plot._wcag_contrast_ratio(
+            fills[-1], "#f7f7f7"
+        ) == pytest.approx(1.908, abs=0.001)
+        for fill, label in zip(fills, axis.texts, strict=True):
+            chosen = hero_plot._wcag_contrast_ratio(fill, label.get_color())
+            best = max(
+                hero_plot._wcag_contrast_ratio(fill, "#222222"),
+                hero_plot._wcag_contrast_ratio(fill, "#f7f7f7"),
+            )
+            if best >= 4.5:
+                assert chosen >= 4.5
+            else:
+                assert chosen == pytest.approx(best)
     finally:
         plt.close(figure)
 
@@ -1444,6 +1480,9 @@ def test_missing_comparison_engine_is_reported_as_unavailable(tmp_path: Path) ->
     files = render_hero_charts(data, tmp_path / "rendered")
     svg = files["hero:redox:svg"].read_text(encoding="utf-8").casefold()
     assert "benchmark unavailable" in svg
+    vapour_svg = files["hero:vapour:svg"].read_text(encoding="utf-8").casefold()
+    assert "all-numeric rms unavailable (n=0)" in vapour_svg
+    assert "all-numeric rms unavailable dex (n=0)" not in vapour_svg
 
 
 def test_read_scores_streams_residuals_from_archive_member(tmp_path: Path) -> None:
