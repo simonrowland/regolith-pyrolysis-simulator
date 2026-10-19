@@ -9,9 +9,213 @@ extraction:
   date: '2026-10-18'
   worker: Codex
 review_status: draft
+fidelity_samples:
+- path: species.TiO2.observations[borisov_2004_table_2_dat32n_activity_coefficient].values.gamma
+  value: 6.63
+  locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'DAT32n rutile-saturated melt activity coefficient'}
 species:
   TiO2:
-    observations: []
+    observations:
+    - observation_id: borisov_2004_table_2_dat32n_rutile_saturation
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1495
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      units: dimensionless activity
+      values: {quantity: activity, method_class: measured_direct, species: TiO2, activity: 1, observation: rutile saturation}
+    - observation_id: borisov_2004_table_2_dat32n_activity_coefficient
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1495
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      derived_from: [borisov_2004_table_2_dat32n_rutile_saturation]
+      derivation: {relation: 'gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation', inputs: [borisov_2004_table_2_dat32n_rutile_saturation], note: 'XTiO2 is printed in the same table row; rutile saturation fixes a(TiO2)=1.'}
+      units: dimensionless activity coefficient; XTiO2 mole fraction; TiO2 wt%
+      values: {quantity: activity_coefficient, method_class: measured_reduced, species: TiO2, gamma: 6.63, XTiO2: 0.1508, TiO2_wt_pct: 19.09, activity: 1, excess_G_kJ_mol: 23.52}
+    - observation_id: borisov_2004_table_2_dat32m_rutile_saturation
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1514
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      units: dimensionless activity
+      values: {quantity: activity, method_class: measured_direct, species: TiO2, activity: 1, observation: rutile saturation}
+    - observation_id: borisov_2004_table_2_dat32m_activity_coefficient
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1514
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      derived_from: [borisov_2004_table_2_dat32m_rutile_saturation]
+      derivation: {relation: 'gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation', inputs: [borisov_2004_table_2_dat32m_rutile_saturation], note: 'XTiO2 is printed in the same table row; rutile saturation fixes a(TiO2)=1.'}
+      units: dimensionless activity coefficient; XTiO2 mole fraction; TiO2 wt%
+      values: {quantity: activity_coefficient, method_class: measured_reduced, species: TiO2, gamma: 6.24, XTiO2: 0.1601, TiO2_wt_pct: 20.19, activity: 1, excess_G_kJ_mol: 23.06}
+    - observation_id: borisov_2004_table_2_dat32c_rutile_saturation
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1522
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      units: dimensionless activity
+      values: {quantity: activity, method_class: measured_direct, species: TiO2, activity: 1, observation: rutile saturation}
+    - observation_id: borisov_2004_table_2_dat32c_activity_coefficient
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1522
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      derived_from: [borisov_2004_table_2_dat32c_rutile_saturation]
+      derivation: {relation: 'gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation', inputs: [borisov_2004_table_2_dat32c_rutile_saturation], note: 'XTiO2 is printed in the same table row; rutile saturation fixes a(TiO2)=1.'}
+      units: dimensionless activity coefficient; XTiO2 mole fraction; TiO2 wt%
+      values: {quantity: activity_coefficient, method_class: measured_reduced, species: TiO2, gamma: 5.93, XTiO2: 0.1685, TiO2_wt_pct: 21.28, activity: 1, excess_G_kJ_mol: 22.53}
+    - observation_id: borisov_2004_table_2_dat32f_rutile_saturation
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1561
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      units: dimensionless activity
+      values: {quantity: activity, method_class: measured_direct, species: TiO2, activity: 1, observation: rutile saturation}
+    - observation_id: borisov_2004_table_2_dat32f_activity_coefficient
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1561
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      derived_from: [borisov_2004_table_2_dat32f_rutile_saturation]
+      derivation: {relation: 'gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation', inputs: [borisov_2004_table_2_dat32f_rutile_saturation], note: 'XTiO2 is printed in the same table row; rutile saturation fixes a(TiO2)=1.'}
+      units: dimensionless activity coefficient; XTiO2 mole fraction; TiO2 wt%
+      values: {quantity: activity_coefficient, method_class: measured_reduced, species: TiO2, gamma: 5.09, XTiO2: 0.1965, TiO2_wt_pct: 24.5, activity: 1, excess_G_kJ_mol: 21.12}
+    - observation_id: borisov_2004_table_2_dat32a_rutile_saturation
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1567
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      units: dimensionless activity
+      values: {quantity: activity, method_class: measured_direct, species: TiO2, activity: 1, observation: rutile saturation}
+    - observation_id: borisov_2004_table_2_dat32a_activity_coefficient
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1567
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      derived_from: [borisov_2004_table_2_dat32a_rutile_saturation]
+      derivation: {relation: 'gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation', inputs: [borisov_2004_table_2_dat32a_rutile_saturation], note: 'XTiO2 is printed in the same table row; rutile saturation fixes a(TiO2)=1.'}
+      units: dimensionless activity coefficient; XTiO2 mole fraction; TiO2 wt%
+      values: {quantity: activity_coefficient, method_class: measured_reduced, species: TiO2, gamma: 4.89, XTiO2: 0.2044, TiO2_wt_pct: 25.38, activity: 1, excess_G_kJ_mol: 20.68}
+    - observation_id: borisov_2004_table_2_dat32p_rutile_saturation
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1616
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      units: dimensionless activity
+      values: {quantity: activity, method_class: measured_direct, species: TiO2, activity: 1, observation: rutile saturation}
+    - observation_id: borisov_2004_table_2_dat32p_activity_coefficient
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1616
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      derived_from: [borisov_2004_table_2_dat32p_rutile_saturation]
+      derivation: {relation: 'gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation', inputs: [borisov_2004_table_2_dat32p_rutile_saturation], note: 'XTiO2 is printed in the same table row; rutile saturation fixes a(TiO2)=1.'}
+      units: dimensionless activity coefficient; XTiO2 mole fraction; TiO2 wt%
+      values: {quantity: activity_coefficient, method_class: measured_reduced, species: TiO2, gamma: 4.2, XTiO2: 0.2383, TiO2_wt_pct: 29.13, activity: 1, excess_G_kJ_mol: 19.27}
+    - observation_id: borisov_2004_table_2_dat32r_rutile_saturation
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1628
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      units: dimensionless activity
+      values: {quantity: activity, method_class: measured_direct, species: TiO2, activity: 1, observation: rutile saturation}
+    - observation_id: borisov_2004_table_2_dat32r_activity_coefficient
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1628
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      derived_from: [borisov_2004_table_2_dat32r_rutile_saturation]
+      derivation: {relation: 'gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation', inputs: [borisov_2004_table_2_dat32r_rutile_saturation], note: 'XTiO2 is printed in the same table row; rutile saturation fixes a(TiO2)=1.'}
+      units: dimensionless activity coefficient; XTiO2 mole fraction; TiO2 wt%
+      values: {quantity: activity_coefficient, method_class: measured_reduced, species: TiO2, gamma: 4.03, XTiO2: 0.2483, TiO2_wt_pct: 30.12, activity: 1, excess_G_kJ_mol: 18.86}
+    - observation_id: borisov_2004_table_2_dat46h_rutile_saturation
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1671
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      units: dimensionless activity
+      values: {quantity: activity, method_class: measured_direct, species: TiO2, activity: 1, observation: rutile saturation}
+    - observation_id: borisov_2004_table_2_dat46h_activity_coefficient
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1671
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      derived_from: [borisov_2004_table_2_dat46h_rutile_saturation]
+      derivation: {relation: 'gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation', inputs: [borisov_2004_table_2_dat46h_rutile_saturation], note: 'XTiO2 is printed in the same table row; rutile saturation fixes a(TiO2)=1.'}
+      units: dimensionless activity coefficient; XTiO2 mole fraction; TiO2 wt%
+      values: {quantity: activity_coefficient, method_class: measured_reduced, species: TiO2, gamma: 3.35, XTiO2: 0.2984, TiO2_wt_pct: 35.98, activity: 1, excess_G_kJ_mol: 16.8}
+    - observation_id: borisov_2004_table_2_dat46i_rutile_saturation
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1694
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      units: dimensionless activity
+      values: {quantity: activity, method_class: measured_direct, species: TiO2, activity: 1, observation: rutile saturation}
+    - observation_id: borisov_2004_table_2_dat46i_activity_coefficient
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1694
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      derived_from: [borisov_2004_table_2_dat46i_rutile_saturation]
+      derivation: {relation: 'gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation', inputs: [borisov_2004_table_2_dat46i_rutile_saturation], note: 'XTiO2 is printed in the same table row; rutile saturation fixes a(TiO2)=1.'}
+      units: dimensionless activity coefficient; XTiO2 mole fraction; TiO2 wt%
+      values: {quantity: activity_coefficient, method_class: measured_reduced, species: TiO2, gamma: 3.05, XTiO2: 0.3281, TiO2_wt_pct: 39.39, activity: 1, excess_G_kJ_mol: 15.7}
+    - observation_id: borisov_2004_table_2_dat46j_rutile_saturation
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1723
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      units: dimensionless activity
+      values: {quantity: activity, method_class: measured_direct, species: TiO2, activity: 1, observation: rutile saturation}
+    - observation_id: borisov_2004_table_2_dat46j_activity_coefficient
+      type: activity_coefficient
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
+      T_K: 1723
+      phase: liquid_melt_Di_An_TiO2
+      standard_state: rutile-saturated melt; a(TiO2) = 1
+      composition: {state: {tag: unknown, reason: not_published}, locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2', note: 'Di/An oxide proportions are not printed.'}}
+      derived_from: [borisov_2004_table_2_dat46j_rutile_saturation]
+      derivation: {relation: 'gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation', inputs: [borisov_2004_table_2_dat46j_rutile_saturation], note: 'XTiO2 is printed in the same table row; rutile saturation fixes a(TiO2)=1.'}
+      units: dimensionless activity coefficient; XTiO2 mole fraction; TiO2 wt%
+      values: {quantity: activity_coefficient, method_class: measured_reduced, species: TiO2, gamma: 2.8, XTiO2: 0.3575, TiO2_wt_pct: 43.05, activity: 1, excess_G_kJ_mol: 14.73}
     context:
     - observation_id: borisov_2004_table_1_redox_conditions_and_liquidus_phases
       type: experiment_series
@@ -58,26 +262,6 @@ species:
         - {sample: 'DAT32 g', T_C: 1249, minus_log_fO2: 12.11, duration_h: 29, loop: Pt, phases: Kar+Gl}
         - {sample: 'DAT32 h', T_C: 1220, minus_log_fO2: 12.32, duration_h: 29, loop: Pt, phases: Rut+Sph+Gl, fO2_note: calculated}
         note_on_superscripts: 'Rows marked with superscript a share the preceding run conditions; c marks reversal experiments; b marks calculated fO2.'
-    - observation_id: borisov_2004_table_2_tio2_activity_coefficients
-      type: experiment_series
-      locator: {page: 3, pdf_page_index: 2, published_page: 71, table: '2'}
-      units: T in K; TiO2 in wt%; XTiO2 and gamma dimensionless; excess Gibbs energy kJ/mol
-      values:
-        method_class: measured_reduced
-        caption: 'Rutile solubility and TiO2 thermodynamic properties in the melts of Di–An–TiO2 system in air.'
-        relation: 'Rutile-saturated melt: a(TiO2)=1 and gamma(TiO2)=1/X(TiO2).'
-        composition_note: 'Melt is the Di–An eutectic system with variable TiO2; full Di:An composition is not printed, so no complete composition is inferred.'
-        rows:
-        - {sample: DAT32n, T_K: 1495, TiO2_wt_pct: 19.09, XTiO2: 0.1508, gamma_TiO2: 6.63, minus_excess_G_kJ_mol: 23.52}
-        - {sample: DAT32m, T_K: 1514, TiO2_wt_pct: 20.19, XTiO2: 0.1601, gamma_TiO2: 6.24, minus_excess_G_kJ_mol: 23.06}
-        - {sample: DAT32c, T_K: 1522, TiO2_wt_pct: 21.28, XTiO2: 0.1685, gamma_TiO2: 5.93, minus_excess_G_kJ_mol: 22.53}
-        - {sample: DAT32f, T_K: 1561, TiO2_wt_pct: 24.50, XTiO2: 0.1965, gamma_TiO2: 5.09, minus_excess_G_kJ_mol: 21.12}
-        - {sample: DAT32a, T_K: 1567, TiO2_wt_pct: 25.38, XTiO2: 0.2044, gamma_TiO2: 4.89, minus_excess_G_kJ_mol: 20.68}
-        - {sample: DAT32p, T_K: 1616, TiO2_wt_pct: 29.13, XTiO2: 0.2383, gamma_TiO2: 4.20, minus_excess_G_kJ_mol: 19.27}
-        - {sample: DAT32r, T_K: 1628, TiO2_wt_pct: 30.12, XTiO2: 0.2483, gamma_TiO2: 4.03, minus_excess_G_kJ_mol: 18.86}
-        - {sample: 'DAT46 h', T_K: 1671, TiO2_wt_pct: 35.98, XTiO2: 0.2984, gamma_TiO2: 3.35, minus_excess_G_kJ_mol: 16.80}
-        - {sample: DAT46i, T_K: 1694, TiO2_wt_pct: 39.39, XTiO2: 0.3281, gamma_TiO2: 3.05, minus_excess_G_kJ_mol: 15.70}
-        - {sample: DAT46j, T_K: 1723, TiO2_wt_pct: 43.05, XTiO2: 0.3575, gamma_TiO2: 2.80, minus_excess_G_kJ_mol: 14.73}
     - observation_id: borisov_2004_table_3_reduced_redox_values
       type: experiment_series
       locator: {page: 4, pdf_page_index: 3, published_page: 72, table: '3'}
@@ -99,12 +283,28 @@ species:
         - {sample: DAT32-5, minus_log_fO2: 11.12, TiO2_wt_pct: 26.99, excess_TiO2_wt_pct: 1.76, Ti4_over_Ti3: 15.91}
     - observation_id: borisov_2004_table_4_karrooite_composition
       type: experiment_series
-      locator: {page: 5, pdf_page_index: 4, published_page: 73, table: '4'}
+      locator: {page: 7, pdf_page_index: 6, published_page: 75, table: '4'}
       units: wt% and mole fractions as printed
       values:
         method_class: measured_direct
         caption: 'Microprobe analysis of Ti-rich karrooite and recalculations to pseudobrookite components.'
-        reason: 'Measured crystalline residue composition is in scope but not transcribed in this pass.'
+        row_count: 12
+        rendered_cell_source: "600 dpi render, physical PDF page 7 (journal p. 75), Table 4"
+        rows:
+        - {sample: 'DAT32ik', TiO2_wt_pct: 81.81, Al2O3_wt_pct: 4.41, MgO_wt_pct: 14.89, total_wt_pct: 101.1, mole_fraction_Ti2O3: 0.0595, mole_fraction_TiO2: 0.6362, mole_fraction_Al2O3: 0.0319, mole_fraction_MgO: 0.2724, component_MgTi2O5: 0.749, component_Al2TiO5: 0.088, component_Ti3plus2TiO5: 0.163, Ti_over_Mg_atomic: 2.8, D_Al_wt_ratio: 0.39, D_Ti3plus_atomic: 8.2}
+        - {sample: 'DAT32jk', TiO2_wt_pct: 81.65, Al2O3_wt_pct: 4.21, MgO_wt_pct: 15.1, total_wt_pct: 100.96, mole_fraction_Ti2O3: 0.0566, mole_fraction_TiO2: 0.6377, mole_fraction_Al2O3: 0.0303, mole_fraction_MgO: 0.2754, component_MgTi2O5: 0.76, component_Al2TiO5: 0.084, component_Ti3plus2TiO5: 0.156, Ti_over_Mg_atomic: 2.7, D_Al_wt_ratio: 0.37, D_Ti3plus_atomic: 7.7}
+        - {sample: 'DAT32-5a', TiO2_wt_pct: 81.41, Al2O3_wt_pct: 4.25, MgO_wt_pct: 15.44, total_wt_pct: 101.1, mole_fraction_Ti2O3: 0.0513, mole_fraction_TiO2: 0.6395, mole_fraction_Al2O3: 0.0303, mole_fraction_MgO: 0.2789, component_MgTi2O5: 0.774, component_Al2TiO5: 0.084, component_Ti3plus2TiO5: 0.142, Ti_over_Mg_atomic: 2.7, D_Al_wt_ratio: 0.39, D_Ti3plus_atomic: 7.8}
+        - {sample: 'DAT32-12', TiO2_wt_pct: 82.6, Al2O3_wt_pct: 4.21, MgO_wt_pct: 14.67, total_wt_pct: 101.49, mole_fraction_Ti2O3: 0.0653, mole_fraction_TiO2: 0.6347, mole_fraction_Al2O3: 0.0306, mole_fraction_MgO: 0.2694, component_MgTi2O5: 0.738, component_Al2TiO5: 0.084, component_Ti3plus2TiO5: 0.179, Ti_over_Mg_atomic: 2.8, D_Al_wt_ratio: 0.39, D_Ti3plus_atomic: 7.7}
+        - {sample: 'DAT32-12a', TiO2_wt_pct: 82.79, Al2O3_wt_pct: 4.35, MgO_wt_pct: 14.77, total_wt_pct: 101.91, mole_fraction_Ti2O3: 0.064, mole_fraction_TiO2: 0.6349, mole_fraction_Al2O3: 0.0314, mole_fraction_MgO: 0.2697, component_MgTi2O5: 0.739, component_Al2TiO5: 0.086, component_Ti3plus2TiO5: 0.175, Ti_over_Mg_atomic: 2.8, D_Al_wt_ratio: 0.4, D_Ti3plus_atomic: 7.6}
+        - {sample: 'DAT32-19', TiO2_wt_pct: 82.82, Al2O3_wt_pct: 4.02, MgO_wt_pct: 14.21, total_wt_pct: 101.06, mole_fraction_Ti2O3: 0.0731, mole_fraction_TiO2: 0.6324, mole_fraction_Al2O3: 0.0296, mole_fraction_MgO: 0.2648, component_MgTi2O5: 0.72, component_Al2TiO5: 0.081, component_Ti3plus2TiO5: 0.199, Ti_over_Mg_atomic: 2.9, D_Al_wt_ratio: 0.35, D_Ti3plus_atomic: 8.0}
+        - {sample: 'DAT32-15', TiO2_wt_pct: 84.67, Al2O3_wt_pct: 4.02, MgO_wt_pct: 13.25, total_wt_pct: 101.93, mole_fraction_Ti2O3: 0.0925, mole_fraction_TiO2: 0.6258, mole_fraction_Al2O3: 0.0301, mole_fraction_MgO: 0.2516, component_MgTi2O5: 0.672, component_Al2TiO5: 0.081, component_Ti3plus2TiO5: 0.247, Ti_over_Mg_atomic: 3.2, D_Al_wt_ratio: 0.35, D_Ti3plus_atomic: 8.5}
+        - {sample: 'DAT32-15a', TiO2_wt_pct: 84.15, Al2O3_wt_pct: 3.84, MgO_wt_pct: 13.48, total_wt_pct: 101.48, mole_fraction_Ti2O3: 0.0882, mole_fraction_TiO2: 0.6277, mole_fraction_Al2O3: 0.0288, mole_fraction_MgO: 0.2554, component_MgTi2O5: 0.686, component_Al2TiO5: 0.077, component_Ti3plus2TiO5: 0.237, Ti_over_Mg_atomic: 3.1, D_Al_wt_ratio: 0.34, D_Ti3plus_atomic: 8.2}
+        - {sample: 'DAT32-15b', TiO2_wt_pct: 84.59, Al2O3_wt_pct: 3.85, MgO_wt_pct: 13.19, total_wt_pct: 101.63, mole_fraction_Ti2O3: 0.0938, mole_fraction_TiO2: 0.6257, mole_fraction_Al2O3: 0.029, mole_fraction_MgO: 0.2515, component_MgTi2O5: 0.672, component_Al2TiO5: 0.077, component_Ti3plus2TiO5: 0.251, Ti_over_Mg_atomic: 3.2, D_Al_wt_ratio: 0.35, D_Ti3plus_atomic: 8.5}
+        - {sample: 'DAT32il', TiO2_wt_pct: 80.46, Al2O3_wt_pct: 4.2, MgO_wt_pct: 15.58, total_wt_pct: 100.24, mole_fraction_Ti2O3: 0.0469, mole_fraction_TiO2: 0.641, mole_fraction_Al2O3: 0.03, mole_fraction_MgO: 0.282, component_MgTi2O5: 0.786, component_Al2TiO5: 0.084, component_Ti3plus2TiO5: 0.131, Ti_over_Mg_atomic: 2.6, D_Al_wt_ratio: 0.36, D_Ti3plus_atomic: 9.9}
+        - {sample: 'DAT32jl', TiO2_wt_pct: 81.24, Al2O3_wt_pct: 4.07, MgO_wt_pct: 15.87, total_wt_pct: 101.18, mole_fraction_Ti2O3: 0.0455, mole_fraction_TiO2: 0.6419, mole_fraction_Al2O3: 0.0287, mole_fraction_MgO: 0.2839, component_MgTi2O5: 0.793, component_Al2TiO5: 0.08, component_Ti3plus2TiO5: 0.127, Ti_over_Mg_atomic: 2.6, D_Al_wt_ratio: 0.35, D_Ti3plus_atomic: 9.7}
+        - {sample: 'DAT32 g', TiO2_wt_pct: 81.47, Al2O3_wt_pct: 3.75, MgO_wt_pct: 15.2, total_wt_pct: 100.42, mole_fraction_Ti2O3: 0.0562, mole_fraction_TiO2: 0.6389, mole_fraction_Al2O3: 0.0271, mole_fraction_MgO: 0.2778, component_MgTi2O5: 0.769, component_Al2TiO5: 0.075, component_Ti3plus2TiO5: 0.156, Ti_over_Mg_atomic: 2.7, D_Al_wt_ratio: 0.32, D_Ti3plus_atomic: 23.3}
+        prose_bounds: {Ti_over_Mg_atomic: [2.6, 3.3], CaO_wt_pct: [0.03, 0.68], ignored_CaO_average_wt_pct: 0.3, Al2TiO5_component_mean_wt_pct: 8.2, Al2TiO5_component_1sigma_wt_pct: 0.4}
+        prose_notes: 'The authors state that high analytical totals reflect Ti3+; small CaO fractions were omitted from Table 4; the Al2TiO5 mean and 1-sigma spread are printed in the prose.'
     - observation_id: borisov_2004_table_5_crystal_structure
       type: experiment_series
       locator: {page: 7, pdf_page_index: 6, published_page: 75, table: '5'}
@@ -112,3 +312,33 @@ species:
       values:
         caption: 'Comparison between calculated and measured d-values for karrooite from representative experimental charges.'
         reason: 'Crystal-structure comparison, outside the requested melt-activity and redox data.'
+    - observation_id: borisov_2004_figure_1_deferred
+      type: deferred_figure
+      locator: {page: 3, pdf_page_index: 2, published_page: 71, figure: '1'}
+      units: TiO2 wt%; temperature K
+      values: {quantity: rutile_solubility, method_class: figure_only, phase: silicate_melt, caption: 'Temperature dependence of the rutile solubility in An–Di eutectic melts in air; polynomial fit shown as dashed line.', panels: [main], axes_as_printed: {x: temperature_K, y: TiO2_wt_pct}, series: [measured_solubility, polynomial_fit], marker_counts: not counted, attribution: this_work, digitisation: deferred to a figure pass}
+    - observation_id: borisov_2004_figure_2_deferred
+      type: deferred_figure
+      locator: {page: 4, pdf_page_index: 3, published_page: 72, figure: '2'}
+      units: excess Gibbs energy as printed; temperature K
+      values: {quantity: excess_gibbs_energy, method_class: figure_only, phase: silicate_melt, caption: 'Temperature dependence of the partial molar excess Gibbs function of TiO2 in An–Di melt.', panels: [main], axes_as_printed: {x: temperature_K, y: excess_G_kJ_mol}, series: [measured_reduced_values], marker_counts: not counted, attribution: this_work, digitisation: deferred to a figure pass}
+    - observation_id: borisov_2004_figure_3_deferred
+      type: deferred_figure
+      locator: {page: 5, pdf_page_index: 4, published_page: 73, figure: '3'}
+      units: TiO2 wt%; oxygen fugacity as printed
+      values: {quantity: rutile_solubility, method_class: figure_only, phase: silicate_melt, T_C: 1300, caption: 'Rutile solubility at reducing conditions at 1,300°C; apparent total TiO2 content for estimated Ti4+/Ti3+ is shown as a dashed line.', panels: [main], axes_as_printed: {x: minus_log_fO2, y: TiO2_wt_pct}, series: [measured_total_TiO2, estimated_Ti3plus_fraction], marker_counts: not counted, attribution: this_work, digitisation: deferred to a figure pass}
+    - observation_id: borisov_2004_figure_4_deferred
+      type: deferred_figure
+      locator: {page: 6, pdf_page_index: 5, published_page: 74, figure: '4'}
+      units: inverse temperature 10^4/K; oxygen fugacity as printed
+      values: {quantity: liquidus_phase_stability, method_class: figure_only, phase: liquid_melt_Di_An_TiO2, caption: 'Rutile/karrooite stability on the liquidus of the Di–An eutectic composition with 32 wt% TiO2; Ti3+ isopleths and buffer slopes are shown.', panels: [main], axes_as_printed: {x: minus_log_fO2, y: inverse_temperature_10e4_per_K}, series: [liquidus_phase_fields, Ti3plus_isopleths, buffer_slopes], marker_counts: not counted, attribution: this_work, digitisation: deferred to a figure pass}
+    - observation_id: borisov_2004_figure_5_deferred
+      type: deferred_figure
+      locator: {page: 8, pdf_page_index: 7, published_page: 76, figure: '5'}
+      units: lattice images and diffraction patterns
+      values: {quantity: karrooite_crystal_structure_image, method_class: figure_only, phase: karrooite, caption: 'High resolution electron microscopy images of karrooite; panels a and b show lattice images and diffraction patterns.', panels: [a, b], axes_as_printed: {a: none, b: reciprocal_lattice}, series: [lattice_image, diffraction_pattern], marker_counts: {a: 0, b: 0}, attribution: this_work, digitisation: deferred to a figure pass}
+    - observation_id: borisov_2004_figure_6_deferred
+      type: deferred_figure
+      locator: {page: 9, pdf_page_index: 8, published_page: 77, figure: '6'}
+      units: Ti3O5 component mole fraction; oxygen fugacity as printed
+      values: {quantity: Ti3O5_component_fraction, method_class: figure_only, phase: karrooite, caption: 'The content of the Ti3O5 component of karrooites; dashed 1,300°C lines are from a regression and two other lines are parallel.', panels: [main], axes_as_printed: {x: log_fO2_or_inverse_temperature, y: mole_fraction_Ti3O5}, series: [measured_component_fractions, regressions], marker_counts: not counted, attribution: this_work, digitisation: deferred to a figure pass}
