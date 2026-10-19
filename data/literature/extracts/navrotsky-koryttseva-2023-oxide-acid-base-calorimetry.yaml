@@ -6,21 +6,1425 @@ source:
   doi: 10.3390/molecules28124623
   year: 2023
 extraction:
-  method: Born-digital pdftotext-layout tables preserved in context; no MinerU table
-    JSON available. Figures retained without numeric points.
+  method: Born-digital pdftotext-layout transcription; all 45 Table 1 heat-content cells
+    attributed to reference [28] were checked against 600 dpi renders of physical pages 5–7.
+    Figures retained without numeric points.
   date: '2026-10-19'
   worker: fam13-1019
   provenance_path: text/navrotsky-koryttseva-2023-oxide-acid-base-calorimetry/pdftotext-layout.txt
 review_status: draft
+fidelity_samples:
+- path: species.K2O.observations[nav23_t1_k2o_heat_content].values.series[0].enthalpy_increment
+  value: '66.70'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: K2 O (s)
+    column: 700 °C heat content
+- path: species.K2O.observations[nav23_t1_k2o_heat_content].values.series[1].enthalpy_increment
+  value: '78.17'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: K2 O (s)
+    column: 800 °C heat content
+- path: species.BaO.observations[nav23_t1_bao_heat_content].values.series[0].enthalpy_increment
+  value: '35.55'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: BaO (s)
+    column: 700 °C heat content
+- path: species.BaO.observations[nav23_t1_bao_heat_content].values.series[1].enthalpy_increment
+  value: '41.20'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: BaO (s)
+    column: 800 °C heat content
+- path: species.Na2O.observations[nav23_t1_na2o_heat_content].values.series[0].enthalpy_increment
+  value: '56.52'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Na2 O (s)
+    column: 700 °C heat content
+- path: species.Na2O.observations[nav23_t1_na2o_heat_content].values.series[1].enthalpy_increment
+  value: '68.76'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Na2 O (s)
+    column: 800 °C heat content
+- path: species.SrO.observations[nav23_t1_sro_heat_content].values.series[0].enthalpy_increment
+  value: '34.67'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: SrO (s)
+    column: 700 °C heat content
+- path: species.SrO.observations[nav23_t1_sro_heat_content].values.series[1].enthalpy_increment
+  value: '40.21'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: SrO (s)
+    column: 800 °C heat content
+- species: Li2.5O
+  observation_id: nav23_t1_li2p5o_heat_content
+  value:
+    quantity: H_minus_H298
+    method_class: quoted_attributed
+    attribution: Reference [28], as cited in Table 1.
+    printed_species: Li2.5 O (s)
+    series:
+    - T_K: '973.15'
+      temperature_as_published: 700 °C
+      enthalpy_increment: '50.20'
+      state_as_published: solid
+      reference: '[28]'
+      locator:
+        table: '1'
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        row: Li2.5 O (s)
+        column: 700 °C heat content
+    - T_K: '1073.15'
+      temperature_as_published: 800 °C
+      enthalpy_increment: '58.52'
+      state_as_published: solid
+      reference: '[28]'
+      locator:
+        table: '1'
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        row: Li2.5 O (s)
+        column: 800 °C heat content
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: Li2.5 O (s)
+    column: 700 °C heat content
+- path: species.CaO.observations[nav23_t1_cao_heat_content].values.series[0].enthalpy_increment
+  value: '33.55'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: CaO (s)
+    column: 700 °C heat content
+- path: species.CaO.observations[nav23_t1_cao_heat_content].values.series[1].enthalpy_increment
+  value: '38.87'
+  locator:
+    table: '1'
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    row: CaO (s)
+    column: 800 °C heat content
+- path: species.MgO.observations[nav23_t1_mgo_heat_content].values.series[0].enthalpy_increment
+  value: '31.60'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: MgO (s)
+    column: 700 °C heat content
+- path: species.MgO.observations[nav23_t1_mgo_heat_content].values.series[1].enthalpy_increment
+  value: '36.71'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: MgO (s)
+    column: 800 °C heat content
+- path: species.ZrO2.observations[nav23_t1_zro2_heat_content].values.series[0].enthalpy_increment
+  value: '47.07'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: ZrO2 (s)
+    column: 700 °C heat content
+- path: species.ZrO2.observations[nav23_t1_zro2_heat_content].values.series[1].enthalpy_increment
+  value: '54.68'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: ZrO2 (s)
+    column: 800 °C heat content
+- path: species.Ta2O5.observations[nav23_t1_ta2o5_heat_content].values.series[0].enthalpy_increment
+  value: '110.71'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: Ta2 O5 (s)
+    column: 700 °C heat content
+- path: species.Ta2O5.observations[nav23_t1_ta2o5_heat_content].values.series[1].enthalpy_increment
+  value: '129.29'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: Ta2 O5 (s)
+    column: 800 °C heat content
+- path: species.TiO2.observations[nav23_t1_tio2_heat_content].values.series[0].enthalpy_increment
+  value: '46.26'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: TiO2 (s, rutile)
+    column: 700 °C heat content
+- path: species.TiO2.observations[nav23_t1_tio2_heat_content].values.series[1].enthalpy_increment
+  value: '53.70'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: TiO2 (s, rutile)
+    column: 800 °C heat content
+- path: species.Nb2O5.observations[nav23_t1_nb2o5_heat_content].values.series[0].enthalpy_increment
+  value: '108.00'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: Nb2 O5 (s)
+    column: 700 °C heat content
+- path: species.Nb2O5.observations[nav23_t1_nb2o5_heat_content].values.series[1].enthalpy_increment
+  value: '125.40'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: Nb2 O5 (s)
+    column: 800 °C heat content
+- path: species.Al2O3.observations[nav23_t1_al2o3_heat_content].values.series[0].enthalpy_increment
+  value: '74.26'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: α-Al2 O3 (s, cor.)
+    column: 700 °C heat content
+- path: species.Al2O3.observations[nav23_t1_al2o3_heat_content].values.series[1].enthalpy_increment
+  value: '86.68'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: α-Al2 O3 (s, cor.)
+    column: 800 °C heat content
+- path: species.V2O5.observations[nav23_t1_v2o5_heat_content].values.series[0].enthalpy_increment
+  value: '177.19'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: V2 O5 (s)
+    column: 700 °C heat content
+- path: species.V2O5.observations[nav23_t1_v2o5_heat_content].values.series[1].enthalpy_increment
+  value: '196.25'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: V2 O5 (s)
+    column: 800 °C heat content
+- path: species.Fe2O3.observations[nav23_t1_fe2o3_heat_content].values.series[0].enthalpy_increment
+  value: '96.43'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: Fe2 O3 (s)
+    column: 700 °C heat content
+- path: species.Fe2O3.observations[nav23_t1_fe2o3_heat_content].values.series[1].enthalpy_increment
+  value: '110.94'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: Fe2 O3 (s)
+    column: 800 °C heat content
+- path: species.CoO.observations[nav23_t1_coo_heat_content].values.series[0].enthalpy_increment
+  value: '36.25'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: CoO (s)
+    column: 700 °C heat content
+- path: species.CoO.observations[nav23_t1_coo_heat_content].values.series[1].enthalpy_increment
+  value: '41.80'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: CoO (s)
+    column: 800 °C heat content
+- path: species.CuO.observations[nav23_t1_cuo_heat_content].values.series[0].enthalpy_increment
+  value: '34.55'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: CuO (s)
+    column: 700 °C heat content
+- path: species.CuO.observations[nav23_t1_cuo_heat_content].values.series[1].enthalpy_increment
+  value: '40.07'
+  locator:
+    table: '1'
+    page: 6
+    published_page: 6
+    pdf_page_index: 5
+    row: CuO (s)
+    column: 800 °C heat content
+- path: species.SiO2.observations[nav23_t1_sio2_heat_content].values.series[0].enthalpy_increment
+  value: '43.46'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: SiO2 (s, quartz)
+    column: 700 °C heat content
+- path: species.SiO2.observations[nav23_t1_sio2_heat_content].values.series[1].enthalpy_increment
+  value: '50.37'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: SiO2 (s, quartz)
+    column: 800 °C heat content
+- path: species.B2O3.observations[nav23_t1_b2o3_heat_content].values.series[0].enthalpy_increment
+  value: '94.06'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: B2 O3
+    column: 700 °C heat content
+- path: species.B2O3.observations[nav23_t1_b2o3_heat_content].values.series[1].enthalpy_increment
+  value: '107.03'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: B2 O3
+    column: 800 °C heat content
+- path: species.MoO3.observations[nav23_t1_moo3_heat_content].values.series[0].enthalpy_increment
+  value: '60.96'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: MoO3 (s)
+    column: 700 °C heat content
+- path: species.MoO3.observations[nav23_t1_moo3_heat_content].values.series[1].enthalpy_increment
+  value: '71.56'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: MoO3 (s)
+    column: 800 °C heat content
+- path: species.P2O5.observations[nav23_t1_p2o5_heat_content].values.series[0].enthalpy_increment
+  value: '115.00'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: P2 O5 (s)
+    column: 700 °C heat content
+- path: species.PbO.observations[nav23_t1_pbo_heat_content].values.series[0].enthalpy_increment
+  value: '36.86'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: PbO (red, tetragon)
+    column: 700 °C heat content
+- path: species.PbO.observations[nav23_t1_pbo_heat_content].values.series[1].enthalpy_increment
+  value: '42.88'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: PbO (red, tetragon)
+    column: 800 °C heat content
+- path: species.WO3.observations[nav23_t1_wo3_heat_content].values.series[0].enthalpy_increment
+  value: '62.15'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: WO3 (s)
+    column: 700 °C heat content
+- path: species.WO3.observations[nav23_t1_wo3_heat_content].values.series[1].enthalpy_increment
+  value: '73.61'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: WO3 (s)
+    column: 800 °C heat content
+- path: species.SO3.observations[nav23_t1_so3_heat_content].values.series[0].enthalpy_increment
+  value: '45.43'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: SO3 (g)
+    column: 700 °C heat content
+- path: species.SO3.observations[nav23_t1_so3_heat_content].values.series[1].enthalpy_increment
+  value: '53.11'
+  locator:
+    table: '1'
+    page: 7
+    published_page: 7
+    pdf_page_index: 6
+    row: SO3 (g)
+    column: 800 °C heat content
 species:
+  K2O:
+    observations:
+    - observation_id: nav23_t1_k2o_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        row: K2 O (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: K2 O (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '66.70'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: K2 O (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '78.17'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: K2 O (s)
+            column: 800 °C heat content
+  BaO:
+    observations:
+    - observation_id: nav23_t1_bao_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        row: BaO (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: BaO (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '35.55'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: BaO (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '41.20'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: BaO (s)
+            column: 800 °C heat content
+  Na2O:
+    observations:
+    - observation_id: nav23_t1_na2o_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        row: Na2 O (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: Na2 O (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '56.52'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Na2 O (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '68.76'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Na2 O (s)
+            column: 800 °C heat content
+  SrO:
+    observations:
+    - observation_id: nav23_t1_sro_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        row: SrO (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: SrO (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '34.67'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: SrO (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '40.21'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: SrO (s)
+            column: 800 °C heat content
+  Li2.5O:
+    observations:
+    - observation_id: nav23_t1_li2p5o_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        row: Li2.5 O (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: Li2.5 O (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '50.20'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Li2.5 O (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '58.52'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: Li2.5 O (s)
+            column: 800 °C heat content
+  CaO:
+    observations:
+    - observation_id: nav23_t1_cao_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        row: CaO (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: CaO (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '33.55'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: CaO (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '38.87'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 5
+            published_page: 5
+            pdf_page_index: 4
+            row: CaO (s)
+            column: 800 °C heat content
+  MgO:
+    observations:
+    - observation_id: nav23_t1_mgo_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: MgO (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: MgO (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '31.60'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: MgO (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '36.71'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: MgO (s)
+            column: 800 °C heat content
+  ZrO2:
+    observations:
+    - observation_id: nav23_t1_zro2_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: ZrO2 (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: ZrO2 (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '47.07'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: ZrO2 (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '54.68'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: ZrO2 (s)
+            column: 800 °C heat content
+  Ta2O5:
+    observations:
+    - observation_id: nav23_t1_ta2o5_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: Ta2 O5 (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: Ta2 O5 (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '110.71'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: Ta2 O5 (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '129.29'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: Ta2 O5 (s)
+            column: 800 °C heat content
+  TiO2:
+    observations:
+    - observation_id: nav23_t1_tio2_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: TiO2 (s, rutile)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: TiO2 (s, rutile)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '46.26'
+          state_as_published: solid, rutile
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: TiO2 (s, rutile)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '53.70'
+          state_as_published: solid, rutile
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: TiO2 (s, rutile)
+            column: 800 °C heat content
+  Nb2O5:
+    observations:
+    - observation_id: nav23_t1_nb2o5_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: Nb2 O5 (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: Nb2 O5 (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '108.00'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: Nb2 O5 (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '125.40'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: Nb2 O5 (s)
+            column: 800 °C heat content
+  Al2O3:
+    observations:
+    - observation_id: nav23_t1_al2o3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: α-Al2 O3 (s, cor.)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: α-Al2 O3 (s, cor.)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '74.26'
+          state_as_published: solid, corundum
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: α-Al2 O3 (s, cor.)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '86.68'
+          state_as_published: solid, corundum
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: α-Al2 O3 (s, cor.)
+            column: 800 °C heat content
+  V2O5:
+    observations:
+    - observation_id: nav23_t1_v2o5_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: V2 O5 (s)
+        column: 700 °C heat content
+      phase: l
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: V2 O5 (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '177.19'
+          state_as_published: liquid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: V2 O5 (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '196.25'
+          state_as_published: liquid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: V2 O5 (s)
+            column: 800 °C heat content
+  Fe2O3:
+    observations:
+    - observation_id: nav23_t1_fe2o3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: Fe2 O3 (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: Fe2 O3 (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '96.43'
+          state_as_published: II-modif
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: Fe2 O3 (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '110.94'
+          state_as_published: III-modif
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: Fe2 O3 (s)
+            column: 800 °C heat content
+  CoO:
+    observations:
+    - observation_id: nav23_t1_coo_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: CoO (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: CoO (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '36.25'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: CoO (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '41.80'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: CoO (s)
+            column: 800 °C heat content
+  CuO:
+    observations:
+    - observation_id: nav23_t1_cuo_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 6
+        published_page: 6
+        pdf_page_index: 5
+        row: CuO (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: CuO (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '34.55'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: CuO (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '40.07'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 6
+            published_page: 6
+            pdf_page_index: 5
+            row: CuO (s)
+            column: 800 °C heat content
+  B2O3:
+    observations:
+    - observation_id: nav23_t1_b2o3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 7
+        published_page: 7
+        pdf_page_index: 6
+        row: B2 O3
+        column: 700 °C heat content
+      phase: l
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: B2 O3
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '94.06'
+          state_as_published: liquid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: B2 O3
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '107.03'
+          state_as_published: liquid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: B2 O3
+            column: 800 °C heat content
+  MoO3:
+    observations:
+    - observation_id: nav23_t1_moo3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 7
+        published_page: 7
+        pdf_page_index: 6
+        row: MoO3 (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: MoO3 (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '60.96'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: MoO3 (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '71.56'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: MoO3 (s)
+            column: 800 °C heat content
+  P2O5:
+    observations:
+    - observation_id: nav23_t1_p2o5_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 7
+        published_page: 7
+        pdf_page_index: 6
+        row: P2 O5 (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: P2 O5 (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '115.00'
+          state_as_published: solid
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: P2 O5 (s)
+            column: 700 °C heat content
+  PbO:
+    observations:
+    - observation_id: nav23_t1_pbo_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 7
+        published_page: 7
+        pdf_page_index: 6
+        row: PbO (red, tetragon)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: PbO (red, tetragon)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '36.86'
+          state_as_published: solid, red tetragonal
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: PbO (red, tetragon)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '42.88'
+          state_as_published: solid, red tetragonal
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: PbO (red, tetragon)
+            column: 800 °C heat content
+  WO3:
+    observations:
+    - observation_id: nav23_t1_wo3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 7
+        published_page: 7
+        pdf_page_index: 6
+        row: WO3 (s)
+        column: 700 °C heat content
+      phase: cr
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: WO3 (s)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '62.15'
+          state_as_published: orthorhombic
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: WO3 (s)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '73.61'
+          state_as_published: tetragonal
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: WO3 (s)
+            column: 800 °C heat content
+  SO3:
+    observations:
+    - observation_id: nav23_t1_so3_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        table: '1'
+        page: 7
+        published_page: 7
+        pdf_page_index: 6
+        row: SO3 (g)
+        column: 700 °C heat content
+      phase: g
+      units: kJ_per_mol
+      values:
+        quantity: H_minus_H298
+        method_class: quoted_attributed
+        attribution: Reference [28], as cited in Table 1.
+        printed_species: SO3 (g)
+        series:
+        - T_K: '973.15'
+          temperature_as_published: 700 °C
+          enthalpy_increment: '45.43'
+          state_as_published: gas
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: SO3 (g)
+            column: 700 °C heat content
+        - T_K: '1073.15'
+          temperature_as_published: 800 °C
+          enthalpy_increment: '53.11'
+          state_as_published: gas
+          reference: '[28]'
+          locator:
+            table: '1'
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
+            row: SO3 (g)
+            column: 800 °C heat content
   SiO2:
-    observations: []
+    observations:
+      - observation_id: nav23_t1_sio2_heat_content
+        type: heat_capacity_and_heat_content_series
+        locator:
+          table: '1'
+          page: 7
+          published_page: 7
+          pdf_page_index: 6
+          row: SiO2 (s, quartz)
+          column: 700 °C heat content
+        phase: cr
+        units: kJ_per_mol
+        values:
+          quantity: H_minus_H298
+          method_class: quoted_attributed
+          attribution: Reference [28], as cited in Table 1.
+          printed_species: SiO2 (s, quartz)
+          series:
+          - T_K: '973.15'
+            temperature_as_published: 700 °C
+            enthalpy_increment: '43.46'
+            state_as_published: solid, quartz
+            reference: '[28]'
+            locator:
+              table: '1'
+              page: 7
+              published_page: 7
+              pdf_page_index: 6
+              row: SiO2 (s, quartz)
+              column: 700 °C heat content
+          - T_K: '1073.15'
+            temperature_as_published: 800 °C
+            enthalpy_increment: '50.37'
+            state_as_published: solid, quartz
+            reference: '[28]'
+            locator:
+              table: '1'
+              page: 7
+              published_page: 7
+              pdf_page_index: 6
+              row: SiO2 (s, quartz)
+              column: 800 °C heat content
     context:
     - observation_id: navrotsky_koryttseva_2023_table_1_context
       type: table_context
       units: kJ/mol or kJ/mol of oxygen atoms as labeled in table
       locator:
         page: 5
+        published_page: 5
         pdf_page_index: 4
         table: '1'
       values:
@@ -402,13 +1806,14 @@ species:
           \ in basic\n                                    properties in this direction,\
           \ and is consistent with the general trends in properties in the\n     \
           \                               periodic table."
-        schema_gap: No enthalpy-of-solution quantity token exists; values remain context.
+        schema_gap: Table 1 heat-content cells attributed to reference [28] are typed. Cells attributed to other references and the drop/solution enthalpies remain context; no enthalpy-of-solution token exists.
     - observation_id: navrotsky_koryttseva_2023_table_2_context
       type: table_context
       units: kJ/mol or kJ/mol of oxygen atoms as labeled in table
       locator:
-        page: 6
-        pdf_page_index: 5
+        page: 9
+        published_page: 9
+        pdf_page_index: 8
         table: '2'
       values:
         caption: Enthalpies of solution of oxides in lithium–sodium borate and CMAS
@@ -448,150 +1853,568 @@ species:
         schema_gap: No enthalpy-of-solution quantity token exists; values remain context.
     - observation_id: navrotsky_koryttseva_2023_figure_1_deferred
       type: figure_context
-      units: as printed in caption
+      units: kJ/mol and conditions as printed in the caption/axes
       locator:
         figure: '1'
         page: 8
+        published_page: 8
         pdf_page_index: 7
       values:
-        caption: Figure 1. Partial molar enthalpies of solution as a function of the
-          mole fraction of (a) MoO3 in Figure 1. Partial molar enthalpies of solution
-          as a function of the mole fraction of (a) MoO3 in Na2MoO4–MoO3 mixtures
-          (melts) at 700 ◦°C [45]; (b) liquid B2O3 and solid PbO in lead borate melts
-        quantity_as_printed: enthalpy of solution / heat content as caption states
-        species_as_printed: binary oxide or melt components named in caption
-        phase_as_printed: oxide melt; see caption
-        temperature_as_printed: see caption and axes
-        axes_as_printed: see caption; axes not independently transcribed
-        series: []
-        marker_count_per_series: not counted; deferred figure pass
-        digitisation: deferred to a figure pass
+        quantity: partial molar enthalpy of solution
+        identity: MoO3, B2O3, PbO and SiO2 in the oxide-melt systems named by each panel
+        panel: a–d; panel is recorded on each plotted series
+        axes:
+        - panel: a
+          x: mole fraction n(MoO3)
+          y: partial enthalpy of solution of MoO3 (kJ/mole)
+        - panel: b
+          x: n(B2O3)
+          y: partial enthalpy of solution of PbO (kJ/mol)
+          y2: partial enthalpy of solution of B2O3 (kJ/mol)
+        - panel: c
+          x: n(SiO2)
+          y: partial enthalpy of solution of PbO (kJ/mol)
+          y2: partial enthalpy of solution of SiO2 (quartz) (kJ/mol)
+        - panel: d
+          x: n(B2O3)
+          y: partial enthalpy of solution of B2O3 (kJ/mol)
+        caption_as_printed: 'Partial molar enthalpies of solution as a function of mole fraction: (a) MoO3 in Na2MoO4–MoO3 melts
+          at 700 °C [45]; (b) liquid B2O3 and solid PbO in lead borate melts at 800 °C [42]; (c) liquid PbO and solid SiO2 (quartz)
+          in lead–silicate melts at 900 °C [43]; (d) B2O3 in Li, Na and K borate melts at 667, 712 and 712 °C, respectively [27].'
+        series:
+        - panel: a
+          name: MoO3 in Na2MoO4–MoO3 melt, 700 °C
+          marker: blue filled circle
+          marker_count: 26
+          attribution: reference [45]
+        - panel: a
+          name: visual guide
+          marker: blue dashed curve
+          marker_count: 0
+          attribution: authors' guide to the eye
+        - panel: b
+          name: PbO in lead borate melt, 800 °C
+          marker: blue filled circle
+          marker_count: 13
+          attribution: reference [42]
+        - panel: b
+          name: B2O3 in lead borate melt, 800 °C
+          marker: red filled circle
+          marker_count: 11
+          attribution: reference [42]
+        - panel: b
+          name: visual guides
+          marker: dashed curves
+          marker_count: 0
+          attribution: authors' guides to the eye
+        - panel: c
+          name: PbO in lead–silicate melt, 900 °C
+          marker: blue filled circle
+          marker_count: 8
+          attribution: reference [43]
+        - panel: c
+          name: SiO2 (quartz) in lead–silicate melt, 900 °C
+          marker: red filled circle
+          marker_count: 8
+          attribution: reference [43]
+        - panel: c
+          name: visual guides
+          marker: dashed curves
+          marker_count: 0
+          attribution: authors' guides to the eye
+        - panel: d
+          name: B2O3 in lithium borate melt, 667 °C
+          marker: red filled circle
+          marker_count: 15
+          attribution: reference [27]
+        - panel: d
+          name: B2O3 in sodium borate melt, 712 °C
+          marker: blue filled circle
+          marker_count: 8
+          attribution: reference [27]
+        - panel: d
+          name: B2O3 in potassium borate melt, 712 °C
+          marker: green filled circle
+          marker_count: 5
+          attribution: reference [27]
+        - panel: d
+          name: visual guides
+          marker: dashed curves
+          marker_count: 0
+          attribution: authors' guides to the eye
+        attribution: Cited works [27], [42], [43] and [45], as identified in the caption; curves guide the eye.
+        digitisation: marker inventory checked at 600 dpi; numeric digitisation deferred
     - observation_id: navrotsky_koryttseva_2023_figure_2_deferred
       type: figure_context
-      units: as printed in caption
+      units: kJ/mol and conditions as printed in the caption/axes
       locator:
         figure: '2'
         page: 10
+        published_page: 10
         pdf_page_index: 9
       values:
-        caption: Figure 2. values in of Enthalpies sodium molybdate solution of somewhat
-        quantity_as_printed: enthalpy of solution / heat content as caption states
-        species_as_printed: binary oxide or melt components named in caption
-        phase_as_printed: oxide melt; see caption
-        temperature_as_printed: see caption and axes
-        axes_as_printed: see caption; axes not independently transcribed
-        series: []
-        marker_count_per_series: not counted; deferred figure pass
-        digitisation: deferred to a figure pass
+        quantity: enthalpy of solution of binary oxides
+        identity: binary oxides plotted against Pauling electronegativity in sodium molybdate and lead borate systems
+        panel: a–c; panel is recorded on each plotted series
+        axes:
+        - panel: a
+          x: Pauling electronegativity of binary-oxide-forming element
+          y: enthalpy of solution in sodium molybdate (kJ/mol oxygen atoms)
+        - panel: b
+          x: Pauling electronegativity of binary-oxide-forming element
+          y: enthalpy of solution in lead borate (kJ/mol oxygen atoms)
+        - panel: c
+          x: Pauling electronegativity of binary-oxide-forming element
+          y: enthalpy of solution in alkaline borate (kJ/mol oxygen atoms)
+        caption_as_printed: 'Enthalpies of solution of binary oxides vs. Pauling electronegativity: (a) trend for sodium molybdate
+          melt at 700 °C; (b) trend for lead borate at 800 °C; (c) curves guide the eye.'
+        series:
+        - panel: a
+          name: sodium molybdate, 700 °C
+          marker: red filled triangle
+          marker_count: 39
+          attribution: Table 1 values and cited sources in this study
+        - panel: a
+          name: visual guide
+          marker: red dashed curve
+          marker_count: 0
+          attribution: authors' guide to the eye
+        - panel: b
+          name: lead borate, 800 °C
+          marker: green filled circle
+          marker_count: 33
+          attribution: Table 1 values and cited sources in this study
+        - panel: b
+          name: visual guide
+          marker: green dashed curve
+          marker_count: 0
+          attribution: authors' guide to the eye
+        - panel: c
+          name: alkaline borate oxide series
+          marker: blue filled square
+          marker_count: 9
+          attribution: authors' plotted values; citation not specified in caption
+        - panel: c
+          name: visual guide
+          marker: blue dashed curve
+          marker_count: 0
+          attribution: authors' guide to the eye
+        attribution: Panel a/b Table 1 compilation; panel c is plotted without an independent citation in the caption.
+        digitisation: marker inventory checked at 600 dpi; numeric digitisation deferred
     - observation_id: navrotsky_koryttseva_2023_figure_4_deferred
       type: figure_context
-      units: as printed in caption
+      units: kJ/mol and conditions as printed in the caption/axes
       locator:
         figure: '4'
         page: 11
+        published_page: 11
         pdf_page_index: 10
       values:
-        caption: Figure 4. Enthalpies of solution of the binary oxides vs. Mulliken
-          electronegativity for diﬀerent cal- Figure 4. Enthalpies of solution of
-          the binary oxides vs. Mulliken electronegativity for different orimetric
+        quantity: enthalpy of solution of binary oxides
+        identity: binary oxide enthalpies compared against Mulliken electronegativity of oxide-forming elements
+        panel: single
+        axes:
+        - panel: single
+          x: Mulliken electronegativity of binary-oxide-forming element
+          y: enthalpy of solution (kJ/mol oxygen atoms)
+        caption_as_printed: Enthalpies of solution of the binary oxides vs. Mulliken electronegativity for different calorimetric
           solvents.
-        quantity_as_printed: enthalpy of solution / heat content as caption states
-        species_as_printed: binary oxide or melt components named in caption
-        phase_as_printed: oxide melt; see caption
-        temperature_as_printed: see caption and axes
-        axes_as_printed: see caption; axes not independently transcribed
-        series: []
-        marker_count_per_series: not counted; deferred figure pass
-        digitisation: deferred to a figure pass
+        series:
+        - panel: single
+          name: lead borate, 700 °C
+          marker: filled green circle
+          marker_count: 27
+          attribution: present study and cited source data
+        - panel: single
+          name: lead borate, 800 °C
+          marker: open green circle
+          marker_count: 26
+          attribution: present study and cited source data
+        - panel: single
+          name: sodium molybdate, 700 °C
+          marker: filled red triangle
+          marker_count: 38
+          attribution: present study and cited source data
+        - panel: single
+          name: sodium molybdate, 800 °C
+          marker: open red triangle
+          marker_count: 29
+          attribution: present study and cited source data
+        - panel: top axis
+          name: Mulliken electronegativity labels
+          marker: open blue circle
+          marker_count: 39
+          attribution: reference [51]
+        - panel: single
+          name: polynomial visual guide
+          marker: blue dashed curve
+          marker_count: 0
+          attribution: authors' guide to the eye
+        attribution: Mulliken electronegativities from reference [51]; enthalpy data from cited calorimetric sources.
+        digitisation: marker inventory checked at 600 dpi; numeric digitisation deferred
     - observation_id: navrotsky_koryttseva_2023_figure_5_deferred
       type: figure_context
-      units: as printed in caption
+      units: kJ/mol and conditions as printed in the caption/axes
       locator:
         figure: '5'
         page: 12
+        published_page: 12
         pdf_page_index: 11
       values:
-        caption: Figure 5. Enthalpies Figure of solution of binary 5. Enthalpies oxidesofin
-        quantity_as_printed: enthalpy of solution / heat content as caption states
-        species_as_printed: binary oxide or melt components named in caption
-        phase_as_printed: oxide melt; see caption
-        temperature_as_printed: see caption and axes
-        axes_as_printed: see caption; axes not independently transcribed
-        series: []
-        marker_count_per_series: not counted; deferred figure pass
-        digitisation: deferred to a figure pass
+        quantity: enthalpy of solution of binary oxides
+        identity: binary oxides in lead borate plotted against oxide Mulliken electronegativity
+        panel: a arithmetic-mean electronegativity; b geometric-mean electronegativity
+        axes:
+        - panel: a
+          x: Mulliken electronegativity of oxides (mean arithmetic)
+          y: enthalpy of solution (kJ/mol oxygen atoms)
+        - panel: b
+          x: Mulliken electronegativity of oxides (mean geometric)
+          y: enthalpy of solution (kJ/mol oxygen atoms)
+        caption_as_printed: Enthalpies of solution of binary oxides in lead borate vs. Mulliken electronegativity [51] of oxides,
+          calculated as arithmetic mean (a) and geometric mean (b) of electronegativity of consistent elements.
+        series:
+        - panel: a
+          name: lead borate, 700 °C
+          marker: filled green circle
+          marker_count: 30
+          attribution: Table 1 values; oxide electronegativity calculated by authors from [51]
+        - panel: a
+          name: lead borate, 800 °C
+          marker: open green circle
+          marker_count: 29
+          attribution: Table 1 values; oxide electronegativity calculated by authors from [51]
+        - panel: a
+          name: quadratic visual guide
+          marker: green dashed curve
+          marker_count: 0
+          attribution: authors' guide to the eye
+        - panel: b
+          name: lead borate, 700 °C
+          marker: filled green circle
+          marker_count: 30
+          attribution: Table 1 values; oxide electronegativity calculated by authors from [51]
+        - panel: b
+          name: lead borate, 800 °C
+          marker: open green circle
+          marker_count: 29
+          attribution: Table 1 values; oxide electronegativity calculated by authors from [51]
+        - panel: b
+          name: quadratic visual guide
+          marker: green dashed curve
+          marker_count: 0
+          attribution: authors' guide to the eye
+        attribution: Heat-content and solution values from the cited study data; oxide electronegativities based on [51].
+        digitisation: marker inventory checked at 600 dpi; numeric digitisation deferred
     - observation_id: navrotsky_koryttseva_2023_figure_6_deferred
       type: figure_context
-      units: as printed in caption
+      units: kJ/mol and conditions as printed in the caption/axes
       locator:
         figure: '6'
         page: 13
+        published_page: 13
         pdf_page_index: 12
       values:
-        caption: Figure 6. Enthalpies of solution of oxides, organized in groups according
-          to stoichiometry of highest Figure 6. Enthalpies of solution of oxides,
-          organized in groups according to stoichiometry of highest oxidation state
-          of oxide-forming elements in lead borate and sodium molybdate melts vs.
-          ionic radii
-        quantity_as_printed: enthalpy of solution / heat content as caption states
-        species_as_printed: binary oxide or melt components named in caption
-        phase_as_printed: oxide melt; see caption
-        temperature_as_printed: see caption and axes
-        axes_as_printed: see caption; axes not independently transcribed
-        series: []
-        marker_count_per_series: not counted; deferred figure pass
-        digitisation: deferred to a figure pass
+        quantity: enthalpy of solution of binary oxides
+        identity: oxide solutions grouped by highest oxidation-state stoichiometry of oxide-forming elements
+        panel: a M2O; b MO; c M2O3; d MO2; e M2O5; f MO3
+        axes:
+        - panel: a–f
+          x: ionic radius (Å)
+          y: enthalpy of solution (kJ/mol)
+        caption_as_printed: 'Enthalpies of solution of oxides organized by oxide-forming element stoichiometry in lead borate and
+          sodium molybdate melts vs. ionic radii: (a) M2O, (b) MO, (c) M2O3, (d) MO2, (e) M2O5, and (f) MO3.'
+        series:
+        - panel: a
+          name: lead borate, 700 °C
+          marker: filled green circle
+          marker_count: 3
+          attribution: Table 1 and cited source data
+        - panel: a
+          name: lead borate, 800 °C
+          marker: open green circle
+          marker_count: 3
+          attribution: Table 1 and cited source data
+        - panel: a
+          name: sodium molybdate, 700 °C
+          marker: filled red triangle
+          marker_count: 3
+          attribution: Table 1 and cited source data
+        - panel: a
+          name: sodium molybdate, 800 °C
+          marker: open red triangle
+          marker_count: 3
+          attribution: Table 1 and cited source data
+        - panel: b
+          name: lead borate, 700 °C
+          marker: filled green circle
+          marker_count: 7
+          attribution: Table 1 and cited source data
+        - panel: b
+          name: lead borate, 800 °C
+          marker: open green circle
+          marker_count: 4
+          attribution: Table 1 and cited source data
+        - panel: b
+          name: sodium molybdate, 700 °C
+          marker: filled red triangle
+          marker_count: 6
+          attribution: Table 1 and cited source data
+        - panel: b
+          name: sodium molybdate, 800 °C
+          marker: open red triangle
+          marker_count: 5
+          attribution: Table 1 and cited source data
+        - panel: c
+          name: lead borate, 700 °C
+          marker: filled green circle
+          marker_count: 17
+          attribution: Table 1 and cited source data
+        - panel: c
+          name: lead borate, 800 °C
+          marker: open green circle
+          marker_count: 17
+          attribution: Table 1 and cited source data
+        - panel: c
+          name: sodium molybdate, 700 °C
+          marker: filled red triangle
+          marker_count: 17
+          attribution: Table 1 and cited source data
+        - panel: c
+          name: sodium molybdate, 800 °C
+          marker: open red triangle
+          marker_count: 17
+          attribution: Table 1 and cited source data
+        - panel: d
+          name: lead borate, 700 °C
+          marker: filled green circle
+          marker_count: 8
+          attribution: Table 1 and cited source data
+        - panel: d
+          name: lead borate, 800 °C
+          marker: open green circle
+          marker_count: 8
+          attribution: Table 1 and cited source data
+        - panel: d
+          name: sodium molybdate, 700 °C
+          marker: filled red triangle
+          marker_count: 8
+          attribution: Table 1 and cited source data
+        - panel: d
+          name: sodium molybdate, 800 °C
+          marker: open red triangle
+          marker_count: 8
+          attribution: Table 1 and cited source data
+        - panel: e
+          name: lead borate, 700 °C
+          marker: filled green circle
+          marker_count: 2
+          attribution: Table 1 and cited source data
+        - panel: e
+          name: lead borate, 800 °C
+          marker: open green circle
+          marker_count: 0
+          attribution: Table 1 and cited source data
+        - panel: e
+          name: sodium molybdate, 700 °C
+          marker: filled red triangle
+          marker_count: 5
+          attribution: Table 1 and cited source data
+        - panel: e
+          name: sodium molybdate, 800 °C
+          marker: open red triangle
+          marker_count: 4
+          attribution: Table 1 and cited source data
+        - panel: f
+          name: lead borate, 700 °C
+          marker: filled green circle
+          marker_count: 0
+          attribution: Table 1 and cited source data
+        - panel: f
+          name: lead borate, 800 °C
+          marker: open green circle
+          marker_count: 1
+          attribution: Table 1 and cited source data
+        - panel: f
+          name: sodium molybdate, 700 °C
+          marker: filled red triangle
+          marker_count: 2
+          attribution: Table 1 and cited source data
+        - panel: f
+          name: sodium molybdate, 800 °C
+          marker: open red triangle
+          marker_count: 1
+          attribution: Table 1 and cited source data
+        - panel: a–f
+          name: polynomial guides
+          marker: dashed curves
+          marker_count: 0
+          attribution: authors' fitted visual guides
+        attribution: Present study compilation and cited sources; dashed polynomial curves are author fits for trend display.
+        digitisation: marker inventory checked at 600 dpi; numeric digitisation deferred
     - observation_id: navrotsky_koryttseva_2023_figure_3_deferred
       type: figure_context
-      units: as printed in caption
+      units: kJ/mol and conditions as printed in the caption/axes
       locator:
         figure: '3'
         page: 10
+        published_page: 10
         pdf_page_index: 9
       values:
-        caption: Figure3.3. Enthalpies Figure Enthalpies of of solution solutionofofthe
-          thebinary oxides binary vs.vs. oxi
-        quantity_as_printed: enthalpy of solution / heat content as caption states
-        species_as_printed: binary oxide or melt components named in caption
-        phase_as_printed: oxide melt; see caption
-        temperature_as_printed: see caption and axes
-        axes_as_printed: see caption; axes not independently transcribed
-        series: []
-        marker_count_per_series: not counted; deferred figure pass
-        digitisation: deferred to a figure pass
+        quantity: enthalpy of solution of binary oxides
+        identity: binary oxides in lead borate, sodium molybdate and alkali borate solvents
+        panel: single plot with Pauling electronegativity element labels along the top axis
+        axes:
+        - panel: single
+          x: Pauling electronegativity of binary-oxide-forming element
+          y: enthalpy of solution (kJ/mol oxygen atoms)
+        caption_as_printed: Enthalpies of solution of the binary oxides vs. Pauling electronegativity for different calorimetric
+          solvents.
+        series:
+        - panel: single
+          name: lead borate, 700 °C
+          marker: filled green circle
+          marker_count: 27
+          attribution: present study and cited source data
+        - panel: single
+          name: lead borate, 800 °C
+          marker: open green circle
+          marker_count: 26
+          attribution: present study and cited source data
+        - panel: single
+          name: sodium molybdate, 700 °C
+          marker: filled red triangle
+          marker_count: 38
+          attribution: present study and cited source data
+        - panel: single
+          name: sodium molybdate, 800 °C
+          marker: open red triangle
+          marker_count: 29
+          attribution: present study and cited source data
+        - panel: single
+          name: alkali borates, 700 °C
+          marker: teal square
+          marker_count: 8
+          attribution: references [27] and related sources
+        - panel: top axis
+          name: Pauling electronegativity labels
+          marker: open blue circle
+          marker_count: 39
+          attribution: reference [1]
+        - panel: single
+          name: quadratic visual guide
+          marker: blue dashed curve
+          marker_count: 0
+          attribution: authors' guide to the eye
+        attribution: Present study compilation with cited source values; the polynomial curve is a guide to the eye.
+        digitisation: marker inventory checked at 600 dpi; numeric digitisation deferred
     - observation_id: navrotsky_koryttseva_2023_figure_7_deferred
       type: figure_context
-      units: as printed in caption
+      units: kJ/mol and conditions as printed in the caption/axes
       locator:
         figure: '7'
         page: 14
+        published_page: 14
         pdf_page_index: 13
       values:
-        caption: Figure7.7.Enthalpies Figure Enthalpiesofofsolution solutionofofSiO
-          SiO2ininsilicate silicatemelts meltsvs.
-        quantity_as_printed: enthalpy of solution / heat content as caption states
-        species_as_printed: binary oxide or melt components named in caption
-        phase_as_printed: oxide melt; see caption
-        temperature_as_printed: see caption and axes
-        axes_as_printed: see caption; axes not independently transcribed
-        series: []
-        marker_count_per_series: not counted; deferred figure pass
-        digitisation: deferred to a figure pass
+        quantity: enthalpy of solution of SiO2
+        identity: silica solution in alkali-silicate, CMAS and related silicate melts
+        panel: single
+        axes:
+        - panel: single
+          x: mole fraction of (SiO2 + Al2O3) in melt
+          y: enthalpy of solution of SiO2 (kJ/mole)
+        caption_as_printed: Enthalpies of solution of SiO2 in silicate melts vs. mole fraction of (silica plus alumina) in silicate-containing
+          melts [46,55].
+        series:
+        - panel: single
+          name: SiO2–Na2O, 1465 K
+          marker: open blue circle
+          marker_count: 9
+          attribution: reference [46]
+        - panel: single
+          name: SiO2–Cs2O, 1465 K
+          marker: filled green circle
+          marker_count: 7
+          attribution: reference [46]
+        - panel: single
+          name: SiO2–Na2O, 1663 K
+          marker: filled light-blue circle
+          marker_count: 6
+          attribution: reference [46]
+        - panel: single
+          name: SiO2–CaO–Al2O3
+          marker: open blue triangle
+          marker_count: 6
+          attribution: reference [46]
+        - panel: single
+          name: SiO2–K2O, 1465 K
+          marker: open orange circle
+          marker_count: 11
+          attribution: reference [46]
+        - panel: single
+          name: SiO2–Li2O, 1663 K
+          marker: filled blue circle
+          marker_count: 9
+          attribution: reference [46]
+        - panel: single
+          name: SiO2–K2O, 1663 K
+          marker: filled orange circle
+          marker_count: 6
+          attribution: reference [46]
+        - panel: single
+          name: CMAS, 35 mol%
+          marker: filled orange square
+          marker_count: 8
+          attribution: reference [55]
+        attribution: Silicate-melt data attributed to references [46] and [55] in the caption.
+        digitisation: marker inventory checked at 600 dpi; numeric digitisation deferred
     - observation_id: navrotsky_koryttseva_2023_figure_8_deferred
       type: figure_context
-      units: as printed in caption
+      units: kJ/mol and conditions as printed in the caption/axes
       locator:
         figure: '8'
         page: 15
+        published_page: 15
         pdf_page_index: 14
       values:
-        caption: Figure8.8.Enthalpies Figure Enthalpiesofofsolution solution(kJ/mole
-          (kJ/moleoxygen oxygenatoms) atoms)ofof the
-        quantity_as_printed: enthalpy of solution / heat content as caption states
-        species_as_printed: binary oxide or melt components named in caption
-        phase_as_printed: oxide melt; see caption
-        temperature_as_printed: see caption and axes
-        axes_as_printed: see caption; axes not independently transcribed
-        series: []
-        marker_count_per_series: not counted; deferred figure pass
-        digitisation: deferred to a figure pass
+        quantity: enthalpy of solution of binary oxides and difference between CMAS melts
+        identity: selected oxides in CMAS melts with 35 and 42 mol.% silica
+        panel: a enthalpies of solution; b enthalpy difference between the melts
+        axes:
+        - panel: a
+          x: Pauling electronegativity of binary-oxide-forming element
+          y: enthalpy of solution at 1450 °C (kJ/mol)
+        - panel: b
+          x: Pauling electronegativity of binary-oxide-forming element
+          y: enthalpy difference (kJ/mol)
+        caption_as_printed: Enthalpies of solution (kJ/mole oxygen atoms) of binary oxides (a) and enthalpy difference of their
+          solution (b) in 35 and 42 mol.% silica in CMAS systems.
+        series:
+        - panel: a
+          name: 35 mol.% CMAS
+          marker: filled orange square
+          marker_count: 7
+          attribution: reference [47]
+        - panel: a
+          name: 42 mol.% CMAS
+          marker: filled blue square
+          marker_count: 7
+          attribution: reference [47]
+        - panel: a
+          name: visual guides
+          marker: dashed curves
+          marker_count: 0
+          attribution: authors' fitted guides
+        - panel: b
+          name: 42-minus-35 mol.% CMAS solution enthalpy difference
+          marker: open blue square
+          marker_count: 4
+          attribution: calculated by authors from reference [47] measurements
+        - panel: b
+          name: visual guide
+          marker: blue dashed curve
+          marker_count: 0
+          attribution: authors' fitted guide
+        attribution: Selected CMAS measurements by Costa et al. [47]; panel b differences calculated by the paper authors.
+        digitisation: marker inventory checked at 600 dpi; numeric digitisation deferred
