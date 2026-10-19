@@ -5128,7 +5128,7 @@ def test_aborted_artifacts_skip_unbound_extraction_cache_rows(
         feedstock=FEEDSTOCK,
         fidelity="internal-analytical",
         definitions=study.objective_definitions(profile),
-        failure_counts={"evaluation_timeout": 1},
+        failure_counts={},
         constraints=constraints,
     )
 

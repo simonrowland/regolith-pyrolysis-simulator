@@ -6070,6 +6070,8 @@ def _records_from_cache_sqlite(
     )
     records: list[StudyRecord] = []
     for index, scored in enumerate(scoped):
+        if not _cached_extraction_completion_feasible(scored, active_constraints):
+            continue
         candidate = _candidate_from_cached_scored(scored, index=index, schema=schema)
         records.append(_to_record(candidate, scored, cache_hit=True))
     return tuple(records)
