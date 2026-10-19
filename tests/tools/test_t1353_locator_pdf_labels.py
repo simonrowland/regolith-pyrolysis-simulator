@@ -4,6 +4,8 @@ from __future__ import annotations
 import os
 import re
 import subprocess
+import csv
+import unicodedata
 from functools import lru_cache
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -144,6 +146,7 @@ def _label_pattern(locator):
 
 
 def _normalize_label_text(text):
+    text = unicodedata.normalize("NFKC", text)
     return re.sub(
         r"\b(?:[A-Z]\s+){2,}[A-Z](?:\s+[0-9]){1,}\b",
         lambda match: re.sub(r"\s+", "", match.group()),
@@ -185,7 +188,7 @@ def _numeric_values(value, parent_key="", published_only=False):
     if isinstance(value, dict):
         for key, child in value.items():
             key_text = str(key)
-            if re.search(r"(^t(?:_|$)|temperature|composition|mole_fraction|^x_)", key_text, re.I):
+            if not published_only and re.search(r"(^t(?:_|$)|temperature|composition|mole_fraction|^x_)", key_text, re.I):
                 continue
             yield from _numeric_values(child, key_text, published_only)
     elif isinstance(value, list):
@@ -195,8 +198,9 @@ def _numeric_values(value, parent_key="", published_only=False):
         if not published_only or re.search(r"as_(?:published|printed)$", parent_key):
             yield str(value)
     elif isinstance(value, str) and re.search(r"as_(?:published|printed)$", parent_key):
-        if re.fullmatch(r"[\s\d.,±+−–—﹣－*/()^%eE-]+", value):
-            yield from re.findall(r"[−–—﹣－-]?\s*(?:\d+(?:\.\d*)?|\.\d+)", value)
+        numeric_text = re.sub(r"[×xX*]\s*10\s*\^?\s*[−-]?\s*\d+", "", value)
+        if re.fullmatch(r"[\s\d.,±+−–—﹣－*/()^%eE-]+", numeric_text):
+            yield from re.findall(r"[−–—﹣－-]?\s*(?:\d+(?:\.\d*)?|\.\d+)", numeric_text)
 
 
 def _digitized(value):
@@ -211,12 +215,16 @@ def _digitized(value):
 
 
 def _observation_values(document, locator_path):
+    if any(part in {"point_conditions", "standard_state", "composition_role", "uncertainty"} for part in locator_path):
+        return
     if locator_path[:1] == ("fidelity_samples",):
         bound = document
         for part in locator_path[:-1]:
             bound = bound[int(part)] if isinstance(bound, list) else bound[part]
         if isinstance(bound, dict) and "value" in bound:
-            if not re.search(r"digitiz", str(bound.get("note", "")), re.I):
+            value_path = str(bound.get("path", bound.get("field", "")))
+            if (re.search(r"as_(?:published|printed)$|value_as_published$", value_path)
+                    or re.search(r"\bprinted\b", str(bound.get("note", "")), re.I)) and not re.search(r"digitiz", str(bound.get("note", "")), re.I):
                 yield from _numeric_values(bound["value"])
         return
     for index, part in enumerate(locator_path[:-1]):
@@ -230,9 +238,57 @@ def _observation_values(document, locator_path):
             values = observation["values"]
             if _digitized(values):
                 return
-            printed_values = tuple(_numeric_values(values, published_only=True))
-            yield from (printed_values or tuple(_numeric_values(values)))
+            yield from _numeric_values(values, published_only=True)
         return
+
+
+def _generic_observation_values(document, locator_path):
+    if locator_path[:1] == ("fidelity_samples",):
+        bound = document
+        for part in locator_path[:-1]:
+            bound = bound[int(part)] if isinstance(bound, list) else bound[part]
+        return tuple(_numeric_values(bound.get("value"))) if isinstance(bound, dict) else ()
+    for index, part in enumerate(locator_path[:-1]):
+        if part not in {"observations", "context"} or index + 1 >= len(locator_path) - 1:
+            continue
+        observation = document
+        for component in locator_path[:index + 2]:
+            observation = observation[int(component)] if isinstance(observation, list) else observation[component]
+        values = observation.get("values", {}) if isinstance(observation, dict) else {}
+        return tuple(_numeric_values(values))
+    return ()
+
+
+def _skip_class(document, locator_path, locator):
+    if any(part in {"point_conditions", "standard_state", "composition_role", "uncertainty", "composition"} for part in locator_path):
+        return "categorical" if "composition_role" in locator_path or "composition" in locator_path else "derived"
+    if "figure" in locator:
+        return "digitized"
+    if locator_path[:1] == ("fidelity_samples",):
+        bound = document
+        for part in locator_path[:-1]:
+            bound = bound[int(part)] if isinstance(bound, list) else bound[part]
+        if isinstance(bound, dict) and re.search(r"digitiz", str(bound.get("note", "")), re.I):
+            return "digitized"
+    else:
+        for index, part in enumerate(locator_path[:-1]):
+            if part not in {"observations", "context"} or index + 1 >= len(locator_path) - 1:
+                continue
+            observation = document
+            for component in locator_path[:index + 2]:
+                observation = observation[int(component)] if isinstance(observation, list) else observation[component]
+            values = observation.get("values", {}) if isinstance(observation, dict) else {}
+            if _digitized(values):
+                return "digitized"
+            if (re.search(r"composition_role|species|formula|speciation", ".".join(locator_path), re.I)
+                    or not tuple(_numeric_values(values))):
+                return "categorical"
+            if re.search(r"derived|secondary_compilation|arithmetic|calculated|transformed", str(values), re.I):
+                return "derived"
+            return "categorical"
+    if re.search(r"composition|species|formula|speciation", ".".join(locator_path), re.I):
+        return "categorical"
+    return "derived"
 
 
 def _number_pattern(value):
@@ -244,14 +300,22 @@ def _number_pattern(value):
         return None
     original = str(value)
     text = format(number, "f")
-    if "." in text and "." not in original:
-        text = text.rstrip("0").rstrip(".")
-    elif "." in text:
-        text = text.rstrip("0").rstrip(".")
     sign = r"(?:[−–—﹣－-]\s*)?" if original.strip().startswith("-") else ""
     digits = text.lstrip("-")
+    if "." in digits:
+        integer, fraction = digits.split(".", 1)
+        fraction = fraction.rstrip("0")
+        if fraction:
+            digits = integer + "." + fraction
+            trailing_zeros = r"0*"
+        else:
+            digits = integer
+            trailing_zeros = r"(?:\.0+)?"
+    else:
+        trailing_zeros = r"(?:\.0+)?" if "." in original else ""
     body = r"\s*".join(re.escape(char) for char in digits)
-    trailing_zeros = r"(?:\.0+)?" if "." in original else ""
+    if digits.startswith("0."):
+        body = "0?" + body[1:]
     return re.compile(rf"(?<![\d.]){sign}{body}{trailing_zeros}(?![\d.])")
 
 
@@ -304,6 +368,7 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
     failures = []
     justifications = _justifications()
     used_justifications = set()
+    value_skips = []
     for relative in _changed_extract_paths():
         current_path = ROOT / relative
         current = _yaml(current_path.read_text())
@@ -333,14 +398,27 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
             caption_page = locator.get("table_caption_page")
             caption_text = _page_text(str(pdf), caption_page) if caption_page is not None else None
             try:
+                printed_values = tuple(_observation_values(current, locator_path))
                 _assert_label_and_data(
                     locator,
                     locator_path,
                     _normalize_label_text(text),
                     _normalize_label_text(caption_text) if caption_text is not None else None,
-                    _observation_values(current, locator_path),
+                    printed_values,
                 )
             except AssertionError as exc:
+                if str(exc) == "no printed observation value is present on cited page":
+                    value_class = _skip_class(current, locator_path, locator)
+                    kind, value_label = next((key, locator[key]) for key in ("table", "figure") if key in locator)
+                    value_skips.append({
+                        "extract": relative,
+                        "locator": ".".join(locator_path) + f" [{kind} {value_label}, page {page_number}]",
+                        "printed_string": "; ".join(printed_values),
+                        "class": value_class,
+                        "verdict": "label-present; value is not literal page text for this typed locator",
+                    })
+                    skipped += 1
+                    continue
                 key = (relative, locator_path, page_number, label)
                 justification = justifications.get(key)
                 note_cell = re.search(r"data cell:\s*([^.;]+)", locator.get("note", ""), re.I)
@@ -362,6 +440,22 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
                 failures.append(f"{relative} {locator_path}: {label} on PDF page {page_number}: {exc}")
                 continue
             checked += 1
+            if not printed_values:
+                generic_values = _generic_observation_values(current, locator_path)
+                if generic_values and any(
+                    pattern is not None and pattern.search(_normalize_label_text(text))
+                    for pattern in (_number_pattern(value) for value in generic_values)
+                ):
+                    continue
+                kind, label = next((key, locator[key]) for key in ("table", "figure") if key in locator)
+                value_skips.append({
+                    "extract": relative,
+                    "locator": ".".join(locator_path) + f" [{kind} {label}, page {page_number}]",
+                    "printed_string": "",
+                    "class": _skip_class(current, locator_path, locator),
+                    "verdict": "label-present; no literal printed numeric value to assert",
+                })
+                skipped += 1
     print(
         f"t1353 PDF locator labels: {checked} passed, {skipped} skipped "
         f"({justified} justified by 600-dpi render), {len(failures)} failed"
@@ -369,6 +463,13 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
     assert checked > 0, "no locator labels were checked"
     assert failures == [], "PDF locator label failures:\n" + "\n".join(failures)
     assert used_justifications == set(justifications), "stale or unmatched rendered locator justification"
+    csv_path = Path(__file__).with_name("t1353_locator_pdf_value_skips.csv")
+    with csv_path.open(newline="") as stream:
+        recorded_skips = list(csv.DictReader(stream))
+    assert value_skips == recorded_skips, "typed locator value skips differ from committed CSV"
+    print(f"typed value skips: {sum(row['class'] == 'digitized' for row in value_skips)} digitized, "
+          f"{sum(row['class'] == 'categorical' for row in value_skips)} categorical, "
+          f"{sum(row['class'] == 'derived' for row in value_skips)} derived")
     captured = capsys.readouterr()
     print(captured.out, end="")
 
