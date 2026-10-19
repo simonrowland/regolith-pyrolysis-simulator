@@ -2497,11 +2497,13 @@ def _merge_product_story_mass(target, species, mass):
 
 
 def _product_story_bucket(species_kg, **details):
-    rounded_species = {
-        species: round(mass, 2)
-        for species, mass in sorted(species_kg.items())
-        if float(mass) > 0.0
-    }
+    rounded_species = {}
+    for species, mass in sorted(species_kg.items()):
+        if float(mass) <= 0.0:
+            continue
+        displayed_mass = round(mass, 2)
+        if displayed_mass != 0.0:
+            rounded_species[species] = displayed_mass
     return {
         'species_kg': rounded_species,
         **{key: round(float(value), 2) for key, value in details.items()},
