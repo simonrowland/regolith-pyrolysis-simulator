@@ -270,6 +270,9 @@ class _ImmediateFailurePool:
         future.set_exception(self.exception)
         return future
 
+    def _abort_request(self, _future, *, diagnostic_detail=None):
+        return False
+
 
 def _make_pooled_subprocess_backend(exception):
     backend = MAGEMinBackend()
