@@ -266,6 +266,21 @@ def test_exact_zero_lots_and_fully_debited_balances_are_empty() -> None:
     assert ledger.mol_by_account("process.cleaned_melt") == {}
 
 
+@pytest.mark.xfail(strict=True, reason="mol-native ledger lots are reconstructed from kg")
+def test_mol_native_debit_applies_the_retained_fe_amount() -> None:
+    amount_mol = 1.1987204510704742e-9
+    ledger = AtomLedger()
+    account = "process.overhead_gas"
+    ledger._balances[account] = {"Fe": amount_mol}
+
+    debit = ledger.debit_mol(account, {"Fe": amount_mol})
+    projected = ledger.project(
+        LedgerTransition("exact_fe_depletion", debits=(debit,), credits=())
+    )
+
+    assert projected[account] == {}
+
+
 def _direct_overdraft_normal() -> tuple[Action, Action, type[BaseException]]:
     def valid() -> None:
         ledger = AtomLedger()
