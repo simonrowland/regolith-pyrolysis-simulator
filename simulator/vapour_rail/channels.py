@@ -1449,29 +1449,13 @@ def attempt_channel_composition(
                 )
             )
         ):
-            return ChannelCompositionRefusal(
-                carrier=carrier,
-                element=element,
-                disposition=REFUSAL_CARBON_SIDE_OWNER_MISSING,
-                missing_channels=(),
-                missing_melt_owners=(),
-                detail=(
-                    f"carrier {carrier}: carbon-side owner missing "
-                    "(not a gas channel in t-571)"
-                ),
-                ledger_missing=missing_text,
-                pathway=pathway,
-            )
-        return ChannelCompositionRefusal(
+            disposition = REFUSAL_CARBON_SIDE_OWNER_MISSING
+        else:
+            disposition = REFUSAL_MISSING_CHANNEL_INPUT
+        return _empty_channel_composition_refusal(
             carrier=carrier,
             element=element,
-            disposition=REFUSAL_MISSING_CHANNEL_INPUT,
-            missing_channels=(),
-            missing_melt_owners=(),
-            detail=(
-                f"carrier {carrier}: NEEDS-CHANNEL but no channel requirement "
-                "could be inferred; balanced reaction still required"
-            ),
+            disposition=disposition,
             ledger_missing=missing_text,
             pathway=pathway,
         )
@@ -1516,6 +1500,39 @@ def attempt_channel_composition(
             pathway=pathway,
         )
     return MappingProxyType(resolved)
+
+
+def _empty_channel_composition_refusal(
+    *,
+    carrier: str,
+    element: str | None,
+    disposition: str,
+    ledger_missing: str | None,
+    pathway: str | None,
+) -> ChannelCompositionRefusal:
+    """Build the typed refusal used when no channel is required."""
+
+    if disposition == REFUSAL_CARBON_SIDE_OWNER_MISSING:
+        detail = (
+            f"carrier {carrier}: carbon-side owner missing "
+            "(not a gas channel in t-571)"
+        )
+    else:
+        disposition = REFUSAL_MISSING_CHANNEL_INPUT
+        detail = (
+            f"carrier {carrier}: NEEDS-CHANNEL but no channel requirement "
+            "could be inferred; balanced reaction still required"
+        )
+    return ChannelCompositionRefusal(
+        carrier=carrier,
+        element=element,
+        disposition=disposition,
+        missing_channels=(),
+        missing_melt_owners=(),
+        detail=detail,
+        ledger_missing=ledger_missing,
+        pathway=pathway,
+    )
 
 
 # ---------------------------------------------------------------------------
