@@ -14,11 +14,12 @@ Hero history is one append-only row per green store in
 ``docs-private/research/2026-10-19-three-hero-charts/hero-history.jsonl``;
 pass it explicitly with ``--history-path``. Each ``battery_hero_history`` row
 has ``schema_version`` and, per rail and engine, the scorer's numeric count,
-RMS and median |dex|, refusal count and scorer-reason counts from residual
-rows, and open predict-and-flag notice counts by kind. Same-row benchmark RMS
-is stored separately for openimcc and internal-analytical against the best
-comparison engine (vaporock, thermoengine, alphamelts, or magemin); unavailable
-benchmarks have a null engine and RMS with ``n=0``.
+RMS and median |dex|, attempted refusal count and scorer-reason counts,
+non-observable count, and open predict-and-flag notice counts by kind. Each row
+also carries all-rail attempted-refusal and non-observable counts per engine.
+Same-row benchmark RMS is stored separately for openimcc and internal-analytical
+against the best comparison engine (vaporock, thermoengine, alphamelts, or
+magemin); unavailable benchmarks have a null engine and RMS with ``n=0``.
 """
 
 from __future__ import annotations
@@ -73,6 +74,7 @@ from simulator.feedstock_composition import resolve_feedstock_composition  # noq
 from simulator.battery.score import (  # noqa: E402
     _flagged_payload_strata,
     _paired_engine_rail_benchmarks,
+    _residual_engine_observable,
 )
 
 
@@ -120,6 +122,8 @@ class EngineSummary:
     residual_square_sum: float = 0.0
     rms_count: int = 0
     refusals: Counter[str] = field(default_factory=Counter)
+    refused_by_rail: Counter[str] = field(default_factory=Counter)
+    not_observable_by_rail: Counter[str] = field(default_factory=Counter)
     excluded_d139_rows: int = 0
     non_dex_rows: int = 0
     missing_identity_rows: int = 0
@@ -417,16 +421,23 @@ def _record_hero_diagnostic(
     rail: str,
     engine: str,
     status: ResidualStatus,
+    engine_observable: bool,
 ) -> None:
     bucket = diagnostics.setdefault(
         (rail, engine),
         {
             "refused_count": 0,
+            "not_observable_count": 0,
             "refused_by_reason": Counter(),
             "open_predict_and_flag_notice_counts_by_kind": Counter(),
         },
     )
     if status is ResidualStatus.REFUSED:
+        if not engine_observable:
+            bucket["not_observable_count"] = int(
+                bucket["not_observable_count"]
+            ) + 1
+            return
         reason = _refusal_reason(row)
         bucket["refused_count"] = int(bucket["refused_count"]) + 1
         refusal_counts = bucket["refused_by_reason"]
@@ -469,6 +480,7 @@ def _normalized_hero_diagnostics(
     return {
         key: {
             "refused_count": value.get("refused_count", 0),
+            "not_observable_count": value.get("not_observable_count", 0),
             "refused_by_reason": dict(
                 sorted(value.get("refused_by_reason", {}).items())
             ),
@@ -648,6 +660,10 @@ def read_scores(
                     rails_seen.add(rail)
 
                 status = residual_status_token(row.get("status"))
+                engine_observable = (
+                    status is not ResidualStatus.REFUSED
+                    or _residual_engine_observable(row)
+                )
                 if rail in HERO_RAILS:
                     _record_hero_diagnostic(
                         hero_diagnostics,
@@ -655,11 +671,16 @@ def read_scores(
                         rail=rail,
                         engine=engine,
                         status=status,
+                        engine_observable=engine_observable,
                     )
                 if status is ResidualStatus.REFUSED:
                     reason = _refusal_reason(row)
-                    summary.refusals[reason] += 1
-                    if rail in HERO_RAILS:
+                    if engine_observable:
+                        summary.refusals[reason] += 1
+                        summary.refused_by_rail[rail] += 1
+                    else:
+                        summary.not_observable_by_rail[rail] += 1
+                    if rail in HERO_RAILS and engine_observable:
                         formula = _row_formula(row)
                         identity = _row_identity(row)
                         composition_key, _composition_label = _composition_fields(identity)
@@ -954,29 +975,45 @@ def _history_fields_from_scores(
 ) -> tuple[
     dict[tuple[str, str], Mapping[str, object]],
     dict[tuple[str, str], Mapping[str, object]],
+    list[dict[str, object]],
 ]:
     rows: list[Mapping[str, object]] = []
     diagnostics: dict[tuple[str, str], dict[str, object]] = {}
+    engines: set[str] = set()
+    rails: set[str] = {rail.value for rail in Rail}
+    refusal_coverage: Counter[tuple[str, str, str]] = Counter()
     with _open_residual_jsonl(path) as source:
         for line in source:
             if not line.strip():
                 continue
             row = json.loads(line)
-            if not isinstance(row, Mapping) or row.get("rail") not in HERO_RAILS:
+            if not isinstance(row, Mapping):
                 continue
-            rail = str(row["rail"])
+            rail = str(row.get("rail") or "")
             engine = _engine_name(row)
-            if not engine:
+            if not rail or not engine:
                 continue
-            _record_hero_diagnostic(
-                diagnostics,
-                row,
-                rail=rail,
-                engine=engine,
-                status=residual_status_token(row.get("status")),
+            engines.add(engine)
+            rails.add(rail)
+            status = residual_status_token(row.get("status"))
+            engine_observable = (
+                status is not ResidualStatus.REFUSED
+                or _residual_engine_observable(row)
             )
+            if status is ResidualStatus.REFUSED:
+                bucket = "refused" if engine_observable else "not_observable"
+                refusal_coverage[(rail, engine, bucket)] += 1
+            if rail in HERO_RAILS:
+                _record_hero_diagnostic(
+                    diagnostics,
+                    row,
+                    rail=rail,
+                    engine=engine,
+                    status=status,
+                    engine_observable=engine_observable,
+                )
             numeric = row.get("numeric")
-            if (
+            if rail in HERO_RAILS and (
                 isinstance(numeric, Mapping)
                 and numeric.get("operation") == "dex"
                 and numeric.get("value") is not None
@@ -991,7 +1028,40 @@ def _history_fields_from_scores(
             rails=HERO_RAILS,
         )
     }
-    return benchmarks, _normalized_hero_diagnostics(diagnostics)
+    coverage = [
+        {
+            "rail": rail,
+            "engine": engine,
+            "refused_count": refusal_coverage[(rail, engine, "refused")],
+            "not_observable_count": refusal_coverage[
+                (rail, engine, "not_observable")
+            ],
+        }
+        for rail in sorted(rails)
+        for engine in sorted(engines)
+    ]
+    return benchmarks, _normalized_hero_diagnostics(diagnostics), coverage
+
+
+def _refusal_coverage_from_summaries(
+    summaries: Mapping[str, EngineSummary],
+) -> list[dict[str, object]]:
+    rails = {rail.value for rail in Rail}
+    for summary in summaries.values():
+        rails.update(summary.refused_by_rail)
+        rails.update(summary.not_observable_by_rail)
+    return [
+        {
+            "rail": rail,
+            "engine": engine,
+            "refused_count": summaries[engine].refused_by_rail.get(rail, 0),
+            "not_observable_count": summaries[engine].not_observable_by_rail.get(
+                rail, 0
+            ),
+        }
+        for rail in sorted(rails)
+        for engine in sorted(summaries)
+    ]
 
 
 def _git_commit_date(commit: str) -> str:
@@ -1011,6 +1081,7 @@ def _history_record(
     landing_sha: str,
     benchmarks: Mapping[tuple[str, str], Mapping[str, object]],
     diagnostics: Mapping[tuple[str, str], Mapping[str, object]],
+    refusal_coverage: Sequence[Mapping[str, object]] = (),
     commit_date: str | None = None,
 ) -> dict[str, Any]:
     records = summary.get("records")
@@ -1045,6 +1116,9 @@ def _history_record(
             {
                 "numeric_count": metric.get("n") or 0,
                 "refused_count": diagnostic.get("refused_count", 0),
+                "not_observable_count": diagnostic.get(
+                    "not_observable_count", 0
+                ),
                 "refused_by_reason": diagnostic.get("refused_by_reason", {}),
                 "open_predict_and_flag_notice_counts_by_kind": diagnostic.get(
                     "open_predict_and_flag_notice_counts_by_kind", {}
@@ -1065,6 +1139,7 @@ def _history_record(
         "commit_date": commit_date or _git_commit_date(landing_sha),
         "metrics": metrics,
         "benchmarks": [benchmarks[key] for key in sorted(benchmarks)],
+        "refusal_coverage": [dict(item) for item in refusal_coverage],
     }
 
 
@@ -1074,19 +1149,25 @@ def history_record_from_archive(
     landing_sha: str,
     benchmarks: Mapping[tuple[str, str], Mapping[str, object]] | None = None,
     diagnostics: Mapping[tuple[str, str], Mapping[str, object]] | None = None,
+    refusal_coverage: Sequence[Mapping[str, object]] | None = None,
 ) -> dict[str, Any]:
     summary = _archive_json_member(archive_path, "data/battery/score-summary.json")
-    if benchmarks is None or diagnostics is None:
-        streamed_benchmarks, streamed_diagnostics = _history_fields_from_scores(
-            archive_path
+    if benchmarks is None or diagnostics is None or refusal_coverage is None:
+        streamed_benchmarks, streamed_diagnostics, streamed_coverage = (
+            _history_fields_from_scores(archive_path)
         )
-        benchmarks = benchmarks or streamed_benchmarks
-        diagnostics = diagnostics or streamed_diagnostics
+        if benchmarks is None:
+            benchmarks = streamed_benchmarks
+        if diagnostics is None:
+            diagnostics = streamed_diagnostics
+        if refusal_coverage is None:
+            refusal_coverage = streamed_coverage
     return _history_record(
         summary,
         landing_sha=landing_sha,
         benchmarks=benchmarks,
         diagnostics=diagnostics,
+        refusal_coverage=refusal_coverage,
     )
 
 
@@ -1650,14 +1731,22 @@ def _no_scored_rows_note(data: ScorePlotData, engines: Sequence[str]) -> str:
     entries: list[str] = []
     for engine in engines:
         refusals = data.summaries[engine].refusals
+        not_observable = sum(
+            data.summaries[engine].not_observable_by_rail.values()
+        )
+        details: list[str] = []
+        if not_observable:
+            details.append(
+                f"not an observable of this engine ×{not_observable:,}"
+            )
         if refusals:
             reason, count = sorted(
                 refusals.items(), key=lambda item: (-item[1], item[0])
             )[0]
-            detail = f"{reason} ×{count:,}"
-        else:
-            detail = "no refusal reason recorded"
-        entries.append(f"{engine} ({detail})")
+            details.append(f"{reason} ×{count:,}")
+        if not details:
+            details.append("no refusal reason recorded")
+        entries.append(f"{engine} ({'; '.join(details)})")
     return "no scored rows: " + ", ".join(entries)
 
 
@@ -2047,6 +2136,14 @@ def _hero_summary_payload(
         }
         charts[rail] = {
             "plotted_observations_by_engine": dict(sorted(rows_by_engine.items())),
+            "not_observable_by_engine": {
+                engine: int(
+                    data.hero_diagnostics.get((rail, engine), {}).get(
+                        "not_observable_count", 0
+                    )
+                )
+                for engine in sorted(data.engines)
+            },
             "refused_by_engine_reason": {
                 engine: dict(sorted(reasons.items()))
                 for engine, reasons in sorted(refusals.items())
@@ -2127,6 +2224,18 @@ def render_hero_charts(
                     f"{benchmark.get('benchmark_engine')} {benchmark.get('benchmark_rms_dex')} dex "
                     f"(n={benchmark.get('n')}) · all-numeric RMS {all_numeric_rms} dex"
                 )
+        not_observable = [
+            f"{engine} {int(diagnostic.get('not_observable_count') or 0):,}"
+            for (diagnostic_rail, engine), diagnostic in sorted(
+                data.hero_diagnostics.items()
+            )
+            if diagnostic_rail == rail
+            and int(diagnostic.get("not_observable_count") or 0) > 0
+        ]
+        if not_observable:
+            status_lines.append(
+                "not an observable of this engine: " + ", ".join(not_observable)
+            )
         figure.suptitle(
             f"{_HERO_TITLES[rail]}\n" + "\n".join(status_lines),
             fontsize=8.2,
@@ -2310,6 +2419,10 @@ def _summary_payload(
             "temperature_span_K": [summary.min_temperature_K, summary.max_temperature_K],
             "rms_dex": summary.rms_dex,
             "refused_by_reason": dict(sorted(summary.refusals.items())),
+            "refused_by_rail": dict(sorted(summary.refused_by_rail.items())),
+            "not_observable_by_rail": dict(
+                sorted(summary.not_observable_by_rail.items())
+            ),
             "non_dex_rows_skipped": summary.non_dex_rows,
             "missing_identity_rows_skipped": summary.missing_identity_rows,
             "source_relation_counts": dict(sorted(summary.source_relations.items())),
@@ -2413,6 +2526,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             landing_sha=args.landing_sha,
             benchmarks=data.hero_benchmarks,
             diagnostics=data.hero_diagnostics,
+            refusal_coverage=_refusal_coverage_from_summaries(data.summaries),
         )
         append_history(args.history_path, record)
     abundance = load_element_abundance(args.abundance_feedstock)

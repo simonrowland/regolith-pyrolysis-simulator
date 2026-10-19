@@ -17,11 +17,13 @@ from scripts.battery_hero_plot import (
     _history_record,
     _hero_facets,
     _hero_refusal_entries,
+    _refusal_coverage_from_summaries,
     _parser,
     append_history,
     draw_panel,
     element_tier,
     element_view_series,
+    history_record_from_archive,
     load_element_abundance,
     read_scores,
     render_hero_charts,
@@ -148,7 +150,8 @@ def test_binning_averages_same_experiment_duplicates_and_excludes_refusals(tmp_p
     assert data.summaries["openimcc"].unique_points == 17
     assert data.summaries["openimcc"].refusals == {}
     assert data.summaries["magemin"].scored_rows == 0
-    assert data.summaries["magemin"].refusals == {"unsupported_species": 1}
+    assert data.summaries["magemin"].refusals == {}
+    assert data.summaries["magemin"].not_observable_by_rail["vapour"] == 1
     assert data.summaries["openimcc"].source_relations["quoted_overlap"] == 1
     activity_bin = {
         point.bin_index: point
@@ -515,7 +518,7 @@ def test_hero_series_keep_composition_and_count_refusals_by_reason(
         "value": {"amount_basis": "mole_fraction", "components": [["CaO", "0.7"]]},
     }
     refused = _record(
-        engine="magemin",
+        engine="vaporock",
         experiment="refused-P",
         formula="P2O5",
         temperature_K=1200,
@@ -550,19 +553,100 @@ def test_hero_series_keep_composition_and_count_refusals_by_reason(
         ("internal-analytical", "Si")
     ]
     assert {point.composition_key for point in element_points} == composition_keys
-    assert data.hero_refusal_totals[("vapour", "magemin", "identity_incomplete")] == 1
-    assert data.hero_diagnostics[("vapour", "magemin")]["refused_count"] == 1
-    assert data.hero_diagnostics[("vapour", "magemin")]["refused_by_reason"] == {
+    assert data.hero_refusal_totals[("vapour", "vaporock", "identity_incomplete")] == 1
+    assert data.hero_diagnostics[("vapour", "vaporock")]["refused_count"] == 1
+    assert data.hero_diagnostics[("vapour", "vaporock")]["refused_by_reason"] == {
         "identity_incomplete": 1
     }
     assert _hero_refusal_entries(data, "vapour", "minor:P") == (
-        ("magemin", "identity_incomplete", 1),
+        ("vaporock", "identity_incomplete", 1),
     )
     assert set(_hero_facets(data, "vapour")) >= {
         "SiO",
         "P2O5",
         *(facet for facet, _label in HERO_MINOR_FACETS),
     }
+
+
+def test_non_observable_rows_are_separate_from_refusals_and_history(
+    tmp_path: Path,
+) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    not_observable = _record(
+        engine="magemin",
+        experiment="magemin-vapour",
+        formula="P2O5",
+        temperature_K=1400,
+        residual=None,
+        rail="vapour",
+        status="refused",
+    )
+    not_observable["refusal"] = {"reason": "unsupported"}
+    refused = _record(
+        engine="vaporock",
+        experiment="vaporock-refusal",
+        formula="SiO2",
+        temperature_K=1400,
+        residual=None,
+        rail="vapour",
+        status="refused",
+    )
+    refused["refusal"] = {"reason": "outside_supported_species"}
+    residuals.write_text(
+        "".join(
+            json.dumps(row) + "\n"
+            for row in (
+                {"kind": "battery_store_stamp", "revision": "non-observable-test"},
+                not_observable,
+                refused,
+            )
+        ),
+        encoding="utf-8",
+    )
+
+    data = read_scores(residuals, rails=HERO_RAILS)
+
+    assert data.hero_refusal_totals == {
+        ("vapour", "vaporock", "outside_supported_species"): 1
+    }
+    assert data.hero_diagnostics[("vapour", "magemin")]["refused_count"] == 0
+    assert data.hero_diagnostics[("vapour", "magemin")]["not_observable_count"] == 1
+    assert data.hero_diagnostics[("vapour", "magemin")]["refused_by_reason"] == {}
+    assert data.summaries["magemin"].refusals == {}
+    assert data.summaries["magemin"].not_observable_by_rail["vapour"] == 1
+
+    record = _history_record(
+        {"store": {"revision": "non-observable-test"}, "records": []},
+        landing_sha="non-observable-test",
+        commit_date="2026-10-19T00:00:00Z",
+        benchmarks=data.hero_benchmarks,
+        diagnostics=data.hero_diagnostics,
+        refusal_coverage=_refusal_coverage_from_summaries(data.summaries),
+    )
+    metric = next(
+        item
+        for item in record["metrics"]
+        if item["rail"] == "vapour" and item["engine"] == "magemin"
+    )
+    assert metric["not_observable_count"] == 1
+    assert metric["refused_count"] == 0
+    assert metric["refused_by_reason"] == {}
+    coverage = next(
+        item
+        for item in record["refusal_coverage"]
+        if item["rail"] == "vapour" and item["engine"] == "magemin"
+    )
+    assert coverage["not_observable_count"] == 1
+    assert coverage["refused_count"] == 0
+    assert any(
+        item["rail"] == "thermochemistry" and item["engine"] == "magemin"
+        for item in record["refusal_coverage"]
+    )
+
+    files = render_hero_charts(data, tmp_path / "rendered")
+    svg = files["hero:vapour:svg"].read_text(encoding="utf-8").casefold()
+    assert "not an observable of this engine" in svg
+    assert "magemin 1" in svg
 
 
 def test_hero_flagged_points_are_hollow_and_benchmark_uses_shared_rows(
@@ -693,12 +777,21 @@ def test_history_schema_keeps_scorer_metrics_and_per_rail_counts() -> None:
         diagnostics={
             ("redox", "internal-analytical"): {
                 "refused_count": 2,
+                "not_observable_count": 4,
                 "refused_by_reason": {"unsupported": 2},
                 "open_predict_and_flag_notice_counts_by_kind": {
                     "out_of_certified_band": 1
                 },
             }
         },
+        refusal_coverage=[
+            {
+                "rail": "redox",
+                "engine": "internal-analytical",
+                "refused_count": 2,
+                "not_observable_count": 4,
+            }
+        ],
     )
 
     assert record["kind"] == "battery_hero_history"
@@ -713,10 +806,19 @@ def test_history_schema_keeps_scorer_metrics_and_per_rail_counts() -> None:
     assert metric["rms_dex"] == "0.4"
     assert metric["median_abs_dex"] == "0.3"
     assert metric["refused_count"] == 2
+    assert metric["not_observable_count"] == 4
     assert metric["refused_by_reason"] == {"unsupported": 2}
     assert metric["open_predict_and_flag_notice_counts_by_kind"] == {
         "out_of_certified_band": 1
     }
+    assert record["refusal_coverage"] == [
+        {
+            "rail": "redox",
+            "engine": "internal-analytical",
+            "refused_count": 2,
+            "not_observable_count": 4,
+        }
+    ]
 
 
 def test_cli_requires_explicit_history_path() -> None:
@@ -770,6 +872,42 @@ def test_missing_comparison_engine_is_reported_as_unavailable(tmp_path: Path) ->
 
 
 def test_read_scores_streams_residuals_from_archive_member(tmp_path: Path) -> None:
+    magemin_vapour = _record(
+        engine="magemin",
+        experiment="archive-magemin-vapour",
+        formula="SiO",
+        temperature_K=1200,
+        residual=None,
+        rail="vapour",
+        status="refused",
+    )
+    magemin_vapour["refusal"] = {"reason": "unsupported"}
+    attempted_vapour_refusal = _record(
+        engine="vaporock",
+        experiment="archive-vaporock-refusal",
+        formula="SiO",
+        temperature_K=1200,
+        residual=None,
+        rail="vapour",
+        status="refused",
+    )
+    attempted_vapour_refusal["refusal"] = {
+        "reason": "outside_supported_species"
+    }
+    compilation_refusal = _record(
+        engine="alphamelts",
+        experiment="archive-thermo-refusal",
+        formula="SiO",
+        temperature_K=1200,
+        residual=None,
+        rail="thermochemistry",
+        status="refused",
+    )
+    compilation_refusal["candidate_request"]["quantity"] = "H_minus_H298"
+    compilation_refusal["refusal"] = {
+        "reason": "unsupported",
+        "detail": {"reason": "quantity_not_predicted"},
+    }
     rows = [
         {"kind": "battery_store_stamp", "revision": "archive-test"},
         _record(
@@ -780,13 +918,34 @@ def test_read_scores_streams_residuals_from_archive_member(tmp_path: Path) -> No
             residual=0.25,
             rail="vapour",
         ),
+        magemin_vapour,
+        attempted_vapour_refusal,
+        compilation_refusal,
     ]
     payload = "".join(json.dumps(row) + "\n" for row in rows).encode("utf-8")
+    summary_payload = json.dumps(
+        {
+            "store": {"revision": "archive-test"},
+            "records": [
+                {
+                    "tier": "all_numeric",
+                    "rail": "vapour",
+                    "engine": "internal-analytical",
+                    "n": 1,
+                    "rms_dex": "0.25",
+                    "median_abs_dex": "0.25",
+                }
+            ],
+        }
+    ).encode("utf-8")
     archive_path = tmp_path / "battery.tgz"
     with tarfile.open(archive_path, "w:gz") as archive:
         member = tarfile.TarInfo("data/battery/residuals.jsonl")
         member.size = len(payload)
         archive.addfile(member, io.BytesIO(payload))
+        summary_member = tarfile.TarInfo("data/battery/score-summary.json")
+        summary_member.size = len(summary_payload)
+        archive.addfile(summary_member, io.BytesIO(summary_payload))
 
     data = read_scores(archive_path, rails=HERO_RAILS)
 
@@ -797,6 +956,30 @@ def test_read_scores_streams_residuals_from_archive_member(tmp_path: Path) -> No
         compact.write(payload)
     compact_data = read_scores(compact_path, rails=HERO_RAILS)
     assert compact_data.hero_series == data.hero_series
+
+    history = history_record_from_archive(archive_path, landing_sha="HEAD")
+    coverage = {
+        (item["rail"], item["engine"]): item
+        for item in history["refusal_coverage"]
+    }
+    assert coverage[("vapour", "magemin")] == {
+        "rail": "vapour",
+        "engine": "magemin",
+        "refused_count": 0,
+        "not_observable_count": 1,
+    }
+    assert coverage[("vapour", "vaporock")] == {
+        "rail": "vapour",
+        "engine": "vaporock",
+        "refused_count": 1,
+        "not_observable_count": 0,
+    }
+    assert coverage[("thermochemistry", "alphamelts")] == {
+        "rail": "thermochemistry",
+        "engine": "alphamelts",
+        "refused_count": 0,
+        "not_observable_count": 1,
+    }
 
 
 def test_hero_svg_is_byte_identical_for_the_same_input(tmp_path: Path) -> None:
@@ -935,4 +1118,4 @@ def test_stamp_contents_and_png_output(tmp_path: Path) -> None:
     assert files["species:tile_png"].read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
     assert "test-store-2026-10-15-species" in files["species:tile_png"].name
     assert "test-store-2026-10-15-element" in files["element:tile_png"].name
-    assert "no scored rows: magemin (unsupported_species ×1)" in files["species:tile_svg"].read_text(encoding="utf-8")
+    assert "no scored rows: magemin (not an observable of this engine ×1)" in files["species:tile_svg"].read_text(encoding="utf-8")
