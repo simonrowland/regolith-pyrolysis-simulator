@@ -58,7 +58,6 @@ from engines.alphamelts.petthermo import (
 from engines.domain_reason import OutOfDomainReason, reason_value
 from engines.engine_commissioning import (
     assess_engine_commissioning,
-    engine_commissioning,
 )
 from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
@@ -2371,25 +2370,39 @@ class _MELTSBackendSupport(MeltBackend):
         runs: a notice with authority=extrapolated and certified_band is
         attached. ``observed_crash_floor_wt_pct`` is metadata only; an
         actual AlphaMELTS subprocess death below that floor is annotated
-        on the typed engine_crash already produced by the base path.
+        on the typed engine_crash already produced by the base path. The
+        assessment's below-floor result is carried into the transport
+        diagnostics so its preflight and crash paths reuse this decision.
         """
         assessment = assess_engine_commissioning(
             self.backend_name,
             sio2_wt_pct=self._canonical_sio2_wt_pct(comp_wt),
             temperature_K=float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
         )
-        if assessment.notice is None:
+        pending: dict[str, object] = {}
+        if assessment.below_crash_floor:
+            crash_floor = (
+                assessment.spec.sio2_wt_pct.observed_crash_floor_wt_pct
+            )
+            if crash_floor is not None:
+                pending.update({
+                    'below_crash_floor': True,
+                    'sio2_crash_floor_wt_pct': float(crash_floor),
+                })
+        notice = assessment.notice
+        if notice is not None:
+            notice = dict(notice)
+            pending.update({
+                'commissioning_notice': notice,
+                'authority': notice['authority'],
+                'certified_band': notice['certified_band'],
+            })
+        if not pending:
             return None
-        notice = dict(assessment.notice)
-        pending: dict[str, object] = {
-            'commissioning_notice': notice,
-            'authority': notice['authority'],
-            'certified_band': notice['certified_band'],
-        }
         if isinstance(diagnostics, dict):
             for key, value in pending.items():
                 diagnostics.setdefault(key, value)
-        if warnings is not None:
+        if warnings is not None and notice is not None:
             warnings.append(
                 'CommissioningNotice: out of certified band; '
                 f"authority={notice['authority']}; engine will run"
@@ -3234,14 +3247,17 @@ class _MELTSBackendSupport(MeltBackend):
             redox_mode == REDOX_MODE_NOT_AN_INPUT
             and active_components in alkali_silica_binaries
         ):
-            crash_floor = engine_commissioning(
-                self.backend_name
-            ).sio2_wt_pct.observed_crash_floor_wt_pct
+            assessment_diagnostics = dict(diagnostics or {})
             sio2_wt_pct = self._canonical_sio2_wt_pct(comp_wt)
             if (
-                crash_floor is not None
-                and sio2_wt_pct < float(crash_floor)
+                assessment_diagnostics.get('below_crash_floor') is True
+                and assessment_diagnostics.get(
+                    'sio2_crash_floor_wt_pct'
+                ) is not None
             ):
+                crash_floor = float(
+                    assessment_diagnostics['sio2_crash_floor_wt_pct']
+                )
                 return self._domain_gate_result(
                     requested_temperature_C,
                     requested_pressure_bar,
@@ -3500,17 +3516,13 @@ class _MELTSBackendSupport(MeltBackend):
         crash_point['stage'] = 'alphamelts_subprocess_execute'
         failure_diagnostics['out_of_domain_crash_point'] = crash_point
         failure_diagnostics['subprocess_failure'] = dict(failure)
-        if reason_code == ALPHAMELTS_REASON_SUBPROCESS_DIED:
-            floor = engine_commissioning(
-                self.backend_name
-            ).sio2_wt_pct.observed_crash_floor_wt_pct
-            sio2_wt_pct = self._canonical_sio2_wt_pct(
-                crash_point.get('composition_wt_pct') or {}
+        if (
+            reason_code == ALPHAMELTS_REASON_SUBPROCESS_DIED
+            and failure_diagnostics.get('below_crash_floor') is True
+        ):
+            failure_diagnostics['engine_reason'] = (
+                'sio2_below_observed_crash_floor'
             )
-            if floor is not None and sio2_wt_pct < float(floor):
-                failure_diagnostics['engine_reason'] = (
-                    'sio2_below_observed_crash_floor'
-                )
         return self._emit_equilibrium_result(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
