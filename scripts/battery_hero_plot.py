@@ -1707,6 +1707,16 @@ _HERO_TITLES = {
     Rail.MELT_ACTIVITY.value: "Melt activity",
 }
 _HERO_MARKERS = ("o", "s", "^", "D", "v", "P", "X", "<", ">", "*")
+_HERO_OXYGEN_MODE_MARKERS = {
+    "printed": "o",
+    "commanded": "s",
+    "solved": "^",
+}
+_HERO_OXYGEN_MODE_LABELS = {
+    "printed": "printed scorer oxygen condition",
+    "commanded": "commanded scorer oxygen condition",
+    "solved": "solved cell oxygen balance",
+}
 _HERO_ENGINE_COLORS = {
     "openimcc": "#0072b2",
     "internal-analytical": "#d55e00",
@@ -1919,7 +1929,7 @@ def _draw_hero_deck_scatter(
 ) -> None:
     """Draw scorer-produced deck points, with hollow faces only for scorer flags."""
 
-    grouped: dict[tuple[str, bool, str], list[tuple[float, float]]] = defaultdict(list)
+    grouped: dict[tuple[str, bool, str, float], list[tuple[float, float]]] = defaultdict(list)
     for point in points:
         x_value = _finite_float(point.get("x_value"))
         y_value = _finite_float(point.get("y_value"))
@@ -1927,17 +1937,18 @@ def _draw_hero_deck_scatter(
         if x_value is None or y_value is None:
             continue
         marker = str(point.get("marker") or "o")
-        grouped[(engine, bool(point.get("flagged")), marker)].append(
+        marker_size = _finite_float(point.get("marker_size")) or 24.0
+        grouped[(engine, bool(point.get("flagged")), marker, marker_size)].append(
             (x_value, y_value)
         )
 
-    for (engine, flagged, marker), values in sorted(grouped.items()):
+    for (engine, flagged, marker, marker_size), values in sorted(grouped.items()):
         color = engine_colors.get(engine, "#555555")
         artist = axis.scatter(
             [value[0] for value in values],
             [value[1] for value in values],
             marker=marker,
-            s=24,
+            s=marker_size,
             facecolors="#ffffff" if flagged else color,
             edgecolors=color,
             linewidths=1.0,
@@ -2722,6 +2733,8 @@ def _hero_deck_legend_handles(
     engine_colors: Mapping[str, Any],
     *,
     group_labels: Sequence[tuple[str, str]] = (),
+    source_labels: Sequence[tuple[str, str]] = (),
+    size_labels: Sequence[tuple[float, str]] = (),
 ) -> list[Line2D]:
     engines = sorted({str(point.get("engine") or "unknown") for point in points})
     handles = [
@@ -2764,7 +2777,35 @@ def _hero_deck_legend_handles(
             markersize=4,
             label=label,
         )
+        for marker, label in source_labels
+    )
+    handles.extend(
+        Line2D(
+            [0],
+            [0],
+            color="#555555",
+            linestyle="None",
+            marker=marker,
+            markerfacecolor="#ffffff",
+            markeredgecolor="#555555",
+            markersize=4,
+            label=label,
+        )
         for marker, label in group_labels
+    )
+    handles.extend(
+        Line2D(
+            [0],
+            [0],
+            color="#555555",
+            linestyle="None",
+            marker="o",
+            markerfacecolor="#ffffff",
+            markeredgecolor="#555555",
+            markersize=math.sqrt(size),
+            label=label,
+        )
+        for size, label in size_labels
     )
     return handles
 
@@ -2863,6 +2904,55 @@ def render_hero_deck_charts(
         points = [
             point for point in data.hero_deck_points if point.get("chart") == chart
         ]
+        oxygen_modes = tuple(
+            sorted({str(point.get("oxygen_mode") or "unknown") for point in points})
+        )
+        source_labels = tuple(
+            (
+                _HERO_OXYGEN_MODE_MARKERS[mode],
+                _HERO_OXYGEN_MODE_LABELS[mode],
+            )
+            for mode in oxygen_modes
+            if mode in _HERO_OXYGEN_MODE_MARKERS
+        )
+        mixed_sio_sources = chart == "sio_evolution" and len(oxygen_modes) > 1
+        sio_bin_marker_sizes: dict[int, float] = {}
+        if chart == "redox_sensitivity":
+            points = [
+                {
+                    **point,
+                    "marker": _HERO_OXYGEN_MODE_MARKERS.get(
+                        str(point.get("oxygen_mode") or ""), "o"
+                    ),
+                }
+                for point in points
+            ]
+        elif mixed_sio_sources:
+            group_indices = sorted(
+                {
+                    int(point["group_index"])
+                    for point in points
+                    if point.get("group_index") is not None
+                }
+            )
+            sio_bin_marker_sizes = {
+                group: (
+                    36.0
+                    if len(group_indices) == 1
+                    else 16.0 + 40.0 * index / (len(group_indices) - 1)
+                )
+                for index, group in enumerate(group_indices)
+            }
+            points = [
+                {
+                    **point,
+                    "marker": _HERO_OXYGEN_MODE_MARKERS.get(
+                        str(point.get("oxygen_mode") or ""), "o"
+                    ),
+                    "marker_size": sio_bin_marker_sizes[int(point["group_index"])],
+                }
+                for point in points
+            ]
         current_groups: list[tuple[str, tuple[Mapping[str, object], ...]]] = []
         if chart == "redox_sensitivity":
             for species in ("Fe", "SiO", "Na"):
@@ -2919,10 +3009,25 @@ def render_hero_deck_charts(
             wspace=0.34,
         )
         figure.suptitle(title, fontsize=10, y=0.985)
+        caption = _hero_deck_benchmark_caption(data, chart)
+        if chart == "residue_composition":
+            caption += " · fraction evaporated: no typed mass-loss value yet (t-1312)"
+        elif chart in {"redox_sensitivity", "sio_evolution"}:
+            modes = set(oxygen_modes)
+            if modes == {"solved"}:
+                caption += " · fO₂: solved cell oxygen balance (model), not measured"
+            elif "solved" in modes:
+                caption += (
+                    " · fO₂ sources include solved cell oxygen balance (model), "
+                    "not measured, and printed/commanded scorer conditions; "
+                    "marker shapes distinguish source"
+                )
+            elif modes and modes <= {"printed", "commanded"}:
+                caption += " · fO₂: printed/commanded scorer input from observations-v2"
         figure.text(
             0.5,
             0.935,
-            _hero_deck_benchmark_caption(data, chart),
+            caption,
             ha="center",
             va="center",
             fontsize=6,
@@ -2940,7 +3045,7 @@ def render_hero_deck_charts(
                     axis.text(
                         0.5,
                         0.5,
-                        f"No scored {species} rows with measured fO₂",
+                        f"No scored {species} row with a scorer-recorded oxygen condition",
                         transform=axis.transAxes,
                         ha="center",
                         va="center",
@@ -3003,7 +3108,7 @@ def render_hero_deck_charts(
                     in data.hero_deck_unavailable_axis_counts.items()
                     if missing_chart == chart
                 )
-                message = "No typed mass-loss fraction matches these residue rows."
+                message = "fraction evaporated: no typed mass-loss value yet (t-1312)."
                 if missing:
                     message += (
                         f"  Scored residue rows without this axis: "
@@ -3026,28 +3131,48 @@ def render_hero_deck_charts(
                         group: _HERO_MARKERS[index % len(_HERO_MARKERS)]
                         for index, group in enumerate(group_indices)
                     }
-                    points = [
-                        {**point, "marker": markers[int(point["group_index"])]}
-                        for point in points
-                    ]
-                    group_labels = [
-                        (
-                            markers[group],
-                            next(
-                                str(point["group_label"])
-                                for point in points
-                                if int(point["group_index"]) == group
-                            ),
-                        )
-                        for group in group_indices
-                    ]
+                    if mixed_sio_sources:
+                        group_labels = []
+                        size_labels = [
+                            (
+                                sio_bin_marker_sizes[group],
+                                next(
+                                    str(point["group_label"])
+                                    for point in points
+                                    if int(point["group_index"]) == group
+                                ),
+                            )
+                            for group in group_indices
+                        ]
+                    else:
+                        points = [
+                            {**point, "marker": markers[int(point["group_index"])]}
+                            for point in points
+                        ]
+                        group_labels = [
+                            (
+                                markers[group],
+                                next(
+                                    str(point["group_label"])
+                                    for point in points
+                                    if int(point["group_index"]) == group
+                                ),
+                            )
+                            for group in group_indices
+                        ]
+                        size_labels = []
                 else:
                     group_labels = []
+                    size_labels = []
                 _draw_hero_deck_scatter(axis, points, engine_colors=engine_colors)
                 if chart == "sio_evolution":
                     axis.legend(
                         handles=_hero_deck_legend_handles(
-                            points, engine_colors, group_labels=group_labels
+                            points,
+                            engine_colors,
+                            group_labels=group_labels,
+                            source_labels=source_labels if mixed_sio_sources else (),
+                            size_labels=size_labels,
                         ),
                         loc="upper left",
                         bbox_to_anchor=(1.005, 1.0),
@@ -3063,12 +3188,12 @@ def render_hero_deck_charts(
                 )
                 if chart == "redox_sensitivity":
                     message = (
-                        "No scored Fe, SiO, or Na row has a printed or commanded "
-                        "oxygen request; ΔIW cannot be computed."
+                        "No scored Fe, SiO, or Na row has a scorer-recorded oxygen "
+                        "condition; ΔIW cannot be computed."
                     )
                 elif chart == "sio_evolution":
                     message = (
-                        "No scored SiO row has a printed or commanded oxygen request "
+                        "No scored SiO row has a scorer-recorded oxygen condition "
                         "and a finite temperature; "
                         "pO₂ binning cannot be computed."
                     )
@@ -3129,17 +3254,33 @@ def render_hero_deck_charts(
 
         if points:
             group_labels: list[tuple[str, str]] = []
+            size_labels: list[tuple[float, str]] = []
             if chart == "sio_evolution":
                 seen_groups: dict[int, str] = {}
                 for point in points:
                     if point.get("group_index") is not None:
                         seen_groups[int(point["group_index"])] = str(point["group_label"])
-                group_labels = [
-                    (_HERO_MARKERS[index % len(_HERO_MARKERS)], label)
-                    for index, (_group, label) in enumerate(sorted(seen_groups.items()))
-                ]
+                groups = sorted(seen_groups.items())
+                if mixed_sio_sources:
+                    size_labels = [
+                        (sio_bin_marker_sizes[group], label)
+                        for group, label in groups
+                    ]
+                else:
+                    group_labels = [
+                        (_HERO_MARKERS[index % len(_HERO_MARKERS)], label)
+                        for index, (_group, label) in enumerate(groups)
+                    ]
             handles = _hero_deck_legend_handles(
-                points, engine_colors, group_labels=group_labels
+                points,
+                engine_colors,
+                group_labels=group_labels,
+                source_labels=(
+                    source_labels
+                    if chart == "redox_sensitivity" or mixed_sio_sources
+                    else ()
+                ),
+                size_labels=size_labels,
             )
             figure.legend(
                 handles=handles,

@@ -420,10 +420,75 @@ def test_deck_renderer_emits_all_panels_and_missing_axis_labels(
     )
     sio_svg = Path(files["deck:sio-evolution:svg"]).read_text(encoding="utf-8")
     assert "engine-computed fO2 not yet available" in cross_svg
-    assert "No typed mass-loss fraction matches these residue rows" in residue_svg
+    assert "fraction evaporated: no typed mass-loss value yet (t-1312)" in residue_svg
     assert "no history rows" in sio_svg
     assert "1970-01-01" not in sio_svg
     assert "Green landing date" not in polymerisation_svg
+
+
+def test_sio_deck_distinguishes_oxygen_sources_and_pO2_bins(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    _score_file(residuals)
+    data = read_scores(residuals)
+    base = {
+        "chart": "sio_evolution",
+        "engine": "openimcc",
+        "facet": "10^-10–10^-9 bar",
+        "x_value": "1200",
+        "y_value": "0.2",
+        "residual_dex": "0.2",
+        "flagged": False,
+    }
+    points = (
+        {
+            **base,
+            "group_index": -10,
+            "group_label": "10^-10–10^-9 bar",
+            "oxygen_mode": "solved",
+        },
+        {
+            **base,
+            "group_index": -10,
+            "group_label": "10^-10–10^-9 bar",
+            "oxygen_mode": "printed",
+        },
+        {
+            **base,
+            "group_index": -9,
+            "group_label": "10^-9–10^-8 bar",
+            "oxygen_mode": "solved",
+        },
+    )
+    data = replace(data, hero_deck_points=points)
+    drawn_points: list[dict[str, object]] = []
+    original_draw = hero_plot._draw_hero_deck_scatter
+
+    def capture_draw(axis, plotted_points, *, engine_colors):
+        if plotted_points and plotted_points[0].get("chart") == "sio_evolution":
+            drawn_points.extend(plotted_points)
+        original_draw(axis, plotted_points, engine_colors=engine_colors)
+
+    monkeypatch.setattr(hero_plot, "_draw_hero_deck_scatter", capture_draw)
+    files = hero_plot.render_hero_deck_charts(data, tmp_path / "deck")
+    svg = Path(files["deck:sio-evolution:svg"]).read_text(encoding="utf-8")
+    by_mode = {
+        str(point["oxygen_mode"]): point
+        for point in drawn_points
+        if point["group_index"] == -10
+    }
+    solved_later_bin = next(
+        point for point in drawn_points if point["group_index"] == -9
+    )
+
+    assert by_mode["solved"]["marker"] == "^"
+    assert by_mode["printed"]["marker"] == "o"
+    assert by_mode["solved"]["marker_size"] != solved_later_bin["marker_size"]
+    assert "marker shapes distinguish source" in svg
+    assert "10^-10–10^-9 bar" in svg
+    assert "10^-9–10^-8 bar" in svg
 
 
 def test_deck_refusal_strip_includes_missing_scorer_axis(tmp_path: Path) -> None:

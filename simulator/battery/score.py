@@ -3952,20 +3952,40 @@ def _printed_point_composition(observation: Observation) -> State[Composition] |
     return point.state
 
 
-def _solved_effusion_po2_bar(prediction: EnginePrediction) -> float | None:
-    engine = prediction.engine
+def _solved_effusion_oxygen_payload(
+    engine: Engine | None,
+    notices: Iterable[Notice | Mapping[str, object]],
+) -> Mapping[str, object] | None:
     if engine is None:
         return None
-    prefix = OXYGEN_BALANCE_NOTICE_PREFIX
-    for notice in prediction.notices:
-        if notice.origin != f"engine:{engine.value}":
+    origin = f"engine:{engine.value}"
+    for notice in notices:
+        if isinstance(notice, Notice):
+            notice_origin, reason = notice.origin, notice.reason
+        elif isinstance(notice, Mapping):
+            notice_origin, reason = notice.get("origin"), notice.get("reason")
+        else:
             continue
-        if not notice.reason.startswith(prefix):
+        if notice_origin != origin or not isinstance(reason, str):
             continue
-        payload = json.loads(notice.reason.split(" ", 1)[1])
+        if not reason.startswith(OXYGEN_BALANCE_NOTICE_PREFIX):
+            continue
+        payload = json.loads(reason[len(OXYGEN_BALANCE_NOTICE_PREFIX) :])
+        if not isinstance(payload, Mapping):
+            continue
         value = payload.get("pO2_bar")
         if isinstance(value, (int, float)) and math.isfinite(float(value)):
-            return float(value)
+            return payload
+    return None
+
+
+def _solved_effusion_po2_bar(prediction: EnginePrediction) -> float | None:
+    payload = _solved_effusion_oxygen_payload(
+        prediction.engine, prediction.notices
+    )
+    value = None if payload is None else payload.get("pO2_bar")
+    if isinstance(value, (int, float)) and math.isfinite(float(value)):
+        return float(value)
     return None
 
 
@@ -4576,21 +4596,48 @@ def _battery_hero_oxygen_condition(
     reference: str,
     observations: Mapping[str, Observation],
     engine: Engine,
-) -> tuple[str, Decimal | None, Decimal | None, str]:
-    """Return the scorer's oxygen mode, log10(bar), Pa value, and refusal reason."""
+    notices: Iterable[Notice | Mapping[str, object]] = (),
+) -> tuple[str, Decimal | None, Decimal | None, str | None, str | None, str]:
+    """Return the oxygen condition used for a scored row and its provenance."""
 
     from simulator.diagnostic_helpers.binary_pot_battery import (
         PO2_COMMANDED,
         PO2_NOT_AN_INPUT,
     )
 
+    solved = _solved_effusion_oxygen_payload(engine, notices)
+    if solved is not None and solved.get("kind") == (
+        "fo2_oxygen_balance_effusion_solved"
+    ):
+        source_raw = solved.get("oxygen_condition_source")
+        source = source_raw if isinstance(source_raw, str) and source_raw else None
+        kind_raw = solved.get("kind")
+        kind = kind_raw if isinstance(kind_raw, str) else None
+        try:
+            pO2_bar = as_decimal(solved.get("pO2_bar"))
+            if not pO2_bar.is_finite() or pO2_bar <= 0:
+                raise ValueError("oxygen balance has no positive finite pO2")
+            # At these pressures fO2 ≈ pO2, so log10(fO2) is log10(pO2_bar).
+            log10_fO2_bar = pO2_bar.log10()
+            fO2_Pa = pO2_bar * PA_PER_BAR_DEC
+        except (TypeError, ValueError, ArithmeticError):
+            return (
+                "missing",
+                None,
+                None,
+                source,
+                kind,
+                "invalid solved oxygen balance condition",
+            )
+        return "solved", log10_fO2_bar, fO2_Pa, source, kind, ""
+
     observation = observations.get(reference)
     if observation is None or not isinstance(observation.identity, Identity):
-        return "missing", None, None, "no fO2 for this row"
+        return "missing", None, None, None, None, "no fO2 for this row"
     identity = observation.identity
     quantity = quantity_token(identity)
     if quantity is None:
-        return "missing", None, None, "no fO2 for this row"
+        return "missing", None, None, None, None, "no fO2 for this row"
 
     requested = identity.composition
     if requested is None or not requested.is_value:
@@ -4617,11 +4664,25 @@ def _battery_hero_oxygen_condition(
             if detail.get("reason") == "missing_fO2"
             else "scorer did not produce an oxygen request"
         )
-        return "missing", None, None, reason
+        return "missing", None, None, None, None, reason
     if decision.mode == PO2_NOT_AN_INPUT:
-        return "not_an_input", None, None, "oxygen is not an input for this row"
+        return (
+            "not_an_input",
+            None,
+            None,
+            None,
+            None,
+            "oxygen is not an input for this row",
+        )
     if decision.mode != PO2_COMMANDED or decision.po2_bar is None:
-        return "missing", None, None, "scorer did not produce an oxygen request"
+        return (
+            "missing",
+            None,
+            None,
+            None,
+            None,
+            "scorer did not produce an oxygen request",
+        )
 
     try:
         pO2_bar = as_decimal(decision.po2_bar)
@@ -4630,9 +4691,9 @@ def _battery_hero_oxygen_condition(
         log10_fO2_bar = pO2_bar.log10()
         fO2_Pa = pO2_bar * PA_PER_BAR_DEC
     except (TypeError, ValueError, ArithmeticError):
-        return "missing", None, None, "invalid scorer oxygen request"
+        return "missing", None, None, None, None, "invalid scorer oxygen request"
     mode = "printed" if _has_printed_fo2(observation, identity) else "commanded"
-    return mode, log10_fO2_bar, fO2_Pa, ""
+    return mode, log10_fO2_bar, fO2_Pa, "observations-v2", mode, ""
 
 
 def predict_with_engine(
@@ -9525,6 +9586,8 @@ def _battery_hero_deck_records(
                     "missing",
                     None,
                     None,
+                    None,
+                    None,
                     "scorer engine is unavailable",
                 )
             else:
@@ -9532,19 +9595,27 @@ def _battery_hero_deck_records(
                     str(row.get("reference") or ""),
                     observations,
                     oxygen_engine,
+                    row.get("notices") or (),
                 )
         if is_redox_species:
             assert oxygen_condition is not None
-            mode, log10_fO2_bar, request_fO2_pa, oxygen_reason = oxygen_condition
+            (
+                mode,
+                log10_fO2_bar,
+                request_fO2_pa,
+                oxygen_source,
+                oxygen_kind,
+                oxygen_reason,
+            ) = oxygen_condition
             delta_iw = (
                 _battery_hero_delta_iw(temperature, request_fO2_pa)
-                if mode in {"printed", "commanded"}
+                if mode in {"printed", "commanded", "solved"}
                 and request_fO2_pa is not None
                 else None
             )
             if delta_iw is None:
                 reason = oxygen_reason
-                if mode in {"printed", "commanded"}:
+                if mode in {"printed", "commanded", "solved"}:
                     reason = "no finite temperature or delta-IW for this row"
                 refuse_axis("redox_sensitivity", engine, reason)
             else:
@@ -9556,6 +9627,8 @@ def _battery_hero_deck_records(
                     y_value=residual_dex,
                     residual_dex=residual_dex,
                     oxygen_mode=mode,
+                    oxygen_source=oxygen_source,
+                    oxygen_kind=oxygen_kind,
                     log10_fO2_bar=str(log10_fO2_bar),
                     fO2_Pa=str(request_fO2_pa),
                 )
@@ -9576,10 +9649,17 @@ def _battery_hero_deck_records(
 
         elif rail == Rail.SIO_EVOLUTION.value and formula == "SiO":
             assert oxygen_condition is not None
-            mode, log10_fO2_bar, request_fO2_pa, oxygen_reason = oxygen_condition
+            (
+                mode,
+                log10_fO2_bar,
+                request_fO2_pa,
+                oxygen_source,
+                oxygen_kind,
+                oxygen_reason,
+            ) = oxygen_condition
             pO2_bin = (
                 _battery_hero_pO2_bin(request_fO2_pa)
-                if mode in {"printed", "commanded"}
+                if mode in {"printed", "commanded", "solved"}
                 and request_fO2_pa is not None
                 else None
             )
@@ -9593,7 +9673,7 @@ def _battery_hero_deck_records(
                 or temperature_value <= 0
             ):
                 reason = oxygen_reason
-                if mode in {"printed", "commanded"}:
+                if mode in {"printed", "commanded", "solved"}:
                     reason = "no finite temperature or pO2 bin for this row"
                 refuse_axis("sio_evolution", engine, reason)
             else:
@@ -9608,6 +9688,8 @@ def _battery_hero_deck_records(
                     group_index=decade,
                     group_label=group_label,
                     oxygen_mode=mode,
+                    oxygen_source=oxygen_source,
+                    oxygen_kind=oxygen_kind,
                     log10_fO2_bar=str(log10_fO2_bar),
                     fO2_Pa=str(request_fO2_pa),
                 )
