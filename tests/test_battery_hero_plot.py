@@ -477,6 +477,59 @@ def test_deck_renderer_emits_all_panels_and_missing_axis_labels(
     assert "Green landing date" not in polymerisation_svg
 
 
+def test_deck_sweet_spot_uses_same_colors_across_engine_panels(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    _score_file(residuals)
+    data = read_scores(residuals)
+    data = replace(
+        data,
+        hero_sweet_spot_cells={
+            ("vapour", "openimcc"): (
+                {
+                    "sio2_lower": 0.0,
+                    "sio2_upper": 1.0,
+                    "temperature_lower_K": 1000.0,
+                    "temperature_upper_K": 1100.0,
+                    "n": 3,
+                    "median_abs_dex": 1.0,
+                    "color_eligible": True,
+                },
+            ),
+            ("vapour", "magemin"): (
+                {
+                    "sio2_lower": 0.0,
+                    "sio2_upper": 1.0,
+                    "temperature_lower_K": 1000.0,
+                    "temperature_upper_K": 1100.0,
+                    "n": 3,
+                    "median_abs_dex": 2.0,
+                    "color_eligible": True,
+                },
+            ),
+        },
+    )
+    colors: dict[str, list[tuple[float, ...]]] = {}
+    original_draw = hero_plot._draw_hero_sweet_spot
+
+    def capture_color(axis, engine, cells, **kwargs):
+        colors.setdefault(engine, []).append(
+            kwargs["colormap"](kwargs["normalization"](1.0))
+        )
+        return original_draw(axis, engine, cells, **kwargs)
+
+    monkeypatch.setattr(hero_plot, "_draw_hero_sweet_spot", capture_color)
+    hero_plot.render_hero_deck_charts(data, tmp_path / "deck")
+
+    assert len(colors["openimcc"]) == len(colors["magemin"]) == 2
+    for openimcc_color, magemin_color in zip(
+        colors["openimcc"], colors["magemin"]
+    ):
+        assert openimcc_color == pytest.approx(magemin_color)
+
+
 def test_sio_deck_distinguishes_oxygen_sources_and_pO2_bins(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
