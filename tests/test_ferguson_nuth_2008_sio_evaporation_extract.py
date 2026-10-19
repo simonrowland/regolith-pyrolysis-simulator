@@ -42,7 +42,7 @@ def test_table_rows_migrate_temperature_conditions_and_source_pins(
     thermodynamic_fits = context["ferguson_nuth_2008_thermodynamic_fits"]
     assert thermodynamic_fits["locator"]["pdf_page_index"] == 5
     assert thermodynamic_fits["values"]["enthalpy_results_locator"] == {
-        "page": 2830,
+        "page": 7,
         "pdf_page_index": 6,
         "published_page": 2830,
         "section": "Results",
@@ -58,7 +58,7 @@ def test_table_rows_migrate_temperature_conditions_and_source_pins(
     schnurre = context["ferguson_nuth_2008_quoted_thermodynamic_assessments"][
         "values"]["assessments"][3]
     assert schnurre["locator"] == {
-        "page": 2831,
+        "page": 8,
         "pdf_page_index": 7,
         "published_page": 2831,
         "section": "Results",

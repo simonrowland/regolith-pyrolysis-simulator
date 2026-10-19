@@ -6,9 +6,8 @@ import yaml
 
 from simulator.battery.migrate import REPO_ROOT
 from simulator.battery.validate import validate_corpus
-from simulator.yaml_cache import YAML12SafeLoader
+from simulator.yaml_cache import YAML12SafeLoader, yaml_mapping_source_issues
 from tests.battery.test_migrate import _migrate_real_extract
-from tests.test_yaml_flow_scalar_commas import _walk_mapping_source_issues
 
 
 EXTRACT_NAME = "fuyuki-2007-sio-recombination.yaml"
@@ -35,7 +34,7 @@ def test_text_results_table_and_deferred_figures_migrate_without_observations(
         "unit": "K",
         "approximate": True,
         "condition": "early observation, 10–13 ns after laser irradiation",
-        "locator": {"page": 440, "published_page": 440, "pdf_page_index": 3},
+        "locator": {"page": 4, "published_page": 440, "pdf_page_index": 3},
     }
     temperature_results = by_id[
         "fuyuki_2007_textual_temperature_and_cooling_results"
@@ -48,7 +47,7 @@ def test_text_results_table_and_deferred_figures_migrate_without_observations(
     assert comparison["unit"] == "K"
     assert comparison["observation_period_as_printed"] == "40–80 μs"
     assert comparison["locator"] == {
-        "page": 443,
+        "page": 7,
         "published_page": 443,
         "pdf_page_index": 6,
     }
@@ -119,7 +118,7 @@ def test_text_results_table_and_deferred_figures_migrate_without_observations(
     try:
         node = loader.get_single_node()
         assert node is not None
-        assert _walk_mapping_source_issues(node, loader, source) == []
+        assert yaml_mapping_source_issues(source) == []
         loader.construct_document(node)
     finally:
         loader.dispose()

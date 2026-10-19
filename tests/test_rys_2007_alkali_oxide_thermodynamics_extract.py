@@ -6,8 +6,7 @@ from collections import Counter
 
 from simulator.battery.enums import Phase, Quantity
 from simulator.battery.migrate import Migrator
-from simulator.yaml_cache import YAML12SafeLoader
-from tests.test_yaml_flow_scalar_commas import _walk_mapping_source_issues
+from simulator.yaml_cache import YAML12SafeLoader, yaml_mapping_source_issues
 import yaml
 
 
@@ -29,7 +28,7 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
     try:
         node = loader.get_single_node()
         assert node is not None
-        assert _walk_mapping_source_issues(node, loader, source) == []
+        assert yaml_mapping_source_issues(source) == []
         document = loader.construct_document(node)
     finally:
         loader.dispose()

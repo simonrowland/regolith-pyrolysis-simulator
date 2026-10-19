@@ -6,9 +6,8 @@ import yaml
 
 from simulator.battery.migrate import REPO_ROOT
 from simulator.battery.validate import validate_corpus
-from simulator.yaml_cache import YAML12SafeLoader
+from simulator.yaml_cache import YAML12SafeLoader, yaml_mapping_source_issues
 from tests.battery.test_migrate import _migrate_real_extract
-from tests.test_yaml_flow_scalar_commas import _walk_mapping_source_issues
 
 
 EXTRACT_NAME = "toguri-1961-mgo-silicon-reduction.yaml"
@@ -101,7 +100,7 @@ def test_reaction_table_and_deferred_figures_remain_context_only(
     try:
         node = loader.get_single_node()
         assert node is not None
-        assert _walk_mapping_source_issues(node, loader, source) == []
+        assert yaml_mapping_source_issues(source) == []
         loader.construct_document(node)
     finally:
         loader.dispose()

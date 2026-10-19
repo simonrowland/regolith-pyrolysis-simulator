@@ -15289,7 +15289,8 @@ def test_stolyarova_1995_printed_compositions_reach_migrated_observations(
         condition = obs.point_conditions["composition"]
         assert condition.state.is_value
         assert condition.locator is not None
-        assert condition.locator.page == 687
+        assert condition.locator.page == 2
+        assert condition.locator.published_page == 687
         assert condition.locator.table == "2"
         assert "binary complement" in condition.locator.note
         assert condition.state.value == obs.identity.composition.value

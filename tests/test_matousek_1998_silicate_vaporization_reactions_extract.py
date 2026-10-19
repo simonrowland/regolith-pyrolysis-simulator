@@ -7,9 +7,8 @@ import yaml
 from simulator.battery.enums import Quantity
 from simulator.battery.migrate import REPO_ROOT
 from simulator.battery.validate import validate_corpus
-from simulator.yaml_cache import YAML12SafeLoader
+from simulator.yaml_cache import YAML12SafeLoader, yaml_mapping_source_issues
 from tests.battery.test_migrate import _migrate_real_extract
-from tests.test_yaml_flow_scalar_commas import _walk_mapping_source_issues
 
 
 EXTRACT_NAME = "matousek-1998-silicate-vaporization-reactions.yaml"
@@ -150,7 +149,7 @@ def test_tables_quotes_and_deferred_figures_migrate_cleanly(
     try:
         node = loader.get_single_node()
         assert node is not None
-        assert _walk_mapping_source_issues(node, loader, source) == []
+        assert yaml_mapping_source_issues(source) == []
         loader.construct_document(node)
     finally:
         loader.dispose()
@@ -171,7 +170,7 @@ def test_tables_quotes_and_deferred_figures_migrate_cleanly(
         temperature = observation.point_conditions["temperature_K"]
         assert temperature.state.is_value
         assert temperature.locator is not None
-        assert temperature.locator.page == 76
+        assert temperature.locator.page == 3
         assert temperature.locator.published_page == 76
         assert temperature.locator.pdf_page_index == 2
     validation = validate_corpus(
