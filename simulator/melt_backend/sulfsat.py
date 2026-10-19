@@ -635,13 +635,20 @@ class SulfSatGate:
         if not (ratio == ratio) or ratio < 0.0 or ratio > 1.0:
             # NaN / out-of-range -> the fit produced no usable answer.
             # Tag and warn instead of fabricating a default.
+            reason = (
+                'fit_nonfinite'
+                if not math.isfinite(ratio)
+                else 'fit_outside_[0,1]'
+            )
             return (
                 0.0,
                 [
-                    'Kress-Carmichael 1991 Fe3+/SumFe fit produced non-finite or '
-                    f'out-of-range ratio {ratio!r} '
-                    f'(T_K={T_K}, fO2_log={fO2_log}); '
-                    'no operator Fe3Fet_Liq supplied -> calibration tagged out_of_range'
+                    self._finite_output_repair_notice(
+                        field='Fe3Fet_Liq',
+                        raw=ratio,
+                        replacement=0.0,
+                        reason=reason,
+                    )
                 ],
                 False,
             )
@@ -695,6 +702,22 @@ class SulfSatGate:
         return cleaned
 
     @staticmethod
+    def _finite_output_repair_notice(
+        *,
+        field: str,
+        raw: float,
+        replacement: float,
+        reason: str,
+        unit: str = '',
+    ) -> str:
+        unit_suffix = f' {unit}' if unit else ''
+        return (
+            'SR24:sulfsat_output_repaired '
+            f'field={field} raw={format(raw, ".17g")} reason={reason} '
+            f'replacement={replacement:.1f}{unit_suffix}'
+        )
+
+    @staticmethod
     def _finite_capacity_ppm(
         value: float,
         *,
@@ -715,6 +738,17 @@ class SulfSatGate:
                 f'{model} returned non-finite {field}={number!r}; '
                 'treating capacity as 0.0 ppm for degenerate no modeled '
                 'sulfide/sulfate saturation',
+            )
+        if number < 0.0:
+            return (
+                0.0,
+                SulfSatGate._finite_output_repair_notice(
+                    field=field,
+                    raw=number,
+                    replacement=0.0,
+                    reason='negative_capacity',
+                    unit='ppm',
+                ),
             )
         return max(0.0, number), None
 
@@ -738,6 +772,17 @@ class SulfSatGate:
                 0.0,
                 f'{model} returned non-finite {field}={number!r}; '
                 'treating fraction as 0.0 for degenerate sulfur speciation',
+            )
+        if number < 0.0 or number > 1.0:
+            replacement = min(1.0, max(0.0, number))
+            return (
+                replacement,
+                SulfSatGate._finite_output_repair_notice(
+                    field=field,
+                    raw=number,
+                    replacement=replacement,
+                    reason='fraction_outside_[0,1]',
+                ),
             )
         return min(1.0, max(0.0, number)), None
 
