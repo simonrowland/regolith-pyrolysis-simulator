@@ -320,6 +320,7 @@ class CampaignManager:
         self._c2a_staged_cumulative_yield_mol_by_species: dict[str, float] = {}
         self._c2a_staged_last_log_slope_by_species: dict[str, float] = {}
         self.last_c2a_staged_termination: dict[str, object] | None = None
+        self.last_c0b_termination: dict[str, object] | None = None
         self._pending_c3_na_scoped_overrides: dict | None = None
         self._active_c3_na_scoped_overrides: dict | None = None
         self._pending_post_mg_c2a_overrides: dict | None = None
@@ -1484,6 +1485,7 @@ class CampaignManager:
 
         elif campaign == CampaignPhase.C0B:
             cfg = self._campaign_config(campaign)
+            self.last_c0b_termination = None
             melt.atmosphere = Atmosphere.CONTROLLED_O2_FLOW
             melt.pO2_mbar = self._pressure_config_float(
                 cfg, 'pO2_mbar', 'pO2_mbar_default', 9.0)
@@ -2188,7 +2190,7 @@ class CampaignManager:
         fractions; numeric thresholds come from setpoints.yaml
         ``soft_endpoint`` / ``endpoint`` / ``composition_endpoint``):
         - C0: temperature >= configured min after min hold, else max_hold
-        - C0B: max_hold only
+        - C0B: configured hold after attaining the hold temperature
         - C2A: armed total kg/hr below configured threshold after min
           hold, else max_hold
         - C2A_STAGED: per-stage log-slope or legacy flux-decay, else
@@ -2213,11 +2215,11 @@ class CampaignManager:
         campaign = melt.campaign
         completed_campaign_hour = self._completed_campaign_hour_for_endpoint(melt)
 
-        # Check user-specified max_hours override first. C6 handles this as a
-        # hold-acquisition refusal below so the wall clock cannot claim a
-        # successful reaction without provider dispatch.
+        # C0B counts its max_hours override at temperature. C6 handles its
+        # wall clock as a hold-acquisition refusal below, so neither can claim
+        # a completed hold from ramp time alone.
         ovr = self._campaign_overrides(campaign)
-        if campaign not in (CampaignPhase.C4, CampaignPhase.C6) and 'max_hours' in ovr:
+        if campaign not in (CampaignPhase.C0B, CampaignPhase.C4, CampaignPhase.C6) and 'max_hours' in ovr:
             raw_max_hours = ovr['max_hours']
             if not is_declared_real_scalar(
                 raw_max_hours,
@@ -2244,8 +2246,26 @@ class CampaignManager:
                 return True
 
         elif campaign == CampaignPhase.C0B:
+            target_C, _ = self.get_temp_target(campaign, melt.campaign_hour, melt)
+            if melt.temperature_C < target_C:
+                return False
+            # Endpoint evaluation follows this hour's work and precedes its
+            # snapshot, so count the current at-temperature hour once. Ramp
+            # snapshots contribute no hold time (hours + hours -> hours).
+            completed_hold_hr = 1.0 + sum(
+                snapshot.duration_h
+                for snapshot in record.snapshots
+                if snapshot.campaign == campaign
+                and snapshot.temperature_C >= target_C
+            )
             max_hold_hr = self._max_hold_hr(campaign)
-            if completed_campaign_hour >= max_hold_hr:
+            if completed_hold_hr >= max_hold_hr:
+                residual_p2o5_kg = melt.composition_kg.get('P2O5', 0.0)
+                self.last_c0b_termination = {
+                    'completed_hold_hr': completed_hold_hr,
+                    'residual_p2o5_kg': residual_p2o5_kg,
+                    'status': 'residual_phosphorus' if residual_p2o5_kg > 0.0 else 'no_phosphorus_inventory',
+                }
                 return True
 
         elif campaign == CampaignPhase.C2A:
@@ -3008,11 +3028,19 @@ class CampaignManager:
         Build a DecisionPoint for the operator when a decision is needed.
         """
         if current == CampaignPhase.C0B:
+            residual = self.last_c0b_termination or {}
+            residual_note = (
+                f"Residual P2O5: {residual['residual_p2o5_kg']:.6g} kg; "
+                'P cleanup incomplete. '
+                if residual.get('status') == 'residual_phosphorus'
+                else ''
+            )
             return DecisionPoint(
                 decision_type=DecisionType.PATH_AB,
                 options=['A', 'A_staged', 'B'],
                 recommendation='A_staged',
                 context=(
+                    residual_note +
                     'Path A: Continuous pN₂ ramp extracts Na/K/Fe/SiO₂. '
                     'Path A_staged: staged pN₂ ramp separates alkali, '
                     'SiO, hot Fe hold, then cool Na cleanup. '

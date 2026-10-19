@@ -2875,8 +2875,6 @@ class CondensationModel:
             vapour_carrier_authority_severity,
             vapour_carrier_authority_status,
         )
-        from simulator.vapour_rail.request import REFUSAL_INAPPLICABLE_PREDICATE
-
         raw_carrier_authority = getattr(
             evap_flux, 'carrier_authority_by_species', {}
         )
@@ -2917,27 +2915,27 @@ class CondensationModel:
                 current_status,
                 vapor_pressure_data=self.vapor_pressure_data,
             )
+            source_row = _species_vapor_data(
+                species, vapor_pressure_data=self.vapor_pressure_data,
+            )
             extra = carrier_authority_by_species.get(species, {}).get('extra', {})
             evidence = extra.get('applicability_evidence', {})
-            campaign = str(getattr(getattr(melt, 'campaign', None), 'name', ''))
-            expected_stage = {'C0': 'stage0_p_carriers', 'C0B': 'c0b_p_cleanup'}.get(campaign)
             if (
-                reason == REFUSAL_INAPPLICABLE_PREDICATE
+                reason == CONDENSATION_ADMISSION_REFUSAL_NO_DATA
                 and current_status in {
                     VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
                     VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
                 }
                 and evidence.get('active') is True
-                and evidence.get('predicate') == 'stage0_only'
-                and expected_stage is not None
-                and evidence.get('stage') == expected_stage
-                and evidence.get('process_phase') == 'hot_train'
+                and evidence.get('predicate') == 'applicable'
                 and 'P2O5' in evidence.get('parent_species_ids', ())
+                and source_row.get('condensation_saturation_model') == 'unavailable_source_reaction_not_psat'
                 and not _species_is_flux_dormant(species, vapor_pressure_data=self.vapor_pressure_data)
             ):
-                # The source predicate authorizes cleanup evaporation, while
-                # hot-train condensation remains inapplicable. Carry vapor
-                # through the declared offgas route; never promote a refusal.
+                # An admitted P2O5 source authorizes evaporation in any hot
+                # campaign. Its reaction pressure is not a condensation Psat:
+                # retain the vapor through overhead to offgas, never a salt or
+                # wall capture claim. Refused source authority stays refused.
                 cleanup_offgas_authorization[species] = copy.deepcopy(evidence)
                 promoted, reason = current_status, None
             carrier_authority_status_by_species[species] = promoted

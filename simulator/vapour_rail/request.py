@@ -962,6 +962,7 @@ def _applicability_evidence(
     stage = state.stage if state else None
     if (
         rule.applicability_predicate not in {"stage0_only", "not_applicable", "inapplicable"}
+        and rule.parent_oxide != "P2O5"
         and not (stage == "c0b_p_cleanup" and "P2O5" not in rule.parent_species_ids)
     ):
         return {}
