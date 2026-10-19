@@ -248,6 +248,7 @@ def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> 
         if item.readiness.engine in _COMPARABLE and item.payload is not None
     ]
     assert comparable
+    assert all(not item.readiness.flags for item in comparable)
     assert {item.payload["fO2_log"] for item in comparable} == {
         resolved.log10_fO2_bar
     }
