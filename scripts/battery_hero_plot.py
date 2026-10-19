@@ -104,6 +104,9 @@ DEFAULT_RAILS = (
     Rail.SIO_EVOLUTION.value,
 )
 HERO_RAILS = (Rail.VAPOUR.value, Rail.REDOX.value, Rail.MELT_ACTIVITY.value)
+HERO_AND_DECK_SOURCE_RAILS = frozenset(HERO_RAILS) | frozenset(
+    _BATTERY_HERO_DECK_SOURCE_RAILS
+)
 HERO_PRIMARY_ENGINES = ("openimcc", "internal-analytical")
 HERO_COMPARISON_ENGINES = ("vaporock", "thermoengine", "alphamelts", "magemin")
 HERO_MINOR_FACETS = (
@@ -624,7 +627,7 @@ def read_scores(
         raise ValueError("bin width must be a finite positive number of kelvin")
     selected_rails = _requested_rails(rails)
     selected = set(selected_rails)
-    retained_rails = selected | set(HERO_RAILS) | set(_BATTERY_HERO_DECK_SOURCE_RAILS)
+    retained_rails = selected | HERO_AND_DECK_SOURCE_RAILS
     summaries: dict[str, EngineSummary] = defaultdict(EngineSummary)
     rails_seen: set[str] = set()
     benchmark_payloads: list[Mapping[str, object]] = []
@@ -710,7 +713,7 @@ def read_scores(
                     status is not ResidualStatus.REFUSED
                     or _residual_engine_observable(row)
                 )
-                if rail in _BATTERY_HERO_DECK_SOURCE_RAILS:
+                if rail in HERO_AND_DECK_SOURCE_RAILS:
                     _record_hero_diagnostic(
                         hero_diagnostics,
                         row,
@@ -726,7 +729,7 @@ def read_scores(
                         summary.refused_by_rail[rail] += 1
                     else:
                         summary.not_observable_by_rail[rail] += 1
-                    if rail in _BATTERY_HERO_DECK_SOURCE_RAILS and engine_observable:
+                    if rail in HERO_AND_DECK_SOURCE_RAILS and engine_observable:
                         formula = _row_formula(row)
                         identity = _row_identity(row)
                         composition_key, _composition_label = _composition_fields(identity)
@@ -816,7 +819,7 @@ def read_scores(
                         else max(summary.max_temperature_K, temperature)
                     )
                 composition_key, composition_label = _composition_fields(identity)
-                if rail in HERO_RAILS or rail in _BATTERY_HERO_DECK_SOURCE_RAILS:
+                if rail in HERO_AND_DECK_SOURCE_RAILS:
                     composition_raw = _state_value(identity.get("composition"))
                     sio2_fraction = _battery_hero_sio2_mole_fraction(composition_raw)
                     if sio2_fraction is not None:
