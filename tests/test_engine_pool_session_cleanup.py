@@ -24,12 +24,14 @@ from simulator.engine_pool import (
 )
 
 
-def _bootstrap_cleanup_worker():
-    return None, "cleanup-ready"
+def _bootstrap_cleanup_worker(handler_started=None):
+    return handler_started, "cleanup-ready"
 
 
-def _handle_cleanup_request(_resource, request, _errlog):
+def _handle_cleanup_request(resource, request, _errlog):
     if isinstance(request, dict) and request.get("sleep_forever"):
+        if resource is not None:
+            resource.set()
         while True:
             time.sleep(0.05)
     if isinstance(request, dict) and request.get("delay"):
@@ -37,10 +39,11 @@ def _handle_cleanup_request(_resource, request, _errlog):
     return request
 
 
-def _cleanup_worker(_index, *, call_timeout_s=1.0):
+def _cleanup_worker(_index, *, call_timeout_s=1.0, handler_started=None):
     return WarmEngineWorker(
         name="session-cleanup-test",
         bootstrap=_bootstrap_cleanup_worker,
+        bootstrap_args=(handler_started,),
         handler=_handle_cleanup_request,
         startup_timeout_s=2.0,
         call_timeout_s=call_timeout_s,
@@ -141,10 +144,19 @@ def test_sessionfinish_interrupts_in_flight_job_within_automatic_budget():
 
 
 def test_aborting_running_request_reaps_and_restarts_its_worker_slot():
-    pool = EngineWorkerPool(_cleanup_worker, size=1)
+    context = multiprocessing.get_context("spawn")
+    handler_started = context.Event()
+    pool = EngineWorkerPool(
+        lambda index: _cleanup_worker(
+            index,
+            call_timeout_s=30.0,
+            handler_started=handler_started,
+        ),
+        size=1,
+    )
     try:
         first = pool.submit({'sleep_forever': True}, timeout_s=30.0)
-        _wait_until_running(first)
+        assert handler_started.wait(timeout=5.0)
         worker = pool.workers[0]
         first_pid = worker.process.pid
 

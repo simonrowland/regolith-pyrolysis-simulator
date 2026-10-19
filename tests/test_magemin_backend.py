@@ -75,6 +75,10 @@ def _handle_successful_magemin_request(_resource, _request, _errlog):
     return {'phases': {'liq': {'mass_kg': 1.0}}}
 
 
+def _handle_reusable_magemin_request(_resource, request, _errlog):
+    return request.get('request_id')
+
+
 class _RegisteredMageminPool:
     def __init__(self):
         self.workers = (types.SimpleNamespace(
@@ -649,6 +653,117 @@ def test_successful_magemin_worker_call_writes_no_timeout_record(tmp_path):
         ) == {'phases': {'liq': {'mass_kg': 1.0}}}
         assert diagnostic_log_path.read_text(encoding='utf-8') == ''
     finally:
+        pool.close(cancel_pending=True, timeout_s=3.0)
+
+
+@pytest.mark.timeout(20)
+def test_magemin_blocked_send_timeout_reaps_and_restarts_worker_slot():
+    pool = engine_pool.EngineWorkerPool(
+        lambda index: engine_pool.WarmEngineWorker(
+            name=f'fake MAGEMin slot {index}',
+            bootstrap=_bootstrap_sleeping_magemin_worker,
+            handler=_handle_reusable_magemin_request,
+            startup_timeout_s=2.0,
+            call_timeout_s=30.0,
+        ),
+        size=1,
+    )
+    worker = pool.workers[0]
+    connection = worker.connection
+    process = worker.process
+    worker_pid = process.pid
+    send_entered = threading.Event()
+    release_send = threading.Event()
+    send_unblocked = threading.Event()
+    real_send = connection.send
+
+    def blocked_send(request):
+        send_entered.set()
+        if not release_send.wait(timeout=_RENDEZVOUS_TIMEOUT_S):
+            raise TimeoutError('test send was not released')
+        send_unblocked.set()
+        if process.is_alive():
+            return real_send(request)
+        raise BrokenPipeError('worker exited during blocked send')
+
+    connection.send = blocked_send
+
+    def release_send_after_worker_exit():
+        process.join(timeout=_RENDEZVOUS_TIMEOUT_S)
+        if not process.is_alive():
+            release_send.set()
+
+    exit_watcher = threading.Thread(
+        target=release_send_after_worker_exit,
+        daemon=True,
+    )
+    exit_watcher.start()
+
+    backend = _make_pooled_subprocess_backend(None)
+    backend._subprocess_pool = pool
+    backend._config = {
+        'warm_call_timeout_s': 0.05,
+        'worker_startup_timeout_s': 2.0,
+    }
+    projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
+    submitted = []
+    original_submit = pool.submit
+
+    def capture_submit(request, *, timeout_s=None):
+        future = original_submit(request, timeout_s=timeout_s)
+        submitted.append(future)
+        return future
+
+    pool.submit = capture_submit
+    caller_finished = threading.Event()
+    caller_outcomes = []
+    caller_elapsed = []
+
+    def call_magemin():
+        started_at = time.monotonic()
+        try:
+            backend._call_magemin(
+                projection,
+                temperature_C=1200.0,
+                pressure_bar=1.0,
+                fO2_log=-8.0,
+                composition_mol={'SiO2': 0.5, 'MgO': 0.25},
+            )
+        except BaseException as exc:
+            caller_outcomes.append(exc)
+        finally:
+            caller_elapsed.append(time.monotonic() - started_at)
+            caller_finished.set()
+
+    caller = threading.Thread(target=call_magemin, daemon=True)
+    caller.start()
+    try:
+        assert send_entered.wait(timeout=5.0)
+        # The MAGEMin future wait is 4.45 s for these configured budgets;
+        # the remaining margin covers the worker kill and reap joins.
+        assert caller_finished.wait(timeout=7.0), (
+            'caller did not return after aborting the blocked send'
+        )
+        assert caller_elapsed[0] < 7.0
+        assert len(caller_outcomes) == 1
+        assert isinstance(caller_outcomes[0], EngineWorkerTimeout)
+        assert caller_outcomes[0].timeout_s == pytest.approx(4.45)
+        with pytest.raises(EngineWorkerDied) as send_failure:
+            submitted[0].result(timeout=1.0)
+        assert send_failure.value.phase == 'call'
+        assert send_unblocked.is_set()
+        assert worker.process is None
+        with pytest.raises(ProcessLookupError):
+            os.kill(worker_pid, 0)
+
+        next_future = pool.submit({'request_id': 'slot-reused'}, timeout_s=2.0)
+        assert next_future.result(timeout=5.0) == 'slot-reused'
+        assert worker.process.pid != worker_pid
+    finally:
+        release_send.set()
+        caller.join(timeout=5.0)
+        exit_watcher.join(timeout=5.0)
+        connection.send = real_send
         pool.close(cancel_pending=True, timeout_s=3.0)
 
 
