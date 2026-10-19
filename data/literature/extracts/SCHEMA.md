@@ -420,10 +420,11 @@ This typed reason is reported as a notice and exempts that locator from the
 `page == pdf_page_index + 1` check only while both corpus PDF paths are absent.
 
 For a table that continues from a captioned page onto a page containing cited
-data, set `table_continued: true` on the data-page locator. The locator's
-`page` and `pdf_page_index` identify the page containing the data. The caption
-may be on the immediately preceding physical page; this marker records that
-continuation and is verification metadata, not a location key.
+data, set `table_caption_page` to the one-based physical page containing the
+caption/label. The locator's `page` and `pdf_page_index` identify the page
+containing the cited data, and `table_caption_page` must be an integer earlier
+than `page`. This verification metadata is not a location key. The label test
+checks the caption on `table_caption_page` and the cited data cell on `page`.
 
 Every **observation** requires a `locator`.  
 Every **equipment-metadata field** that is present requires its **own** `locator`

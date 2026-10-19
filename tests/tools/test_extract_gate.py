@@ -244,7 +244,7 @@ def test_page_verification_migrates_as_locator_field_not_note():
     )
 
 
-def test_table_continued_migrates_as_locator_field_not_note():
+def test_table_caption_page_migrates_as_locator_field_not_note():
     from simulator.battery.migrate import locator_from_mapping
 
     locator = locator_from_mapping(
@@ -252,14 +252,22 @@ def test_table_continued_migrates_as_locator_field_not_note():
             "page": 4,
             "pdf_page_index": 3,
             "table": "877",
-            "table_continued": True,
+            "table_caption_page": 3,
             "record": "3300.000 64.806",
         }
     )
 
     assert locator is not None
-    assert locator.table_continued is True
+    assert locator.table_caption_page == 3
     assert locator.note is None
+
+
+def test_table_caption_page_must_precede_data_page():
+    import pytest
+    from simulator.battery.records import Locator
+
+    with pytest.raises(ValueError, match="earlier than the data page"):
+        Locator(page=3, table="877", table_caption_page=3)
 
 
 def test_absent_corpus_pdf_only_warns_about_page_count(tmp_path: Path):

@@ -136,6 +136,16 @@ def _normalize_label_text(text):
     )
 
 
+def _justifications():
+    path = Path(__file__).with_name("t1353_locator_label_justifications.yaml")
+    entries = yaml.safe_load(path.read_text()) or []
+    assert all(entry.get("reason") and entry.get("checked_by_render") for entry in entries)
+    return {
+        (entry["extract"], tuple(entry["locator_path"]), entry["page"], entry["label"]): entry
+        for entry in entries
+    }
+
+
 @lru_cache(maxsize=None)
 def _page_text(pdf, page_number):
     result = subprocess.run(
@@ -155,26 +165,44 @@ def _has_page_text(text):
     return bool(substantive)
 
 
-def _assert_label_and_data(locator, page_text, previous_page_text=None):
+def _assert_label_and_data(locator, locator_path, page_text, caption_page_text=None):
     label_pattern = _label_pattern(locator)
-    if locator.get("table_continued") is True:
-        if previous_page_text is None or not label_pattern.search(previous_page_text):
-            raise AssertionError("continued table caption is absent from previous page")
+    caption_page = locator.get("table_caption_page")
+    if caption_page is not None:
+        if type(caption_page) is not int or not isinstance(locator.get("page"), int):
+            raise AssertionError("table caption and data pages must be physical page integers")
+        if caption_page >= locator["page"]:
+            raise AssertionError("table caption page must precede the data page")
         match = re.search(r"data cell:\s*([^.;]+)", locator.get("note", ""), re.I)
-        if match is None:
-            raise AssertionError("continued table locator requires a data-cell record in its note")
-        record = match.group(1)
-        record_pattern = re.compile(r"\s+".join(re.escape(part) for part in record.split()))
+        if match:
+            record = match.group(1)
+        elif "species" in locator_path:
+            record = locator_path[locator_path.index("species") + 1]
+        elif locator.get("record"):
+            record = locator["record"]
+        else:
+            raise AssertionError("continued table locator requires a data-cell record")
+        parts = str(record).split()
+        record_pattern = re.compile(
+            r"\s+".join(
+                r"\s*".join(re.escape(char) for char in part) if part.isdigit() else re.escape(part)
+                for part in parts
+            )
+        )
         if not record_pattern.search(page_text):
             raise AssertionError("continued table data-cell record is absent from cited page")
+        if caption_page_text is None or not label_pattern.search(caption_page_text):
+            raise AssertionError("table caption label is absent from caption page")
         return
     if not label_pattern.search(page_text):
         raise AssertionError("table/figure label is absent from cited page")
 
 
 def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
-    checked = skipped = 0
+    checked = skipped = justified = 0
     failures = []
+    justifications = _justifications()
+    used_justifications = set()
     for relative in _changed_extract_paths():
         current_path = ROOT / relative
         current = _yaml(current_path.read_text())
@@ -188,7 +216,7 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
         for locator_path, locator in after.items():
             prior = before.get(locator_path)
             if prior is None or not any(prior.get(key) != locator.get(key)
-                                        for key in ("page", "published_page", "pdf_page_index", "table_continued")):
+                                        for key in ("page", "published_page", "pdf_page_index", "table_caption_page")):
                 continue
             if not ("page" in locator and "pdf_page_index" in locator):
                 continue
@@ -201,36 +229,58 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
             if not _has_page_text(text):
                 skipped += 1
                 continue
-            previous_text = (
-                _page_text(str(pdf), page_number - 1)
-                if locator.get("table_continued") is True and page_number > 1
-                else None
-            )
+            caption_page = locator.get("table_caption_page")
+            caption_text = _page_text(str(pdf), caption_page) if caption_page is not None else None
             try:
                 _assert_label_and_data(
                     locator,
+                    locator_path,
                     _normalize_label_text(text),
-                    _normalize_label_text(previous_text) if previous_text is not None else None,
+                    _normalize_label_text(caption_text) if caption_text is not None else None,
                 )
             except AssertionError as exc:
+                key = (relative, locator_path, page_number, label)
+                justification = justifications.get(key)
+                note_cell = re.search(r"data cell:\s*([^.;]+)", locator.get("note", ""), re.I)
+                label_failure = str(exc) in {
+                    "table caption label is absent from caption page",
+                    "table/figure label is absent from cited page",
+                }
+                scanned_cell_failure = (
+                    str(exc) == "continued table data-cell record is absent from cited page"
+                    and justification is not None
+                    and note_cell is not None
+                    and justification.get("data_cell") == note_cell.group(1)
+                )
+                if justification is not None and (label_failure or scanned_cell_failure):
+                    used_justifications.add(key)
+                    skipped += 1
+                    justified += 1
+                    continue
                 failures.append(f"{relative} {locator_path}: {label} on PDF page {page_number}: {exc}")
                 continue
             checked += 1
-    print(f"t1353 PDF locator labels: {checked} passed, {skipped} skipped, {len(failures)} failed")
+    print(
+        f"t1353 PDF locator labels: {checked} passed, {skipped} skipped "
+        f"({justified} justified by 600-dpi render), {len(failures)} failed"
+    )
     assert checked > 0, "no locator labels were checked"
     assert failures == [], "PDF locator label failures:\n" + "\n".join(failures)
+    assert used_justifications == set(justifications), "stale or unmatched rendered locator justification"
     captured = capsys.readouterr()
     print(captured.out, end="")
 
 
-def test_continued_table_checks_caption_on_previous_page_and_data_on_cited_page():
+def test_continued_table_checks_caption_page_and_data_page():
     locator = {
         "table": "877",
-        "table_continued": True,
+        "page": 4,
+        "table_caption_page": 3,
         "note": "Table 877 continues; data cell: 3300.000 64.806.",
     }
     _assert_label_and_data(
         locator,
+        (),
         "T (K)  F°(T)\n3300.000 64.806 346.974",
         "Class accuracy\nTable 877",
     )
