@@ -115,12 +115,15 @@ def test_oneill_feo_gamma_identity_keeps_printed_pressure() -> None:
     assert observation.identity.fO2_Pa.value == _log_fO2_to_pa(Decimal("-12.61"))
 
 
-def _migrate_fixture(tmp_path: Path, *, quantity: str, point: dict):
+def _migrate_fixture(
+    tmp_path: Path, *, quantity: str, point: dict, parent: dict | None = None
+):
     values = {
         "quantity": quantity,
         "method_class": "measured_direct",
         "admission_status": "admitted",
         "series": [point],
+        **(parent or {}),
     }
     extract = _scalar_extract(
         quantity=quantity,
@@ -222,6 +225,93 @@ def test_activity_buffer_offset_stays_unknown(tmp_path: Path) -> None:
     assert oxygen.reason.startswith("buffer-relative fO2 (")
     assert "FMQ+2.7" in oxygen.reason
     assert matches[0].point_conditions["fO2_control"].state.value == "FMQ+2.7"
+
+
+def test_child_buffer_beats_parent_log(tmp_path: Path) -> None:
+    # Parent log -9 bar is 1e-4 Pa. The child's named buffer is a refusal.
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity",
+        parent={"log_fO2": {"value": "-9", "units": "log10(bar)"}},
+        point={
+            "T_K": 1673,
+            "activity": "0.2",
+            "oxygen_buffer_as_published": "IW",
+            "point_conditions": {
+                "fO2_control": {
+                    "state": {"tag": "value", "value": "IW+2"},
+                    "locator": {"published_page": 1},
+                }
+            },
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
+    matches = [
+        observation
+        for observation in result.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.ACTIVITY
+        and isinstance((observation.point_conditions or {}).get("fO2_control"), Located)
+        and (observation.point_conditions or {})["fO2_control"].state.value == "IW+2"
+    ]
+    assert len(matches) == 1
+    oxygen = matches[0].identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_unknown
+    assert oxygen.reason is not None
+    assert oxygen.reason.startswith("buffer-relative fO2 (")
+    assert "IW+2" in oxygen.reason
+
+
+def test_child_typed_pressure_beats_parent_log(tmp_path: Path) -> None:
+    # Parent log -9 bar is 1e-4 Pa. The child's typed pressure stays 0.001 Pa.
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity",
+        parent={"log_fO2": {"value": "-9", "units": "log10(bar)"}},
+        point={
+            "T_K": 1673,
+            "activity": "0.2",
+            "point_conditions": {
+                "fO2_Pa": {
+                    "state": {"tag": "value", "value": "0.001"},
+                    "locator": {"published_page": 1},
+                }
+            },
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
+    matches = [
+        observation
+        for observation in result.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.ACTIVITY
+        and _decimal_point(
+            (observation.point_conditions or {}).get("fO2_Pa").state
+            if isinstance((observation.point_conditions or {}).get("fO2_Pa"), Located)
+            else None
+        )
+        == Decimal("0.001")
+    ]
+    assert len(matches) == 1
+    oxygen = matches[0].identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_value
+    assert oxygen.value == Decimal("0.001")
+
+
+def test_plante_derived_ratio_reaches_p_partial_identity() -> None:
+    # Table 2 series 1104 row 1 derives P_O2 = 0.226 P_K. The row-scope
+    # strip must not drop that pressure: it is this row's oxygen, and
+    # identity copies the point. The green pascal value is the pin.
+    result = _migrated("kems-042-plante-1979.yaml")
+    observation = _one(result, "plante1979_table2_s1104_r001_quoted")
+    assert observation.identity.quantity.value is Quantity.P_PARTIAL
+    located = observation.point_conditions["fO2_Pa"]
+    assert located.inference is not None
+    printed = _decimal_point(located.state)
+    assert printed == Decimal("0.015823519950")
+    assert observation.identity.fO2_Pa is not None
+    assert observation.identity.fO2_Pa.is_value
+    assert observation.identity.fO2_Pa.value == printed
 
 
 def test_activity_without_printed_oxygen_stays_unknown(tmp_path: Path) -> None:

@@ -29,6 +29,7 @@ from typing import Any, Callable, Iterable, Mapping, Sequence
 
 import yaml
 
+from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
@@ -5135,6 +5136,8 @@ def _comparison_identity(
     if redox and isinstance(prediction.identity, Identity):
         # Redox predictions consume the row's printed composition and oxygen
         # condition; compare both sides at those exact point conditions.
+        # fO2_Pa on both identities is log10_fo2_to_pa of that printed log.
+        # Exact equality is the check; this does not rebuild or relax it.
         for field_name in ("composition", "fO2_Pa", "total_pressure_Pa"):
             actual = getattr(identity, field_name)
             used = getattr(prediction.identity, field_name)
@@ -5436,9 +5439,7 @@ def _predict_fe_redox(
         prediction_identity = replace(
             identity,
             composition=composition_state,
-            fO2_Pa=State.of(
-                Decimal(str(100000.0 * 10.0 ** float(fO2_log)))
-            ),
+            fO2_Pa=State.of(log10_fo2_to_pa(fO2_log)),
         )
         sources = (
             f"openimcc-redox-pack:sha256:{result.redox_pack_digest}",
@@ -5488,8 +5489,8 @@ def _predict_fe_redox(
         return input_refusal
     # The extract labels this column log10 fO2; its air rows are about -0.68,
     # i.e. log10(0.21 bar), matching the simulator's log10(bar) convention.
-    # For identity comparison, fO2(Pa) = 10**log10(fO2/bar) * 1e5 Pa/bar;
-    # the predictor itself receives the printed log value without a frame shift.
+    # Identity fO2_Pa is log10_fo2_to_pa of that printed log. The predictor
+    # still receives the printed log, with no frame shift.
 
     pressure_pa = identity.total_pressure_Pa
     point_pressure = point_value("total_pressure_Pa")
@@ -5588,7 +5589,7 @@ def _predict_fe_redox(
     prediction_identity = replace(
         identity,
         composition=composition_state,
-        fO2_Pa=State.of(Decimal(str(100000.0 * 10.0 ** float(fO2_log)))),
+        fO2_Pa=State.of(log10_fo2_to_pa(fO2_log)),
         total_pressure_Pa=pressure_pa,
     )
     return EnginePrediction(

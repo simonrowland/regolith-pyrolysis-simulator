@@ -52,6 +52,7 @@ from typing import Any, Callable, Iterable, Iterator, Mapping, Sequence, Union, 
 
 import yaml
 
+from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.polymorph_dictionary import (
     POLYMORPH_ALIASES,
     is_generic_polymorph_name,
@@ -11435,12 +11436,9 @@ def _rejected_log_fO2_reason(facts: PrintedOxygenFacts) -> str | None:
 def _log_fO2_to_pa(
     log10_fO2: Decimal, reference_pressure_pa: Decimal = _BAR_PA
 ) -> Decimal:
-    # Printed log10 fO2 (bar) -> Pa = 10^x × 1e5.
-    # An atm frame uses 101325 Pa instead of 1e5. Callers pass that reference.
-    # Unit check: 10^x is dimensionless, so 10^x × Pa is Pa.
-    # Sanity: log10 fO2 = -9.56 (bar) -> 2.754e-5 Pa
-    # (1e5 × 10^-9.56 = 0.00002754228703338166448631210659 Pa).
-    return reference_pressure_pa * (Decimal(10) ** log10_fO2)
+    """Printed log → pascal identity. The formula lives in oxygen_identity."""
+
+    return log10_fo2_to_pa(log10_fO2, reference_pressure_pa)
 
 
 @dataclass(frozen=True)
@@ -11502,13 +11500,14 @@ def printed_oxygen_decision(
     *,
     raw_item: object,
     point_conditions: Mapping[str, Any] | None,
+    scope: str,
 ) -> PrintedOxygenDecision | None:
-    """Turn printed oxygen into one identity state, for every quantity.
+    """Turn one oxygen scope into one identity state, for every quantity.
 
-    ``facts`` are the facts ``_merge_printed_oxygen`` just computed, parent
-    fallback included. The bar-versus-atm reference lives on those facts and
-    is not stored on the point log, so a second row-only walk would miss both
-    the fallback and the frame.
+    ``scope="row"`` is oxygen printed on this row: a log, a typed pressure,
+    or a buffer refusal. ``scope="inherited"`` is a parent or experiment
+    fallback. An inherited log is not a row absolute, so that scope does not
+    read a row buffer or a row pressure. Callers resolve the row first.
 
     Provenance stays split. The printed log remains on point_conditions
     ``fO2_log`` with whatever inference it already had. ``identity.fO2_Pa``
@@ -11519,6 +11518,11 @@ def printed_oxygen_decision(
     not add a second condition key.
     """
 
+    if scope == "inherited":
+        raw_item = None
+        point_conditions = None
+    elif scope != "row":
+        raise ValueError(f"unknown printed oxygen scope {scope!r}")
     buffer_text = _printed_oxygen_buffer_text(raw_item, point_conditions)
     log_point = (
         facts.log_fO2.state.value
@@ -11549,6 +11553,100 @@ def printed_oxygen_decision(
     if pressure is None:
         return None
     return PrintedOxygenDecision("pressure", State.of(pressure))
+
+
+def _overlay_raw_oxygen_conditions(
+    point_conditions: Mapping[str, Any] | None,
+    payloads: Iterable[object],
+) -> dict[str, Any]:
+    """Row point conditions plus typed oxygen keys still nested on the payload."""
+
+    out = dict(point_conditions or {})
+    for item in payloads:
+        if not isinstance(item, Mapping):
+            continue
+        nested = item.get("point_conditions")
+        if not isinstance(nested, Mapping):
+            continue
+        for key in ("fO2_log", "fO2_Pa", "fO2_control"):
+            if key in out or key not in nested:
+                continue
+            try:
+                located = _point_condition_from_plain(nested[key], key=key)
+            except (TypeError, ValueError, ArithmeticError):
+                located = None
+            if located is not None:
+                out[key] = located
+    return out
+
+
+def _row_oxygen_point_conditions(
+    point_conditions: Mapping[str, Any] | None,
+    raw_item: object,
+    *,
+    before: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Drop oxygen keys a parent fallback wrote onto this row's conditions."""
+
+    raw_keys: set[str] = set()
+    if isinstance(raw_item, Mapping) and isinstance(raw_item.get("point_conditions"), Mapping):
+        raw_keys = {str(key) for key in raw_item["point_conditions"]}
+    present_before = set(before or {})
+    out: dict[str, Any] = {}
+    for key, value in (point_conditions or {}).items():
+        if key in {"fO2_log", "fO2_Pa"} and key not in present_before and key not in raw_keys:
+            continue
+        out[str(key)] = value
+    return _overlay_raw_oxygen_conditions(out, (raw_item,))
+
+
+def _scoped_oxygen_decision(
+    *,
+    facts: PrintedOxygenFacts,
+    from_fallback: bool,
+    raw_item: object,
+    row_point_conditions: Mapping[str, Any] | None,
+) -> tuple[PrintedOxygenDecision | None, bool]:
+    """Row oxygen first. Inherited facts fill only when the row has none."""
+
+    row_decision = printed_oxygen_decision(
+        PrintedOxygenFacts() if from_fallback else facts,
+        raw_item=raw_item,
+        point_conditions=row_point_conditions,
+        scope="row",
+    )
+    if row_decision is not None or not from_fallback:
+        return row_decision, False
+    return (
+        printed_oxygen_decision(
+            facts,
+            raw_item=None,
+            point_conditions=None,
+            scope="inherited",
+        ),
+        True,
+    )
+
+
+def _row_scope_oxygen_decision(
+    facts: PrintedOxygenFacts,
+    payloads: Iterable[object],
+    point_conditions: Mapping[str, Any] | None,
+) -> PrintedOxygenDecision | None:
+    """Row-local oxygen, including a typed pressure or buffer the walk missed."""
+
+    overlay = _overlay_raw_oxygen_conditions(point_conditions, payloads)
+    items = [item for item in payloads if isinstance(item, Mapping)] or [None]
+    for item in items:
+        decision = printed_oxygen_decision(
+            facts,
+            raw_item=item,
+            point_conditions=overlay,
+            scope="row",
+        )
+        if decision is not None:
+            return decision
+    return None
 
 
 def _printed_oxygen_may_set(
@@ -12920,6 +13018,10 @@ class Migrator:
             and facts.oxygen_partial_pressure_Pa is None
             and _rejected_log_fO2_reason(facts) is None
             and fallback
+            and _row_scope_oxygen_decision(
+                PrintedOxygenFacts(), specific, point_conditions
+            )
+            is None
         ):
             ratio_oxygen = collect_author_ratio_oxygen(fallback, locator)
             if ratio_oxygen is None:
@@ -12928,9 +13030,8 @@ class Migrator:
         if ratio_oxygen is not None:
             # The nested oxygen_partial_pressure is Plante's derived
             # congruent-vaporization condition, not a printed pO2 cell.
-            # Keep the printed log on the point condition, but hand identity
-            # an empty fact set so it copies this derived pressure instead of
-            # converting the log over it.
+            # Keep the printed log on the point condition. Identity must not
+            # convert that log over the derived pressure.
             facts = PrintedOxygenFacts(
                 log_fO2=facts.log_fO2,
                 log_fO2_reference_Pa=facts.log_fO2_reference_Pa,
@@ -12960,7 +13061,22 @@ class Migrator:
             # Per-row derived products span orders of magnitude; never collapse
             # them onto experiment.fO2_control.oxygen_partial_pressure_Pa.
             merged["fO2_Pa"] = ratio_oxygen
-        identity_facts = PrintedOxygenFacts() if ratio_oxygen is not None else facts
+        if ratio_oxygen is not None and not used_fallback:
+            # The derived Pa is on this row's point conditions. Identity facts
+            # stay empty so the decision copies that point, including a typed
+            # pressure that was already there, instead of converting the log.
+            # Callers keep this key in the row view: the row-scope strip is
+            # only for a parent fallback.
+            identity_facts = PrintedOxygenFacts()
+        elif ratio_oxygen is not None:
+            # Parent ratio. The row view drops fallback-written keys, so the
+            # inherited decision needs the derived pressure as a fact. The
+            # log stays off this fact set.
+            identity_facts = PrintedOxygenFacts(
+                oxygen_partial_pressure_Pa=ratio_oxygen
+            )
+        else:
+            identity_facts = facts
         return merged or None, identity_facts, used_fallback
 
     def _experiment_identity_fields(
@@ -15265,6 +15381,7 @@ class Migrator:
             oxygen_roots.append(values)
         if isinstance(obs.get("equipment"), Mapping):
             oxygen_roots.append(obs["equipment"])
+        oxygen_points_before = point_conditions
         point_conditions, oxygen_facts, oxygen_from_fallback = self._merge_printed_oxygen(
             experiment_id,
             point_conditions,
@@ -15328,14 +15445,27 @@ class Migrator:
         # into ident_kwargs before experiment inheritance, which fills only
         # axes still absent. The scratch fill decides whether this profile
         # accepts the axis; a not-applicable axis is left alone.
+        # A parent fallback's log or pressure must not look row-local.
+        # Oxygen this row derived (Plante's ratio × P_K) stays on the row.
+        row_point_conditions = (
+            _row_oxygen_point_conditions(
+                point_conditions,
+                values if isinstance(values, Mapping) else None,
+                before=oxygen_points_before,
+            )
+            if oxygen_from_fallback
+            else point_conditions
+        )
+        oxygen_decision, oxygen_decision_fallback = _scoped_oxygen_decision(
+            facts=oxygen_facts,
+            from_fallback=oxygen_from_fallback,
+            raw_item=values if isinstance(values, Mapping) else None,
+            row_point_conditions=row_point_conditions,
+        )
         oxygen_state = _printed_oxygen_state_for(
             fill_identity(quantity, species, **ident_kwargs),
-            printed_oxygen_decision(
-                oxygen_facts,
-                raw_item=values if isinstance(values, Mapping) else None,
-                point_conditions=point_conditions,
-            ),
-            from_fallback=oxygen_from_fallback,
+            oxygen_decision,
+            from_fallback=oxygen_decision_fallback,
         )
         if oxygen_state is not None:
             ident_kwargs["fO2_Pa"] = oxygen_state
@@ -16934,6 +17064,7 @@ class Migrator:
         )
         if lab_pc:
             point_conditions = {**(point_conditions or {}), **lab_pc}
+        oxygen_points_before = point_conditions
         point_conditions, oxygen_facts, oxygen_from_fallback = self._merge_printed_oxygen(
             experiment_id,
             point_conditions,
@@ -17292,6 +17423,16 @@ class Migrator:
             )
         ):
             self._row_local_printed_observations.add(point_id)
+        # Same split as the parent stamp: strip only a fallback's oxygen.
+        row_point_conditions = (
+            _row_oxygen_point_conditions(
+                point_conditions,
+                raw_item if isinstance(raw_item, Mapping) else None,
+                before=oxygen_points_before,
+            )
+            if oxygen_from_fallback
+            else point_conditions
+        )
         if parent_point_conditions:
             # Parent located conditions, including conversion provenance, are
             # defaults. The child replaces only the keys it printed.
@@ -17299,14 +17440,16 @@ class Migrator:
                 **parent_point_conditions,
                 **(point_conditions or {}),
             }
+        oxygen_decision, oxygen_decision_fallback = _scoped_oxygen_decision(
+            facts=oxygen_facts,
+            from_fallback=oxygen_from_fallback,
+            raw_item=raw_item if isinstance(raw_item, Mapping) else None,
+            row_point_conditions=row_point_conditions,
+        )
         oxygen_state = _printed_oxygen_state_for(
             identity,
-            printed_oxygen_decision(
-                oxygen_facts,
-                raw_item=raw_item if isinstance(raw_item, Mapping) else None,
-                point_conditions=point_conditions,
-            ),
-            from_fallback=oxygen_from_fallback,
+            oxygen_decision,
+            from_fallback=oxygen_decision_fallback,
         )
         if oxygen_state is not None:
             identity = replace(identity, fO2_Pa=oxygen_state)

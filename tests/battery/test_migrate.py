@@ -654,9 +654,14 @@ def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(
         assert observation.identity.species.phase.value is Phase.L
         assert reference.component_basis == "Fe(1-x)O"
         assert reference.reference_pressure_bar == Decimal("1.01325")
+    for observation in table2:
         assert identity_equal(observation.identity, observation.identity).kind is (
-            IdentityEqualKind.IDENTITY_UNKNOWN
+            IdentityEqualKind.EQUAL
         )
+    for observation in table3:
+        outcome = identity_equal(observation.identity, observation.identity)
+        assert outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+        assert "composition" in outcome.fields
 
     assert all(observation.identity.composition.is_value for observation in table2)
     assert all(observation.identity.composition.is_unknown for observation in table3)
