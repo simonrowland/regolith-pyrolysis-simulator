@@ -330,7 +330,28 @@ def _mixture_duct_coefficients(total_Pa, G, P_down, molecular_C, knudsen_at_tota
     return {
         species: w_v * factor + w_m * C
         for species, C in molecular_C.items()
-    }, w_v * factor, w_m
+    }, w_v * factor, {
+        species: w_m * C * P_down for species, C in molecular_C.items()
+    }
+
+
+def _mixture_duct_outflow_mol_s(
+    partials_Pa, *, carrier_partials_Pa, P_carrier_Pa, G_mol_s_Pa2,
+    P_downstream_Pa, molecular_C_mol_s_Pa, knudsen_at_total_Pa,
+):
+    # Complete affine duct law q_i=K_i(P)*p_i-b_i: the molecular
+    # downstream term b_i=w_m*C_i*Pd [mol/s] is also the steady root's
+    # supply term. Its sign follows C_i*(p_i-Pd), not a vacuum-only sink.
+    total = sum(max(0.0, float(p)) for p in partials_Pa.values()) + P_carrier_Pa
+    drains, viscous, downstream = _mixture_duct_coefficients(
+        total, G_mol_s_Pa2, max(0.0, P_downstream_Pa),
+        molecular_C_mol_s_Pa, knudsen_at_total_Pa,
+    )
+    return {
+        species: max(0.0, float(p) - carrier_partials_Pa.get(species, 0.0))
+        * drains.get(species, viscous) - downstream.get(species, 0.0)
+        for species, p in partials_Pa.items()
+    }
 
 
 def _molecular_pipe_conductance_mol_s_Pa(
@@ -522,7 +543,7 @@ def mixture_surface_partials_Pa(
 
     def partials_at(P_vapour: float) -> dict[str, float]:
         total = max(0.0, P_vapour) + P_extra
-        drains, viscous, w_m = _mixture_duct_coefficients(
+        drains, viscous, downstream = _mixture_duct_coefficients(
             total, G_mol_s_Pa2, P_down, C_map, knudsen_at_total_Pa,
         )
         out = dict(extra)
@@ -536,7 +557,6 @@ def mixture_surface_partials_Pa(
                     and coproduct.get(species, 0.0) <= 0.0):
                 out[species] = companion_pressure(str(species))
                 continue
-            C = float(C_map.get(species, 0.0))
             drain = drains.get(species, viscous)
             supply = max(0.0, coproduct.get(species, 0.0))
             denom = conductance + drain
@@ -544,7 +564,7 @@ def mixture_surface_partials_Pa(
                 out[species] = P_eq
             else:
                 out[species] = (
-                    conductance * P_eq + supply + w_m * C * P_down
+                    conductance * P_eq + supply + downstream.get(species, 0.0)
                 ) / denom
             out[species] += carrier_partial
         return out
@@ -606,15 +626,13 @@ def _source_duct_residual_rel(
     source_mol_hr: Mapping[str, float] | None = None,
     carrier_partials_Pa: Mapping[str, float] | None = None,
 ) -> float:
-    total_P = (
-        sum(max(0.0, float(pressure)) for pressure in partials_Pa.values())
-        + max(0.0, float(P_carrier_Pa))
+    outflow = _mixture_duct_outflow_mol_s(
+        partials_Pa, carrier_partials_Pa=carrier_partials_Pa or {},
+        P_carrier_Pa=max(0.0, float(P_carrier_Pa)), G_mol_s_Pa2=G_mol_s_Pa2,
+        P_downstream_Pa=P_downstream_Pa,
+        molecular_C_mol_s_Pa=molecular_C_mol_s_Pa or {},
+        knudsen_at_total_Pa=knudsen_at_total_Pa,
     )
-    C_map = dict(molecular_C_mol_s_Pa or {})
-    drains, viscous, w_m = _mixture_duct_coefficients(
-        total_P, G_mol_s_Pa2, P_downstream_Pa, C_map, knudsen_at_total_Pa,
-    )
-    P_down = max(0.0, float(P_downstream_Pa))
     max_scale = 0.0
     max_delta = 0.0
     species = set(partials_Pa) | set(flux_kg_hr) | set(source_mol_hr or {})
@@ -625,10 +643,7 @@ def _source_duct_residual_rel(
         q_source = max(0.0, float(flux_kg_hr.get(name, 0.0))) / mass / 3600.0
         if source_mol_hr is not None:
             q_source = float(source_mol_hr.get(name, 0.0)) / 3600.0
-        p_i = max(0.0, float(partials_Pa.get(name, 0.0))
-                  - float((carrier_partials_Pa or {}).get(name, 0.0)))
-        C = max(0.0, float(C_map.get(name, 0.0)))
-        q_duct = p_i * drains.get(name, viscous) - w_m * C * P_down
+        q_duct = outflow.get(name, 0.0)
         supplied = max(0.0, q_source)
         disposed = q_duct
         max_delta = max(max_delta, abs(supplied - disposed))
