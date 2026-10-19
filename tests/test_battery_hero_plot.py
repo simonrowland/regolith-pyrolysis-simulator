@@ -792,21 +792,23 @@ def test_non_observable_rows_are_separate_from_refusals_and_history(
 
 def test_sweet_spot_panels_show_shared_cell_counts_and_hatch_sparse_cells(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     rows: list[dict[str, object]] = [
         {"kind": "battery_store_stamp", "revision": "sweet-spot-test"}
     ]
-    for engine, experiment, residual in (
-        ("internal-analytical", "ia-1", 0.2),
-        ("internal-analytical", "ia-2", -0.8),
-        ("internal-analytical", "ia-3", 1.0),
-        ("openimcc", "open-1", 0.4),
+    for engine, experiment, residual, temperature in (
+        ("internal-analytical", "ia-1", 0.2, 1200),
+        ("internal-analytical", "ia-2", -0.8, 1200),
+        ("internal-analytical", "ia-3", 1.0, 1200),
+        ("openimcc", "open-1", 0.4, 1200),
+        ("openimcc", "open-2", 0.6, 1400),
     ):
         row = _record(
             engine=engine,
             experiment=experiment,
             formula="SiO",
-            temperature_K=1200,
+            temperature_K=temperature,
             residual=residual,
             rail="vapour",
         )
@@ -834,6 +836,15 @@ def test_sweet_spot_panels_show_shared_cell_counts_and_hatch_sparse_cells(
         internal_cell["temperature_lower_K"]
         == openimcc_cell["temperature_lower_K"]
     )
+    all_cells = [*internal_cells, *openimcc_cells]
+    x_limits = (
+        min(float(cell["sio2_lower"]) for cell in all_cells),
+        max(float(cell["sio2_upper"]) for cell in all_cells),
+    )
+    temperature_limits = (
+        min(float(cell["temperature_lower_K"]) for cell in all_cells),
+        max(float(cell["temperature_upper_K"]) for cell in all_cells),
+    )
 
     fig, axis = plt.subplots()
     _draw_hero_sweet_spot(
@@ -842,14 +853,32 @@ def test_sweet_spot_panels_show_shared_cell_counts_and_hatch_sparse_cells(
         openimcc_cells,
         colormap=plt.get_cmap("viridis"),
         normalization=Normalize(vmin=0, vmax=1),
+        x_limits=x_limits,
+        temperature_limits=temperature_limits,
     )
+    assert axis.get_xlim() == x_limits
+    assert axis.get_ylim() == temperature_limits
     assert any(patch.get_hatch() == "///" for patch in axis.patches)
     assert "1" in {text.get_text() for text in axis.texts}
     assert "0" not in {text.get_text() for text in axis.texts}
     assert len(axis.patches) == sum(int(cell["n"]) > 0 for cell in openimcc_cells)
     plt.close(fig)
 
+    import scripts.battery_hero_plot as plotter
+
+    rendered_limits: list[tuple[tuple[float, float], tuple[float, float]]] = []
+    original_draw = plotter._draw_hero_sweet_spot
+
+    def capture_limits(axis, engine, cells, **kwargs):
+        drawn = original_draw(axis, engine, cells, **kwargs)
+        if drawn:
+            rendered_limits.append((axis.get_xlim(), axis.get_ylim()))
+        return drawn
+
+    monkeypatch.setattr(plotter, "_draw_hero_sweet_spot", capture_limits)
     files = render_hero_charts(data, tmp_path / "sweet-spot-render")
+    assert len(rendered_limits) == 2
+    assert rendered_limits[0] == rendered_limits[1]
     svg = files["hero:vapour:svg"].read_text(encoding="utf-8").casefold()
     assert "cell label=n" in svg
     assert "sweet-spot fill=median" in svg

@@ -1944,10 +1944,11 @@ def _draw_hero_sweet_spot(
     *,
     colormap: Any,
     normalization: Normalize,
+    x_limits: tuple[float, float],
+    temperature_limits: tuple[float, float],
 ) -> bool:
     """Draw scorer-owned cell medians and sample counts for one engine."""
 
-    temperatures: list[float] = []
     for cell in cells:
         x_low = _finite_float(cell.get("sio2_lower"))
         x_high = _finite_float(cell.get("sio2_upper"))
@@ -1960,7 +1961,6 @@ def _draw_hero_sweet_spot(
         count = int(cell.get("n") or 0)
         if count == 0:
             continue
-        temperatures.extend((y_low, y_high))
         value = _finite_float(cell.get("median_abs_dex"))
         color_eligible = bool(cell.get("color_eligible")) and value is not None
         sparse = count < 3
@@ -1996,11 +1996,11 @@ def _draw_hero_sweet_spot(
             fontsize=5.0,
         )
 
-    if not temperatures:
+    if not any(int(cell.get("n") or 0) for cell in cells):
         axis.set_axis_off()
         return False
-    axis.set_xlim(0.0, 1.0)
-    axis.set_ylim(min(temperatures), max(temperatures))
+    axis.set_xlim(*x_limits)
+    axis.set_ylim(*temperature_limits)
     axis.set_xticks([index / 10 for index in range(11)])
     axis.set_xticklabels([f"{index / 10:.1f}" for index in range(11)], fontsize=5)
     cell_lowers = sorted(
@@ -2231,6 +2231,38 @@ def render_hero_charts(
                 for cell in data.hero_sweet_spot_cells[(sweet_spot_rail, engine)]
             )
         )
+        rail_sweet_spot_cells = [
+            cell
+            for (sweet_spot_rail, _engine), cells in data.hero_sweet_spot_cells.items()
+            if sweet_spot_rail == rail
+            for cell in cells
+        ]
+        sio2_edges = [
+            edge
+            for cell in rail_sweet_spot_cells
+            for edge in (
+                _finite_float(cell.get("sio2_lower")),
+                _finite_float(cell.get("sio2_upper")),
+            )
+            if edge is not None
+        ]
+        temperature_edges = [
+            edge
+            for cell in rail_sweet_spot_cells
+            for edge in (
+                _finite_float(cell.get("temperature_lower_K")),
+                _finite_float(cell.get("temperature_upper_K")),
+            )
+            if edge is not None
+        ]
+        sweet_spot_x_limits = (
+            (min(sio2_edges), max(sio2_edges)) if sio2_edges else (0.0, 1.0)
+        )
+        sweet_spot_temperature_limits = (
+            (min(temperature_edges), max(temperature_edges))
+            if temperature_edges
+            else (0.0, 1.0)
+        )
         sweet_spot_cells = {
             engine: data.hero_sweet_spot_cells[(rail, engine)]
             for engine in sweet_spot_engines
@@ -2403,6 +2435,8 @@ def render_hero_charts(
                         sweet_spot_cells[engine],
                         colormap=sweet_spot_colormap,
                         normalization=normalization,
+                        x_limits=sweet_spot_x_limits,
+                        temperature_limits=sweet_spot_temperature_limits,
                     ):
                         sweet_spot_axes.append(axis)
             row_index += 1
