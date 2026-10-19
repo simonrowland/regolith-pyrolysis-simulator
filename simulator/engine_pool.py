@@ -682,8 +682,10 @@ class WarmEngineWorker:
                         f'{self.name} worker exited without a result',
                     )
                 # Passing this locked check admits this request to the send.
-                # Keep transport I/O outside the lock so disable and abort can
-                # still kill the child if send blocks.
+                # It may reach the child and briefly run its handler before an
+                # abort kills it; the post-send token and slot checks discard
+                # its result. Keep transport I/O outside the state lock so
+                # disable and abort can still kill the child if send blocks.
             connection.send(request)
             with self._state_lock:
                 if abort_event is not None and abort_event.is_set():
