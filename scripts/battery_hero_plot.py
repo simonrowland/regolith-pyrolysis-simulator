@@ -2974,6 +2974,18 @@ def render_hero_deck_charts(
             tuple(sweet_spot_engines[index : index + 2])
             for index in range(0, len(sweet_spot_engines), 2)
         ]
+        sweet_spot_values = [
+            value
+            for (rail, _engine), cells in data.hero_sweet_spot_cells.items()
+            if rail == source_rail
+            for cell in cells
+            if cell.get("color_eligible")
+            if (value := _finite_float(cell.get("median_abs_dex"))) is not None
+        ]
+        sweet_spot_colormap = plt.get_cmap("viridis")
+        sweet_spot_normalization = Normalize(
+            vmin=0.0, vmax=max(sweet_spot_values, default=1.0) or 1.0
+        )
         refusal_rails = (
             (source_rail, Rail.SIO_EVOLUTION.value)
             if chart == "redox_sensitivity"
@@ -3231,19 +3243,12 @@ def render_hero_deck_charts(
                     grid[row_index, column * 3 : (column + 1) * 3]
                 )
                 cells = data.hero_sweet_spot_cells[(source_rail, engine)]
-                numeric_values = [
-                    value
-                    for cell in cells
-                    if cell.get("color_eligible")
-                    if (value := _finite_float(cell.get("median_abs_dex"))) is not None
-                ]
-                color_max = max(numeric_values, default=1.0) or 1.0
                 if _draw_hero_sweet_spot(
                     axis,
                     engine,
                     cells,
-                    colormap=plt.get_cmap("viridis"),
-                    normalization=Normalize(vmin=0.0, vmax=color_max),
+                    colormap=sweet_spot_colormap,
+                    normalization=sweet_spot_normalization,
                     x_limits=(0.0, 1.0),
                     temperature_limits=data.x_limits,
                 ):
@@ -3302,8 +3307,8 @@ def render_hero_deck_charts(
             numeric_values = [value for value in values if value is not None]
             if numeric_values:
                 scalar = matplotlib.cm.ScalarMappable(
-                    norm=Normalize(vmin=0.0, vmax=max(numeric_values) or 1.0),
-                    cmap=plt.get_cmap("viridis"),
+                    norm=sweet_spot_normalization,
+                    cmap=sweet_spot_colormap,
                 )
                 scalar.set_array([])
                 colorbar = figure.colorbar(
