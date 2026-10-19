@@ -3859,6 +3859,36 @@ def _full_conditional_context_from_metadata(metadata: Mapping[str, Any]):
     return context
 
 
+def _cached_extraction_completion_feasible(
+    scored: ScoredResult,
+    constraints: Any,
+) -> bool:
+    if "extraction_completeness" not in getattr(
+        constraints,
+        "active_gates",
+        (),
+    ):
+        return True
+    reference = scored.run_reference
+    trace = reference.trace if reference is not None else None
+    bind_extraction = getattr(constraints, "extraction_completeness", None)
+    if not isinstance(trace, Mapping) or not callable(bind_extraction):
+        return False
+    trace_payload = dict(trace)
+    product_ledger = reference.product_summary.get("product_ledger_kg")
+    if "product_ledger_kg" not in trace_payload and isinstance(
+        product_ledger,
+        Mapping,
+    ):
+        trace_payload["product_ledger_kg"] = product_ledger
+    bound_margin = bind_extraction(SimpleNamespace(**trace_payload))
+    return (
+        bound_margin.feasible
+        and bound_margin.observed is not None
+        and math.isfinite(bound_margin.observed)
+    )
+
+
 def _lookup_cached(
     candidate: Candidate,
     profile: Mapping[str, Any],
@@ -3890,29 +3920,11 @@ def _lookup_cached(
     cached = store.lookup(spec)
     if cached is None:
         return None
-    if cached.feasible and "extraction_completeness" in getattr(
+    if not _cached_extraction_completion_feasible(
+        cached,
         constraints,
-        "active_gates",
-        (),
     ):
-        reference = cached.run_reference
-        trace = reference.trace if reference is not None else None
-        bind_extraction = getattr(constraints, "extraction_completeness", None)
-        if not isinstance(trace, Mapping) or not callable(bind_extraction):
-            return None
-        trace_payload = dict(trace)
-        product_ledger = reference.product_summary.get("product_ledger_kg")
-        if "product_ledger_kg" not in trace_payload and isinstance(
-            product_ledger,
-            Mapping,
-        ):
-            trace_payload["product_ledger_kg"] = product_ledger
-        bound_margin = bind_extraction(SimpleNamespace(**trace_payload))
-        # Keep historical margins when their capture evidence is bindable.
-        # Only an unbound row (reported as a non-finite observation by the
-        # owning gate resolver) must miss and undergo fresh evaluation.
-        if bound_margin.observed is None or not math.isfinite(bound_margin.observed):
-            return None
+        return None
     if require_certified_cache_state and not _is_certified_cache_state(
         _cache_state_from_scored(cached)
     ):
