@@ -17,6 +17,7 @@ from enum import Enum
 import math
 from typing import Any, ClassVar, Dict, List, Mapping, Optional, Sequence
 
+from engines.domain_reason import OutOfDomainReason
 from simulator.melt_regime import liquid_fraction_invalidity
 
 
@@ -650,6 +651,58 @@ class MeltBackend(ABC):
 
     backend_name = 'unknown'
     supports_intrinsic_fO2 = False
+
+    def _not_an_input_redox_refusal(
+        self,
+        *,
+        redox_mode: Optional[str],
+        composition_kg: Optional[Mapping[str, float]],
+        composition_mol: Optional[Mapping[str, float]],
+        composition_mol_by_account: Optional[
+            Mapping[str, Mapping[str, float]]
+        ],
+        temperature_C: float,
+        pressure_bar: float,
+        fO2_log: Optional[float],
+        oxide_aliases: Mapping[str, str],
+    ) -> EquilibriumResult | None:
+        if redox_mode != REDOX_MODE_NOT_AN_INPUT:
+            return None
+        if composition_mol_by_account is not None:
+            composition = composition_mol_by_account.get(
+                CLEANED_MELT_ACCOUNT, {}
+            )
+        elif composition_mol is not None:
+            composition = composition_mol
+        else:
+            composition = composition_kg
+        components = multivalent_components(
+            composition,
+            oxide_aliases=oxide_aliases,
+        )
+        if not components:
+            return None
+
+        reason = OutOfDomainReason.INVALID_INPUT.value
+        message = (
+            "redox_mode='not_an_input' requires a composition without "
+            "multivalent elements; found " + ", ".join(components)
+        )
+        return EquilibriumResult(
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            status='out_of_domain',
+            warnings=[message],
+            diagnostics={
+                'backend_status': 'out_of_domain',
+                'backend_status_reason': reason,
+                'backend_failure_reason_code': reason,
+                'redox_mode': redox_mode,
+                'multivalent_components': list(components),
+                'authoritative_for_requested_conditions': False,
+            },
+        )
 
     @abstractmethod
     def initialize(self, config: dict) -> bool:

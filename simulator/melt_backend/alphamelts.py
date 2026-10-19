@@ -1455,6 +1455,18 @@ class _MELTSBackendSupport(MeltBackend):
             raise ValueError(f'unsupported redox_mode={redox_mode!r}')
         if redox_mode == REDOX_MODE_NOT_AN_INPUT and fO2_log is not None:
             raise ValueError('not_an_input redox_mode requires fO2_log=None')
+        redox_refusal = self._not_an_input_redox_refusal(
+            redox_mode=redox_mode,
+            composition_kg=composition_kg,
+            composition_mol=composition_mol,
+            composition_mol_by_account=composition_mol_by_account,
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            oxide_aliases=MELTS_OXIDE_ALIASES,
+        )
+        if redox_refusal is not None:
+            return redox_refusal
         if (
             fO2_log is None
             and redox_mode != REDOX_MODE_NOT_AN_INPUT

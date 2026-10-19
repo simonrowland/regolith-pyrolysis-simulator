@@ -737,11 +737,11 @@ def test_not_an_input_rejects_multivalent_composition_at_backend_and_cell(
 
     assert direct.status == "out_of_domain"
     assert direct.diagnostics["backend_status_reason"] == (
-        OutOfDomainReason.FORBIDDEN_SPECIES.value
+        OutOfDomainReason.INVALID_INPUT.value
     )
     assert cell.status == "refusal"
     assert cell.engine_status == "out_of_domain"
-    assert cell.engine_reason == OutOfDomainReason.FORBIDDEN_SPECIES.value
+    assert cell.engine_reason == OutOfDomainReason.INVALID_INPUT.value
     assert transport_calls == []
 
 
