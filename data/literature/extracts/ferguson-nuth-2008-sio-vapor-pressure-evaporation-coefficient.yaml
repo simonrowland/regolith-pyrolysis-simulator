@@ -144,6 +144,7 @@ species:
           third_law_mean_uncertainty_kJ_mol: 2.0
           delta_fH_SiO_g_298_kJ_mol: -93.6
           delta_fH_uncertainty_kJ_mol: 2.0
+          enthalpy_results_locator: {page: 2830, pdf_page_index: 6, published_page: 2830, section: Results}
           identity_gap: mixed-reservoir reaction is not safely represented by current profiles
       - observation_id: ferguson_nuth_2008_rocabois_quoted_formation_enthalpy
         type: relation
@@ -210,6 +211,7 @@ species:
               equation: '16'
             - method_class: quoted_attributed
               attribution: "Schnurre et al. [9]"
+              locator: {page: 2831, pdf_page_index: 7, published_page: 2831, section: Results}
               quote_as_printed: "condensation distance approximately 4 mm at 1693 K for Delta T from 25 to 100 K"
               condensation_distance_mm: {value: {kind: point, point: 4, approximate: true}}
               temperature_K: 1693

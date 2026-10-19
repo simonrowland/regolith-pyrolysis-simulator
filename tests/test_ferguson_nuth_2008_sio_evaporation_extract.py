@@ -39,6 +39,33 @@ def test_table_rows_migrate_temperature_conditions_and_source_pins(
     fedkin = prior["values"]["quotations"][2]
     assert fedkin["method_class"] == "quoted_attributed"
     assert fedkin["value_range"] == {"kind": "interval", "low": 0.12, "high": 0.21}
+    thermodynamic_fits = context["ferguson_nuth_2008_thermodynamic_fits"]
+    assert thermodynamic_fits["locator"]["pdf_page_index"] == 5
+    assert thermodynamic_fits["values"]["enthalpy_results_locator"] == {
+        "page": 2830,
+        "pdf_page_index": 6,
+        "published_page": 2830,
+        "section": "Results",
+    }
+    assert [
+        thermodynamic_fits["values"][key]
+        for key in (
+            "second_law_delta_rxnH_298_kJ_mol",
+            "third_law_mean_delta_rxnH_298_kJ_mol",
+            "delta_fH_SiO_g_298_kJ_mol",
+        )
+    ] == [351, 359.1, -93.6]
+    schnurre = context["ferguson_nuth_2008_quoted_thermodynamic_assessments"][
+        "values"]["assessments"][3]
+    assert schnurre["locator"] == {
+        "page": 2831,
+        "pdf_page_index": 7,
+        "published_page": 2831,
+        "section": "Results",
+    }
+    assert schnurre["condensation_distance_mm"]["value"]["point"] == 4
+    assert schnurre["temperature_K"] == 1693
+    assert schnurre["sublimation_temperature_at_1bar_K"] == 2070
 
     changed_pin = deepcopy(document)
     changed_pin["species"]["SiO"]["observations"][0]["values"]["points"][0][
