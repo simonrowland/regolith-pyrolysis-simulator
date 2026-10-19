@@ -986,15 +986,36 @@ class EngineWorkerPool:
             self._queue.put((future, request, timeout_s))
         return future
 
-    def _abort_request(self, future: Future) -> bool:
+    def _abort_request(
+        self,
+        future: Future,
+        *,
+        diagnostic_detail: str | None = None,
+    ) -> bool:
         """Abort the worker currently running ``future`` and keep its slot.
 
         The active-request lock prevents the consumer from releasing this
         worker for its next request until the current process has been killed
-        and reaped. Pending futures have no assigned worker and return False.
+        and reaped. Diagnostic detail is appended to that worker's existing
+        diagnostic log; a pending request uses the first slot's log. Pending
+        futures have no assigned worker and return False.
         """
         with self._active_requests_lock:
             active = self._active_requests.get(future)
+            worker = active[0] if active is not None else self._workers[0]
+            diagnostic_path = worker.diagnostic_log_path
+            if diagnostic_detail is not None and diagnostic_path is not None:
+                try:
+                    diagnostic_path.parent.mkdir(parents=True, exist_ok=True)
+                    with diagnostic_path.open('a', encoding='utf-8') as log:
+                        log.write(
+                            'MAGEMin timed-out request: '
+                            f'{diagnostic_detail}\n'
+                        )
+                except OSError:
+                    # Logging must not prevent worker cleanup or replace the
+                    # typed timeout returned to the caller.
+                    pass
             if active is None:
                 return False
             worker, call_finished = active
