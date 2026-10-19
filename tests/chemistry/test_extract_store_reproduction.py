@@ -1997,10 +1997,20 @@ def test_alkali_first_observed_stays_unparsed_ordering() -> None:
     )
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="b-308: unknown qualitative payload is mislabeled as an ordering gap",
+@pytest.mark.parametrize(
+    "quantity",
+    (
+        "vapour_partial_pressure_ordering_no_numeric_P",
+        "vapour_partial_pressure_ratio_ordering_no_numeric_P",
+    ),
 )
+def test_explicit_ordering_quantity_stays_unparsed_ordering(quantity: str) -> None:
+    obs = _ordering_fixture(quantity=quantity)
+    _assert_qualitative_skip(
+        obs, "typed-refusal:unsupported_observable:ordering_claim_unparsed"
+    )
+
+
 def test_unclassified_qualitative_payload_is_not_reported_as_ordering_gap() -> None:
     obs = _ordering_fixture(
         observation_id="unclassified_qualitative_payload",
@@ -2046,6 +2056,9 @@ _LIVE_QUALITATIVE_SKIP_BY_ID = {
     "drowart_2005_kems_reporting_requirements": (
         "unsupported_observable:methodology_guidance_not_observable"
     ),
+    "ichise_1986_few_activity_runs_no_arrest": (
+        "unsupported_observable:qualitative_activity_not_tabulated"
+    ),
     "hastie_1981_table3_solgasmix_model_not_measurement": (
         "model_output_not_measurement"
     ),
@@ -2054,6 +2067,9 @@ _LIVE_QUALITATIVE_SKIP_BY_ID = {
     ),
     "sauerborn_2005_qms_traces_figure_only_blocked": (
         "unsupported_observable:figure_only_not_digitized"
+    ),
+    "sossi_fegley_2018_table5_Ag_speciation": (
+        "unsupported_observable:species_speciation_without_numeric_pressures"
     ),
     "sesko_2024_crucible_deposit_edx": (
         "unsupported_observable:deposit_composition_not_species_rate"
