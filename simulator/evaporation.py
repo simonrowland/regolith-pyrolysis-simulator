@@ -1244,9 +1244,8 @@ class EvaporationMixin:
 
             merge_notes_into_mapping(diagnostic, _partial_sz_notes)
         self._last_evaporation_flux_diagnostic = diagnostic
-        continuum_notice = diagnostic.get('continuum_extrapolation_notice')
         condensation_model = getattr(self, 'condensation_model', None)
-        if continuum_notice and condensation_model is not None:
+        if condensation_model is not None:
             from simulator.wall_deposition import _record_wall_pressure_notice
 
             for species, series in diagnostic.get('evaporation_series_resistance', {}).items():
@@ -1259,7 +1258,7 @@ class EvaporationMixin:
                 _record_wall_pressure_notice(
                     condensation_model, 'evaporation_transport_notices_by_species',
                     species, 'evaporation', {
-                        **notice, 'temperature_K': continuum_notice['gas_temperature_K'],
+                        **notice, 'temperature_K': control_inputs['gas_temperature_K'],
                     },
                 )
         alpha_authority_statuses = dict(

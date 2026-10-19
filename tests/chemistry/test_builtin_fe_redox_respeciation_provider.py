@@ -19,8 +19,10 @@ from tests.chemistry.conftest import _atom_check, _build_sim
 
 DECLARED_ACCOUNTS = frozenset({
     "process.cleaned_melt",
+    "process.spent_reductant_residue",
     "process.overhead_gas",
     "reservoir.fo2_buffer",
+    "process.metal_phase",
 })
 
 
@@ -69,6 +71,29 @@ def test_provider_declares_fe_redox_respeciation_authority_and_accounts():
     assert profile.declared_accounts == DECLARED_ACCOUNTS
 
 
+@pytest.mark.parametrize('metal,ferric', [(2., 5.), (5., 2.), (0., 5.)])
+def test_comproportionation_funds_both_reactants_and_closes_atoms(metal, ferric):
+    provider = BuiltinFeRedoxRespeciationProvider()
+    result = provider.dispatch(_request({}, {
+        'process.cleaned_melt': {'FeO': 10., 'Fe2O3': ferric},
+        'process.metal_phase': {'Fe': metal},
+    }, fO2_log=-10., control_inputs={'reaction': 'fe0_comproportionation'}))
+    assert result.status == 'ok'
+    if not metal:
+        assert result.transition is None
+        return
+    proposal = result.transition
+    validate_atom_balance(proposal, {})
+    validate_proposal_accounts(proposal, provider.DECLARED_ACCOUNTS)
+    extent = proposal.debits['process.metal_phase']['Fe']
+    assert 0 < extent <= min(metal, ferric)
+    assert proposal.debits['process.cleaned_melt']['Fe2O3'] == extent
+    assert proposal.credits['process.cleaned_melt']['FeO'] == 3*extent
+    if extent < metal:
+        assert result.diagnostic['equilibrium_gap_dex'] == pytest.approx(0., abs=1e-9)
+    assert 'O2' not in proposal.credits.get('process.overhead_gas', {})
+
+
 def test_fe_redox_respeciation_intent_authority_is_registered(
     vapor_pressure_data,
     feedstocks_data,
@@ -85,6 +110,48 @@ def test_fe_redox_respeciation_intent_authority_is_registered(
     assert summary[ChemistryIntent.FE_REDOX_RESPECIATION.value][
         "authoritative"
     ] == "builtin-fe-redox-respeciation"
+
+
+def test_respeciation_at_intrinsic_potential_keeps_spent_oxide_equilibrium(
+    formula_registry,
+):
+    from simulator.accounting.ledger import AtomLedger
+    from simulator.chemistry.kernel.account_filters import build_provider_account_view
+    from simulator.core import PyrolysisSimulator
+    from simulator.fe_redox import kress91_intrinsic_state, melt_mol_fractions_for_kress91
+
+    accounts = {
+        'process.cleaned_melt': {'SiO2': 200.0, 'FeO': 100.0, 'Fe2O3': 1.0},
+        'process.spent_reductant_residue': {'Na2O': 50.0},
+    }
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.atom_ledger = AtomLedger(formula_registry)
+    for account, species_mol in accounts.items():
+        sim.atom_ledger.load_external_mol(
+            account, species_mol, source='fixture', material_origin='feedstock')
+    composition = sim._melt_oxide_wt_pct()
+    intrinsic = kress91_intrinsic_state(
+        feo_mol=100.0, fe2o3_mol=1.0,
+        mol_fractions=melt_mol_fractions_for_kress91(composition),
+        T_K=2423.15, pressure_bar=1e-9, exchange_fO2_log=-9.0,
+    )['fO2_log']
+    provider = BuiltinFeRedoxRespeciationProvider()
+    view = build_provider_account_view(
+        sim.atom_ledger, provider.capability_profile().declared_accounts,
+        formula_registry)
+    request = IntentRequest(
+        intent=ChemistryIntent.FE_REDOX_RESPECIATION,
+        account_view=view, temperature_C=2150.0, pressure_bar=1e-9,
+        fO2_log=intrinsic,
+    )
+    before_mol = sim.atom_ledger.mol_by_account()
+
+    result = provider.dispatch(request)
+
+    assert result.status == 'ok'
+    assert result.transition is None
+    assert result.diagnostic['delta_fe2o3_mol'] == pytest.approx(0.0, abs=1e-12)
+    assert sim.atom_ledger.mol_by_account() == before_mol
 
 
 def test_oxidizing_respeciation_consumes_explicit_o2_and_matches_kress91(
@@ -155,6 +222,12 @@ def test_respeciation_provider_refuses_below_authoritative_temperature_band(
 
 
 def test_1670c_respeciation_predicts_flagged_kress_split(formula_registry):
+    """1670 °C is the experimentally confirmed Kress extrapolation band.
+
+    The same split is the 1670 °C point of
+    test_hot_respeciation_predicts_flagged_kress_split. This name keeps
+    that case: a flagged, atom-balanced ferric credit from the provider.
+    """
     from engines.builtin._common import composition_wt_pct_from_account_view
     from simulator.fe_redox import (
         kress91_fe3_over_sigma_fe, melt_mol_fractions_for_kress91,
@@ -184,6 +257,51 @@ def test_1670c_respeciation_predicts_flagged_kress_split(formula_registry):
     validate_atom_balance(result.transition, formula_registry)
     expected = kress91_fe3_over_sigma_fe(
         fO2_log=request.fO2_log, T_K=1943.15, pressure_bar=2e-4,
+        mol_fractions=melt_mol_fractions_for_kress91(
+            composition_wt_pct_from_account_view(request.account_view, "process.cleaned_melt"),
+        ),
+    )
+    assert result.transition.credits["process.cleaned_melt"]["Fe2O3"] == pytest.approx(
+        5.0 * expected,
+    )
+    assert result.transition.debits["process.cleaned_melt"]["FeO"] == pytest.approx(
+        10.0 * expected,
+    )
+
+
+@pytest.mark.parametrize("temperature_C", [1670.0, 2300.0, 2600.0])
+def test_hot_respeciation_predicts_flagged_kress_split(formula_registry, temperature_C):
+    from engines.builtin._common import composition_wt_pct_from_account_view
+    from simulator.fe_redox import (
+        kress91_fe3_over_sigma_fe, kress91_temperature_band_case,
+        melt_mol_fractions_for_kress91,
+    )
+
+    request = _request(
+        formula_registry,
+        {
+            "process.cleaned_melt": {"FeO": 10.0, "SiO2": 20.0},
+            "process.overhead_gas": {"O2": 10.0},
+        },
+        fO2_log=-3.6989700043360187,  # pure O2 at 0.2 mbar = 2e-4 bar
+        temperature_C=temperature_C,
+        pressure_bar=2e-4,
+    )
+    result = BuiltinFeRedoxRespeciationProvider().dispatch(
+        request,
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert result.diagnostic["temperature_band_authoritative"] is False
+    assert "OUT_OF_CERTIFIED_BAND" in result.diagnostic["flags"]
+    band_case = kress91_temperature_band_case(temperature_C)["case"]
+    assert result.diagnostic["temperature_band_case"] == band_case
+    assert band_case in result.diagnostic["flags"]
+    assert result.diagnostic["authority"] == "extrapolated"
+    validate_atom_balance(result.transition, formula_registry)
+    expected = kress91_fe3_over_sigma_fe(
+        fO2_log=request.fO2_log, T_K=temperature_C + 273.15, pressure_bar=2e-4,
         mol_fractions=melt_mol_fractions_for_kress91(
             composition_wt_pct_from_account_view(request.account_view, "process.cleaned_melt"),
         ),

@@ -171,13 +171,15 @@ def test_base_char_electrolysis_and_web_additive_outputs_are_pinned(
 
     assert len(entries) == 27
     assert _digest(char) == (
-        "bed92af234928b16635372df91a7981b0e7ad9debaed9813cb7ba1e0531d2bc8"
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        '6002fc2a7f7917bd83d7798ab94540f102798bb750598f0732bcc97127c92c4f'
     )
     assert _digest(electrolysis) == (
         "c9a981b084c0f62c5d53e3aab226014001a5f793829bd9ab1f3308ef6e8eddf7"
     )
     assert _digest(web) == (
-        "20c0071f01eb6bb5436057568c57f42842add55b5f7c812ac3df1550d33e2c4c"
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        'a6c6504104a7b4b890988cc5edb645809f6593d539bb6db3653e6ba53353dddd'
     )
 
 

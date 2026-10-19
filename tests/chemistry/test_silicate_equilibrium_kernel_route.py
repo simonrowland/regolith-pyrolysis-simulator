@@ -28,7 +28,8 @@ class AlphaMELTSBackend:
     def get_engine_version(self):
         return 'fake-alphamelts-kernel-route'
 
-    def equilibrate(self, **kwargs):
+    def equilibrate(self, *, composition_mol_by_account=None, **kwargs):
+        kwargs['composition_mol_by_account'] = composition_mol_by_account
         self.calls.append(kwargs)
         result = EquilibriumResult(
             temperature_C=float(kwargs['temperature_C']),

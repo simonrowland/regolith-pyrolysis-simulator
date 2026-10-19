@@ -32,6 +32,7 @@ class _MatchingThermoEngineBackend:
         temperature_C: float,
         composition_mol: dict[str, float] | None = None,
         composition_kg: dict[str, float] | None = None,
+        composition_mol_by_account: dict[str, dict[str, float]] | None = None,
         fO2_log: float = -9.0,
         pressure_bar: float = 1e-6,
         vapor_transport_pO2_bar: float | None = None,
@@ -166,7 +167,10 @@ def test_l5_thermoengine_excludes_overhead_metal_products_from_backend_inputs(
     overhead = sim.atom_ledger.mol_by_account("process.overhead_gas")
     assert overhead.get("Fe", 0.0) > 0.0
     sim._get_equilibrium()
-    assert "Fe" not in backend.last_composition_mol
+    # The feedstock's measured native Fe0 is a legitimate backend input;
+    # overhead Fe product must not be added to that metal-phase inventory.
+    assert backend.last_composition_mol['Fe'] == pytest.approx(
+        sim.atom_ledger.mol_by_account('process.metal_phase')['Fe'])
 
 
 def test_l5_thermoengine_mismatch_keeps_kernel_value(
@@ -189,12 +193,21 @@ def test_l5_thermoengine_mismatch_keeps_kernel_value(
     sim.start_campaign(CampaignPhase.C2A)
     sim.melt.temperature_C = 1700.0
 
+    # This reference is the closed runtime request, including its intrinsic
+    # potential; a lab request with only transport pO2 is a different control.
+    intrinsic = sim._compute_intrinsic_melt_fO2()
     kernel = sim._chem_kernel.dispatch(
         ChemistryIntent.VAPOR_PRESSURE,
         temperature_C=sim.melt.temperature_C,
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
-        control_inputs={"pO2_bar": sim._vapor_pressure_dispatch_pO2_bar()},
-        fO2_log=sim._compute_intrinsic_melt_fO2(),
+        control_inputs={
+            "pO2_bar": sim._vapor_pressure_dispatch_pO2_bar(),
+            "intrinsic_fO2_log": intrinsic,
+            "melt_redox_state": {
+                "origin": "closed_ledger", **sim._last_intrinsic_redox_state,
+            },
+        },
+        fO2_log=intrinsic,
     )
     kernel_vp = dict((kernel.diagnostic or {}).get("vapor_pressures_Pa") or {})
     kernel_provenance = dict(

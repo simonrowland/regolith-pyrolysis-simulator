@@ -286,6 +286,14 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
     schedule["furnace_ceiling_C"] = 2200.0
     for knot in schedule["melt_temperature_C"]:
         knot["value"] = 2200.0
+    if hours == 24:
+        # At 2473.15 K with Ar and the declared 0.02 m bore, the transport
+        # owner gives Kn=0.002356 at 13 mbar. With T and bore fixed, Kn is
+        # proportional to 1/P: 1.3 mbar gives Kn=0.02356 (dimensionless),
+        # outside the Kn<0.01 continuum band; P->0 increases Kn. Explicitly
+        # exercise extrapolation instead of relying on stale pipe sizing.
+        for knot in schedule['chamber_pressure_mbar']:
+            knot['value'] = 1.3
     if hours > schedule["duration_h"]:
         schedule["duration_h"] = float(hours)
         for profile in (schedule["melt_temperature_C"], schedule["chamber_pressure_mbar"],
@@ -329,14 +337,14 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
             for record in refused["Al2"].values()
         ]
     assert document["per_hour_summary"][0]["T_C"] == 2200.0
+    transport = wall["evaporation_transport_notices_by_species"]
+    assert transport["Si"]["evaporation"]["authority_level"] == "unavailable"
+    assert transport["Si"]["evaporation"]["refusal_type"] == "EvaporationFluxConfigurationError"
     if hours == 24:
         assert not any(record.get("refusal_type") == "DepositionInputRefusal"
                        for records in refused.values() for record in records.values())
-        transport = wall["evaporation_transport_notices_by_species"]
         assert transport["SiO"]["evaporation"]["authority_level"] == "extrapolated"
         assert "Kn < 0.01" in transport["SiO"]["evaporation"]["model_domain"]
-        assert transport["Si"]["evaporation"]["authority_level"] == "unavailable"
-        assert transport["Si"]["evaporation"]["refusal_type"] == "EvaporationFluxConfigurationError"
     pareto = document["run_metadata"]["pressure_coating_pareto_diagnostic"]["by_species"]
     assert pareto["Mg"]["authority_level"] == "extrapolated"
     assert pareto["Na"]["status"] == "unavailable"
