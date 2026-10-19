@@ -590,6 +590,101 @@ def test_polymerisation_deck_facets_points_by_species_and_keeps_benchmark(
     assert "vaporock" in svg
 
 
+def test_deck_legends_include_points_refusals_and_history_on_empty_axes(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    _score_file(residuals)
+    data = read_scores(residuals)
+    data = replace(
+        data,
+        hero_deck_points=(
+            {
+                "chart": "polymerisation",
+                "engine": "openimcc",
+                "facet": "SiO2",
+                "x_value": "1.0",
+                "y_value": "0.2",
+                "residual_dex": "0.2",
+                "flagged": False,
+            },
+        ),
+        hero_deck_axis_refusals={
+            ("polymerisation", "vaporock", "no usable NBO/T"): 1,
+            ("residue_composition", "magemin", "no recorded mass loss"): 1,
+            ("fo2_cross_comparison", "magemin", "no measured fO2"): 1,
+        },
+        hero_deck_axis_refusal_details={},
+        hero_sweet_spot_cells={},
+    )
+    history = tmp_path / "history.jsonl"
+    history.write_text(
+        json.dumps(
+            {
+                "kind": "battery_hero_history",
+                "schema_version": 1,
+                "store_sha": "test-store",
+                "commit_date": "2026-10-18T10:27:53-04:00",
+                "metrics": [
+                    {"rail": "vapour", "engine": "thermoengine", "rms_dex": "0.2"},
+                    {
+                        "rail": "residue_composition",
+                        "engine": "thermoengine",
+                        "rms_dex": "0.3",
+                    },
+                    {"rail": "redox", "engine": "thermoengine", "rms_dex": "0.4"},
+                ],
+                "benchmarks": [
+                    {
+                        "rail": rail,
+                        "primary_engine": "openimcc",
+                        "benchmark_engine": "alphamelts",
+                        "primary_rms_dex": "0.2",
+                        "benchmark_rms_dex": "0.3",
+                        "n": 2,
+                    }
+                    for rail in ("vapour", "residue_composition", "redox")
+                ],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    legends: dict[str, set[str]] = {}
+    original_legend = Figure.legend
+
+    def capture_legend(figure: Figure, *args, **kwargs):
+        title = figure._suptitle.get_text() if figure._suptitle is not None else ""
+        handles = kwargs.get("handles", ())
+        legends[title] = {str(handle.get_label()) for handle in handles}
+        return original_legend(figure, *args, **kwargs)
+
+    monkeypatch.setattr(Figure, "legend", capture_legend)
+    hero_plot.render_hero_deck_charts(
+        data, tmp_path / "deck", history_path=history
+    )
+
+    assert legends["Polymerisation test"] >= {
+        "openimcc",
+        "vaporock",
+        "thermoengine",
+        "alphamelts",
+    }
+    assert legends["Residue composition"] >= {
+        "magemin",
+        "thermoengine",
+        "openimcc",
+        "alphamelts",
+    }
+    assert legends["fO₂ cross-comparison"] >= {
+        "magemin",
+        "thermoengine",
+        "openimcc",
+        "alphamelts",
+    }
+
+
 def test_sio_deck_distinguishes_oxygen_sources_and_pO2_bins(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
