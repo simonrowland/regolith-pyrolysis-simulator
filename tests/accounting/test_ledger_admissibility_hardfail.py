@@ -34,9 +34,11 @@ from simulator.chemistry.kernel import (
     ProposalRejected,
     ProviderRegistry,
 )
+from simulator.chemistry.kernel.validation import _build_lots
 
 
 Action = Callable[[], None]
+_RETAINED_FE_AMOUNT_MOL = 1.1987204510704742e-9
 
 
 class _AdmissibilityProvider(ChemistryProvider):
@@ -266,9 +268,8 @@ def test_exact_zero_lots_and_fully_debited_balances_are_empty() -> None:
     assert ledger.mol_by_account("process.cleaned_melt") == {}
 
 
-@pytest.mark.xfail(strict=True, reason="mol-native ledger lots are reconstructed from kg")
 def test_mol_native_debit_applies_the_retained_fe_amount() -> None:
-    amount_mol = 1.1987204510704742e-9
+    amount_mol = _RETAINED_FE_AMOUNT_MOL
     ledger = AtomLedger()
     account = "process.overhead_gas"
     ledger._balances[account] = {"Fe": amount_mol}
@@ -279,6 +280,63 @@ def test_mol_native_debit_applies_the_retained_fe_amount() -> None:
     )
 
     assert projected[account] == {}
+
+
+def test_mol_credit_round_trips_the_retained_species_amount() -> None:
+    ledger = AtomLedger()
+    lot = ledger.credit_mol(
+        "process.overhead_gas",
+        {"Fe": _RETAINED_FE_AMOUNT_MOL},
+    )
+
+    assert lot.species_moles_for(ledger.registry) == {
+        "Fe": _RETAINED_FE_AMOUNT_MOL
+    }
+
+
+def test_kernel_proposal_lot_round_trips_the_retained_species_amount() -> None:
+    ledger = AtomLedger()
+    (lot,) = _build_lots(
+        {"process.overhead_gas": {"Fe": _RETAINED_FE_AMOUNT_MOL}},
+        ledger.registry,
+        kind="credit",
+    )
+
+    assert lot.species_moles_for(ledger.registry) == {
+        "Fe": _RETAINED_FE_AMOUNT_MOL
+    }
+
+
+def test_gross_flow_records_the_retained_species_amount() -> None:
+    ledger = AtomLedger()
+    account = "process.overhead_gas"
+    ledger.load_external_mol(
+        account,
+        {"Fe": _RETAINED_FE_AMOUNT_MOL},
+        material_origin="feedstock",
+    )
+
+    flows = ledger.gross_account_flows()
+    assert flows["inputs"]["species_mol_by_account"][account] == {
+        "Fe": _RETAINED_FE_AMOUNT_MOL
+    }
+
+
+def test_atom_projection_uses_the_retained_species_amount() -> None:
+    ledger = AtomLedger()
+    debit = ledger.debit_mol(
+        "process.overhead_gas",
+        {"Fe": _RETAINED_FE_AMOUNT_MOL},
+    )
+    transition = LedgerTransition(
+        "exact_fe_depletion",
+        debits=(debit,),
+        credits=(),
+    )
+
+    assert transition.debit_atom_moles(ledger.registry) == {
+        "Fe": _RETAINED_FE_AMOUNT_MOL
+    }
 
 
 def _direct_overdraft_normal() -> tuple[Action, Action, type[BaseException]]:
