@@ -616,6 +616,44 @@ def test_round9_initial_charge_role_admits_map_and_keeps_note_as_provenance() ->
     assert note in result.inference.inputs
 
 
+def test_round10_datum_state_role_admits_measured_composition_without_proxy() -> None:
+    result = _composition_located_from_values(
+        {
+            "composition_role": {
+                "value": "datum_state",
+                "locator": {"table": "2"},
+                "quote": "1302 | 43.94 | 6.91E-7",
+            },
+            "composition_wt_pct": {"K2O": "43.94", "SiO2": "56.06"},
+        },
+        None,
+    )
+
+    assert result is not None and result.state.is_value
+    assert result.state.value.components == wt_pct_to_mole_fraction(
+        {"K2O": Decimal("43.94"), "SiO2": Decimal("56.06")}
+    ).components
+    assert result.state.value.proxy_flag is None
+
+
+def test_round10_plante_1979_table_row_keeps_datum_state_composition(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-042-plante-1979.yaml")
+    observation = next(
+        row
+        for observation_id, row in result.observations.items()
+        if observation_id.endswith("plante1979_table2_s1104_r001_quoted")
+    )
+    composition = (observation.point_conditions or {}).get("composition")
+
+    assert composition is not None and composition.state.is_value
+    assert composition.state.value.proxy_flag is None
+    from simulator.battery import score as score_module
+
+    assert score_module._initial_charge_composition_notice(observation) is None
+
+
 def test_round9_catalogue_composition_note_does_not_change_admission() -> None:
     source = REPO_ROOT / "data/literature/extracts/kems-027-plante-hastie-1983.yaml"
     original_load = migrate_module.load_yaml
