@@ -527,6 +527,8 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker(
             assert json.loads(outcomes[0].diagnostic_detail)[
                 'diagnostic_capture_error'
             ] == 'RuntimeError'
+            diagnostic_log = diagnostic_log_path.read_text(encoding='utf-8')
+            assert outcomes[0].diagnostic_detail in diagnostic_log
         else:
             for arg in (
                 '--Temp=1200.000000',
@@ -534,8 +536,6 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker(
                 '--db=ig',
             ):
                 assert arg in timeout_text
-            diagnostic_log = diagnostic_log_path.read_text(encoding='utf-8')
-            assert outcomes[0].diagnostic_detail in diagnostic_log
         assert time.monotonic() - started_at < 5.5
         assert worker.process is None
         with pytest.raises(ProcessLookupError):
