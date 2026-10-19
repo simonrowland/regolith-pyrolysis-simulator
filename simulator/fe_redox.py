@@ -1470,7 +1470,7 @@ def kress91_intrinsic_state(
         # Algebra: log10(fO2/bar) = [ln(n_Fe2O3)-ln(n_FeO)-B]/[a ln(10)].
         # All logs are dimensionless; the mol units cancel in the ratio.
         # Limits: n_Fe2O3 -> 0 gives -infinity, n_FeO -> 0 gives +infinity;
-        # those exact ends use exchange above. Sanity: at 1873.15 K, 0.01 bar,
+        # those exact ends use the bounds above. Sanity: at 1873.15 K, 0.01 bar,
         # the basalt test basis ratio 0.02275705282703544 returns -7.5 dex.
         baseline = _kress91_fe2o3_over_feo_molar(
             fO2_log=0.0, mol_fractions=mol_fractions,
@@ -1479,6 +1479,19 @@ def kress91_intrinsic_state(
         value = (math.log(fe2o3_mol) - math.log(feo_mol) - math.log(baseline)) / (
             KRESS91_LN_FO2_COEFFICIENT * math.log(10.0)
         )
+        # Zero forward oxygen demand at P identifies the funded boundary split:
+        # (target_Fe2O3-current_Fe2O3)/2 = 0 mol O2. Its inverse is exactly
+        # log10(P/bar); subtracting the inventory logs can round above P.
+        # More oxidized inventories have negative demand and retain their
+        # above-gas potential. The mol units cancel; as ferric inventory
+        # increases through the boundary, uptake changes to release.
+        pressure_ceiling = math.log10(pressure_bar)
+        if kress91_oxygen_demand_mol(
+            feo_mol=feo_mol, fe2o3_mol=fe2o3_mol,
+            fO2_log=pressure_ceiling, mol_fractions=mol_fractions,
+            T_K=T_K, pressure_bar=pressure_bar,
+        ) == 0.0:
+            value = pressure_ceiling
     state = {'fO2_log': value, 'exchange_bounded': bounded, 'bound': bound,
              'flags': flags, 'notices': notices}
     if bounded:

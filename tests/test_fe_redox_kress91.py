@@ -181,6 +181,29 @@ def test_intrinsic_kress91_inverse_round_trip(T_K, pressure_bar, fO2_log, alkali
     assert ('OUT_OF_CERTIFIED_BAND' in state['flags']) == (T_K > 1903.15)
 
 
+@pytest.mark.parametrize('T_K', [1473.15, 1873.15, 2073.15])
+@pytest.mark.parametrize('total_fe_mol', [1.0, 1000.0])
+def test_intrinsic_kress91_pressure_boundary_is_exact(T_K, total_fe_mol):
+    from simulator.fe_redox import kress91_intrinsic_state, kress91_oxygen_demand_mol
+
+    pressure_bar = 0.01
+    ceiling = math.log10(pressure_bar)
+    uptake = kress91_oxygen_demand_mol(
+        feo_mol=total_fe_mol, fe2o3_mol=0.0,
+        fO2_log=ceiling, mol_fractions=KRESS91_MOL_FRACTIONS,
+        T_K=T_K, pressure_bar=pressure_bar,
+    )
+    # 2 FeO + 1/2 O2 -> Fe2O3: each mol O2 funds 4 mol FeO -> 2 mol
+    # Fe2O3. These mol coefficients conserve Fe and O at any inventory scale.
+    state = kress91_intrinsic_state(
+        feo_mol=total_fe_mol - 4.0 * uptake, fe2o3_mol=2.0 * uptake,
+        mol_fractions=KRESS91_MOL_FRACTIONS, T_K=T_K,
+        pressure_bar=pressure_bar, exchange_fO2_log=ceiling,
+    )
+    assert state['fO2_log'] == ceiling
+    assert not state['exchange_bounded']
+
+
 @pytest.mark.parametrize('temperature_C', [1630., 1630.0001, 1750.])
 def test_kress91_ceiling_emits_typed_notice_without_clamping(temperature_C):
     from simulator.fe_redox import kress91_intrinsic_state
