@@ -8998,6 +8998,83 @@ def measured_engine_rail_records(
     return records
 
 
+def _paired_engine_rail_benchmarks(
+    residuals: Iterable[Mapping[str, object]],
+    *,
+    primary_engine: str,
+) -> list[dict[str, object]]:
+    """Choose the lowest-RMS comparison on references shared with primary.
+
+    Only one numeric dex row per engine/reference/rail is unambiguous enough
+    to pair. Missing rows and duplicates are excluded from that comparison.
+    """
+
+    values: dict[tuple[str, str], dict[str, list[Decimal]]] = defaultdict(
+        lambda: defaultdict(list)
+    )
+    for row in residuals:
+        rail = str(row.get("rail") or "")
+        reference = str(row.get("reference") or "")
+        numeric = row.get("numeric")
+        if (
+            not rail
+            or not reference
+            or not isinstance(numeric, Mapping)
+            or numeric.get("operation") != MetricOperation.DEX.value
+            or numeric.get("value") is None
+        ):
+            continue
+        engine = _engine_from_payload(row)
+        if engine == "unknown":
+            continue
+        try:
+            value = as_decimal(numeric["value"])
+        except (KeyError, TypeError, ValueError, ArithmeticError):
+            continue
+        if not value.is_finite():
+            continue
+        values[(rail, reference)][engine].append(value)
+
+    paired: dict[str, dict[str, list[tuple[Decimal, Decimal]]]] = defaultdict(
+        lambda: defaultdict(list)
+    )
+    for (rail, _reference), by_engine in values.items():
+        primary_values = by_engine.get(primary_engine, ())
+        if len(primary_values) != 1:
+            continue
+        primary_value = primary_values[0]
+        for engine, engine_values in by_engine.items():
+            if engine != primary_engine and len(engine_values) == 1:
+                paired[rail][engine].append((primary_value, engine_values[0]))
+
+    records: list[dict[str, object]] = []
+    for rail, comparisons in sorted(paired.items()):
+        candidates: list[tuple[Decimal, str, Decimal, int]] = []
+        for engine, pairs in comparisons.items():
+            benchmark_rms = _rms([comparison for _primary, comparison in pairs])
+            primary_rms = _rms([primary for primary, _comparison in pairs])
+            if benchmark_rms is not None and primary_rms is not None:
+                candidates.append(
+                    (benchmark_rms, engine, primary_rms, len(pairs))
+                )
+        if not candidates:
+            continue
+        benchmark_rms, engine, primary_rms, count = min(
+            candidates, key=lambda candidate: (candidate[0], candidate[1])
+        )
+        records.append(
+            {
+                "rail": rail,
+                "primary_engine": primary_engine,
+                "benchmark_engine": engine,
+                "n": count,
+                "primary_rms_dex": str(primary_rms),
+                "benchmark_rms_dex": str(benchmark_rms),
+            }
+        )
+    return records
+
+
 def _optional_decimal(value: Decimal | None) -> str | None:
     return None if value is None else str(value)
 

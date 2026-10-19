@@ -88,6 +88,7 @@ from simulator.battery.score import (
     ScoreContext,
     SINGLE_CATION_COEFFICIENT_BASIS,
     SINGLE_LIQUID_ENGINES,
+    _paired_engine_rail_benchmarks,
     compile_residual,
     compute_metric,
     dumps_residual_line,
@@ -4670,6 +4671,54 @@ def test_measured_engine_rail_records_group_source_relation() -> None:
         (SourceRelation.INDEPENDENT.value, 1),
         (SourceRelation.TRAINING.value, 1),
     ]
+
+
+def test_paired_engine_rail_benchmark_uses_only_shared_references() -> None:
+    rows = [
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "shared",
+            "candidate_request": {"engine": "internal-analytical"},
+            "numeric": {"operation": "dex", "value": "3"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "primary-only",
+            "candidate_request": {"engine": "internal-analytical"},
+            "numeric": {"operation": "dex", "value": "4"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "shared",
+            "candidate_request": {"engine": "openimcc"},
+            "numeric": {"operation": "dex", "value": "1"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "comparison-only",
+            "candidate_request": {"engine": "openimcc"},
+            "numeric": {"operation": "dex", "value": "100"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "shared",
+            "candidate_request": {"engine": "thermoengine"},
+            "numeric": {"operation": "dex", "value": "2"},
+        },
+    ]
+
+    record = _paired_engine_rail_benchmarks(
+        rows, primary_engine="internal-analytical"
+    )[0]
+
+    assert record == {
+        "rail": Rail.VAPOUR.value,
+        "primary_engine": "internal-analytical",
+        "benchmark_engine": "openimcc",
+        "n": 1,
+        "primary_rms_dex": "3",
+        "benchmark_rms_dex": "1",
+    }
 
 
 def test_measured_headline_mode_serializes_typed_residuals_end_to_end(
