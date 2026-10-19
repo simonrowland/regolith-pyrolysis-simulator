@@ -979,6 +979,80 @@ def test_refusal_strip_uses_integer_unique_ticks() -> None:
     plt.close(fig)
 
 
+def test_refusal_ticks_do_not_overlap_the_next_facet_title(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    rows: list[dict[str, object]] = [
+        {"kind": "battery_store_stamp", "revision": "strip-spacing-test"}
+    ]
+    for facet_index, formula in enumerate(
+        ("Al2O3", "CaO", "FeO", "K2O", "MgO", "SiO2")
+    ):
+        rows.append(
+            _record(
+                engine="openimcc",
+                experiment=f"numeric-{facet_index}",
+                formula=formula,
+                temperature_K=1935 + facet_index,
+                residual=0.25,
+            )
+        )
+        for refusal_index in range(2):
+            refused = _record(
+                engine="openimcc",
+                experiment=f"refused-{facet_index}-{refusal_index}",
+                formula=formula,
+                temperature_K=1935 + facet_index,
+                residual=None,
+                status="refused",
+            )
+            refused["refusal"] = {"reason": "identity_unknown"}
+            rows.append(refused)
+
+    residuals = tmp_path / "strip-spacing.jsonl"
+    residuals.write_text(
+        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
+    )
+    data = read_scores(residuals, rails=HERO_RAILS)
+    captured: list[Figure] = []
+    import scripts.battery_hero_plot as plotter
+
+    close = plt.close
+    monkeypatch.setattr(plotter.plt, "close", lambda figure: captured.append(figure))
+    try:
+        render_hero_charts(data, tmp_path / "strip-spacing-render")
+    finally:
+        monkeypatch.setattr(plotter.plt, "close", close)
+
+    try:
+        vapor = captured[0]
+        vapor.canvas.draw()
+        renderer = vapor.canvas.get_renderer()
+        titles = [
+            (axis, axis._left_title, axis._left_title.get_window_extent(renderer))
+            for axis in vapor.axes
+            if axis.get_title(loc="left")
+        ]
+        assert len(titles) >= 6
+        tick_labels = [
+            (axis, label, label.get_window_extent(renderer))
+            for axis in vapor.axes
+            for label in (*axis.get_xticklabels(), *axis.get_yticklabels())
+            if label.get_visible() and label.get_text()
+        ]
+        collisions = [
+            (label.get_text(), title.get_text())
+            for label_axis, label, label_box in tick_labels
+            for title_axis, title, title_box in titles
+            if label_axis is not title_axis and label_box.overlaps(title_box)
+        ]
+        assert not collisions
+    finally:
+        for figure in captured:
+            close(figure)
+
+
 def test_hero_flagged_points_are_hollow_and_benchmark_uses_shared_rows(
     tmp_path: Path,
 ) -> None:
