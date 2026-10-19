@@ -184,6 +184,14 @@ def test_single_component_transition_keeps_composition_not_applicable() -> None:
     assert glass.composition.reason == "no composition mapped from source"
 
 
+def test_explicit_unknown_transition_composition_stays_a_required_axis() -> None:
+    eutectic = _transition(
+        "eutectic", State.unknown("printed_components_total_96_percent_no_reconstruction")
+    )
+    assert eutectic.composition.is_unknown
+    assert "composition" in profile_for(eutectic).required
+
+
 def test_dropping_mixture_composition_from_the_profile_fails() -> None:
     """Mutation: composition must stay required for a printed mixture.
 

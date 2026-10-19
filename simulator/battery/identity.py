@@ -1013,11 +1013,13 @@ def profile_for(identity: Identity) -> QuantityProfile:
         if identity.subtype is not None and identity.subtype.is_value and identity.subtype.value is not None:
             subtype = str(identity.subtype.value)
         # Liquidus, solidus and glass always compare on composition.
-        # Every other subtype keeps a printed mixture and leaves a
-        # single-component phase not_applicable.
+        composition = identity.composition
+        # Every other subtype keeps a printed mixture. An explicit unknown
+        # composition remains a compared axis; absent composition and pure
+        # single-component transitions stay not_applicable.
         if subtype in {"solidus", "liquidus", "glass"} or _mixture_composition(
             identity
-        ):
+        ) or (composition is not None and composition.is_unknown):
             req("composition")
         else:
             na("composition")

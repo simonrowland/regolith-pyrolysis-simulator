@@ -16550,6 +16550,30 @@ class Migrator:
             point_composition_located = point_catalogue
         elif point_composition_located is not None:
             ident_kwargs["composition"] = point_composition_located.state
+        elif q_token is Quantity.TRANSITION_TEMPERATURE:
+            raw_point_conditions = (
+                raw_item.get("point_conditions")
+                if isinstance(raw_item, Mapping)
+                else None
+            )
+            located_composition = (
+                _point_condition_from_plain(
+                    raw_point_conditions["composition"], key="composition"
+                )
+                if isinstance(raw_point_conditions, Mapping)
+                and "composition" in raw_point_conditions
+                else None
+            )
+            inherited_composition = ident_kwargs.get("composition")
+            if (
+                isinstance(located_composition, Located)
+                and located_composition.state.is_unknown
+                and not (
+                    isinstance(inherited_composition, State)
+                    and inherited_composition.is_value
+                )
+            ):
+                ident_kwargs["composition"] = located_composition.state
         if coord is not None:
             ident_kwargs["temperature_K"] = State.of(coord)
         else:
