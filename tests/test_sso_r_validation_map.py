@@ -15,7 +15,9 @@ from scripts import sso_r_validation_map as validation_map
 # stateful validation-map smoke fixture errors under xdist coscheduling.
 pytestmark = [pytest.mark.serial, pytest.mark.xdist_group("serial")]
 
-GOLDEN_PATH = Path("tests/goldens/sso_r_validation_map_lunar_mare_low_ti.json")
+CONFIGLESS_GOLDEN_PATH = Path(
+    "tests/goldens/sso_r_validation_map_lunar_mare_low_ti_configless.json"
+)
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -728,7 +730,7 @@ def test_map_live_semantics_parity_tolerances_bind(smoke_payload, monkeypatch):
 
 
 def test_distilled_golden_fixture_matches_current_anchors(smoke_payload):
-    golden = json.loads(GOLDEN_PATH.read_text(encoding="utf-8"))
+    golden = json.loads(CONFIGLESS_GOLDEN_PATH.read_text(encoding="utf-8"))
     current = validation_map.golden_payload(smoke_payload)
 
     assert golden["schema_version"] == validation_map.GOLDEN_SCHEMA_VERSION
