@@ -404,6 +404,7 @@ FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE = "source_flagged_less_reliable"
 FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
 FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion"
 FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
+FLAGGED_STRATUM_APPROXIMATE_VALUE = "approximate-printed-value"
 FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
 FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
@@ -1243,6 +1244,8 @@ def _classify_flagged_notice_facts(
         for kind, reason in notices
     ):
         strata.append(FLAGGED_STRATUM_FIGURE_ONLY)
+    if NoticeKind.APPROXIMATE_VALUE.value in kinds:
+        strata.append(FLAGGED_STRATUM_APPROXIMATE_VALUE)
     if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
@@ -7998,10 +8001,24 @@ def compile_residual(
     )
     if non_measured_comparison:
         evidence_class_notices = (_evidence_class_notice(quantity, source_reference),)
+    # Value owns approximation; this notice carries it through the stratum/report flow.
+    approximate_value_notices = (
+        (
+            Notice(
+                kind=NoticeKind.APPROXIMATE_VALUE,
+                affected_quantities=(quantity,),
+                reason="approximate_printed_value",
+                origin=reference.observation_id,
+            ),
+        )
+        if reference.value.approximate and quantity is not None
+        else ()
+    )
     notices = union_notices(
         reference.notices,
         flagged_notices,
         evidence_class_notices,
+        approximate_value_notices,
         _quench_notices(reference),
     )
     comparison_ids = comparison_ids or {reference.observation_id}

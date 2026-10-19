@@ -3769,6 +3769,61 @@ def test_figure_only_evidence_adds_notice_to_scored_residual() -> None:
     assert FLAGGED_STRATUM_FIGURE_ONLY in flagged_strata(residual.notices)
 
 
+@pytest.mark.parametrize("approximate", (False, True))
+def test_approximate_reference_value_is_scored_but_left_out_of_headline(
+    approximate: bool,
+) -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
+        flagged_strata,
+        flagged_stratum_rows,
+        headline_rows,
+    )
+
+    experiment = F.kems_experiment()
+    identity = F.activity_identity()
+    reference = F.observation(
+        f"approximate-value-{approximate}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    reference = replace(
+        reference,
+        value=replace(reference.value, approximate=approximate),
+    )
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=_predict(Decimal("0.3"), identity),
+    )
+
+    assert residual.numeric is not None
+    assert ("not_flagged_stratum" in residual.exclusions) is approximate
+    expected_strata = (
+        (FLAGGED_STRATUM_APPROXIMATE_VALUE,) if approximate else ()
+    )
+    assert flagged_strata(residual.notices) == expected_strata
+    headline = next(
+        row
+        for row in headline_rows(
+            (residual,), context=context, engines=(Engine.INTERNAL_ANALYTICAL,)
+        )
+        if row["rail"] == residual.rail.value
+    )
+    assert headline["n"] == (0 if approximate else 1)
+    assert [
+        row["stratum"]
+        for row in flagged_stratum_rows(
+            (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
+        )
+    ] == list(expected_strata)
+
+
 def test_source_internal_inconsistency_is_flagged_reported_and_excluded() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
@@ -4420,6 +4475,7 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
         FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
@@ -4465,6 +4521,11 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
             NoticeKind.LIQUIDUS_POSITION_CONTESTED,
             "liquidus_position_contested:probe",
         ),
+        (
+            FLAGGED_STRATUM_APPROXIMATE_VALUE,
+            NoticeKind.APPROXIMATE_VALUE,
+            "approximate_printed_value",
+        ),
     )
     for stratum, kind, reason in cases:
         notice = Notice(
@@ -4486,6 +4547,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_CELL_MATERIAL_INFERRED,
         FLAGGED_STRATUM_FIGURE_ONLY,
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
         FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED,
@@ -4513,6 +4575,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
             "source_flagged_less_reliable:probe",
         ),
         (NoticeKind.FIGURE_ONLY, "figure_only:probe"),
+        (NoticeKind.APPROXIMATE_VALUE, "approximate_printed_value"),
         (NoticeKind.REACTIVE_CELL_NOT_MODELLED, "reactive_cell_not_modelled:probe"),
         (
             NoticeKind.LIQUIDUS_POSITION_CONTESTED,
@@ -4538,6 +4601,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
         FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_FIGURE_ONLY,
+        FLAGGED_STRATUM_APPROXIMATE_VALUE,
         FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED,
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
     )
