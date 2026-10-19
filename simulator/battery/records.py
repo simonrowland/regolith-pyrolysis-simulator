@@ -70,6 +70,7 @@ _LOCATOR_KEYS = (
     "published_page",
     "pdf_page_index",
     "page_verification",
+    "table_continued",
     "table",
     "figure",
     "paragraph",
@@ -128,6 +129,7 @@ class Locator:
     published_page: str | int | None = None
     pdf_page_index: int | None = None
     page_verification: str | None = None
+    table_continued: bool | None = None
     table: str | None = None
     figure: str | None = None
     paragraph: str | None = None
@@ -144,7 +146,7 @@ class Locator:
 
     def has_location(self) -> bool:
         for name in _LOCATOR_KEYS:
-            if name == "page_verification":
+            if name in {"page_verification", "table_continued"}:
                 continue
             raw = getattr(self, name)
             if raw is None:

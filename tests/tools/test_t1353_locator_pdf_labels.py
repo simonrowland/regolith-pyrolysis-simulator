@@ -64,7 +64,10 @@ def _label_pattern(locator):
     label = str(label).strip().strip("'\"")
     label = re.sub(r"\s*\(continued\)$", "", label, flags=re.I)
     if kind == "figure":
-        return re.compile(rf"\b(?:fig(?:ure)?\.?\s*){re.escape(label)}\b", re.I)
+        return re.compile(
+            rf"(?:\bfig(?:ure)?\.?\s*{re.escape(label)}\b|^\s*{re.escape(label)}\.)",
+            re.I | re.M,
+        )
     if label.lower() == "ia":
         return re.compile(r"\btable\s+(?:ia|la)\b", re.I)
     return re.compile(rf"\b(?:table|таблица)\s+{re.escape(label)}\b", re.I)
@@ -89,9 +92,24 @@ def _has_page_text(text):
     return bool(substantive)
 
 
+def _assert_label_and_data(locator, page_text, previous_page_text=None):
+    label_pattern = _label_pattern(locator)
+    if locator.get("table_continued") is True:
+        assert previous_page_text is not None
+        assert label_pattern.search(previous_page_text), "continued table caption is absent from previous page"
+        match = re.search(r"data cell:\s*([^.;]+)", locator.get("note", ""), re.I)
+        assert match is not None, "continued table locator requires a data-cell record in its note"
+        record = match.group(1)
+        record_pattern = re.compile(r"\s+".join(re.escape(part) for part in record.split()))
+        assert record_pattern.search(page_text), "continued table data-cell record is absent from cited page"
+        return
+    assert label_pattern.search(page_text), "table/figure label is absent from cited page"
+
+
 def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
     checked = skipped = 0
     skip_reasons = []
+    failures = []
     for relative in _changed_extract_paths():
         current_path = ROOT / relative
         current = _yaml(current_path.read_text())
@@ -105,11 +123,10 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
         for locator_path, locator in after.items():
             prior = before.get(locator_path)
             if prior is None or not any(prior.get(key) != locator.get(key)
-                                        for key in ("page", "published_page", "pdf_page_index")):
+                                        for key in ("page", "published_page", "pdf_page_index", "table_continued")):
                 continue
             if not ("page" in locator and "pdf_page_index" in locator):
                 continue
-            label_pattern = _label_pattern(locator)
             label = f"{next(k for k in ('table', 'figure') if k in locator)} {locator[next(k for k in ('table', 'figure') if k in locator)]}"
             if pdf is None:
                 skipped += 1
@@ -121,13 +138,34 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
                 skipped += 1
                 skip_reasons.append(f"{relative} {locator_path}: empty PDF text page {page_number} ({label})")
                 continue
-            assert label_pattern.search(text), (
-                f"{relative} {locator_path}: {label} absent from physical PDF page {page_number}"
+            previous_text = (
+                _page_text(str(pdf), page_number - 1)
+                if locator.get("table_continued") is True and page_number > 1
+                else None
             )
+            try:
+                _assert_label_and_data(locator, text, previous_text)
+            except AssertionError as exc:
+                failures.append(f"{relative} {locator_path}: {label}: {exc}")
+                continue
             checked += 1
-    print(f"t1353 PDF locator labels: {checked} passed, {skipped} skipped")
+    print(f"t1353 PDF locator labels: {checked} passed, {skipped} skipped, {len(failures)} failed")
     for reason in skip_reasons:
         print(f"SKIP {reason}")
-    assert checked > 0
+    assert checked > 0, "no locator labels were checked"
+    assert failures == [], "PDF locator label failures:\n" + "\n".join(failures)
     captured = capsys.readouterr()
     print(captured.out, end="")
+
+
+def test_continued_table_checks_caption_on_previous_page_and_data_on_cited_page():
+    locator = {
+        "table": "877",
+        "table_continued": True,
+        "note": "Table 877 continues; data cell: 3300.000 64.806.",
+    }
+    _assert_label_and_data(
+        locator,
+        "T (K)  F°(T)\n3300.000 64.806 346.974",
+        "Class accuracy\nTable 877",
+    )

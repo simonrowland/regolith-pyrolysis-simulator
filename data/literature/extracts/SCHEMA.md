@@ -419,6 +419,12 @@ location key; the validator counts it as a notice and rejects it when either PDF
 This typed reason is reported as a notice and exempts that locator from the
 `page == pdf_page_index + 1` check only while both corpus PDF paths are absent.
 
+For a table that continues from a captioned page onto a page containing cited
+data, set `table_continued: true` on the data-page locator. The locator's
+`page` and `pdf_page_index` identify the page containing the data. The caption
+may be on the immediately preceding physical page; this marker records that
+continuation and is verification metadata, not a location key.
+
 Every **observation** requires a `locator`.  
 Every **equipment-metadata field** that is present requires its **own** `locator`
 (often experimental-section prose or apparatus figures, not result tables).  
