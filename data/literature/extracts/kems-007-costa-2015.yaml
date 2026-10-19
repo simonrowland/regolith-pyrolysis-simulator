@@ -828,9 +828,9 @@ species:
     - observation_id: costa_2015_fe_olivine_kems_alpha_multicell
       type: alpha
       locator:
-        source_path: raw/kems-007-costa-2015/kems-007-costa-2015.pdf
+        source_path: text/kems-007-costa-2015/mineru/source/vlm/source.md
         figure: vaporization coefficients Fe+ / SiO+
-        line_range: '386'
+        line_range: 532
         note: Measured vaporization coefficients of Fe+ and SiO+ using three Mo Knudsen cells with different
           orifice sizes; image docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/images/142292b86695fb9b3d3098881d5279bbb57f83f1b18d4ecac847962321570fd5.jpg
       T_range_K:
@@ -919,17 +919,17 @@ species:
               schematic shows field aperture 1 mm diam and source aperture 2 mm diam (molecular-beam collimation,
               not Knudsen orifice).
           locator:
-            source_path: raw/kems-007-costa-2015/kems-007-costa-2015.pdf
+            source_path: text/kems-007-costa-2015/mineru/source/vlm/source.md
             paragraph: Multiple-cell configuration with different orifice diameters; Whitman-Motzfeld
-            line_range: 163-186
+            line_range: 144-184, 191
             figure: apparatus schematic (restricted collimation)
         cell_material:
           value: Mo cells for multi-orifice α series; Ir liners in graphite cell required for equilibrium
             (Mo reacts with olivine)
           locator:
-            source_path: raw/kems-007-costa-2015/kems-007-costa-2015.pdf
+            source_path: text/kems-007-costa-2015/mineru/source/vlm/source.md
             paragraph: Mo forms compounds / erratic; Ir cell liners in graphite unreactive
-            line_range: '259'
+            line_range: 329
         sample_surface_area:
           value:
             definition: A equals cell cross-sectional area in Whitman-Motzfeld f = W_B·B/A
@@ -937,15 +937,15 @@ species:
             note: Sample free-surface area not stated; A in the published method is the cell cross-section
               (not melt free surface). Numeric A missing.
           locator:
-            source_path: raw/kems-007-costa-2015/kems-007-costa-2015.pdf
+            source_path: text/kems-007-costa-2015/mineru/source/vlm/source.md
             paragraph: A - cross sectional area of the cell
-            line_range: '179'
+            line_range: 207-209
     - observation_id: costa_2015_fe_olivine_class_and_motzfeldt_absence_b1
       type: alpha
       locator:
-        source_path: raw/kems-007-costa-2015/kems-007-costa-2015.pdf
+        source_path: text/kems-007-costa-2015/mineru/source/vlm/source.md
         figure: vaporization coefficients Fe+ / SiO+
-        line_range: '386'
+        line_range: 532
         note: 'B1 harvest: class axis + Motzfeldt geometry typed absence; does not rewrite placeholder
           multi-orifice row'
       T_range_K:
@@ -1025,9 +1025,9 @@ species:
           value: Mo (multi-orifice α series); Ir liners in graphite required for equilibrium (Mo reacts
             with olivine)
           locator:
-            source_path: raw/kems-007-costa-2015/kems-007-costa-2015.pdf
+            source_path: text/kems-007-costa-2015/mineru/source/vlm/source.md
             paragraph: Mo forms compounds / Ir cell liners in graphite unreactive
-            line_range: '259'
+            line_range: 329
     - observation_id: costa_2015_fe_time_equilibrium_mo_1669
       type: rate_series
       experiment: time_mo_1669
@@ -4824,9 +4824,9 @@ species:
     - observation_id: costa_2015_sio_olivine_kems_alpha_multicell
       type: alpha
       locator:
-        source_path: raw/kems-007-costa-2015/kems-007-costa-2015.pdf
+        source_path: text/kems-007-costa-2015/mineru/source/vlm/source.md
         figure: vaporization coefficients Fe+ / SiO+
-        line_range: '386'
+        line_range: 532
         note: SiO+ panel of same multi-cell Mo figure; image docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/images/142292b86695fb9b3d3098881d5279bbb57f83f1b18d4ecac847962321570fd5.jpg
       T_range_K:
       - 1700.0
@@ -4901,31 +4901,31 @@ species:
             restricted_collimation: true
             note: shared multi-cell series with Fe+ α measurement
           locator:
-            source_path: raw/kems-007-costa-2015/kems-007-costa-2015.pdf
+            source_path: text/kems-007-costa-2015/mineru/source/vlm/source.md
             paragraph: Measured vaporization coefficients of Fe+ and SiO+ using three Mo Knudsen cells
-            line_range: '386'
+            line_range: 532
         cell_material:
           value: Mo cells for multi-orifice α series; Ir liners in graphite cell required for equilibrium
             (Mo reacts with olivine)
           locator:
-            source_path: raw/kems-007-costa-2015/kems-007-costa-2015.pdf
+            source_path: text/kems-007-costa-2015/mineru/source/vlm/source.md
             paragraph: Mo reacts; Ir must be used
-            line_range: 259-391
+            line_range: 329
         sample_surface_area:
           value:
             definition: A equals cell cross-sectional area in Whitman-Motzfeld f = W_B·B/A
             numeric_m2: null
             note: numeric cell cross-section A not stated
           locator:
-            source_path: raw/kems-007-costa-2015/kems-007-costa-2015.pdf
+            source_path: text/kems-007-costa-2015/mineru/source/vlm/source.md
             paragraph: A - cross sectional area of the cell
-            line_range: '179'
+            line_range: 207-209
     - observation_id: costa_2015_sio_olivine_class_and_motzfeldt_absence_b1
       type: alpha
       locator:
-        source_path: raw/kems-007-costa-2015/kems-007-costa-2015.pdf
+        source_path: text/kems-007-costa-2015/mineru/source/vlm/source.md
         figure: vaporization coefficients Fe+ / SiO+
-        line_range: '386'
+        line_range: 532
       T_range_K:
       - 1700.0
       - 1800.0
@@ -4984,17 +4984,17 @@ species:
         cell_material:
           value: Mo multi-orifice α series; Ir liners in graphite for equilibrium
           locator:
-            source_path: raw/kems-007-costa-2015/kems-007-costa-2015.pdf
+            source_path: text/kems-007-costa-2015/mineru/source/vlm/source.md
             paragraph: Mo reacts; Ir must be used
-            line_range: 259-391
+            line_range: 329
 fidelity_samples:
 - path: species.Fe.observations[costa_2015_fe_olivine_kems_alpha_multicell].equipment.multi_orifice_series.value.n_cells
   value: 3
   note: Source-stated number of Mo Knudsen cells; figure-derived alpha values are not fidelity anchors.
   locator:
-    source_path: raw/kems-007-costa-2015/kems-007-costa-2015.pdf
+    source_path: text/kems-007-costa-2015/mineru/source/vlm/source.md
     paragraph: three Knudsen cells with different orifice sizes
-    line_range: '179-386'
+    line_range: 532
 - path: species.Fe.observations[costa_2015_fe_time_equilibrium_mo_1669].values.points[2].ion_intensity
   value: 10447.4
   note: 'Independent readings: first marker-center read (749.0,822.5) px -> 10447.4;

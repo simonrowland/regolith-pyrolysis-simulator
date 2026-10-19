@@ -444,7 +444,7 @@ species:
       locator:
         source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
         figure: '4'
-        line_range: 169-198
+        line_range: '214'
         paragraph: Ca partial pressures reported in Fig. 4 only; ion intensity measurement difficult
         note: "bound_not_point_ordering: figure carries a bound, never a point value."
       T_range_K:
@@ -563,7 +563,7 @@ species:
       locator:
         source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
         section: ACTIVITY DETERMINATION BY MULTIPLE-ROTATING KNUDSEN CELL
-        line_range: 340-356
+        line_range: 125, 343-345
         figure: '3'
       phase: lunar_basalt_melt_12065
       standard_state:
@@ -606,7 +606,7 @@ species:
           locator:
             source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
             paragraph: effusion holes knife-edge orifice 1 mm diameter
-            line_range: 350-352
+            line_range: '343'
         multi_orifice_series:
           value:
             n_cells: 3
@@ -620,20 +620,20 @@ species:
           locator:
             source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
             section: ACTIVITY DETERMINATION BY MULTIPLE-ROTATING KNUDSEN CELL
-            line_range: 342-352
+            line_range: 341-343
         cell_material:
           value: Re (sample cell); multi-cell set Re / Fe / MgO; Ta external cap on Fe-cell lid; Pt unsuccessful
             (foam overflow)
           locator:
             source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
             paragraph: crucibles Re, Fe, MgO; Ta cap; Pt unsuccessful
-            line_range: 346-356
+            line_range: 341-347
     - observation_id: demaria_1971_feo_detected_not_tabulated_P
       type: rate_series
       locator:
         source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
         table: '6'
-        line_range: 324-328
+        line_range: 314-316
         paragraph: FeO among molecular species detected; equilibria in Table 6
       T_range_K:
       - 1300.0
@@ -877,7 +877,7 @@ species:
       locator:
         source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
         table: '7'
-        line_range: 330-334
+        line_range: 320-322
         paragraph: Third-law heat of SiO2(g)=SiO(g)+1/2O2(g); simultaneous partial pressures
       T_range_K:
       - 1850.0
@@ -1030,7 +1030,7 @@ species:
         source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
         figure: '6'
         table: '6'
-        line_range: 262-268, 324-328
+        line_range: 246, 314-316
         paragraph: TiO and TiO2 only Ti-containing species; comparable P in 2000–2170 K
         note: "bound_not_point_ordering: figure carries a comparison, never a point value."
       T_range_K:
@@ -1093,7 +1093,7 @@ species:
       locator:
         source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
         figure: '6'
-        line_range: 262-268
+        line_range: '246'
         note: "bound_not_point_ordering: figure carries a comparison, never a point value."
       T_range_K:
       - 2000.0
@@ -1488,7 +1488,7 @@ species:
       locator:
         source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
         table: '8'
-        line_range: 337-341
+        line_range: 328-330
         paragraph: Third-law AlO(g)=Al(g)+O(g); 12065 BC; simultaneous Kp
       T_range_K:
       - 2360.0
@@ -2620,7 +2620,7 @@ species:
       locator:
         source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
         figure: '2'
-        line_range: 56-101
+        line_range: '104'
         paragraph: K+ first ion species ~1250 K; Fig. 2; rapid depletion
       T_range_K:
       - 1250.0
@@ -2802,35 +2802,35 @@ fidelity_samples:
   locator:
     source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
     table: '4'
-    line_range: '286'
+    line_range: 284-286
 - path: species.AlO.observations[demaria_1971_alo_psat_table4].values.points[1].p_atm
   value: 1.3e-06
   note: 'Table 4: AlO BC 12065 at 2360 K = 1.30e-6 atm (co-measured with Al2O 6.90e-7)'
   locator:
     source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
     table: '4'
-    line_range: '286'
+    line_range: 284-286
 - path: species.O.observations[demaria_1971_o_atomic_psat_table5].values.points[1].p_atm
   value: 2.2e-07
   note: 'Table 5: O NAA 12022 at 2060 K = 2.2e-7 atm (same T as Al2O 5.07e-9)'
   locator:
     source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
     table: '5'
-    line_range: '300'
+    line_range: 288-290
 - path: species.Mn.observations[demaria_1971_mn_psat_table2_sample_12022].values.points[2].p_atm
   value: 8.47e-08
   note: 'Table 2: Mn 1725 K = 8.47e-8 atm (co-measured with Cr 1.03e-8)'
   locator:
     source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
     table: '2'
-    line_range: '129'
+    line_range: 127-129
 - path: species.Mg.observations[demaria_1971_mg_psat_table3_lunar_basalt].values.points[0].p_atm
   value: 1.6e-08
   note: 'Table 3: Mg BC 12022 at 1650 K = 1.6e-8 atm'
   locator:
     source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
     table: '3'
-    line_range: '145'
+    line_range: 143-145
 - species: Fe
   observable: activity_coefficient
   observation_id: demaria_1971_fe_lunar_basalt_kems_main_cell
@@ -2839,14 +2839,14 @@ fidelity_samples:
   locator:
     source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
     figure: '3'
-    line_range: '111'
+    line_range: 114, 125
 - path: species.AlO.observations[demaria_1971_alo_al_o_kp_table8].values.points[0].Kp
   value: 3.19e-05
   note: 'Table 8: Kp(AlO=Al+O) at 2360 K = 3.19e-5'
   locator:
     source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
     table: '8'
-    line_range: '337'
+    line_range: 328-330
 - species: Na
   observable: psat_series
   observation_id: demaria_1971_na_psat_figure1_sample_12022_digitized
