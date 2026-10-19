@@ -115,10 +115,12 @@ MRE_CURRENT_PARTITION_SOURCE = (
 )
 MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
 MRE_MULTI_OXIDE_PARTITION_REFUSAL = "uncertified_multi_oxide_current_partition"
+MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL = "electrolysis_control_out_of_domain"
 MRE_RAW_MARGIN_REFUSAL = "non_authoritative_fallback_raw_margin_nonpositive"
 MRE_PRODUCT_PHASE_MISMATCH_REFUSAL = "mre_product_phase_mismatch_refused"
 MRE_TERMINAL_PHYSICS_REFUSAL_REASONS = frozenset({
     "invalid_electrolysis_control",
+    MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     MRE_RAW_MARGIN_REFUSAL,
     MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,

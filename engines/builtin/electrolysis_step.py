@@ -114,7 +114,6 @@ MRE_CURRENT_PARTITION_SOURCE = (
 )
 MRE_CURRENT_PARTITION_CERTIFICATION = "uncertified_current_partition"
 MRE_INVALID_CONTROL_REFUSAL = "invalid_electrolysis_control"
-MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL = "electrolysis_control_out_of_domain"
 MRE_INVALID_TARGET_REFUSAL = "invalid_allowed_oxides"
 MRE_INVALID_GAS_FUGACITY_REFUSAL = "invalid_gas_product_fugacity"
 
@@ -293,6 +292,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             FERRIC_TO_FERROUS_O2_PER_FE2O3,
             FERRIC_TO_FERROUS_REFERENCE_V,
             FERRIC_TO_FERROUS_REFERENCE_STATUS,
+            MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
             MRE_MULTI_OXIDE_PARTITION_REFUSAL,
             MRE_PRODUCT_PHASE_MISMATCH_REFUSAL,
             MRE_RAW_MARGIN_REFUSAL,

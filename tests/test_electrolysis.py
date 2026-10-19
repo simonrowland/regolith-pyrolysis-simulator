@@ -14,6 +14,7 @@ from simulator.electrolysis import (
     ElectrolysisModel,
     MRECurrentPartitionRefusal,
     MREElectrolysisRefusal,
+    MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     MRE_RAW_MARGIN_REFUSAL,
     mre_selectivity_weight,
@@ -109,16 +110,7 @@ def test_mre_baseline_multi_oxide_partition_is_typed_refusal_not_poisoned_hour(
     [
         MRE_RAW_MARGIN_REFUSAL,
         "invalid_electrolysis_control",
-        pytest.param(
-            "electrolysis_control_out_of_domain",
-            marks=pytest.mark.xfail(
-                strict=True,
-                reason=(
-                    "b-434: control-domain refusal is not registered for "
-                    "terminal whole-hour rollback"
-                ),
-            ),
-        ),
+        MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
     ],
 )
 def test_sc109_mre_non_partition_refusal_propagates_typed_through_executor(
