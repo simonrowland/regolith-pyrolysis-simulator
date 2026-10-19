@@ -1,585 +1,1601 @@
 schema_version: literature_extract.v1
 source_id: shornikov-2025-ca-al-inclusion-thermodynamics
 source:
-  citation: "Shornikov, S. I. (2025). Thermodynamic Properties of Oxide Compounds Occurring in Ca–Al-Rich Inclusions. Geochemistry International, 63(9), 810–836."
+  citation: Shornikov, S. I. (2025). Thermodynamic Properties of Oxide Compounds Occurring in Ca–Al-Rich Inclusions.
+    Geochemistry International, 63(9), 810–836.
   doi: 10.1134/S0016702925600324
   year: 2025
   corpus_asset: raw/shornikov-2025-ca-al-inclusion-thermodynamics/shornikov-2025-ca-al-inclusion-thermodynamics.pdf
   corpus_sha256: 871fba603fa3486d8a834fe3e2cc5c48b564f8027413256f33dd2b5a1530639e
 extraction:
   method: Manual transcription from pdftotext-layout.txt; Table 2 rendered at 600 dpi for cell verification.
-  date: "2026-10-18"
+  date: '2026-10-18'
   worker: fam10-1019
 review_status: draft
 fidelity_samples:
-  - species: CaAl2O4
-    observable: transition_point
-    observation_id: shornikov_2025_table2_zherbetsov_melting
-    field: delta_H_m_kJ_per_mol
-    value: 35.00
-    locator:
-      page: 5
-      published_page: 814
-      pdf_page_index: 4
-      table: "2"
+- species: CaAl2O4
+  observable: transition_point
+  observation_id: shornikov_2025_table2_zherbetsov_melting
+  field: delta_H_m_kJ_per_mol
+  value: 35.0
+  locator:
+    page: 5
+    published_page: 814
+    pdf_page_index: 4
+    table: '2'
 species:
   CaAl2O4:
     observations:
-      - observation_id: shornikov_2025_table2_allibert_melting
-        type: transition_point
-        locator: {page: 5, published_page: 814, pdf_page_index: 4, table: "2"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Allibert et al., 1981
-          research_method_as_printed: KEMS
-          T_m_as_printed: 1875 ± 6
-          T_m_K: 1875
-          T_m_uncertainty_K: 6
-          delta_H_m_as_printed: 45.00 ± 6.00
-          delta_H_m_kJ_per_mol: 45.00
-          delta_H_m_uncertainty_kJ_per_mol: 6.00
-          delta_S_m_as_printed: 24.00 ± 4.00
-          delta_S_m_J_per_mol_K: 24.00
-          delta_S_m_uncertainty_J_per_mol_K: 4.00
-      - observation_id: shornikov_2025_table2_shornikov_melting
-        type: transition_point
-        locator: {page: 5, published_page: 814, pdf_page_index: 4, table: "2"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Shornikov et al., 1997
-          research_method_as_printed: KEMS
-          T_m_as_printed: 1877 K
-          T_m_K: 1877
-          delta_H_m_as_printed: 31.90 ± 3.00
-          delta_H_m_kJ_per_mol: 31.90
-          delta_H_m_uncertainty_kJ_per_mol: 3.00
-          delta_S_m_as_printed: 17.00 ± 1.60
-          delta_S_m_J_per_mol_K: 17.00
-          delta_S_m_uncertainty_J_per_mol_K: 1.60
-      - observation_id: shornikov_2025_table2_zherbetsov_melting
-        type: transition_point
-        locator: {page: 5, published_page: 814, pdf_page_index: 4, table: "2"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Zherebtsov et al., 1999
-          research_method_as_printed: DTA
-          T_m_as_printed: 1877 K
-          T_m_K: 1877
-          delta_H_m_as_printed: 35.00 ± 5.00
-          delta_H_m_kJ_per_mol: 35.00
-          delta_H_m_uncertainty_kJ_per_mol: 5.00
-          delta_S_m_as_printed: 18.65 ± 2.66
-          delta_S_m_J_per_mol_K: 18.65
-          delta_S_m_uncertainty_J_per_mol_K: 2.66
+    - observation_id: shornikov_2025_table2_allibert_melting
+      type: transition_point
+      locator:
+        page: 5
+        published_page: 814
+        pdf_page_index: 4
+        table: '2'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Allibert et al., 1981
+        research_method_as_printed: KEMS
+        T_m_as_printed: 1875 ± 6
+        T_m_K: 1875
+        T_m_uncertainty_K: 6
+        delta_H_m_as_printed: 45.00 ± 6.00
+        delta_H_m_kJ_per_mol: 45.0
+        delta_H_m_uncertainty_kJ_per_mol: 6.0
+        delta_S_m_as_printed: 24.00 ± 4.00
+        delta_S_m_J_per_mol_K: 24.0
+        delta_S_m_uncertainty_J_per_mol_K: 4.0
+    - observation_id: shornikov_2025_table2_shornikov_melting
+      type: transition_point
+      locator:
+        page: 5
+        published_page: 814
+        pdf_page_index: 4
+        table: '2'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Shornikov et al., 1997
+        research_method_as_printed: KEMS
+        T_m_as_printed: 1877 K
+        T_m_K: 1877
+        delta_H_m_as_printed: 31.90 ± 3.00
+        delta_H_m_kJ_per_mol: 31.9
+        delta_H_m_uncertainty_kJ_per_mol: 3.0
+        delta_S_m_as_printed: 17.00 ± 1.60
+        delta_S_m_J_per_mol_K: 17.0
+        delta_S_m_uncertainty_J_per_mol_K: 1.6
+    - observation_id: shornikov_2025_table2_zherbetsov_melting
+      type: transition_point
+      locator:
+        page: 5
+        published_page: 814
+        pdf_page_index: 4
+        table: '2'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Zherebtsov et al., 1999
+        research_method_as_printed: DTA
+        T_m_as_printed: 1877 K
+        T_m_K: 1877
+        delta_H_m_as_printed: 35.00 ± 5.00
+        delta_H_m_kJ_per_mol: 35.0
+        delta_H_m_uncertainty_kJ_per_mol: 5.0
+        delta_S_m_as_printed: 18.65 ± 2.66
+        delta_S_m_J_per_mol_K: 18.65
+        delta_S_m_uncertainty_J_per_mol_K: 2.66
     context:
-      - observation_id: shornikov_2025_table2_formation_from_oxides
-        type: thermodynamic_context
-        locator: {page: 5, published_page: 814, pdf_page_index: 4, table: "2"}
-        units: as printed
-        values:
-          quantity: enthalpy_and_entropy_of_CaAl2O4_formation_from_oxides
-          method_class: quoted_attributed
-          reaction_as_printed: not explicitly printed for this table; formation from oxides stated in the article text
-          phase: cr
-          rows_as_printed: "T=1773 K: ΔHT −9.56 ± 0.50 kJ/mol; ΔST 8.58 ± 0.90 J/(mol K), Kalyanram and Bell (1961). T=1260–1400 K: −9.00 ± 0.50; 9.40 ± 0.40, Popov et al. (1979). T=923–1223 K: −9.06 ± 0.90; 9.31 ± 0.74, Allibert et al. (1981). T=1200–1400 K: −9.50 ± 2.30; 11.70 ± 1.90, Skolis et al. (1983). T=1050–1500 K: −7.56 ± 0.42; 9.10 ± 0.28, Kumar and Kay (1985). T=1373–1873 K: −8.96 ± 0.20; 8.69 ± 0.20, Nagata et al. (1989). T=1600–1773 K: −10.86 ± 0.22; 8.19 ± 0.13, Zaitsev et al. (1990). T=1000–1200 K: −6.99 ± 0.08; 9.50 ± 0.15, Rog et al. (1993). T=1173 K: −4.00 ± 0.50; entropy not printed, Ayed et al. (1994). T=1877–2033 K: 22.99 ± 0.50; 28.10 ± 0.25, Shults and Shornikov (1995). T=1833–1877 K: −8.91 ± 1.52; 11.10 ± 0.81, Shornikov et al. (1997)."
+    - observation_id: shornikov_2025_table2_formation_from_oxides
+      type: thermodynamic_context
+      locator:
+        page: 5
+        published_page: 814
+        pdf_page_index: 4
+        table: '2'
+      units: as printed
+      values:
+        quantity: enthalpy_and_entropy_of_CaAl2O4_formation_from_oxides
+        method_class: quoted_attributed
+        reaction_as_printed: not explicitly printed for this table; formation from oxides stated in the article
+          text
+        phase: cr
+        rows_as_printed: 'T=1773 K: ΔHT −9.56 ± 0.50 kJ/mol; ΔST 8.58 ± 0.90 J/(mol K), Kalyanram and Bell (1961).
+          T=1260–1400 K: −9.00 ± 0.50; 9.40 ± 0.40, Popov et al. (1979). T=923–1223 K: −9.06 ± 0.90; 9.31 ± 0.74,
+          Allibert et al. (1981). T=1200–1400 K: −9.50 ± 2.30; 11.70 ± 1.90, Skolis et al. (1983). T=1050–1500 K:
+          −7.56 ± 0.42; 9.10 ± 0.28, Kumar and Kay (1985). T=1373–1873 K: −8.96 ± 0.20; 8.69 ± 0.20, Nagata et al.
+          (1989). T=1600–1773 K: −10.86 ± 0.22; 8.19 ± 0.13, Zaitsev et al. (1990). T=1000–1200 K: −6.99 ± 0.08;
+          9.50 ± 0.15, Rog et al. (1993). T=1173 K: −4.00 ± 0.50; entropy not printed, Ayed et al. (1994). T=1877–2033
+          K: 22.99 ± 0.50; 28.10 ± 0.25, Shults and Shornikov (1995). T=1833–1877 K: −8.91 ± 1.52; 11.10 ± 0.81,
+          Shornikov et al. (1997).'
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_table13_printed_context
+      type: printed_data_context
+      locator:
+        page: 17
+        pdf_page_index: 16
+        table: '13'
+      units: as printed
+      values:
+        quantity: table_13_thermodynamic_data_as_printed
+        method_class: model_derived
+        identity_as_printed: CaAl2O4
+        note: Complete table transcription is retained in context because these comparison or model-derived columns
+          do not map to a safe scored field in this extract.
+        table_as_printed: "Table 13. Thermodynamic properties of oxide compounds and Ca–Al-rich inclusions of chondrites\
+          \ at a temperature of 2000 K\n\n\n\n\nGEOCHEMISTRY INTERNATIONAL\n                                   \
+          \                                         Oxide activity\n                                           \
+          \                                                                                ΔGm,         ΔHT,   \
+          \      ΔST,       Tm,      ΔHm,\n                               Compound\n                           \
+          \                                                                                               kJ/mol\
+          \       kJ/mol     J/(mol K)      K      kJ/mol\n                                                    CaO\
+          \          MgO            Al2O3           TiO2          SiO2\n\n\n                             {CaAl2O4}\
+          \          1.03 × 10–1       –          1.79 × 10–1         –             –          –33.20        –8.91\
+          \           11.10   1877     31.90\n\n\n\n\n                                                         \
+          \                                                                                                    \
+          \                    THERMODYNAMIC PROPERTIES OF OXIDE COMPOUNDS\n                             [CaAl4O7]\
+          \          1.39 × 10–2       –          7.98 × 10–1         –             –          –26.20        –6.34\
+          \           9.94    2035    27.00\n\n\n                             [CaAl12O19]        4.64 × 10–3   \
+          \    –          9.92 × 10–1         –             –          –12.87        –2.88           5.00    2148*\
+          \   16.80\n\n\n\nVol. 63\n                             [CaTiO3]           2.36 × 10–2       –        \
+          \       –          1.65 × 10–1       –          –46.13      –39.88            3.15    2241     47.61\n\
+          \n\n                             [MgAl2O4]               –        3.12 × 10–1    2.25 × 10–1         –\
+          \             –          –22.09       –12.02           5.03    2420    55.81\nNo. 9\n                \
+          \             {MgSiO3}                –        2.28 × 10–1         –              –         5.01 × 10–1\
+          \    –18.04      –20.36        –2.68       1850*    37.47\n2025\n                             [Mg2SiO4]\
+          \               –        3.84 × 10–1         –              –         2.19 × 10–1    –19.02       –22.14\
+          \       –1.56       2171    36.34\n\n\n                             {CaMgSi2O4}        1.29 × 10–1   1.07\
+          \ × 10–2         –              –         1.79 × 10–1    –41.68      –39.06        –2.03       1665  \
+          \  33.21\n\n\n                             {Ca2MgSi2O5}       1.71 × 10–1   1.81 × 10–1         –    \
+          \          –         6.55 × 10–2    –35.56      –36.43        –2.41       1727    24.92\n\n\n        \
+          \                     {Ca2Al2SiO7}       4.74 × 10–1       –          3.44 × 10–2         –         2.75\
+          \ × 10–3    –44.71      –36.82            2.39    1863    42.33\n\n\n                             {CaAl2Si2O8}\
+          \       6.51 × 10–3       –          3.31 × 10–1         –         4.31 × 10–1    –27.60       –26.70\
+          \       –1.10       1830    33.30\n\n\n                             {CAIs, type A}     4.36 × 10–2   3.41\
+          \ × 10–1    8.81 × 10–2     2.25 × 10–2   1.41 × 10–2    –49.27       –31.29           5.82    1777  \
+          \  50.35\n\n\n                             {CAIs, type B}     9.06 × 10–3   1.73 × 10–1    1.77 × 10–1\
+          \     2.90 × 10–2   7.79 × 10–2    –47.76       –29.98           4.79    1695    45.63\n\n           \
+          \                  * Decomposition temperature.                                                      \
+          \                                                                  827\n\f828                        \
+          \                                          SHORNIKOV\n\n                                             \
+          \ (a)                                                                            (b)\n\n            –10\n\
+          \                                                                                             –4     \
+          \                                         7\n                                                        \
+          \ 6               3                                                            6\n                   \
+          \                                      7\n           –20\n\n\n\n'G im, kJ/mol\n                      \
+          \                                                       log ptot, atm\n                              \
+          \                                      5                        –5\n                                 11\
+          \                                      2\n           –30                                             \
+          \                                                                                                 1\n\
+          \                         9                                                                   –6\n   \
+          \                                                                      1\n                         8 \
+          \                                                                                                    \
+          \                             2\n                                 10                                 \
+          \                            11\n           –40                                                      \
+          \                                                                                        3\n         \
+          \                        4                                                           –7 8          9 \
+          \     5     10        4\n\n                     1000     1200     1400      1600   1800      2000    \
+          \                                     1800                   2000               2200\n               \
+          \                               T, K                                                                 \
+          \          T, K"
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_table14_printed_context
+      type: printed_data_context
+      locator:
+        page: 19
+        pdf_page_index: 18
+        table: '14'
+      units: as printed
+      values:
+        quantity: table_14_thermodynamic_data_as_printed
+        method_class: model_derived
+        identity_as_printed: CaAl2O4
+        note: Complete table transcription is retained in context because these comparison or model-derived columns
+          do not map to a safe scored field in this extract.
+        table_as_printed: "Table 14. Partial pressures of atomic and molecular oxygen and total vapor pressure above\
+          \ molten oxide compounds and\nmaterial of Ca–Al-rich inclusions of chondrites at a temperature of 2000\
+          \ K\n                Compound                ptot, atm              pO, atm                         pO2\
+          \ , atm              O + O2, mol %                 O2/O\n\n [CaAl12O19]                          2.31\
+          \ × 10–8            1.17 × 10–8                     3.05 × 10–10                 51.86               \
+          \   2.61 × 10–2\n [CaAl4O7]                            3.58 × 10–8            1.70 × 10–8            \
+          \         6.52 × 10–10                 49.38                  3.84 × 10–2\n [CaTiO3]                 \
+          \            1.11 × 10–7            2.30 × 10–8                     1.19 × 10–9                  21.83\
+          \                  5.17 × 10–2\n {CaAl2O4}                            9.52 × 10–8            4.16 × 10–8\
+          \                     3.89 × 10–9                  47.72                  9.35 × 10–2\n {Ca2Al2SiO7} \
+          \                        9.87 × 10–7            2.62 × 10–7                     1.54 × 10–6          \
+          \        42.15                  5.88 × 10–1\n [MgAl2O4]                            2.70 × 10–6       \
+          \     4.98 × 10–7                     5.57 × 10–7                  39.02                      1.12\n {CAIs\
+          \ A}                             4.11 × 10–6            6.41 × 10–7                     9.24 × 10–7  \
+          \                38.13                      1.44\n {Ca2MgSi2O5}                         6.99 × 10–5  \
+          \          8.79 × 10–7                     1.74 × 10–6                  37.45                      1.98\n\
+          \ {CaMgSi2O4}                          1.22 × 10–5            1.19 × 10–6                     3.19 × 10–6\
+          \                  36.04                      2.68\n [Mg2SiO4]                            1.46 × 10–5\
+          \            1.32 × 10–6                     3.89 × 10–6                  35.70                      2.95\n\
+          \ {CaAl2Si2O8}                         2.13 × 10–5            1.61 × 10–6                     5.81 × 10–6\
+          \                  34.80                      3.61\n {MgSiO3}                             2.39 × 10–5\
+          \            1.73 × 10–6                     6.69 × 10–6                  35.29                      3.87\n\
+          \n                                                                     GEOCHEMISTRY INTERNATIONAL    \
+          \                               Vol. 63        No. 9      2025\n\f                                   \
+          \                THERMODYNAMIC PROPERTIES OF OXIDE COMPOUNDS                                         \
+          \                      829\n\n                                                      (a)              \
+          \                                                            (b)\n\n                                 \
+          \                                                                         0.5\n              50\n\n  \
+          \                                                                                                    \
+          \     0\n\n\n O + O 2, mol %\n                                                                       \
+          \                log (pO₂/pO)\n              45\n                                                    \
+          \                                                  –0.5\n                            1       7       \
+          \                                                                                                    \
+          \     1     7\n              40            2       8                                                 \
+          \                                                               2     8\n                            3\
+          \        9                                                                –1.0                       \
+          \                    3      9\n                            5       10                                \
+          \                                                                               4     10\n           \
+          \                 6       11                                                                         \
+          \                                      5     11\n              35                    12              \
+          \                                                  –1.5                                           6  \
+          \   12\n                                        –7                 –6             –5                 \
+          \                   –8         –7               –6             –5\n                                  \
+          \                 log ptot, atm                                                            log (pO₂ +\
+          \ pO), atm"
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_figure1_context
+      type: figure_only
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '1'
+      units: as plotted; no numeric points
+      values:
+        quantity: thermodynamic_property_figure_context
+        method_class: figure_only
+        species: CaAl2O4
+        phase: crystal
+        temperature_as_printed: as plotted; see caption
+        axes_as_printed: as printed in the figure caption and panel labels
+        caption_as_printed: ''
+        series:
+        - series: series identified in the caption; numeric data deferred
+          marker_count: not enumerated; figure values deferred
+        digitisation: deferred to a figure pass
+        attribution: Shornikov (2025); source references are retained in the printed caption.
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_figure2_context
+      type: figure_only
+      locator:
+        page: 4
+        pdf_page_index: 3
+        figure: '2'
+      units: as plotted; no numeric points
+      values:
+        quantity: thermodynamic_property_figure_context
+        method_class: figure_only
+        species: CaAl2O4
+        phase: crystal
+        temperature_as_printed: as plotted; see caption
+        axes_as_printed: as printed in the figure caption and panel labels
+        caption_as_printed: 'Fig. 2. (a) Heat capacity and (b) energy of mixing of CaAl2O4 determined by the following
+          methods: (1–4) calorimetry (Gronow                 and Schwiete, 1933; Bonnickson, 1955; Kojitani et al.,
+          2003; Yong et al., 2012); (5) vibration spectroscopy (Hofmeister, 2004);                 (6–10) investigation
+          of sulfide (Fincham and Richardson, 1954; Carter and Macfarline, 1957; Sharma and Richardson, 1961;                 Fujisawa
+          et al., 1990) and nitride (Cho and Suito, 1994a) capacity of slags; (11–14) investigation of heterogeneous
+          equilibria in                 slags (Chipman, 1961; Kalyanram and Bell, 1961; Zou et al., 1982; Morita
+          et al., 2002); (15–20) EMF (Popov et al., 1979; Allibert                 et al., 1981; Skolis et al.,
+          1983; Kumar and Kay, 1985; Nagata et al., 1989; Rog et al., 1993); (21–24) Knudsen effusion mass spec-                 trometry
+          (Allibert et al., 1981; Zaitsev et al., 1990; Shults and Shornikov, 1995; Shornikov et al., 1997); and
+          (25) calculation from                 thermochemical data (Bale et al., 2016).'
+        series:
+        - series: series identified in the caption; numeric data deferred
+          marker_count: not enumerated; figure values deferred
+        digitisation: deferred to a figure pass
+        attribution: Shornikov (2025); source references are retained in the printed caption.
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_figure13_context
+      type: figure_only
+      locator:
+        page: 19
+        pdf_page_index: 18
+        figure: '13'
+      units: as plotted; no numeric points
+      values:
+        quantity: vapor_pressure_or_activity_model_context
+        method_class: figure_only
+        species: CaAl2O4
+        phase: liquid melt
+        temperature_as_printed: as plotted; see caption
+        axes_as_printed: as printed in the figure caption and panel labels
+        caption_as_printed: 'Fig. 13. Temperature dependencies of the (a) mixing energy and (b) logarithm of total
+          vapor pressure over oxide compounds                 occurring in Ca–Al-rich inclusions from chondrites
+          calculated using the parameters recommended in this study. Compounds:                 (1) calcium aluminate
+          (CaAl2O4); (2) grossite (CaAl4O7); (3) hibonite (CaAl12O19); (4) perovskite (CaTiO3); (5) spinel                 (MgAl2O4);
+          (6) enstatite (MgSiO3); (7) forsterite (Mg2SiO4); (8) diopside (CaMgSi2O6); (9) akermanite (Ca2MgSi2O7);                 (10)
+          gehlenite (Ca2Al2SiO7); and (11) anorthite (CaAl2Si2O8).'
+        series:
+        - series: series identified in the caption; numeric data deferred
+          marker_count: not enumerated; figure values deferred
+        digitisation: deferred to a figure pass
+        attribution: Shornikov (2025); source references are retained in the printed caption.
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_figure14_context
+      type: figure_only
+      locator:
+        page: 20
+        pdf_page_index: 19
+        figure: '14'
+      units: as plotted; no numeric points
+      values:
+        quantity: vapor_pressure_or_activity_model_context
+        method_class: figure_only
+        species: CaAl2O4
+        phase: liquid melt
+        temperature_as_printed: as plotted; see caption
+        axes_as_printed: as printed in the figure caption and panel labels
+        caption_as_printed: 'Fig. 14. (a) Oxygen content and (b) dissociation of molecular oxygen in the gas phase
+          over melts of oxide compounds and material                   of Ca–Al-rich inclusions of chondrites at
+          a temperature of 2000 K: (1) CaAl12O19; (2) CaAl4O7; (3) CaAl2O4; (4) CaTiO3;                   (5) MgAl2O4;
+          (6) MgSiO3; (7) Mg2SiO4; (8) CaMgSi2O6; (9) Ca2MgSi2O7; (10) Ca2Al2SiO7; (11) CaAl2Si2O8; and (12) CAIs.'
+        series:
+        - series: series identified in the caption; numeric data deferred
+          marker_count: not enumerated; figure values deferred
+        digitisation: deferred to a figure pass
+        attribution: Shornikov (2025); source references are retained in the printed caption.
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_figure15_context
+      type: figure_only
+      locator:
+        page: 20
+        pdf_page_index: 19
+        figure: '15'
+      units: as plotted; no numeric points
+      values:
+        quantity: vapor_pressure_or_activity_model_context
+        method_class: figure_only
+        species: CaAl2O4
+        phase: liquid melt
+        temperature_as_printed: as plotted; see caption
+        axes_as_printed: as printed in the figure caption and panel labels
+        caption_as_printed: Fig. 15. Experimental (symbols) and calculated (lines) temperature dependencies of (a)
+          partial pressure of gaseous species                   ((1) Ca; (2) Mg; (3) Al; and (4) SiO) and (b) changes
+          of the composition of residual melt of type A CAIs during evaporation                   ((5) CaO; (6)
+          MgO; (7) Al2O3; and (8) SiO2).
+        series:
+        - series: series identified in the caption; numeric data deferred
+          marker_count: not enumerated; figure values deferred
+        digitisation: deferred to a figure pass
+        attribution: Shornikov (2025); source references are retained in the printed caption.
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_figure16_context
+      type: figure_only
+      locator:
+        page: 21
+        pdf_page_index: 20
+        figure: '16'
+      units: as plotted; no numeric points
+      values:
+        quantity: vapor_pressure_or_activity_model_context
+        method_class: figure_only
+        species: CaAl2O4
+        phase: liquid melt
+        temperature_as_printed: as plotted; see caption
+        axes_as_printed: as printed in the figure caption and panel labels
+        caption_as_printed: 'Fig. 16. Calculated activities of (a) oxides and (b) oxide compounds in residual melts
+          of type B CAIs during evaporation (Yakovlev          and Shornikov, 2024): (1) CaO; (2) MgO; (3) Al2O3;
+          (4) SiO2; (5) CaAl2O4; (6) CaAl4O7; (7) CaAl12O19; (8) MgAl2O4;          (9) MgSiO3; (10) Mg2SiO4; (11)
+          CaMgSi2O6; (12) Ca2MgSi2O7; (13) Ca2Al2SiO7; and (14) CaAl2Si2O8.'
+        series:
+        - series: series identified in the caption; numeric data deferred
+          marker_count: not enumerated; figure values deferred
+        digitisation: deferred to a figure pass
+        attribution: Shornikov (2025); source references are retained in the printed caption.
   CaAl4O7:
     observations:
-      - observation_id: shornikov_2025_table3_shornikov_melting
-        type: transition_point
-        locator: {page: 6, published_page: 815, pdf_page_index: 5, table: "3"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Shornikov et al., 1997
-          T_m_as_printed: 2035 K
-          T_m_K: 2035
-          delta_H_m_as_printed: 27.00 ± 2.50
-          delta_H_m_kJ_per_mol: 27.00
-          delta_H_m_uncertainty_kJ_per_mol: 2.50
-          delta_S_m_as_printed: 13.27 ± 1.20
-          delta_S_m_J_per_mol_K: 13.27
-          delta_S_m_uncertainty_J_per_mol_K: 1.20
-      - observation_id: shornikov_2025_table3_zherbetsov_melting
-        type: transition_point
-        locator: {page: 6, published_page: 815, pdf_page_index: 5, table: "3"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Zherebtsov et al., 1999
-          T_m_as_printed: 2035 K
-          T_m_K: 2035
-          delta_H_m_as_printed: 43.33 ± 3.33
-          delta_H_m_kJ_per_mol: 43.33
-          delta_H_m_uncertainty_kJ_per_mol: 3.33
-          delta_S_m_as_printed: 21.29 ± 1.64
-          delta_S_m_J_per_mol_K: 21.29
-          delta_S_m_uncertainty_J_per_mol_K: 1.64
-          note: "Table footnote: calculated accounting for ΔHm(Al2O3) = 118.407 kJ/mol (Bale et al., 2016)."
+    - observation_id: shornikov_2025_table3_shornikov_melting
+      type: transition_point
+      locator:
+        page: 6
+        published_page: 815
+        pdf_page_index: 5
+        table: '3'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Shornikov et al., 1997
+        T_m_as_printed: 2035 K
+        T_m_K: 2035
+        delta_H_m_as_printed: 27.00 ± 2.50
+        delta_H_m_kJ_per_mol: 27.0
+        delta_H_m_uncertainty_kJ_per_mol: 2.5
+        delta_S_m_as_printed: 13.27 ± 1.20
+        delta_S_m_J_per_mol_K: 13.27
+        delta_S_m_uncertainty_J_per_mol_K: 1.2
+    - observation_id: shornikov_2025_table3_zherbetsov_melting
+      type: transition_point
+      locator:
+        page: 6
+        published_page: 815
+        pdf_page_index: 5
+        table: '3'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Zherebtsov et al., 1999
+        T_m_as_printed: 2035 K
+        T_m_K: 2035
+        delta_H_m_as_printed: 43.33 ± 3.33
+        delta_H_m_kJ_per_mol: 43.33
+        delta_H_m_uncertainty_kJ_per_mol: 3.33
+        delta_S_m_as_printed: 21.29 ± 1.64
+        delta_S_m_J_per_mol_K: 21.29
+        delta_S_m_uncertainty_J_per_mol_K: 1.64
+        note: 'Table footnote: calculated accounting for ΔHm(Al2O3) = 118.407 kJ/mol (Bale et al., 2016).'
     context:
-      - observation_id: shornikov_2025_table3_formation_from_oxides
-        type: thermodynamic_context
-        locator: {page: 6, published_page: 815, pdf_page_index: 5, table: "3"}
-        units: as printed
-        values:
-          quantity: enthalpy_and_entropy_of_CaAl4O7_formation_from_oxides
-          method_class: quoted_attributed
-          reaction_as_printed: not explicitly printed for this table; formation from oxides stated in the article text
-          phase: cr
-          rows_as_printed: "T=1700–1900 K: ΔHT −5.58 ± 2.80 kJ/mol; ΔST 6.38 ± 1.50 J/(mol K), Rein and Chipman (1965). T=1260–1400 K: −0.30 ± 0.50; 9.30 ± 0.40, Popov et al. (1979). T=923–1223 K: −5.36 ± 0.27; 8.57 ± 0.22, Allibert et al. (1981). T=1200–1400 K: −10.50 ± 0.30; 7.90 ± 0.30, Skolis et al. (1983). T=1100–1500 K: −4.31 ± 0.42; 8.91 ± 0.28, Kumar and Kay (1985). T=1063 K: −8.53 ± 1.57; 4.83 ± 0.97, Geiger et al. (1988). T=1373–1873 K: −5.22 ± 0.18; 8.61 ± 0.18, Nagata et al. (1989). T=1562–1773 K: −6.14 ± 0.29; 8.15 ± 0.18, Zaitsev et al. (1990). T=1000–1200 K: −3.96 ± 0.03; 9.17 ± 0.13, Rog et al. (1993). T=1173 K: −4.67 ± 0.33; entropy not printed, Ayed et al. (1994). T=1833–2035 K: −6.34 ± 0.25; 9.94 ± 0.30, Shults and Shornikov (1995). T=2035–2100 K: 20.66 ± 1.26; 23.21 ± 0.62, Shornikov et al. (1997)."
+    - observation_id: shornikov_2025_table3_formation_from_oxides
+      type: thermodynamic_context
+      locator:
+        page: 6
+        published_page: 815
+        pdf_page_index: 5
+        table: '3'
+      units: as printed
+      values:
+        quantity: enthalpy_and_entropy_of_CaAl4O7_formation_from_oxides
+        method_class: quoted_attributed
+        reaction_as_printed: not explicitly printed for this table; formation from oxides stated in the article
+          text
+        phase: cr
+        rows_as_printed: 'T=1700–1900 K: ΔHT −5.58 ± 2.80 kJ/mol; ΔST 6.38 ± 1.50 J/(mol K), Rein and Chipman (1965).
+          T=1260–1400 K: −0.30 ± 0.50; 9.30 ± 0.40, Popov et al. (1979). T=923–1223 K: −5.36 ± 0.27; 8.57 ± 0.22,
+          Allibert et al. (1981). T=1200–1400 K: −10.50 ± 0.30; 7.90 ± 0.30, Skolis et al. (1983). T=1100–1500 K:
+          −4.31 ± 0.42; 8.91 ± 0.28, Kumar and Kay (1985). T=1063 K: −8.53 ± 1.57; 4.83 ± 0.97, Geiger et al. (1988).
+          T=1373–1873 K: −5.22 ± 0.18; 8.61 ± 0.18, Nagata et al. (1989). T=1562–1773 K: −6.14 ± 0.29; 8.15 ± 0.18,
+          Zaitsev et al. (1990). T=1000–1200 K: −3.96 ± 0.03; 9.17 ± 0.13, Rog et al. (1993). T=1173 K: −4.67 ±
+          0.33; entropy not printed, Ayed et al. (1994). T=1833–2035 K: −6.34 ± 0.25; 9.94 ± 0.30, Shults and Shornikov
+          (1995). T=2035–2100 K: 20.66 ± 1.26; 23.21 ± 0.62, Shornikov et al. (1997).'
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_figure3_context
+      type: figure_only
+      locator:
+        page: 6
+        pdf_page_index: 5
+        figure: '3'
+      units: as plotted; no numeric points
+      values:
+        quantity: thermodynamic_property_figure_context
+        method_class: figure_only
+        species: CaAl4O7
+        phase: crystal
+        temperature_as_printed: as plotted; see caption
+        axes_as_printed: as printed in the figure caption and panel labels
+        caption_as_printed: 'Fig. 3. (a) Heat capacity and (b) energy of mixing of grossite determined by the following
+          methods: (1) calorimetry (Bonnickson,                     1955); (2) vibration spectroscopy (Hofmeister,
+          2004); (3–5) investigation of sulfide capacity of slags (Cameron et al., 1966;                     Edmunds
+          and Taylor, 1972; Fujisawa et al., 1990); (6) and (7) investigation of heterogeneous equilibria in slags
+          (Rein and Chipman,                     1965; Morita et al., 2002); (8–13) EMF (Popov et al., 1979; Allibert
+          et al., 1981; Skolis et al., 1983; Kumar and Kay, 1985; Nagata                     et al., 1989; Rog et
+          al., 1993); (14–17) Knudsen effusion mass spectrometry (Allibert et al., 1981; Zaitsev et al., 1990; Shults
+          and                     Shornikov, 1995; Shornikov et al., 1997); and (18) and (19) calculation from thermochemical
+          data (Barin, 1995; Bale et al., 2016).'
+        series:
+        - series: series identified in the caption; numeric data deferred
+          marker_count: not enumerated; figure values deferred
+        digitisation: deferred to a figure pass
+        attribution: Shornikov (2025); source references are retained in the printed caption.
   CaAl12O19:
     context:
-      - observation_id: shornikov_2025_table4_hibonite_formation_from_oxides
-        type: thermodynamic_context
-        locator: {page: 7, published_page: 816, pdf_page_index: 6, table: "4"}
-        units: as printed
-        values:
-          quantity: enthalpy_and_entropy_of_hibonite_formation_from_oxides
-          method_class: quoted_attributed
-          note: These ΔHT and ΔST values are formation from oxides, not delta_fH or absolute S. Table caption also lists decomposition/melting values already partly represented as observations.
-          rows_as_printed: "T K: ΔHT kJ/mol; ΔST J/(mol K); reference. 1260–1400: −4.50 ± 0.50; 4.10 ± 0.40; Popov et al. 1979. 923–1223: −2.49 ± 0.19; 5.31 ± 0.16; Allibert et al. 1981. 1200–1400: −3.60 ± 0.20; 4.60 ± 0.20; Skolis et al. 1983. 1100–1500: −2.55 ± 0.12; 5.62 ± 0.08; Kumar and Kay 1985. 1063: −4.71 ± 1.39; 3.47 ± 0.40; Geiger et al. 1988. 1373–1873: −2.34 ± 0.15; 5.37 ± 0.15; Nagata et al. 1989. 1498–1650: −4.59 ± 0.22; 3.11 ± 0.14; Zaitsev et al. 1990. 1000–1200: −2.21 ± 0.04; 5.87 ± 0.01; Rog et al. 1993. 1173: −6.86 ± 0.43; entropy unavailable; Ayed et al. 1994. 1833–2033: −2.88 ± 0.25; 5.00 ± 0.20; Shults and Shornikov 1995. 2148–2200: 13.92 ± 0.96; 12.82 ± 0.46; Shornikov et al. 1997."
+    - observation_id: shornikov_2025_table4_hibonite_formation_from_oxides
+      type: thermodynamic_context
+      locator:
+        page: 7
+        published_page: 816
+        pdf_page_index: 6
+        table: '4'
+      units: as printed
+      values:
+        quantity: enthalpy_and_entropy_of_hibonite_formation_from_oxides
+        method_class: quoted_attributed
+        note: These ΔHT and ΔST values are formation from oxides, not delta_fH or absolute S. Table caption also
+          lists decomposition/melting values already partly represented as observations.
+        rows_as_printed: 'T K: ΔHT kJ/mol; ΔST J/(mol K); reference. 1260–1400: −4.50 ± 0.50; 4.10 ± 0.40; Popov
+          et al. 1979. 923–1223: −2.49 ± 0.19; 5.31 ± 0.16; Allibert et al. 1981. 1200–1400: −3.60 ± 0.20; 4.60
+          ± 0.20; Skolis et al. 1983. 1100–1500: −2.55 ± 0.12; 5.62 ± 0.08; Kumar and Kay 1985. 1063: −4.71 ± 1.39;
+          3.47 ± 0.40; Geiger et al. 1988. 1373–1873: −2.34 ± 0.15; 5.37 ± 0.15; Nagata et al. 1989. 1498–1650:
+          −4.59 ± 0.22; 3.11 ± 0.14; Zaitsev et al. 1990. 1000–1200: −2.21 ± 0.04; 5.87 ± 0.01; Rog et al. 1993.
+          1173: −6.86 ± 0.43; entropy unavailable; Ayed et al. 1994. 1833–2033: −2.88 ± 0.25; 5.00 ± 0.20; Shults
+          and Shornikov 1995. 2148–2200: 13.92 ± 0.96; 12.82 ± 0.46; Shornikov et al. 1997.'
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_figure4_context
+      type: figure_only
+      locator:
+        page: 7
+        pdf_page_index: 6
+        figure: '4'
+      units: as plotted; no numeric points
+      values:
+        quantity: thermodynamic_property_figure_context
+        method_class: figure_only
+        species: CaAl12O19
+        phase: crystal
+        temperature_as_printed: as plotted; see caption
+        axes_as_printed: as printed in the figure caption and panel labels
+        caption_as_printed: 'Fig. 4. (a) Heat capacity and (b) energy of mixing of hibonite determined by the following
+          methods: (1) vibration spectroscopy                       (Hofmeister, 2004); (2) solution calorimetry
+          in fused salts (Geiger et al., 1988); (3) investigation of sulfide capacity of slags (Fuji-                       sawa
+          et al., 1990); (4–9) EMF (Popov et al., 1979; Allibert et al., 1981; Skolis et al., 1983; Kumar and Kay,
+          1985; Nagata et al.,                       1989; Rog et al., 1993); (10–13) Knudsen effusion mass spectrometry
+          (Tovmachenko et al., 1979; Zaitsev et al., 1990; Shults and                       Shornikov, 1995; Shornikov
+          et al., 1997); and (14) calculation from thermochemical data (Bale et al., 2016).'
+        series:
+        - series: series identified in the caption; numeric data deferred
+          marker_count: not enumerated; figure values deferred
+        digitisation: deferred to a figure pass
+        attribution: Shornikov (2025); source references are retained in the printed caption.
     observations:
-      - observation_id: shornikov_2025_table4_shornikov_melting
-        type: transition_point
-        locator: {page: 7, published_page: 816, pdf_page_index: 6, table: "4"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Shornikov et al., 1997
-          T_m_as_printed: 2148 K
-          T_m_K: 2148
-          delta_H_m_as_printed: 16.80 ± 1.90
-          delta_H_m_kJ_per_mol: 16.80
-          delta_H_m_uncertainty_kJ_per_mol: 1.90
-          delta_S_m_as_printed: 7.82 ± 0.90
-          delta_S_m_J_per_mol_K: 7.82
-          delta_S_m_uncertainty_J_per_mol_K: 0.90
-      - observation_id: shornikov_2025_table4_zherbetsov_melting
-        type: transition_point
-        locator: {page: 7, published_page: 816, pdf_page_index: 6, table: "4"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Zherebtsov et al., 1999
-          T_m_as_printed: 2125 K
-          T_m_K: 2125
-          delta_H_m_as_printed: 17.28 ± 4.77
-          delta_H_m_kJ_per_mol: 17.28
-          delta_H_m_uncertainty_kJ_per_mol: 4.77
-          delta_S_m_as_printed: 8.13 ± 2.24
-          delta_S_m_J_per_mol_K: 8.13
-          delta_S_m_uncertainty_J_per_mol_K: 2.24
-          note: "Table footnote: calculated accounting for ΔHm(Al2O3) = 118.407 kJ/mol (Bale et al., 2016)."
+    - observation_id: shornikov_2025_table4_shornikov_melting
+      type: transition_point
+      locator:
+        page: 7
+        published_page: 816
+        pdf_page_index: 6
+        table: '4'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Shornikov et al., 1997
+        T_m_as_printed: 2148 K
+        T_m_K: 2148
+        delta_H_m_as_printed: 16.80 ± 1.90
+        delta_H_m_kJ_per_mol: 16.8
+        delta_H_m_uncertainty_kJ_per_mol: 1.9
+        delta_S_m_as_printed: 7.82 ± 0.90
+        delta_S_m_J_per_mol_K: 7.82
+        delta_S_m_uncertainty_J_per_mol_K: 0.9
+    - observation_id: shornikov_2025_table4_zherbetsov_melting
+      type: transition_point
+      locator:
+        page: 7
+        published_page: 816
+        pdf_page_index: 6
+        table: '4'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Zherebtsov et al., 1999
+        T_m_as_printed: 2125 K
+        T_m_K: 2125
+        delta_H_m_as_printed: 17.28 ± 4.77
+        delta_H_m_kJ_per_mol: 17.28
+        delta_H_m_uncertainty_kJ_per_mol: 4.77
+        delta_S_m_as_printed: 8.13 ± 2.24
+        delta_S_m_J_per_mol_K: 8.13
+        delta_S_m_uncertainty_J_per_mol_K: 2.24
+        note: 'Table footnote: calculated accounting for ΔHm(Al2O3) = 118.407 kJ/mol (Bale et al., 2016).'
   CaTiO3:
     context:
-      - observation_id: shornikov_2025_table5_perovskite_formation_from_oxides
-        type: thermodynamic_context
-        locator: {page: 8, published_page: 817, pdf_page_index: 7, table: "5"}
-        units: as printed
-        values:
-          quantity: enthalpy_and_entropy_of_perovskite_formation_from_oxides
-          method_class: quoted_attributed
-          note: These ΔHT and ΔST values are formation from oxides, not delta_fH or absolute S. Table melting observations are separately recorded.
-          rows_as_printed: "T K: ΔHT kJ/mol; ΔST J/(mol K); reference. 1180–1290: −26.88 ± 8.05; 11.07 ± 6.44; Golubenko and Rezukhina 1964. 888–972: −37.05 ± 3.28; 4.62 ± 3.54; Rezukhina et al. 1966. 1573–1993: −39.25 ± 0.15; 2.99 ± 0.08; Popov et al. 1979. 1068: −40.45 ± 1.15; entropy unavailable; Takayama-Muromachi and Navrotsky 1988. 1073: −40.43 ± 1.87; 4.37 ± 1.23; Prasanna and Navrotsky 1994. 1074: −43.78 ± 1.73; entropy unavailable; Linton et al. 1998. 1900: −36.20 ± 1.65; entropy unavailable; Woodfield et al. 1999. 973: −38.73 ± 1.34; entropy unavailable; Putnam et al. 1999. 1046: −42.38 ± 1.82; entropy unavailable; Putnam et al. 1999. 1078: −42.83 ± 3.12; entropy unavailable; Koito et al. 2000. 976: −42.86 ± 1.71; entropy unavailable; Helean et al. 2002. 900–1250: −40.07 ± 0.08; 3.15 ± 0.09; Jacob and Abraham 2009. 975: −42.25 ± 1.05; entropy unavailable; Navi et al. 2012. 975: −41.88 ± 1.36; entropy unavailable; Sahu et al. 2013. 1791–2241: −39.88 ± 0.54; 3.15 ± 0.28; Shornikov 2019. 2241–2398: 7.73 ± 1.76; 24.39 ± 0.76; Shornikov 2019."
+    - observation_id: shornikov_2025_table5_perovskite_formation_from_oxides
+      type: thermodynamic_context
+      locator:
+        page: 8
+        published_page: 817
+        pdf_page_index: 7
+        table: '5'
+      units: as printed
+      values:
+        quantity: enthalpy_and_entropy_of_perovskite_formation_from_oxides
+        method_class: quoted_attributed
+        note: These ΔHT and ΔST values are formation from oxides, not delta_fH or absolute S. Table melting observations
+          are separately recorded.
+        rows_as_printed: 'T K: ΔHT kJ/mol; ΔST J/(mol K); reference. 1180–1290: −26.88 ± 8.05; 11.07 ± 6.44; Golubenko
+          and Rezukhina 1964. 888–972: −37.05 ± 3.28; 4.62 ± 3.54; Rezukhina et al. 1966. 1573–1993: −39.25 ± 0.15;
+          2.99 ± 0.08; Popov et al. 1979. 1068: −40.45 ± 1.15; entropy unavailable; Takayama-Muromachi and Navrotsky
+          1988. 1073: −40.43 ± 1.87; 4.37 ± 1.23; Prasanna and Navrotsky 1994. 1074: −43.78 ± 1.73; entropy unavailable;
+          Linton et al. 1998. 1900: −36.20 ± 1.65; entropy unavailable; Woodfield et al. 1999. 973: −38.73 ± 1.34;
+          entropy unavailable; Putnam et al. 1999. 1046: −42.38 ± 1.82; entropy unavailable; Putnam et al. 1999.
+          1078: −42.83 ± 3.12; entropy unavailable; Koito et al. 2000. 976: −42.86 ± 1.71; entropy unavailable;
+          Helean et al. 2002. 900–1250: −40.07 ± 0.08; 3.15 ± 0.09; Jacob and Abraham 2009. 975: −42.25 ± 1.05;
+          entropy unavailable; Navi et al. 2012. 975: −41.88 ± 1.36; entropy unavailable; Sahu et al. 2013. 1791–2241:
+          −39.88 ± 0.54; 3.15 ± 0.28; Shornikov 2019. 2241–2398: 7.73 ± 1.76; 24.39 ± 0.76; Shornikov 2019.'
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_figure5_context
+      type: figure_only
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: '5'
+      units: as plotted; no numeric points
+      values:
+        quantity: thermodynamic_property_figure_context
+        method_class: figure_only
+        species: CaTiO3
+        phase: crystal
+        temperature_as_printed: as plotted; see caption
+        axes_as_printed: as printed in the figure caption and panel labels
+        caption_as_printed: 'Fig. 5. (a) Heat capacity and (b) energy of mixing of perovskite determined by the
+          following methods: (1–6) calorimetry (Naylor                     and Cook, 1946; Buykx, 1982; Guyot et
+          al., 1993; Woodfield et al., 1999; Sato et al., 2001; Prasanna and Navrotsky, 1994);                     (7–10)
+          EMF (Golubenko and Rezukhina, 1964; Taylor and Schmalzried, 1964; Rezukhina et al., 1966; Jacob and Abraham,                     2009);
+          (11–13) Knudsen effusion mass spectrometry (Banon et al., 1981; Shornikov et al., 2000; Shornikov, 2019);
+          and (14) cal-                     culation from thermochemical data (Bale et al., 2016).'
+        series:
+        - series: series identified in the caption; numeric data deferred
+          marker_count: not enumerated; figure values deferred
+        digitisation: deferred to a figure pass
+        attribution: Shornikov (2025); source references are retained in the printed caption.
     observations:
-      - observation_id: shornikov_2025_table5_klimm_melting
-        type: transition_point
-        locator: {page: 8, published_page: 817, pdf_page_index: 7, table: "5"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Klimm et al., 2018
-          research_method_as_printed: DTA
-          T_m_as_printed: 2220 K
-          T_m_K: 2220
-          delta_H_m_as_printed: 56.65 ± 11.33
-          delta_H_m_kJ_per_mol: 56.65
-          delta_H_m_uncertainty_kJ_per_mol: 11.33
-          delta_S_m_as_printed: 25.52 ± 5.10
-          delta_S_m_J_per_mol_K: 25.52
-          delta_S_m_uncertainty_J_per_mol_K: 5.10
-      - observation_id: shornikov_2025_table5_shornikov_melting
-        type: transition_point
-        locator: {page: 8, published_page: 817, pdf_page_index: 7, table: "5"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Shornikov, 2019
-          research_method_as_printed: KEMS
-          T_m_as_printed: 2241 K
-          T_m_K: 2241
-          delta_H_m_as_printed: 47.61 ± 1.84
-          delta_H_m_kJ_per_mol: 47.61
-          delta_H_m_uncertainty_kJ_per_mol: 1.84
-          delta_S_m_as_printed: 21.24 ± 0.81
-          delta_S_m_J_per_mol_K: 21.24
-          delta_S_m_uncertainty_J_per_mol_K: 0.81
+    - observation_id: shornikov_2025_table5_klimm_melting
+      type: transition_point
+      locator:
+        page: 8
+        published_page: 817
+        pdf_page_index: 7
+        table: '5'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Klimm et al., 2018
+        research_method_as_printed: DTA
+        T_m_as_printed: 2220 K
+        T_m_K: 2220
+        delta_H_m_as_printed: 56.65 ± 11.33
+        delta_H_m_kJ_per_mol: 56.65
+        delta_H_m_uncertainty_kJ_per_mol: 11.33
+        delta_S_m_as_printed: 25.52 ± 5.10
+        delta_S_m_J_per_mol_K: 25.52
+        delta_S_m_uncertainty_J_per_mol_K: 5.1
+    - observation_id: shornikov_2025_table5_shornikov_melting
+      type: transition_point
+      locator:
+        page: 8
+        published_page: 817
+        pdf_page_index: 7
+        table: '5'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Shornikov, 2019
+        research_method_as_printed: KEMS
+        T_m_as_printed: 2241 K
+        T_m_K: 2241
+        delta_H_m_as_printed: 47.61 ± 1.84
+        delta_H_m_kJ_per_mol: 47.61
+        delta_H_m_uncertainty_kJ_per_mol: 1.84
+        delta_S_m_as_printed: 21.24 ± 0.81
+        delta_S_m_J_per_mol_K: 21.24
+        delta_S_m_uncertainty_J_per_mol_K: 0.81
   MgSiO3:
     context:
-      - observation_id: shornikov_2025_table7_enstatite_formation_from_oxides
-        type: thermodynamic_context
-        locator: {page: 11, published_page: 820, pdf_page_index: 10, table: "7"}
-        units: as printed
-        values:
-          quantity: enthalpy_and_entropy_of_enstatite_formation_from_oxides
-          method_class: quoted_attributed
-          note: These ΔHT and ΔST values are formation from oxides, not delta_fH or absolute S. First entropy uncertainty is printed with an unusual multiplier.
-          rows_as_printed: "T K: ΔHT kJ/mol; ΔST J/(mol K); reference. 1757–1849: 3.88 ± 8.56; 8.00 ± 4.7·1; Henderson and Taylor 1966. 1173: −17.05 ± 1.19; entropy unavailable; Shearer and Kleppa 1973. 1373–1573: −19.16 ± 0.27; 1.13 ± 0.25; Rog et al. 1974. 1170: −17.49 ± 0.56; entropy unavailable; Kiseleva et al. 1979, 1981. 1023: −17.97 ± 0.65; entropy unavailable; Chatillon-Colinet et al. 1983. 1873–1973: 21.71 ± 2.50; 20.00 ± 1.75; Kambayashi and Kato 1983, 1984. 1073: −16.95 ± 0.88; entropy unavailable; Brousse et al. 1984. 1790–1890: −32.74 ± 3.27; −10.29 ± 2.22; Stolyarova et al. 2004. 1571–1873: −15.42 ± 0.21; −0.07 ± 0.15; Zaitsev et al. 2006."
+    - observation_id: shornikov_2025_table7_enstatite_formation_from_oxides
+      type: thermodynamic_context
+      locator:
+        page: 11
+        published_page: 820
+        pdf_page_index: 10
+        table: '7'
+      units: as printed
+      values:
+        quantity: enthalpy_and_entropy_of_enstatite_formation_from_oxides
+        method_class: quoted_attributed
+        note: These ΔHT and ΔST values are formation from oxides, not delta_fH or absolute S. First entropy uncertainty
+          is printed with an unusual multiplier.
+        rows_as_printed: 'T K: ΔHT kJ/mol; ΔST J/(mol K); reference. 1757–1849: 3.88 ± 8.56; 8.00 ± 4.7·1; Henderson
+          and Taylor 1966. 1173: −17.05 ± 1.19; entropy unavailable; Shearer and Kleppa 1973. 1373–1573: −19.16
+          ± 0.27; 1.13 ± 0.25; Rog et al. 1974. 1170: −17.49 ± 0.56; entropy unavailable; Kiseleva et al. 1979,
+          1981. 1023: −17.97 ± 0.65; entropy unavailable; Chatillon-Colinet et al. 1983. 1873–1973: 21.71 ± 2.50;
+          20.00 ± 1.75; Kambayashi and Kato 1983, 1984. 1073: −16.95 ± 0.88; entropy unavailable; Brousse et al.
+          1984. 1790–1890: −32.74 ± 3.27; −10.29 ± 2.22; Stolyarova et al. 2004. 1571–1873: −15.42 ± 0.21; −0.07
+          ± 0.15; Zaitsev et al. 2006.'
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_figure7_context
+      type: figure_only
+      locator:
+        page: 11
+        pdf_page_index: 10
+        figure: '7'
+      units: as plotted; no numeric points
+      values:
+        quantity: thermodynamic_property_figure_context
+        method_class: figure_only
+        species: MgSiO3
+        phase: crystal
+        temperature_as_printed: as plotted; see caption
+        axes_as_printed: as printed in the figure caption and panel labels
+        caption_as_printed: 'Fig. 7. (a) Heat capacity and (b) energy of mixing of enstatite determined by the following
+          methods: (1–6) calorimetry (White,                    1919; Wagner, 1932; Stebbins et al., 1984; Krupka
+          et al., 1985; Courtial and Richet, 1993; Thieblot et al., 1999); (7) investigation                    of
+          sulfide capacity (Fincham and Richardson, 1954); (8) investigation of heterogeneous equilibria in slags
+          (Henderson and Tay-                    lor, 1966); (9) EMF (Rog et al., 1974); (10–12) Knudsen effusion
+          mass spectrometry (Kambayashi and Kato, 1984; Stolyarova                    et al., 2004; Zaitsev et al.,
+          2006); and (13) calculation from thermochemical data (Bale et al., 2016).'
+        series:
+        - series: series identified in the caption; numeric data deferred
+          marker_count: not enumerated; figure values deferred
+        digitisation: deferred to a figure pass
+        attribution: Shornikov (2025); source references are retained in the printed caption.
     observations:
-      - observation_id: shornikov_2025_table7_stebbins_melting
-        type: transition_point
-        locator: {page: 11, published_page: 820, pdf_page_index: 10, table: "7"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Stebbins et al., 1984
-          T_m_as_printed: 1840 K
-          T_m_K: 1840
-          delta_H_m_as_printed: 38.70 ± 2.10
-          delta_H_m_kJ_per_mol: 38.70
-          delta_H_m_uncertainty_kJ_per_mol: 2.10
-          delta_S_m_as_printed: 21.03 ± 1.14
-          delta_S_m_J_per_mol_K: 21.03
-          delta_S_m_uncertainty_J_per_mol_K: 1.14
-      - observation_id: shornikov_2025_table7_richet_melting
-        type: transition_point
-        locator: {page: 11, published_page: 820, pdf_page_index: 10, table: "7"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Richet and Bottinga, 1986
-          T_m_as_printed: 1834 K
-          T_m_K: 1834
-          delta_H_m_as_printed: 36.60 ± 3.00
-          delta_H_m_kJ_per_mol: 36.60
-          delta_H_m_uncertainty_kJ_per_mol: 3.00
-          delta_S_m_as_printed: 19.96 ± 1.64
-          delta_S_m_J_per_mol_K: 19.96
-          delta_S_m_uncertainty_J_per_mol_K: 1.64
-      - observation_id: shornikov_2025_table7_sugawara_melting
-        type: transition_point
-        locator: {page: 11, published_page: 820, pdf_page_index: 10, table: "7"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Sugawara, 2005
-          T_m_as_printed: 1834 K
-          T_m_K: 1834
-          delta_H_m_as_printed: 34.75 ± 1.45
-          delta_H_m_kJ_per_mol: 34.75
-          delta_H_m_uncertainty_kJ_per_mol: 1.45
-          delta_S_m_as_printed: 18.95 ± 0.79
-          delta_S_m_J_per_mol_K: 18.95
-          delta_S_m_uncertainty_J_per_mol_K: 0.79
+    - observation_id: shornikov_2025_table7_stebbins_melting
+      type: transition_point
+      locator:
+        page: 11
+        published_page: 820
+        pdf_page_index: 10
+        table: '7'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Stebbins et al., 1984
+        T_m_as_printed: 1840 K
+        T_m_K: 1840
+        delta_H_m_as_printed: 38.70 ± 2.10
+        delta_H_m_kJ_per_mol: 38.7
+        delta_H_m_uncertainty_kJ_per_mol: 2.1
+        delta_S_m_as_printed: 21.03 ± 1.14
+        delta_S_m_J_per_mol_K: 21.03
+        delta_S_m_uncertainty_J_per_mol_K: 1.14
+    - observation_id: shornikov_2025_table7_richet_melting
+      type: transition_point
+      locator:
+        page: 11
+        published_page: 820
+        pdf_page_index: 10
+        table: '7'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Richet and Bottinga, 1986
+        T_m_as_printed: 1834 K
+        T_m_K: 1834
+        delta_H_m_as_printed: 36.60 ± 3.00
+        delta_H_m_kJ_per_mol: 36.6
+        delta_H_m_uncertainty_kJ_per_mol: 3.0
+        delta_S_m_as_printed: 19.96 ± 1.64
+        delta_S_m_J_per_mol_K: 19.96
+        delta_S_m_uncertainty_J_per_mol_K: 1.64
+    - observation_id: shornikov_2025_table7_sugawara_melting
+      type: transition_point
+      locator:
+        page: 11
+        published_page: 820
+        pdf_page_index: 10
+        table: '7'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Sugawara, 2005
+        T_m_as_printed: 1834 K
+        T_m_K: 1834
+        delta_H_m_as_printed: 34.75 ± 1.45
+        delta_H_m_kJ_per_mol: 34.75
+        delta_H_m_uncertainty_kJ_per_mol: 1.45
+        delta_S_m_as_printed: 18.95 ± 0.79
+        delta_S_m_J_per_mol_K: 18.95
+        delta_S_m_uncertainty_J_per_mol_K: 0.79
   Mg2SiO4:
     context:
-      - observation_id: shornikov_2025_table8_forsterite_formation_from_oxides
-        type: thermodynamic_context
-        locator: {page: 12, published_page: 821, pdf_page_index: 11, table: "8"}
-        units: as printed
-        values:
-          quantity: enthalpy_and_entropy_of_forsterite_formation_from_oxides
-          method_class: quoted_attributed
-          note: These ΔHT and ΔST values are formation from oxides, not delta_fH or absolute S.
-          rows_as_printed: "T K: ΔHT kJ/mol; ΔST J/(mol K); reference. 965: −20.92 ± 1.40; entropy unavailable; Navrotsky 1971. 1173: −20.72 ± 1.16; entropy unavailable; Shearer and Kleppa 1973. 1373–1573: −19.47 ± 0.32; 1.51 ± 0.31; Rog et al. 1974. 970: −20.88 ± 0.38; entropy unavailable; Charlu et al. 1975. 1170: −19.94 ± 0.46; entropy unavailable; Kiseleva et al. 1979, 1981. 1873–1973: −25.80 ± 2.50; −3.67 ± 1.75; Kambayashi and Kato 1983, 1984. 1073: −19.85 ± 0.63; entropy unavailable; Brousse et al. 1984. 1790–1890: 9.63 ± 2.89; 14.09 ± 1.79; Stolyarova et al. 2004. 1571–1873: −21.00 ± 0.30; −0.73 ± 0.15; Zaitsev et al. 2006."
+    - observation_id: shornikov_2025_table8_forsterite_formation_from_oxides
+      type: thermodynamic_context
+      locator:
+        page: 12
+        published_page: 821
+        pdf_page_index: 11
+        table: '8'
+      units: as printed
+      values:
+        quantity: enthalpy_and_entropy_of_forsterite_formation_from_oxides
+        method_class: quoted_attributed
+        note: These ΔHT and ΔST values are formation from oxides, not delta_fH or absolute S.
+        rows_as_printed: 'T K: ΔHT kJ/mol; ΔST J/(mol K); reference. 965: −20.92 ± 1.40; entropy unavailable; Navrotsky
+          1971. 1173: −20.72 ± 1.16; entropy unavailable; Shearer and Kleppa 1973. 1373–1573: −19.47 ± 0.32; 1.51
+          ± 0.31; Rog et al. 1974. 970: −20.88 ± 0.38; entropy unavailable; Charlu et al. 1975. 1170: −19.94 ± 0.46;
+          entropy unavailable; Kiseleva et al. 1979, 1981. 1873–1973: −25.80 ± 2.50; −3.67 ± 1.75; Kambayashi and
+          Kato 1983, 1984. 1073: −19.85 ± 0.63; entropy unavailable; Brousse et al. 1984. 1790–1890: 9.63 ± 2.89;
+          14.09 ± 1.79; Stolyarova et al. 2004. 1571–1873: −21.00 ± 0.30; −0.73 ± 0.15; Zaitsev et al. 2006.'
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_figure8_context
+      type: figure_only
+      locator:
+        page: 12
+        pdf_page_index: 11
+        figure: '8'
+      units: as plotted; no numeric points
+      values:
+        quantity: thermodynamic_property_figure_context
+        method_class: figure_only
+        species: Mg2SiO4
+        phase: crystal
+        temperature_as_printed: as plotted; see caption
+        axes_as_printed: as printed in the figure caption and panel labels
+        caption_as_printed: 'Fig. 8. (a) Heat capacity and (b) energy of mixing of forsterite determined by the
+          following methods: (1–7) calorimetry (Orr,                     1953; Watanabe, 1982; Robie et al., 1982;
+          Ashida et al., 1987; Gillet et al., 1991; Richet and Fiquet, 1991; Kojitani et al., 2012);                     (8)
+          investigation of sulfide capacity (Fincham and Richardson, 1954); (9) investigation of heterogeneous equilibria
+          in slags (Hen-                     derson and Taylor, 1966); (10) and (11) EMF (Rog et al., 1974; O’Neill
+          et al., 2003); (12–14) Knudsen effusion mass spectrom-                     etry (Kambayashi and Kato,
+          1984; Stolyarova et al., 2004; Zaitsev et al., 2006); and (15) calculation from thermochemical data                     (Bale
+          et al., 2016).'
+        series:
+        - series: series identified in the caption; numeric data deferred
+          marker_count: not enumerated; figure values deferred
+        digitisation: deferred to a figure pass
+        attribution: Shornikov (2025); source references are retained in the printed caption.
     observations:
-      - observation_id: shornikov_2025_table8_navrotsky_melting
-        type: transition_point
-        locator: {page: 13, published_page: 822, pdf_page_index: 12, table: "8"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Navrotsky et al., 1989
-          research_method_as_printed: Drop HTSC
-          T_m_as_printed: 2163 K
-          T_m_K: 2163
-          delta_H_m_as_printed: 38.00 ± 6.67
-          delta_H_m_kJ_per_mol: 38.00
-          delta_H_m_uncertainty_kJ_per_mol: 6.67
-          delta_S_m_as_printed: 17.57 ± 3.08
-          delta_S_m_J_per_mol_K: 17.57
-          delta_S_m_uncertainty_J_per_mol_K: 3.08
-      - observation_id: shornikov_2025_table8_richet_melting
-        type: transition_point
-        locator: {page: 13, published_page: 822, pdf_page_index: 12, table: "8"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Richet et al., 1993
-          research_method_as_printed: DTA
-          T_m_as_printed: 2174 K
-          T_m_K: 2174
-          delta_H_m_as_printed: 47.33 ± 4.67
-          delta_H_m_kJ_per_mol: 47.33
-          delta_H_m_uncertainty_kJ_per_mol: 4.67
-          delta_S_m_as_printed: 21.77 ± 2.14
-          delta_S_m_J_per_mol_K: 21.77
-          delta_S_m_uncertainty_J_per_mol_K: 2.14
-      - observation_id: shornikov_2025_table8_sugawara_melting
-        type: transition_point
-        locator: {page: 13, published_page: 822, pdf_page_index: 12, table: "8"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Sugawara, 2005
-          research_method_as_printed: DSC
-          T_m_as_printed: 2174 K
-          T_m_K: 2174
-          delta_H_m_as_printed: 46.30 ± 0.87
-          delta_H_m_kJ_per_mol: 46.30
-          delta_H_m_uncertainty_kJ_per_mol: 0.87
-          delta_S_m_as_printed: 21.30 ± 0.40
-          delta_S_m_J_per_mol_K: 21.30
-          delta_S_m_uncertainty_J_per_mol_K: 0.40
+    - observation_id: shornikov_2025_table8_navrotsky_melting
+      type: transition_point
+      locator:
+        page: 13
+        published_page: 822
+        pdf_page_index: 12
+        table: '8'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Navrotsky et al., 1989
+        research_method_as_printed: Drop HTSC
+        T_m_as_printed: 2163 K
+        T_m_K: 2163
+        delta_H_m_as_printed: 38.00 ± 6.67
+        delta_H_m_kJ_per_mol: 38.0
+        delta_H_m_uncertainty_kJ_per_mol: 6.67
+        delta_S_m_as_printed: 17.57 ± 3.08
+        delta_S_m_J_per_mol_K: 17.57
+        delta_S_m_uncertainty_J_per_mol_K: 3.08
+    - observation_id: shornikov_2025_table8_richet_melting
+      type: transition_point
+      locator:
+        page: 13
+        published_page: 822
+        pdf_page_index: 12
+        table: '8'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Richet et al., 1993
+        research_method_as_printed: DTA
+        T_m_as_printed: 2174 K
+        T_m_K: 2174
+        delta_H_m_as_printed: 47.33 ± 4.67
+        delta_H_m_kJ_per_mol: 47.33
+        delta_H_m_uncertainty_kJ_per_mol: 4.67
+        delta_S_m_as_printed: 21.77 ± 2.14
+        delta_S_m_J_per_mol_K: 21.77
+        delta_S_m_uncertainty_J_per_mol_K: 2.14
+    - observation_id: shornikov_2025_table8_sugawara_melting
+      type: transition_point
+      locator:
+        page: 13
+        published_page: 822
+        pdf_page_index: 12
+        table: '8'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Sugawara, 2005
+        research_method_as_printed: DSC
+        T_m_as_printed: 2174 K
+        T_m_K: 2174
+        delta_H_m_as_printed: 46.30 ± 0.87
+        delta_H_m_kJ_per_mol: 46.3
+        delta_H_m_uncertainty_kJ_per_mol: 0.87
+        delta_S_m_as_printed: 21.30 ± 0.40
+        delta_S_m_J_per_mol_K: 21.3
+        delta_S_m_uncertainty_J_per_mol_K: 0.4
   Ca2MgSi2O7:
     observations:
-      - observation_id: shornikov_2025_table10_proks_melting
-        type: transition_point
-        locator: {page: 15, published_page: 824, pdf_page_index: 14, table: "10"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Proks et al., 1977
-          research_method_as_printed: HF drop HTSC
-          T_m_as_printed: 1727 K
-          T_m_K: 1727
-          delta_H_m_as_printed: 24.78 ± 0.64
-          delta_H_m_kJ_per_mol: 24.78
-          delta_H_m_uncertainty_kJ_per_mol: 0.64
-          delta_S_m_as_printed: 14.35 ± 0.37
-          delta_S_m_J_per_mol_K: 14.35
-          delta_S_m_uncertainty_J_per_mol_K: 0.37
-      - observation_id: shornikov_2025_table10_richet_melting
-        type: transition_point
-        locator: {page: 15, published_page: 824, pdf_page_index: 14, table: "10"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Richet et al., 1994
-          research_method_as_printed: Ice calorimetry
-          T_m_as_printed: 1727 K
-          T_m_K: 1727
-          delta_H_m_as_printed: 24.92 ± 1.50
-          delta_H_m_kJ_per_mol: 24.92
-          delta_H_m_uncertainty_kJ_per_mol: 1.50
-          delta_S_m_as_printed: 14.43 ± 0.87
-          delta_S_m_J_per_mol_K: 14.43
-          delta_S_m_uncertainty_J_per_mol_K: 0.87
-      - observation_id: shornikov_2025_table10_sugawara_melting
-        type: transition_point
-        locator: {page: 15, published_page: 824, pdf_page_index: 14, table: "10"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Sugawara and Akaogi, 2003
-          research_method_as_printed: DSC
-          T_m_as_printed: 1731 K
-          T_m_K: 1731
-          delta_H_m_as_printed: 26.62 ± 0.48
-          delta_H_m_kJ_per_mol: 26.62
-          delta_H_m_uncertainty_kJ_per_mol: 0.48
-          delta_S_m_as_printed: 15.41 ± 0.28
-          delta_S_m_J_per_mol_K: 15.41
-          delta_S_m_uncertainty_J_per_mol_K: 0.28
+    - observation_id: shornikov_2025_table10_proks_melting
+      type: transition_point
+      locator:
+        page: 15
+        published_page: 824
+        pdf_page_index: 14
+        table: '10'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Proks et al., 1977
+        research_method_as_printed: HF drop HTSC
+        T_m_as_printed: 1727 K
+        T_m_K: 1727
+        delta_H_m_as_printed: 24.78 ± 0.64
+        delta_H_m_kJ_per_mol: 24.78
+        delta_H_m_uncertainty_kJ_per_mol: 0.64
+        delta_S_m_as_printed: 14.35 ± 0.37
+        delta_S_m_J_per_mol_K: 14.35
+        delta_S_m_uncertainty_J_per_mol_K: 0.37
+    - observation_id: shornikov_2025_table10_richet_melting
+      type: transition_point
+      locator:
+        page: 15
+        published_page: 824
+        pdf_page_index: 14
+        table: '10'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Richet et al., 1994
+        research_method_as_printed: Ice calorimetry
+        T_m_as_printed: 1727 K
+        T_m_K: 1727
+        delta_H_m_as_printed: 24.92 ± 1.50
+        delta_H_m_kJ_per_mol: 24.92
+        delta_H_m_uncertainty_kJ_per_mol: 1.5
+        delta_S_m_as_printed: 14.43 ± 0.87
+        delta_S_m_J_per_mol_K: 14.43
+        delta_S_m_uncertainty_J_per_mol_K: 0.87
+    - observation_id: shornikov_2025_table10_sugawara_melting
+      type: transition_point
+      locator:
+        page: 15
+        published_page: 824
+        pdf_page_index: 14
+        table: '10'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Sugawara and Akaogi, 2003
+        research_method_as_printed: DSC
+        T_m_as_printed: 1731 K
+        T_m_K: 1731
+        delta_H_m_as_printed: 26.62 ± 0.48
+        delta_H_m_kJ_per_mol: 26.62
+        delta_H_m_uncertainty_kJ_per_mol: 0.48
+        delta_S_m_as_printed: 15.41 ± 0.28
+        delta_S_m_J_per_mol_K: 15.41
+        delta_S_m_uncertainty_J_per_mol_K: 0.28
+    context:
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_table10_printed_context
+      type: printed_data_context
+      locator:
+        page: 15
+        pdf_page_index: 14
+        table: '10'
+      units: as printed
+      values:
+        quantity: table_10_thermodynamic_data_as_printed
+        method_class: quoted_attributed
+        identity_as_printed: Ca2MgSi2O7
+        note: Complete table transcription is retained in context because these comparison or model-derived columns
+          do not map to a safe scored field in this extract.
+        table_as_printed: "Table 10. Enthalpy and entropy of akermanite formation and melting\n                \
+          \             T, K       ΔHT, kJ/mol            ΔST, J/(mol K)                                       \
+          \    Method                           Reference\n                             298              –     \
+          \              3.82 ± 0.50         HF calorimetry                                          Pankratz and\
+          \ Kelley, 1964\n           1700–1724                  –37.24 ± 3.35             –0.34 ± 4.85         \
+          \ Thermochemical calculations                             Rein and Chipman, 1965\n           1724–1900\
+          \                  –14.73 ± 4.02             12.72 ± 6.97\n           1252–1544                    –8.18\
+          \ ± 2.00            15.37 ± 3.20          Equilibria in slags                                     Henderson\
+          \ and Taylor, 1966\n                             298              –                   4.61 ± 0.42    \
+          \     Adiabatic calorimetry                                   Robie et al., 1978\n                   \
+          \          970      –35.92 ± 0.23                   –               Pb2B2O5 HTSC                     \
+          \                       Charlu et al., 1981\n                            1073      –35.65 ± 0.33     \
+          \              –               (Li, Na)BO2 HTSC                                        Brousse et al.,\
+          \ 1984\n                            Tm, K       ΔHm, kJ/mol            ΔSm, J/(mol K)                \
+          \                           Method                           Reference\n                             1724\
+          \       22.51 ± 5.23            13.06 ± 3.03          Thermochemical calculations                    \
+          \         Rein and Chipman, 1965\n                             1727       24.78 ± 0.64            14.35\
+          \ ± 0.37          HF drop HTSC                                            Proks et al., 1977\n       \
+          \                      1727       24.92 ± 1.50            14.43 ± 0.87          Ice calorimetry      \
+          \                                   Richet et al., 1994\n                             1731       26.62\
+          \ ± 0.48             15.41 ± 0.28         DSC                                                     Sugawara\
+          \ and Akaogi, 2003\n\n                                                                               \
+          \ GEOCHEMISTRY INTERNATIONAL                                         Vol. 63     No. 9     2025\n\f  \
+          \                                                THERMODYNAMIC PROPERTIES OF OXIDE COMPOUNDS         \
+          \                                                                     825\n\n                        \
+          \                               (a)                                                                  \
+          \                   (b)\n                                                                            \
+          \                                     –24\n                        360\n\n\n\n\nCp(CaAl2Si2O8), J/(mol\
+          \ K)\n                                                                                           'Gm(CaAl2Si2O8),\
+          \ kJ/mol\n                                                               14                          \
+          \                          –27                                              12\n                     \
+          \   330\n                                                                                            \
+          \                     –30\n                        300\n                                             \
+          \                                                                                                 11\n\
+          \                            270                                                                     \
+          \             –33                                         13\n                                       \
+          \                                                1                                    6\n            \
+          \                                                                           2                        \
+          \            7                14\n                        240                                        \
+          \                    3                         –36        8\n                                        \
+          \                                               4                                     9\n            \
+          \                210                                                        5                        \
+          \            10\n                                                                                    \
+          \                             –39\n                               300       600     900     1200     \
+          \  1500        1800                                       1000   1200   1400    1600         1800   2000\n\
+          \                                                       T, K                                         \
+          \                                         T, K"
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_figure10_context
+      type: figure_only
+      locator:
+        page: 14
+        pdf_page_index: 13
+        figure: '10'
+      units: as plotted; no numeric points
+      values:
+        quantity: thermodynamic_property_figure_context
+        method_class: figure_only
+        species: Ca2MgSi2O7
+        phase: crystal
+        temperature_as_printed: as plotted; see caption
+        axes_as_printed: as printed in the figure caption and panel labels
+        caption_as_printed: 'Fig. 10. (a) Heat capacity and (b) energy of mixing of akermanite determined by the
+          following methods: (1–3) calorimetry (Pank-                       ratz and Kelley, 1964; Proks et al.,
+          1977; Hemingway et al., 1986); (4) and (5) investigation of heterogeneous equilibria in slags                       (Henderson
+          and Taylor, 1966; Morita et al., 2002); (6) and (7) calculation from thermochemical data (Rein and Chipman,
+          1965;                       Bale et al., 2016).'
+        series:
+        - series: series identified in the caption; numeric data deferred
+          marker_count: not enumerated; figure values deferred
+        digitisation: deferred to a figure pass
+        attribution: Shornikov (2025); source references are retained in the printed caption.
   CaAl2Si2O8:
     observations:
-      - observation_id: shornikov_2025_table12_kracek_melting
-        type: transition_point
-        locator: {page: 17, published_page: 826, pdf_page_index: 16, table: "12"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Kracek and Neuvonen, 1951
-          research_method_as_printed: HF HTSC
-          T_m_as_printed: 1828 K
-          T_m_K: 1828
-          delta_H_m_as_printed: 18.80 ± 5.00
-          delta_H_m_kJ_per_mol: 18.80
-          delta_H_m_uncertainty_kJ_per_mol: 5.00
-          delta_S_m_as_printed: 10.28 ± 2.74
-          delta_S_m_J_per_mol_K: 10.28
-          delta_S_m_uncertainty_J_per_mol_K: 2.74
-      - observation_id: shornikov_2025_table12_ferrier_melting
-        type: transition_point
-        locator: {page: 17, published_page: 826, pdf_page_index: 16, table: "12"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Ferrier, 1971
-          research_method_as_printed: HF HTSC
-          T_m_as_printed: 1826 K
-          T_m_K: 1826
-          delta_H_m_as_printed: 41.74 ± 2.00
-          delta_H_m_kJ_per_mol: 41.74
-          delta_H_m_uncertainty_kJ_per_mol: 2.00
-          delta_S_m_as_printed: 22.86 ± 1.10
-          delta_S_m_J_per_mol_K: 22.86
-          delta_S_m_uncertainty_J_per_mol_K: 1.10
-      - observation_id: shornikov_2025_table12_robie_melting
-        type: transition_point
-        locator: {page: 17, published_page: 826, pdf_page_index: 16, table: "12"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Robie et al., 1978
-          research_method_as_printed: Adiabatic calorimetry
-          T_m_as_printed: 1830 K
-          T_m_K: 1830
-          delta_H_m_as_printed: 24.50 ± 4.50
-          delta_H_m_kJ_per_mol: 24.50
-          delta_H_m_uncertainty_kJ_per_mol: 4.50
-          delta_S_m_as_printed: 13.39 ± 2.46
-          delta_S_m_J_per_mol_K: 13.39
-          delta_S_m_uncertainty_J_per_mol_K: 2.46
-      - observation_id: shornikov_2025_table12_charlu_melting
-        type: transition_point
-        locator: {page: 17, published_page: 826, pdf_page_index: 16, table: "12"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Charlu et al., 1978
-          research_method_as_printed: Pb2B2O5 HTSC
-          T_m_as_printed: 1830 K
-          T_m_K: 1830
-          delta_H_m_as_printed: 33.20 ± 0.30
-          delta_H_m_kJ_per_mol: 33.20
-          delta_H_m_uncertainty_kJ_per_mol: 0.30
-          delta_S_m_as_printed: 18.14 ± 0.16
-          delta_S_m_J_per_mol_K: 18.14
-          delta_S_m_uncertainty_J_per_mol_K: 0.16
-      - observation_id: shornikov_2025_table12_navrotsky_melting
-        type: transition_point
-        locator: {page: 17, published_page: 826, pdf_page_index: 16, table: "12"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Navrotsky et al., 1980
-          research_method_as_printed: Pb2B2O5 HTSC
-          T_m_as_printed: 1830 K
-          T_m_K: 1830
-          delta_H_m_as_printed: 33.30 ± 0.30
-          delta_H_m_kJ_per_mol: 33.30
-          delta_H_m_uncertainty_kJ_per_mol: 0.30
-          delta_S_m_as_printed: 18.20 ± 0.16
-          delta_S_m_J_per_mol_K: 18.20
-          delta_S_m_uncertainty_J_per_mol_K: 0.16
-      - observation_id: shornikov_2025_table12_weill_melting
-        type: transition_point
-        locator: {page: 17, published_page: 826, pdf_page_index: 16, table: "12"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Weill et al., 1980a
-          research_method_as_printed: Drop calorimetry
-          T_m_as_printed: 1830 K
-          T_m_K: 1830
-          delta_H_m_as_printed: 33.89 ± 2.20
-          delta_H_m_kJ_per_mol: 33.89
-          delta_H_m_uncertainty_kJ_per_mol: 2.20
-          delta_S_m_as_printed: 18.52 ± 1.20
-          delta_S_m_J_per_mol_K: 18.52
-          delta_S_m_uncertainty_J_per_mol_K: 1.20
-      - observation_id: shornikov_2025_table12_richet_b_bottinga_melting
-        type: transition_point
-        locator: {page: 17, published_page: 826, pdf_page_index: 16, table: "12"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Richet and Bottinga, 1984
-          research_method_as_printed: Drop calorimetry
-          T_m_as_printed: 1830 K
-          T_m_K: 1830
-          delta_H_m_as_printed: 33.30 ± 1.00
-          delta_H_m_kJ_per_mol: 33.30
-          delta_H_m_uncertainty_kJ_per_mol: 1.00
-          delta_S_m_as_printed: 18.20 ± 0.55
-          delta_S_m_J_per_mol_K: 18.20
-          delta_S_m_uncertainty_J_per_mol_K: 0.55
-      - observation_id: shornikov_2025_table12_richet_melting
-        type: transition_point
-        locator: {page: 17, published_page: 826, pdf_page_index: 16, table: "12"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Richet et al., 1994
-          research_method_as_printed: Ice calorimetry
-          T_m_as_printed: 1830 K
-          T_m_K: 1830
-          delta_H_m_as_printed: 33.25 ± 0.16
-          delta_H_m_kJ_per_mol: 33.25
-          delta_H_m_uncertainty_kJ_per_mol: 0.16
-          delta_S_m_as_printed: 18.17 ± 0.16
-          delta_S_m_J_per_mol_K: 18.17
-          delta_S_m_uncertainty_J_per_mol_K: 0.16
-      - observation_id: shornikov_2025_table12_sugawara_melting
-        type: transition_point
-        locator: {page: 17, published_page: 826, pdf_page_index: 16, table: "12"}
-        phase: cr
-        units: K
-        values:
-          quantity: transition_temperature
-          method_class: quoted_attributed
-          attribution: Sugawara, 2005
-          research_method_as_printed: DSC
-          T_m_as_printed: 1830 K
-          T_m_K: 1830
-          delta_H_m_as_printed: 36.65 ± 0.80
-          delta_H_m_kJ_per_mol: 36.65
-          delta_H_m_uncertainty_kJ_per_mol: 0.80
-          delta_S_m_as_printed: 20.03 ± 0.44
-          delta_S_m_J_per_mol_K: 20.03
-          delta_S_m_uncertainty_J_per_mol_K: 0.44
+    - observation_id: shornikov_2025_table12_kracek_melting
+      type: transition_point
+      locator:
+        page: 17
+        published_page: 826
+        pdf_page_index: 16
+        table: '12'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Kracek and Neuvonen, 1951
+        research_method_as_printed: HF HTSC
+        T_m_as_printed: 1828 K
+        T_m_K: 1828
+        delta_H_m_as_printed: 18.80 ± 5.00
+        delta_H_m_kJ_per_mol: 18.8
+        delta_H_m_uncertainty_kJ_per_mol: 5.0
+        delta_S_m_as_printed: 10.28 ± 2.74
+        delta_S_m_J_per_mol_K: 10.28
+        delta_S_m_uncertainty_J_per_mol_K: 2.74
+    - observation_id: shornikov_2025_table12_ferrier_melting
+      type: transition_point
+      locator:
+        page: 17
+        published_page: 826
+        pdf_page_index: 16
+        table: '12'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Ferrier, 1971
+        research_method_as_printed: HF HTSC
+        T_m_as_printed: 1826 K
+        T_m_K: 1826
+        delta_H_m_as_printed: 41.74 ± 2.00
+        delta_H_m_kJ_per_mol: 41.74
+        delta_H_m_uncertainty_kJ_per_mol: 2.0
+        delta_S_m_as_printed: 22.86 ± 1.10
+        delta_S_m_J_per_mol_K: 22.86
+        delta_S_m_uncertainty_J_per_mol_K: 1.1
+    - observation_id: shornikov_2025_table12_robie_melting
+      type: transition_point
+      locator:
+        page: 17
+        published_page: 826
+        pdf_page_index: 16
+        table: '12'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Robie et al., 1978
+        research_method_as_printed: Adiabatic calorimetry
+        T_m_as_printed: 1830 K
+        T_m_K: 1830
+        delta_H_m_as_printed: 24.50 ± 4.50
+        delta_H_m_kJ_per_mol: 24.5
+        delta_H_m_uncertainty_kJ_per_mol: 4.5
+        delta_S_m_as_printed: 13.39 ± 2.46
+        delta_S_m_J_per_mol_K: 13.39
+        delta_S_m_uncertainty_J_per_mol_K: 2.46
+    - observation_id: shornikov_2025_table12_charlu_melting
+      type: transition_point
+      locator:
+        page: 17
+        published_page: 826
+        pdf_page_index: 16
+        table: '12'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Charlu et al., 1978
+        research_method_as_printed: Pb2B2O5 HTSC
+        T_m_as_printed: 1830 K
+        T_m_K: 1830
+        delta_H_m_as_printed: 33.20 ± 0.30
+        delta_H_m_kJ_per_mol: 33.2
+        delta_H_m_uncertainty_kJ_per_mol: 0.3
+        delta_S_m_as_printed: 18.14 ± 0.16
+        delta_S_m_J_per_mol_K: 18.14
+        delta_S_m_uncertainty_J_per_mol_K: 0.16
+    - observation_id: shornikov_2025_table12_navrotsky_melting
+      type: transition_point
+      locator:
+        page: 17
+        published_page: 826
+        pdf_page_index: 16
+        table: '12'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Navrotsky et al., 1980
+        research_method_as_printed: Pb2B2O5 HTSC
+        T_m_as_printed: 1830 K
+        T_m_K: 1830
+        delta_H_m_as_printed: 33.30 ± 0.30
+        delta_H_m_kJ_per_mol: 33.3
+        delta_H_m_uncertainty_kJ_per_mol: 0.3
+        delta_S_m_as_printed: 18.20 ± 0.16
+        delta_S_m_J_per_mol_K: 18.2
+        delta_S_m_uncertainty_J_per_mol_K: 0.16
+    - observation_id: shornikov_2025_table12_weill_melting
+      type: transition_point
+      locator:
+        page: 17
+        published_page: 826
+        pdf_page_index: 16
+        table: '12'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Weill et al., 1980a
+        research_method_as_printed: Drop calorimetry
+        T_m_as_printed: 1830 K
+        T_m_K: 1830
+        delta_H_m_as_printed: 33.89 ± 2.20
+        delta_H_m_kJ_per_mol: 33.89
+        delta_H_m_uncertainty_kJ_per_mol: 2.2
+        delta_S_m_as_printed: 18.52 ± 1.20
+        delta_S_m_J_per_mol_K: 18.52
+        delta_S_m_uncertainty_J_per_mol_K: 1.2
+    - observation_id: shornikov_2025_table12_richet_b_bottinga_melting
+      type: transition_point
+      locator:
+        page: 17
+        published_page: 826
+        pdf_page_index: 16
+        table: '12'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Richet and Bottinga, 1984
+        research_method_as_printed: Drop calorimetry
+        T_m_as_printed: 1830 K
+        T_m_K: 1830
+        delta_H_m_as_printed: 33.30 ± 1.00
+        delta_H_m_kJ_per_mol: 33.3
+        delta_H_m_uncertainty_kJ_per_mol: 1.0
+        delta_S_m_as_printed: 18.20 ± 0.55
+        delta_S_m_J_per_mol_K: 18.2
+        delta_S_m_uncertainty_J_per_mol_K: 0.55
+    - observation_id: shornikov_2025_table12_richet_melting
+      type: transition_point
+      locator:
+        page: 17
+        published_page: 826
+        pdf_page_index: 16
+        table: '12'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Richet et al., 1994
+        research_method_as_printed: Ice calorimetry
+        T_m_as_printed: 1830 K
+        T_m_K: 1830
+        delta_H_m_as_printed: 33.25 ± 0.16
+        delta_H_m_kJ_per_mol: 33.25
+        delta_H_m_uncertainty_kJ_per_mol: 0.16
+        delta_S_m_as_printed: 18.17 ± 0.16
+        delta_S_m_J_per_mol_K: 18.17
+        delta_S_m_uncertainty_J_per_mol_K: 0.16
+    - observation_id: shornikov_2025_table12_sugawara_melting
+      type: transition_point
+      locator:
+        page: 17
+        published_page: 826
+        pdf_page_index: 16
+        table: '12'
+      phase: cr
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: Sugawara, 2005
+        research_method_as_printed: DSC
+        T_m_as_printed: 1830 K
+        T_m_K: 1830
+        delta_H_m_as_printed: 36.65 ± 0.80
+        delta_H_m_kJ_per_mol: 36.65
+        delta_H_m_uncertainty_kJ_per_mol: 0.8
+        delta_S_m_as_printed: 20.03 ± 0.44
+        delta_S_m_J_per_mol_K: 20.03
+        delta_S_m_uncertainty_J_per_mol_K: 0.44
+    context:
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_table12_printed_context
+      type: printed_data_context
+      locator:
+        page: 17
+        pdf_page_index: 16
+        table: '12'
+      units: as printed
+      values:
+        quantity: table_12_thermodynamic_data_as_printed
+        method_class: quoted_attributed
+        identity_as_printed: CaAl2Si2O8
+        note: Complete table transcription is retained in context because these comparison or model-derived columns
+          do not map to a safe scored field in this extract.
+        table_as_printed: "Table 12. Enthalpy and entropy of anorthite formation and melting\n      T, K       \
+          \ ΔHT, kJ/mol       ΔST, J/(mol K)                  Method                        Reference\n 1700–1823\
+          \       –19.25 ± 2.09         8.26 ± 1.19     Thermochemical calculations     Rein and Chipman, 1965\n\
+          \ 1823–1900        –1.05 ± 2.34        18.41 ± 2.26\n       970       –25.17 ± 0.32             –    \
+          \       Pb2B2O5 HTSC                    Newton et al., 1980\n       970       –25.03 ± 0.50          \
+          \   –           Pb2B2O5 HTSC                    Charlu et al., 1981\n      1870       –22.00 ± 0.80  \
+          \           –           Drop calorimetry                Kosa et al., 1992\n      1000       –24.69 ± 0.37\
+          \         6.81 ± 0.40     Pb2B2O5 HTSC                    Zhu et al., 1994\n      1173       –21.75 ±\
+          \ 0.25             –           Pb2B2O5 HTSC                    Ayed et al., 1994\n 1252–1544       –25.51\
+          \ ± 0.84         4.80 ± 0.60     KEMS                            Zaitsev et al., 1995\n 1833–2033    \
+          \     6.60 ± 2.50        17.10 ± 2.00     KEMS                            Shornikov et al., 1996\n   \
+          \   Tm, K       ΔHm, kJ/mol       ΔSm, J/(mol K)                  Method                        Reference\n\
+          \      1823        18.20 ± 3.14         9.98 ± 1.72     Thermochemical calculations     Rein and Chipman,\
+          \ 1965\n      1828        18.80 ± 5.00        10.28 ± 2.74     HF HTSC                         Kracek\
+          \ and Neuvonen, 1951\n      1826        41.74 ± 2.00        22.86 ± 1.10     HF HTSC                 \
+          \        Ferrier, 1971\n      1830        24.50 ± 4.50        13.39 ± 2.46     Adiabatic calorimetry \
+          \          Robie et al., 1978\n      1830        33.20 ± 0.30        18.14 ± 0.16     Pb2B2O5 HTSC   \
+          \                 Charlu et al., 1978\n      1830        33.30 ± 0.30        18.20 ± 0.16     Pb2B2O5\
+          \ HTSC                    Navrotsky et al., 1980\n      1830        33.89 ± 2.20        18.52 ± 1.20 \
+          \    Drop calorimetry                Weill et al., 1980a\n      1830        33.30 ± 1.00        18.20\
+          \ ± 0.55     Drop calorimetry                Richet and Bottinga, 1984\n      1830        33.25 ± 0.16\
+          \        18.17 ± 0.16     Ice calorimetry                 Richet et al., 1994\n      1830        36.65\
+          \ ± 0.80        20.03 ± 0.44     DSC                             Sugawara, 2005\n\n\naccurate. Note that\
+          \ the high values of the energy of             The plausibility of the selected values of the mixing\n\
+          mixing in anorthite obtained by Shornikov et al.             energies of oxide compounds was supported\
+          \ by calcu-\n(1996) and Morita et al. (2002) do not conflict with         lation of oxide activities using\
+          \ the associated solution\nthe information on the enthalpy of crystalline anor-         theory in binary\
+          \ (Shornikov, 2003, 2004, 2006, 2020,\nthite formation and enthalpy of melting.                     2015,\
+          \ 2019a, 2020; Shornikov and Shornikova, 2018)\n                                                     \
+          \        and ternary (Shornikov, 2007, 2008, 2016, 2011;\n                                           \
+          \                  Shornikov et al., 2019) melts of the CaO–MgO–\n                  RECOMMENDED      \
+          \                          Al2O3–TiO2–SiO2 system and modeling the composi-\n              THERMODYNAMIC\
+          \ VALUES                           tional evolution of a multicomponent oxide melt during\n          \
+          \                                                   evaporation using the determined values of oxide activ-\n\
+          \   Based on the revision of experimental data on the         ities (Shornikov and Yakovlev, 2014; Shornikov,\
+          \ 2019,\nhigh-temperature properties of 11 oxide compounds            2023), which coincided with the\
+          \ available experimental\noccurring in CAIs (Table 1), recommended thermo-             data (Markova et\
+          \ al., 1986; Mendybaev et al., 2006,\ndynamic values are compiled in Table 13, and Fig. 13a        2013,\
+          \ 2017, 2021; Richter et al., 2007; Ivanova et al.,\nshows the temperature dependencies of the energy\
+          \ of          2021; Shornikov and Yakovlev, 2022).\nmixing in the compounds. It can be seen that the low-\n\
+          est ΔGm values were obtained for perovskite and                  As an example, Table 13 gives the activities\
+          \ of\ngehlenite, and the highest, for hibonite and enstatite.      oxides forming the compounds considered\
+          \ at a tem-\nThe ΔGm values of all 11 compounds in the field of           perature of 2000 K computed\
+          \ on the basis of these data\ncrystalline phases are approximately constant over the       (values for\
+          \ crystalline and liquid states are shown in\ntemperature range considered, which is related to their\
+          \      brackets and braces, respectively). As can be seen from\nsmall entropies of formation from oxides\
+          \ (Table 13). In      Table 13, among the compounds considered, the high-\ncontrast, the ΔGm values of\
+          \ all the compounds                est calcium oxide activity is characteristic of gehlenite;\ndecrease\
+          \ rapidly with increasing temperature in the          magnesium oxide, forsterite; aluminum oxide, hibo-\n\
+          liquid phase field.                                          nite; and silicon oxide, enstatite and anorthite.\n\
+          \n                                                     GEOCHEMISTRY INTERNATIONAL             Vol. 63\
+          \    No. 9    2025"
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_figure12_context
+      type: figure_only
+      locator:
+        page: 16
+        pdf_page_index: 15
+        figure: '12'
+      units: as plotted; no numeric points
+      values:
+        quantity: thermodynamic_property_figure_context
+        method_class: figure_only
+        species: CaAl2Si2O8
+        phase: crystal
+        temperature_as_printed: as plotted; see caption
+        axes_as_printed: as printed in the figure caption and panel labels
+        caption_as_printed: 'Fig. 12. (a) Heat capacity and (b) energy of mixing of anorthite determined by the
+          following methods: (1–5) calorimetry (White,                        1919; Robie et al., 1978; Krupka et
+          al., 1979; Richet and Fiquet, 1991; Richet et al., 1994); (6) solution calorimetry in fused salts                        (Zhu
+          et al., 1994); (7) and (8) investigation of heterogeneous equilibria in slags (Kay and Taylor, 1960; Morita
+          et al., 2002);                        (9) and (10) investigation of sulfide (Cameron et al., 1966) and
+          nitride (Cho and Suito, 1994) capacity of slags; (11) and (12) Knud-                        sen effusion
+          mass spectrometry (Zaitsev et al., 1995; Shornikov et al., 1996); (13) and (14) calculation from thermochemical
+          data                        (Rein and Chipman, 1965; Bale et al., 2016).'
+        series:
+        - series: series identified in the caption; numeric data deferred
+          marker_count: not enumerated; figure values deferred
+        digitisation: deferred to a figure pass
+        attribution: Shornikov (2025); source references are retained in the printed caption.
+  MgAl2O4:
+    context:
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_table6_printed_context
+      type: printed_data_context
+      locator:
+        page: 10
+        pdf_page_index: 9
+        table: '6'
+      units: as printed
+      values:
+        quantity: table_6_thermodynamic_data_as_printed
+        method_class: quoted_attributed
+        identity_as_printed: MgAl2O4
+        note: Complete table transcription is retained in context because these comparison or model-derived columns
+          do not map to a safe scored field in this extract.
+        table_as_printed: "Table 6. Enthalpy and entropy of spinel formation and melting\n    T, K        ΔHT, kJ/mol\
+          \      ΔST, J/(mol K)                    Method                            Reference\n\n     1773    \
+          \   –9.43 ± 2.62       1.40 ± 1.47        Measurement of sulfide capacity   Kalyanram and Bell, 1961\n\
+          \                                                      of slag\n 1143–1414       10.84 ± 3.51     20.53\
+          \ ± 2.68        Flow method for equilibrium with Grjotheim et al., 1961, 1962\n                      \
+          \                                MgO and Al\n 1143–1423        3.93 ± 1.85     14.95 ± 1.42\n 1866–2163\
+          \     –16.74 ± 5.02            –             KEMS                              Altman, 1963\n 1296–1400\
+          \     –14.64 ± 4.98            –             Flow method for equilibrium with Altman, 1964\n         \
+          \                                             MgO and Al in Ar\n 1324–1452     –13.25 ± 6.73       6.37\
+          \ ± 4.83        Flow method for equilibrium with Grjotheim et al., 1964\n                            \
+          \                          Al4C3\n\n     1273      –14.43 ± 1.05       2.30 ± 0.42        EMF        \
+          \                       Tretjakow and Schmalzried, 1965\n 1700–1900      –9.41 ± 2.09       3.14 ± 1.23\
+          \        Equilibria in slags               Rein and Chipman, 1965\n     970       –18.10 ± 0.61      \
+          \      –             Cd3Pb9B8O24 HTSC                  Navrotsky and Kleppa, 1966,\n                 \
+          \                                                                       1967, 1968\n               –15.65\
+          \ ± 0.41            –\n               –18.24 ± 0.61            –\n     970       –18.20 ± 0.63       \
+          \     –             Cd3Pb9B8O24 HTSC                  Kleppa, 1967\n\n    2048        –9.20 ± 1.73   \
+          \         –             KEMS                              Rutman et al., 1968\n     965       –12.41 ±\
+          \ 1.17            –             Pb2B2O5 HTSC                      Shearer and Kleppa, 1973\n     1173\
+          \       –11.15 ± 1.40           –\n    2100        –8.37 ± 4.18            –             Evaporation after\
+          \ Langmuir        Sata and Yokoyama, 1973\n     970       –11.25 ± 0.38            –             Pb2B2O5\
+          \ HTSC                      Charlu et al., 1975\n\n 1023–1473     –14.64 ± 0.63       1.46 ± 0.42    \
+          \    EMF                               Jacob and Alcock, 1977\n 1773–2173      –11.75 ± 0.42      3.26\
+          \ ± 0.22        KEMS                              Sasamoto et al., 1981\n      973      –11.90 ± 0.48\
+          \            –             Pb2B2O5 HTSC                      Navrotsky et al., 1986\n\n    1000      \
+          \        –            6.44 ± 0.07        NMR                               Wood et al., 1986\n 1427–1673\
+          \     –10.80 ± 3.43       5.04 ± 2.18        Equilibria with Pd                Chamberlin et al., 1994,\
+          \ 1995\n  900–1250     –11.80 ± 0.50       2.96 ± 0.50        EMF                               Jacob\
+          \ et al., 1998\n 1651–1850     –10.40 ± 7.18       7.85 ± 4.07        Equilibria in slags            \
+          \   Fujii et al., 2000\n 1851–2298     –12.02 ± 1.14       5.03 ± 0.56        KEMS                   \
+          \           Shornikov, 2017\n    1900       –14.62 ± 37.38           –             KEMS              \
+          \                Gribchenkova et al., 2017\n    Tm, K       ΔHm, kJ/mol      ΔSm, J/(mol K)          \
+          \          Method                            Reference\n\n    2408         53.50 ± 5.50     22.22 ± 2.28\
+          \        DTA                               Richet et al., 1993\n    2420         55.81 ± 4.62     23.06\
+          \ ± 1.73        KEMS                              Shornikov, 2017\n\n   GEOCHEMISTRY INTERNATIONAL   \
+          \            Vol. 63    No. 9    2025\n\f820                                                         \
+          \                SHORNIKOV\n\n                                                   (a)                 \
+          \                                                                (b)\n\n                             \
+          \                                                                              –10                   \
+          \                    8\n                                                                             \
+          \  13\n\n\n\n\nCp(MgSiO3), J/(mol K)\n                                                               \
+          \                                            –12\n\n\n\n\n                                           \
+          \                                          'Gm(MgSiO3), kJ/mol\n                        140\n        \
+          \                                                                                                    \
+          \                                                 11\n                                               \
+          \                                                            –14\n                                   \
+          \                                                                                                    \
+          \       12                  13\n                        120\n                                        \
+          \                                         1                         –16\n                            \
+          \                                                     2                                              \
+          \                                  10\n                                                              \
+          \                   3                         –18\n                        100                       \
+          \                               4\n                                                                  \
+          \               5                     –20                             9\n                            \
+          \                                                     6                                7\n           \
+          \               300    600       900      1200       1500       1800                                 \
+          \  1000   1200      1400   1600        1800       2000\n                                             \
+          \     T, K                                                                               T, K"
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_figure6_context
+      type: figure_only
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: '6'
+      units: as plotted; no numeric points
+      values:
+        quantity: thermodynamic_property_figure_context
+        method_class: figure_only
+        species: MgAl2O4
+        phase: crystal
+        temperature_as_printed: as plotted; see caption
+        axes_as_printed: as printed in the figure caption and panel labels
+        caption_as_printed: 'Fig. 6. (a) Heat capacity and (b) energy of mixing of spinel determined by the following
+          methods: (1–3) calorimetry (Bonnickson,                    1955; Landa and Naumova, 1979; Richet and Fiquet,
+          1991); (4–8) EMF (Schmalzried, 1960; Taylor and Schmalzried, 1964; Tret-                    jakow and
+          Schmalzried, 1965; Jacob and Alcock, 1977; Jacob et al., 1998); (9) investigation of spinel solubility
+          in solid solutions of                    the CoAl2O4–MgAl2O4 system (Rosen and Muan, 1966); (10) and (11)
+          flow (Grjotheim et al., 1962, 1964); (12–15) investigation                    of heterogeneous equilibria
+          in multicomponent melts (Kalyanram and Bell, 1961; Rein and Chipman, 1965; Fujii et al., 2000;                    Chamberlin
+          et al., 1995); (16–19) Knudsen effusion mass spectrometry (Grjotheim et al., 1963; Allibert et al., 1979;
+          Sasamoto et al.,                    1981; Shornikov, 2017); and (20–22) calculation from thermochemical
+          data (Barin, 1995; Chase, 1998; Bale et al., 2016).'
+        series:
+        - series: series identified in the caption; numeric data deferred
+          marker_count: not enumerated; figure values deferred
+        digitisation: deferred to a figure pass
+        attribution: Shornikov (2025); source references are retained in the printed caption.
+    observations: []
+  CaMgSi2O6:
+    context:
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_table9_printed_context
+      type: printed_data_context
+      locator:
+        page: 14
+        pdf_page_index: 13
+        table: '9'
+      units: as printed
+      values:
+        quantity: table_9_thermodynamic_data_as_printed
+        method_class: quoted_attributed
+        identity_as_printed: CaMgSi2O6
+        note: Complete table transcription is retained in context because these comparison or model-derived columns
+          do not map to a safe scored field in this extract.
+        table_as_printed: "Table 9. Enthalpy and entropy of diopside formation and melting\n                   \
+          \           T, K             ΔHT, kJ/mol           ΔST, J/(mol K)                                    \
+          \       Method                    Reference\n                            1773–1823          10.71 ± 5.08\
+          \            21.42 ± 4.44                                 Equilibria in slags      Henderson and Taylor,\
+          \ 1966\n                                986           –35.88 ± 0.42                 –                \
+          \                       Pb2B2O5 HTSC             Navrotsky and Coons, 1976\n                         \
+          \         970         –36.90 ± 0.28                   –                                     Pb2B2O5 HTSC\
+          \             Newton et al., 1977\n                                  970         –36.60 ± 0.43       \
+          \            –                                     Pb2B2O5 HTSC             Charlu et al., 1978\n    \
+          \                          1070            –35.50 ± 0.49                   –                         \
+          \            Pb2B2O5 HTSC             Kiseleva et al., 1979, 1981\n                            1566–1665\
+          \         –39.06 ± 1.53           –2.03 ± 0.81                                  KEMS                 \
+          \    Shornikov et al., 1997a\n                            1665–1862          –5.85 ± 2.42            17.92\
+          \ ± 1.39                                 KEMS                     Shornikov et al., 1997a\n          \
+          \                    T, K             ΔHT, kJ/mol           ΔST, J/(mol K)                           \
+          \                Method                    Reference\n                              1665             32.00\
+          \ ± 2.00            19.22 ± 1.20                                 HF HTSC                  Ferrier, 1971\n\
+          \                              1663             23.10 ± 5.00            13.89 ±3.01                  \
+          \                H2O HTSC                 Khitarov and Kadik, 1973\n                              1665\
+          \             35.70 ± 2.60            21.44 ± 1.60                                 Pb2B2O5 HTSC      \
+          \       Weill et al., 1980\n                              1665             34.52 ± 0.52            20.73\
+          \ ± 0.31                                 DSC                      Stebbins et al., 1983\n            \
+          \                  1665             34.63 ± 0.80            20.80 ± 0.48                             \
+          \    DSC                      Ziegler and Navrotsky, 1986\n                              1665        \
+          \     34.43 ± 0.50            20.68 ± 0.30                                 DSC                      Lange\
+          \ et al., 1991\n                              1670             34.43 ± 1.60            20.61 ± 0.96  \
+          \                               Ice calorimetry          Richet et al., 1994\n                       \
+          \       1665             31.25 ± 1.75            18.77 ± 1.05                                 DSC    \
+          \                  DeYoreo et al., 1995\n                              1665             33.21 ± 2.86 \
+          \           19.95 ± 1.61                                 KEMS                     Shornikov et al., 1997a\n\
+          \n                      GEOCHEMISTRY INTERNATIONAL                    Vol. 63    No. 9               \
+          \ 2025\n\f824                                                                             SHORNIKOV\n\n\
+          \                                                       (a)                                          \
+          \                                            (b)\n                            330\n                  \
+          \                                                                                                –40\n\
+          \n\n\n\nCp(Ca2Al2SiO7), J/(mol K)\n                                                                  \
+          \               10\n\n\n\n\n                                                                         \
+          \               'Gm(Ca2Al2SiO7), kJ/mol\n                            300\n                           \
+          \                                                                                       –42\n        \
+          \                                                                                                    \
+          \                                       10\n                            270                          \
+          \                                                         –44\n                                      \
+          \                                                                                                    8\
+          \                              9\n\n                            240                                  \
+          \                                                 –46\n                                              \
+          \                                      1\n                                                           \
+          \                         2                                     5\n                                  \
+          \                                                  3                             –48     6\n         \
+          \                   210                                                     4                        \
+          \             7\n                              300    600       900      1200       1500      1800   \
+          \                                    1000     1200    1400     1600       1800      2000\n           \
+          \                                           T, K                                                     \
+          \                                 T, K"
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_figure9_context
+      type: figure_only
+      locator:
+        page: 13
+        pdf_page_index: 12
+        figure: '9'
+      units: as plotted; no numeric points
+      values:
+        quantity: thermodynamic_property_figure_context
+        method_class: figure_only
+        species: CaMgSi2O6
+        phase: crystal
+        temperature_as_printed: as plotted; see caption
+        axes_as_printed: as printed in the figure caption and panel labels
+        caption_as_printed: 'Fig. 9. (a) Heat capacity and (b) energy of mixing of diopside determined by the following
+          methods: (1–6) calorimetry (White,                       1909, 1919; Wagner, 1932; Stebbins et al., 1983;
+          Lange et al., 1991; Richet and Fiquet, 1991); (7) and (8) investigation of hetero-                       geneous
+          equilibria in slags (Henderson and Taylor, 1966; Morita et al., 2002); (9) Knudsen effusion mass spectrometry
+          (Sho-                       rnikov et al., 1997a); and (10) and (11) calculation from thermochemical data
+          (Barin, 1995; Bale et al., 2016).'
+        series:
+        - series: series identified in the caption; numeric data deferred
+          marker_count: not enumerated; figure values deferred
+        digitisation: deferred to a figure pass
+        attribution: Shornikov (2025); source references are retained in the printed caption.
+    observations: []
+  Ca2Al2SiO7:
+    context:
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_table11_printed_context
+      type: printed_data_context
+      locator:
+        page: 16
+        pdf_page_index: 15
+        table: '11'
+      units: as printed
+      values:
+        quantity: table_11_thermodynamic_data_as_printed
+        method_class: quoted_attributed
+        identity_as_printed: Ca2Al2SiO7
+        note: Complete table transcription is retained in context because these comparison or model-derived columns
+          do not map to a safe scored field in this extract.
+        table_as_printed: "Table 11. Enthalpy and entropy of gehlenite formation and melting\n                 \
+          \             T, K              ΔHT, kJ/mol            ΔST, J/(mol K)                                \
+          \       Method                    Reference\n                              1870             –44.20 ± 0.80\
+          \                    –                                    Drop calorimetry    Kosa et al., 1992\n    \
+          \                              1173         –32.50 ± 0.25                    –                       \
+          \             Pb2B2O5 HTSC        Ayed et al., 1994\n                            1252–1544          –34.20\
+          \ ± 0.61               6.90 ± 0.45                               KEMS                Zaitsev et al., 1995\n\
+          \                            1833–1863          –36.82 ± 1.56              2.39 ± 0.87               \
+          \                 KEMS                Stolyarova and Shormikov, 1991;\n                            1863–2133\
+          \            5.51 ± 1.29             25.11 ± 0.65                                                    Shornikov\
+          \ et al., 1996\n                              T, K              ΔHT, kJ/mol            ΔST, J/(mol K)\
+          \                                       Method                    Reference\n                        \
+          \      1863              39.05 ± 3.50             20.96 ± 1.88                                HF HTSC\
+          \             Scholze and Kumm, 1969\n                              1863              43.03 ± 1.50   \
+          \          23.09 ± 0.81                                Drop calorimetry    Zigo et al., 1987\n       \
+          \                       1863              42.33 ± 2.02             22.72 ± 1.09                      \
+          \          KEMS                Shornikov et al., 1996\n\n                       GEOCHEMISTRY INTERNATIONAL\
+          \                     Vol. 63    No. 9               2025\n\f826                                     \
+          \             SHORNIKOV"
+    - observation_id: shornikov_2025_ca_al_inclusion_thermodynamics_figure11_context
+      type: figure_only
+      locator:
+        page: 15
+        pdf_page_index: 14
+        figure: '11'
+      units: as plotted; no numeric points
+      values:
+        quantity: thermodynamic_property_figure_context
+        method_class: figure_only
+        species: Ca2Al2SiO7
+        phase: crystal
+        temperature_as_printed: as plotted; see caption
+        axes_as_printed: as printed in the figure caption and panel labels
+        caption_as_printed: 'Fig. 11. (a) Heat capacity and (b) energy of mixing of gehlenite determined by the
+          following methods: (1–4) calorimetry (Gronow                        and Schwiete, 1933; Pankratz and Kelley,
+          1964; Hemingway and Robie, 1984; Bouhifd et al., 2002); (5) and (6) investigation of                        heterogeneous
+          equilibria in slags (Kay and Taylor, 1960; Morita et al., 2002); (7) investigation of sulfide capacity
+          of slags (Cam-                        eron et al., 1966); (8) and (9) Knudsen effusion mass spectrometry
+          (Zaitsev et al., 1995; Shornikov et al., 1996); and (10) calcu-                        lation from thermochemical
+          data (Bale et al., 2016).'
+        series:
+        - series: series identified in the caption; numeric data deferred
+          marker_count: not enumerated; figure values deferred
+        digitisation: deferred to a figure pass
+        attribution: Shornikov (2025); source references are retained in the printed caption.
+    observations: []
