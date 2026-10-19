@@ -91,38 +91,125 @@ def test_isolated_migration_reports_kinds_and_refusals(tmp_path: Path, monkeypat
     assert next(item for item in report.findings if item.check == "isolated-migration").severity == "HARD"
 
 
-def test_species_container_misfiling_is_hard_and_repair_mutation_clears_it(
-    tmp_path: Path,
-):
+def test_scored_species_misfiling_and_three_non_scored_shapes(tmp_path: Path):
     doc = _document()
-    doc["species"]["SiO2"] = {
-        "observations": [
-            {
-                "observation_id": "van_westrenen_glass_cao_wt_percent",
-                "type": "composition_point",
-                "locator": {"table": "2", "page": 3, "pdf_page_index": 2},
-                "phase": "glass",
-                "units": "wt%",
-                "basis_as_published": "CaO wt% in glass, Table 4",
-                "values": {"value": "12.4"},
-            }
-        ]
+    doc["species"] = {
+        "W": {
+            "observations": [
+                {
+                    "observation_id": "fixture_activity_a_Fe",
+                    "type": "activity",
+                    "locator": {"table": "1", "page": 3, "pdf_page_index": 2},
+                    "phase": "l",
+                    "standard_state": "pure liquid Fe",
+                    "values": {
+                        "quantity": "activity",
+                        "method_class": "measured_direct",
+                        "activity": "0.865",
+                        "a_Fe": "0.865",
+                    },
+                }
+            ]
+        },
+        "SiO2": {
+            "observations": [
+                {
+                    "observation_id": "chen22_C1_liquid_tio2",
+                    "type": "equilibrium_phase_composition",
+                    "locator": {
+                        "table": "II",
+                        "row": "C1, Liquid",
+                        "column": "TiO2 equilibrium wt.%",
+                        "page": 3,
+                        "pdf_page_index": 2,
+                    },
+                    "phase": "l",
+                    "units": "wt.%",
+                    "values": {
+                        "quantity": "equilibrium_phase_composition",
+                        "component_as_published": "TiO2",
+                        "value": "45.9",
+                    },
+                }
+            ]
+        },
+        "FeSO4_cr": {
+            "observations": [
+                {
+                    "observation_id": "cea_FeSO4(cr)_gibbs",
+                    "type": "gibbs_table",
+                    "locator": {"table": "1", "page": 3, "pdf_page_index": 2},
+                    "phase": "cr",
+                    "units": "kJ/mol",
+                    "values": {
+                        "quantity": "delta_fG",
+                        "formula": "FeSO4",
+                        "value": "-100.0",
+                    },
+                }
+            ]
+        },
+        "Al2O3": {
+            "observations": [
+                {
+                    "observation_id": "shornikov_2008_mgo_aluminosilicate_melts_al2o3",
+                    "type": "gibbs_table",
+                    "locator": {"table": "1", "page": 3, "pdf_page_index": 2},
+                    "phase": "cr",
+                    "units": "kJ/mol",
+                    "values": {"quantity": "delta_fG", "value": "-1017.742"},
+                }
+            ]
+        },
     }
 
     report = _run_gate(tmp_path, doc)
     finding = next(
-        item for item in report.findings
-        if item.check == "isolated-migration"
+        item for item in report.findings if item.check == "isolated-migration"
     )
     assert finding.severity == "HARD"
-    assert "migrated as SiO2, while row names CaO" in finding.detail
+    assert "migrated as W, while row names Fe" in finding.detail
 
-    # Mutation: put the same printed CaO row in its actual species container.
-    row = doc["species"]["SiO2"]["observations"].pop()
-    doc["species"]["CaO"] = {"observations": [row]}
+    path = tmp_path / "fixture-source.yaml"
+    migrator = gate.migrate.Migrator(
+        root=gate.migrate.REPO_ROOT, index={}, aliases={}
+    )
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    observations = migrator.result.observations
+    assert (
+        observations["fixture-source::fixture_activity_a_Fe"].identity.species.formula
+        == "W"
+    )
+    assert (
+        observations["fixture-source::chen22_C1_liquid_tio2"].identity.species.formula
+        == "SiO2"
+    )
+    assert (
+        observations["fixture-source::cea_FeSO4(cr)_gibbs"].identity.species.formula
+        == "FeSO4"
+    )
+    assert observations[
+        "fixture-source::shornikov_2008_mgo_aluminosilicate_melts_al2o3"
+    ].identity.species.formula == "Al2O3"
+    issues = gate._species_container_issues(doc, observations)
+    assert len(issues) == 1
+
+    # Mutation: repair the activity's container and verify its migrated identity.
+    row = doc["species"]["W"]["observations"].pop()
+    doc["species"]["Fe"] = {"observations": [row]}
     repaired = _run_gate(tmp_path, doc)
+    repaired_migrator = gate.migrate.Migrator(
+        root=gate.migrate.REPO_ROOT, index={}, aliases={}
+    )
+    repaired_migrator._migrate_extract(path)
+    repaired_migrator.finalize()
+    repaired_identity = repaired_migrator.result.observations[
+        "fixture-source::fixture_activity_a_Fe"
+    ].identity.species.formula
+    assert repaired_identity == "Fe"
     assert not any(
-        "migrated as SiO2, while row names CaO" in item.detail
+        item.check == "isolated-migration" and "migrated as W" in item.detail
         for item in repaired.findings
     )
 
