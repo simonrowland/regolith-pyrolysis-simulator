@@ -28,7 +28,7 @@ def test_zaitsev_1999_scored_rows_migrate_with_temperature_and_composition():
     assert migrator.result.validation is not None
     assert migrator.result.validation.ok
     assert migrator.result.validation.hard_issues == ()
-    assert len(migrator.result.observations) == 72
+    assert len(migrator.result.observations) == 116
     assert all(
         all(
             key in (observation.point_conditions or {})
@@ -37,6 +37,17 @@ def test_zaitsev_1999_scored_rows_migrate_with_temperature_and_composition():
             for key in ("temperature_K", "composition")
         )
         for observation in migrator.result.observations.values()
+    )
+    table4 = [
+        observation
+        for observation in migrator.result.observations.values()
+        if "::zaitsev_1999_table4_" in observation.observation_id
+    ]
+    assert len(table4) == 44
+    assert all(
+        observation.provenance["printed_form"] == "neg_log10"
+        and observation.locator.page == 6
+        for observation in table4
     )
 
     na2o = [

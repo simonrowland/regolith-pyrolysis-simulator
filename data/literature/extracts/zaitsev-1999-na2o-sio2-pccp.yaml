@@ -148,6 +148,113 @@ species:
           series:
             - {formula_as_printed: NS, T_K: '298.15', delta_fH: '-1556.03', minus_delta_fH_as_printed: '1556.03', locator: {page: 7, published_page: 1905, pdf_page_index: 6, table: '6', row: NS, note: 'printed -Delta_fH = 1556.03 kJ/mol; stored delta_fH = -1556.03 kJ/mol'}, composition_mol: {basis: printed_formula_stoichiometry, Na2O: '0.5', SiO2: '0.5'}}
             - {formula_as_printed: N2S, T_K: '298.15', delta_fH: '-2100.8', minus_delta_fH_as_printed: '2100.8', locator: {page: 7, published_page: 1905, pdf_page_index: 6, table: '6', row: N2S, note: 'printed -Delta_fH = 2100.8 kJ/mol; stored delta_fH = -2100.8 kJ/mol'}, composition_mol: {basis: printed_formula_stoichiometry, Na2O: '0.6666666667', SiO2: '0.3333333333'}}
+      - observation_id: zaitsev_1999_table4_present_na2o_activity
+        type: activity_coefficient
+        regime: knudsen_effusion_mass_spectrometry
+        locator:
+          page: 6
+          published_page: 1904
+          pdf_page_index: 5
+          table: '4'
+        phase: l
+        units: dimensionless activity
+        standard_state: pure liquid Na2O
+        composition_basis: printed_mole_fraction
+        composition_derivation: Binary Na2O-SiO2; x(SiO2) = 1 - x(Na2O).
+        values:
+          quantity: activity
+          method_class: measured_direct
+          admission_status: admitted
+          printed_header_as_published: '-log[a(Na2O)]'
+          points:
+            - {row_as_printed: 'x(Na2O)=0.103 a; T=1430 K; Present=9.394', x_Na2O_as_printed: '0.103', T_K: '1430', activity: '9.394', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.103', SiO2: '0.897'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.103 a; T=1430 K', note: 'Footnote a states that these data are for the two-phase region tridymite + melt.'}}
+            - {row_as_printed: 'x(Na2O)=0.103 a; T=1473 K; Present=9.158', x_Na2O_as_printed: '0.103', T_K: '1473', activity: '9.158', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.103', SiO2: '0.897'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.103 a; T=1473 K', note: 'Footnote a states that these data are for the two-phase region tridymite + melt.'}}
+            - {row_as_printed: 'x(Na2O)=0.254; T=1430 K; Present=9.094', x_Na2O_as_printed: '0.254', T_K: '1430', activity: '9.094', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.254', SiO2: '0.746'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.254; T=1430 K', note: 'Present column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.254; T=1473 K; Present=8.827', x_Na2O_as_printed: '0.254', T_K: '1473', activity: '8.827', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.254', SiO2: '0.746'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.254; T=1473 K', note: 'Present column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.254; T=1515 K; Present=8.580', x_Na2O_as_printed: '0.254', T_K: '1515', activity: '8.580', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.254', SiO2: '0.746'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.254; T=1515 K', note: 'Present column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.254; T=1557 K; Present=8.346', x_Na2O_as_printed: '0.254', T_K: '1557', activity: '8.346', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.254', SiO2: '0.746'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.254; T=1557 K', note: 'Present column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.303; T=1344 K; Present=9.261', x_Na2O_as_printed: '0.303', T_K: '1344', activity: '9.261', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.303', SiO2: '0.697'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.303; T=1344 K', note: 'Present column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.303; T=1387 K; Present=8.966', x_Na2O_as_printed: '0.303', T_K: '1387', activity: '8.966', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.303', SiO2: '0.697'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.303; T=1387 K', note: 'Present column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.303; T=1430 K; Present=8.689', x_Na2O_as_printed: '0.303', T_K: '1430', activity: '8.689', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.303', SiO2: '0.697'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.303; T=1430 K', note: 'Present column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.303; T=1473 K; Present=8.429', x_Na2O_as_printed: '0.303', T_K: '1473', activity: '8.429', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.303', SiO2: '0.697'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.303; T=1473 K', note: 'Present column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.303; T=1515 K; Present=8.188', x_Na2O_as_printed: '0.303', T_K: '1515', activity: '8.188', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.303', SiO2: '0.697'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.303; T=1515 K', note: 'Present column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.402; T=1255 K; Present=8.674', x_Na2O_as_printed: '0.402', T_K: '1255', activity: '8.674', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.402', SiO2: '0.598'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.402; T=1255 K', note: 'Present column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.402; T=1344 K; Present=8.062', x_Na2O_as_printed: '0.402', T_K: '1344', activity: '8.062', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.402', SiO2: '0.598'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.402; T=1344 K', note: 'Present column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.402; T=1387 K; Present=7.794', x_Na2O_as_printed: '0.402', T_K: '1387', activity: '7.794', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.402', SiO2: '0.598'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.402; T=1387 K', note: 'Present column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.402; T=1430 K; Present=7.543', x_Na2O_as_printed: '0.402', T_K: '1430', activity: '7.543', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.402', SiO2: '0.598'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.402; T=1430 K', note: 'Present column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.402; T=1473 K; Present=7.305', x_Na2O_as_printed: '0.402', T_K: '1473', activity: '7.305', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.402', SiO2: '0.598'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.402; T=1473 K', note: 'Present column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.500; T=1387 K; Present=6.264', x_Na2O_as_printed: '0.500', T_K: '1387', activity: '6.264', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.500', SiO2: '0.500'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.500; T=1387 K', note: 'Present column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.500; T=1430 K; Present=6.030', x_Na2O_as_printed: '0.500', T_K: '1430', activity: '6.030', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.500', SiO2: '0.500'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.500; T=1430 K', note: 'Present column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.500; T=1473 K; Present=5.810', x_Na2O_as_printed: '0.500', T_K: '1473', activity: '5.810', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.500', SiO2: '0.500'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.500; T=1473 K', note: 'Present column of Table 4.'}}
+      - observation_id: zaitsev_1999_table4_present_model_na2o_activity
+        type: activity_coefficient
+        regime: tabulation
+        locator:
+          page: 6
+          published_page: 1904
+          pdf_page_index: 5
+          table: '4'
+        phase: l
+        units: dimensionless activity
+        standard_state: pure liquid Na2O
+        composition_basis: printed_mole_fraction
+        composition_derivation: Binary Na2O-SiO2; x(SiO2) = 1 - x(Na2O).
+        derived_from: [zaitsev_1999_table4_present_na2o_activity, zaitsev_1999_table5_present_partial_molar_enthalpy]
+        derivation:
+          relation: >-
+            Footnote b states that these values were calculated by extrapolating liquid thermodynamic properties to the sodium-metasilicate stability region. Inputs are the same-composition measured activity at 1473 K and the partial molar enthalpy at x(Na2O)=0.500.
+          inputs: [zaitsev_1999_table4_present_na2o_activity, zaitsev_1999_table5_present_partial_molar_enthalpy]
+        values:
+          quantity: activity
+          method_class: model_derived
+          admission_status: admitted
+          printed_header_as_published: '-log[a(Na2O)]'
+          points:
+            - {row_as_printed: 'x(Na2O)=0.500; T=1255 K; Present=7.080b', x_Na2O_as_printed: '0.500', T_K: '1255', activity: '7.080', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.500', SiO2: '0.500'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.500; T=1255 K', note: 'Present cell marked b; Footnote b states that these values were calculated by extrapolating liquid thermodynamic properties to the sodium-metasilicate stability region.'}}
+            - {row_as_printed: 'x(Na2O)=0.500; T=1300 K; Present=6.784b', x_Na2O_as_printed: '0.500', T_K: '1300', activity: '6.784', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.500', SiO2: '0.500'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.500; T=1300 K', note: 'Present cell marked b; Footnote b states that these values were calculated by extrapolating liquid thermodynamic properties to the sodium-metasilicate stability region.'}}
+            - {row_as_printed: 'x(Na2O)=0.500; T=1344 K; Present=6.512b', x_Na2O_as_printed: '0.500', T_K: '1344', activity: '6.512', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.500', SiO2: '0.500'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.500; T=1344 K', note: 'Present cell marked b; Footnote b states that these values were calculated by extrapolating liquid thermodynamic properties to the sodium-metasilicate stability region.'}}
+      - observation_id: zaitsev_1999_table4_ref16_na2o_activity
+        type: activity_coefficient
+        regime: tabulation
+        locator:
+          page: 6
+          published_page: 1904
+          pdf_page_index: 5
+          table: '4'
+        phase: l
+        units: dimensionless activity
+        standard_state: pure liquid Na2O
+        composition_basis: printed_mole_fraction
+        composition_derivation: Binary Na2O-SiO2; x(SiO2) = 1 - x(Na2O).
+        values:
+          quantity: activity
+          method_class: quoted_attributed
+          admission_status: admitted
+          printed_header_as_published: '-log[a(Na2O)]'
+          attribution: 'Ref. 16'
+          points:
+            - {row_as_printed: 'x(Na2O)=0.103 a; T=1430 K; Ref. 16=9.823', x_Na2O_as_printed: '0.103', T_K: '1430', activity: '9.823', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.103', SiO2: '0.897'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.103 a; T=1430 K', note: 'Footnote a states that these data are for the two-phase region tridymite + melt.'}}
+            - {row_as_printed: 'x(Na2O)=0.103 a; T=1473 K; Ref. 16=9.770', x_Na2O_as_printed: '0.103', T_K: '1473', activity: '9.770', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.103', SiO2: '0.897'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.103 a; T=1473 K', note: 'Footnote a states that these data are for the two-phase region tridymite + melt.'}}
+            - {row_as_printed: 'x(Na2O)=0.254; T=1430 K; Ref. 16=9.572', x_Na2O_as_printed: '0.254', T_K: '1430', activity: '9.572', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.254', SiO2: '0.746'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.254; T=1430 K', note: 'Ref. 16 column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.254; T=1473 K; Ref. 16=9.515', x_Na2O_as_printed: '0.254', T_K: '1473', activity: '9.515', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.254', SiO2: '0.746'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.254; T=1473 K', note: 'Ref. 16 column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.254; T=1515 K; Ref. 16=8.981', x_Na2O_as_printed: '0.254', T_K: '1515', activity: '8.981', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.254', SiO2: '0.746'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.254; T=1515 K', note: 'Ref. 16 column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.254; T=1557 K; Ref. 16=8.79', x_Na2O_as_printed: '0.254', T_K: '1557', activity: '8.79', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.254', SiO2: '0.746'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.254; T=1557 K', note: 'Ref. 16 column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.303; T=1344 K; Ref. 16=9.090', x_Na2O_as_printed: '0.303', T_K: '1344', activity: '9.090', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.303', SiO2: '0.697'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.303; T=1344 K', note: 'Ref. 16 column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.303; T=1387 K; Ref. 16=8.859', x_Na2O_as_printed: '0.303', T_K: '1387', activity: '8.859', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.303', SiO2: '0.697'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.303; T=1387 K', note: 'Ref. 16 column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.303; T=1430 K; Ref. 16=8.590', x_Na2O_as_printed: '0.303', T_K: '1430', activity: '8.590', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.303', SiO2: '0.697'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.303; T=1430 K', note: 'Ref. 16 column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.303; T=1473 K; Ref. 16=8.286', x_Na2O_as_printed: '0.303', T_K: '1473', activity: '8.286', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.303', SiO2: '0.697'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.303; T=1473 K', note: 'Ref. 16 column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.303; T=1515 K; Ref. 16=8.065', x_Na2O_as_printed: '0.303', T_K: '1515', activity: '8.065', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.303', SiO2: '0.697'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.303; T=1515 K', note: 'Ref. 16 column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.402; T=1255 K; Ref. 16=8.143', x_Na2O_as_printed: '0.402', T_K: '1255', activity: '8.143', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.402', SiO2: '0.598'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.402; T=1255 K', note: 'Ref. 16 column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.402; T=1344 K; Ref. 16=7.756', x_Na2O_as_printed: '0.402', T_K: '1344', activity: '7.756', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.402', SiO2: '0.598'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.402; T=1344 K', note: 'Ref. 16 column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.402; T=1387 K; Ref. 16=7.596', x_Na2O_as_printed: '0.402', T_K: '1387', activity: '7.596', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.402', SiO2: '0.598'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.402; T=1387 K', note: 'Ref. 16 column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.402; T=1430 K; Ref. 16=7.374', x_Na2O_as_printed: '0.402', T_K: '1430', activity: '7.374', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.402', SiO2: '0.598'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.402; T=1430 K', note: 'Ref. 16 column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.402; T=1473 K; Ref. 16=7.392', x_Na2O_as_printed: '0.402', T_K: '1473', activity: '7.392', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.402', SiO2: '0.598'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.402; T=1473 K', note: 'Ref. 16 column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.500; T=1255 K; Ref. 16=6.558', x_Na2O_as_printed: '0.500', T_K: '1255', activity: '6.558', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.500', SiO2: '0.500'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.500; T=1255 K', note: 'Ref. 16 column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.500; T=1300 K; Ref. 16=6.236', x_Na2O_as_printed: '0.500', T_K: '1300', activity: '6.236', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.500', SiO2: '0.500'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.500; T=1300 K', note: 'Ref. 16 column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.500; T=1344 K; Ref. 16=5.841', x_Na2O_as_printed: '0.500', T_K: '1344', activity: '5.841', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.500', SiO2: '0.500'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.500; T=1344 K', note: 'Ref. 16 column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.500; T=1387 K; Ref. 16=5.641', x_Na2O_as_printed: '0.500', T_K: '1387', activity: '5.641', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.500', SiO2: '0.500'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.500; T=1387 K', note: 'Ref. 16 column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.500; T=1430 K; Ref. 16=5.576', x_Na2O_as_printed: '0.500', T_K: '1430', activity: '5.576', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.500', SiO2: '0.500'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.500; T=1430 K', note: 'Ref. 16 column of Table 4.'}}
+            - {row_as_printed: 'x(Na2O)=0.500; T=1473 K; Ref. 16=5.429', x_Na2O_as_printed: '0.500', T_K: '1473', activity: '5.429', printed_form: neg_log10, composition_mol: {basis: printed_mole_fraction, Na2O: '0.500', SiO2: '0.500'}, locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4', row: 'x=0.500; T=1473 K', note: 'Ref. 16 column of Table 4.'}}
     context:
       - observation_id: zaitsev_1999_table2_na2o_partial_thermodynamic_functions
         type: thermodynamic_functions
@@ -190,45 +297,6 @@ species:
             1/2 NS | 953-1110 K | -Delta H 115.4 +/- 0.6 kJ/mol | Delta S -2.30 +/- 0.60 J/(mol K)
             1/5 N3S2 | 1068-1285 K | -Delta H 110.5 +/- 0.6 kJ/mol | Delta S 6.15 +/- 0.55 J/(mol K)
             1/3 N2S | 942-1271 K | -Delta H 127.1 +/- 0.6 kJ/mol | Delta S -6.90 +/- 0.60 J/(mol K)
-      - observation_id: zaitsev_1999_table4_na2o_negative_log_activity
-        type: log_activity_table
-        locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '4'}
-        units: '-log[a(Na2O)] as printed'
-        values:
-          quantity: negative logarithm of Na2O activity
-          printed_header_as_published: '-log[a(Na2O)]'
-          method_class: mixed measured and model-derived comparison
-          admission_status: typed_unavailable
-          reason: >-
-            The store has no token for printed negative log activity. Preserve
-            every value and source as printed; do not exponentiate the values.
-          footnotes:
-            a: data for the two-phase region tridymite + melt
-            b: calculated by extrapolation of liquid thermodynamic properties to the stability region of sodium metasilicate
-          rows_as_printed: |-
-            x(Na2O) | T(K) | Present | Ref. 16
-            0.103 a | 1430 | 9.394 | 9.823
-            0.103 a | 1473 | 9.158 | 9.770
-            0.254 | 1430 | 9.094 | 9.572
-            0.254 | 1473 | 8.827 | 9.515
-            0.254 | 1515 | 8.580 | 8.981
-            0.254 | 1557 | 8.346 | 8.79
-            0.303 | 1344 | 9.261 | 9.090
-            0.303 | 1387 | 8.966 | 8.859
-            0.303 | 1430 | 8.689 | 8.590
-            0.303 | 1473 | 8.429 | 8.286
-            0.303 | 1515 | 8.188 | 8.065
-            0.402 | 1255 | 8.674 | 8.143
-            0.402 | 1344 | 8.062 | 7.756
-            0.402 | 1387 | 7.794 | 7.596
-            0.402 | 1430 | 7.543 | 7.374
-            0.402 | 1473 | 7.305 | 7.392
-            0.500 | 1255 | 7.080 b | 6.558
-            0.500 | 1300 | 6.784 b | 6.236
-            0.500 | 1344 | 6.512 b | 5.841
-            0.500 | 1387 | 6.264 | 5.641
-            0.500 | 1430 | 6.030 | 5.576
-            0.500 | 1473 | 5.810 | 5.429
       - observation_id: zaitsev_1999_table5_partial_molar_entropy
         type: table
         locator: {page: 6, published_page: 1904, pdf_page_index: 5, table: '5'}
