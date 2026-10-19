@@ -1,0 +1,172 @@
+schema_version: literature_extract.v1
+source_id: van-der-waal-2023-volatile-loss-isotope-fractionation
+source:
+  citation: 'Van et al. (2023). “Isotope Fractionation during Volatile Loss from Planets and Asteroids.” University of Oxford doctoral thesis (2023).'
+  year: 2023
+extraction:
+  method: pdftotext-layout table-of-contents audit; selected context transcribed from born-digital text and 600 dpi render
+  date: '2026-10-18'
+  worker: Codex
+review_status: draft
+species:
+  Zn:
+    observations: []
+    context:
+    - observation_id: van_der_waal_2023_table_4_3_trace_element_abundances
+      type: experiment_series
+      locator: {page: 134, pdf_page_index: 133, published_page: 105, table: '4.3', note: 'Data table spans PDF pages 131–134.'}
+      units: ppm
+      values:
+        method_class: measured_direct
+        caption: 'The experimental conditions and LA-ICP-MS trace element abundances (ppm) for the volatility experiments.'
+        experiment_count: 76
+        scope_status: not_transcribed_in_thesis_pass
+        reason: 'In-scope residue-composition data; four pages contain approximately 1,300 trace-element cells. The existing MinerU draft tool found no tables in this thesis, and a complete hand transcription plus cell-by-cell 600 dpi audit exceeds the thesis effort cap.'
+    - observation_id: van_der_waal_2023_table_a4_2_volatility_factors
+      type: experiment_series
+      locator: {page: 297, pdf_page_index: 296, published_page: 'XXXVIII', table: 'A4.2'}
+      units: dimensionless volatility factor
+      values:
+        method_class: measured_reduced
+        caption: 'The volatility factors normalized to the shortest experiment in each time series for SM, SM-2, IB and AN; IB-G is normalized against the starting material.'
+        reason: 'In-scope evaporation series, left for the bounded thesis pass with its supporting cell-level uncertainty table A4.3.'
+    - observation_id: van_der_waal_2023_table_a4_4_volatility_factors
+      type: experiment_series
+      locator: {page: 303, pdf_page_index: 302, published_page: 'XLII', table: 'A4.4'}
+      units: dimensionless volatility factor
+      values:
+        method_class: measured_reduced
+        caption: 'The volatility factors as normalized to the starting trace element abundances in Table 2.2.'
+        reason: 'In-scope evaporation series, left for the bounded thesis pass; 76 experiment rows across 17 elements require transcribing and render-auditing.'
+    - observation_id: van_der_waal_2023_table_4_15_activity_coefficients
+      type: experiment_series
+      locator: {page: 163, pdf_page_index: 162, published_page: 134, table: '4.15'}
+      units: activity coefficient, dimensionless
+      values:
+        method_class: quoted_attributed
+        caption: 'Range of activity coefficients compiled from literature. Sources: Reyes and Gaskell (1983), Holzheid and Lodders (2001), Wood and Wade (2013), Norris (2016), and Sossi et al. (2019). *Extrapolated.'
+        reason: 'Retained as context because the table combines ranges and multiple source attributions without mapping each endpoint to a source.'
+        rows:
+        - {element: Li, gamma_as_printed: '1.8 ± 0.2 – 15.4 ± 3.1', sources: '5'}
+        - {element: V, gamma_as_printed: '4.8 ± 0.32', sources: '4'}
+        - {element: Cu, gamma_as_printed: '3.5 – 11.8 ± 1.7', sources: '2, 3, 4, 5'}
+        - {element: Zn, gamma_as_printed: '1.9·10^-2 ± 1·10^-2 – 0.51 ± 0.13', sources: '1, 3, 4, 5'}
+        - {element: Ga, gamma_as_printed: '1.82 ± 0.53', sources: '4'}
+        - {element: Ge, gamma_as_printed: '3.7·10^-3 ± 1·10^-3 – 0.11 ± 0.01', sources: '4, 5'}
+        - {element: As, gamma_as_printed: '—', sources: '—'}
+        - {element: Rb, gamma_as_printed: '1.3·10^-4 ± 1.5·10^-5', sources: '5'}
+        - {element: Ag, gamma_as_printed: '0.11 ± 0.023 – 0.67', sources: '4, 5'}
+        - {element: Cd, gamma_as_printed: '0.15 – 1561 ± 206', sources: '4, 5'}
+        - {element: In, gamma_as_printed: '0.02 – 0.039 ± 8.5·10^-3', sources: '3, 4'}
+        - {element: Sn, gamma_as_printed: '1.6·10^-4 ± 3.6·10^-4', sources: '4'}
+        - {element: Sb, gamma_as_printed: '1.90 ± 0.43', sources: '4'}
+        - {element: Cs, gamma_as_printed: '3.4·10^-5', sources: '*'}
+        - {element: Tl, gamma_as_printed: '2535 ± 146', sources: '4'}
+        - {element: Pb, gamma_as_printed: '0.17 – 0.50 ± 0.11', sources: '3, 4, 5'}
+    - observation_id: van_der_waal_2023_table_4_16_apparent_evaporation_thermodynamics
+      type: experiment_series
+      locator: {page: 173, pdf_page_index: 172, published_page: 144, table: '4.16'}
+      units: kJ and kJ mol^-1 K^-1 as printed
+      values:
+        method_class: model_derived
+        caption: 'The apparent enthalpy and entropy for evaporation reactions from silicate melt compared to pure-species data and previous work.'
+        reason: 'Apparent regression outputs and cross-study comparisons; not direct measurements.'
+    - observation_id: van_der_waal_2023_table_2_1_experimental_redox_conditions
+      type: experiment_series
+      locator: {page: 58, pdf_page_index: 57, published_page: 19, table: '2.1'}
+      units: gas flow rates as printed; ΔIW and ΔFMQ
+      values:
+        method_class: measured_direct
+        caption: 'The temperature and oxygen fugacity conditions used in experiments.'
+        reason: 'Conditions table not converted to observation rows in this bounded pass.'
+    - observation_id: van_der_waal_2023_table_2_3_initial_compositions
+      type: experiment_series
+      locator: {page: 65, pdf_page_index: 64, published_page: 26, table: '2.3'}
+      units: wt% and ppm as printed
+      values:
+        method_class: measured_direct
+        caption: 'Major (wt. %) and trace element (ppm) composition of the doped starting materials.'
+        reason: 'Initial composition table not converted to observation rows in this bounded pass.'
+    - observation_id: van_der_waal_2023_table_4_2_chlorine_abundances
+      type: experiment_series
+      locator: {page: 130, pdf_page_index: 129, table: '4.2'}
+      units: ppm and fugacity as printed
+      values:
+        method_class: measured_direct
+        caption: 'Chlorine abundances of IB experiments; includes volatility factors and chlorine fugacity.'
+        reason: 'Relevant measured chlorine data remain for the follow-up extraction pass.'
+    - observation_id: van_der_waal_2023_table_2_2_isotope_standard
+      type: experiment_series
+      locator: {page: 63, pdf_page_index: 62, table: '2.2'}
+      units: isotope abundance and ppm as printed
+      values: {caption: 'Overview of measured isotopes for the GSE-1G secondary standard, with measured average abundance, standard deviation, preferred values, detection limits, errors, and n.', reason: 'Analytical reference standard, outside the four requested battery rails.'}
+    - observation_id: van_der_waal_2023_table_2_4_hkl_parameters
+      type: experiment_series
+      locator: {page: 77, pdf_page_index: 76, table: '2.4'}
+      units: as printed
+      values: {caption: 'Explanation of parameters in the modified Hertz-Knudsen-Langmuir equation.', reason: 'Equation definitions and parameters, not measured values.'}
+    - observation_id: van_der_waal_2023_table_3_1_chromatography
+      type: experiment_series
+      locator: {page: 93, pdf_page_index: 92, table: '3.1'}
+      units: procedural
+      values: {caption: 'Schematic overview of Zn ion exchange chromatography adapted from Sweere et al. (2018).', reason: 'Analytical procedure, outside the requested rails.'}
+    - observation_id: van_der_waal_2023_table_3_2_mass_spectrometer_conditions
+      type: experiment_series
+      locator: {page: 97, pdf_page_index: 96, table: '3.2'}
+      units: instrument settings
+      values: {caption: 'Typical operating conditions for the MC-ICP-MS set-up for Zn analyses.', reason: 'Analytical setup, outside the requested rails.'}
+    - observation_id: van_der_waal_2023_table_3_3_collector_array
+      type: experiment_series
+      locator: {page: 100, pdf_page_index: 99, table: '3.3'}
+      units: mass channels as printed
+      values: {caption: 'Overview of the collector array for Zn isotope analysis.', reason: 'Instrument layout, outside the requested rails.'}
+    - observation_id: van_der_waal_2023_table_3_4_blanks
+      type: experiment_series
+      locator: {page: 105, pdf_page_index: 104, table: '3.4'}
+      units: ng/mL and ng as printed
+      values: {caption: 'Blanks and potential interferences for elements relevant to Zn isotope measurements.', reason: 'Analytical blank/interference data, outside the requested rails.'}
+    - observation_id: van_der_waal_2023_table_3_5_interferences
+      type: experiment_series
+      locator: {page: 108, pdf_page_index: 107, table: '3.5'}
+      units: mass and isotope abundance as printed
+      values: {caption: 'Full range of collector half-masses and potential isobaric, doubly-charged, and polyatomic interferences.', reason: 'Instrument interference table, outside the requested rails.'}
+    - observation_id: van_der_waal_2023_tables_4_1_and_a2_reactions
+      type: experiment_series
+      locator: {page: 127, pdf_page_index: 126, table: '4.1'}
+      units: reaction constants as printed
+      values: {caption: 'Summary of evaporation reactions and constants used to calculate equilibrium constants; thermodynamic data from Barin et al. (1989).', reason: 'Compiled thermodynamic parameters rather than measured battery observations.'}
+    - observation_id: van_der_waal_2023_tables_4_4_to_4_14_regressions
+      type: experiment_series
+      locator: {page: 149, pdf_page_index: 148, table: '4.4–4.14'}
+      units: log(K*) and n as printed
+      values: {caption: 'Non-linear least-squares regression results for evaporation reactions of Cu, Zn, Ga, Ge, As, Rb, In, Sn, Sb, Cs, and Pb.', reason: 'Fitted model parameters; retained as model-derived context.'}
+    - observation_id: van_der_waal_2023_table_5_1_zinc_isotope_results
+      type: experiment_series
+      locator: {page: 188, pdf_page_index: 187, table: '5.1'}
+      units: ppm and ‰ as printed
+      values: {caption: 'Zn concentration and δ66ZnLyon of samples, starting materials, and secondary standards.', reason: 'Isotope analytical results, outside the requested battery rails.'}
+    - observation_id: van_der_waal_2023_table_5_2_isotope_fractionation
+      type: experiment_series
+      locator: {page: 196, pdf_page_index: 195, table: '5.2'}
+      units: isotope fractionation factor as printed
+      values: {caption: 'Expected liquid-vapour fractionation factor for 66Zn/64Zn at different fO2 calculated using Equation 5.6.', reason: 'Calculated isotope fractionation values, not measurements.'}
+    - observation_id: van_der_waal_2023_appendix_1_tables
+      type: experiment_series
+      locator: {page: 260, pdf_page_index: 259, table: 'A1.1–A1.2'}
+      units: procedural
+      values: {caption: 'Cleaning procedures for plastics and AG1-X8 resin.', reason: 'Laboratory procedures, outside the requested rails.'}
+    - observation_id: van_der_waal_2023_appendix_2_tables
+      type: experiment_series
+      locator: {page: 261, pdf_page_index: 260, table: 'A2.1–A2.2'}
+      units: reactions as printed
+      values: {caption: 'Potential evaporation reactions and thermodynamic data from Barin et al. (1989).', reason: 'Compiled thermodynamic data, not measurements.'}
+    - observation_id: van_der_waal_2023_appendix_3_table
+      type: experiment_series
+      locator: {page: 282, pdf_page_index: 281, table: 'A3.1'}
+      units: reaction names as printed
+      values: {caption: 'Potential monometallic chloride evaporation reactions and oxidation-state changes.', reason: 'Reaction inventory, not measured values.'}
+    - observation_id: van_der_waal_2023_appendix_4_error_tables
+      type: experiment_series
+      locator: {page: 294, pdf_page_index: 293, table: 'A4.1, A4.3, A4.5'}
+      units: ppm or dimensionless standard deviations
+      values: {caption: 'Standard deviations for trace element abundances and volatility factors in Tables 4.3, A4.2, and A4.4.', reason: 'Uncertainty tables remain paired with their corresponding untranscribed measurements.'}
