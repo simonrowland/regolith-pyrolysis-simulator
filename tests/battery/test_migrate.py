@@ -6703,6 +6703,80 @@ def _scalar_extract(*, quantity: str, units: str, values: dict, obs_type: str = 
     return extract
 
 
+@pytest.mark.parametrize(
+    ("printed", "operator", "expected"),
+    ((">77", ">", Decimal("0.77")), ("<5", "<", Decimal("0.05"))),
+)
+def test_named_mass_loss_bounds_migrate_as_typed_values(
+    tmp_path: Path, printed: str, operator: str, expected: Decimal
+) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_fraction",
+        units="%",
+        obs_type="mass_loss",
+        values={
+            "quantity": "mass_loss_fraction",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "mass_loss_pct": printed,
+        },
+    )
+    extract["species"]["Na"]["observations"][0]["observation_id"] = (
+        "na_mass_loss_bound"
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+    assert observation.value.kind is ValueKind.BOUND
+    assert observation.value.bound_operator == operator
+    assert observation.value.bound_value == expected
+    assert extract["species"]["Na"]["observations"][0]["values"][
+        "mass_loss_pct"
+    ] == printed
+
+
+def test_named_mass_loss_percent_point_remains_a_fraction(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_fraction",
+        units="%",
+        obs_type="mass_loss",
+        values={
+            "quantity": "mass_loss_fraction",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "mass_loss_pct": 77,
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.value.kind is ValueKind.POINT
+    assert observation.value.point == Decimal("0.77")
+
+
+def test_named_mass_loss_two_sided_range_keeps_interval_handling(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="mass_loss_fraction",
+        units="%",
+        obs_type="mass_loss",
+        values={
+            "quantity": "mass_loss_fraction",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "range": [5, 10],
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.value.kind is ValueKind.INTERVAL
+    assert observation.value.interval_low == Decimal("5")
+    assert observation.value.interval_high == Decimal("10")
+
+
 def test_located_printed_and_initial_pins_numeric_composition() -> None:
     _printed, initial = _located_printed_and_initial(
         {"SiO2": Decimal("60"), "MgO": Decimal("40")}, None
