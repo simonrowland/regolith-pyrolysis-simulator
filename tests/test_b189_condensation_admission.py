@@ -533,16 +533,22 @@ def test_legacy_antoine_rows_still_consult_applicability(payload) -> None:
     )
     assert "Na" not in result.wall_deposit_by_species
 
-    catalog = compiled_catalog_for(payload, emit_u0_request_rules=False)
+    # Keep the negative fixture's declared stage-only rules explicit now that
+    # production P sources are eligible in hot campaigns. The same guard must
+    # still reject those declarations; production P's NO_DATA case is below.
+    stage_only = deepcopy(payload)
+    for carrier in P_CARRIERS:
+        _set_applicability(stage_only, carrier, "stage0_only")
+    catalog = compiled_catalog_for(stage_only, emit_u0_request_rules=False)
     measured = {
         species_id
         for species_id in catalog.species
         if _condensation_admission_refusal(
-            species_id, vapor_pressure_data=payload
+            species_id, vapor_pressure_data=stage_only
         )
         == REFUSAL_INAPPLICABLE_PREDICATE
         and not _species_has_compiled_or_legacy_pressure(
-            species_id, vapor_pressure_data=payload
+            species_id, vapor_pressure_data=stage_only
         )
     }
     assert measured == REORDERED_ROWS
