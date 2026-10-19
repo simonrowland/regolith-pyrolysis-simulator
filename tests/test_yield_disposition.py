@@ -268,7 +268,7 @@ def test_pure_origin_unattributed_stream_uses_declared_schema_value() -> None:
     assert row["attribution_method"] == "origin_unattributed"
 
 
-def test_sub_reportable_terminal_origin_dust_is_ignored() -> None:
+def test_sub_reportable_terminal_origin_dust_keeps_its_stream_row() -> None:
     oxygen_molar_kg = resolve_species_formula(
         "O",
         {},
@@ -296,7 +296,15 @@ def test_sub_reportable_terminal_origin_dust_is_ignored() -> None:
     assert [row["element"] for row in payload["fraction_table"]["rows"]] == ["Na"]
     assert {
         row["species"] for row in payload["terminal_species_streams"]
-    } == {"Na"}
+    } == {"Na", "O"}
+    oxygen_row = next(
+        row
+        for row in payload["terminal_species_streams"]
+        if row["species"] == "O"
+    )
+    assert oxygen_row["terminal_kg"] == pytest.approx(
+        1.4e-17 * oxygen_molar_kg
+    )
 
 
 def test_unstamped_external_producer_raises_typed_error() -> None:

@@ -76,9 +76,6 @@ _CLEANUP_CAMPAIGNS = frozenset({"C0", "C0B"})
 _CONDENSATION_AMALGAMATED_ELEMENTS = frozenset({"Na", "K"})
 _WALL_PREFIX = "process.wall_deposit_segment_"
 _CLOSURE_LIMIT_FRACTION = 5.0e-14
-# Unattributed dust below this kg scale remains in the ledger and origin
-# summary, but is below the reporting resolution for a terminal stream row.
-_UNATTRIBUTED_STREAM_REPORTING_FLOOR_KG = 1.0e-12
 # Absolute cancellation dust below any physically meaningful mol-atom ledger
 # quantity.  The Chapman-Enskog correction can leave 1.74e-18 mol-atoms in a
 # terminal account after tracked-origin pools have cancelled to zero.
@@ -580,7 +577,6 @@ def _terminal_portions(
         physical_atoms = _element_atoms(species_mol, registry)
         account_origins = origin_balances.get(account, {})
         account_unresolved = unresolved_balances.get(account, {})
-        preexisting_unattributed_elements = frozenset(account_unresolved)
         methods = origin_methods.get(account, {})
         feedstock_atoms: dict[str, float] = {}
         reagent_atoms: dict[str, float] = {}
@@ -641,13 +637,7 @@ def _terminal_portions(
             )
             for portion in condensation:
                 portions.append(portion)
-                streams.extend(
-                    _stream_rows(
-                        portion,
-                        registry,
-                        preexisting_unattributed_elements,
-                    )
-                )
+                streams.extend(_stream_rows(portion, registry))
                 for element in portion.reagent_atoms:
                     reagent_method_sets[element].add(
                         portion.attribution_method_by_element[element]
@@ -671,13 +661,7 @@ def _terminal_portions(
         )
         for portion in split:
             portions.append(portion)
-            streams.extend(
-                _stream_rows(
-                    portion,
-                    registry,
-                    preexisting_unattributed_elements,
-                )
-            )
+            streams.extend(_stream_rows(portion, registry))
     return (
         portions,
         dict(reagent_terminal),
@@ -1409,12 +1393,10 @@ def _melt_subdisposition_rows(
 def _stream_rows(
     portion: _Portion,
     registry: Mapping[str, Any],
-    preexisting_unattributed_elements: frozenset[str],
 ) -> list[dict[str, Any]]:
     rows = []
     for species, mol in sorted(portion.species_mol.items()):
         formula = resolve_species_formula(species, registry)
-        terminal_kg = mol * formula.molar_mass_kg_per_mol()
         element_methods = {
             portion.attribution_method_by_element[element]
             for element in formula.elements
@@ -1433,11 +1415,6 @@ def _stream_rows(
                 else "typed_material_origin"
             )
         elif unattributed_elements:
-            if (
-                set(formula.elements) <= preexisting_unattributed_elements
-                and terminal_kg <= _UNATTRIBUTED_STREAM_REPORTING_FLOOR_KG
-            ):
-                continue
             attribution_method = _ORIGIN_UNATTRIBUTED
             origin_scope = _ORIGIN_UNATTRIBUTED
         else:
@@ -1452,7 +1429,7 @@ def _stream_rows(
                 "subdisposition": portion.subdisposition,
                 "species": species,
                 "terminal_mol": mol,
-                "terminal_kg": terminal_kg,
+                "terminal_kg": mol * formula.molar_mass_kg_per_mol(),
                 "origin_scope": origin_scope,
                 "attribution_method": attribution_method,
             }
