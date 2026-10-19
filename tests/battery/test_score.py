@@ -4785,6 +4785,7 @@ def test_residual_engine_observability_uses_scorer_domain_decisions() -> None:
             "reason": RefusalReason.UNSUPPORTED.value,
             "detail": {"reason": "quantity_not_predicted"},
         },
+        "execution": {"state": ExecutionState.UNSUPPORTED.value},
     }
     assert Quantity.H_MINUS_H298 not in _engine_thermo_quantities(Engine.ALPHAMELTS)
     assert not _residual_engine_observable(unsupported_thermo)
@@ -4799,9 +4800,26 @@ def test_residual_engine_observability_uses_scorer_domain_decisions() -> None:
             "reason": RefusalReason.UNSUPPORTED.value,
             "detail": {"reason": "quantity_not_predicted"},
         },
+        "execution": {"state": ExecutionState.UNSUPPORTED.value},
     }
     assert Quantity.CP in _engine_thermo_quantities(Engine.THERMOENGINE)
     assert _residual_engine_observable(supported_thermo)
+
+    for reason in (
+        RefusalReason.IDENTITY_INCOMPLETE,
+        RefusalReason.METRIC_DOMAIN,
+    ):
+        assert _residual_engine_observable(
+            {
+                "rail": Rail.REDOX.value,
+                "candidate_request": {
+                    "engine": Engine.INTERNAL_ANALYTICAL.value,
+                    "quantity": Quantity.FE3_FE2_RATIO.value,
+                },
+                "execution": {"state": ExecutionState.NOT_PROBED.value},
+                "refusal": {"reason": reason.value},
+            }
+        )
 
     assert not _residual_engine_observable(
         {
