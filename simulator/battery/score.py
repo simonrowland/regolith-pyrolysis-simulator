@@ -9095,6 +9095,111 @@ def _paired_engine_rail_benchmarks(
     return records
 
 
+def _battery_hero_sweet_spot_records(
+    samples: Iterable[tuple[str, str, object, object, object]],
+) -> list[dict[str, object]]:
+    """Score median |dex| cells over declared SiO2 mole fraction and T.
+
+    Each sample is ``(rail, engine, temperature_K, composition, signed_dex)``;
+    the caller unwraps serialized State fields, while this owner assigns bins
+    and computes the median. All engines on a rail receive the same complete
+    grid. Composition components are a complete map, so an omitted SiO2
+    component is zero when the declared amount basis is mole fraction.
+    """
+
+    sio2_width = Decimal("0.05")
+    temperature_width = Decimal("100")
+    values_by_cell: dict[tuple[str, str, int, int], list[Decimal]] = defaultdict(
+        list
+    )
+    temperature_bins_by_rail: dict[str, set[int]] = defaultdict(set)
+    engines_by_rail: dict[str, set[str]] = defaultdict(set)
+
+    for rail, engine, temperature_raw, composition_raw, dex_raw in samples:
+        if not rail or not engine or not isinstance(composition_raw, Mapping):
+            continue
+        if composition_raw.get("amount_basis") != AmountBasis.MOLE_FRACTION.value:
+            continue
+        components = composition_raw.get("components")
+        if (
+            not isinstance(components, Sequence)
+            or isinstance(components, (str, bytes))
+            or not components
+        ):
+            continue
+        try:
+            temperature = as_decimal(temperature_raw)
+            dex = as_decimal(dex_raw)
+        except (TypeError, ValueError, ArithmeticError):
+            continue
+        if not temperature.is_finite() or not dex.is_finite():
+            continue
+
+        sio2_fraction = Decimal(0)
+        try:
+            for component in components:
+                if (
+                    isinstance(component, Sequence)
+                    and not isinstance(component, (str, bytes))
+                    and len(component) == 2
+                    and component[0] == "SiO2"
+                ):
+                    sio2_fraction = as_decimal(component[1])
+                    break
+        except (TypeError, ValueError, ArithmeticError):
+            continue
+        if (
+            not sio2_fraction.is_finite()
+            or sio2_fraction < 0
+            or sio2_fraction > 1
+        ):
+            continue
+
+        temperature_bin = math.floor(temperature / temperature_width)
+        sio2_bin = (
+            19
+            if sio2_fraction == 1
+            else math.floor(sio2_fraction / sio2_width)
+        )
+        key = (str(rail), str(engine), temperature_bin, sio2_bin)
+        values_by_cell[key].append(dex)
+        temperature_bins_by_rail[str(rail)].add(temperature_bin)
+        engines_by_rail[str(rail)].add(str(engine))
+
+    records: list[dict[str, object]] = []
+    for rail in sorted(temperature_bins_by_rail):
+        temperature_bins = temperature_bins_by_rail[rail]
+        for engine in sorted(engines_by_rail[rail]):
+            for temperature_bin in range(
+                min(temperature_bins), max(temperature_bins) + 1
+            ):
+                temperature_lower = Decimal(temperature_bin) * temperature_width
+                for sio2_bin in range(20):
+                    cell_values = values_by_cell.get(
+                        (rail, engine, temperature_bin, sio2_bin), []
+                    )
+                    records.append(
+                        {
+                            "rail": rail,
+                            "engine": engine,
+                            "temperature_lower_K": str(temperature_lower),
+                            "temperature_upper_K": str(
+                                temperature_lower + temperature_width
+                            ),
+                            "sio2_lower": str(Decimal(sio2_bin) * sio2_width),
+                            "sio2_upper": str(Decimal(sio2_bin + 1) * sio2_width),
+                            "n": len(cell_values),
+                            "color_eligible": len(cell_values) >= 3,
+                            "median_abs_dex": (
+                                None
+                                if not cell_values
+                                else str(_median_abs(cell_values))
+                            ),
+                        }
+                    )
+    return records
+
+
 def _optional_decimal(value: Decimal | None) -> str | None:
     return None if value is None else str(value)
 

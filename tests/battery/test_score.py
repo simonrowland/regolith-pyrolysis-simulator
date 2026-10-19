@@ -88,6 +88,7 @@ from simulator.battery.score import (
     ScoreContext,
     SINGLE_CATION_COEFFICIENT_BASIS,
     SINGLE_LIQUID_ENGINES,
+    _battery_hero_sweet_spot_records,
     _paired_engine_rail_benchmarks,
     _residual_engine_observable,
     compile_residual,
@@ -4830,6 +4831,140 @@ def test_residual_engine_observability_uses_scorer_domain_decisions() -> None:
             "refusal": {"reason": RefusalReason.UNSUPPORTED.value},
         }
     )
+
+
+def test_battery_hero_sweet_spot_scores_shared_mole_fraction_bins() -> None:
+    mole_composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": [["SiO2", "0.02"]],
+    }
+    samples = [
+        (Rail.VAPOUR.value, "openimcc", "100", mole_composition, "-1"),
+        (Rail.VAPOUR.value, "openimcc", "199.9", mole_composition, "3"),
+        (
+            Rail.VAPOUR.value,
+            "openimcc",
+            "200",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["SiO2", "0.05"]],
+            },
+            "6",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "openimcc",
+            "199",
+            {
+                "amount_basis": AmountBasis.MASS_PERCENT.value,
+                "components": [["SiO2", "0.02"]],
+            },
+            "100",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "vaporock",
+            "500",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["FeO", "1"]],
+            },
+            "-7",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "vaporock",
+            "500",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["FeO", "1"]],
+            },
+            "-1",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "vaporock",
+            "500",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["FeO", "1"]],
+            },
+            "-3",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "vaporock",
+            "600",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["SiO2", "1"]],
+            },
+            "-8",
+        ),
+    ]
+
+    records = _battery_hero_sweet_spot_records(samples)
+    openimcc_cell = next(
+        row
+        for row in records
+        if row["engine"] == "openimcc"
+        and row["temperature_lower_K"] == "100"
+        and row["sio2_lower"] == "0.00"
+    )
+    assert openimcc_cell["n"] == 2
+    assert Decimal(str(openimcc_cell["median_abs_dex"])) == Decimal("2")
+    assert openimcc_cell["color_eligible"] is False
+
+    boundary_cell = next(
+        row
+        for row in records
+        if row["engine"] == "openimcc"
+        and row["temperature_lower_K"] == "200"
+        and row["sio2_lower"] == "0.05"
+    )
+    assert boundary_cell["n"] == 1
+    assert Decimal(str(boundary_cell["median_abs_dex"])) == Decimal("6")
+
+    shared_empty_cell = next(
+        row
+        for row in records
+        if row["engine"] == "openimcc"
+        and row["temperature_lower_K"] == "500"
+        and row["sio2_lower"] == "0.95"
+    )
+    assert shared_empty_cell["n"] == 0
+    assert shared_empty_cell["median_abs_dex"] is None
+    zero_sio2_cell = next(
+        row
+        for row in records
+        if row["engine"] == "vaporock"
+        and row["temperature_lower_K"] == "500"
+        and row["sio2_lower"] == "0.00"
+    )
+    assert zero_sio2_cell["n"] == 3
+    assert Decimal(str(zero_sio2_cell["median_abs_dex"])) == Decimal("3")
+    assert zero_sio2_cell["color_eligible"] is True
+    upper_boundary_cell = next(
+        row
+        for row in records
+        if row["engine"] == "vaporock"
+        and row["temperature_lower_K"] == "600"
+        and row["sio2_lower"] == "0.95"
+    )
+    assert upper_boundary_cell["n"] == 1
+    assert Decimal(str(upper_boundary_cell["median_abs_dex"])) == Decimal("8")
+    assert upper_boundary_cell["color_eligible"] is False
+    openimcc_temperature_bins = {
+        (row["temperature_lower_K"], row["temperature_upper_K"])
+        for row in records
+        if row["engine"] == "openimcc"
+    }
+    vaporock_temperature_bins = {
+        (row["temperature_lower_K"], row["temperature_upper_K"])
+        for row in records
+        if row["engine"] == "vaporock"
+    }
+    assert openimcc_temperature_bins == vaporock_temperature_bins
 
 
 def test_measured_headline_mode_serializes_typed_residuals_end_to_end(
