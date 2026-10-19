@@ -17,6 +17,7 @@ from scripts.battery_hero_plot import (
     _history_record,
     _hero_facets,
     _hero_refusal_entries,
+    _parser,
     append_history,
     draw_panel,
     element_tier,
@@ -605,11 +606,12 @@ def test_hero_flagged_points_are_hollow_and_benchmark_uses_shared_rows(
     )
     data = read_scores(residuals, rails=HERO_RAILS)
 
-    benchmark = data.hero_benchmarks["redox"]
-    assert benchmark["benchmark_engine"] == "openimcc"
+    benchmark = data.hero_benchmarks[("redox", "internal-analytical")]
+    assert benchmark["benchmark_engine"] == "thermoengine"
     assert benchmark["n"] == 1
     assert benchmark["primary_rms_dex"] == "3.0"
-    assert benchmark["benchmark_rms_dex"] == "1.0"
+    assert benchmark["benchmark_rms_dex"] == "2.0"
+    assert data.hero_benchmarks[("redox", "openimcc")]["benchmark_engine"] == "thermoengine"
     assert data.hero_diagnostics[("redox", "internal-analytical")][
         "open_predict_and_flag_notice_counts_by_kind"
     ] == {NoticeKind.OUT_OF_CERTIFIED_BAND.value: 1}
@@ -636,11 +638,11 @@ def test_hero_flagged_points_are_hollow_and_benchmark_uses_shared_rows(
 
 
 def test_history_appends_without_rewriting_existing_bytes(tmp_path: Path) -> None:
-    history = tmp_path / "scoreboard-history.jsonl"
+    history = tmp_path / "hero-history.jsonl"
     history.write_text('{"store_sha":"old"}\n', encoding="utf-8")
     previous = history.read_bytes()
     record = {
-        "kind": "battery_scoreboard_history",
+        "kind": "battery_hero_history",
         "store_sha": "new",
         "commit_date": "2026-10-18T10:27:53-04:00",
         "metrics": [],
@@ -670,7 +672,24 @@ def test_history_schema_keeps_scorer_metrics_and_per_rail_counts() -> None:
         },
         landing_sha="green-test",
         commit_date="2026-10-18T10:27:53-04:00",
-        benchmarks={},
+        benchmarks={
+            ("redox", "internal-analytical"): {
+                "rail": "redox",
+                "primary_engine": "internal-analytical",
+                "benchmark_engine": None,
+                "n": 0,
+                "primary_rms_dex": None,
+                "benchmark_rms_dex": None,
+            },
+            ("redox", "openimcc"): {
+                "rail": "redox",
+                "primary_engine": "openimcc",
+                "benchmark_engine": None,
+                "n": 0,
+                "primary_rms_dex": None,
+                "benchmark_rms_dex": None,
+            },
+        },
         diagnostics={
             ("redox", "internal-analytical"): {
                 "refused_count": 2,
@@ -682,7 +701,13 @@ def test_history_schema_keeps_scorer_metrics_and_per_rail_counts() -> None:
         },
     )
 
+    assert record["kind"] == "battery_hero_history"
     assert record["schema_version"] == 1
+    assert [entry["primary_engine"] for entry in record["benchmarks"]] == [
+        "internal-analytical",
+        "openimcc",
+    ]
+    assert all(entry["benchmark_engine"] is None for entry in record["benchmarks"])
     metric = record["metrics"][0]
     assert metric["numeric_count"] == 7
     assert metric["rms_dex"] == "0.4"
@@ -692,6 +717,56 @@ def test_history_schema_keeps_scorer_metrics_and_per_rail_counts() -> None:
     assert metric["open_predict_and_flag_notice_counts_by_kind"] == {
         "out_of_certified_band": 1
     }
+
+
+def test_cli_requires_explicit_history_path() -> None:
+    with pytest.raises(SystemExit) as error:
+        _parser().parse_args(
+            [
+                "--input",
+                "residuals.jsonl",
+                "--output-dir",
+                "rendered",
+                "--simulator-commit",
+                "simulator-pin",
+                "--openimcc-commit",
+                "openimcc-pin",
+            ]
+        )
+    assert error.value.code == 2
+
+
+def test_missing_comparison_engine_is_reported_as_unavailable(tmp_path: Path) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    rows: list[dict[str, object]] = [
+        {"kind": "battery_store_stamp", "revision": "unavailable-test"}
+    ]
+    for engine, value in (("openimcc", 0.2), ("internal-analytical", 0.3)):
+        row = _record(
+            engine=engine,
+            experiment="shared-redox",
+            formula="FeO",
+            temperature_K=1400,
+            residual=value,
+            rail="redox",
+        )
+        row["reference"] = "shared-redox"
+        row["candidate_observation"]["identity"]["quantity"] = {
+            "tag": "value",
+            "value": "fe3_fe2_ratio",
+        }
+        rows.append(row)
+    residuals.write_text(
+        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
+    )
+
+    data = read_scores(residuals, rails=HERO_RAILS)
+    for engine in ("openimcc", "internal-analytical"):
+        assert data.hero_benchmarks[("redox", engine)]["benchmark_engine"] is None
+
+    files = render_hero_charts(data, tmp_path / "rendered")
+    svg = files["hero:redox:svg"].read_text(encoding="utf-8").casefold()
+    assert "benchmark unavailable" in svg
 
 
 def test_read_scores_streams_residuals_from_archive_member(tmp_path: Path) -> None:
@@ -740,11 +815,11 @@ def test_hero_svg_is_byte_identical_for_the_same_input(tmp_path: Path) -> None:
     residuals.write_text(
         "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
     )
-    history = tmp_path / "scoreboard-history.jsonl"
+    history = tmp_path / "hero-history.jsonl"
     history.write_text(
         json.dumps(
             {
-                "kind": "battery_scoreboard_history",
+                "kind": "battery_hero_history",
                 "store_sha": "hero-test",
                 "store_revision": "hero-test",
                 "commit_date": "2026-10-18T10:27:53-04:00",

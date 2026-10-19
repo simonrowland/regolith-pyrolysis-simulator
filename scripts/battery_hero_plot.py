@@ -11,10 +11,14 @@ The JSONL is read one line at a time. A temporary SQLite file collapses
 same-experiment duplicates without retaining the input rows in memory.
 
 Hero history is one append-only row per green store in
-``data/battery/scoreboard-history.jsonl``. Each row has ``schema_version`` and,
-per rail and engine, the scorer's numeric count, RMS and median |dex|, refusal
-count and scorer-reason counts from residual rows, and open predict-and-flag
-notice counts by kind. Same-row benchmark RMS is stored alongside those metrics.
+``docs-private/research/2026-10-19-three-hero-charts/hero-history.jsonl``;
+pass it explicitly with ``--history-path``. Each ``battery_hero_history`` row
+has ``schema_version`` and, per rail and engine, the scorer's numeric count,
+RMS and median |dex|, refusal count and scorer-reason counts from residual
+rows, and open predict-and-flag notice counts by kind. Same-row benchmark RMS
+is stored separately for openimcc and internal-analytical against the best
+comparison engine (vaporock, thermoengine, alphamelts, or magemin); unavailable
+benchmarks have a null engine and RMS with ``n=0``.
 """
 
 from __future__ import annotations
@@ -80,6 +84,8 @@ DEFAULT_RAILS = (
     Rail.SIO_EVOLUTION.value,
 )
 HERO_RAILS = (Rail.VAPOUR.value, Rail.REDOX.value, Rail.MELT_ACTIVITY.value)
+HERO_PRIMARY_ENGINES = ("openimcc", "internal-analytical")
+HERO_COMPARISON_ENGINES = ("vaporock", "thermoengine", "alphamelts", "magemin")
 HERO_MINOR_FACETS = (
     ("minor:P", "P"),
     ("minor:S", "S"),
@@ -87,7 +93,6 @@ HERO_MINOR_FACETS = (
     ("minor:C", "C"),
     ("minor:alkali_salts", "Alkali salts"),
 )
-HISTORY_PATH = ROOT / "data" / "battery" / "scoreboard-history.jsonl"
 DEFAULT_GROUP_BY = ("species", "element")
 DEFAULT_ABUNDANCE_FEEDSTOCK = "lunar_mare_low_ti"
 Y_LIMITS = (-3.0, 3.0)
@@ -165,7 +170,7 @@ class ScorePlotData:
     hero_refusals: Mapping[tuple[str, str, str, str, str], int]
     hero_refusal_totals: Mapping[tuple[str, str, str], int]
     hero_diagnostics: Mapping[tuple[str, str], Mapping[str, object]]
-    hero_benchmarks: Mapping[str, Mapping[str, object]]
+    hero_benchmarks: Mapping[tuple[str, str], Mapping[str, object]]
     x_limits: tuple[float, float]
     bin_width_K: float
 
@@ -905,10 +910,12 @@ def read_scores(
         x_limits = (0.0, bin_width_K)
 
     hero_benchmarks = {
-        str(record["rail"]): record
+        (str(record["rail"]), str(record["primary_engine"])): record
         for record in _paired_engine_rail_benchmarks(
             benchmark_payloads,
-            primary_engine="internal-analytical",
+            primary_engines=HERO_PRIMARY_ENGINES,
+            comparison_engines=HERO_COMPARISON_ENGINES,
+            rails=HERO_RAILS,
         )
     }
 
@@ -945,7 +952,7 @@ def _archive_json_member(path: Path, member_name: str) -> Mapping[str, Any]:
 def _history_fields_from_scores(
     path: Path,
 ) -> tuple[
-    dict[str, Mapping[str, object]],
+    dict[tuple[str, str], Mapping[str, object]],
     dict[tuple[str, str], Mapping[str, object]],
 ]:
     rows: list[Mapping[str, object]] = []
@@ -976,8 +983,13 @@ def _history_fields_from_scores(
             ):
                 rows.append(row)
     benchmarks = {
-        str(record["rail"]): record
-        for record in _paired_engine_rail_benchmarks(rows, primary_engine="internal-analytical")
+        (str(record["rail"]), str(record["primary_engine"])): record
+        for record in _paired_engine_rail_benchmarks(
+            rows,
+            primary_engines=HERO_PRIMARY_ENGINES,
+            comparison_engines=HERO_COMPARISON_ENGINES,
+            rails=HERO_RAILS,
+        )
     }
     return benchmarks, _normalized_hero_diagnostics(diagnostics)
 
@@ -997,7 +1009,7 @@ def _history_record(
     summary: Mapping[str, Any],
     *,
     landing_sha: str,
-    benchmarks: Mapping[str, Mapping[str, object]],
+    benchmarks: Mapping[tuple[str, str], Mapping[str, object]],
     diagnostics: Mapping[tuple[str, str], Mapping[str, object]],
     commit_date: str | None = None,
 ) -> dict[str, Any]:
@@ -1046,13 +1058,13 @@ def _history_record(
     store = summary.get("store")
     store = store if isinstance(store, Mapping) else {}
     return {
-        "kind": "battery_scoreboard_history",
+        "kind": "battery_hero_history",
         "schema_version": 1,
         "store_sha": landing_sha,
         "store_revision": store.get("revision"),
         "commit_date": commit_date or _git_commit_date(landing_sha),
         "metrics": metrics,
-        "benchmarks": [benchmarks[rail] for rail in sorted(benchmarks)],
+        "benchmarks": [benchmarks[key] for key in sorted(benchmarks)],
     }
 
 
@@ -1060,7 +1072,7 @@ def history_record_from_archive(
     archive_path: Path,
     *,
     landing_sha: str,
-    benchmarks: Mapping[str, Mapping[str, object]] | None = None,
+    benchmarks: Mapping[tuple[str, str], Mapping[str, object]] | None = None,
     diagnostics: Mapping[tuple[str, str], Mapping[str, object]] | None = None,
 ) -> dict[str, Any]:
     summary = _archive_json_member(archive_path, "data/battery/score-summary.json")
@@ -1852,12 +1864,15 @@ def _draw_hero_history(axis: Axes, rail: str, history: Sequence[Mapping[str, Any
     metrics_by_engine: dict[str, dict[str, list[tuple[float, float]]]] = defaultdict(
         lambda: {"rms_dex": [], "median_abs_dex": []}
     )
-    paired_primary_points: list[tuple[float, float]] = []
-    benchmark_points: list[tuple[float, float]] = []
+    paired_primary_points: dict[str, list[tuple[float, float]]] = defaultdict(list)
+    benchmark_points: dict[str, list[tuple[float, float]]] = defaultdict(list)
+    unavailable_dates: dict[str, list[str]] = defaultdict(list)
+    history_rows = 0
     for entry in history:
         date = _history_date(entry)
         if date is None:
             continue
+        history_rows += 1
         metrics = entry.get("metrics")
         if isinstance(metrics, Sequence) and not isinstance(metrics, (str, bytes)):
             for metric in metrics:
@@ -1873,12 +1888,21 @@ def _draw_hero_history(axis: Axes, rail: str, history: Sequence[Mapping[str, Any
             for benchmark in benchmarks:
                 if not isinstance(benchmark, Mapping) or benchmark.get("rail") != rail:
                     continue
+                primary = str(benchmark.get("primary_engine") or "unknown")
                 primary_value = _finite_float(benchmark.get("primary_rms_dex"))
-                if primary_value is not None:
-                    paired_primary_points.append((date, primary_value))
                 value = _finite_float(benchmark.get("benchmark_rms_dex"))
-                if value is not None:
-                    benchmark_points.append((date, value))
+                if (
+                    benchmark.get("benchmark_engine") is None
+                    or primary_value is None
+                    or value is None
+                    or int(benchmark.get("n") or 0) == 0
+                ):
+                    unavailable_dates[primary].append(
+                        str(entry.get("commit_date") or "unknown date")[:10]
+                    )
+                    continue
+                paired_primary_points[primary].append((date, primary_value))
+                benchmark_points[primary].append((date, value))
 
     engine_names = sorted(metrics_by_engine)
     palette = plt.get_cmap("tab10")
@@ -1902,31 +1926,50 @@ def _draw_hero_history(axis: Axes, rail: str, history: Sequence[Mapping[str, Any
                 linewidth=0.9,
                 label=f"{engine} {label}",
             )
-    if paired_primary_points:
-        paired_primary_points.sort()
-        axis.plot(
-            [date for date, _value in paired_primary_points],
-            [value for _date, value in paired_primary_points],
-            color=engine_colors.get("internal-analytical", "#333333"),
-            linestyle="-.",
-            marker="s",
-            markersize=3,
-            linewidth=1.0,
-            label="internal RMS (same rows)",
+    for primary in HERO_PRIMARY_ENGINES:
+        primary_points = sorted(paired_primary_points[primary])
+        if primary_points:
+            axis.plot(
+                [date for date, _value in primary_points],
+                [value for _date, value in primary_points],
+                color=engine_colors.get(primary, "#333333"),
+                linestyle="-.",
+                marker="s",
+                markersize=3,
+                linewidth=1.0,
+                label=f"{primary} same-row RMS",
+            )
+        comparison_points = sorted(benchmark_points[primary])
+        if comparison_points:
+            axis.plot(
+                [date for date, _value in comparison_points],
+                [value for _date, value in comparison_points],
+                color=engine_colors.get(primary, "#555555"),
+                linestyle=":",
+                marker="D",
+                markersize=3,
+                linewidth=1.1,
+                label=f"best comparison vs {primary}",
+            )
+
+    unavailable_labels = [
+        f"{engine}: {', '.join(sorted(dates))}"
+        for engine, dates in sorted(unavailable_dates.items())
+        if dates
+    ]
+    if unavailable_labels:
+        axis.text(
+            0.01,
+            0.98,
+            "Benchmark unavailable (no shared comparison rows): "
+            + "; ".join(unavailable_labels),
+            transform=axis.transAxes,
+            ha="left",
+            va="top",
+            color="#8b3535",
+            fontsize=5.3,
         )
-    if benchmark_points:
-        benchmark_points.sort()
-        axis.plot(
-            [date for date, _value in benchmark_points],
-            [value for _date, value in benchmark_points],
-            color="#111111",
-            linestyle=":",
-            marker="D",
-            markersize=3,
-            linewidth=1.1,
-            label="best comparison RMS (same rows)",
-        )
-    if not metrics_by_engine and not paired_primary_points and not benchmark_points:
+    if history_rows == 0:
         axis.text(
             0.5,
             0.5,
@@ -1943,7 +1986,12 @@ def _draw_hero_history(axis: Axes, rail: str, history: Sequence[Mapping[str, Any
     axis.tick_params(axis="x", rotation=30, labelsize=6)
     axis.tick_params(axis="y", labelsize=6)
     axis.grid(True, color="#999999", alpha=0.18, linewidth=0.5)
-    if metrics_by_engine or paired_primary_points or benchmark_points:
+    if (
+        metrics_by_engine
+        or any(paired_primary_points.values())
+        or any(benchmark_points.values())
+        or unavailable_dates
+    ):
         axis.legend(loc="best", fontsize=5.5, frameon=False, ncol=2)
 
 
@@ -1956,8 +2004,8 @@ def _current_history_entry(
     return history[-1] if history else {}
 
 
-def _current_primary_metric(
-    history: Sequence[Mapping[str, Any]], rail: str, revision: object
+def _current_engine_metric(
+    history: Sequence[Mapping[str, Any]], rail: str, revision: object, engine: str
 ) -> Mapping[str, Any] | None:
     entry = _current_history_entry(history, revision)
     metrics = entry.get("metrics")
@@ -1969,7 +2017,7 @@ def _current_primary_metric(
             for metric in metrics
             if isinstance(metric, Mapping)
             and metric.get("rail") == rail
-            and metric.get("engine") == "internal-analytical"
+            and metric.get("engine") == engine
         ),
         None,
     )
@@ -1991,22 +2039,28 @@ def _hero_summary_payload(
         for (refusal_rail, engine, reason), count in data.hero_refusal_totals.items():
             if refusal_rail == rail:
                 refusals[engine][reason] = count
-        current = _current_primary_metric(history, rail, data.stamp.get("revision"))
+        current_metrics = {
+            engine: _current_engine_metric(
+                history, rail, data.stamp.get("revision"), engine
+            )
+            for engine in HERO_PRIMARY_ENGINES
+        }
         charts[rail] = {
             "plotted_observations_by_engine": dict(sorted(rows_by_engine.items())),
             "refused_by_engine_reason": {
                 engine: dict(sorted(reasons.items()))
                 for engine, reasons in sorted(refusals.items())
             },
-            "current_internal_rms_dex": (
-                data.hero_benchmarks[rail].get("primary_rms_dex")
-                if rail in data.hero_benchmarks
-                else None if current is None else current.get("rms_dex")
-            ),
-            "current_all_numeric_internal_rms_dex": (
-                None if current is None else current.get("rms_dex")
-            ),
-            "same_row_benchmark": data.hero_benchmarks.get(rail),
+            "current_all_numeric_rms_dex_by_primary_engine": {
+                engine: (
+                    None if metric is None else metric.get("rms_dex")
+                )
+                for engine, metric in current_metrics.items()
+            },
+            "same_row_benchmarks_by_primary_engine": {
+                engine: data.hero_benchmarks[(rail, engine)]
+                for engine in HERO_PRIMARY_ENGINES
+            },
         }
     return charts
 
@@ -2055,20 +2109,29 @@ def render_hero_charts(
         history_axis = figure.add_subplot(grid[-1])
         _draw_hero_history(history_axis, rail, history)
 
-        primary = _current_primary_metric(history, rail, data.stamp.get("revision"))
-        benchmark = data.hero_benchmarks.get(rail)
-        if isinstance(primary, Mapping) and isinstance(benchmark, Mapping):
-            status = (
-                f"same-row internal RMS {benchmark.get('primary_rms_dex')} dex · "
-                f"{benchmark.get('benchmark_engine')} same-row RMS "
-                f"{benchmark.get('benchmark_rms_dex')} dex (n={benchmark.get('n')}) · "
-                f"all-numeric internal RMS {primary.get('rms_dex')} dex"
+        status_lines: list[str] = []
+        for engine in HERO_PRIMARY_ENGINES:
+            benchmark = data.hero_benchmarks[(rail, engine)]
+            metric = _current_engine_metric(
+                history, rail, data.stamp.get("revision"), engine
             )
-        elif isinstance(primary, Mapping):
-            status = "current internal RMS " + str(primary.get("rms_dex")) + " dex · no paired comparison rows"
-        else:
-            status = "current benchmark unavailable"
-        figure.suptitle(f"{_HERO_TITLES[rail]} · {status}", fontsize=10, y=0.997)
+            all_numeric_rms = "unavailable" if metric is None else metric.get("rms_dex")
+            if benchmark.get("benchmark_engine") is None:
+                status_lines.append(
+                    f"{engine}: benchmark unavailable (no shared comparison rows) · "
+                    f"all-numeric RMS {all_numeric_rms} dex"
+                )
+            else:
+                status_lines.append(
+                    f"{engine}: same-row RMS {benchmark.get('primary_rms_dex')} dex vs "
+                    f"{benchmark.get('benchmark_engine')} {benchmark.get('benchmark_rms_dex')} dex "
+                    f"(n={benchmark.get('n')}) · all-numeric RMS {all_numeric_rms} dex"
+                )
+        figure.suptitle(
+            f"{_HERO_TITLES[rail]}\n" + "\n".join(status_lines),
+            fontsize=8.2,
+            y=0.997,
+        )
         figure.text(
             0.5,
             0.002,
@@ -2319,8 +2382,8 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--history-path",
         type=Path,
-        default=HISTORY_PATH,
-        help="append-only hero chart history JSONL",
+        required=True,
+        help="append-only hero chart history JSONL (for example docs-private/.../hero-history.jsonl)",
     )
     parser.add_argument(
         "--append-history",
