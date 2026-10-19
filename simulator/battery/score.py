@@ -4572,6 +4572,69 @@ def _oxygen_input_request(
     return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
 
 
+def _battery_hero_oxygen_condition(
+    reference: str,
+    observations: Mapping[str, Observation],
+    engine: Engine,
+) -> tuple[str, Decimal | None, Decimal | None, str]:
+    """Return the scorer's oxygen mode, log10(bar), Pa value, and refusal reason."""
+
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        PO2_NOT_AN_INPUT,
+    )
+
+    observation = observations.get(reference)
+    if observation is None or not isinstance(observation.identity, Identity):
+        return "missing", None, None, "no fO2 for this row"
+    identity = observation.identity
+    quantity = quantity_token(identity)
+    if quantity is None:
+        return "missing", None, None, "no fO2 for this row"
+
+    requested = identity.composition
+    if requested is None or not requested.is_value:
+        requested = _printed_point_composition(observation)
+    composition_value = (
+        requested.value
+        if requested is not None and requested.is_value
+        else None
+    )
+    decision = _oxygen_input_request(
+        engine=engine,
+        channel=ENGINE_CHANNELS[engine],
+        sources=ENGINE_COEFFICIENT_SOURCES[engine],
+        identity=identity,
+        requested=requested,
+        quantity=quantity,
+        composition_value=composition_value,
+        input_notices=[],
+    )
+    if isinstance(decision, EnginePrediction):
+        detail = decision.refusal_detail or {}
+        reason = (
+            "no fO2 for this row"
+            if detail.get("reason") == "missing_fO2"
+            else "scorer did not produce an oxygen request"
+        )
+        return "missing", None, None, reason
+    if decision.mode == PO2_NOT_AN_INPUT:
+        return "not_an_input", None, None, "oxygen is not an input for this row"
+    if decision.mode != PO2_COMMANDED or decision.po2_bar is None:
+        return "missing", None, None, "scorer did not produce an oxygen request"
+
+    try:
+        pO2_bar = as_decimal(decision.po2_bar)
+        if not pO2_bar.is_finite() or pO2_bar <= 0:
+            raise ValueError("oxygen request is outside the positive finite domain")
+        log10_fO2_bar = pO2_bar.log10()
+        fO2_Pa = pO2_bar * PA_PER_BAR_DEC
+    except (TypeError, ValueError, ArithmeticError):
+        return "missing", None, None, "invalid scorer oxygen request"
+    mode = "printed" if _has_printed_fo2(observation, identity) else "commanded"
+    return mode, log10_fO2_bar, fO2_Pa, ""
+
+
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -9259,19 +9322,139 @@ def _battery_hero_deck_payload(row: Mapping[str, object]) -> dict[str, object]:
     }
 
 
+def _battery_hero_deck_store_observations(
+    rows: Iterable[Mapping[str, object]],
+) -> dict[str, Observation]:
+    references = {
+        str(row.get("reference") or "")
+        for row in rows
+        if row.get("reference")
+    }
+    sources = tuple(
+        sorted(
+            {
+                reference.split("::", 1)[0]
+                for reference in references
+                if "::" in reference
+            }
+        )
+    )
+    if not sources:
+        return {}
+
+    observation_dir = REPO_ROOT / "data" / "literature" / "observations-v2"
+    if not observation_dir.is_dir():
+        raise FileNotFoundError(f"BLOCKED: need-full-seat {REPO_ROOT}")
+    tokens = source_filter_tokens(sources)
+    if not any(
+        path_matches_source_tokens(path, observation_dir, tokens)
+        for path in iter_observation_store_paths(observation_dir)
+    ):
+        return {}
+    _works, _experiments, observations = load_migrated_store(sources=sources)
+    return observations
+
+
+def _battery_hero_deck_join_key(
+    observation: Observation,
+) -> tuple[str, str | Decimal] | None:
+    point_conditions = observation.point_conditions or {}
+    for key, multiplier in (
+        ("time_s", Decimal(1)),
+        ("duration_s", Decimal(1)),
+        ("time_min", Decimal(60)),
+    ):
+        located = point_conditions.get(key)
+        if (
+            not isinstance(located, Located)
+            or located.inference is not None
+            or not located.state.is_value
+            or located.state.value is None
+        ):
+            continue
+        raw = located.state.value
+        if isinstance(raw, Value):
+            raw = point_magnitude(raw)
+        try:
+            seconds = as_decimal(raw) * multiplier
+        except (TypeError, ValueError, ArithmeticError):
+            continue
+        if seconds.is_finite():
+            return "time_s", seconds
+
+    identity = observation.identity
+    if isinstance(identity, Identity) and identity.exposure is not None:
+        exposure_state = identity.exposure
+        if exposure_state.is_value and exposure_state.value is not None:
+            duration = exposure_state.value.duration_s
+            if duration.is_value and duration.value is not None:
+                return "time_s", duration.value
+
+    for key in ("run_key", "run_id"):
+        located = point_conditions.get(key)
+        if (
+            isinstance(located, Located)
+            and located.inference is None
+            and located.state.is_value
+            and located.state.value is not None
+        ):
+            return "run", str(located.state.value)
+    return None
+
+
+def _battery_hero_mass_loss_fraction(
+    reference: str,
+    observations: Mapping[str, Observation],
+) -> tuple[Decimal | None, str | None]:
+    residue = observations.get(reference)
+    if residue is None:
+        return None, "no recorded mass loss"
+    join_key = _battery_hero_deck_join_key(residue)
+    if join_key is None:
+        return None, "no recorded mass loss"
+    matches = [
+        observation
+        for observation in observations.values()
+        if observation.experiment_id == residue.experiment_id
+        and quantity_token(observation.identity) is Quantity.MASS_LOSS_FRACTION
+        and _battery_hero_deck_join_key(observation) == join_key
+    ]
+    if not matches:
+        return None, "no recorded mass loss"
+    if len(matches) != 1:
+        return None, "ambiguous recorded mass loss"
+    measurement = matches[0].value
+    if measurement.kind is not ValueKind.POINT or measurement.point is None:
+        return None, "invalid recorded mass loss"
+    try:
+        fraction = as_decimal(measurement.point)
+    except (TypeError, ValueError, ArithmeticError):
+        return None, "invalid recorded mass loss"
+    if not fraction.is_finite() or fraction < 0 or fraction > 1:
+        return None, "invalid recorded mass loss"
+    return fraction, None
+
+
 def _battery_hero_deck_records(
     rows: Iterable[Mapping[str, object]],
     *,
     primary_engines: Sequence[str] = (),
     comparison_engines: Sequence[str] = (),
+    observations: Mapping[str, Observation] | None = None,
 ) -> dict[str, object]:
     """Score plotted deck axes and chart-specific same-row summaries."""
 
+    observations = observations or {}
     points: list[dict[str, object]] = []
     benchmark_rows: dict[str, list[Mapping[str, object]]] = defaultdict(list)
     metric_values: dict[tuple[str, str], list[Decimal]] = defaultdict(list)
     unavailable: dict[tuple[str, str], int] = defaultdict(int)
+    axis_refusals: dict[tuple[str, str, str], int] = defaultdict(int)
     engines: set[str] = set()
+
+    def refuse_axis(chart: str, engine: str, reason: str) -> None:
+        unavailable[(chart, engine)] += 1
+        axis_refusals[(chart, engine, reason)] += 1
 
     def add_point(
         chart: str,
@@ -9333,10 +9516,37 @@ def _battery_hero_deck_records(
         is_redox_species = (
             rail == Rail.VAPOUR.value and formula in {"Fe", "SiO", "Na"}
         ) or (rail == Rail.SIO_EVOLUTION.value and formula == "SiO")
+        oxygen_condition = None
         if is_redox_species:
-            delta_iw = _battery_hero_delta_iw(temperature, fO2_pa)
+            try:
+                oxygen_engine = Engine(engine)
+            except ValueError:
+                oxygen_condition = (
+                    "missing",
+                    None,
+                    None,
+                    "scorer engine is unavailable",
+                )
+            else:
+                oxygen_condition = _battery_hero_oxygen_condition(
+                    str(row.get("reference") or ""),
+                    observations,
+                    oxygen_engine,
+                )
+        if is_redox_species:
+            assert oxygen_condition is not None
+            mode, log10_fO2_bar, request_fO2_pa, oxygen_reason = oxygen_condition
+            delta_iw = (
+                _battery_hero_delta_iw(temperature, request_fO2_pa)
+                if mode in {"printed", "commanded"}
+                and request_fO2_pa is not None
+                else None
+            )
             if delta_iw is None:
-                unavailable[("redox_sensitivity", engine)] += 1
+                reason = oxygen_reason
+                if mode in {"printed", "commanded"}:
+                    reason = "no finite temperature or delta-IW for this row"
+                refuse_axis("redox_sensitivity", engine, reason)
             else:
                 add_point(
                     "redox_sensitivity",
@@ -9345,12 +9555,15 @@ def _battery_hero_deck_records(
                     x_value=delta_iw,
                     y_value=residual_dex,
                     residual_dex=residual_dex,
+                    oxygen_mode=mode,
+                    log10_fO2_bar=str(log10_fO2_bar),
+                    fO2_Pa=str(request_fO2_pa),
                 )
 
         if rail == Rail.VAPOUR.value:
             nbo_t = _battery_hero_nbo_t(composition)
             if nbo_t is None:
-                unavailable[("polymerisation", engine)] += 1
+                refuse_axis("polymerisation", engine, "no usable NBO/T")
             else:
                 add_point(
                     "polymerisation",
@@ -9362,7 +9575,14 @@ def _battery_hero_deck_records(
                 )
 
         elif rail == Rail.SIO_EVOLUTION.value and formula == "SiO":
-            pO2_bin = _battery_hero_pO2_bin(fO2_pa)
+            assert oxygen_condition is not None
+            mode, log10_fO2_bar, request_fO2_pa, oxygen_reason = oxygen_condition
+            pO2_bin = (
+                _battery_hero_pO2_bin(request_fO2_pa)
+                if mode in {"printed", "commanded"}
+                and request_fO2_pa is not None
+                else None
+            )
             try:
                 temperature_value = as_decimal(temperature)
             except (TypeError, ValueError, ArithmeticError):
@@ -9372,7 +9592,10 @@ def _battery_hero_deck_records(
                 or not temperature_value.is_finite()
                 or temperature_value <= 0
             ):
-                unavailable[("sio_evolution", engine)] += 1
+                reason = oxygen_reason
+                if mode in {"printed", "commanded"}:
+                    reason = "no finite temperature or pO2 bin for this row"
+                refuse_axis("sio_evolution", engine, reason)
             else:
                 decade, group_label = pO2_bin
                 add_point(
@@ -9384,6 +9607,9 @@ def _battery_hero_deck_records(
                     residual_dex=residual_dex,
                     group_index=decade,
                     group_label=group_label,
+                    oxygen_mode=mode,
+                    log10_fO2_bar=str(log10_fO2_bar),
+                    fO2_Pa=str(request_fO2_pa),
                 )
 
         elif rail == Rail.REDOX.value and quantity == "fe3_fe2_ratio":
@@ -9404,23 +9630,21 @@ def _battery_hero_deck_records(
             try:
                 prediction = as_decimal(raw_prediction)
                 fO2_value = as_decimal(fO2_pa)
-                if (
-                    not has_measured_composition
-                    or not prediction.is_finite()
-                    or prediction <= 0
-                    or not fO2_value.is_finite()
-                    or fO2_value <= 0
-                ):
-                    raise ValueError("redox cross-comparison lacks measured inputs")
+                if not has_measured_composition:
+                    raise ValueError("no measured composition")
+                if not prediction.is_finite() or prediction <= 0:
+                    raise ValueError("no positive measured redox prediction")
+                if not fO2_value.is_finite() or fO2_value <= 0:
+                    raise ValueError("no measured fO2")
                 # residual_dex = log10(predicted / measured), the score.py
                 # metric contract. Recover the measured scalar at that recorded
                 # precision because the score row serializes the prediction and
                 # residual, but not a second copy of the reference value.
                 measured = prediction / (Decimal(10) ** residual_dex)
                 if not measured.is_finite() or measured <= 0:
-                    raise ValueError("redox reference recovery left the metric domain")
-            except (TypeError, ValueError, ArithmeticError):
-                unavailable[("fo2_cross_comparison", engine)] += 1
+                    raise ValueError("measured redox recovery left the metric domain")
+            except (TypeError, ValueError, ArithmeticError) as exc:
+                refuse_axis("fo2_cross_comparison", engine, str(exc))
                 continue
             add_point(
                 "fo2_cross_comparison",
@@ -9434,11 +9658,28 @@ def _battery_hero_deck_records(
             )
 
         elif rail == Rail.RESIDUE_COMPOSITION.value:
-            unavailable[("residue_composition", engine)] += 1
             metric_values[("residue_composition", engine)].append(residual_dex)
-            benchmark_rows["residue_composition"].append(
-                {**row, "rail": "residue_composition"}
+            reference = str(row.get("reference") or "")
+            fraction_evaporated, refusal_reason = _battery_hero_mass_loss_fraction(
+                reference,
+                observations,
             )
+            if fraction_evaporated is None:
+                refuse_axis(
+                    "residue_composition",
+                    engine,
+                    refusal_reason or "no recorded mass loss",
+                )
+            else:
+                add_point(
+                    "residue_composition",
+                    row,
+                    facet=formula or quantity,
+                    x_value=fraction_evaporated,
+                    y_value=residual_dex,
+                    residual_dex=residual_dex,
+                    fraction_evaporated=str(fraction_evaporated),
+                )
 
     values_by_chart_engine: dict[tuple[str, str], list[Decimal]] = defaultdict(list)
     for point in points:
@@ -9474,6 +9715,7 @@ def _battery_hero_deck_records(
         "metrics": metrics,
         "benchmarks": benchmarks,
         "unavailable_axis_counts": dict(unavailable),
+        "axis_refusals": dict(axis_refusals),
     }
 
 

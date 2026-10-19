@@ -85,6 +85,7 @@ from simulator.battery.score import (  # noqa: E402
     _battery_hero_binned_score_records,
     _battery_hero_deck_payload,
     _battery_hero_deck_records,
+    _battery_hero_deck_store_observations,
     _battery_hero_facet,
     _battery_hero_minor_foulant_facets,
     _flagged_payload_strata,
@@ -198,6 +199,9 @@ class ScorePlotData:
         default_factory=dict
     )
     hero_deck_unavailable_axis_counts: Mapping[tuple[str, str], int] = field(
+        default_factory=dict
+    )
+    hero_deck_axis_refusals: Mapping[tuple[str, str, str], int] = field(
         default_factory=dict
     )
 
@@ -904,10 +908,12 @@ def read_scores(
             rails=HERO_RAILS,
         )
     }
+    deck_observations = _battery_hero_deck_store_observations(deck_score_rows)
     deck_records = _battery_hero_deck_records(
         deck_score_rows,
         primary_engines=HERO_PRIMARY_ENGINES,
         comparison_engines=HERO_COMPARISON_ENGINES,
+        observations=deck_observations,
     )
     hero_sweet_spot_groups: dict[
         tuple[str, str], list[Mapping[str, object]]
@@ -943,6 +949,7 @@ def read_scores(
         hero_deck_unavailable_axis_counts=deck_records[
             "unavailable_axis_counts"
         ],
+        hero_deck_axis_refusals=deck_records["axis_refusals"],
     )
 
 
@@ -2969,14 +2976,14 @@ def render_hero_deck_charts(
             axis.set_ylabel(y_label, fontsize=6)
         else:
             axis = figure.add_subplot(grid[0, :])
-            if chart == "residue_composition":
+            if chart == "residue_composition" and not points:
                 missing = sum(
                     count
                     for (missing_chart, _engine), count
                     in data.hero_deck_unavailable_axis_counts.items()
                     if missing_chart == chart
                 )
-                message = "fraction evaporated is not recorded in scored rows"
+                message = "No typed mass-loss fraction matches these residue rows."
                 if missing:
                     message += (
                         f"  Scored residue rows without this axis: "
@@ -3036,12 +3043,13 @@ def render_hero_deck_charts(
                 )
                 if chart == "redox_sensitivity":
                     message = (
-                        "No Fe, SiO, or Na scored vapour rows carry a finite fO₂_Pa; "
-                        "ΔIW cannot be computed."
+                        "No scored Fe, SiO, or Na row has a printed or commanded "
+                        "oxygen request; ΔIW cannot be computed."
                     )
                 elif chart == "sio_evolution":
                     message = (
-                        "No scored SiO rows carry both temperature and pO₂; "
+                        "No scored SiO row has a printed or commanded oxygen request "
+                        "and a finite temperature; "
                         "pO₂ binning cannot be computed."
                     )
                 else:
@@ -3058,12 +3066,21 @@ def render_hero_deck_charts(
             if chart == "redox_sensitivity"
             else (source_rail,)
         )
+        axis_refusal_entries = tuple(
+            (engine, reason, count)
+            for (axis_chart, engine, reason), count
+            in sorted(data.hero_deck_axis_refusals.items())
+            if axis_chart == chart and count
+        )
         _draw_hero_refusals(
             refusal_axis,
-            tuple(
-                entry
-                for rail in refusal_rails
-                for entry in _hero_deck_refusal_entries(data, rail)
+            (
+                *(
+                    entry
+                    for rail in refusal_rails
+                    for entry in _hero_deck_refusal_entries(data, rail)
+                ),
+                *axis_refusal_entries,
             ),
             engine_colors=engine_colors,
         )
