@@ -1997,6 +1997,22 @@ def test_alkali_first_observed_stays_unparsed_ordering() -> None:
     )
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason="b-308: unknown qualitative payload is mislabeled as an ordering gap",
+)
+def test_unclassified_qualitative_payload_is_not_reported_as_ordering_gap() -> None:
+    obs = _ordering_fixture(
+        observation_id="unclassified_qualitative_payload",
+        quantity="unclassified_qualitative_trend",
+        note="Qualitative trend only; no ordering relation is stated.",
+    )
+    _assert_qualitative_skip(
+        obs,
+        "typed-refusal:unsupported_observable:qualitative_payload_unclassified",
+    )
+
+
 # Live-battery qualitative rows that used to share ordering_claim_unparsed.
 # Tokens are the payload class; none of these become comparable.
 _LIVE_QUALITATIVE_SKIP_BY_ID = {
