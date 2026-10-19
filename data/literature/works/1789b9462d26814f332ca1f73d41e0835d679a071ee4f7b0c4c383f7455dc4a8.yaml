@@ -1,0 +1,1075 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8
+  citation: Shornikov and Yakovlev (2015), High-Temperature Thermodynamic Properties of CAI Minerals, 46th Lunar and Planetary
+    Science Conference, abstract 1270.
+  source_ids:
+  - shornikov-2015-cai-mineral-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:shornikov-2015-cai-mineral-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=CA; column_header=$T_{melt}$ , K
+context:
+- observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_01_context
+  type: thermodynamic_example
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+  units: ΔG_T as plotted (kJ/mole); T (K)
+  values:
+    quantity: delta_fG
+    quantity_as_printed: ΔG_T
+    attribution: not stated in the caption; Figure 1 appears in this paper
+    method_class: model_derived
+    species: CaAl2O4
+    phase:
+      state:
+        tag: unknown
+        reason: not_stated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+    temperature_range_as_plotted: 1000–2200 K
+    x_axis_as_printed: T, K
+    x_axis_tick_labels:
+    - '1000'
+    - '1200'
+    - '1400'
+    - '1600'
+    - '1800'
+    - '2000'
+    - '2200'
+    y_axis_as_printed: ΔG_T, kJ/mole
+    y_axis_tick_labels:
+    - −10
+    - −20
+    - −30
+    - −40
+    caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate, 2 – grossite,
+      3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside, 9 – akermanite, 10
+      – gehlenite, 11 – anorthite and 12 – grossular.'
+    panel: single panel; no panel label printed
+    series_list:
+    - '1: calcium aluminate'
+    - '2: grossite'
+    - '3: hibonite'
+    - '4: perovskite'
+    - '5: magnesium spinel'
+    - '6: enstatite'
+    - '7: forsterite'
+    - '8: diopside'
+    - '9: akermanite'
+    - '10: gehlenite'
+    - '11: anorthite'
+    - '12: grossular'
+    marker_count_per_series:
+      '1': 0
+      '2': 0
+      '3': 0
+      '4': 0
+      '5': 0
+      '6': 0
+      '7': 0
+      '8': 0
+      '9': 0
+      '10': 0
+      '11': 0
+      '12': 0
+    source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page 1).
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2015-cai-mineral-thermodynamics::context::shornikov_2015_cai_mineral_thermodynamics_figure1_01_context
+  work_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  species: CaAl2O4
+- observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_02_context
+  type: thermodynamic_example
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+  units: ΔG_T as plotted (kJ/mole); T (K)
+  values:
+    quantity: delta_fG
+    quantity_as_printed: ΔG_T
+    attribution: not stated in the caption; Figure 1 appears in this paper
+    method_class: model_derived
+    species: CaAl4O7
+    phase:
+      state:
+        tag: unknown
+        reason: not_stated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+    temperature_range_as_plotted: 1000–2200 K
+    x_axis_as_printed: T, K
+    x_axis_tick_labels:
+    - '1000'
+    - '1200'
+    - '1400'
+    - '1600'
+    - '1800'
+    - '2000'
+    - '2200'
+    y_axis_as_printed: ΔG_T, kJ/mole
+    y_axis_tick_labels:
+    - −10
+    - −20
+    - −30
+    - −40
+    caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate, 2 – grossite,
+      3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside, 9 – akermanite, 10
+      – gehlenite, 11 – anorthite and 12 – grossular.'
+    panel: single panel; no panel label printed
+    series_list:
+    - '1: calcium aluminate'
+    - '2: grossite'
+    - '3: hibonite'
+    - '4: perovskite'
+    - '5: magnesium spinel'
+    - '6: enstatite'
+    - '7: forsterite'
+    - '8: diopside'
+    - '9: akermanite'
+    - '10: gehlenite'
+    - '11: anorthite'
+    - '12: grossular'
+    marker_count_per_series:
+      '1': 0
+      '2': 0
+      '3': 0
+      '4': 0
+      '5': 0
+      '6': 0
+      '7': 0
+      '8': 0
+      '9': 0
+      '10': 0
+      '11': 0
+      '12': 0
+    source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page 1).
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2015-cai-mineral-thermodynamics::context::shornikov_2015_cai_mineral_thermodynamics_figure1_02_context
+  work_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  species: CaAl4O7
+- observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_03_context
+  type: thermodynamic_example
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+  units: ΔG_T as plotted (kJ/mole); T (K)
+  values:
+    quantity: delta_fG
+    quantity_as_printed: ΔG_T
+    attribution: not stated in the caption; Figure 1 appears in this paper
+    method_class: model_derived
+    species: CaAl12O19
+    phase:
+      state:
+        tag: unknown
+        reason: not_stated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+    temperature_range_as_plotted: 1000–2200 K
+    x_axis_as_printed: T, K
+    x_axis_tick_labels:
+    - '1000'
+    - '1200'
+    - '1400'
+    - '1600'
+    - '1800'
+    - '2000'
+    - '2200'
+    y_axis_as_printed: ΔG_T, kJ/mole
+    y_axis_tick_labels:
+    - −10
+    - −20
+    - −30
+    - −40
+    caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate, 2 – grossite,
+      3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside, 9 – akermanite, 10
+      – gehlenite, 11 – anorthite and 12 – grossular.'
+    panel: single panel; no panel label printed
+    series_list:
+    - '1: calcium aluminate'
+    - '2: grossite'
+    - '3: hibonite'
+    - '4: perovskite'
+    - '5: magnesium spinel'
+    - '6: enstatite'
+    - '7: forsterite'
+    - '8: diopside'
+    - '9: akermanite'
+    - '10: gehlenite'
+    - '11: anorthite'
+    - '12: grossular'
+    marker_count_per_series:
+      '1': 0
+      '2': 0
+      '3': 0
+      '4': 0
+      '5': 0
+      '6': 0
+      '7': 0
+      '8': 0
+      '9': 0
+      '10': 0
+      '11': 0
+      '12': 0
+    source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page 1).
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2015-cai-mineral-thermodynamics::context::shornikov_2015_cai_mineral_thermodynamics_figure1_03_context
+  work_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  species: CaAl12O19
+- observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_04_context
+  type: thermodynamic_example
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+  units: ΔG_T as plotted (kJ/mole); T (K)
+  values:
+    quantity: delta_fG
+    quantity_as_printed: ΔG_T
+    attribution: not stated in the caption; Figure 1 appears in this paper
+    method_class: model_derived
+    species: CaTiO3
+    phase:
+      state:
+        tag: unknown
+        reason: not_stated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+    temperature_range_as_plotted: 1000–2200 K
+    x_axis_as_printed: T, K
+    x_axis_tick_labels:
+    - '1000'
+    - '1200'
+    - '1400'
+    - '1600'
+    - '1800'
+    - '2000'
+    - '2200'
+    y_axis_as_printed: ΔG_T, kJ/mole
+    y_axis_tick_labels:
+    - −10
+    - −20
+    - −30
+    - −40
+    caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate, 2 – grossite,
+      3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside, 9 – akermanite, 10
+      – gehlenite, 11 – anorthite and 12 – grossular.'
+    panel: single panel; no panel label printed
+    series_list:
+    - '1: calcium aluminate'
+    - '2: grossite'
+    - '3: hibonite'
+    - '4: perovskite'
+    - '5: magnesium spinel'
+    - '6: enstatite'
+    - '7: forsterite'
+    - '8: diopside'
+    - '9: akermanite'
+    - '10: gehlenite'
+    - '11: anorthite'
+    - '12: grossular'
+    marker_count_per_series:
+      '1': 0
+      '2': 0
+      '3': 0
+      '4': 0
+      '5': 0
+      '6': 0
+      '7': 0
+      '8': 0
+      '9': 0
+      '10': 0
+      '11': 0
+      '12': 0
+    source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page 1).
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2015-cai-mineral-thermodynamics::context::shornikov_2015_cai_mineral_thermodynamics_figure1_04_context
+  work_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  species: CaTiO3
+- observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_05_context
+  type: thermodynamic_example
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+  units: ΔG_T as plotted (kJ/mole); T (K)
+  values:
+    quantity: delta_fG
+    quantity_as_printed: ΔG_T
+    attribution: not stated in the caption; Figure 1 appears in this paper
+    method_class: model_derived
+    species: MgAl2O4
+    phase:
+      state:
+        tag: unknown
+        reason: not_stated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+    temperature_range_as_plotted: 1000–2200 K
+    x_axis_as_printed: T, K
+    x_axis_tick_labels:
+    - '1000'
+    - '1200'
+    - '1400'
+    - '1600'
+    - '1800'
+    - '2000'
+    - '2200'
+    y_axis_as_printed: ΔG_T, kJ/mole
+    y_axis_tick_labels:
+    - −10
+    - −20
+    - −30
+    - −40
+    caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate, 2 – grossite,
+      3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside, 9 – akermanite, 10
+      – gehlenite, 11 – anorthite and 12 – grossular.'
+    panel: single panel; no panel label printed
+    series_list:
+    - '1: calcium aluminate'
+    - '2: grossite'
+    - '3: hibonite'
+    - '4: perovskite'
+    - '5: magnesium spinel'
+    - '6: enstatite'
+    - '7: forsterite'
+    - '8: diopside'
+    - '9: akermanite'
+    - '10: gehlenite'
+    - '11: anorthite'
+    - '12: grossular'
+    marker_count_per_series:
+      '1': 0
+      '2': 0
+      '3': 0
+      '4': 0
+      '5': 0
+      '6': 0
+      '7': 0
+      '8': 0
+      '9': 0
+      '10': 0
+      '11': 0
+      '12': 0
+    source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page 1).
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2015-cai-mineral-thermodynamics::context::shornikov_2015_cai_mineral_thermodynamics_figure1_05_context
+  work_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  species: MgAl2O4
+- observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_06_context
+  type: thermodynamic_example
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+  units: ΔG_T as plotted (kJ/mole); T (K)
+  values:
+    quantity: delta_fG
+    quantity_as_printed: ΔG_T
+    attribution: not stated in the caption; Figure 1 appears in this paper
+    method_class: model_derived
+    species: MgSiO3
+    phase:
+      state:
+        tag: unknown
+        reason: not_stated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+    temperature_range_as_plotted: 1000–2200 K
+    x_axis_as_printed: T, K
+    x_axis_tick_labels:
+    - '1000'
+    - '1200'
+    - '1400'
+    - '1600'
+    - '1800'
+    - '2000'
+    - '2200'
+    y_axis_as_printed: ΔG_T, kJ/mole
+    y_axis_tick_labels:
+    - −10
+    - −20
+    - −30
+    - −40
+    caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate, 2 – grossite,
+      3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside, 9 – akermanite, 10
+      – gehlenite, 11 – anorthite and 12 – grossular.'
+    panel: single panel; no panel label printed
+    series_list:
+    - '1: calcium aluminate'
+    - '2: grossite'
+    - '3: hibonite'
+    - '4: perovskite'
+    - '5: magnesium spinel'
+    - '6: enstatite'
+    - '7: forsterite'
+    - '8: diopside'
+    - '9: akermanite'
+    - '10: gehlenite'
+    - '11: anorthite'
+    - '12: grossular'
+    marker_count_per_series:
+      '1': 0
+      '2': 0
+      '3': 0
+      '4': 0
+      '5': 0
+      '6': 0
+      '7': 0
+      '8': 0
+      '9': 0
+      '10': 0
+      '11': 0
+      '12': 0
+    source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page 1).
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2015-cai-mineral-thermodynamics::context::shornikov_2015_cai_mineral_thermodynamics_figure1_06_context
+  work_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  species: MgSiO3
+- observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_07_context
+  type: thermodynamic_example
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+  units: ΔG_T as plotted (kJ/mole); T (K)
+  values:
+    quantity: delta_fG
+    quantity_as_printed: ΔG_T
+    attribution: not stated in the caption; Figure 1 appears in this paper
+    method_class: model_derived
+    species: Mg2SiO4
+    phase:
+      state:
+        tag: unknown
+        reason: not_stated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+    temperature_range_as_plotted: 1000–2200 K
+    x_axis_as_printed: T, K
+    x_axis_tick_labels:
+    - '1000'
+    - '1200'
+    - '1400'
+    - '1600'
+    - '1800'
+    - '2000'
+    - '2200'
+    y_axis_as_printed: ΔG_T, kJ/mole
+    y_axis_tick_labels:
+    - −10
+    - −20
+    - −30
+    - −40
+    caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate, 2 – grossite,
+      3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside, 9 – akermanite, 10
+      – gehlenite, 11 – anorthite and 12 – grossular.'
+    panel: single panel; no panel label printed
+    series_list:
+    - '1: calcium aluminate'
+    - '2: grossite'
+    - '3: hibonite'
+    - '4: perovskite'
+    - '5: magnesium spinel'
+    - '6: enstatite'
+    - '7: forsterite'
+    - '8: diopside'
+    - '9: akermanite'
+    - '10: gehlenite'
+    - '11: anorthite'
+    - '12: grossular'
+    marker_count_per_series:
+      '1': 0
+      '2': 0
+      '3': 0
+      '4': 0
+      '5': 0
+      '6': 0
+      '7': 0
+      '8': 0
+      '9': 0
+      '10': 0
+      '11': 0
+      '12': 0
+    source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page 1).
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2015-cai-mineral-thermodynamics::context::shornikov_2015_cai_mineral_thermodynamics_figure1_07_context
+  work_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  species: Mg2SiO4
+- observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_08_context
+  type: thermodynamic_example
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+  units: ΔG_T as plotted (kJ/mole); T (K)
+  values:
+    quantity: delta_fG
+    quantity_as_printed: ΔG_T
+    attribution: not stated in the caption; Figure 1 appears in this paper
+    method_class: model_derived
+    species: CaMgSi2O6
+    phase:
+      state:
+        tag: unknown
+        reason: not_stated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+    temperature_range_as_plotted: 1000–2200 K
+    x_axis_as_printed: T, K
+    x_axis_tick_labels:
+    - '1000'
+    - '1200'
+    - '1400'
+    - '1600'
+    - '1800'
+    - '2000'
+    - '2200'
+    y_axis_as_printed: ΔG_T, kJ/mole
+    y_axis_tick_labels:
+    - −10
+    - −20
+    - −30
+    - −40
+    caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate, 2 – grossite,
+      3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside, 9 – akermanite, 10
+      – gehlenite, 11 – anorthite and 12 – grossular.'
+    panel: single panel; no panel label printed
+    series_list:
+    - '1: calcium aluminate'
+    - '2: grossite'
+    - '3: hibonite'
+    - '4: perovskite'
+    - '5: magnesium spinel'
+    - '6: enstatite'
+    - '7: forsterite'
+    - '8: diopside'
+    - '9: akermanite'
+    - '10: gehlenite'
+    - '11: anorthite'
+    - '12: grossular'
+    marker_count_per_series:
+      '1': 0
+      '2': 0
+      '3': 0
+      '4': 0
+      '5': 0
+      '6': 0
+      '7': 0
+      '8': 0
+      '9': 0
+      '10': 0
+      '11': 0
+      '12': 0
+    source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page 1).
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2015-cai-mineral-thermodynamics::context::shornikov_2015_cai_mineral_thermodynamics_figure1_08_context
+  work_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  species: CaMgSi2O6
+- observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_09_context
+  type: thermodynamic_example
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+  units: ΔG_T as plotted (kJ/mole); T (K)
+  values:
+    quantity: delta_fG
+    quantity_as_printed: ΔG_T
+    attribution: not stated in the caption; Figure 1 appears in this paper
+    method_class: model_derived
+    species: Ca2MgSi2O7
+    phase:
+      state:
+        tag: unknown
+        reason: not_stated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+    temperature_range_as_plotted: 1000–2200 K
+    x_axis_as_printed: T, K
+    x_axis_tick_labels:
+    - '1000'
+    - '1200'
+    - '1400'
+    - '1600'
+    - '1800'
+    - '2000'
+    - '2200'
+    y_axis_as_printed: ΔG_T, kJ/mole
+    y_axis_tick_labels:
+    - −10
+    - −20
+    - −30
+    - −40
+    caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate, 2 – grossite,
+      3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside, 9 – akermanite, 10
+      – gehlenite, 11 – anorthite and 12 – grossular.'
+    panel: single panel; no panel label printed
+    series_list:
+    - '1: calcium aluminate'
+    - '2: grossite'
+    - '3: hibonite'
+    - '4: perovskite'
+    - '5: magnesium spinel'
+    - '6: enstatite'
+    - '7: forsterite'
+    - '8: diopside'
+    - '9: akermanite'
+    - '10: gehlenite'
+    - '11: anorthite'
+    - '12: grossular'
+    marker_count_per_series:
+      '1': 0
+      '2': 0
+      '3': 0
+      '4': 0
+      '5': 0
+      '6': 0
+      '7': 0
+      '8': 0
+      '9': 0
+      '10': 0
+      '11': 0
+      '12': 0
+    source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page 1).
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2015-cai-mineral-thermodynamics::context::shornikov_2015_cai_mineral_thermodynamics_figure1_09_context
+  work_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  species: Ca2MgSi2O7
+- observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_10_context
+  type: thermodynamic_example
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+  units: ΔG_T as plotted (kJ/mole); T (K)
+  values:
+    quantity: delta_fG
+    quantity_as_printed: ΔG_T
+    attribution: not stated in the caption; Figure 1 appears in this paper
+    method_class: model_derived
+    species: Ca2Al2SiO7
+    phase:
+      state:
+        tag: unknown
+        reason: not_stated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+    temperature_range_as_plotted: 1000–2200 K
+    x_axis_as_printed: T, K
+    x_axis_tick_labels:
+    - '1000'
+    - '1200'
+    - '1400'
+    - '1600'
+    - '1800'
+    - '2000'
+    - '2200'
+    y_axis_as_printed: ΔG_T, kJ/mole
+    y_axis_tick_labels:
+    - −10
+    - −20
+    - −30
+    - −40
+    caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate, 2 – grossite,
+      3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside, 9 – akermanite, 10
+      – gehlenite, 11 – anorthite and 12 – grossular.'
+    panel: single panel; no panel label printed
+    series_list:
+    - '1: calcium aluminate'
+    - '2: grossite'
+    - '3: hibonite'
+    - '4: perovskite'
+    - '5: magnesium spinel'
+    - '6: enstatite'
+    - '7: forsterite'
+    - '8: diopside'
+    - '9: akermanite'
+    - '10: gehlenite'
+    - '11: anorthite'
+    - '12: grossular'
+    marker_count_per_series:
+      '1': 0
+      '2': 0
+      '3': 0
+      '4': 0
+      '5': 0
+      '6': 0
+      '7': 0
+      '8': 0
+      '9': 0
+      '10': 0
+      '11': 0
+      '12': 0
+    source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page 1).
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2015-cai-mineral-thermodynamics::context::shornikov_2015_cai_mineral_thermodynamics_figure1_10_context
+  work_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  species: Ca2Al2SiO7
+- observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_11_context
+  type: thermodynamic_example
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+  units: ΔG_T as plotted (kJ/mole); T (K)
+  values:
+    quantity: delta_fG
+    quantity_as_printed: ΔG_T
+    attribution: not stated in the caption; Figure 1 appears in this paper
+    method_class: model_derived
+    species: CaAl2Si2O8
+    phase:
+      state:
+        tag: unknown
+        reason: not_stated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+    temperature_range_as_plotted: 1000–2200 K
+    x_axis_as_printed: T, K
+    x_axis_tick_labels:
+    - '1000'
+    - '1200'
+    - '1400'
+    - '1600'
+    - '1800'
+    - '2000'
+    - '2200'
+    y_axis_as_printed: ΔG_T, kJ/mole
+    y_axis_tick_labels:
+    - −10
+    - −20
+    - −30
+    - −40
+    caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate, 2 – grossite,
+      3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside, 9 – akermanite, 10
+      – gehlenite, 11 – anorthite and 12 – grossular.'
+    panel: single panel; no panel label printed
+    series_list:
+    - '1: calcium aluminate'
+    - '2: grossite'
+    - '3: hibonite'
+    - '4: perovskite'
+    - '5: magnesium spinel'
+    - '6: enstatite'
+    - '7: forsterite'
+    - '8: diopside'
+    - '9: akermanite'
+    - '10: gehlenite'
+    - '11: anorthite'
+    - '12: grossular'
+    marker_count_per_series:
+      '1': 0
+      '2': 0
+      '3': 0
+      '4': 0
+      '5': 0
+      '6': 0
+      '7': 0
+      '8': 0
+      '9': 0
+      '10': 0
+      '11': 0
+      '12': 0
+    source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page 1).
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2015-cai-mineral-thermodynamics::context::shornikov_2015_cai_mineral_thermodynamics_figure1_11_context
+  work_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  species: CaAl2Si2O8
+- observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_12_context
+  type: thermodynamic_example
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+  units: ΔG_T as plotted (kJ/mole); T (K)
+  values:
+    quantity: delta_fG
+    quantity_as_printed: ΔG_T
+    attribution: not stated in the caption; Figure 1 appears in this paper
+    method_class: model_derived
+    species: Ca3Al2Si3O12
+    phase:
+      state:
+        tag: unknown
+        reason: not_stated
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+    temperature_range_as_plotted: 1000–2200 K
+    x_axis_as_printed: T, K
+    x_axis_tick_labels:
+    - '1000'
+    - '1200'
+    - '1400'
+    - '1600'
+    - '1800'
+    - '2000'
+    - '2200'
+    y_axis_as_printed: ΔG_T, kJ/mole
+    y_axis_tick_labels:
+    - −10
+    - −20
+    - −30
+    - −40
+    caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate, 2 – grossite,
+      3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside, 9 – akermanite, 10
+      – gehlenite, 11 – anorthite and 12 – grossular.'
+    panel: single panel; no panel label printed
+    series_list:
+    - '1: calcium aluminate'
+    - '2: grossite'
+    - '3: hibonite'
+    - '4: perovskite'
+    - '5: magnesium spinel'
+    - '6: enstatite'
+    - '7: forsterite'
+    - '8: diopside'
+    - '9: akermanite'
+    - '10: gehlenite'
+    - '11: anorthite'
+    - '12: grossular'
+    marker_count_per_series:
+      '1': 0
+      '2': 0
+      '3': 0
+      '4': 0
+      '5': 0
+      '6': 0
+      '7': 0
+      '8': 0
+      '9': 0
+      '10': 0
+      '11': 0
+      '12': 0
+    source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page 1).
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2015-cai-mineral-thermodynamics::context::shornikov_2015_cai_mineral_thermodynamics_figure1_12_context
+  work_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  species: Ca3Al2Si3O12
+- observation_id: shornikov_2015_cai_mineral_thermodynamics_oxide_formation_parameters
+  type: oxide_component_formation_thermodynamic_parameters
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1 ΔH_T and ΔS_T columns; the equation explaining these terms is Eq. (4).
+  units: ΔH_T in kJ/mole; ΔS_T in J/(mole·K) as printed
+  values:
+    quantity: delta_GT_parameters_for_oxide_component_formation
+    species_scope_as_printed: all twelve minerals in Table 1
+    method_class: quoted_attributed
+    attribution_as_printed: '[11–17]'
+    phase_as_printed: crystalline state
+    temperature_dependence_as_printed: ΔG_T = ΔH_T – T ΔS_T
+    reaction_as_printed: ΔG° = ∑ n_i ΔG°_i + ΔG_T ∑ n_i
+    reaction_terms_as_printed: ΔG°_i is the standard Gibbs energy of formation of the i-th oxide; n_i are the oxide mole numbers
+      in the mineral.
+    assumption_as_printed: ΔH_T and ΔS_T are assumed constant over a limited temperature interval; numeric bounds are not
+      printed.
+    rows:
+    - row_label: CA
+      mineral: calcium aluminate
+      formula: CaAl2O4
+      delta_H_T_kJ_per_mole: '-8.91'
+      delta_S_T_J_per_mole_K: '11.10'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: CA
+    - row_label: CA2
+      mineral: grossite
+      formula: CaAl4O7
+      delta_H_T_kJ_per_mole: '-6.34'
+      delta_S_T_J_per_mole_K: '9.94'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: CA2
+    - row_label: CA6
+      mineral: hibonite
+      formula: CaAl12O19
+      delta_H_T_kJ_per_mole: '-2.88'
+      delta_S_T_J_per_mole_K: '5.00'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: CA6
+    - row_label: CT
+      mineral: perovskite
+      formula: CaTiO3
+      delta_H_T_kJ_per_mole: '-39.51'
+      delta_S_T_J_per_mole_K: '2.87'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: CT
+    - row_label: MA
+      mineral: magnesium spinel
+      formula: MgAl2O4
+      delta_H_T_kJ_per_mole: '-13.29'
+      delta_S_T_J_per_mole_K: '4.38'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: MA
+    - row_label: MS
+      mineral: enstatite
+      formula: MgSiO3
+      delta_H_T_kJ_per_mole: '-10.28'
+      delta_S_T_J_per_mole_K: '-0.07'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: MS
+    - row_label: M2S
+      mineral: forsterite
+      formula: Mg2SiO4
+      delta_H_T_kJ_per_mole: '-21.76'
+      delta_S_T_J_per_mole_K: '-0.92'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: M2S
+    - row_label: CMS2
+      mineral: diopside
+      formula: CaMgSi2O6
+      delta_H_T_kJ_per_mole: '-36.55'
+      delta_S_T_J_per_mole_K: '-3.15'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: CMS2
+    - row_label: C2MS2
+      mineral: akermanite
+      formula: Ca2MgSi2O7
+      delta_H_T_kJ_per_mole: '-36.43'
+      delta_S_T_J_per_mole_K: '-2.41'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: C2MS2
+    - row_label: C2AS
+      mineral: gehlenite
+      formula: Ca2Al2SiO7
+      delta_H_T_kJ_per_mole: '-37.33'
+      delta_S_T_J_per_mole_K: '2.11'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: C2AS
+    - row_label: CAS2
+      mineral: anorthite
+      formula: CaAl2Si2O8
+      delta_H_T_kJ_per_mole: '-26.70'
+      delta_S_T_J_per_mole_K: '-1.10'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: CAS2
+    - row_label: C3AS3
+      mineral: grossular
+      formula: Ca3Al2Si3O12
+      delta_H_T_kJ_per_mole: '-47.70'
+      delta_S_T_J_per_mole_K: '-10.98'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: C3AS3
+  context_id: shornikov-2015-cai-mineral-thermodynamics::context::shornikov_2015_cai_mineral_thermodynamics_oxide_formation_parameters
+  work_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  species: CaAl2O4

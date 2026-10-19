@@ -1,0 +1,594 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2205/2011nz000230
+  citation: Shornikov, S. I. (2011), “Thermodynamic properties of CaO–MgO–Al2O3 melts,” Vestnik Otdelenia nauk o Zemle RAN
+    3, NZ6100.
+  source_ids:
+  - shornikov-2011-cao-mgo-alumina-melts
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:shornikov-2011-cao-mgo-alumina-melts
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2205/2011nz000230
+experiments:
+- experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series1_allibert_1979
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'mass-spectrometric Knudsen effusion method' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1960'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        note: Figure 1 caption states 1960 K for the melt system.
+    composition:
+      state:
+        tag: unknown
+        reason: incomplete_melt_composition
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        note: Figure 1 caption states 1960 K for the melt system.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2205/2011nz000230
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    note: Experimental comparator data are attributed to Allibert et al. (1979).
+- experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series2_hallstedt_1992
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'sublattice model calculation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1960'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        note: Figure 1 caption states 1960 K for the melt system.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2205/2011nz000230
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    note: Model curves shown in Figure 1; no curve points digitized.
+- experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_figure1_series3_present_study
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'ideal associated solutions thermodynamic calculation' is not a closed method token (kems_effusion alone
+      is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1960'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+        note: Figure 1 caption states 1960 K for the melt system.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2205/2011nz000230
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    note: Model curves shown in Figure 1; no curve points digitized.
+- experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_table1_present_calculation
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'ideal associated solutions thermodynamic calculation' is not a closed method token (kems_effusion alone
+      is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1960'
+          approximate: false
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        note: 'Table 1 title and caption: Gibbs energies calculated in the present study from the cited thermodynamic data
+          at 1960 K.'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2205/2011nz000230
+  locator:
+    page: 1
+    pdf_page_index: 0
+    table: '1'
+    note: 'Table 1 title and caption: Gibbs energies calculated in the present study from the cited thermodynamic data at
+      1960 K.'
+- experiment_id: 10.2205/2011nz000230::experiment::shornikov_2011_text_conclusion_minimum_melt
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermodynamic value quoted in the discussion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1960'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        section: Results
+        note: The value is labelled ΔfG1960.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2205/2011nz000230
+  locator:
+    page: 2
+    pdf_page_index: 1
+    section: Results
+    note: Final paragraph on PDF page 2.
+context:
+- observation_id: shornikov_2011_table2_composition_r01
+  type: composition
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '2'
+    row: 1
+    note: Printed investigated composition; all six emitter cells in this row were assigned against the 600 dpi table render.
+  units: wt. % and mole % as printed
+  values:
+    quantity: composition
+    method_class: quoted_attributed
+    attribution: Table 2, investigated compositions in the present study.
+    row_number_as_printed: '1'
+    concentration_wt_pct:
+      CaO: '52.84'
+      MgO: '7.16'
+      Al2O3: '40.00'
+    concentration_mole_pct:
+      CaO: '59.48'
+      MgO: '15.76'
+      Al2O3: '24.76'
+  context_id: shornikov-2011-cao-mgo-alumina-melts::context::shornikov_2011_table2_composition_r01
+  work_id: 10.2205/2011nz000230
+  source_id: shornikov-2011-cao-mgo-alumina-melts
+  species: MgO
+- observation_id: shornikov_2011_table2_composition_r02
+  type: composition
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '2'
+    row: 2
+    note: Printed investigated composition; all six emitter cells in this row were assigned against the 600 dpi table render.
+  units: wt. % and mole % as printed
+  values:
+    quantity: composition
+    method_class: quoted_attributed
+    attribution: Table 2, investigated compositions in the present study.
+    row_number_as_printed: '2'
+    concentration_wt_pct:
+      CaO: '50.24'
+      MgO: '7.16'
+      Al2O3: '42.60'
+    concentration_mole_pct:
+      CaO: '57.31'
+      MgO: '15.97'
+      Al2O3: '26.73'
+  context_id: shornikov-2011-cao-mgo-alumina-melts::context::shornikov_2011_table2_composition_r02
+  work_id: 10.2205/2011nz000230
+  source_id: shornikov-2011-cao-mgo-alumina-melts
+  species: MgO
+- observation_id: shornikov_2011_table2_composition_r03
+  type: composition
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '2'
+    row: 3
+    note: Printed investigated composition; all six emitter cells in this row were assigned against the 600 dpi table render.
+  units: wt. % and mole % as printed
+  values:
+    quantity: composition
+    method_class: quoted_attributed
+    attribution: Table 2, investigated compositions in the present study.
+    row_number_as_printed: '3'
+    concentration_wt_pct:
+      CaO: '47.64'
+      MgO: '7.16'
+      Al2O3: '45.20'
+    concentration_mole_pct:
+      CaO: '55.07'
+      MgO: '16.19'
+      Al2O3: '28.74'
+  context_id: shornikov-2011-cao-mgo-alumina-melts::context::shornikov_2011_table2_composition_r03
+  work_id: 10.2205/2011nz000230
+  source_id: shornikov-2011-cao-mgo-alumina-melts
+  species: MgO
+- observation_id: shornikov_2011_table2_composition_r04
+  type: composition
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '2'
+    row: 4
+    note: Printed investigated composition; all six emitter cells in this row were assigned against the 600 dpi table render.
+  units: wt. % and mole % as printed
+  values:
+    quantity: composition
+    method_class: quoted_attributed
+    attribution: Table 2, investigated compositions in the present study.
+    row_number_as_printed: '4'
+    concentration_wt_pct:
+      CaO: '45.04'
+      MgO: '7.16'
+      Al2O3: '47.80'
+    concentration_mole_pct:
+      CaO: '52.78'
+      MgO: '16.41'
+      Al2O3: '30.81'
+  context_id: shornikov-2011-cao-mgo-alumina-melts::context::shornikov_2011_table2_composition_r04
+  work_id: 10.2205/2011nz000230
+  source_id: shornikov-2011-cao-mgo-alumina-melts
+  species: MgO
+- observation_id: shornikov_2011_table2_composition_r05
+  type: composition
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '2'
+    row: 5
+    note: Printed investigated composition; all six emitter cells in this row were assigned against the 600 dpi table render.
+  units: wt. % and mole % as printed
+  values:
+    quantity: composition
+    method_class: quoted_attributed
+    attribution: Table 2, investigated compositions in the present study.
+    row_number_as_printed: '5'
+    concentration_wt_pct:
+      CaO: '41.98'
+      MgO: '7.16'
+      Al2O3: '50.86'
+    concentration_mole_pct:
+      CaO: '50.00'
+      MgO: '16.68'
+      Al2O3: '33.32'
+  context_id: shornikov-2011-cao-mgo-alumina-melts::context::shornikov_2011_table2_composition_r05
+  work_id: 10.2205/2011nz000230
+  source_id: shornikov-2011-cao-mgo-alumina-melts
+  species: MgO
+- observation_id: shornikov_2011_table2_composition_r06
+  type: composition
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '2'
+    row: 6
+    note: Printed investigated composition; all six emitter cells in this row were assigned against the 600 dpi table render.
+  units: wt. % and mole % as printed
+  values:
+    quantity: composition
+    method_class: quoted_attributed
+    attribution: Table 2, investigated compositions in the present study.
+    row_number_as_printed: '6'
+    concentration_wt_pct:
+      CaO: '39.38'
+      MgO: '7.16'
+      Al2O3: '53.46'
+    concentration_mole_pct:
+      CaO: '47.57'
+      MgO: '16.91'
+      Al2O3: '35.52'
+  context_id: shornikov-2011-cao-mgo-alumina-melts::context::shornikov_2011_table2_composition_r06
+  work_id: 10.2205/2011nz000230
+  source_id: shornikov-2011-cao-mgo-alumina-melts
+  species: MgO
+- observation_id: shornikov_2011_table2_composition_r07
+  type: composition
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '2'
+    row: 7
+    note: Printed investigated composition; all six emitter cells in this row were assigned against the 600 dpi table render.
+  units: wt. % and mole % as printed
+  values:
+    quantity: composition
+    method_class: quoted_attributed
+    attribution: Table 2, investigated compositions in the present study.
+    row_number_as_printed: '7'
+    concentration_wt_pct:
+      CaO: '36.78'
+      MgO: '7.16'
+      Al2O3: '56.06'
+    concentration_mole_pct:
+      CaO: '45.07'
+      MgO: '17.15'
+      Al2O3: '37.78'
+  context_id: shornikov-2011-cao-mgo-alumina-melts::context::shornikov_2011_table2_composition_r07
+  work_id: 10.2205/2011nz000230
+  source_id: shornikov-2011-cao-mgo-alumina-melts
+  species: MgO
+- observation_id: shornikov_2011_table2_composition_r08
+  type: composition
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '2'
+    row: 8
+    note: Printed investigated composition; all six emitter cells in this row were assigned against the 600 dpi table render.
+  units: wt. % and mole % as printed
+  values:
+    quantity: composition
+    method_class: quoted_attributed
+    attribution: Table 2, investigated compositions in the present study.
+    row_number_as_printed: '8'
+    concentration_wt_pct:
+      CaO: '34.18'
+      MgO: '7.16'
+      Al2O3: '58.66'
+    concentration_mole_pct:
+      CaO: '42.49'
+      MgO: '17.40'
+      Al2O3: '40.11'
+  context_id: shornikov-2011-cao-mgo-alumina-melts::context::shornikov_2011_table2_composition_r08
+  work_id: 10.2205/2011nz000230
+  source_id: shornikov-2011-cao-mgo-alumina-melts
+  species: MgO
+- observation_id: shornikov_2011_table2_composition_r09
+  type: composition
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '2'
+    row: 9
+    note: Printed investigated composition; all six emitter cells in this row were assigned against the 600 dpi table render.
+  units: wt. % and mole % as printed
+  values:
+    quantity: composition
+    method_class: quoted_attributed
+    attribution: Table 2, investigated compositions in the present study.
+    row_number_as_printed: '9'
+    concentration_wt_pct:
+      CaO: '31.58'
+      MgO: '7.16'
+      Al2O3: '61.26'
+    concentration_mole_pct:
+      CaO: '39.84'
+      MgO: '17.66'
+      Al2O3: '42.50'
+  context_id: shornikov-2011-cao-mgo-alumina-melts::context::shornikov_2011_table2_composition_r09
+  work_id: 10.2205/2011nz000230
+  source_id: shornikov-2011-cao-mgo-alumina-melts
+  species: MgO
+- observation_id: shornikov_2011_table2_composition_r10
+  type: composition
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '2'
+    row: 10
+    note: Printed investigated composition; all six emitter cells in this row were assigned against the 600 dpi table render.
+  units: wt. % and mole % as printed
+  values:
+    quantity: composition
+    method_class: quoted_attributed
+    attribution: Table 2, investigated compositions in the present study.
+    row_number_as_printed: '10'
+    concentration_wt_pct:
+      CaO: '28.98'
+      MgO: '7.16'
+      Al2O3: '63.86'
+    concentration_mole_pct:
+      CaO: '37.10'
+      MgO: '17.93'
+      Al2O3: '44.97'
+  context_id: shornikov-2011-cao-mgo-alumina-melts::context::shornikov_2011_table2_composition_r10
+  work_id: 10.2205/2011nz000230
+  source_id: shornikov-2011-cao-mgo-alumina-melts
+  species: MgO
+- observation_id: shornikov_2011_table2_composition_r11
+  type: composition
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '2'
+    row: 11
+    note: Printed investigated composition; all six emitter cells in this row were assigned against the 600 dpi table render.
+  units: wt. % and mole % as printed
+  values:
+    quantity: composition
+    method_class: quoted_attributed
+    attribution: Table 2, investigated compositions in the present study.
+    row_number_as_printed: '11'
+    concentration_wt_pct:
+      CaO: '26.38'
+      MgO: '7.16'
+      Al2O3: '66.46'
+    concentration_mole_pct:
+      CaO: '34.29'
+      MgO: '18.20'
+      Al2O3: '47.51'
+  context_id: shornikov-2011-cao-mgo-alumina-melts::context::shornikov_2011_table2_composition_r11
+  work_id: 10.2205/2011nz000230
+  source_id: shornikov-2011-cao-mgo-alumina-melts
+  species: MgO
+- observation_id: shornikov_2011_table2_composition_r12
+  type: composition
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '2'
+    row: 12
+    note: Printed investigated composition; all six emitter cells in this row were assigned against the 600 dpi table render.
+  units: wt. % and mole % as printed
+  values:
+    quantity: composition
+    method_class: quoted_attributed
+    attribution: Table 2, investigated compositions in the present study.
+    row_number_as_printed: '12'
+    concentration_wt_pct:
+      CaO: '23.91'
+      MgO: '7.16'
+      Al2O3: '68.93'
+    concentration_mole_pct:
+      CaO: '31.53'
+      MgO: '18.46'
+      Al2O3: '50.00'
+  context_id: shornikov-2011-cao-mgo-alumina-melts::context::shornikov_2011_table2_composition_r12
+  work_id: 10.2205/2011nz000230
+  source_id: shornikov-2011-cao-mgo-alumina-melts
+  species: MgO
+- observation_id: shornikov_2011_text_ca3mgal4o10_composition
+  type: composition
+  locator:
+    page: 2
+    pdf_page_index: 1
+    section: Results
+    note: The final paragraph reports 33.3 mole % Al2O3 for Ca3MgAl4O10.
+  units: mole % Al2O3
+  values:
+    method_class: quoted_attributed
+    concentration_mole_pct:
+      Al2O3: '33.3'
+    attribution: Final paragraph reports the Al2O3 composition of Ca3MgAl4O10.
+  experiment: shornikov_2011_text_conclusion_minimum_melt
+  context_id: shornikov-2011-cao-mgo-alumina-melts::context::shornikov_2011_text_ca3mgal4o10_composition
+  work_id: 10.2205/2011nz000230
+  source_id: shornikov-2011-cao-mgo-alumina-melts
+  species: Ca3MgAl4O10
+- observation_id: shornikov_2011_text_conclusion_values
+  type: author_interpretation
+  locator:
+    page: 2
+    pdf_page_index: 1
+    section: Results
+    note: Final paragraph on PDF page 2.
+  units: as printed
+  values:
+    method_class: quoted_attributed
+    statements_as_printed:
+    - Observable deviations of the calculated values of activities a(MgO) from experimental data (Fig. 1b) are insignificant
+      – approximately in 2 times.
+    - The minimal value of the Gibbs energy of melt formation (from oxides) in the CaO–MgO–Al2O3 system is not large (ΔfG1960
+      = −31.5 kJ/mole).
+    - It corresponds to the composition containing 45 mole % Al2O3 closed to liquidus line.
+    - It shown the instability in melt of the ternary compound Ca3MgAl4O10 containing 33.3 mole % Al2O3.
+    model_temperature_range_K_as_printed:
+    - '1800'
+    - '2200'
+  context_id: shornikov-2011-cao-mgo-alumina-melts::context::shornikov_2011_text_conclusion_values
+  work_id: 10.2205/2011nz000230
+  source_id: shornikov-2011-cao-mgo-alumina-melts
+  species: Al2O3

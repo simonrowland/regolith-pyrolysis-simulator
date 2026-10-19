@@ -1,0 +1,856 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  citation: Shornikov, S. I., & Yakovlev, O. I. (2020). The chemical fractionation of perovskite at evaporation. Experiment
+    in Geosciences, 26(1), 37–39.
+  source_ids:
+  - shornikov-2020-perovskite-chemical-fractionation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:shornikov-2020-perovskite-chemical-fractionation
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d::shornikov-2020-perovskite-chemical-fractionation
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  locator:
+    page: 2
+    published_page: 37
+    pdf_page_index: 1
+    section: Results
+    note: Pure-component vapor pressure reported for CaO.
+context:
+- observation_id: shornikov_2020_fractionation_equation2_refusal
+  type: refusal
+  locator:
+    page: 2
+    published_page: 37
+    pdf_page_index: 1
+    equation: '2'
+  units: atm×(g/mol)^−½, as printed
+  values:
+    quantity: refused_source_content
+    method_class: method_only
+    refused:
+    - item: Congruent-evaporation criterion in equation (2)
+      reason: schema_gap_no_quantity_for_molecular_weight_scaled_pressure
+      value_as_printed: 2.263 × 10⁻⁷ atm×(g/mol)^−½
+      criterion_as_printed: xCaO γCaO p°CaO / √MCaO = xTiO2 γTiO2 p°TiO2 / √MTiO2
+      locator:
+        page: 2
+        published_page: 37
+        pdf_page_index: 1
+        equation: '2'
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_equation2_refusal
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: CaTiO3
+- observation_id: shornikov_2020_fractionation_figure1_panel_a
+  type: figure_record
+  locator:
+    page: 2
+    published_page: 37
+    pdf_page_index: 1
+    figure: '1'
+    panel: a
+  units: mol % TiO2; weight loss percent; T in K
+  values:
+    quantity: concentration_series
+    species: TiO2 in perovskite melt
+    phase: l
+    temperature_K: 2278
+    axes_as_printed:
+      x: Weight loss, %
+      y: TiO2, mol %
+    caption_as_printed: 'Fig. 1. Dependences of changes in the composition (a) and weight (b) of perovskite melt during evaporation
+      at 2278 K, determined experimentally (symbols) by Zhang et al. (2014) and calculated in the present study (lines): 1
+      – without taking into account redox conditions; 2 – for the case of neutral redox conditions; 3 – for the case of the
+      melt evaporation from a molybdenum effusion cell (according to Knudsen); 4 – for the case of the melt evaporation in
+      a vacuum furnace with a tungsten heater (according to Langmuir).'
+    series:
+    - id: '1'
+      attribution: present-study calculation without taking redox conditions into account
+      marker_count: 0
+    - id: '2'
+      attribution: present-study calculation for neutral redox conditions
+      marker_count: 0
+    - id: '3'
+      attribution: present-study calculation for a molybdenum effusion cell (Knudsen)
+      marker_count: 0
+    - id: '4'
+      attribution: present-study calculation for a tungsten-heated vacuum furnace (Langmuir)
+      marker_count: 0
+    - id: symbols
+      attribution: Zhang et al. (2014)
+      marker_count: 5
+    marker_count_note: Five experimental symbols are visible; no coordinates were digitized.
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_figure1_panel_a
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: CaTiO3
+- observation_id: shornikov_2020_fractionation_figure1_panel_b
+  type: figure_record
+  locator:
+    page: 2
+    published_page: 37
+    pdf_page_index: 1
+    figure: '1'
+    panel: b
+  units: percent weight loss; time in min; T in K
+  values:
+    quantity: mass_loss
+    species: perovskite melt CaTiO3
+    phase: l
+    temperature_K: 2278
+    axes_as_printed:
+      x: t, min
+      y: Weight loss, %
+    caption_as_printed: 'Fig. 1. Dependences of changes in the composition (a) and weight (b) of perovskite melt during evaporation
+      at 2278 K, determined experimentally (symbols) by Zhang et al. (2014) and calculated in the present study (lines): 1
+      – without taking into account redox conditions; 2 – for the case of neutral redox conditions; 3 – for the case of the
+      melt evaporation from a molybdenum effusion cell (according to Knudsen); 4 – for the case of the melt evaporation in
+      a vacuum furnace with a tungsten heater (according to Langmuir).'
+    series:
+    - id: '1'
+      attribution: present-study calculation without taking redox conditions into account
+      marker_count: 0
+    - id: '2'
+      attribution: present-study calculation for neutral redox conditions
+      marker_count: 0
+    - id: '3'
+      attribution: present-study calculation for a molybdenum effusion cell (Knudsen)
+      marker_count: 0
+    - id: '4'
+      attribution: present-study calculation for a tungsten-heated vacuum furnace (Langmuir)
+      marker_count: 0
+    - id: symbols
+      attribution: Zhang et al. (2014)
+      marker_count: 5
+    marker_count_note: Five experimental symbols are visible; no coordinates were digitized.
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_figure1_panel_b
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: CaTiO3
+- observation_id: shornikov_2020_fractionation_figure2_panel_a
+  type: figure_record
+  locator:
+    page: 4
+    published_page: 39
+    pdf_page_index: 3
+    figure: '2'
+    panel: a
+  units: lg pressure in atm; T in K
+  values:
+    quantity: partial_pressure
+    species_as_printed: (Ca), (CaO), (Ti), (TiO), (TiO2), (Ti2O3), (Ti2O4), (CaTiO3), (O), (O2), total vapor pressure
+    phase: gas
+    temperature_K: 2278
+    axes_as_printed:
+      x: lg pO, atm
+      y: lg pi, atm
+    caption_as_printed: Fig. 2. The total and partial pressures of vapor species over perovskite melt vs. pO (a), during its
+      evaporation at different redox conditions (b), over the CaO–TiO2 melts in the absence of redox effects (c) and at evaporation
+      from molybdenum effusion cell (according to Knudsen) (d) at 2278 K.
+    series:
+    - id: I
+      attribution: calculated with no redox effects
+      marker_count: 11
+      marker_count_per_species: 1
+      species_count: 11
+    - id: II
+      attribution: experimental Shornikov (2019) molybdenum-cell data
+      marker_count: 11
+      marker_count_per_species: 1
+      species_count: 11
+    - id: III
+      attribution: calculated reducing condition; tungsten heater and Langmuir method
+      marker_count: 11
+      marker_count_per_species: 1
+      species_count: 11
+    species_series_mapping_as_printed:
+    - '1: (Ca)'
+    - '2: (CaO)'
+    - '3: (Ti)'
+    - '4: (TiO)'
+    - '5: (TiO2)'
+    - '6: (Ti2O3)'
+    - '7: (Ti2O4)'
+    - '8: (CaTiO3)'
+    - '9: (O)'
+    - '10: (O2)'
+    - '11: total vapor pressure'
+    marker_count_note: The condition symbols overlap in the rendered panel; no coordinates were digitized.
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_figure2_panel_a
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: CaTiO3
+- observation_id: shornikov_2020_fractionation_figure2_panel_b
+  type: figure_record
+  locator:
+    page: 4
+    published_page: 39
+    pdf_page_index: 3
+    figure: '2'
+    panel: b
+  units: lg pO in atm; TiO2 mol %; T in K
+  values:
+    quantity: partial_pressure
+    species: atomic oxygen (O)
+    phase: gas
+    temperature_K: 2278
+    axes_as_printed:
+      x: TiO2, mol %
+      y: lg pO, atm
+    caption_as_printed: Fig. 2. The total and partial pressures of vapor species over perovskite melt vs. pO (a), during its
+      evaporation at different redox conditions (b), over the CaO–TiO2 melts in the absence of redox effects (c) and at evaporation
+      from molybdenum effusion cell (according to Knudsen) (d) at 2278 K.
+    series:
+    - id: '1'
+      attribution: present-study calculation without redox effects
+      marker_count: 0
+    - id: '2'
+      attribution: present-study calculation for neutral redox conditions
+      marker_count: 0
+    - id: '3'
+      attribution: present-study molybdenum-cell calculation using Knudsen conditions
+      marker_count: 0
+    - id: '4'
+      attribution: present-study tungsten-heater calculation using Langmuir conditions
+      marker_count: 0
+    - id: '5'
+      attribution: Zhang et al. (2014)
+      marker_count: 5
+    - id: '6'
+      attribution: Shornikov (2019)
+      marker_count: 11
+    marker_count_note: Series 5 symbols are black and series 6 symbols are blue; no coordinates were digitized.
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_figure2_panel_b
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: CaTiO3
+- observation_id: shornikov_2020_fractionation_figure2_panel_c
+  type: figure_record
+  locator:
+    page: 4
+    published_page: 39
+    pdf_page_index: 3
+    figure: '2'
+    panel: c
+  units: lg pressure in atm; TiO2 mol %; T in K
+  values:
+    quantity: partial_pressure
+    species_as_printed: (Ca), (CaO), (Ti), (TiO), (TiO2), (Ti2O3), (Ti2O4), (CaTiO3), (O), (O2), total vapor pressure
+    phase: gas
+    temperature_K: 2278
+    axes_as_printed:
+      x: TiO2, mol %
+      y: lg pi, atm
+    caption_as_printed: Fig. 2. The total and partial pressures of vapor species over perovskite melt vs. pO (a), during its
+      evaporation at different redox conditions (b), over the CaO–TiO2 melts in the absence of redox effects (c) and at evaporation
+      from molybdenum effusion cell (according to Knudsen) (d) at 2278 K.
+    series:
+    - id: '1'
+      species: (Ca)
+      attribution: present-study calculation without redox effects
+      marker_count: 0
+    - id: '2'
+      species: (CaO)
+      attribution: present-study calculation without redox effects
+      marker_count: 0
+    - id: '3'
+      species: (Ti)
+      attribution: present-study calculation without redox effects
+      marker_count: 0
+    - id: '4'
+      species: (TiO)
+      attribution: present-study calculation without redox effects
+      marker_count: 0
+    - id: '5'
+      species: (TiO2)
+      attribution: present-study calculation without redox effects
+      marker_count: 0
+    - id: '6'
+      species: (Ti2O3)
+      attribution: present-study calculation without redox effects
+      marker_count: 0
+    - id: '7'
+      species: (Ti2O4)
+      attribution: present-study calculation without redox effects
+      marker_count: 0
+    - id: '8'
+      species: (CaTiO3)
+      attribution: present-study calculation without redox effects
+      marker_count: 0
+    - id: '9'
+      species: (O)
+      attribution: present-study calculation without redox effects
+      marker_count: 0
+    - id: '10'
+      species: (O2)
+      attribution: present-study calculation without redox effects
+      marker_count: 0
+    - id: '11'
+      species: total vapor pressure
+      attribution: present-study calculation without redox effects
+      marker_count: 0
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_figure2_panel_c
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: CaTiO3
+- observation_id: shornikov_2020_fractionation_figure2_panel_d
+  type: figure_record
+  locator:
+    page: 4
+    published_page: 39
+    pdf_page_index: 3
+    figure: '2'
+    panel: d
+  units: lg pressure in atm; TiO2 mol %; T in K
+  values:
+    quantity: partial_pressure
+    species_as_printed: (Ca), (CaO), (Ti), (TiO), (TiO2), (Ti2O3), (Ti2O4), (CaTiO3), (O), (O2), total vapor pressure
+    phase: gas
+    temperature_K: 2278
+    axes_as_printed:
+      x: TiO2, mol %
+      y: lg pi, atm
+    caption_as_printed: Fig. 2. The total and partial pressures of vapor species over perovskite melt vs. pO (a), during its
+      evaporation at different redox conditions (b), over the CaO–TiO2 melts in the absence of redox effects (c) and at evaporation
+      from molybdenum effusion cell (according to Knudsen) (d) at 2278 K.
+    series:
+    - id: '1'
+      species: (Ca)
+      attribution: Shornikov (2020) experimental molybdenum-cell KEMS data
+      marker_count: 16
+    - id: '2'
+      species: (CaO)
+      attribution: Shornikov (2020) experimental molybdenum-cell KEMS data
+      marker_count: 16
+    - id: '3'
+      species: (Ti)
+      attribution: Shornikov (2020) experimental molybdenum-cell KEMS data
+      marker_count: 16
+    - id: '4'
+      species: (TiO)
+      attribution: Shornikov (2020) experimental molybdenum-cell KEMS data
+      marker_count: 16
+    - id: '5'
+      species: (TiO2)
+      attribution: Shornikov (2020) experimental molybdenum-cell KEMS data
+      marker_count: 16
+    - id: '6'
+      species: (Ti2O3)
+      attribution: Shornikov (2020) experimental molybdenum-cell KEMS data
+      marker_count: 16
+    - id: '7'
+      species: (Ti2O4)
+      attribution: Shornikov (2020) experimental molybdenum-cell KEMS data
+      marker_count: 16
+    - id: '8'
+      species: (CaTiO3)
+      attribution: Shornikov (2020) experimental molybdenum-cell KEMS data
+      marker_count: 16
+    - id: '9'
+      species: (O)
+      attribution: Shornikov (2020) experimental molybdenum-cell KEMS data
+      marker_count: 16
+    - id: '10'
+      species: (O2)
+      attribution: Shornikov (2020) experimental molybdenum-cell KEMS data
+      marker_count: 16
+    - id: '11'
+      species: total vapor pressure
+      attribution: Shornikov (2020) experimental molybdenum-cell KEMS data
+      marker_count: 16
+    marker_count_note: Some colored symbols and curves overlap in the rendered panel; marker count is visual.
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_figure2_panel_d
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: CaTiO3
+- observation_id: shornikov_2020_fractionation_gas_mole_fractions_method
+  type: method
+  locator:
+    page: 3
+    published_page: 38
+    pdf_page_index: 2
+    equation: '15'
+  units: gas mole fraction at 2278 K
+  values:
+    quantity: prevailing_vapor_species_mole_fraction_method_inputs
+    method_class: method_only
+    temperature_K: 2278
+    x_Ca_as_printed: '0.548'
+    x_TiO2_as_printed: '0.839'
+    equation_as_printed: p° = p_i / x_i
+    note: These two mole fractions are inputs to equation (15); the paper does not publish a complete gas-phase composition.
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_gas_mole_fractions_method
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: CaTiO3
+- observation_id: shornikov_2020_fractionation_model_endpoints
+  type: model_result
+  locator:
+    page: 2
+    published_page: 37
+    pdf_page_index: 1
+    figure: '1'
+    panel: a
+  units: mol % TiO2 in perovskite melt at 2278 K
+  values:
+    quantity: congruent_evaporation_residual_melt_composition
+    method_class: model_derived
+    attribution: Present study; Fig. 1a lines 1–3 are calculated in this study.
+    phase: l
+    temperature_K: 2278
+    composition:
+      state:
+        tag: unknown
+        reason: Only the TiO2 concentration is stated; a complete melt composition is not published.
+      locator:
+        page: 2
+        published_page: 37
+        pdf_page_index: 1
+        figure: '1'
+        panel: a
+    results_as_printed:
+    - line: 1
+      redox_condition_as_printed: without taking into account redox conditions
+      TiO2_mol_percent: '41.25'
+      TiO2_mol_percent_as_printed: 41.25 mol % TiO2
+    - line: 2
+      redox_condition_as_printed: neutral redox conditions
+      TiO2_mol_percent: '44.83'
+      TiO2_mol_percent_as_printed: 44.83 mol % TiO2
+    - line: 3
+      redox_condition_as_printed: molybdenum effusion cell (according to Knudsen)
+      TiO2_mol_percent: '55.18'
+      TiO2_mol_percent_as_printed: 55.18 mol % TiO2
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_model_endpoints
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: CaTiO3
+- observation_id: shornikov_2020_fractionation_molybdenum_cell_p_o_cross_reference
+  type: cross_reference
+  locator:
+    page: 3
+    published_page: 38
+    pdf_page_index: 2
+    figure: '2'
+    panel: a
+    series: II
+    line: 9
+  units: atm at 2278 K
+  values:
+    quantity: existing_partial_pressure_point
+    existing_source_id: shornikov-2020-cao-tio2-melts
+    existing_observation_id: shornikov_2020_table4_p_o_eq11_2278k_x50_00
+    existing_extract_locator:
+      published_page: 1295
+      pdf_page_index: 6
+      table: '4'
+      row: xTiO2=50.00%
+    matching_source_value_as_printed: 2.72×10⁻⁷ atm
+    disposition: cross_reference_only
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_molybdenum_cell_p_o_cross_reference
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: O
+- observation_id: shornikov_2020_fractionation_omitted_gas_species_method
+  type: method
+  locator:
+    page: 3
+    published_page: 38
+    pdf_page_index: 2
+    section: Results and discussion
+  units: mol % in vapor phase
+  values:
+    quantity: neglected_vapor_species
+    method_class: method_only
+    species_as_printed: (Ca2), (O3), (O4)
+    amount_as_printed: less than 10⁻⁷ mol %
+    note: The authors state these molecular species are neglected as insignificant.
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_omitted_gas_species_method
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: CaTiO3
+- observation_id: shornikov_2020_fractionation_oxygen_pressure_comparison
+  type: literature_context
+  locator:
+    page: 3
+    published_page: 38
+    pdf_page_index: 2
+    section: Results and discussion
+  units: qualitative comparison, as printed
+  values:
+    quantity: oxygen_pressure_comparison
+    method_class: quoted_attributed
+    comparison_as_printed: approximately 3 times less
+    compared_pO_atm_as_printed: 8.53×10⁻⁸; 2.72×10⁻⁷
+    note: The second value is cross-referenced above and is not duplicated as an observation.
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_oxygen_pressure_comparison
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: CaTiO3
+- observation_id: shornikov_2020_fractionation_quoted_wo3_in_residual_melt
+  type: literature_context
+  locator:
+    page: 4
+    published_page: 39
+    pdf_page_index: 3
+    section: Results and discussion
+  units: wt % WO3 in residual melt, as printed
+  values:
+    quantity: quoted_tungsten_oxide_residual_melt_composition
+    method_class: quoted_attributed
+    attribution: Wang et al. (2001)
+    WO3_wt_percent_range_as_printed: 0.06–0.6 wt %
+    residual_melt_composition_as_printed: CaO–MgO–FeO–Al2O3–TiO2–SiO2
+    composition:
+      state:
+        tag: unknown
+        reason: Individual oxide proportions are not reported for this cited comparison.
+      locator:
+        page: 4
+        published_page: 39
+        pdf_page_index: 3
+        section: Results and discussion
+    equipment_relation_as_printed: similar experiments on the same equipment used in Zhang et al. (2014)
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_quoted_wo3_in_residual_melt
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: WO3
+- observation_id: shornikov_2020_fractionation_table1_calcium_reactions_refusal
+  type: refusal
+  locator:
+    page: 2
+    published_page: 37
+    pdf_page_index: 1
+    table: '1'
+  units: dimensionless K_r at 2278 K; as printed
+  values:
+    quantity: refused_source_content
+    method_class: method_only
+    refused:
+    - item: Equation (4), reaction equilibrium constant
+      reason: schema_gap_reaction_equilibrium_constant
+      reaction_as_printed: (CaTiO3) = (CaO) + (TiO2)
+      expression_as_printed: K4 = pCaO pTiO2 / pCaTiO3
+      value_as_printed: 2.372×10⁻⁶
+      locator:
+        page: 2
+        published_page: 37
+        pdf_page_index: 1
+        table: '1'
+        row: 3
+    - item: Equation (11), reaction equilibrium constant
+      reason: schema_gap_reaction_equilibrium_constant
+      reaction_as_printed: '{CaTiO3} = [CaO] + {TiO2}'
+      expression_as_printed: K11 = aCaO aTiO2 / aCaTiO3
+      value_as_printed: 8.551×10⁵
+      locator:
+        page: 2
+        published_page: 37
+        pdf_page_index: 1
+        table: '1'
+        row: 10
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_table1_calcium_reactions_refusal
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: Ca
+- observation_id: shornikov_2020_fractionation_table1_cao_reactions_refusal
+  type: refusal
+  locator:
+    page: 2
+    published_page: 37
+    pdf_page_index: 1
+    table: '1'
+  units: dimensionless K_r at 2278 K; as printed
+  values:
+    quantity: refused_source_content
+    method_class: method_only
+    refused:
+    - item: Equation (5), reaction equilibrium constant
+      reason: schema_gap_reaction_equilibrium_constant
+      reaction_as_printed: (CaO) = (Ca) + (O)
+      expression_as_printed: K5 = pCa pO / pCaO
+      value_as_printed: 3.573×10⁻⁴
+      locator:
+        page: 2
+        published_page: 37
+        pdf_page_index: 1
+        table: '1'
+        row: 4
+    - item: Equation (12), reaction equilibrium constant
+      reason: schema_gap_reaction_equilibrium_constant
+      reaction_as_printed: '[CaO] = (CaO)'
+      expression_as_printed: K12 = pCaO / aCaO
+      value_as_printed: 1.225×10⁻⁷
+      locator:
+        page: 2
+        published_page: 37
+        pdf_page_index: 1
+        table: '1'
+        row: 11
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_table1_cao_reactions_refusal
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: CaO
+- observation_id: shornikov_2020_fractionation_table1_oxygen_reactions_refusal
+  type: refusal
+  locator:
+    page: 2
+    published_page: 37
+    pdf_page_index: 1
+    table: '1'
+  units: dimensionless K_r at 2278 K; as printed
+  values:
+    quantity: refused_source_content
+    method_class: method_only
+    refused:
+    - item: Equation (10), reaction equilibrium constant
+      reason: schema_gap_reaction_equilibrium_constant
+      reaction_as_printed: (O2) = 2(O)
+      expression_as_printed: K10 = pO² / pO2
+      value_as_printed: 1.872×10⁻⁵
+      locator:
+        page: 2
+        published_page: 37
+        pdf_page_index: 1
+        table: '1'
+        row: 9
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_table1_oxygen_reactions_refusal
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: O
+- observation_id: shornikov_2020_fractionation_table1_perovskite_reactions_refusal
+  type: refusal
+  locator:
+    page: 2
+    published_page: 37
+    pdf_page_index: 1
+    table: '1'
+  units: dimensionless K_r at 2278 K; as printed
+  values:
+    quantity: refused_source_content
+    method_class: method_only
+    caption_as_printed: Table 1. Equilibrium constants of perovskite evaporation reactions at 2278 K (Glushko et al., 1978–1982;
+      Balducci et al., 1985; Shornikov, 2019)
+    refused:
+    - item: Equation (3), reaction equilibrium constant
+      reason: schema_gap_reaction_equilibrium_constant
+      reaction_as_printed: '{CaTiO3} = (CaTiO3)'
+      expression_as_printed: K3 = pCaTiO3 / aCaTiO3
+      value_as_printed: 7.267×10⁻⁹
+      locator:
+        page: 2
+        published_page: 37
+        pdf_page_index: 1
+        table: '1'
+        row: 2
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_table1_perovskite_reactions_refusal
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: CaTiO3
+- observation_id: shornikov_2020_fractionation_table1_ti2o3_reaction_refusal
+  type: refusal
+  locator:
+    page: 2
+    published_page: 37
+    pdf_page_index: 1
+    table: '1'
+  units: dimensionless K_r at 2278 K; as printed
+  values:
+    quantity: refused_source_content
+    method_class: method_only
+    refused:
+    - item: Equation (9), reaction equilibrium constant
+      reason: schema_gap_reaction_equilibrium_constant
+      reaction_as_printed: (Ti2O4) = (Ti2O3) = (O)
+      expression_as_printed: K9 = pTi2O3 pO / pTi2O4
+      value_as_printed: 2.092×10⁻⁸
+      locator:
+        page: 2
+        published_page: 37
+        pdf_page_index: 1
+        table: '1'
+        row: 8
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_table1_ti2o3_reaction_refusal
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: Ti2O3
+- observation_id: shornikov_2020_fractionation_table1_ti2o4_reaction_refusal
+  type: refusal
+  locator:
+    page: 2
+    published_page: 37
+    pdf_page_index: 1
+    table: '1'
+  units: dimensionless K_r at 2278 K; as printed
+  values:
+    quantity: refused_source_content
+    method_class: method_only
+    refused:
+    - item: Equation (8), reaction equilibrium constant
+      reason: schema_gap_reaction_equilibrium_constant
+      reaction_as_printed: 2(TiO2) = (Ti2O4)
+      expression_as_printed: K8 = pTi2O4 / pTiO2²
+      value_as_printed: 3.197×10⁻³
+      locator:
+        page: 2
+        published_page: 37
+        pdf_page_index: 1
+        table: '1'
+        row: 7
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_table1_ti2o4_reaction_refusal
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: Ti2O4
+- observation_id: shornikov_2020_fractionation_table1_tio2_reactions_refusal
+  type: refusal
+  locator:
+    page: 2
+    published_page: 37
+    pdf_page_index: 1
+    table: '1'
+  units: dimensionless K_r at 2278 K; as printed
+  values:
+    quantity: refused_source_content
+    method_class: method_only
+    refused:
+    - item: Equation (6), reaction equilibrium constant
+      reason: schema_gap_reaction_equilibrium_constant
+      reaction_as_printed: (TiO2) = (TiO) + (O)
+      expression_as_printed: K6 = pTiO pO / pTiO2
+      value_as_printed: 1.917×10⁻⁷
+      locator:
+        page: 2
+        published_page: 37
+        pdf_page_index: 1
+        table: '1'
+        row: 5
+    - item: Equation (13), reaction equilibrium constant
+      reason: schema_gap_reaction_equilibrium_constant
+      reaction_as_printed: '{TiO2} = (TiO2)'
+      expression_as_printed: K13 = pTiO2 / aTiO2
+      value_as_printed: 2.264×10⁻⁵
+      locator:
+        page: 3
+        published_page: 38
+        pdf_page_index: 2
+        table: '1'
+        row: 2
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_table1_tio2_reactions_refusal
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: TiO2
+- observation_id: shornikov_2020_fractionation_table1_tio_reaction_refusal
+  type: refusal
+  locator:
+    page: 2
+    published_page: 37
+    pdf_page_index: 1
+    table: '1'
+  units: dimensionless K_r at 2278 K; as printed
+  values:
+    quantity: refused_source_content
+    method_class: method_only
+    refused:
+    - item: Equation (7), reaction equilibrium constant
+      reason: schema_gap_reaction_equilibrium_constant
+      reaction_as_printed: (TiO) = (Ti) + (O)
+      expression_as_printed: K7 = pTi pO / pTiO
+      value_as_printed: 5.351×10⁻¹⁰
+      locator:
+        page: 2
+        published_page: 37
+        pdf_page_index: 1
+        table: '1'
+        row: 6
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_table1_tio_reaction_refusal
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: TiO
+- observation_id: shornikov_2020_fractionation_table1_tungsten_oxide_reaction_refusal
+  type: refusal
+  locator:
+    page: 3
+    published_page: 38
+    pdf_page_index: 2
+    table: '1'
+  units: dimensionless K_r at 2278 K; as printed
+  values:
+    quantity: refused_source_content
+    method_class: method_only
+    refused:
+    - item: Equation (14), reaction equilibrium constant
+      reason: schema_gap_reaction_equilibrium_constant
+      reaction_as_printed: '[W] + 3(O) = [WO3]'
+      expression_as_printed: K14 = aWO3 / aW pO³
+      value_as_printed: 3.054×10¹⁴
+      locator:
+        page: 3
+        published_page: 38
+        pdf_page_index: 2
+        table: '1'
+        row: 3
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_table1_tungsten_oxide_reaction_refusal
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: WO3
+- observation_id: shornikov_2020_fractionation_zhang_pressure_context
+  type: method
+  locator:
+    page: 3
+    published_page: 38
+    pdf_page_index: 2
+    section: Results and discussion
+  units: atm
+  values:
+    quantity: vacuum_furnace_pressure_upper_bound
+    method_class: method_only
+    pressure_upper_bound_atm_as_printed: not exceeding 1.32×10⁻⁹
+    attribution: Zhang et al. (2014)
+    equipment_as_printed: tungsten-heated vacuum furnace
+  context_id: shornikov-2020-perovskite-chemical-fractionation::context::shornikov_2020_fractionation_zhang_pressure_context
+  work_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  species: CaTiO3

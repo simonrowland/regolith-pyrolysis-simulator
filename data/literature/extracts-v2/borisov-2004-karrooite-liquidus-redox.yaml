@@ -1,0 +1,1354 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/borisov-2004-karrooite-liquidus-redox.yaml
+observations:
+- observation_id: borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+  experiment_id: 10.1007/s00410-004-0586-y::borisov-2004-karrooite-liquidus-redox
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: TiO2
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: rutile-saturated melt; a(TiO2) = 1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+  source_id: borisov-2004-karrooite-liquidus-redox
+  locator:
+    page: 3
+    published_page: 71
+    pdf_page_index: 2
+    table: '2'
+  read_from: unknown:borisov-2004-karrooite-liquidus-redox
+- observation_id: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32a_activity_coefficient
+  experiment_id: 10.1007/s00410-004-0586-y::borisov-2004-karrooite-liquidus-redox
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: TiO2
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1567'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: rutile-saturated melt; a(TiO2) = 1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '4.89'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32a_activity_coefficient
+  source_id: borisov-2004-karrooite-liquidus-redox
+  locator:
+    page: 3
+    published_page: 71
+    pdf_page_index: 2
+    table: '2'
+  read_from: unknown:borisov-2004-karrooite-liquidus-redox
+  point_conditions:
+    XTiO2:
+      state:
+        tag: value
+        value: '0.2044'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    TiO2_wt_pct:
+      state:
+        tag: value
+        value: '25.38'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    temperature_K:
+      state:
+        tag: value
+        value: '1567'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+  derived_from:
+  - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+  derivation:
+    relation: gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation
+    inputs:
+    - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+    parameters: []
+    output_unit: as_published
+- observation_id: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32c_activity_coefficient
+  experiment_id: 10.1007/s00410-004-0586-y::borisov-2004-karrooite-liquidus-redox
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: TiO2
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1522'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: rutile-saturated melt; a(TiO2) = 1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '5.93'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32c_activity_coefficient
+  source_id: borisov-2004-karrooite-liquidus-redox
+  locator:
+    page: 3
+    published_page: 71
+    pdf_page_index: 2
+    table: '2'
+  read_from: unknown:borisov-2004-karrooite-liquidus-redox
+  point_conditions:
+    XTiO2:
+      state:
+        tag: value
+        value: '0.1685'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    TiO2_wt_pct:
+      state:
+        tag: value
+        value: '21.28'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    temperature_K:
+      state:
+        tag: value
+        value: '1522'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+  derived_from:
+  - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+  derivation:
+    relation: gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation
+    inputs:
+    - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+    parameters: []
+    output_unit: as_published
+- observation_id: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32f_activity_coefficient
+  experiment_id: 10.1007/s00410-004-0586-y::borisov-2004-karrooite-liquidus-redox
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: TiO2
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1561'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: rutile-saturated melt; a(TiO2) = 1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '5.09'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32f_activity_coefficient
+  source_id: borisov-2004-karrooite-liquidus-redox
+  locator:
+    page: 3
+    published_page: 71
+    pdf_page_index: 2
+    table: '2'
+  read_from: unknown:borisov-2004-karrooite-liquidus-redox
+  point_conditions:
+    XTiO2:
+      state:
+        tag: value
+        value: '0.1965'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    TiO2_wt_pct:
+      state:
+        tag: value
+        value: '24.5'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    temperature_K:
+      state:
+        tag: value
+        value: '1561'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+  derived_from:
+  - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+  derivation:
+    relation: gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation
+    inputs:
+    - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+    parameters: []
+    output_unit: as_published
+- observation_id: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32m_activity_coefficient
+  experiment_id: 10.1007/s00410-004-0586-y::borisov-2004-karrooite-liquidus-redox
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: TiO2
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1514'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: rutile-saturated melt; a(TiO2) = 1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '6.24'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32m_activity_coefficient
+  source_id: borisov-2004-karrooite-liquidus-redox
+  locator:
+    page: 3
+    published_page: 71
+    pdf_page_index: 2
+    table: '2'
+  read_from: unknown:borisov-2004-karrooite-liquidus-redox
+  point_conditions:
+    XTiO2:
+      state:
+        tag: value
+        value: '0.1601'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    TiO2_wt_pct:
+      state:
+        tag: value
+        value: '20.19'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    temperature_K:
+      state:
+        tag: value
+        value: '1514'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+  derived_from:
+  - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+  derivation:
+    relation: gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation
+    inputs:
+    - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+    parameters: []
+    output_unit: as_published
+- observation_id: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32n_activity_coefficient
+  experiment_id: 10.1007/s00410-004-0586-y::borisov-2004-karrooite-liquidus-redox
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: TiO2
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1495'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: rutile-saturated melt; a(TiO2) = 1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '6.63'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32n_activity_coefficient
+  source_id: borisov-2004-karrooite-liquidus-redox
+  locator:
+    page: 3
+    published_page: 71
+    pdf_page_index: 2
+    table: '2'
+  read_from: unknown:borisov-2004-karrooite-liquidus-redox
+  point_conditions:
+    XTiO2:
+      state:
+        tag: value
+        value: '0.1508'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    TiO2_wt_pct:
+      state:
+        tag: value
+        value: '19.09'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    temperature_K:
+      state:
+        tag: value
+        value: '1495'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+  derived_from:
+  - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+  derivation:
+    relation: gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation
+    inputs:
+    - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+    parameters: []
+    output_unit: as_published
+- observation_id: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32p_activity_coefficient
+  experiment_id: 10.1007/s00410-004-0586-y::borisov-2004-karrooite-liquidus-redox
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: TiO2
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1616'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: rutile-saturated melt; a(TiO2) = 1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '4.2'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32p_activity_coefficient
+  source_id: borisov-2004-karrooite-liquidus-redox
+  locator:
+    page: 3
+    published_page: 71
+    pdf_page_index: 2
+    table: '2'
+  read_from: unknown:borisov-2004-karrooite-liquidus-redox
+  point_conditions:
+    XTiO2:
+      state:
+        tag: value
+        value: '0.2383'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    TiO2_wt_pct:
+      state:
+        tag: value
+        value: '29.13'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    temperature_K:
+      state:
+        tag: value
+        value: '1616'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+  derived_from:
+  - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+  derivation:
+    relation: gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation
+    inputs:
+    - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+    parameters: []
+    output_unit: as_published
+- observation_id: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32r_activity_coefficient
+  experiment_id: 10.1007/s00410-004-0586-y::borisov-2004-karrooite-liquidus-redox
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: TiO2
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1628'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: rutile-saturated melt; a(TiO2) = 1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '4.03'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat32r_activity_coefficient
+  source_id: borisov-2004-karrooite-liquidus-redox
+  locator:
+    page: 3
+    published_page: 71
+    pdf_page_index: 2
+    table: '2'
+  read_from: unknown:borisov-2004-karrooite-liquidus-redox
+  point_conditions:
+    XTiO2:
+      state:
+        tag: value
+        value: '0.2483'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    TiO2_wt_pct:
+      state:
+        tag: value
+        value: '30.12'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    temperature_K:
+      state:
+        tag: value
+        value: '1628'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+  derived_from:
+  - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+  derivation:
+    relation: gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation
+    inputs:
+    - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+    parameters: []
+    output_unit: as_published
+- observation_id: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat46h_activity_coefficient
+  experiment_id: 10.1007/s00410-004-0586-y::borisov-2004-karrooite-liquidus-redox
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: TiO2
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1671'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: rutile-saturated melt; a(TiO2) = 1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '3.35'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat46h_activity_coefficient
+  source_id: borisov-2004-karrooite-liquidus-redox
+  locator:
+    page: 3
+    published_page: 71
+    pdf_page_index: 2
+    table: '2'
+  read_from: unknown:borisov-2004-karrooite-liquidus-redox
+  point_conditions:
+    XTiO2:
+      state:
+        tag: value
+        value: '0.2984'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    TiO2_wt_pct:
+      state:
+        tag: value
+        value: '35.98'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    temperature_K:
+      state:
+        tag: value
+        value: '1671'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+  derived_from:
+  - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+  derivation:
+    relation: gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation
+    inputs:
+    - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+    parameters: []
+    output_unit: as_published
+- observation_id: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat46i_activity_coefficient
+  experiment_id: 10.1007/s00410-004-0586-y::borisov-2004-karrooite-liquidus-redox
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: TiO2
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1694'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: rutile-saturated melt; a(TiO2) = 1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '3.05'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat46i_activity_coefficient
+  source_id: borisov-2004-karrooite-liquidus-redox
+  locator:
+    page: 3
+    published_page: 71
+    pdf_page_index: 2
+    table: '2'
+  read_from: unknown:borisov-2004-karrooite-liquidus-redox
+  point_conditions:
+    XTiO2:
+      state:
+        tag: value
+        value: '0.3281'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    TiO2_wt_pct:
+      state:
+        tag: value
+        value: '39.39'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    temperature_K:
+      state:
+        tag: value
+        value: '1694'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+  derived_from:
+  - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+  derivation:
+    relation: gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation
+    inputs:
+    - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+    parameters: []
+    output_unit: as_published
+- observation_id: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat46j_activity_coefficient
+  experiment_id: 10.1007/s00410-004-0586-y::borisov-2004-karrooite-liquidus-redox
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: TiO2
+      phase:
+        tag: unknown
+        reason: phase string 'liquid_melt_Di_An_TiO2' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1723'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: rutile-saturated melt; a(TiO2) = 1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '2.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity_coefficient
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: borisov-2004-karrooite-liquidus-redox::borisov_2004_table_2_dat46j_activity_coefficient
+  source_id: borisov-2004-karrooite-liquidus-redox
+  locator:
+    page: 3
+    published_page: 71
+    pdf_page_index: 2
+    table: '2'
+  read_from: unknown:borisov-2004-karrooite-liquidus-redox
+  point_conditions:
+    XTiO2:
+      state:
+        tag: value
+        value: '0.3575'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    TiO2_wt_pct:
+      state:
+        tag: value
+        value: '43.05'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+    temperature_K:
+      state:
+        tag: value
+        value: '1723'
+      locator:
+        page: 3
+        published_page: 71
+        pdf_page_index: 2
+        table: '2'
+  derived_from:
+  - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+  derivation:
+    relation: gamma(TiO2)=a(TiO2)/X(TiO2)=1/X(TiO2) at rutile saturation
+    inputs:
+    - borisov-2004-karrooite-liquidus-redox::borisov_2004_rutile_saturation_standard_state
+    parameters: []
+    output_unit: as_published

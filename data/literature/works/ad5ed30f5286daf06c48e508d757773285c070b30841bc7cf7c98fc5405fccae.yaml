@@ -1,0 +1,1013 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  citation: Shornikov, S. I. (2020), Thermodynamic properties of the CaO–MgO melts, Experiment in Geosciences, vol. 26, no.
+    1, pp. 77–80.
+  source_ids:
+  - shornikov-2020-cao-mgo-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:shornikov-2020-cao-mgo-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae::shornikov-2020-cao-mgo-thermodynamics
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  locator:
+    page: 2
+    published_page: 78
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=2900; column_header=CaO  $\Delta H_m,$  kJ/mol
+context:
+- observation_id: shornikov_2020_fig1_s2_03
+  type: figure_boundary_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    published_page: 78
+    marker: symbol 2 red open circle
+    note: Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference
+      list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre
+      on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid).
+      The two rasters are separate measurements.
+  units: K
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    property_kind: not_a_liquidus_or_solidus
+    status: typed_refusal
+    reason: The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+    T_K: 2.90e3
+    T_K_read_2: '2902.1'
+    cao_mol_pct_read: '20.0'
+    cao_mol_pct_read_2: '20.0'
+    embedded_px_read_1:
+    - '205.94'
+    - '163.04'
+    embedded_px_read_2:
+    - '205.94'
+    - '163.05'
+    page_600dpi_px_read_1:
+    - '925.5'
+    - '2616.5'
+    page_600dpi_px_read_2:
+    - '925.5'
+    - '2616.5'
+    read_uncertainty_K: '2.2'
+    read_uncertainty_mol_pct: '0.03'
+    read_1_method: jpeg_hole_centroid
+    read_2_method: visual_page_grid
+    attribution: 'Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933; Afanasjev & Saldau,
+      1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the marker is figure_only.'
+    T_K_read_1: '2902.2'
+    cao_mol_pct_read_1: '20.0'
+    read_2_evidence: Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre, with a 10 px grid. The
+      centre was estimated on that crop, not by a second segmentation.
+    schema_gap: The marker is inside a phase field or on an overlap whose centre is not the liquidus or the solidus line.
+      It is not given either of those identities. identity.py requires composition only for solidus, liquidus, and glass.
+      No other subtype keeps composition required, and a generic subtype would mark it not applicable. The point stays in
+      context. The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_fig1_s2_03
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_fig1_s2_04
+  type: figure_boundary_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    published_page: 78
+    marker: symbol 2 red open circle
+    note: Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference
+      list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre
+      on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid).
+      The two rasters are separate measurements.
+  units: K
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    property_kind: not_a_liquidus_or_solidus
+    status: typed_refusal
+    reason: The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+    T_K: 2.77e3
+    T_K_read_2: '2773.9'
+    cao_mol_pct_read: '30.0'
+    cao_mol_pct_read_2: '30.0'
+    embedded_px_read_1:
+    - '261.5'
+    - '221.11'
+    embedded_px_read_2:
+    - '261.56'
+    - '221.18'
+    page_600dpi_px_read_1:
+    - '1092.3'
+    - '2790.8'
+    page_600dpi_px_read_2:
+    - '1092.5'
+    - '2791'
+    read_uncertainty_K: '4.2'
+    read_uncertainty_mol_pct: '0.01'
+    read_1_method: jpeg_hole_centroid
+    read_2_method: visual_page_grid
+    attribution: 'Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933; Afanasjev & Saldau,
+      1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the marker is figure_only.'
+    T_K_read_1: '2774.2'
+    cao_mol_pct_read_1: '30.0'
+    read_2_evidence: Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre, with a 10 px grid. The
+      centre was estimated on that crop, not by a second segmentation.
+    schema_gap: The marker is inside a phase field or on an overlap whose centre is not the liquidus or the solidus line.
+      It is not given either of those identities. identity.py requires composition only for solidus, liquidus, and glass.
+      No other subtype keeps composition required, and a generic subtype would mark it not applicable. The point stays in
+      context. The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_fig1_s2_04
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_fig1_s2_05
+  type: figure_boundary_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    published_page: 78
+    marker: symbol 2 red open circle
+    note: Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference
+      list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre
+      on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid).
+      The two rasters are separate measurements.
+  units: K
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    property_kind: not_a_liquidus_or_solidus
+    status: typed_refusal
+    reason: The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+    T_K: 2.71e3
+    T_K_read_2: '2708.2'
+    cao_mol_pct_read: '35.0'
+    cao_mol_pct_read_2: '35.0'
+    embedded_px_read_1:
+    - '289'
+    - '251'
+    embedded_px_read_2:
+    - '289.2'
+    - '251'
+    page_600dpi_px_read_1:
+    - '1174.9'
+    - '2880.5'
+    page_600dpi_px_read_2:
+    - '1175.5'
+    - '2880.5'
+    read_uncertainty_K: '1.8'
+    read_uncertainty_mol_pct: '0.03'
+    read_1_method: jpeg_hole_centroid
+    read_2_method: visual_page_grid
+    attribution: 'Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933; Afanasjev & Saldau,
+      1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the marker is figure_only.'
+    T_K_read_1: '2708.3'
+    cao_mol_pct_read_1: '35.0'
+    read_2_evidence: Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre, with a 10 px grid. The
+      centre was estimated on that crop, not by a second segmentation.
+    schema_gap: The marker is inside a phase field or on an overlap whose centre is not the liquidus or the solidus line.
+      It is not given either of those identities. identity.py requires composition only for solidus, liquidus, and glass.
+      No other subtype keeps composition required, and a generic subtype would mark it not applicable. The point stays in
+      context. The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_fig1_s2_05
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_fig1_s2_08
+  type: figure_boundary_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    published_page: 78
+    marker: symbol 2 red open circle
+    note: Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference
+      list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre
+      on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid).
+      The two rasters are separate measurements.
+  units: K
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    property_kind: not_a_liquidus_or_solidus
+    status: typed_refusal
+    reason: The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+    T_K: 2.60e3
+    T_K_read_2: '2600.2'
+    cao_mol_pct_read: '45.5'
+    cao_mol_pct_read_2: '45.5'
+    embedded_px_read_1:
+    - '347.56'
+    - '300.03'
+    embedded_px_read_2:
+    - '347.81'
+    - '299.97'
+    page_600dpi_px_read_1:
+    - '1350.7'
+    - '3027.7'
+    page_600dpi_px_read_2:
+    - '1351.5'
+    - '3027.5'
+    read_uncertainty_K: '0.4'
+    read_uncertainty_mol_pct: '0.03'
+    read_1_method: jpeg_hole_centroid
+    read_2_method: visual_page_grid
+    attribution: 'Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933; Afanasjev & Saldau,
+      1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the marker is figure_only.'
+    T_K_read_1: '2600.2'
+    cao_mol_pct_read_1: '45.5'
+    read_2_evidence: Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre, with a 10 px grid. The
+      centre was estimated on that crop, not by a second segmentation.
+    schema_gap: The marker is inside a phase field or on an overlap whose centre is not the liquidus or the solidus line.
+      It is not given either of those identities. identity.py requires composition only for solidus, liquidus, and glass.
+      No other subtype keeps composition required, and a generic subtype would mark it not applicable. The point stays in
+      context. The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_fig1_s2_08
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_fig1_s2_09
+  type: figure_boundary_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    published_page: 78
+    marker: symbol 2 red open circle
+    note: Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference
+      list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre
+      on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid).
+      The two rasters are separate measurements.
+  units: K
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    property_kind: not_a_liquidus_or_solidus
+    status: typed_refusal
+    reason: The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+    T_K: 2.68e3
+    T_K_read_2: '2683.6'
+    cao_mol_pct_read: '50.1'
+    cao_mol_pct_read_2: '50.0'
+    embedded_px_read_1:
+    - '373'
+    - '263'
+    embedded_px_read_2:
+    - '372.62'
+    - '262.16'
+    page_600dpi_px_read_1:
+    - '1427.1'
+    - '2916.5'
+    page_600dpi_px_read_2:
+    - '1426'
+    - '2914'
+    read_uncertainty_K: '3.6'
+    read_uncertainty_mol_pct: '0.10'
+    read_1_method: jpeg_ring_centre
+    read_2_method: visual_page_grid
+    attribution: 'Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933; Afanasjev & Saldau,
+      1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the marker is figure_only.'
+    T_K_read_1: '2681.8'
+    cao_mol_pct_read_1: '50.1'
+    read_2_evidence: Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre, with a 10 px grid. The
+      centre was estimated on that crop, not by a second segmentation.
+    schema_gap: The marker is inside a phase field or on an overlap whose centre is not the liquidus or the solidus line.
+      It is not given either of those identities. identity.py requires composition only for solidus, liquidus, and glass.
+      No other subtype keeps composition required, and a generic subtype would mark it not applicable. The point stays in
+      context. The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_fig1_s2_09
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_fig1_s2_11
+  type: figure_boundary_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    published_page: 78
+    marker: symbol 2 red open circle
+    note: Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference
+      list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre
+      on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid).
+      The two rasters are separate measurements.
+  units: K
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    property_kind: not_a_liquidus_or_solidus
+    status: typed_refusal
+    reason: The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+    T_K: 2.80e3
+    T_K_read_2: '2802.9'
+    cao_mol_pct_read: '70.0'
+    cao_mol_pct_read_2: '70.0'
+    embedded_px_read_1:
+    - '483.59'
+    - '208.08'
+    embedded_px_read_2:
+    - '483.85'
+    - '208.02'
+    page_600dpi_px_read_1:
+    - '1759.2'
+    - '2751.7'
+    page_600dpi_px_read_2:
+    - '1760'
+    - '2751.5'
+    read_uncertainty_K: '2.9'
+    read_uncertainty_mol_pct: '0.02'
+    read_1_method: jpeg_hole_centroid
+    read_2_method: visual_page_grid
+    attribution: 'Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933; Afanasjev & Saldau,
+      1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the marker is figure_only.'
+    T_K_read_1: '2802.9'
+    cao_mol_pct_read_1: '70.0'
+    read_2_evidence: Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre, with a 10 px grid. The
+      centre was estimated on that crop, not by a second segmentation.
+    schema_gap: The marker is inside a phase field or on an overlap whose centre is not the liquidus or the solidus line.
+      It is not given either of those identities. identity.py requires composition only for solidus, liquidus, and glass.
+      No other subtype keeps composition required, and a generic subtype would mark it not applicable. The point stays in
+      context. The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_fig1_s2_11
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_fig1_s2_12
+  type: figure_boundary_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    published_page: 78
+    marker: symbol 2 red open circle
+    note: Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference
+      list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre
+      on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid).
+      The two rasters are separate measurements.
+  units: K
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    property_kind: not_a_liquidus_or_solidus
+    status: typed_refusal
+    reason: The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+    T_K: 2.82e3
+    T_K_read_2: '2823.9'
+    cao_mol_pct_read: '80.0'
+    cao_mol_pct_read_2: '80.0'
+    embedded_px_read_1:
+    - '539.11'
+    - '198.5'
+    embedded_px_read_2:
+    - '539.3'
+    - '198.53'
+    page_600dpi_px_read_1:
+    - '1925.9'
+    - '2722.9'
+    page_600dpi_px_read_2:
+    - '1926.5'
+    - '2723'
+    read_uncertainty_K: '4.0'
+    read_uncertainty_mol_pct: '0.03'
+    read_1_method: jpeg_hole_centroid
+    read_2_method: visual_page_grid
+    attribution: 'Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933; Afanasjev & Saldau,
+      1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the marker is figure_only.'
+    T_K_read_1: '2824.0'
+    cao_mol_pct_read_1: '80.0'
+    read_2_evidence: Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre, with a 10 px grid. The
+      centre was estimated on that crop, not by a second segmentation.
+    schema_gap: The marker is inside a phase field or on an overlap whose centre is not the liquidus or the solidus line.
+      It is not given either of those identities. identity.py requires composition only for solidus, liquidus, and glass.
+      No other subtype keeps composition required, and a generic subtype would mark it not applicable. The point stays in
+      context. The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_fig1_s2_12
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_fig1_s2_13
+  type: figure_boundary_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    published_page: 78
+    marker: symbol 2 red open circle
+    note: Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference
+      list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre
+      on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid).
+      The two rasters are separate measurements.
+  units: K
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    property_kind: not_a_liquidus_or_solidus
+    status: typed_refusal
+    reason: The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+    T_K: 2.84e3
+    T_K_read_2: '2836.7'
+    cao_mol_pct_read: '90.0'
+    cao_mol_pct_read_2: '90.0'
+    embedded_px_read_1:
+    - '594.75'
+    - '192.62'
+    embedded_px_read_2:
+    - '595.08'
+    - '192.7'
+    page_600dpi_px_read_1:
+    - '2093'
+    - '2705.3'
+    page_600dpi_px_read_2:
+    - '2094'
+    - '2705.5'
+    read_uncertainty_K: '3.3'
+    read_uncertainty_mol_pct: '0.03'
+    read_1_method: jpeg_hole_centroid
+    read_2_method: visual_page_grid
+    attribution: 'Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933; Afanasjev & Saldau,
+      1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the marker is figure_only.'
+    T_K_read_1: '2837.0'
+    cao_mol_pct_read_1: '90.0'
+    read_2_evidence: Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre, with a 10 px grid. The
+      centre was estimated on that crop, not by a second segmentation.
+    schema_gap: The marker is inside a phase field or on an overlap whose centre is not the liquidus or the solidus line.
+      It is not given either of those identities. identity.py requires composition only for solidus, liquidus, and glass.
+      No other subtype keeps composition required, and a generic subtype would mark it not applicable. The point stays in
+      context. The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_fig1_s2_13
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_fig1_s2_14
+  type: figure_boundary_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    published_page: 78
+    marker: symbol 2 red open circle
+    note: Figure 1 symbol 2 (red open circle), Afanasjev & Saldau, 1950. The caption year for symbol 3 is 1965; the reference
+      list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre
+      on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid).
+      The two rasters are separate measurements.
+  units: K
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    property_kind: not_a_liquidus_or_solidus
+    status: typed_refusal
+    reason: The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+    T_K: 2.84e3
+    T_K_read_2: '2843.0'
+    cao_mol_pct_read: 1.00e2
+    cao_mol_pct_read_2: '100.0'
+    embedded_px_read_1:
+    - '650.23'
+    - '189.87'
+    embedded_px_read_2:
+    - '650.52'
+    - '189.86'
+    page_600dpi_px_read_1:
+    - '2259.6'
+    - '2697'
+    page_600dpi_px_read_2:
+    - '2260.5'
+    - '2697'
+    read_uncertainty_K: '3.1'
+    read_uncertainty_mol_pct: '0.04'
+    read_1_method: jpeg_hole_centroid
+    read_2_method: visual_page_grid
+    attribution: 'Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933; Afanasjev & Saldau,
+      1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the marker is figure_only.'
+    T_K_read_1: '2843.1'
+    cao_mol_pct_read_1: '100.0'
+    read_2_evidence: Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre, with a 10 px grid. The
+      centre was estimated on that crop, not by a second segmentation.
+    schema_gap: The marker is inside a phase field or on an overlap whose centre is not the liquidus or the solidus line.
+      It is not given either of those identities. identity.py requires composition only for solidus, liquidus, and glass.
+      No other subtype keeps composition required, and a generic subtype would mark it not applicable. The point stays in
+      context. The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_fig1_s2_14
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_fig1_s3_04
+  type: figure_boundary_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    published_page: 78
+    marker: symbol 3 blue filled circle
+    note: Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol 3 is 1965; the reference
+      list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre
+      on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid).
+      The two rasters are separate measurements.
+  units: K
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    property_kind: not_a_liquidus_or_solidus
+    status: typed_refusal
+    reason: The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+    T_K: 2.60e3
+    T_K_read_2: '2604.2'
+    cao_mol_pct_read: '6.45'
+    cao_mol_pct_read_2: '6.4'
+    embedded_px_read_1:
+    - '130.82'
+    - '298.34'
+    embedded_px_read_2:
+    - '130.68'
+    - '298.13'
+    page_600dpi_px_read_1:
+    - '699.9'
+    - '3022.6'
+    page_600dpi_px_read_2:
+    - '699.5'
+    - '3022'
+    read_uncertainty_K: '4.2'
+    read_uncertainty_mol_pct: '0.05'
+    read_1_method: jpeg_interior_centroid
+    read_2_method: visual_page_grid
+    attribution: 'Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933; Afanasjev & Saldau,
+      1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the marker is figure_only.'
+    T_K_read_1: '2603.9'
+    cao_mol_pct_read_1: '6.5'
+    read_2_evidence: Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre, with a 10 px grid. The
+      centre was estimated on that crop, not by a second segmentation.
+    schema_gap: The marker sits on a solid-solution boundary (regions I/II, I/III, or IV). The caption's regions I and II
+      contain no liquid. It is not a liquidus or a solidus. identity.py requires composition only for solidus, liquidus, and
+      glass. No other subtype keeps composition required, and a generic subtype would mark it not applicable. The point stays
+      in context. The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_fig1_s3_04
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_fig1_s3_08
+  type: figure_boundary_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    published_page: 78
+    marker: symbol 3 blue filled circle
+    note: Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol 3 is 1965; the reference
+      list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre
+      on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid).
+      The two rasters are separate measurements.
+  units: K
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    property_kind: not_a_liquidus_or_solidus
+    status: typed_refusal
+    reason: The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+    T_K: 2.74e3
+    T_K_read_2: '2742.7'
+    cao_mol_pct_read: '74.3'
+    cao_mol_pct_read_2: '74.2'
+    embedded_px_read_1:
+    - '507.32'
+    - '235.22'
+    embedded_px_read_2:
+    - '507.16'
+    - '235.34'
+    page_600dpi_px_read_1:
+    - '1830.5'
+    - '2833.1'
+    page_600dpi_px_read_2:
+    - '1830'
+    - '2833.5'
+    read_uncertainty_K: '3.1'
+    read_uncertainty_mol_pct: '0.10'
+    read_1_method: jpeg_interior_centroid
+    read_2_method: visual_page_grid
+    attribution: 'Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933; Afanasjev & Saldau,
+      1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the marker is figure_only.'
+    T_K_read_1: '2743.1'
+    cao_mol_pct_read_1: '74.3'
+    read_2_evidence: Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre, with a 10 px grid. The
+      centre was estimated on that crop, not by a second segmentation.
+    schema_gap: The marker is inside a phase field or on an overlap whose centre is not the liquidus or the solidus line.
+      It is not given either of those identities. identity.py requires composition only for solidus, liquidus, and glass.
+      No other subtype keeps composition required, and a generic subtype would mark it not applicable. The point stays in
+      context. The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_fig1_s3_08
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_fig1_s3_09
+  type: figure_boundary_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    published_page: 78
+    marker: symbol 3 blue filled circle
+    note: Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol 3 is 1965; the reference
+      list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre
+      on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid).
+      The two rasters are separate measurements.
+  units: K
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    property_kind: not_a_liquidus_or_solidus
+    status: typed_refusal
+    reason: The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+    T_K: 2.61e3
+    T_K_read_2: '2609.0'
+    cao_mol_pct_read: '80.7'
+    cao_mol_pct_read_2: '80.7'
+    embedded_px_read_1:
+    - '543.09'
+    - '295.81'
+    embedded_px_read_2:
+    - '543.29'
+    - '295.97'
+    page_600dpi_px_read_1:
+    - '1937.9'
+    - '3015'
+    page_600dpi_px_read_2:
+    - '1938.5'
+    - '3015.5'
+    read_uncertainty_K: '1.0'
+    read_uncertainty_mol_pct: '0.03'
+    read_1_method: jpeg_interior_centroid
+    read_2_method: visual_page_grid
+    attribution: 'Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933; Afanasjev & Saldau,
+      1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the marker is figure_only.'
+    T_K_read_1: '2609.5'
+    cao_mol_pct_read_1: '80.7'
+    read_2_evidence: Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre, with a 10 px grid. The
+      centre was estimated on that crop, not by a second segmentation.
+    schema_gap: The marker sits on a solid-solution boundary (regions I/II, I/III, or IV). The caption's regions I and II
+      contain no liquid. It is not a liquidus or a solidus. identity.py requires composition only for solidus, liquidus, and
+      glass. No other subtype keeps composition required, and a generic subtype would mark it not applicable. The point stays
+      in context. The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_fig1_s3_09
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_fig1_s3_11
+  type: figure_boundary_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '1'
+    published_page: 78
+    marker: symbol 3 blue filled circle
+    note: Figure 1 symbol 3 (blue filled circle), Doman et al., 1965. The caption year for symbol 3 is 1965; the reference
+      list says Doman et al. (1963). The caption spelling is kept. Linear T (K) versus mol% CaO. Read 1 is the marker centre
+      on the embedded JPEG. Read 2 is a visual centre of the marker on a fresh 600 dpi render of PDF page 2 (visual_page_grid).
+      The two rasters are separate measurements.
+  units: K
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    property_kind: not_a_liquidus_or_solidus
+    status: typed_refusal
+    reason: The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+    T_K: 2.90e3
+    T_K_read_2: '2898.1'
+    cao_mol_pct_read: 1.00e2
+    cao_mol_pct_read_2: '100.0'
+    embedded_px_read_1:
+    - '650.21'
+    - '164.91'
+    embedded_px_read_2:
+    - '650.52'
+    - '164.88'
+    page_600dpi_px_read_1:
+    - '2259.6'
+    - '2622.1'
+    page_600dpi_px_read_2:
+    - '2260.5'
+    - '2622'
+    read_uncertainty_K: '1.9'
+    read_uncertainty_mol_pct: '0.03'
+    read_1_method: jpeg_interior_centroid
+    read_2_method: visual_page_grid
+    attribution: 'Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933; Afanasjev & Saldau,
+      1950; Doman et al., 1965; Foex, 1968). Those parents are not stored, so the marker is figure_only.'
+    T_K_read_1: '2898.1'
+    cao_mol_pct_read_1: '100.0'
+    read_2_evidence: Fresh 3x nearest-neighbor crop of the 600 dpi page, offset from the JPEG centre, with a 10 px grid. The
+      centre was estimated on that crop, not by a second segmentation.
+    schema_gap: The marker is inside a phase field or on an overlap whose centre is not the liquidus or the solidus line.
+      It is not given either of those identities. identity.py requires composition only for solidus, liquidus, and glass.
+      No other subtype keeps composition required, and a generic subtype would mark it not applicable. The point stays in
+      context. The read width is the difference of two digitised centre reads, not a number the paper prints. observation.uncertainty
+      and T_m_uncertainty_K both migrate as UncertaintyKind.PRINTED, and no extract field stores UncertaintyKind.DERIVED.
+      The marker is typed-refused so that width is not stored as a printed band.
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_fig1_s3_11
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_fig2b_series1_mixing_energy
+  type: figure_mixing_energy
+  locator:
+    page: 3
+    pdf_page_index: 2
+    figure: '2'
+    published_page: 79
+    note: Figure 2 panel b series 1 at 2973 K, present study. Calculated curve. No data markers. Not sampled.
+  units: kJ/mol
+  values:
+    quantity_as_printed: ΔG^m, kJ/mol
+    method_class: figure_only
+    temperature_K_as_printed: '2973'
+    status: typed_refusal
+    unavailable_reason: model_curve_not_sampled
+    value_as_printed: not sampled
+    schema_gap: The ordinate is the mixing energy ΔG^m in kJ/mol. Quantity has no mixing-energy token, so the curve is context
+      and is not stored as delta_fG.
+    attribution: 'Figure 2 caption: mixing energies; series 1 is present study at 2973 K. Panel b shows curves, not markers.'
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_fig2b_series1_mixing_energy
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_fig2b_series2_mixing_energy
+  type: figure_mixing_energy
+  locator:
+    page: 3
+    pdf_page_index: 2
+    figure: '2'
+    published_page: 79
+    note: Figure 2 panel b series 2 at 3173 K, present study. Calculated curve. No data markers. Not sampled.
+  units: kJ/mol
+  values:
+    quantity_as_printed: ΔG^m, kJ/mol
+    method_class: figure_only
+    temperature_K_as_printed: '3173'
+    status: typed_refusal
+    unavailable_reason: model_curve_not_sampled
+    value_as_printed: not sampled
+    schema_gap: The ordinate is the mixing energy ΔG^m in kJ/mol. Quantity has no mixing-energy token, so the curve is context
+      and is not stored as delta_fG.
+    attribution: 'Figure 2 caption: mixing energies; series 2 is present study at 3173 K. Panel b shows curves, not markers.'
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_fig2b_series2_mixing_energy
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_fig2b_series3_mixing_energy
+  type: figure_mixing_energy
+  locator:
+    page: 3
+    pdf_page_index: 2
+    figure: '2'
+    published_page: 79
+    note: Figure 2 panel b series 3 at 2973 K, Wu et al. (1993). Calculated curve. No data markers. Not sampled.
+  units: kJ/mol
+  values:
+    quantity_as_printed: ΔG^m, kJ/mol
+    method_class: figure_only
+    temperature_K_as_printed: '2973'
+    status: typed_refusal
+    unavailable_reason: model_curve_not_sampled
+    value_as_printed: not sampled
+    schema_gap: The ordinate is the mixing energy ΔG^m in kJ/mol. Quantity has no mixing-energy token, so the curve is context
+      and is not stored as delta_fG.
+    attribution: 'Figure 2 caption: mixing energies; series 3 is Wu et al. (1993) at 2973 K. Panel b shows curves, not markers.'
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_fig2b_series3_mixing_energy
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_fig2b_series7_mixing_energy
+  type: figure_mixing_energy
+  locator:
+    page: 3
+    pdf_page_index: 2
+    figure: '2'
+    published_page: 79
+    note: Figure 2 panel b series 7 at 3173 K, Wu et al. (1993). Calculated curve. No data markers. Not sampled.
+  units: kJ/mol
+  values:
+    quantity_as_printed: ΔG^m, kJ/mol
+    method_class: figure_only
+    temperature_K_as_printed: '3173'
+    status: typed_refusal
+    unavailable_reason: model_curve_not_sampled
+    value_as_printed: not sampled
+    schema_gap: The ordinate is the mixing energy ΔG^m in kJ/mol. Quantity has no mixing-energy token, so the curve is context
+      and is not stored as delta_fG.
+    attribution: 'Figure 2 caption: mixing energies; series 7 is Wu et al. (1993) at 3173 K. Panel b shows curves, not markers.'
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_fig2b_series7_mixing_energy
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_prose_eutectic_range
+  type: quoted_prose_schema_gap
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 77
+    note: Right-hand column, published page 77.
+  units: as printed
+  values:
+    value_as_printed: from 45 (Afanasjev & Saldau, 1950) to 59 mol. % CaO (Doman et al., 1963) and from 2553 (Wartenberg &
+      Prophet, 1932; Wartenberg et al., 1937) to 2643 K (Ruff et al., 1933; Doman et al., 1963)
+    attribution: Shornikov's summary of the eutectic literature on published page 77.
+    conditions_as_printed: eutectic positions in the CaO–MgO system
+    uncertainty_as_printed: the sentence prints the range, not a single ±
+    phase_as_printed: eutectic
+    schema_gap: OBSERVATION_TYPES has no formation-enthalpy or entropy type, and AmountBasis has no mole-percent token. The
+      printed sentence is context. It is not a scored observation.
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_prose_eutectic_range
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_prose_kubaschewski_camgo2
+  type: quoted_prose_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 78
+    note: Prose under Fig. 1, published page 78.
+  units: as printed
+  values:
+    value_as_printed: Kubaschewski (1972) reported of CaMgO2 decomposing at 2573 K. The enthalpy of formation (ΔfH298) of
+      this compound calculated by Kubashevsky was –3.77±0.62 kJ/mol.
+    attribution: Kubaschewski (1972), quoted by Shornikov. The paper spells Kubashevsky in that sentence.
+    conditions_as_printed: ΔfH298; decomposition of CaMgO2 at 2573 K
+    uncertainty_as_printed: ±0.62 kJ/mol on ΔfH298; 2573 K is printed without a ±
+    phase_as_printed: CaMgO2
+    source_criticism: No compounds or solid-solution regions were detected in the CaO–MgO system at 1173–1273 K (Fletcher
+      et al., 1970; Terpstra et al., 1984), so Shornikov says the compound decomposes at a significantly lower temperature
+      than Kubaschewski reports.
+    schema_gap: OBSERVATION_TYPES has no formation-enthalpy or entropy type, and AmountBasis has no mole-percent token. The
+      printed sentence is context. It is not a scored observation.
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_prose_kubaschewski_camgo2
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_prose_liquidus_sources
+  type: quoted_prose_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 78
+    note: The sentence begins at the bottom of published page 77 and ends on page 78.
+  units: as printed
+  values:
+    value_as_printed: the liquidus line in the phase diagram of the CaO–MgO system in Fig. 1 was constructed based on the
+      agreed data obtained in (Foex, 1968; Ronchi & Sheindlin, 2001; Manara et al., 2014)
+    attribution: Shornikov, published pages 77–78. This is the stated source of the Fig. 1 liquidus.
+    schema_gap: The sentence names the parents of the liquidus and does not add a table cell. Those parents are not stored.
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_prose_liquidus_sources
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_prose_mixing_minimum
+  type: prose_mixing_energy_comparison
+  locator:
+    page: 3
+    pdf_page_index: 2
+    figure: '2'
+    published_page: 79
+    note: Prose under Figure 2. Not a sampled curve.
+  units: kJ/mol
+  values:
+    value_as_printed: its minimum value is in the range from –10 kJ/mol (at 2973 K) to –14 kJ/mol (at 3173 K). The ΔGm minimum
+      value is in the concentration range of 50–55 mol. % CaO.
+    schema_gap: The ordinate is the mixing energy ΔG^m in kJ/mol. Quantity has no mixing-energy token, so the sentence is
+      context and is not stored as delta_fG.
+    attribution: Page 79 prose. The numbers are the author's description of Figure 2b, not a table cell.
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_prose_mixing_minimum
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_prose_powell_searcy
+  type: quoted_prose_schema_gap
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 78
+    note: Prose under Fig. 1, published page 78.
+  units: as printed
+  values:
+    value_as_printed: dolomite decomposes into gaseous CO2 and glassy CaMgO2, for which ΔfH850 = 78.65 kJ/mol and ΔfS850 =36.82
+      J/mol/K
+    attribution: Powell & Searcy (1978), quoted by Shornikov.
+    conditions_as_printed: 850 K; dolomite decomposition in vacuum at 770–900 K by the torsion method
+    uncertainty_as_printed: the quotation prints neither a ± on 78.65 kJ/mol nor on 36.82 J/mol/K
+    phase_as_printed: glassy CaMgO2 and gaseous CO2
+    source_criticism: Shornikov says the glassy CaMgO2 claim rests on broad x-ray peaks that could be an oxide mixture, and
+      that the torsion data disagree because condensation and self-cooling were not taken into account (Lvov & Ugolkov, 2003).
+      That is his explanation of the difference from Kubaschewski (1972) and Barin (1995).
+    schema_gap: OBSERVATION_TYPES has no formation-enthalpy or entropy type, and AmountBasis has no mole-percent token. The
+      printed sentence is context. It is not a scored observation.
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_prose_powell_searcy
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO
+- observation_id: shornikov_2020_prose_rankin_merwin_eutectic
+  type: quoted_prose_schema_gap
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 77
+    note: Right-hand column, published page 77.
+  units: as printed
+  values:
+    value_as_printed: 59 mol. % CaO at 2573±50 K
+    attribution: Rankin & Merwin (1916), quoted by Shornikov.
+    conditions_as_printed: eutectic composition in the CaO–MgO system
+    uncertainty_as_printed: ±50 K
+    phase_as_printed: eutectic
+    schema_gap: OBSERVATION_TYPES has no formation-enthalpy or entropy type, and AmountBasis has no mole-percent token. The
+      printed sentence is context. It is not a scored observation.
+  context_id: shornikov-2020-cao-mgo-thermodynamics::context::shornikov_2020_prose_rankin_merwin_eutectic
+  work_id: ad5ed30f5286daf06c48e508d757773285c070b30841bc7cf7c98fc5405fccae
+  source_id: shornikov-2020-cao-mgo-thermodynamics
+  species: CaO-MgO

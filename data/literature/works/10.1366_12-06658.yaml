@@ -1,0 +1,480 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1366/12-06658
+  citation: Wetzel, S., Klevenz, M., Pucci, A. & Gail, H.-P. (2012). The Temperature-Dependent Decomposition of SiO Studied
+    by Infrared Vibrational Spectroscopy. Applied Spectroscopy 66(9), 1061–1067.
+  source_ids:
+  - lead-25-wetzel-2012a
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:lead-25-wetzel-2012a
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1366/12-06658
+experiments: []
+context:
+- observation_id: wetzel_2012_equation4_as1_position_fit
+  type: model_equation_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1064
+    equation: '4'
+  phase: condensed_amorphous_SiO_film
+  units: cm^-1
+  values:
+    method_class: model_derived
+    quantity_as_printed: fitted AS1 mode position
+    equation_as_printed: x_AS1 [cm^-1] = (0.089 ± 0.003) T/K + (953 ± 2) [cm^-1]
+    slope: '0.089'
+    slope_uncertainty: '0.003'
+    intercept_cm-1: 953
+    intercept_uncertainty_cm-1: 2
+    note: Fit coefficients are model-derived; no compatible wavenumber quantity token exists.
+  context_id: lead-25-wetzel-2012a::context::wetzel_2012_equation4_as1_position_fit
+  work_id: 10.1366/12-06658
+  source_id: lead-25-wetzel-2012a
+  species: SiO
+- observation_id: wetzel_2012_equation5_as2_position_fit
+  type: model_equation_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1064
+    equation: '5'
+  phase: condensed_amorphous_SiO_film
+  units: cm^-1
+  values:
+    method_class: model_derived
+    quantity_as_printed: fitted AS2 mode position
+    equation_as_printed: x_AS2 [cm^-1] = (0.070 ± 0.004) T/K + (1075 ± 2) [cm^-1]
+    slope: '0.07'
+    slope_uncertainty: '0.004'
+    intercept_cm-1: 1075
+    intercept_uncertainty_cm-1: 2
+    note: Fit coefficients are model-derived; no compatible wavenumber quantity token exists.
+  context_id: lead-25-wetzel-2012a::context::wetzel_2012_equation5_as2_position_fit
+  work_id: 10.1366/12-06658
+  source_id: lead-25-wetzel-2012a
+  species: SiO
+- observation_id: wetzel_2012_figure_1_deferred
+  type: figure_only
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 1062
+    figure: '1'
+  phase: condensed_amorphous_SiO_structure_schematic
+  units: no numeric units; structural schematic
+  values:
+    method_class: figure_only
+    quantity_as_printed: oxygen bridge and Si-SiyO4-y tetrahedron schematic
+    quantity_token: unavailable
+    species: SiO
+    temperature: not_applicable_schematic
+    axes_as_printed: none
+    caption: Oxygen bridge and different Si-SiyO4-y tetrahedra (0 <= y <= 4) according to the random bonding model; Si and
+      O atoms are distinguished by color.
+    panel: none
+    series: []
+    marker_count_per_series: []
+    attribution: random bonding model, Philipp (1971), reference 12
+    digitisation: deferred to a figure pass
+  context_id: lead-25-wetzel-2012a::context::wetzel_2012_figure_1_deferred
+  work_id: 10.1366/12-06658
+  source_id: lead-25-wetzel-2012a
+  species: SiO
+- observation_id: wetzel_2012_figure_2_deferred
+  type: figure_only
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1063
+    figure: '2'
+  phase: condensed_amorphous_SiO_film_on_Si
+  units: wavenumber in cm^-1; transmittance relative
+  values:
+    method_class: figure_only
+    quantity_as_printed: normal transmittance spectra
+    quantity_token: unavailable
+    species: SiO
+    temperature: substrate temperatures indicated in panels a-e
+    axes_as_printed:
+      x: wavenumber [cm^-1]
+      y: normal transmittance
+    caption: Selected normal transmittance spectra during SiO condensation on Si at indicated substrate temperatures; five
+      film thicknesses from 0 to 40 nm are shown for each.
+    panel: a-e
+    series:
+    - label: substrate temperature panels a-e, five thickness spectra per panel
+      marker_count: 0
+      line_series_count: 25
+    attribution: Wetzel et al. (2012), measured spectra
+    digitisation: deferred to a figure pass
+  context_id: lead-25-wetzel-2012a::context::wetzel_2012_figure_2_deferred
+  work_id: 10.1366/12-06658
+  source_id: lead-25-wetzel-2012a
+  species: SiO
+- observation_id: wetzel_2012_figure_3_deferred
+  type: figure_only
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1063
+    figure: '3'
+  phase: condensed_amorphous_SiO_film
+  units: wavenumber and widths in cm^-1; oscillator strength as plotted
+  values:
+    method_class: figure_only
+    quantity_as_printed: fitted vibrational wavenumbers, Gaussian widths, and oscillator strengths
+    quantity_token: unavailable
+    species: SiO
+    temperature: substrate temperature T [K]
+    axes_as_printed:
+      x: substrate temperature T [K]
+      y_panels_a_b: peak position [cm^-1]
+      y_panel_c: sum of Gaussian widths [cm^-1]
+      y_panel_d: sum of oscillator strengths
+    caption: Fitted AS1 and AS2 peak positions and sums of their Gaussian widths and oscillator strengths versus substrate
+      temperature.
+    panel: a-d
+    series:
+    - label: panel a, AS1 peak position
+      marker_count: 5
+    - label: panel b, AS2 peak position
+      marker_count: 5
+    - label: panel c, summed Gaussian widths
+      marker_count: 5
+    - label: panel d, summed oscillator strengths
+      marker_count: 5
+    attribution: Wetzel et al. (2012), fitted from measured spectra
+    digitisation: deferred to a figure pass
+  context_id: lead-25-wetzel-2012a::context::wetzel_2012_figure_3_deferred
+  work_id: 10.1366/12-06658
+  source_id: lead-25-wetzel-2012a
+  species: SiO
+- observation_id: wetzel_2012_figure_4_deferred
+  type: figure_only
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1064
+    figure: '4'
+  phase: condensed_amorphous_SiO_film_on_Si
+  units: wavenumber in cm^-1; relative transmittance
+  values:
+    method_class: figure_only
+    quantity_as_printed: relative transmittance spectrum and dielectric-function fit
+    quantity_token: unavailable
+    species: SiO
+    temperature: 93 K substrate temperature
+    axes_as_printed:
+      x: wavenumber [cm^-1]
+      y: relative transmittance
+    caption: Measurement at substrate temperature 93 K and film thickness 40 nm compared to the best fit with the dielectric-function
+      model.
+    panel: none
+    series:
+    - label: measured spectrum
+      marker_count: 0
+      curve_count: 1
+    - label: dielectric-function best fit
+      marker_count: 0
+      curve_count: 1
+    attribution: Wetzel et al. (2012), measurement and fitted model
+    digitisation: deferred to a figure pass
+  context_id: lead-25-wetzel-2012a::context::wetzel_2012_figure_4_deferred
+  work_id: 10.1366/12-06658
+  source_id: lead-25-wetzel-2012a
+  species: SiO
+- observation_id: wetzel_2012_figure_5_deferred
+  type: figure_only
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1064
+    figure: '5'
+  phase: condensed_amorphous_SiO_film_and_SiO2_reference_film
+  units: wavenumber in cm^-1; relative transmittance
+  values:
+    method_class: figure_only
+    quantity_as_printed: relative transmittance spectra
+    quantity_token: unavailable
+    species: SiO
+    temperature: annealing temperatures 300, 573, 873, 1073 K in panel a; panel b compares 300 and 873 K SiO with SiO2
+    axes_as_printed:
+      x: wavenumber [cm^-1]
+      y: relative transmittance
+    caption: Relative transmittance spectra of a 100 nm SiO film for selected 100 min annealing pulses (panel a), and a 100
+      nm SiO2 calculation compared with SiO spectra at 300 K and 873 K (panel b).
+    panel: a-b
+    series:
+    - label: panel a, annealed SiO at 300, 573, 873, 1073 K
+      marker_count: 0
+      curve_count: 4
+    - label: panel b, SiO at 300 K and 873 K and calculated SiO2
+      marker_count: 0
+      curve_count: 3
+    attribution: Wetzel et al. (2012) measurements; SiO2 calculation uses SCOUT and optical data from Gunde, reference 36.
+    digitisation: deferred to a figure pass
+  context_id: lead-25-wetzel-2012a::context::wetzel_2012_figure_5_deferred
+  work_id: 10.1366/12-06658
+  source_id: lead-25-wetzel-2012a
+  species: SiO
+- observation_id: wetzel_2012_figure_6_deferred
+  type: figure_only
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 1065
+    figure: '6'
+  phase: condensed_amorphous_SiO_film
+  units: wavenumber in cm^-1; temperature in K
+  values:
+    method_class: figure_only
+    quantity_as_printed: fitted AS1 and AS2 peak positions
+    quantity_token: unavailable
+    species: SiO
+    temperature: condensation temperature or highest annealing temperature T [K]
+    axes_as_printed:
+      x: temperature T [K]
+      y: peak position [cm^-1]
+    caption: Peak positions of oxygen-stretching modes AS1 (panel a) and AS2 (panel b) versus condensation temperature or
+      highest annealing temperature.
+    panel: a-b
+    series:
+    - label: panel a, condensation
+      marker_count: 5
+    - label: panel a, annealing
+      marker_count: 7
+    - label: panel b, condensation
+      marker_count: 5
+    - label: panel b, annealing
+      marker_count: 8
+    attribution: Wetzel et al. (2012), fitted from measured spectra
+    digitisation: deferred to a figure pass
+  context_id: lead-25-wetzel-2012a::context::wetzel_2012_figure_6_deferred
+  work_id: 10.1366/12-06658
+  source_id: lead-25-wetzel-2012a
+  species: SiO
+- observation_id: wetzel_2012_figure_7_deferred
+  type: figure_only
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 1065
+    figure: '7'
+  phase: condensed_amorphous_SiO_film_on_Si
+  units: wavenumber in cm^-1; relative transmittance
+  values:
+    method_class: figure_only
+    quantity_as_printed: relative transmittance spectra
+    quantity_token: unavailable
+    species: SiO
+    temperature: 473 K annealing and substrate condensation
+    axes_as_printed:
+      x: wavenumber [cm^-1]
+      y: relative transmittance
+    caption: Spectrum of the film annealed at 473 K compared with a condensation spectrum on a substrate heated to the same
+      temperature; the substrate spectrum was scaled for film-thickness difference.
+    panel: none
+    series:
+    - label: annealed film
+      marker_count: 0
+      curve_count: 1
+    - label: heated-substrate condensation film
+      marker_count: 0
+      curve_count: 1
+    attribution: Wetzel et al. (2012), measured spectra
+    digitisation: deferred to a figure pass
+  context_id: lead-25-wetzel-2012a::context::wetzel_2012_figure_7_deferred
+  work_id: 10.1366/12-06658
+  source_id: lead-25-wetzel-2012a
+  species: SiO
+- observation_id: wetzel_2012_figure_8_deferred
+  type: figure_only
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 1065
+    figure: '8'
+  phase: condensed_amorphous_SiO_film_and_SiO2_reference_film
+  units: wavenumber in cm^-1; relative transmittance
+  values:
+    method_class: figure_only
+    quantity_as_printed: silicon-stretching mode relative transmittance spectra
+    quantity_token: unavailable
+    species: SiO
+    temperature: 40, 300, 473, 673, 873, 973 K, with a 100 nm SiO2 comparison
+    axes_as_printed:
+      x: wavenumber [cm^-1]
+      y: relative transmittance
+    caption: SS-mode region of selected spectra from Figure 5 and the 40 K spectrum from Figure 2 compared to 100 nm SiO2;
+      spectra are vertically shifted for illustration.
+    panel: none
+    series:
+    - label: SiO spectra at 40, 300, 473, 673, 873, and 973 K
+      marker_count: 0
+      curve_count: 6
+    - label: SiO2 reference
+      marker_count: 0
+      curve_count: 1
+    attribution: Wetzel et al. (2012) measurements; SiO2 comparison uses SCOUT and optical data from Gunde, reference 36.
+    digitisation: deferred to a figure pass
+  context_id: lead-25-wetzel-2012a::context::wetzel_2012_figure_8_deferred
+  work_id: 10.1366/12-06658
+  source_id: lead-25-wetzel-2012a
+  species: SiO
+- observation_id: wetzel_2012_table1_brendel_parameters
+  type: model_derived_table_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1064
+    table: I
+    note: All entries in Table I were checked against the 600 dpi page render.
+  phase: condensed_amorphous_SiO_film
+  units: cm^-1 as printed in the table caption
+  values:
+    method_class: model_derived
+    quantity_as_printed: Brendel oscillator parameters for the dielectric function
+    quantity_token: unavailable
+    quantity_token_gap: Vibrational resonance wavenumber, oscillator strength, and Gaussian width are not represented by an
+      existing quantity enum.
+    c_fixed_cm-1: 4
+    epsilon_infinity: '3.61'
+    rows:
+    - T_K: 40
+      x0_AS1_cm-1: 957
+      x0_AS2_cm-1: 1077
+      x0_SS_cm-1: 693
+    - T_K: 93
+      x0_AS1_cm-1: 966
+      x0_AS2_cm-1: 1082
+      x0_SS_cm-1: 726
+    - T_K: 300
+      x0_AS1_cm-1: 978
+      x0_AS2_cm-1: 1093
+      x0_SS_cm-1: 717
+    - T_K: 373
+      x0_AS1_cm-1: 987
+      x0_AS2_cm-1: 1099
+      x0_SS_cm-1: 724
+    - T_K: 473
+      x0_AS1_cm-1: 998
+      x0_AS2_cm-1: 1110
+      x0_SS_cm-1: 730
+    oscillator_strength_rows:
+    - T_K: 40
+      X_AS1: 682
+      X_AS2: 336
+      X_SS: 366
+    - T_K: 93
+      X_AS1: 685
+      X_AS2: 324
+      X_SS: 296
+    - T_K: 300
+      X_AS1: 679
+      X_AS2: 334
+      X_SS: 313
+    - T_K: 373
+      X_AS1: 677
+      X_AS2: 327
+      X_SS: 282
+    - T_K: 473
+      X_AS1: 686
+      X_AS2: 334
+      X_SS: 303
+    gaussian_width_rows:
+    - T_K: 40
+      sigma_AS1_cm-1: 63
+      sigma_AS2_cm-1: 52
+      sigma_SS_cm-1: 85
+    - T_K: 93
+      sigma_AS1_cm-1: 61
+      sigma_AS2_cm-1: 49
+      sigma_SS_cm-1: 73
+    - T_K: 300
+      sigma_AS1_cm-1: 56
+      sigma_AS2_cm-1: 48
+      sigma_SS_cm-1: 77
+    - T_K: 373
+      sigma_AS1_cm-1: 54
+      sigma_AS2_cm-1: 46
+      sigma_SS_cm-1: 71
+    - T_K: 473
+      sigma_AS1_cm-1: 52
+      sigma_AS2_cm-1: 46
+      sigma_SS_cm-1: 73
+    cell_audit:
+      source: pdftotext-layout.txt and PDF render
+      render: 600 dpi, PDF page 4
+      numeric_cells_checked: 61
+      printed_data_rows: 15
+      result: every displayed cell agrees with the rendered page
+  context_id: lead-25-wetzel-2012a::context::wetzel_2012_table1_brendel_parameters
+  work_id: 10.1366/12-06658
+  source_id: lead-25-wetzel-2012a
+  species: SiO
+- observation_id: wetzel_2012_text_reported_results
+  type: measured_spectral_result_context
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 1061
+    section: Abstract and Results
+  phase: condensed_amorphous_SiO_film
+  units: mixed printed units, retained in the field names
+  values:
+    method_class: measured_direct
+    quantity_as_printed: infrared vibrational spectral positions and processing conditions
+    quantity_token: unavailable
+    quantity_token_gap: Infrared wavenumber and transmittance are not represented by existing quantity enums; numerical values
+      are preserved here with their printed units and meaning.
+    spectral_range_cm-1:
+    - 450
+    - 5000
+    condensation_substrate_temperature_range_K:
+    - 40
+    - 573
+    post_annealing_temperature_range_K:
+    - 373
+    - 1173
+    reported_AS1_wavenumber_at_40_K_cm-1: 957
+    reported_AS1_wavenumber_at_473_K_cm-1: 998
+    strongest_vibrational_frequency_after_heating_cm-1: 1043
+    reported_SS_wavenumber_at_40_K_cm-1: 685
+    approximate_SS_peak_positions_at_higher_temperature_cm-1:
+    - 670
+    - 800
+    approximate_SS_peak_positions_at_higher_temperature_approximate: true
+    approximate_maximum_oxygen_stretch_position_temperature_K: 873
+    approximate_maximum_oxygen_stretch_position_temperature_approximate: true
+    annealing_temperature_at_or_above_sublimation_onset_K: 973
+    whole_film_re_evaporation_temperature_K: 1073
+    approximate_dominance_of_SiO4_units_temperature_K: 900
+    approximate_dominance_of_SiO4_units_temperature_approximate: true
+    method_conditions:
+      base_pressure_below_mbar: '0.0000000001'
+      evaporation_pressure_below_mbar: '0.000000001'
+      spectral_resolution_cm-1: 4
+      scans_per_deposition_spectrum: 200
+      typical_deposition_rate_nm_per_min:
+      - '0.5'
+      - '1.5'
+      deposition_rate_relative_error_percent_up_to: 10
+      annealing_film_thickness_nm: 100
+      annealing_pulse_duration_min: 100
+    note: The reported maxima near 873 K and 900 K and the SS peak positions near 670 and 800 cm^-1 are approximate as stated
+      in the text. Table I positions and strengths are fitted parameters, not independent plotted measurements.
+  context_id: lead-25-wetzel-2012a::context::wetzel_2012_text_reported_results
+  work_id: 10.1366/12-06658
+  source_id: lead-25-wetzel-2012a
+  species: SiO

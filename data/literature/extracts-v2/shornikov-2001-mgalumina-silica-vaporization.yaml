@@ -99,7 +99,7 @@ observations:
         pdf_page_index: 5
         figure: '2'
         note: Curve 5; CA-S comparative activity attributed by the caption to prior work.
-- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_al2o3_ma_s_2050k
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_al2o3_ma_s_2050k::T=2050:h=0dc7804e1db4
   experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
   identity:
     quantity:
@@ -142,8 +142,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgAl2O4
+          - '0.2531'
+        - - SiO2
+          - '0.7469'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -163,10 +170,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, activity_component, composition_component,
-      composition_basis, composition_axis_range_mole_percent, curve_as_printed, system_as_printed, temperature_as_printed_K,
-      source_attribution_as_printed, data_scope'
+    kind: point
+    point: '0.014'
     approximate: false
   uncertainty:
     kind: none
@@ -177,14 +182,15 @@ observations:
     original_method_class: figure_only
   admission:
     status: pending
-    reason: no observation admission_status mapped from source
+    reason: source admission_status=figure_only is not a closed v2.1 token
   notices: []
   source_id: shornikov-2001-mgalumina-silica-vaporization
   locator:
     published_page: 327
     pdf_page_index: 5
     figure: '2'
-    note: Curve 4; MA-S activity in this study.
+    note: Curve 4, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=b; symbol=filled
+      upward triangles
   read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
   point_conditions:
     temperature_K:
@@ -195,7 +201,539 @@ observations:
         published_page: 327
         pdf_page_index: 5
         figure: '2'
-        note: Curve 4; MA-S activity in this study.
+        note: Curve 4, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=b; symbol=filled
+          upward triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_pseudobinary_mole_percent
+          components:
+          - - MgAl2O4
+            - '0.2531'
+          - - SiO2
+            - '0.7469'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Printed x(SiO2)=74.69 mole%; complementary MgAl2O4 fraction=0.2531; log10(a(Al2O3))=-1.853; independent page-6
+          600-dpi pixel reads (6736.42,6681.83) and (6737.77,6683.03); read uncertainty 0.0006 dex; audit shornikov_2001_f2_al2o3_ma_s_2050k-05.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2001-mgalumina-silica-vaporization
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_al2o3_ma_s_2050k::T=2050:h=1cbe78d35976
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'MgAl2O4-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2050'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgAl2O4
+          - '0.8182'
+        - - SiO2
+          - '0.1818'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.2'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 4, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=b; symbol=filled
+      upward triangles
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2050'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 4, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=b; symbol=filled
+          upward triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_pseudobinary_mole_percent
+          components:
+          - - MgAl2O4
+            - '0.8182'
+          - - SiO2
+            - '0.1818'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Printed x(SiO2)=18.18 mole%; complementary MgAl2O4 fraction=0.8182; log10(a(Al2O3))=-0.706; independent page-6
+          600-dpi pixel reads (4204.17,5462.92) and (4204.58,5464.29); read uncertainty 0.0006 dex; audit shornikov_2001_f2_al2o3_ma_s_2050k-01.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2001-mgalumina-silica-vaporization
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_al2o3_ma_s_2050k::T=2050:h=7469547514d2
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'MgAl2O4-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2050'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgAl2O4
+          - '0.4444'
+        - - SiO2
+          - '0.5556'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.064'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 4, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=b; symbol=filled
+      upward triangles
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2050'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 4, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=b; symbol=filled
+          upward triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_pseudobinary_mole_percent
+          components:
+          - - MgAl2O4
+            - '0.4444'
+          - - SiO2
+            - '0.5556'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Printed x(SiO2)=55.56 mole%; complementary MgAl2O4 fraction=0.4444; log10(a(Al2O3))=-1.194; independent page-6
+          600-dpi pixel reads (5883.00,5980.83) and (5882.71,5980.60); read uncertainty 0.0001 dex; audit shornikov_2001_f2_al2o3_ma_s_2050k-03.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2001-mgalumina-silica-vaporization
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_al2o3_ma_s_2050k::T=2050:h=ea7548144f25
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'MgAl2O4-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2050'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgAl2O4
+          - '0.4779'
+        - - SiO2
+          - '0.5221'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.078'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 4, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=b; symbol=filled
+      upward triangles
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2050'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 4, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=b; symbol=filled
+          upward triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_pseudobinary_mole_percent
+          components:
+          - - MgAl2O4
+            - '0.4779'
+          - - SiO2
+            - '0.5221'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Printed x(SiO2)=52.21 mole%; complementary MgAl2O4 fraction=0.4779; log10(a(Al2O3))=-1.106; independent page-6
+          600-dpi pixel reads (5731.00,5887.25) and (5730.86,5888.66); read uncertainty 0.0007 dex; audit shornikov_2001_f2_al2o3_ma_s_2050k-02.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2001-mgalumina-silica-vaporization
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_al2o3_ma_s_2050k::T=2050:h=ec20aafc6bbf
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'MgAl2O4-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2050'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgAl2O4
+          - '0.3511'
+        - - SiO2
+          - '0.6489'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.033'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 4, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=b; symbol=filled
+      upward triangles
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2050'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 4, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=b; symbol=filled
+          upward triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_pseudobinary_mole_percent
+          components:
+          - - MgAl2O4
+            - '0.3511'
+          - - SiO2
+            - '0.6489'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Printed x(SiO2)=64.89 mole%; complementary MgAl2O4 fraction=0.3511; log10(a(Al2O3))=-1.484; independent page-6
+          600-dpi pixel reads (6300.17,6289.08) and (6298.86,6287.61); read uncertainty 0.0007 dex; audit shornikov_2001_f2_al2o3_ma_s_2050k-04.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2001-mgalumina-silica-vaporization
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
 - observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_cao_ca_s_1933k
   experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::shornikov-2001-mgalumina-silica-vaporization
   identity:
@@ -390,7 +928,7 @@ observations:
         pdf_page_index: 5
         figure: '2'
         note: Curve 3; CT-S comparative activity attributed by the caption to prior work.
-- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_mgo_ma_s_2050k
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_mgo_ma_s_2050k::T=2050:h=240d4d28e822
   experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
   identity:
     quantity:
@@ -433,8 +971,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgAl2O4
+          - '0.8182'
+        - - SiO2
+          - '0.1818'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -454,10 +999,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, activity_component, composition_component,
-      composition_basis, composition_axis_range_mole_percent, curve_as_printed, system_as_printed, temperature_as_printed_K,
-      source_attribution_as_printed, data_scope'
+    kind: point
+    point: '0.34'
     approximate: false
   uncertainty:
     kind: none
@@ -468,14 +1011,15 @@ observations:
     original_method_class: figure_only
   admission:
     status: pending
-    reason: no observation admission_status mapped from source
+    reason: source admission_status=figure_only is not a closed v2.1 token
   notices: []
   source_id: shornikov-2001-mgalumina-silica-vaporization
   locator:
     published_page: 327
     pdf_page_index: 5
     figure: '2'
-    note: Curve 1; MA-S activity in this study.
+    note: Curve 1, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=a; symbol=filled
+      upward triangles
   read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
   point_conditions:
     temperature_K:
@@ -486,7 +1030,666 @@ observations:
         published_page: 327
         pdf_page_index: 5
         figure: '2'
-        note: Curve 1; MA-S activity in this study.
+        note: Curve 1, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=a; symbol=filled
+          upward triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_pseudobinary_mole_percent
+          components:
+          - - MgAl2O4
+            - '0.8182'
+          - - SiO2
+            - '0.1818'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Printed x(SiO2)=18.18 mole%; complementary MgAl2O4 fraction=0.8182; log10(a(MgO))=-0.463; independent page-6
+          600-dpi pixel reads (4217.00,1011.92) and (4217.34,1012.22); read uncertainty 0.0002 dex; audit shornikov_2001_f2_mgo_ma_s_2050k-02.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2001-mgalumina-silica-vaporization
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_mgo_ma_s_2050k::T=2050:h=3152bcfd3e8d
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: unknown
+        reason: phase string 'MgAl2O4-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2050'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgAl2O4
+          - '0.3511'
+        - - SiO2
+          - '0.6489'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.11'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 1, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=a; symbol=filled
+      upward triangles
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2050'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 1, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=a; symbol=filled
+          upward triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_pseudobinary_mole_percent
+          components:
+          - - MgAl2O4
+            - '0.3511'
+          - - SiO2
+            - '0.6489'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Printed x(SiO2)=64.89 mole%; complementary MgAl2O4 fraction=0.3511; log10(a(MgO))=-0.954; independent page-6
+          600-dpi pixel reads (6320.50,1334.25) and (6320.40,1334.89); read uncertainty 0.0005 dex; audit shornikov_2001_f2_mgo_ma_s_2050k-05.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2001-mgalumina-silica-vaporization
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_mgo_ma_s_2050k::T=2050:h=436f0ecd97e3
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: unknown
+        reason: phase string 'MgAl2O4-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2050'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgAl2O4
+          - '1'
+        - - SiO2
+          - '0'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.36'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 1, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=a; symbol=filled
+      upward triangles
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2050'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 1, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=a; symbol=filled
+          upward triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_pseudobinary_mole_percent
+          components:
+          - - MgAl2O4
+            - '1'
+          - - SiO2
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Printed x(SiO2)=0.00 mole%; complementary MgAl2O4 fraction=1.00; log10(a(MgO))=-0.441; independent page-6 600-dpi
+          pixel reads (3394.00,998.00) and (3394.25,1000.80); read uncertainty 0.0021 dex; audit shornikov_2001_f2_mgo_ma_s_2050k-01.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2001-mgalumina-silica-vaporization
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_mgo_ma_s_2050k::T=2050:h=9ba421053830
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: unknown
+        reason: phase string 'MgAl2O4-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2050'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgAl2O4
+          - '0.2531'
+        - - SiO2
+          - '0.7469'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.068'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 1, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=a; symbol=filled
+      upward triangles
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2050'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 1, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=a; symbol=filled
+          upward triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_pseudobinary_mole_percent
+          components:
+          - - MgAl2O4
+            - '0.2531'
+          - - SiO2
+            - '0.7469'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Printed x(SiO2)=74.69 mole%; complementary MgAl2O4 fraction=0.2531; log10(a(MgO))=-1.167; independent page-6
+          600-dpi pixel reads (6760.67,1474.25) and (6759.14,1474.91); read uncertainty 0.0005 dex; audit shornikov_2001_f2_mgo_ma_s_2050k-06.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2001-mgalumina-silica-vaporization
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_mgo_ma_s_2050k::T=2050:h=9ebd22bf30b3
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: unknown
+        reason: phase string 'MgAl2O4-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2050'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgAl2O4
+          - '0.4779'
+        - - SiO2
+          - '0.5221'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.18'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 1, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=a; symbol=filled
+      upward triangles
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2050'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 1, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=a; symbol=filled
+          upward triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_pseudobinary_mole_percent
+          components:
+          - - MgAl2O4
+            - '0.4779'
+          - - SiO2
+            - '0.5221'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Printed x(SiO2)=52.21 mole%; complementary MgAl2O4 fraction=0.4779; log10(a(MgO))=-0.736; independent page-6
+          600-dpi pixel reads (5747.25,1191.50) and (5749.09,1192.49); read uncertainty 0.0008 dex; audit shornikov_2001_f2_mgo_ma_s_2050k-03.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2001-mgalumina-silica-vaporization
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_mgo_ma_s_2050k::T=2050:h=d2a96abe775f
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: unknown
+        reason: phase string 'MgAl2O4-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2050'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source standard_state does not name one reference endmember
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgAl2O4
+          - '0.4444'
+        - - SiO2
+          - '0.5556'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.16'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 1, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=a; symbol=filled
+      upward triangles
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2050'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 1, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=a; symbol=filled
+          upward triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_pseudobinary_mole_percent
+          components:
+          - - MgAl2O4
+            - '0.4444'
+          - - SiO2
+            - '0.5556'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Printed x(SiO2)=55.56 mole%; complementary MgAl2O4 fraction=0.4444; log10(a(MgO))=-0.790; independent page-6
+          600-dpi pixel reads (5897.17,1226.67) and (5898.29,1227.00); read uncertainty 0.0003 dex; audit shornikov_2001_f2_mgo_ma_s_2050k-04.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2001-mgalumina-silica-vaporization
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
 - observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_sio2_ca_s_1933k
   experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::shornikov-2001-mgalumina-silica-vaporization
   identity:
@@ -681,7 +1884,7 @@ observations:
         pdf_page_index: 5
         figure: '2'
         note: Curve 9; CT-S comparative activity attributed by the caption to prior work.
-- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_sio2_ma_s_2050k
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_sio2_ma_s_2050k::T=2050:h=114c2861610a
   experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
   identity:
     quantity:
@@ -719,14 +1922,21 @@ observations:
       reason: profile activity does not use formation_elements
     reference_state:
       tag: unknown
-      reason: 'source standard_state is not typed: Equation (12) integrates SiO2 activity from x(SiO2)=1; the equation does
-        not explicitly state a solid or liquid phase for that pure-composition endpoint.'
+      reason: 'source standard_state is not typed: Equation (12) integrates SiO2 activity from x(SiO2)=1; the pure-composition
+        endpoint phase is not specified.'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgAl2O4
+          - '0.8182'
+        - - SiO2
+          - '0.1818'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -746,10 +1956,8 @@ observations:
       tag: not_applicable
       reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped activity field selected; source fields: quantity, method_class, activity_component, composition_component,
-      composition_basis, composition_axis_range_mole_percent, curve_as_printed, system_as_printed, temperature_as_printed_K,
-      source_attribution_as_printed, data_scope'
+    kind: point
+    point: '0.12'
     approximate: false
   uncertainty:
     kind: none
@@ -760,14 +1968,15 @@ observations:
     original_method_class: figure_only
   admission:
     status: pending
-    reason: no observation admission_status mapped from source
+    reason: source admission_status=figure_only is not a closed v2.1 token
   notices: []
   source_id: shornikov-2001-mgalumina-silica-vaporization
   locator:
     published_page: 327
     pdf_page_index: 5
     figure: '2'
-    note: Curve 7; MA-S activity in this study.
+    note: Curve 7, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=c; symbol=filled
+      upward triangles
   read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
   point_conditions:
     temperature_K:
@@ -778,7 +1987,543 @@ observations:
         published_page: 327
         pdf_page_index: 5
         figure: '2'
-        note: Curve 7; MA-S activity in this study.
+        note: Curve 7, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=c; symbol=filled
+          upward triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_pseudobinary_mole_percent
+          components:
+          - - MgAl2O4
+            - '0.8182'
+          - - SiO2
+            - '0.1818'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Printed x(SiO2)=18.18 mole%; complementary MgAl2O4 fraction=0.8182; log10(a(SiO2))=-0.922; independent page-6
+          600-dpi pixel reads (4209.92,9613.42) and (4208.71,9612.98); read uncertainty 0.0002 dex; audit shornikov_2001_f2_sio2_ma_s_2050k-01.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2001-mgalumina-silica-vaporization
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_sio2_ma_s_2050k::T=2050:h=5cdff0b36e81
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'MgAl2O4-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2050'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Equation (12) integrates SiO2 activity from x(SiO2)=1; the pure-composition
+        endpoint phase is not specified.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgAl2O4
+          - '0.4779'
+        - - SiO2
+          - '0.5221'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.32'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 7, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=c; symbol=filled
+      upward triangles
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2050'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 7, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=c; symbol=filled
+          upward triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_pseudobinary_mole_percent
+          components:
+          - - MgAl2O4
+            - '0.4779'
+          - - SiO2
+            - '0.5221'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Printed x(SiO2)=52.21 mole%; complementary MgAl2O4 fraction=0.4779; log10(a(SiO2))=-0.497; independent page-6
+          600-dpi pixel reads (5736.58,9235.00) and (5736.42,9236.43); read uncertainty 0.0008 dex; audit shornikov_2001_f2_sio2_ma_s_2050k-02.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2001-mgalumina-silica-vaporization
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_sio2_ma_s_2050k::T=2050:h=a409c4330ddf
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'MgAl2O4-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2050'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Equation (12) integrates SiO2 activity from x(SiO2)=1; the pure-composition
+        endpoint phase is not specified.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgAl2O4
+          - '0.2531'
+        - - SiO2
+          - '0.7469'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.66'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 7, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=c; symbol=filled
+      upward triangles
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2050'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 7, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=c; symbol=filled
+          upward triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_pseudobinary_mole_percent
+          components:
+          - - MgAl2O4
+            - '0.2531'
+          - - SiO2
+            - '0.7469'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Printed x(SiO2)=74.69 mole%; complementary MgAl2O4 fraction=0.2531; log10(a(SiO2))=-0.177; independent page-6
+          600-dpi pixel reads (6742.50,8949.92) and (6743.58,8949.37); read uncertainty 0.0003 dex; audit shornikov_2001_f2_sio2_ma_s_2050k-05.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2001-mgalumina-silica-vaporization
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_sio2_ma_s_2050k::T=2050:h=a885fbdacca0
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'MgAl2O4-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2050'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Equation (12) integrates SiO2 activity from x(SiO2)=1; the pure-composition
+        endpoint phase is not specified.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgAl2O4
+          - '0.4444'
+        - - SiO2
+          - '0.5556'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.36'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 7, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=c; symbol=filled
+      upward triangles
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2050'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 7, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=c; symbol=filled
+          upward triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_pseudobinary_mole_percent
+          components:
+          - - MgAl2O4
+            - '0.4444'
+          - - SiO2
+            - '0.5556'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Printed x(SiO2)=55.56 mole%; complementary MgAl2O4 fraction=0.4444; log10(a(SiO2))=-0.439; independent page-6
+          600-dpi pixel reads (5885.42,9182.83) and (5886.57,9182.43); read uncertainty 0.0002 dex; audit shornikov_2001_f2_sio2_ma_s_2050k-03.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2001-mgalumina-silica-vaporization
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_sio2_ma_s_2050k::T=2050:h=e99b3a19e057
+  experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'MgAl2O4-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2050'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Equation (12) integrates SiO2 activity from x(SiO2)=1; the pure-composition
+        endpoint phase is not specified.'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - MgAl2O4
+          - '0.3511'
+        - - SiO2
+          - '0.6489'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.51'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2001-mgalumina-silica-vaporization
+  locator:
+    published_page: 327
+    pdf_page_index: 5
+    figure: '2'
+    note: Curve 7, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=c; symbol=filled
+      upward triangles
+  read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2050'
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Curve 7, MA-S activity in this study at 2050 K; marked filled upward triangles readings.; panel=c; symbol=filled
+          upward triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_pseudobinary_mole_percent
+          components:
+          - - MgAl2O4
+            - '0.3511'
+          - - SiO2
+            - '0.6489'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 327
+        pdf_page_index: 5
+        figure: '2'
+        note: Printed x(SiO2)=64.89 mole%; complementary MgAl2O4 fraction=0.3511; log10(a(SiO2))=-0.295; independent page-6
+          600-dpi pixel reads (6304.00,9054.58) and (6304.87,9054.98); read uncertainty 0.0002 dex; audit shornikov_2001_f2_sio2_ma_s_2050k-04.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2001-mgalumina-silica-vaporization
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
 - observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f2_tio2_ct_s_2100k
   experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::shornikov-2001-mgalumina-silica-vaporization
   identity:
@@ -1028,8 +2773,8 @@ observations:
   experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::experiment::shornikov-2001-mo-kems-1623-2523k
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Gibbs energy of melt formation'
+      tag: value
+      value: delta_fG
     species:
       formula: SiO2
       phase:
@@ -1042,13 +2787,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
     temperature_K:
       tag: value
       value: '2050'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'Gibbs energy of melt formation'; refusing to pick
-      a number
+    unavailable_reason: printed field delta_fG_kJ_mol is null; absence is not a measured zero
     approximate: false
   uncertainty:
     kind: none
@@ -1058,15 +2844,37 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: rejected
+    reason: schema has no quantity token for ΔfG/RT
+    decided_by:
+      worker: codex
+      date: '2026-10-05'
+      evidence:
+        published_page: 328
+        pdf_page_index: 6
+        figure: '3'
+        note: Curve 1 is MA-S from this study at 2050 K. Up-triangle readings retained as (x(SiO2), ΔfG/RT, T). The printed
+          52.21 mole% position is occupied by a square of curve 3, not an up-triangle, and is dropped. x(SiO2)=0.00 mole%,
+          ΔfG/RT=-1.3, T=2050 K; pixel reads (3238.08,1379.17) and (3239.29,1377.80) x(SiO2)=18.18 mole%, ΔfG/RT=-1.5, T=2050
+          K; pixel reads (4077.08,1500.25) and (4076.04,1502.60) x(SiO2)=55.56 mole%, ΔfG/RT=-1.5, T=2050 K; pixel reads (5808.58,1548.33)
+          and (5808.52,1548.98) x(SiO2)=64.89 mole%, ΔfG/RT=-1.4, T=2050 K; pixel reads (6240.58,1417.33) and (6240.21,1418.03)
+          x(SiO2)=74.69 mole%, ΔfG/RT=-1.2, T=2050 K; pixel reads (6695.83,1215.42) and (6696.54,1214.89) The plotted ΔfG/RT
+          values are not converted because the schema has no quantity token for dimensionless ΔfG/RT. Independent pixel reads
+          and axis calibrations are in crown4-1018-figure-read-audit.md.; panel=single panel
   notices: []
   source_id: shornikov-2001-mgalumina-silica-vaporization
   locator:
     published_page: 328
     pdf_page_index: 6
     figure: '3'
-    note: Curve 1; MA-S melt formation Gibbs energy from this study.
+    note: Curve 1 is MA-S from this study at 2050 K. Up-triangle readings retained as (x(SiO2), ΔfG/RT, T). The printed 52.21
+      mole% position is occupied by a square of curve 3, not an up-triangle, and is dropped. x(SiO2)=0.00 mole%, ΔfG/RT=-1.3,
+      T=2050 K; pixel reads (3238.08,1379.17) and (3239.29,1377.80) x(SiO2)=18.18 mole%, ΔfG/RT=-1.5, T=2050 K; pixel reads
+      (4077.08,1500.25) and (4076.04,1502.60) x(SiO2)=55.56 mole%, ΔfG/RT=-1.5, T=2050 K; pixel reads (5808.58,1548.33) and
+      (5808.52,1548.98) x(SiO2)=64.89 mole%, ΔfG/RT=-1.4, T=2050 K; pixel reads (6240.58,1417.33) and (6240.21,1418.03) x(SiO2)=74.69
+      mole%, ΔfG/RT=-1.2, T=2050 K; pixel reads (6695.83,1215.42) and (6696.54,1214.89) The plotted ΔfG/RT values are not
+      converted because the schema has no quantity token for dimensionless ΔfG/RT. Independent pixel reads and axis calibrations
+      are in crown4-1018-figure-read-audit.md.; panel=single panel
   read_from: pdf:shornikov-2001-mgalumina-silica-vaporization
   point_conditions:
     temperature_K:
@@ -1077,7 +2885,14 @@ observations:
         published_page: 328
         pdf_page_index: 6
         figure: '3'
-        note: Curve 1; MA-S melt formation Gibbs energy from this study.
+        note: Curve 1 is MA-S from this study at 2050 K. Up-triangle readings retained as (x(SiO2), ΔfG/RT, T). The printed
+          52.21 mole% position is occupied by a square of curve 3, not an up-triangle, and is dropped. x(SiO2)=0.00 mole%,
+          ΔfG/RT=-1.3, T=2050 K; pixel reads (3238.08,1379.17) and (3239.29,1377.80) x(SiO2)=18.18 mole%, ΔfG/RT=-1.5, T=2050
+          K; pixel reads (4077.08,1500.25) and (4076.04,1502.60) x(SiO2)=55.56 mole%, ΔfG/RT=-1.5, T=2050 K; pixel reads (5808.58,1548.33)
+          and (5808.52,1548.98) x(SiO2)=64.89 mole%, ΔfG/RT=-1.4, T=2050 K; pixel reads (6240.58,1417.33) and (6240.21,1418.03)
+          x(SiO2)=74.69 mole%, ΔfG/RT=-1.2, T=2050 K; pixel reads (6695.83,1215.42) and (6696.54,1214.89) The plotted ΔfG/RT
+          values are not converted because the schema has no quantity token for dimensionless ΔfG/RT. Independent pixel reads
+          and axis calibrations are in crown4-1018-figure-read-audit.md.; panel=single panel
 - observation_id: shornikov-2001-mgalumina-silica-vaporization::shornikov_2001_f3_ma_s_ref11_1873k
   experiment_id: 6277e13c8b853159029dec0d8808f1aee7962f775abafbb72bd800abbb462151::shornikov-2001-mgalumina-silica-vaporization
   identity:

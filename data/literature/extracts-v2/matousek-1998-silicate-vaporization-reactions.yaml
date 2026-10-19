@@ -1,0 +1,330 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/matousek-1998-silicate-vaporization-reactions.yaml
+observations:
+- observation_id: matousek-1998-silicate-vaporization-reactions::matousek_1998_koh_quoted_vapor_pressure::T=1600.15:h=ca971e8e0ef0
+  experiment_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de::matousek-1998-silicate-vaporization-reactions
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: KOH
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1600.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '101325'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Ohe [13], Computer Aided Data Book of Vapor Pressure (1976)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_sat
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matousek-1998-silicate-vaporization-reactions::matousek_1998_koh_quoted_vapor_pressure::T=1600.15:h=ca971e8e0ef0
+  source_id: matousek-1998-silicate-vaporization-reactions
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    section: Vaporization in an atmosphere containing water vapour
+    note: citation=[13]
+  read_from: unknown:matousek-1998-silicate-vaporization-reactions
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1600.15'
+      locator:
+        page: 3
+        published_page: 76
+        pdf_page_index: 2
+        section: Vaporization in an atmosphere containing water vapour
+        note: citation=[13]
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1327'
+            locator:
+              page: 3
+              published_page: 76
+              pdf_page_index: 2
+              section: Vaporization in an atmosphere containing water vapour
+              note: citation=[13]
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 76
+              pdf_page_index: 2
+              section: Vaporization in an atmosphere containing water vapour
+              note: citation=[13]
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1327'
+      locator:
+        page: 3
+        published_page: 76
+        pdf_page_index: 2
+  derivation:
+    relation: kPa_to_Pa
+    inputs:
+    - unknown:matousek-1998-silicate-vaporization-reactions
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '101.325'
+        locator:
+          page: 3
+          published_page: 76
+          pdf_page_index: 2
+          section: Vaporization in an atmosphere containing water vapour
+          note: citation=[13]
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 3
+          published_page: 76
+          pdf_page_index: 2
+          section: Vaporization in an atmosphere containing water vapour
+          note: citation=[13]
+    output_unit: Pa
+- observation_id: matousek-1998-silicate-vaporization-reactions::matousek_1998_naoh_quoted_vapor_pressure::T=1651.15:h=d336c40f26a8
+  experiment_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de::matousek-1998-silicate-vaporization-reactions
+  identity:
+    quantity:
+      tag: value
+      value: p_sat
+    species:
+      formula: NaOH
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1651.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: point
+    point: '101325'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Ohe [13], Computer Aided Data Book of Vapor Pressure (1976)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_sat
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: matousek-1998-silicate-vaporization-reactions::matousek_1998_naoh_quoted_vapor_pressure::T=1651.15:h=d336c40f26a8
+  source_id: matousek-1998-silicate-vaporization-reactions
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    section: Vaporization in an atmosphere containing water vapour
+    note: citation=[13]
+  read_from: unknown:matousek-1998-silicate-vaporization-reactions
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1651.15'
+      locator:
+        page: 3
+        published_page: 76
+        pdf_page_index: 2
+        section: Vaporization in an atmosphere containing water vapour
+        note: citation=[13]
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1378'
+            locator:
+              page: 3
+              published_page: 76
+              pdf_page_index: 2
+              section: Vaporization in an atmosphere containing water vapour
+              note: citation=[13]
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 76
+              pdf_page_index: 2
+              section: Vaporization in an atmosphere containing water vapour
+              note: citation=[13]
+        output_unit: K
+    temperature_C:
+      state:
+        tag: value
+        value: '1378'
+      locator:
+        page: 3
+        published_page: 76
+        pdf_page_index: 2
+  derivation:
+    relation: kPa_to_Pa
+    inputs:
+    - unknown:matousek-1998-silicate-vaporization-reactions
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '101.325'
+        locator:
+          page: 3
+          published_page: 76
+          pdf_page_index: 2
+          section: Vaporization in an atmosphere containing water vapour
+          note: citation=[13]
+    - - factor
+      - state:
+          tag: value
+          value: '1000'
+        locator:
+          page: 3
+          published_page: 76
+          pdf_page_index: 2
+          section: Vaporization in an atmosphere containing water vapour
+          note: citation=[13]
+    output_unit: Pa

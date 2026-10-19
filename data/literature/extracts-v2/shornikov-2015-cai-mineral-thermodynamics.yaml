@@ -1,0 +1,2773 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2015-cai-mineral-thermodynamics.yaml
+observations:
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r02_c04
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: CaAl2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1877'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r02_c04
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=CA; column_header=$T_{melt}$ , K
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1877'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 T_melt cell; this is the reported transition temperature.
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r02_c05
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: CaAl2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1877'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '31.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r02_c05
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=CA; column_header=$\Delta H_{melt}$ , kJ/mole
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1877'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: row_label=CA; column_header=$\Delta H_{melt}$ , kJ/mole
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r03_c04
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: CaAl4O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2035'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r03_c04
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=$CA_{2}$; column_header=$T_{melt}$ , K
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2035'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 T_melt cell; this is the reported transition temperature.
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r03_c05
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: CaAl4O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2035'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '27'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r03_c05
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=$CA_{2}$; column_header=$\Delta H_{melt}$ , kJ/mole
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2035'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: row_label=$CA_{2}$; column_header=$\Delta H_{melt}$ , kJ/mole
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r04_c04_dissociation
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: CaAl12O19
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: dissociation_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2123'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r04_c04_dissociation
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: hibonite, T_melt cell, marker *; confirmed against the 600 dpi page render.
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2123'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 T_melt cell; this is the reported transition temperature.
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r04_c04_liquid_phase
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: CaAl12O19
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: liquid_phase_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2148'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r04_c04_liquid_phase
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: hibonite, T_melt cell, marker **; confirmed against the 600 dpi page render.
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2148'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 T_melt cell; this is the reported transition temperature.
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r04_c05
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: CaAl12O19
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2148'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '16.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r04_c05
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=$CA_{6}$; column_header=$\Delta H_{melt}$ , kJ/mole
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2148'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: row_label=$CA_{6}$; column_header=$\Delta H_{melt}$ , kJ/mole
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r05_c04
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: CaTiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2243'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r05_c04
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=CT; column_header=$T_{melt}$ , K
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2243'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 T_melt cell; this is the reported transition temperature.
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r05_c05
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: CaTiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2243'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '96.68'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r05_c05
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=CT; column_header=$\Delta H_{melt}$ , kJ/mole
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2243'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: row_label=CT; column_header=$\Delta H_{melt}$ , kJ/mole
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r06_c04
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: MgAl2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2408'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r06_c04
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=MA; column_header=$T_{melt}$ , K
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2408'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 T_melt cell; this is the reported transition temperature.
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r06_c05
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: MgAl2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2408'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '100.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r06_c05
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=MA; column_header=$\Delta H_{melt}$ , kJ/mole
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2408'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: row_label=MA; column_header=$\Delta H_{melt}$ , kJ/mole
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r07_c04_dissociation
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: MgSiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: dissociation_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1836'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r07_c04_dissociation
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: enstatite, T_melt cell, marker *; confirmed against the 600 dpi page render.
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1836'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 T_melt cell; this is the reported transition temperature.
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r07_c04_liquid_phase
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: MgSiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: liquid_phase_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1850'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r07_c04_liquid_phase
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: enstatite, T_melt cell, marker **; confirmed against the 600 dpi page render.
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1850'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 T_melt cell; this is the reported transition temperature.
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r07_c05
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: MgSiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1850'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '25.93'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r07_c05
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=MS; column_header=$\Delta H_{melt}$ , kJ/mole
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: row_label=MS; column_header=$\Delta H_{melt}$ , kJ/mole
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r08_c04
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2171'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r08_c04
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=$M_{2}S$; column_header=$T_{melt}$ , K
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2171'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 T_melt cell; this is the reported transition temperature.
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r08_c05
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2171'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '38'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r08_c05
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=$M_{2}S$; column_header=$\Delta H_{melt}$ , kJ/mole
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2171'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: row_label=$M_{2}S$; column_header=$\Delta H_{melt}$ , kJ/mole
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r09_c04
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1665'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r09_c04
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=$CMS_{2}$; column_header=$T_{melt}$ , K
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1665'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 T_melt cell; this is the reported transition temperature.
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r09_c05
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1665'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '34.43'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r09_c05
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=$CMS_{2}$; column_header=$\Delta H_{melt}$ , kJ/mole
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1665'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: row_label=$CMS_{2}$; column_header=$\Delta H_{melt}$ , kJ/mole
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r10_c04
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca2MgSi2O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1727'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r10_c04
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=$C_{2}MS_{2}$; column_header=$T_{melt}$ , K
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1727'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 T_melt cell; this is the reported transition temperature.
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r10_c05
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Ca2MgSi2O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1727'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '24.78'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r10_c05
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=$C_{2}MS_{2}$; column_header=$\Delta H_{melt}$ , kJ/mole
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1727'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: row_label=$C_{2}MS_{2}$; column_header=$\Delta H_{melt}$ , kJ/mole
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r11_c04
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca2Al2SiO7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1863'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r11_c04
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=$C_{2}AS$; column_header=$T_{melt}$ , K
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1863'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 T_melt cell; this is the reported transition temperature.
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r11_c05
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Ca2Al2SiO7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1863'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '43.03'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r11_c05
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=$C_{2}AS$; column_header=$\Delta H_{melt}$ , kJ/mole
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1863'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: row_label=$C_{2}AS$; column_header=$\Delta H_{melt}$ , kJ/mole
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r12_c04
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: CaAl2Si2O8
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1830'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r12_c04
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=$CAS_{2}$; column_header=$T_{melt}$ , K
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1830'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 T_melt cell; this is the reported transition temperature.
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r12_c05
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: CaAl2Si2O8
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1830'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '33.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r12_c05
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=$CAS_{2}$; column_header=$\Delta H_{melt}$ , kJ/mole
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1830'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: row_label=$CAS_{2}$; column_header=$\Delta H_{melt}$ , kJ/mole
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r13_c04_dissociation
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: dissociation_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1373'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r13_c04_dissociation
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: grossular, T_melt cell, marker *; confirmed against the 600 dpi page render.
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1373'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 T_melt cell; this is the reported transition temperature.
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r13_c04_liquid_phase
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Ca3Al2Si3O12
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: liquid_phase_temperature
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1673'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r13_c04_liquid_phase
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: grossular, T_melt cell, marker **; confirmed against the 600 dpi page render.
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673'
+          approximate: false
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 T_melt cell; this is the reported transition temperature.
+- observation_id: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r13_c05
+  experiment_id: 1789b9462d26814f332ca1f73d41e0835d679a071ee4f7b0c4c383f7455dc4a8::shornikov-2015-cai-mineral-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Ca3Al2Si3O12
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1673'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '71'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[11–17]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2015-cai-mineral-thermodynamics::shornikov_2015_cai_mineral_thermodynamics_p002_t01_r13_c05
+  source_id: shornikov-2015-cai-mineral-thermodynamics
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+    note: row_label=$C_{3}AS_{3}$; column_header=$\Delta H_{melt}$ , kJ/mole
+  read_from: unknown:shornikov-2015-cai-mineral-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: row_label=$C_{3}AS_{3}$; column_header=$\Delta H_{melt}$ , kJ/mole

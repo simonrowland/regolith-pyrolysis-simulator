@@ -1,0 +1,635 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1007/bf02659158
+  citation: Rego, D. N., Sigworth, G. K., and Philbrook, W. O. (1988). "Thermodynamic activity of Na2O in Na2O-CaO-SiO2, Na2O-MgO-SiO2,
+    and Na2O-CaO-SiO2-Al2O3 melts at 1400 C." Metallurgical Transactions B, 19(4), 655–661.
+  source_ids:
+  - rego-1988-silicate-na2o-activities
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:rego-1988-silicate-na2o-activities
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1007/bf02659158
+experiments: []
+context:
+- observation_id: rego_1988_abstract_na2o_activity_range
+  type: measurement_summary
+  locator:
+    page: 1
+    published_page: 655
+    pdf_page_index: 0
+    section: Abstract
+  units: log10 activity as printed
+  values:
+    quantity: activity
+    printed_quantity: log a_Na2O
+    method_class: measured_reduced
+    rail: melt_activity
+    range_as_published: about -8.0 to -7.0
+    approximate: true
+    standard_state_as_printed: pure liquid Na2O at 1400 C
+    T_C: 1400
+    attribution: This work; the abstract summarizes the gas-phase equilibration measurements.
+    schema_gap: The extract schema has no log-activity value form. The printed range is preserved here without converting
+      it to linear activity.
+    uncertainty_as_published: not stated
+  context_id: rego-1988-silicate-na2o-activities::context::rego_1988_abstract_na2o_activity_range
+  work_id: 10.1007/bf02659158
+  source_id: rego-1988-silicate-na2o-activities
+  species: Na2O
+- observation_id: rego_1988_binary_master_composition_range
+  type: context
+  locator:
+    page: 2
+    published_page: 656
+    pdf_page_index: 1
+    section: Apparatus and Materials
+  units: mole fraction
+  values:
+    printed_quantity: X_Na2O
+    range_as_published: 0.21 to 0.33
+    melt_as_published: binary Na2O-SiO2 master
+    attribution: This work
+  context_id: rego-1988-silicate-na2o-activities::context::rego_1988_binary_master_composition_range
+  work_id: 10.1007/bf02659158
+  source_id: rego-1988-silicate-na2o-activities
+  species: Na2O
+- observation_id: rego_1988_fig1_equilibration_apparatus
+  type: figure_record
+  locator:
+    page: 2
+    published_page: 656
+    pdf_page_index: 1
+    figure: '1'
+  phase: l
+  units: schematic; no numeric data
+  values:
+    quantity: gas_melt_equilibration_apparatus_schematic
+    method_class: figure_only
+    species: Na2O
+    temperature_as_published: not stated in this figure
+    axes_as_published: none; apparatus schematic
+    caption_as_published: Schematic arrangement of crucible and trays containing the binary master and ternary melts.
+    panel: single panel
+    series:
+    - label: apparatus components
+      marker_count: 0
+    attribution: This work
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: rego-1988-silicate-na2o-activities::context::rego_1988_fig1_equilibration_apparatus
+  work_id: 10.1007/bf02659158
+  source_id: rego-1988-silicate-na2o-activities
+  species: Na2O
+- observation_id: rego_1988_fig2_approach_to_equilibrium_compositions
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 657
+    pdf_page_index: 2
+    figure: '2'
+  phase: l
+  T_C: 1400
+  units: mol pct
+  values:
+    quantity: melt_composition
+    method_class: figure_only
+    species: Na2O
+    system_as_published: Na2O-CaO-SiO2
+    axes_as_published: ternary composition coordinates in mol pct
+    caption_as_published: Compositional paths in the approach to equilibrium in the Na2O-CaO-SiO2 system. Filled symbols indicate
+      starting compositions.
+    panel: single ternary diagram
+    series:
+    - label: starting compositions
+      marker: filled symbols
+      marker_count: 5
+    - label: final compositions
+      marker: open symbols
+      marker_count: 8
+    marker_count_note: Counts are distinct visible marker centres in the render; overlapping symbols cannot be separated into
+      replicates.
+    composition_state: unknown
+    composition_unknown_reason: Individual compositions are plotted only; coordinates were not read because figure digitisation
+      is deferred.
+    attribution: This work
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: rego-1988-silicate-na2o-activities::context::rego_1988_fig2_approach_to_equilibrium_compositions
+  work_id: 10.1007/bf02659158
+  source_id: rego-1988-silicate-na2o-activities
+  species: Na2O
+- observation_id: rego_1988_fig3_na2o_cao_sio2_isoactivity
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 657
+    pdf_page_index: 2
+    figure: '3'
+  phase: l
+  T_C: 1400
+  units: mol pct composition; log10 activity as printed
+  standard_state: pure liquid Na2O at 1400 C
+  values:
+    quantity: activity
+    printed_quantity: log a_Na2O
+    method_class: figure_only
+    evidence_class: figure_only
+    status: typed_refusal
+    reason: figure_not_digitized
+    species: Na2O
+    system_as_published: Na2O-CaO-SiO2
+    axes_as_printed: Na2O mol pct and CaO mol pct in a ternary diagram
+    caption_as_published: Iso-activity data for Na2O in the Na2O-CaO-SiO2 system at 1400 C.
+    panel: single ternary diagram
+    series:
+    - activity_label_as_published: '-7.02'
+      marker: open square
+      marker_count: 5
+    - activity_label_as_published: '-7.53'
+      marker: open triangle
+      marker_count: 5
+    - activity_label_as_published: '-7.56'
+      marker: open circle
+      marker_count: 5
+    - activity_label_as_published: '-7.72'
+      marker: open diamond
+      marker_count: 5
+    - activity_label_as_published: '-7.97'
+      marker: open inverted triangle
+      marker_count: 5
+    composition_state: unknown
+    composition_unknown_reason: Full per-marker melt compositions occur only as plotted positions; coordinates were not read
+      because figure digitisation is deferred.
+    activity_label_attribution: The text states that the isoactivity values are from earlier measurements in the binary Na2O-SiO2
+      system, reference [2].
+    attribution: Melt compositions measured in this work; activity labels attributed to D. N. Rego, G. K. Sigworth, and W.
+      O. Philbrook, Metall. Trans. B, 1985, vol. 16B, pp. 313-23, reference [2].
+    uncertainty_as_published: not stated
+    schema_gap: No log10-activity value form exists in the quantity schema. Labels remain strings as printed; no linear activities
+      are inferred.
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: rego-1988-silicate-na2o-activities::context::rego_1988_fig3_na2o_cao_sio2_isoactivity
+  work_id: 10.1007/bf02659158
+  source_id: rego-1988-silicate-na2o-activities
+  species: Na2O
+- observation_id: rego_1988_fig4_sio2_isoactivity_model
+  type: figure_record
+  locator:
+    page: 4
+    published_page: 658
+    pdf_page_index: 3
+    figure: '4'
+  phase: l
+  T_C: 1400
+  units: activity as plotted
+  standard_state: pure liquid SiO2 at 1400 C
+  values:
+    quantity: activity
+    method_class: model_derived
+    species: SiO2
+    system_as_published: Na2O-CaO-SiO2
+    axes_as_printed: ternary composition coordinates in mol pct
+    caption_as_published: Iso-activity data for SiO2 in the Na2O-CaO-SiO2 system at 1400 C by Gibbs-Duhem integration.
+    panel: single ternary diagram
+    liquidus_reference:
+      activity_as_published: '0.92'
+      phase: liquid in equilibrium with solid cristobalite
+      standard_state: pure liquid SiO2 at 1400 C
+      locator:
+        page: 5
+        published_page: 659
+        pdf_page_index: 4
+      footnote_as_published: To express silica activity with reference to pure solid silica at 1400 C as standard state, divide
+        the given activity values by 0.92.
+      footnote_locator:
+        page: 3
+        published_page: 657
+        pdf_page_index: 2
+      note: The divided values are not stored.
+    series:
+    - activity_label_as_published: '0.8'
+      marker_count: 0
+    - activity_label_as_published: '0.7'
+      marker_count: 0
+    - activity_label_as_published: '0.6'
+      marker_count: 0
+    - activity_label_as_published: '0.5'
+      marker_count: 0
+    - activity_label_as_published: '0.4'
+      marker_count: 0
+    attribution: This work; Gibbs-Duhem integration
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: rego-1988-silicate-na2o-activities::context::rego_1988_fig4_sio2_isoactivity_model
+  work_id: 10.1007/bf02659158
+  source_id: rego-1988-silicate-na2o-activities
+  species: SiO2
+- observation_id: rego_1988_fig5_na2o_mgo_sio2_isoactivity
+  type: figure_record
+  locator:
+    page: 4
+    published_page: 658
+    pdf_page_index: 3
+    figure: '5'
+  phase: l
+  T_C: 1400
+  units: mol pct composition; log10 activity as printed
+  standard_state: pure liquid Na2O at 1400 C
+  values:
+    quantity: activity
+    printed_quantity: log a_Na2O
+    method_class: figure_only
+    evidence_class: figure_only
+    status: typed_refusal
+    reason: figure_not_digitized
+    species: Na2O
+    system_as_published: Na2O-MgO-SiO2
+    axes_as_printed: Na2O mol pct and MgO mol pct in a ternary diagram
+    caption_as_published: Iso-activity data for Na2O in the Na2O-MgO-SiO2 system at 1400 C.
+    panel: single ternary diagram
+    series:
+    - activity_label_as_published: '-7.02'
+      marker: open square
+      marker_count: 5
+    - activity_label_as_published: '-7.53'
+      marker: open triangle
+      marker_count: 5
+    - activity_label_as_published: '-7.56'
+      marker: open circle
+      marker_count: 5
+    - activity_label_as_published: '-7.72'
+      marker: open diamond
+      marker_count: 5
+    - activity_label_as_published: '-7.97'
+      marker: open inverted triangle
+      marker_count: 5
+    composition_state: unknown
+    composition_unknown_reason: Full per-marker melt compositions occur only as plotted positions; coordinates were not read
+      because figure digitisation is deferred.
+    activity_label_attribution: The activity levels are taken from earlier measurements in the binary Na2O-SiO2 system, reference
+      [2].
+    attribution: Melt compositions measured in this work; activity labels attributed to reference [2] as printed.
+    uncertainty_as_published: not stated
+    schema_gap: No log10-activity value form exists in the quantity schema. Labels remain strings as printed; no linear activities
+      are inferred.
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: rego-1988-silicate-na2o-activities::context::rego_1988_fig5_na2o_mgo_sio2_isoactivity
+  work_id: 10.1007/bf02659158
+  source_id: rego-1988-silicate-na2o-activities
+  species: Na2O
+- observation_id: rego_1988_fig6_na2o_blast_furnace_slag_isoactivity
+  type: figure_record
+  locator:
+    page: 4
+    published_page: 658
+    pdf_page_index: 3
+    figure: '6'
+  phase: l
+  T_C: 1400
+  units: normalized mole-fraction ratios; Al2O3 content in wt pct; log10 activity as printed
+  standard_state: pure liquid Na2O at 1400 C
+  values:
+    quantity: activity
+    printed_quantity: log a_Na2O
+    method_class: figure_only
+    evidence_class: figure_only
+    status: typed_refusal
+    reason: figure_not_digitized
+    species: Na2O
+    system_as_published: Na2O-CaO-SiO2-Al2O3 blast-furnace-type slags
+    axes_as_printed: X_CaO/(X_CaO + X_SiO2) and X_Na2O/(X_Na2O + X_SiO2); Al2O3 content series are 10 and 20 wt pct.
+    caption_as_published: Iso-activity data for Na2O in blast furnace type slags.
+    panel: single panel
+    series:
+    - activity_label_as_published: '-7.53'
+      Al2O3_content_as_published: 10 wt pct
+      marker: open inverted triangle
+      marker_count: 4
+    - activity_label_as_published: '-7.53'
+      Al2O3_content_as_published: 20 wt pct
+      marker: filled inverted triangle
+      marker_count: 4
+    - activity_label_as_published: '-7.56'
+      Al2O3_content_as_published: 10 wt pct
+      marker: open square
+      marker_count: 4
+    - activity_label_as_published: '-7.56'
+      Al2O3_content_as_published: 20 wt pct
+      marker: filled square
+      marker_count: 4
+    - activity_label_as_published: '-7.72'
+      Al2O3_content_as_published: 10 wt pct
+      marker: open circle
+      marker_count: 4
+    - activity_label_as_published: '-7.72'
+      Al2O3_content_as_published: 20 wt pct
+      marker: filled circle
+      marker_count: 4
+    - activity_label_as_published: '-7.97'
+      Al2O3_content_as_published: 10 wt pct
+      marker: open triangle
+      marker_count: 2
+    - activity_label_as_published: '-7.97'
+      Al2O3_content_as_published: 20 wt pct
+      marker: filled triangle
+      marker_count: 0
+    composition_state: unknown
+    composition_unknown_reason: Full per-marker compositions are not printed as a table; the two axes and Al2O3 series do
+      not define every melt composition without digitising marker coordinates.
+    activity_label_attribution: Isoactivity values are assigned from the earlier binary-system measurements cited as reference
+      [2].
+    attribution: Melt compositions measured in this work; activity labels attributed to reference [2] as printed.
+    uncertainty_as_published: not stated
+    schema_gap: No log10-activity value form exists in the quantity schema. Labels remain strings as printed; no linear activities
+      are inferred.
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: rego-1988-silicate-na2o-activities::context::rego_1988_fig6_na2o_blast_furnace_slag_isoactivity
+  work_id: 10.1007/bf02659158
+  source_id: rego-1988-silicate-na2o-activities
+  species: Na2O
+- observation_id: rego_1988_fig7_na2o_activity_ratio_model_comparison
+  type: figure_record
+  locator:
+    page: 5
+    published_page: 659
+    pdf_page_index: 4
+    figure: '7'
+  phase: l
+  T_C: 1400
+  units: log10 activity ratio as printed
+  values:
+    quantity: activity
+    printed_quantity: log((a_Na2O)_t/(a_Na2O)_b)
+    method_class: figure_only
+    species: Na2O
+    system_as_published: Na2O-CaO-SiO2 pseudo-binaries
+    axes_as_printed: X_Na2O(SiO2)y and log((a_Na2O)t/(a_Na2O)b)
+    caption_as_published: Variation of log{(a_Na2O)t/(a_Na2O)b} with composition at different fixed SiO2 levels.
+    panel: four panels at X_SiO2 = 0.60, 0.65, 0.70, and 0.75
+    series:
+    - label: Case 1 model curve in each panel
+      marker_count: 0
+      method_class: model_derived
+    - label: Case 2 model curve in each panel
+      marker_count: 0
+      method_class: model_derived
+    - label: Case 3 model curve in each panel
+      marker_count: 0
+      method_class: model_derived
+    - label: experimental points at X_SiO2 = 0.60
+      marker: filled circles
+      marker_count: 4
+      method_class: measured_reduced
+    - label: experimental points at X_SiO2 = 0.65
+      marker: filled circles
+      marker_count: 5
+      method_class: measured_reduced
+    - label: experimental points at X_SiO2 = 0.70
+      marker: filled circles
+      marker_count: 5
+      method_class: measured_reduced
+    - label: experimental points at X_SiO2 = 0.75
+      marker: filled circles
+      marker_count: 2
+      method_class: measured_reduced
+    schema_gap: The plotted observable is a logarithm of an activity ratio; no matching quantity form exists. Figure curves
+      and points are not digitised in this pass.
+    attribution: Richardson's model cases 1 to 3 compared with this work's experimental data.
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: rego-1988-silicate-na2o-activities::context::rego_1988_fig7_na2o_activity_ratio_model_comparison
+  work_id: 10.1007/bf02659158
+  source_id: rego-1988-silicate-na2o-activities
+  species: Na2O
+- observation_id: rego_1988_fig8_sodium_capacity
+  type: figure_record
+  locator:
+    page: 6
+    published_page: 660
+    pdf_page_index: 5
+    figure: '8'
+  phase: l
+  T_C: 1400
+  units: log C_Na as plotted; units not stated
+  values:
+    quantity: sodium_capacity_C_Na
+    printed_quantity: log C_Na
+    method_class: model_derived
+    species: Na2O
+    system_as_published: blast furnace type slags
+    axes_as_printed: (X_CaO + X_Na2O)/(X_SiO2 + 2X_Al2O3) and log C_Na
+    caption_as_published: Sodium capacities C_Na in blast furnace type slags at 1400 C.
+    panel: single panel
+    series:
+    - label: Al2O3 free slags
+      marker: open circles
+      marker_count: 11
+    - label: 10 wt pct Al2O3
+      marker: open squares
+      marker_count: 9
+    - label: 20 wt pct Al2O3
+      marker: open triangles
+      marker_count: 8
+    schema_gap: The store has no sodium-capacity quantity. Values are calculated from equation [6] and are retained as a deferred
+      figure record.
+    attribution: This work; sodium capacity calculated by equation [6].
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: rego-1988-silicate-na2o-activities::context::rego_1988_fig8_sodium_capacity
+  work_id: 10.1007/bf02659158
+  source_id: rego-1988-silicate-na2o-activities
+  species: Na2O
+- observation_id: rego_1988_gas_melt_equilibration_method
+  type: method
+  locator:
+    page: 1
+    published_page: 655
+    pdf_page_index: 0
+    section: Gas-Phase Equilibration Method
+  units: temperature C; gas pressure as described in the text
+  values:
+    quantity: gas_melt_equilibration_method
+    method_class: method_only
+    rail: melt_activity
+    method_as_published: Multiple multicomponent melts were equilibrated through a shared gas phase with a binary Na2O-SiO2
+      master melt in graphite. The Na vapour pressure was established by Na2O(l) + C(s) = 2Na(g) + CO(g). The low-permeability
+      graphite crucible was evacuated and backfilled with CO; pure CO maintained a slight positive pressure, and the gas was
+      not swept over the melt during equilibration. The melts were stirred at 40 to 60 rpm and equilibrated for 3.5 to 4 hours.
+      Samples were withdrawn rapidly, cooled in air, dissolved in toto, and analysed by flame atomic absorption and emission
+      spectrophotometry.
+    standard_state_as_printed: pure liquid Na2O at 1400 C
+    T_C: 1400
+    gas_atmosphere_as_published: pure CO; slight positive pressure
+    total_pressure: unknown; no numeric value published
+    printed_composition_basis: The plotted composition axes are in mol pct for ternary systems; Figure 6 gives normalized
+      mole-fraction ratios and 10 or 20 wt pct Al2O3 series. Full per-marker compositions are not tabulated.
+    uncertainty_as_published: no printed uncertainty for the Na2O activity data
+    attribution: This work
+  context_id: rego-1988-silicate-na2o-activities::context::rego_1988_gas_melt_equilibration_method
+  work_id: 10.1007/bf02659158
+  source_id: rego-1988-silicate-na2o-activities
+  species: Na2O
+- observation_id: rego_1988_quoted_binary_na_vapor_pressure_range
+  type: context
+  locator:
+    page: 1
+    published_page: 655
+    pdf_page_index: 0
+    section: Introduction
+  units: atm
+  values:
+    quantity: p_partial
+    printed_quantity: Na vapor pressure
+    range_as_published: about 10^-2.5 to 10^-1.0 atm
+    approximate: true
+    condition_as_published: CO partial pressure close to 1 atm
+    method_class: quoted_attributed
+    attribution: Rego, Sigworth, and Philbrook 1985, reference [2]
+  context_id: rego-1988-silicate-na2o-activities::context::rego_1988_quoted_binary_na_vapor_pressure_range
+  work_id: 10.1007/bf02659158
+  source_id: rego-1988-silicate-na2o-activities
+  species: Na2O
+- observation_id: rego_1988_stirred_composition_variation
+  type: context
+  locator:
+    page: 3
+    published_page: 657
+    pdf_page_index: 2
+    section: Results and Discussion
+  units: percent
+  values:
+    printed_quantity: Na2O compositional variation
+    value_as_published: less than 2 pct
+    condition_as_published: binary melt stirred during subsequent runs
+    attribution: This work
+  context_id: rego-1988-silicate-na2o-activities::context::rego_1988_stirred_composition_variation
+  work_id: 10.1007/bf02659158
+  source_id: rego-1988-silicate-na2o-activities
+  species: Na2O
+- observation_id: rego_1988_table_i_sio2_terminal_binary_activities
+  type: context
+  locator:
+    page: 5
+    published_page: 659
+    pdf_page_index: 4
+    table: I
+  phase: l
+  T_C: 1400
+  units: mole fraction; log10 activity as printed
+  standard_state: pure liquid SiO2 at 1400 C
+  values:
+    printed_quantity: log a_SiO2(l)
+    schema_gap: No log-activity value form exists in the quantity schema. The printed logarithms remain strings; no linear
+      activities are inferred.
+    columns:
+      CaO-(SiO2)y:
+        method_class: model_derived
+        attribution: Authors' extrapolation of Rein and Chipman, Trans. TMS-AIME, 1965, vol. 233, pp. 415-25, shifted with
+          JANAF.
+      Na2O-(SiO2)y:
+        method_class: quoted_attributed
+        attribution: Rego, Sigworth, and Philbrook, Metall. Trans. B, 1985, vol. 16B, pp. 313-23, reference [2].
+    rows:
+    - X_SiO2: '0.60'
+      y: '1.50'
+      log_a_SiO2(l)_CaO-(SiO2)y: '-0.057'
+      log_a_SiO2(l)_Na2O-(SiO2)y: '-0.982'
+    - X_SiO2: '0.65'
+      y: '1.86'
+      log_a_SiO2(l)_CaO-(SiO2)y: '0.023'
+      log_a_SiO2(l)_Na2O-(SiO2)y: '-0.644'
+    - X_SiO2: '0.70'
+      y: '2.33'
+      log_a_SiO2(l)_CaO-(SiO2)y: '0.050'
+      log_a_SiO2(l)_Na2O-(SiO2)y: '-0.401'
+    - X_SiO2: '0.75'
+      y: '3.00'
+      log_a_SiO2(l)_CaO-(SiO2)y: '0.072'
+      log_a_SiO2(l)_Na2O-(SiO2)y: '-0.233'
+    attribution: This work; Table I values have the column-specific provenance above.
+  context_id: rego-1988-silicate-na2o-activities::context::rego_1988_table_i_sio2_terminal_binary_activities
+  work_id: 10.1007/bf02659158
+  source_id: rego-1988-silicate-na2o-activities
+  species: SiO2
+- observation_id: rego_1988_table_ii_calculated_sodium_capacity_and_pressure
+  type: context
+  locator:
+    page: 7
+    published_page: 661
+    pdf_page_index: 6
+    table: II
+  units: as printed in each table row
+  values:
+    method_class: model_derived
+    table_title_as_published: Calculation of P_Na for a 10 Wt Pct Al2O3 Blast Furnace Type Slag with Unit Basicity
+    calculation_basis: Calculated from the paper's equations; these tabulated values are not measurements.
+    conditions_as_published:
+      Al2O3: 10 wt pct
+      basicity: unit
+    temperature_columns_C:
+    - '1400'
+    - '1500'
+    - '1600'
+    rows:
+    - printed_quantity: log C_Na
+      quantity: sodium_capacity_C_Na
+      values_as_published:
+      - '1.6'
+      - '0.9'
+      - '0.25'
+      schema_gap: The store has no sodium-capacity quantity. The logarithms stay as printed, matching the gap recorded for
+        Figure 8.
+    - printed_quantity: X_Na2O
+      units: mole fraction
+      values_as_published:
+      - '0.005'
+      - '0.005'
+      - '0.005'
+    - printed_quantity: p_CO
+      units: atm
+      values_as_published:
+      - '2.0'
+      - '2.0'
+      - '2.0'
+    - printed_quantity: p_Na
+      quantity: p_partial
+      units: atm
+      method_class: model_derived
+      values_as_published:
+      - '0.008'
+      - '0.018'
+      - '0.037'
+    attribution: This work; calculated values from the paper's equations.
+  context_id: rego-1988-silicate-na2o-activities::context::rego_1988_table_ii_calculated_sodium_capacity_and_pressure
+  work_id: 10.1007/bf02659158
+  source_id: rego-1988-silicate-na2o-activities
+  species: Na2O
+- observation_id: rego_1988_unstirred_reference_binary_difference
+  type: context
+  locator:
+    page: 3
+    published_page: 657
+    pdf_page_index: 2
+    section: Results and Discussion
+  units: percent relative to the binary master
+  values:
+    printed_quantity: Na2O composition difference
+    value_as_published: 3 to 5 pct lower in Na2O
+    sample_as_published: unstirred reference binary melts
+    attribution: This work
+  context_id: rego-1988-silicate-na2o-activities::context::rego_1988_unstirred_reference_binary_difference
+  work_id: 10.1007/bf02659158
+  source_id: rego-1988-silicate-na2o-activities
+  species: Na2O

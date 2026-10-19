@@ -1,0 +1,4093 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1007/s11837-021-04870-0
+  citation: Chen, Min, Wan, Xingbang, Shi, Junjie, Taskinen, Pekka, and Jokilaakso, Ari (2022). Experimental Study on the
+    Phase Relations of the SiO2-MgO-TiO2 System in Air at 1500 C. JOM 74(2), 676–688.
+  source_ids:
+  - chen-2022-mgo-sio2-tio2-phase-equilibria
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:chen-2022-mgo-sio2-tio2-phase-equilibria
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1007/s11837-021-04870-0
+experiments:
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C1
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.3393564875998195784220566995'
+          - - SiO2
+            - '0.3336964885070766371351239802'
+          - - MgO
+            - '0.3269470238931037844428193201'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '44.92'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '33.23'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '21.84'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '44.92'
+          SiO2: '33.23'
+          MgO: '21.84'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C1
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C11
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.5438148520395882668491053701'
+          - - SiO2
+            - '0.1436686028972491286911464536'
+          - - MgO
+            - '0.3125165450631626044597481765'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '67.17'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '13.35'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '19.48'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '67.17'
+          SiO2: '13.35'
+          MgO: '19.48'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C11
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C43
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.3712708046931965473405520617'
+          - - SiO2
+            - '0.3062462860420133616879277328'
+          - - MgO
+            - '0.3224829092647900909715202058'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '48.57'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '30.14'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '21.29'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '48.57'
+          SiO2: '30.14'
+          MgO: '21.29'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C43
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C44
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.3685847145331666150354356845'
+          - - SiO2
+            - '0.3308521117988897152655062888'
+          - - MgO
+            - '0.3005631736679436696990580266'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.92'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '32.36'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '19.72'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '47.92'
+          SiO2: '32.36'
+          MgO: '19.72'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C44
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C45
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.3352979699432377024513381937'
+          - - SiO2
+            - '0.4482908816197240730197137396'
+          - - MgO
+            - '0.2164111484370382245289480665'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 679
+        pdf_page_index: 3
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '42.89'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '43.14'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '13.97'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '42.89'
+          SiO2: '43.14'
+          MgO: '13.97'
+      locator:
+        published_page: 679
+        pdf_page_index: 3
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 679
+    pdf_page_index: 3
+    table: II
+    note: row=C45
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C46
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.2204366375234204485232597583'
+          - - SiO2
+            - '0.4883569965938222714497761594'
+          - - MgO
+            - '0.2912063658827572800269640828'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '30'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '20'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '30'
+          SiO2: '50'
+          MgO: '20'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C46
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C47
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.1942853773195780258744619515'
+          - - SiO2
+            - '0.5085830988810802826880477725'
+          - - MgO
+            - '0.2971315237993416914374902763'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '26.73'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '52.64'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '20.63'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '26.73'
+          SiO2: '52.64'
+          MgO: '20.63'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C47
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C48
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.1599552697223580509556067256'
+          - - SiO2
+            - '0.5296007151249427014198041357'
+          - - MgO
+            - '0.3104440151526992476245891389'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '22.37'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '55.72'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '21.91'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '22.37'
+          SiO2: '55.72'
+          MgO: '21.91'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C48
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C49
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.1234997633842278445496996863'
+          - - SiO2
+            - '0.5518736040650670129805838533'
+          - - MgO
+            - '0.3246266325507051424697164606'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '17.58'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '59.1'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '23.32'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '17.58'
+          SiO2: '59.1'
+          MgO: '23.32'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C49
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C5
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.4579065955209204719360934112'
+          - - SiO2
+            - '0.2469659191433281785576481271'
+          - - MgO
+            - '0.2951274853357513495062584615'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '57.77'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '23.44'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '18.79'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '57.77'
+          SiO2: '23.44'
+          MgO: '18.79'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C5
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C50
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.08924635906100311168370898195'
+          - - SiO2
+            - '0.5751407023955294271017390087'
+          - - MgO
+            - '0.3356129385434674612145520096'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '12.91'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '62.59'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '24.5'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '12.91'
+          SiO2: '62.59'
+          MgO: '24.5'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C50
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C51
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.06043523159599917922491193376'
+          - - SiO2
+            - '0.5925818942639477681293722147'
+          - - MgO
+            - '0.3469828741400530526457158511'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '8.87'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '65.43'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '25.7'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '8.87'
+          SiO2: '65.43'
+          MgO: '25.7'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C51
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C52
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.03600280693081240551520044199'
+          - - SiO2
+            - '0.6075543622660064216424075843'
+          - - MgO
+            - '0.3564428308031811728423919734'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '5.35'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '67.92'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '26.73'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '5.35'
+          SiO2: '67.92'
+          MgO: '26.73'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C52
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C53
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.2733265150280844752697429628'
+          - - SiO2
+            - '0.4584795905764791808603845895'
+          - - MgO
+            - '0.2681938943954363438698724475'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '36.27'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.77'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '17.96'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '36.27'
+          SiO2: '45.77'
+          MgO: '17.96'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C53
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C54
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.02795826232961155155990475367'
+          - - SiO2
+            - '0.5378726107015068372257966097'
+          - - MgO
+            - '0.4341691269688816112142986367'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 679
+        pdf_page_index: 3
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '4.29'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '62.09'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '33.62'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '4.29'
+          SiO2: '62.09'
+          MgO: '33.62'
+      locator:
+        published_page: 679
+        pdf_page_index: 3
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 679
+    pdf_page_index: 3
+    table: II
+    note: row=C54
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C55
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.03811826193034940640463419446'
+          - - SiO2
+            - '0.5036689357244783032266875664'
+          - - MgO
+            - '0.4582128023451722903686782392'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 679
+        pdf_page_index: 3
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '5.88'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '58.45'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '35.67'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '5.88'
+          SiO2: '58.45'
+          MgO: '35.67'
+      locator:
+        published_page: 679
+        pdf_page_index: 3
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 679
+    pdf_page_index: 3
+    table: II
+    note: row=C55
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C57
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.06586611989698113646503024453'
+          - - SiO2
+            - '0.4559973393101039825954054634'
+          - - MgO
+            - '0.478136540792914880939564292'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 679
+        pdf_page_index: 3
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '10.13'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '52.76'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '37.11'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '10.13'
+          SiO2: '52.76'
+          MgO: '37.11'
+      locator:
+        published_page: 679
+        pdf_page_index: 3
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 679
+    pdf_page_index: 3
+    table: II
+    note: row=C57
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C58
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.09890225205111041174182576394'
+          - - SiO2
+            - '0.4197448603126645820369578298'
+          - - MgO
+            - '0.481352887636225006221216406'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '15.04'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '48.02'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '36.94'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '15.04'
+          SiO2: '48.02'
+          MgO: '36.94'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C58
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C59
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.1254010083071249624009504183'
+          - - SiO2
+            - '0.3778801736934693710637615833'
+          - - MgO
+            - '0.4967188179994056665352879985'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '18.99'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '43.05'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '37.96'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '18.99'
+          SiO2: '43.05'
+          MgO: '37.96'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C59
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C60
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.1684074925220011967027731467'
+          - - SiO2
+            - '0.3432976180543144555307417075'
+          - - MgO
+            - '0.4882948894236843477664851457'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '25.02'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '38.37'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '36.61'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '25.02'
+          SiO2: '38.37'
+          MgO: '36.61'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C60
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C61
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.2053074759609690877334480494'
+          - - SiO2
+            - '0.3021500074154070881671794605'
+          - - MgO
+            - '0.4925425166236238240993724901'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '30.14'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '33.37'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '36.49'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '30.14'
+          SiO2: '33.37'
+          MgO: '36.49'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C61
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C65
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.392728401323447996593159729'
+          - - SiO2
+            - '0.231053492230458017993263494'
+          - - MgO
+            - '0.3762181064460939854135767771'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '51.92'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '22.98'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '25.1'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '51.92'
+          SiO2: '22.98'
+          MgO: '25.1'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C65
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C66
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.3878137970059118280626089478'
+          - - SiO2
+            - '0.2049875113530643847771646673'
+          - - MgO
+            - '0.4071986916410237871602263846'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '51.88'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '20.63'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '27.49'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '51.88'
+          SiO2: '20.63'
+          MgO: '27.49'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C66
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C68
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.06630839525237043855242233211'
+          - - SiO2
+            - '0.4884903134328757116626663554'
+          - - MgO
+            - '0.4452012913147538497849113123'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '10.07'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '55.81'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '34.12'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '10.07'
+          SiO2: '55.81'
+          MgO: '34.12'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C68
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C69
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.08236344769369489406492150145'
+          - - SiO2
+            - '0.4645267332682609679757598445'
+          - - MgO
+            - '0.4531098190380441379593186546'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '12.47'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '52.91'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '34.62'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '12.47'
+          SiO2: '52.91'
+          MgO: '34.62'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C69
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C7
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.5009389158220300915279945367'
+          - - SiO2
+            - '0.1992812858976209245284398407'
+          - - MgO
+            - '0.2997797982803489839435656227'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '62.45'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '18.69'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '18.86'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '62.45'
+          SiO2: '18.69'
+          MgO: '18.86'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C7
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C70
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.1009813494904519098097369558'
+          - - SiO2
+            - '0.4428670877810972563767876535'
+          - - MgO
+            - '0.4561515627284508338134753906'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '15.2'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.15'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '34.65'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '15.2'
+          SiO2: '50.15'
+          MgO: '34.65'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C70
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C71
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.1183088582187749311551968491'
+          - - SiO2
+            - '0.4246057919284097276620083908'
+          - - MgO
+            - '0.4570853498528153411827947599'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '17.7'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.79'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '34.51'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '17.7'
+          SiO2: '47.79'
+          MgO: '34.51'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C71
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C72
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.3247974234196712279628295897'
+          - - SiO2
+            - '0.1994743983668137844124002426'
+          - - MgO
+            - '0.4757281782135149876247701675'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 679
+        pdf_page_index: 3
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.43'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '20.99'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '33.58'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 679
+              pdf_page_index: 3
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '45.43'
+          SiO2: '20.99'
+          MgO: '33.58'
+      locator:
+        published_page: 679
+        pdf_page_index: 3
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 679
+    pdf_page_index: 3
+    table: II
+    note: row=C72
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C73
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.05767795082331892638564204264'
+          - - SiO2
+            - '0.493463780572191977990874083'
+          - - MgO
+            - '0.4488582686044890956234838747'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '8.8'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '56.64'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '34.56'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '8.8'
+          SiO2: '56.64'
+          MgO: '34.56'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C73
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C75
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.2757303334295952622869149956'
+          - - SiO2
+            - '0.3383716247989216221826334232'
+          - - MgO
+            - '0.3858980417714831155304515815'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '38.03'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '35.11'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '26.86'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '38.03'
+          SiO2: '35.11'
+          MgO: '26.86'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C75
+- experiment_id: 10.1007/s11837-021-04870-0::experiment::chen22_C78
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - TiO2
+            - '0.1540408972260430794397138582'
+          - - SiO2
+            - '0.3608659662856548490919417181'
+          - - MgO
+            - '0.4850931364883020714683444236'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '22.98'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '40.5'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '36.52'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              published_page: 678
+              pdf_page_index: 2
+              table: II
+        output_unit: mole_fraction
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: '22.98'
+          SiO2: '40.5'
+          MgO: '36.52'
+      locator:
+        published_page: 678
+        pdf_page_index: 2
+        table: II
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s11837-021-04870-0
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    note: row=C78
+context:
+- observation_id: chen22_fig1_furnace_schematic
+  type: figure_record
+  locator:
+    published_page: 680
+    pdf_page_index: 4
+    figure: '1'
+  phase: not applicable; apparatus schematic
+  units: no figure values digitised
+  values:
+    quantity: experimental furnace schematic (no measured quantity)
+    method_class: figure_only
+    evidence_class: figure_only
+    species:
+    - SiO2
+    - MgO
+    - TiO2
+    system_as_published: SiO2-MgO-TiO2
+    T_C: 1500
+    atmosphere_as_published: air
+    axes_as_published: none; labelled furnace schematic
+    caption_as_published: Schematic cross section of experimental furnace with hanging sample pellet at its geometric center.
+    panel: single panel
+    series:
+    - label: furnace and sample apparatus components
+      marker_count: 0
+    attribution: This work
+    digitisation: deferred to a figure pass
+    numeric_points: none
+  context_id: chen-2022-mgo-sio2-tio2-phase-equilibria::context::chen22_fig1_furnace_schematic
+  work_id: 10.1007/s11837-021-04870-0
+  source_id: chen-2022-mgo-sio2-tio2-phase-equilibria
+  species: SiO2
+- observation_id: chen22_fig2_equilibration_and_tio2_xrd
+  type: figure_record
+  locator:
+    published_page: 680
+    pdf_page_index: 4
+    figure: '2'
+  phase: multiple phases as identified in each panel
+  units: no figure values digitised
+  values:
+    quantity: equilibrium_phase_composition (panel a); X-ray diffraction intensity (panel b)
+    method_class: figure_only
+    evidence_class: figure_only
+    species:
+    - SiO2
+    - MgO
+    - TiO2
+    system_as_published: SiO2-MgO-TiO2
+    T_C: 1500
+    atmosphere_as_published: air
+    axes_as_published: (a) Time/h; Concentration/wt.%; (b) 2θ (degree); Intensity (a.u.)
+    caption_as_published: TiO2, SiO2, and MgO concentrations in liquid oxide as well as TiO2 and SiO2 concentrations in solid
+      cristobalite vs equilibration time (a); and XRD pattern of pure TiO2 calcined at 1500°C for 24 hours (b).
+    panel: (a) and (b)
+    series:
+    - panel: a
+      label: TiO2 in liquid oxide
+      marker_count: 4
+    - panel: a
+      label: SiO2 in liquid oxide
+      marker_count: 4
+    - panel: a
+      label: MgO in liquid oxide
+      marker_count: 4
+    - panel: a
+      label: TiO2 in cristobalite
+      marker_count: 4
+    - panel: a
+      label: SiO2 in cristobalite
+      marker_count: 4
+    - panel: b
+      label: pure TiO2 XRD trace
+      marker_count: 0
+    attribution: This work
+    digitisation: deferred to a figure pass
+    numeric_points: none
+    marker_count_note: Counts are visible plotted data markers; continuous XRD traces, reference-peak keys, micrograph scale
+      bars, and legend glyphs are not counted as data markers.
+  context_id: chen-2022-mgo-sio2-tio2-phase-equilibria::context::chen22_fig2_equilibration_and_tio2_xrd
+  work_id: 10.1007/s11837-021-04870-0
+  source_id: chen-2022-mgo-sio2-tio2-phase-equilibria
+  species: SiO2
+- observation_id: chen22_fig3_two_phase_microstructures_and_xrd
+  type: figure_record
+  locator:
+    published_page: 681
+    pdf_page_index: 5
+    figure: '3'
+  phase: multiple phases as identified in each panel
+  units: no figure values digitised
+  values:
+    quantity: back-scattered electron images and X-ray diffraction patterns
+    method_class: figure_only
+    evidence_class: figure_only
+    species:
+    - SiO2
+    - MgO
+    - TiO2
+    system_as_published: SiO2-MgO-TiO2
+    T_C: 1500
+    atmosphere_as_published: air
+    axes_as_published: (a-f) micrographs; associated XRD Intensity (a.u.) vs 2θ (degree)
+    caption_as_published: Back scattered electron images and XRD patterns for single liquid phase equilibrium and liquid-solid
+      two-phase coexisting equilibria; (a) single liquid; (b) liquid-TiO2; (c) liquid-cristobalite; (d) liquid-MgO·SiO2; (e)
+      liquid-2MgO·SiO2; and (f) liquid-MgO·2TiO2.
+    panel: (a-f)
+    series:
+    - panel: a
+      label: C75 single liquid; BSE image and XRD trace
+      marker_count: 0
+    - panel: b
+      label: C5 liquid-TiO2; BSE image and XRD trace
+      marker_count: 0
+    - panel: c
+      label: C49 liquid-cristobalite; BSE image and XRD trace
+      marker_count: 0
+    - panel: d
+      label: C73 liquid-MgO·SiO2; BSE image and XRD trace
+      marker_count: 0
+    - panel: e
+      label: C78 liquid-2MgO·SiO2; BSE image and XRD trace
+      marker_count: 0
+    - panel: f
+      label: C66 liquid-MgO·2TiO2; BSE image and XRD trace
+      marker_count: 0
+    attribution: This work
+    digitisation: deferred to a figure pass
+    numeric_points: none
+    continued_on_published_pages:
+    - 681
+    - 682
+    marker_count_note: Counts are visible plotted data markers; continuous XRD traces, reference-peak keys, micrograph scale
+      bars, and legend glyphs are not counted as data markers.
+  context_id: chen-2022-mgo-sio2-tio2-phase-equilibria::context::chen22_fig3_two_phase_microstructures_and_xrd
+  work_id: 10.1007/s11837-021-04870-0
+  source_id: chen-2022-mgo-sio2-tio2-phase-equilibria
+  species: SiO2
+- observation_id: chen22_fig4_three_phase_microstructures_and_xrd
+  type: figure_record
+  locator:
+    published_page: 683
+    pdf_page_index: 7
+    figure: '4'
+  phase: multiple phases as identified in each panel
+  units: no figure values digitised
+  values:
+    quantity: back-scattered electron images and X-ray diffraction patterns
+    method_class: figure_only
+    evidence_class: figure_only
+    species:
+    - SiO2
+    - MgO
+    - TiO2
+    system_as_published: SiO2-MgO-TiO2
+    T_C: 1500
+    atmosphere_as_published: air
+    axes_as_published: (a-e) micrographs; associated XRD Intensity (a.u.) vs 2θ (degree)
+    caption_as_published: Back scattered electron images and XRD patterns for liquid-solid-solid three-phase coexisting equilibria;
+      (a) liquid-MgO·2TiO2-TiO2; (b) liquid-MgO·SiO2-cristobalite; (c) liquid-TiO2-cristobalite; (d) liquid-MgO·SiO2-2MgO·SiO2;
+      and (e) liquid-2MgO·SiO2-MgO·2TiO2.
+    panel: (a-e)
+    series:
+    - panel: a
+      label: C7 liquid-MgO·2TiO2-TiO2; BSE image and XRD trace
+      marker_count: 0
+    - panel: b
+      label: C54 liquid-MgO·SiO2-cristobalite; BSE image and XRD trace
+      marker_count: 0
+    - panel: c
+      label: C45 liquid-TiO2-cristobalite; BSE image and XRD trace
+      marker_count: 0
+    - panel: d
+      label: C57 liquid-MgO·SiO2-2MgO·SiO2; BSE image and XRD trace
+      marker_count: 0
+    - panel: e
+      label: C72 liquid-2MgO·SiO2-MgO·2TiO2; BSE image and XRD trace
+      marker_count: 0
+    attribution: This work
+    digitisation: deferred to a figure pass
+    numeric_points: none
+    continued_on_published_pages:
+    - 683
+    - 684
+    marker_count_note: Counts are visible plotted data markers; continuous XRD traces, reference-peak keys, micrograph scale
+      bars, and legend glyphs are not counted as data markers.
+  context_id: chen-2022-mgo-sio2-tio2-phase-equilibria::context::chen22_fig4_three_phase_microstructures_and_xrd
+  work_id: 10.1007/s11837-021-04870-0
+  source_id: chen-2022-mgo-sio2-tio2-phase-equilibria
+  species: SiO2
+- observation_id: chen22_fig5_tio2_cristobalite_vs_liquid
+  type: figure_record
+  locator:
+    published_page: 685
+    pdf_page_index: 9
+    figure: '5'
+  phase: multiple phases as identified in each panel
+  units: no figure values digitised
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: figure_only
+    evidence_class: figure_only
+    species:
+    - SiO2
+    - MgO
+    - TiO2
+    system_as_published: SiO2-MgO-TiO2
+    T_C: 1500
+    atmosphere_as_published: air
+    axes_as_published: 'x: TiO2 in liquid/wt%; y: TiO2 in cristobalite/wt.%'
+    caption_as_published: Concentration of TiO2 in cristobalite phase versus TiO2 in liquid oxide.
+    panel: single panel
+    series:
+    - label: Present experimental results (diamonds)
+      marker_count: 11
+    - label: Predictions by MTDATA (red circles)
+      marker_count: 3
+    attribution: 'Present experimental results; model series: MTDATA, Mtox 8.2 database'
+    digitisation: deferred to a figure pass
+    numeric_points: none
+    marker_count_note: Marker counts are visible symbol centres; no coordinates or values were read.
+  context_id: chen-2022-mgo-sio2-tio2-phase-equilibria::context::chen22_fig5_tio2_cristobalite_vs_liquid
+  work_id: 10.1007/s11837-021-04870-0
+  source_id: chen-2022-mgo-sio2-tio2-phase-equilibria
+  species: SiO2
+- observation_id: chen22_fig6_isothermal_phase_diagram_comparisons
+  type: figure_record
+  locator:
+    published_page: 686
+    pdf_page_index: 10
+    figure: '6'
+  phase: multiple phases as identified in each panel
+  units: no figure values digitised
+  values:
+    quantity: isothermal phase diagram / phase-boundary relations
+    method_class: figure_only
+    evidence_class: figure_only
+    species:
+    - SiO2
+    - MgO
+    - TiO2
+    system_as_published: SiO2-MgO-TiO2
+    T_C: 1500
+    atmosphere_as_published: air
+    axes_as_published: (a-d) ternary mass composition with SiO2, MgO, and TiO2 vertices; wt.%
+    caption_as_published: Isothermal phase diagram of MgO-SiO2-TiO2 system in air at 1500°C (a), comparisons of the present
+      results with the data by Massazza and Sirchia 72 (b) in air, and simulations by FactSage (c), and MTDATA (d).
+    panel: (a) present study; (b) Massazza and Sirchia; (c) FactSage; (d) MTDATA
+    series:
+    - panel: a
+      label: Present study phase fields and saturation boundaries
+      marker_count: 0
+    - panel: b
+      label: Massazza and Sirchia (1972) phase boundaries
+      marker_count: 0
+    - panel: c
+      label: FactSage simulation
+      marker_count: 0
+    - panel: d
+      label: MTDATA simulation
+      marker_count: 0
+    attribution: Present study; Massazza and Sirchia (1972); FactSage; MTDATA
+    digitisation: deferred to a figure pass
+    numeric_points: none
+    marker_count_note: Panels show boundary curves, phase fields, and legend symbols; no discrete plotted point series is
+      counted.
+  context_id: chen-2022-mgo-sio2-tio2-phase-equilibria::context::chen22_fig6_isothermal_phase_diagram_comparisons
+  work_id: 10.1007/s11837-021-04870-0
+  source_id: chen-2022-mgo-sio2-tio2-phase-equilibria
+  species: SiO2
+- observation_id: chen22_table_i_reagent_purities
+  type: method
+  locator:
+    published_page: 677
+    pdf_page_index: 1
+    table: I
+  units: wt.% as printed
+  values:
+    quantity: experimental_materials_as_published
+    method_class: method_only
+    materials:
+    - oxide: SiO2
+      purity: '99.995'
+      supplier: Alfa Aesar
+      location: Kandel
+    - oxide: MgO
+      purity: '99.95'
+      supplier: Alfa Aesar
+      location: Karlsruhe
+    - oxide: TiO2
+      purity: '99.8'
+      supplier: Sigma-Aldrich
+      location: Steinheim
+  context_id: chen-2022-mgo-sio2-tio2-phase-equilibria::context::chen22_table_i_reagent_purities
+  work_id: 10.1007/s11837-021-04870-0
+  source_id: chen-2022-mgo-sio2-tio2-phase-equilibria
+  species: SiO2
+- observation_id: chen22_table_ii_experimental_method
+  type: method
+  locator:
+    published_page: 677
+    pdf_page_index: 1
+    section: Experimental
+    table: II
+  units: temperature °C; duration min or h; SEM-EDS settings as printed
+  values:
+    quantity: equilibrium_phase_composition_method
+    method_class: method_only
+    method_as_published: High-temperature isothermal equilibration, quenching, and direct phase analysis by XRD and SEM-EDS.
+    sample_preparation_as_published: Synthetic slag (0.15–0.3 g) was pre-heated at 1600°C for 30 min and then equilibrated
+      at 1500°C. Pure platinum foil supported the pellet; a Pt wire held the crucible.
+    equilibration_and_quench_as_published: Samples were annealed at 1500°C for equilibration and quenched in an ice-water
+      mixture. Samples were annealed at the experimental temperature for 12 h.
+    atmosphere_as_published: air
+    analysis_as_published: 'SEM-EDS at 15 kV, 20 nA, and 20 mm working distance; at least ten random measurements per phase;
+      Proza (Phi-Rho-Z) matrix correction before normalization. Standards: quartz for O-Kα and Si-Kα, rutile for Ti-Kα, and
+      pure metals Mg for Mg-Kα. XRD used Cu Kα radiation, 40 kV, 40 mA, over 10° to 90° (2θ).'
+    T_C: 1500
+    attribution: This work
+    log10_P_O2_atm_as_published: '-0.6778'
+    log10_P_O2_locator:
+      published_page: 679
+      pdf_page_index: 3
+      section: Experimental
+      note: At 1500 °C in air
+    total_pressure_atm_as_published: 1
+    total_pressure_text_as_published: P = 1 atm
+    total_pressure_locator:
+      published_page: 685
+      pdf_page_index: 9
+      section: Gibbs phase rule
+  context_id: chen-2022-mgo-sio2-tio2-phase-equilibria::context::chen22_table_ii_experimental_method
+  work_id: 10.1007/s11837-021-04870-0
+  source_id: chen-2022-mgo-sio2-tio2-phase-equilibria
+  species: SiO2
+- observation_id: chen22_table_ii_printed_parenthetical_values_and_c53_cell
+  type: schema_gap
+  locator:
+    published_page: 678
+    pdf_page_index: 2
+    table: II
+    rows:
+    - C46-C55
+    - C65-C72
+  units: wt.%
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: method_only
+    gap: Several printed central values use a parenthetical form such as 0.0(3); the current scalar parser cannot represent
+      that printed form. Those central values are kept as strings and migrate unavailable. Their complete cells and widths
+      remain verbatim in phase_composition_as_published and uncertainty_as_published. No conversion or uncertainty interpretation
+      was inferred.
+    table_cell_anomaly: The C53 cristobalite MgO cell visibly prints 0.0(3) ± ± 0.0(1); the duplicated ± is retained as printed.
+    unavailable_component_values: 11
+    attribution: This work
+  context_id: chen-2022-mgo-sio2-tio2-phase-equilibria::context::chen22_table_ii_printed_parenthetical_values_and_c53_cell
+  work_id: 10.1007/s11837-021-04870-0
+  source_id: chen-2022-mgo-sio2-tio2-phase-equilibria
+  species: SiO2

@@ -1,0 +1,517 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/folstad-2024-metals-cao-dissolution-cas.yaml
+observations:
+- observation_id: folstad-2024-metals-cao-dissolution-cas::folstad_2024_table3_liquidus_slag1::T=1763.15:h=63cc550c9ff2
+  experiment_id: 10.3390/met14020243::folstad-2024-metals-cao-dissolution-cas
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: liquidus
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.6280796047125404092984913694'
+        - - CaO
+          - '0.1802539376180307659580055488'
+        - - Al2O3
+          - '0.191666457669428824743503082'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1763.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: SiO2-CaO-Al2O3 ternary diagram [12]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: folstad-2024-metals-cao-dissolution-cas
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    table: '3'
+    note: row=1
+  read_from: unknown:folstad-2024-metals-cao-dissolution-cas
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          SiO2_wt_pct: '56'
+          CaO_wt_pct: '15'
+          Al2O3_wt_pct: '29'
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '3'
+    temperature_K:
+      state:
+        tag: value
+        value: '1763.15'
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '3'
+        note: row=1
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1490'
+            locator:
+              page: 5
+              published_page: 5
+              pdf_page_index: 4
+              table: '3'
+              note: row=1
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 5
+              pdf_page_index: 4
+              table: '3'
+              note: row=1
+        output_unit: K
+  derivation:
+    relation: celsius_to_kelvin
+    inputs:
+    - unknown:folstad-2024-metals-cao-dissolution-cas
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1490'
+        locator:
+          page: 5
+          published_page: 5
+          pdf_page_index: 4
+          table: '3'
+          note: row=1
+    - - factor
+      - state:
+          tag: value
+          value: '273.15'
+        locator:
+          page: 5
+          published_page: 5
+          pdf_page_index: 4
+          table: '3'
+          note: row=1
+    output_unit: K
+- observation_id: folstad-2024-metals-cao-dissolution-cas::folstad_2024_table3_liquidus_slag2::T=1823.15:h=0b788571e900
+  experiment_id: 10.3390/met14020243::folstad-2024-metals-cao-dissolution-cas
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: liquidus
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4514217044887851369690124408'
+        - - CaO
+          - '0.2545632299835815506137565513'
+        - - Al2O3
+          - '0.2940150655276333124172310079'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1823.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: SiO2-CaO-Al2O3 ternary diagram [12]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: folstad-2024-metals-cao-dissolution-cas
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    table: '3'
+    note: row=2
+  read_from: unknown:folstad-2024-metals-cao-dissolution-cas
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          SiO2_wt_pct: '38'
+          CaO_wt_pct: '20'
+          Al2O3_wt_pct: '42'
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '3'
+    temperature_K:
+      state:
+        tag: value
+        value: '1823.15'
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '3'
+        note: row=2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1550'
+            locator:
+              page: 5
+              published_page: 5
+              pdf_page_index: 4
+              table: '3'
+              note: row=2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 5
+              pdf_page_index: 4
+              table: '3'
+              note: row=2
+        output_unit: K
+  derivation:
+    relation: celsius_to_kelvin
+    inputs:
+    - unknown:folstad-2024-metals-cao-dissolution-cas
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1550'
+        locator:
+          page: 5
+          published_page: 5
+          pdf_page_index: 4
+          table: '3'
+          note: row=2
+    - - factor
+      - state:
+          tag: value
+          value: '273.15'
+        locator:
+          page: 5
+          published_page: 5
+          pdf_page_index: 4
+          table: '3'
+          note: row=2
+    output_unit: K
+- observation_id: folstad-2024-metals-cao-dissolution-cas::folstad_2024_table3_liquidus_slag3::T=1693.15:h=23d21c68a9f2
+  experiment_id: 10.3390/met14020243::folstad-2024-metals-cao-dissolution-cas
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: liquidus
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.6083410981968291598861233662'
+        - - CaO
+          - '0.2444247967278925617082805373'
+        - - Al2O3
+          - '0.1472341050752782784055960968'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1693.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: SiO2-CaO-Al2O3 ternary diagram [12]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: folstad-2024-metals-cao-dissolution-cas
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 4
+    table: '3'
+    note: row=3
+  read_from: unknown:folstad-2024-metals-cao-dissolution-cas
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          SiO2_wt_pct: '56'
+          CaO_wt_pct: '21'
+          Al2O3_wt_pct: '23'
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '3'
+    temperature_K:
+      state:
+        tag: value
+        value: '1693.15'
+      locator:
+        page: 5
+        published_page: 5
+        pdf_page_index: 4
+        table: '3'
+        note: row=3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1420'
+            locator:
+              page: 5
+              published_page: 5
+              pdf_page_index: 4
+              table: '3'
+              note: row=3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 5
+              published_page: 5
+              pdf_page_index: 4
+              table: '3'
+              note: row=3
+        output_unit: K
+  derivation:
+    relation: celsius_to_kelvin
+    inputs:
+    - unknown:folstad-2024-metals-cao-dissolution-cas
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1420'
+        locator:
+          page: 5
+          published_page: 5
+          pdf_page_index: 4
+          table: '3'
+          note: row=3
+    - - factor
+      - state:
+          tag: value
+          value: '273.15'
+        locator:
+          page: 5
+          published_page: 5
+          pdf_page_index: 4
+          table: '3'
+          note: row=3
+    output_unit: K

@@ -1,0 +1,342 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1007/s00410-020-01769-y
+  citation: Rzehak L.J.A., Kommescher S., Kurzweil F., Sprung P., Leitzke F.P. and Fonseca R.O.C. (2021). The redox dependence
+    of titanium isotope fractionation in synthetic Ti-rich lunar melts. Contributions to Mineralogy and Petrology 176:19.
+    DOI 10.1007/s00410-020-01769-y.
+  source_ids:
+  - rzehak-2021-ti-isotope-redox-lunar-melts
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:rzehak-2021-ti-isotope-redox-lunar-melts
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1007/s00410-020-01769-y
+experiments:
+- experiment_id: 10.1007/s00410-020-01769-y::rzehak-2021-ti-isotope-redox-lunar-melts
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-020-01769-y
+  locator:
+    page: 7
+    published_page: 13
+    pdf_page_index: 6
+    table: '2'
+    note: PDF page 7; table values for orthopyroxene; fO2 conditions as printed
+context:
+- observation_id: rzehak_2021_figure_1_deferred
+  type: deferred_figure
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 8
+    figure: '1'
+  units: relative yield as plotted
+  values:
+    quantity: titanium_column_yield
+    method_class: figure_only
+    caption: Titanium yield and removal of matrix elements during column chemistry.
+    panels:
+    - a
+    - b
+    - c
+    axes_as_printed:
+      x: elution_step
+      y: relative_yield
+    series:
+    - Ti
+    - matrix elements
+    marker_counts: not stated in the text; image bars not counted
+    digitisation: deferred to a figure pass
+  context_id: rzehak-2021-ti-isotope-redox-lunar-melts::context::rzehak_2021_figure_1_deferred
+  work_id: 10.1007/s00410-020-01769-y
+  source_id: rzehak-2021-ti-isotope-redox-lunar-melts
+  species: TiO2
+- observation_id: rzehak_2021_figure_2_deferred
+  type: deferred_figure
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 12
+    figure: '2'
+  units: per mil
+  values:
+    quantity: long_term_reference_material_isotope_reproducibility
+    method_class: figure_only
+    caption: Long-term reproducibility of glass reference material and OL-Ti over several months.
+    panels:
+    - a
+    - b
+    axes_as_printed:
+      x: measurement_date
+      y: delta49Ti_permil
+    series:
+    - glass reference material
+    - OL-Ti
+    marker_counts:
+      glass_reference_material: 13
+      OL_Ti: 79
+    digitisation: deferred to a figure pass
+  context_id: rzehak-2021-ti-isotope-redox-lunar-melts::context::rzehak_2021_figure_2_deferred
+  work_id: 10.1007/s00410-020-01769-y
+  source_id: rzehak-2021-ti-isotope-redox-lunar-melts
+  species: TiO2
+- observation_id: rzehak_2021_figure_3_deferred
+  type: deferred_figure
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 13
+    figure: '3'
+  units: qualitative micrographs; no plotted data axis
+  values:
+    quantity: experimental_run_product_micrographs
+    method_class: figure_only
+    caption: Backscatter electron images of typical run products.
+    panels:
+    - a
+    - b
+    - c
+    axes_as_printed:
+      x: none
+      y: none
+    series:
+    - T5-20 run products
+    marker_counts:
+      a: 0
+      b: 0
+      c: 0
+    digitisation: deferred to a figure pass
+  context_id: rzehak-2021-ti-isotope-redox-lunar-melts::context::rzehak_2021_figure_3_deferred
+  work_id: 10.1007/s00410-020-01769-y
+  source_id: rzehak-2021-ti-isotope-redox-lunar-melts
+  species: TiO2
+- observation_id: rzehak_2021_figure_4_deferred
+  type: deferred_figure
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 13
+    figure: '4'
+  units: per mil
+  values:
+    quantity: isotope_delta
+    method_class: figure_only
+    caption: Overview of delta49Ti and Delta49Ti compared to fO2 and DeltaIW.
+    panels:
+    - a
+    - b
+    axes_as_printed:
+      x: DeltaIW
+      y: delta49Ti or Delta49Ti per mil
+    series:
+    - orthopyroxene
+    - melt
+    - armalcolite
+    - bulk composition
+    - Opx-melt
+    - Arm-melt
+    - Arm-Opx
+    marker_counts: six redox-condition markers per phase or fractionation series; bulk composition is a shaded band
+    digitisation: deferred to a figure pass
+  context_id: rzehak-2021-ti-isotope-redox-lunar-melts::context::rzehak_2021_figure_4_deferred
+  work_id: 10.1007/s00410-020-01769-y
+  source_id: rzehak-2021-ti-isotope-redox-lunar-melts
+  species: TiO2
+- observation_id: rzehak_2021_figure_5_deferred
+  type: deferred_figure
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 14
+    figure: '5'
+  units: per mil
+  values:
+    quantity: isotope_delta
+    method_class: figure_only
+    caption: Overview of Delta49Ti A-B compared to absolute fO2 and DeltaIW.
+    panels:
+    - Opx-melt
+    - Arm-melt
+    - Arm-Opx
+    axes_as_printed:
+      x: log fO2 or DeltaIW
+      y: Delta49Ti per mil
+    series:
+    - experimental isotope fractionation
+    - thermodynamic fitted curve
+    marker_counts: six experimental redox-condition markers in each panel; one fitted curve in each panel
+    digitisation: deferred to a figure pass
+  context_id: rzehak-2021-ti-isotope-redox-lunar-melts::context::rzehak_2021_figure_5_deferred
+  work_id: 10.1007/s00410-020-01769-y
+  source_id: rzehak-2021-ti-isotope-redox-lunar-melts
+  species: TiO2
+- observation_id: rzehak_2021_table_1_starting_material_composition
+  type: experiment_series
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 9
+    table: '1'
+  units: wt.% as printed
+  values:
+    quantity: starting_material_composition
+    method_class: measured_direct
+    caption: Composition of synthetic starting material used in this study
+    rows:
+    - composition: T5-20
+      SiO2: '43.06'
+      TiO2: '22.06'
+      Al2O3: '5.25'
+      MgO: '22.47'
+      CaO: '8.09'
+      Total: '100.93'
+  context_id: rzehak-2021-ti-isotope-redox-lunar-melts::context::rzehak_2021_table_1_starting_material_composition
+  work_id: 10.1007/s00410-020-01769-y
+  source_id: rzehak-2021-ti-isotope-redox-lunar-melts
+  species: TiO2
+- observation_id: rzehak_2021_table_3_phase_fractionations
+  type: experiment_series
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 14
+    table: '3'
+  units: per mil and dimensionless alpha as printed
+  values:
+    quantity: isotope_fractionation_and_alpha_values
+    method_class: measured_reduced
+    note: Fractionation values are differences among Table 2 phase isotope deltas rounded as printed; alpha has no matching
+      quantity token.
+    rows:
+    - fO2: Air
+      Arm_melt_delta49Ti_permil: '-0.092'
+      Arm_melt_95ci_permil: '0.028'
+      Arm_melt_alpha: '0.99991'
+      Arm_opx_delta49Ti_permil: '-0.089'
+      Arm_opx_95ci_permil: '0.027'
+      Arm_opx_alpha: '0.99991'
+      Opx_melt_delta49Ti_permil: '-0.002'
+      Opx_melt_95ci_permil: '0.017'
+      Opx_melt_alpha: '1'
+    - fO2: FMQ-0.5
+      Arm_melt_delta49Ti_permil: '-0.137'
+      Arm_melt_95ci_permil: '0.03'
+      Arm_melt_alpha: '0.99986'
+      Arm_opx_delta49Ti_permil: '-0.108'
+      Arm_opx_95ci_permil: '0.033'
+      Arm_opx_alpha: '0.99989'
+      Opx_melt_delta49Ti_permil: '-0.029'
+      Opx_melt_95ci_permil: '0.03'
+      Opx_melt_alpha: '0.99997'
+    - fO2: FMQ-2
+      Arm_melt_delta49Ti_permil: '-0.15'
+      Arm_melt_95ci_permil: '0.028'
+      Arm_melt_alpha: '0.99985'
+      Arm_opx_delta49Ti_permil: '-0.173'
+      Arm_opx_95ci_permil: '0.01'
+      Arm_opx_alpha: '0.99983'
+      Opx_melt_delta49Ti_permil: '0.023'
+      Opx_melt_95ci_permil: '0.027'
+      Opx_melt_alpha: '1.00002'
+    - fO2: IW-0.1
+      Arm_melt_delta49Ti_permil: '-0.158'
+      Arm_melt_95ci_permil: '0.02'
+      Arm_melt_alpha: '0.99984'
+      Arm_opx_delta49Ti_permil: '-0.21'
+      Arm_opx_95ci_permil: '0.028'
+      Arm_opx_alpha: '0.99979'
+      Opx_melt_delta49Ti_permil: '0.053'
+      Opx_melt_95ci_permil: '0.032'
+      Opx_melt_alpha: '1.00005'
+    - fO2: IW-0.2
+      Arm_melt_delta49Ti_permil: '-0.14'
+      Arm_melt_95ci_permil: '0.037'
+      Arm_melt_alpha: '0.99986'
+      Arm_opx_delta49Ti_permil: '-0.197'
+      Arm_opx_95ci_permil: '0.036'
+      Arm_opx_alpha: '0.9998'
+      Opx_melt_delta49Ti_permil: '0.058'
+      Opx_melt_95ci_permil: '0.046'
+      Opx_melt_alpha: '1.00006'
+    - fO2: IW-1
+      Arm_melt_delta49Ti_permil: '-0.2'
+      Arm_melt_95ci_permil: '0.033'
+      Arm_melt_alpha: '0.9998'
+      Arm_opx_delta49Ti_permil: '-0.25'
+      Arm_opx_95ci_permil: '0.049'
+      Arm_opx_alpha: '0.99975'
+      Opx_melt_delta49Ti_permil: '0.05'
+      Opx_melt_95ci_permil: '0.025'
+      Opx_melt_alpha: '1.00005'
+  context_id: rzehak-2021-ti-isotope-redox-lunar-melts::context::rzehak_2021_table_3_phase_fractionations
+  work_id: 10.1007/s00410-020-01769-y
+  source_id: rzehak-2021-ti-isotope-redox-lunar-melts
+  species: TiO2
+- observation_id: rzehak_2021_table_4_fit_parameters
+  type: thermodynamic_example
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: 15
+    table: '4'
+  units: per mil and dimensionless as printed
+  values:
+    quantity: isotope_redox_fit_parameters
+    method_class: model_derived
+    note: Fitted parameters derived from experimental samples; the four values are preserved in printed row order without
+      assigning the ambiguously wrapped header cells.
+    rows:
+    - equilibrium: opx-melt
+      values_as_printed:
+      - '0.122'
+      - '-0.008'
+      - '0.04'
+      - '2.4'
+    - equilibrium: arm-melt
+      values_as_printed:
+      - '-0.24'
+      - '-0.081'
+      - '0.08'
+      - '1.1'
+    - equilibrium: arm-opx
+      values_as_printed:
+      - '-0.58'
+      - '-0.08'
+      - '0.02'
+      - '1.4'
+  context_id: rzehak-2021-ti-isotope-redox-lunar-melts::context::rzehak_2021_table_4_fit_parameters
+  work_id: 10.1007/s00410-020-01769-y
+  source_id: rzehak-2021-ti-isotope-redox-lunar-melts
+  species: TiO2

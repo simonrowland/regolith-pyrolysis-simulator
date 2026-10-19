@@ -1,0 +1,174 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: c992fdf98983170d47f022bd0b6fd02ccebdb83c9b313007bdb3217dd4583a2c
+  citation: Nagahara, H. (2000). Chemical fractionation in the presence of ambient gas. 63rd Annual Meteoritical Society Meeting,
+    abstract 5166.
+  source_ids:
+  - nagahara-2000-metsoc63-5166
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:nagahara-2000-metsoc63-5166
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: nagahara_2000_degree_of_melting
+  type: measured_result_context
+  locator:
+    pdf_page_index: 0
+    page: 1
+    abstract: '5166'
+    section: Results and Discussion
+  phase: interstitial melt in Jilin H5 chondrite residue
+  units: percent as printed
+  values:
+    method_class: measured_direct
+    quantity_as_printed: degree of melting
+    quantity_token: unavailable
+    quantity_token_gap: No degree-of-melting quantity is present in the enum.
+    at_1300_C:
+      value: 25–30%
+      approximate: true
+    at_1270_C:
+      value: 15–20%
+      approximate: true
+    source: Nagahara (2000), abstract 5166
+  context_id: nagahara-2000-metsoc63-5166::context::nagahara_2000_degree_of_melting
+  work_id: c992fdf98983170d47f022bd0b6fd02ccebdb83c9b313007bdb3217dd4583a2c
+  source_id: nagahara-2000-metsoc63-5166
+  species: Jilin_H5_chondrite_silicate
+- observation_id: nagahara_2000_experimental_conditions
+  type: laboratory_conditions
+  locator:
+    pdf_page_index: 0
+    page: 1
+    abstract: '5166'
+    section: Experimental
+  phase: powdered Jilin (H5) chondrite silicate portion and interstitial melt
+  units: as printed
+  values:
+    method_class: method_only
+    quantity_as_printed: experimental temperature and duration
+    quantity_token: unavailable
+    quantity_token_gap: These values are run conditions, not a scored result.
+    starting_material_as_printed: silicate portion of powdered Jilin (H5) chondrite
+    temperatures_C_as_printed:
+    - 1300
+    - 1270
+    duration_range_as_printed: 40 min to 30 h
+    capsule_hole_diameter_range_mm_as_printed: 0.25 to 2.8
+    source: Nagahara (2000), abstract 5166
+  context_id: nagahara-2000-metsoc63-5166::context::nagahara_2000_experimental_conditions
+  work_id: c992fdf98983170d47f022bd0b6fd02ccebdb83c9b313007bdb3217dd4583a2c
+  source_id: nagahara-2000-metsoc63-5166
+  species: Jilin_H5_chondrite_silicate
+- observation_id: nagahara_2000_melt_separation_at_1400_c
+  type: measured_result_context
+  locator:
+    pdf_page_index: 0
+    page: 1
+    abstract: '5166'
+    section: Results and Discussion
+  phase: silicate melt and solids in Jilin H5 chondrite residue
+  units: °C
+  values:
+    method_class: measured_direct
+    quantity_as_printed: melt/solid separation at 1400°C
+    temperature_C: 1400
+    result_as_printed: significant melt separation
+    limitation_as_printed: results are not discussed in the present study
+    source: Nagahara (2000), abstract 5166
+  context_id: nagahara-2000-metsoc63-5166::context::nagahara_2000_melt_separation_at_1400_c
+  work_id: c992fdf98983170d47f022bd0b6fd02ccebdb83c9b313007bdb3217dd4583a2c
+  source_id: nagahara-2000-metsoc63-5166
+  species: Jilin_H5_chondrite_silicate
+- observation_id: nagahara_2000_modeled_alkali_loss
+  type: model_derived_context
+  locator:
+    pdf_page_index: 0
+    page: 1
+    abstract: '5166'
+    section: Results and Discussion
+  phase: silicate system with ambient gas
+  units: percent as printed
+  values:
+    method_class: model_derived
+    quantity_as_printed: possible alkali loss during short-duration heating
+    quantity_token: unavailable
+    quantity_token_gap: The estimate is an alkali-specific modeled loss, not a typed bulk mass-loss fraction.
+    value_as_printed: 10–20%
+    assumption: constant system volume; dust/gas ratio is a free parameter
+    source: Nagahara (2000), abstract 5166
+  context_id: nagahara-2000-metsoc63-5166::context::nagahara_2000_modeled_alkali_loss
+  work_id: c992fdf98983170d47f022bd0b6fd02ccebdb83c9b313007bdb3217dd4583a2c
+  source_id: nagahara-2000-metsoc63-5166
+  species: Jilin_H5_chondrite_silicate
+- observation_id: nagahara_2000_platinum_cell_dimensions
+  type: laboratory_conditions
+  locator:
+    pdf_page_index: 0
+    page: 1
+    abstract: '5166'
+    section: Experimental
+  phase: platinum Knudsen cell
+  units: mm and cm as printed
+  values:
+    method_class: method_only
+    quantity_as_printed: Knudsen cell dimensions
+    diameter_mm: 3
+    length:
+      value: about 1
+      units: cm
+      approximate: true
+    source: Nagahara (2000), abstract 5166
+  context_id: nagahara-2000-metsoc63-5166::context::nagahara_2000_platinum_cell_dimensions
+  work_id: c992fdf98983170d47f022bd0b6fd02ccebdb83c9b313007bdb3217dd4583a2c
+  source_id: nagahara-2000-metsoc63-5166
+  species: Jilin_H5_chondrite_silicate
+- observation_id: nagahara_2000_potassium_fractionation_factor
+  type: measured_result_context
+  locator:
+    pdf_page_index: 0
+    page: 1
+    abstract: '5166'
+    section: Results and Discussion
+  phase: potassium-bearing vapor and silicate residue
+  units: dimensionless factor as printed
+  values:
+    method_class: measured_direct
+    quantity_as_printed: K fractionation factor at experimental conditions
+    quantity_token: unavailable
+    quantity_token_gap: No generic chemical fractionation-factor quantity is present in the enum.
+    value_range_as_printed: 2–20
+    source: Nagahara (2000), abstract 5166
+  context_id: nagahara-2000-metsoc63-5166::context::nagahara_2000_potassium_fractionation_factor
+  work_id: c992fdf98983170d47f022bd0b6fd02ccebdb83c9b313007bdb3217dd4583a2c
+  source_id: nagahara-2000-metsoc63-5166
+  species: K
+- observation_id: nagahara_2000_sodium_fractionation_factor
+  type: measured_result_context
+  locator:
+    pdf_page_index: 0
+    page: 1
+    abstract: '5166'
+    section: Results and Discussion
+  phase: sodium-bearing vapor and silicate residue
+  units: dimensionless factor as printed
+  values:
+    method_class: measured_direct
+    quantity_as_printed: Na fractionation factor at experimental conditions
+    quantity_token: unavailable
+    quantity_token_gap: No generic chemical fractionation-factor quantity is present in the enum.
+    value_range_as_printed: 10–100
+    source: Nagahara (2000), abstract 5166
+  context_id: nagahara-2000-metsoc63-5166::context::nagahara_2000_sodium_fractionation_factor
+  work_id: c992fdf98983170d47f022bd0b6fd02ccebdb83c9b313007bdb3217dd4583a2c
+  source_id: nagahara-2000-metsoc63-5166
+  species: Na

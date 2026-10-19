@@ -1,0 +1,678 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de
+  citation: Matoušek, J. (1998), "Chemical reactions taking place during vaporization from silicate melts", Ceramics - Silikáty
+    42(2):74–80.
+  source_ids:
+  - matousek-1998-silicate-vaporization-reactions
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:matousek-1998-silicate-vaporization-reactions
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de::matousek-1998-silicate-vaporization-reactions
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    section: Vaporization in an atmosphere containing water vapour
+    note: citation=[13]
+context:
+- observation_id: matousek_1998_approximate_temperature_thresholds
+  type: relation
+  locator:
+    page: 1
+    published_page: 74
+    pdf_page_index: 0
+    section: Vaporization of melts in vacuo and in inert atmosphere
+  units: °C
+  values:
+    method_class: quoted_unattributed
+    temperatures_as_printed:
+      stable_oxide_volatilization:
+        locator:
+          page: 2
+          published_page: 75
+          pdf_page_index: 1
+        value:
+          kind: point
+          point: 1600
+          approximate: true
+        operator: higher_than
+        as_printed: higher than about 1600 °C
+      pure_hydroxide_monomer_dimer_mixture:
+        locator:
+          page: 3
+          published_page: 76
+          pdf_page_index: 2
+        value:
+          kind: point
+          point: 600
+          approximate: true
+        operator: above
+        as_printed: above about 600 °C
+      water_reaction_with_silica_glass:
+        locator:
+          page: 4
+          published_page: 77
+          pdf_page_index: 3
+        threshold: 1200
+        operator: above
+        as_printed: above 1200 °C
+      preferential_Si_OH4_formation:
+        locator:
+          page: 4
+          published_page: 77
+          pdf_page_index: 3
+        threshold: 1300
+        operator: above
+        as_printed: above 1300 °C
+  context_id: matousek-1998-silicate-vaporization-reactions::context::matousek_1998_approximate_temperature_thresholds
+  work_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de
+  source_id: matousek-1998-silicate-vaporization-reactions
+  species: SiO2
+- observation_id: matousek_1998_commercial_glass_compositions
+  type: relation
+  locator:
+    page: 2
+    published_page: 75
+    pdf_page_index: 1
+    section: Reactive vaporization of multicomponent melts
+  units: wt.% oxides and K as printed
+  values:
+    method_class: quoted_unattributed
+    examples:
+    - type_as_printed: Type I Me2O-CaO-SiO2 glass
+      composition_status: unknown
+      composition_unknown_reason: The printed component list totals 99.69 wt.% and the paper does not state the remaining
+        composition.
+      components_as_printed:
+        SiO2: '71.39'
+        Na2O: '12.75'
+        CaO: '10.75'
+        Al2O3: '2.78'
+        K2O: '2.02'
+      temperature_range_as_printed: 1300 - 1800 K
+      gas_species_as_printed:
+      - Na
+      - K
+      - O2
+    - type_as_printed: Type II Me2O-B2O3-SiO2 glass (Simax)
+      composition_status: unknown
+      composition_unknown_reason: The printed component list totals 98.1 wt.% and the paper does not state the remaining composition.
+      components_as_printed:
+        SiO2: '79.6'
+        B2O3: '12.1'
+        Al2O3: '1'
+        Na2O: '3.7'
+        K2O: '1.7'
+      temperature_range_as_printed: 1070 - 1473 K
+      gas_species_as_printed:
+      - NaBO2
+      - KBO2
+      elevated_B2O3_note: Above 30 wt.% B2O3, dimers and NaK(BO2)2 are also reported.
+    - type_as_printed: Type III Me2O-PbO-SiO2 glass (lead crystal)
+      composition_status: unknown
+      composition_unknown_reason: The printed component list totals 74.7 wt.% and the paper does not state the remaining composition.
+      components_as_printed:
+        SiO2: '59.9'
+        K2O: '11.4'
+        Na2O: '2.6'
+        CaO: '0.6'
+        Al2O3: '0.2'
+      temperature_range_as_printed: 1187 - 1315 K
+      gas_species_as_printed:
+      - Na
+      - K
+      - PbO
+      - Pb2O2
+  context_id: matousek-1998-silicate-vaporization-reactions::context::matousek_1998_commercial_glass_compositions
+  work_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de
+  source_id: matousek-1998-silicate-vaporization-reactions
+  species: SiO2
+- observation_id: matousek_1998_figure_1_vaporization_loss
+  type: figure_only
+  locator:
+    figure: '1'
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+  units: mg cm^-2; h^1/2
+  values:
+    method_class: figure_only
+    typed_quantity: mass_loss_areal_density
+    quantity_as_printed: vaporization loss versus square root of time
+    species: Na2O·2SiO2
+    phase: silicate melt
+    temperature_as_printed: 1300 °C
+    x_axis_as_printed: √t (h^1/2)
+    y_axis_as_printed: m_t (mg cm^-2)
+    caption_as_printed: Figure 1. Vaporization loss from Na2O·2SiO2 melt at 1300 °C vs. second root of time in nitrogen-water
+      vapour mixture.
+    panel: single
+    series:
+    - name: p_H2O = 0 kPa
+      marker: open triangle
+      marker_count: 7
+      method_class: quoted_attributed
+    - name: p_H2O = 12 kPa
+      marker: filled square
+      marker_count: 8
+      method_class: quoted_attributed
+    - name: p_H2O = 31 kPa
+      marker: open circle
+      marker_count: 10
+      method_class: quoted_attributed
+    - name: p_H2O = 69 kPa
+      marker: filled triangle
+      marker_count: 9
+      method_class: quoted_attributed
+    attribution: Holá, Matoušek & Hlaváč [14]
+    digitisation: deferred to a figure pass
+  context_id: matousek-1998-silicate-vaporization-reactions::context::matousek_1998_figure_1_vaporization_loss
+  work_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de
+  source_id: matousek-1998-silicate-vaporization-reactions
+  species: SiO2
+- observation_id: matousek_1998_figure_2_vaporization_loss
+  type: figure_only
+  locator:
+    figure: '2'
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+  units: mg cm^-2; h
+  values:
+    method_class: figure_only
+    typed_quantity: mass_loss_areal_density
+    quantity_as_printed: vaporization loss versus time
+    species: float glass melt
+    composition:
+      status: unknown
+      reason: The figure and surrounding text do not state a full composition or explicit system identity.
+    phase: silicate glass melt
+    temperature_as_printed: 1450 °C
+    x_axis_as_printed: t (hours)
+    y_axis_as_printed: m (mg cm^-2)
+    caption_as_printed: Figure 2. Vaporization loss from float glass melt at 1450 °C vs. time in air atmosphere and in an
+      air-water vapour mixture.
+    panel: single
+    series:
+    - name: p_H2O = 0 kPa
+      marker: filled square
+      marker_count: 5
+      method_class: quoted_attributed
+    - name: p_H2O = 29 kPa
+      marker: filled triangle
+      marker_count: 7
+      method_class: quoted_attributed
+    attribution: Matoušek [15]
+    digitisation: deferred to a figure pass
+  context_id: matousek-1998-silicate-vaporization-reactions::context::matousek_1998_figure_2_vaporization_loss
+  work_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de
+  source_id: matousek-1998-silicate-vaporization-reactions
+  species: SiO2
+- observation_id: matousek_1998_figure_3_vaporization_loss
+  type: figure_only
+  locator:
+    figure: '3'
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+  units: mg cm^-2; h
+  values:
+    method_class: figure_only
+    typed_quantity: mass_loss_areal_density
+    quantity_as_printed: vaporization loss versus time
+    species: float glass melt
+    composition:
+      status: unknown
+      reason: The figure and surrounding text do not state a full composition or explicit system identity.
+    phase: silicate glass melt
+    temperature_as_printed: 1450 °C
+    x_axis_as_printed: t (hours)
+    y_axis_as_printed: m (mg cm^-2)
+    caption_as_printed: Figure 3. Vaporization loss from float glass melt at 1450 °C vs. time in an atmosphere of nitrogen
+      and in a mixture of nitrogen and water vapour.
+    panel: single
+    series:
+    - name: p_H2O = 0 kPa
+      marker: filled square
+      marker_count: 6
+      method_class: quoted_attributed
+    - name: p_H2O = 29 kPa
+      marker: filled triangle
+      marker_count: 7
+      method_class: quoted_attributed
+    attribution: Matoušek [15]
+    digitisation: deferred to a figure pass
+  context_id: matousek-1998-silicate-vaporization-reactions::context::matousek_1998_figure_3_vaporization_loss
+  work_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de
+  source_id: matousek-1998-silicate-vaporization-reactions
+  species: SiO2
+- observation_id: matousek_1998_figure_4_vaporization_loss
+  type: figure_only
+  locator:
+    figure: '4'
+    page: 4
+    published_page: 77
+    pdf_page_index: 3
+  units: mg cm^-2; h
+  values:
+    method_class: figure_only
+    typed_quantity: mass_loss_areal_density
+    quantity_as_printed: vaporization loss versus time
+    species: Simax borosilicate glass melt
+    composition:
+      status: unknown
+      reason: The printed Simax components total 98.1 wt.% and the paper does not give the remainder.
+      components_as_printed:
+        SiO2: '79.6'
+        B2O3: '12.1'
+        Al2O3: '1'
+        Na2O: '3.7'
+        K2O: '1.7'
+    phase: borosilicate glass melt
+    temperature_as_printed: 1400 °C
+    x_axis_as_printed: t (hours)
+    y_axis_as_printed: m (mg cm^-2)
+    caption_as_printed: Figure 4. Vaporization loss from Simax glass melt vs. time in carbon dioxide atmosphere, and in a
+      CO2-water vapour mixture at 1400 °C.
+    panel: single
+    series:
+    - name: p_H2O = 0 kPa
+      marker: filled square
+      marker_count: 5
+      method_class: quoted_unattributed
+    - name: p_H2O = 29 kPa
+      marker: filled triangle
+      marker_count: 6
+      method_class: quoted_unattributed
+    attribution: Matoušek (1998)
+    digitisation: deferred to a figure pass
+  context_id: matousek-1998-silicate-vaporization-reactions::context::matousek_1998_figure_4_vaporization_loss
+  work_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de
+  source_id: matousek-1998-silicate-vaporization-reactions
+  species: SiO2
+- observation_id: matousek_1998_figure_5_vaporization_loss
+  type: figure_only
+  locator:
+    figure: '5'
+    page: 4
+    published_page: 77
+    pdf_page_index: 3
+  units: mg cm^-2; kPa
+  values:
+    method_class: figure_only
+    typed_quantity: mass_loss_areal_density
+    quantity_as_printed: vaporization loss versus water-vapor partial pressure
+    species: lead glass melt
+    composition:
+      status: unknown
+      reason: The caption prints 24 wt.% PbO but does not state the remaining glass composition.
+      printed_component: 24 wt.% PbO
+    phase: glass melt
+    temperature_as_printed: 1140 °C
+    x_axis_as_printed: p_H2O (kPa)
+    y_axis_as_printed: m (mg cm^-2)
+    caption_as_printed: Figure 5. Vaporization loss from lead glass melt (24 wt.% PbO) in an atmosphere of air, nitrogen and
+      carbon dioxide at 1140 °C vs. partial pressure of water vapour.
+    panel: single
+    series:
+    - name: N2 + H2O
+      marker: filled square
+      marker_count: 5
+      method_class: quoted_attributed
+    - name: CO2 + H2O
+      marker: open circle
+      marker_count: 7
+      method_class: quoted_attributed
+    - name: air + H2O
+      marker: filled triangle
+      marker_count: 8
+      method_class: quoted_attributed
+    attribution: Matoušek & Paurová [18]
+    digitisation: deferred to a figure pass
+  context_id: matousek-1998-silicate-vaporization-reactions::context::matousek_1998_figure_5_vaporization_loss
+  work_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de
+  source_id: matousek-1998-silicate-vaporization-reactions
+  species: SiO2
+- observation_id: matousek_1998_figure_6_vaporization_loss
+  type: figure_only
+  locator:
+    figure: '6'
+    page: 6
+    published_page: 79
+    pdf_page_index: 5
+  units: mg cm^-2; wt.% SO3
+  values:
+    method_class: figure_only
+    typed_quantity: mass_loss_areal_density
+    quantity_as_printed: vaporization loss versus SO3 content in the melt
+    species: float glass melt
+    composition:
+      status: unknown
+      reason: The figure and surrounding text do not state a full composition or explicit system identity.
+    phase: silicate glass melt
+    temperature_as_printed: 1450 °C
+    x_axis_as_printed: wt.% SO3
+    y_axis_as_printed: m (mg cm^-2)
+    caption_as_printed: Figure 6. Vaporization loss from float glass melt in an atmosphere of air and in a mixture of air
+      and water vapour at 1450 °C vs. SO3 content in the melt.
+    panel: single
+    series:
+    - name: p_H2O = 0 kPa
+      marker: filled square
+      marker_count: 6
+      method_class: quoted_attributed
+    - name: p_H2O = 29 kPa
+      marker: filled triangle
+      marker_count: 3
+      method_class: quoted_attributed
+    attribution: Matoušek [22]
+    digitisation: deferred to a figure pass
+  context_id: matousek-1998-silicate-vaporization-reactions::context::matousek_1998_figure_6_vaporization_loss
+  work_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de
+  source_id: matousek-1998-silicate-vaporization-reactions
+  species: SiO2
+- observation_id: matousek_1998_figure_7_kinetic_model
+  type: figure_only
+  locator:
+    figure: '7'
+    page: 6
+    published_page: 79
+    pdf_page_index: 5
+  units: concentration profile schematic
+  values:
+    method_class: model_derived
+    typed_quantity: null
+    quantity_as_printed: kinetic concentration profile across gas and glass-melt boundary
+    species: volatile component in a silicate glass melt and gas phase
+    phase: gas phase and glass melt
+    temperature_as_printed: not stated
+    x_axis_as_printed: no coordinate axis; schematic spans gas phase to glass melt
+    y_axis_as_printed: concentration profile; no axis title
+    caption_as_printed: Figure 7. Kinetic model of vaporization from silicate melts.
+    panel: single
+    series:
+    - name: model concentration profile
+      marker: continuous line
+      marker_count: 0
+      method_class: model_derived
+    attribution: Matoušek (1998)
+    digitisation: deferred to a figure pass
+  context_id: matousek-1998-silicate-vaporization-reactions::context::matousek_1998_figure_7_kinetic_model
+  work_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de
+  source_id: matousek-1998-silicate-vaporization-reactions
+  species: SiO2
+- observation_id: matousek_1998_other_equilibrium_constants
+  type: relation
+  locator:
+    page: 1
+    published_page: 74
+    pdf_page_index: 0
+    section: Vaporization of melts in vacuo and in inert atmosphere
+    equations: 1, 3, 4
+  units: dimensionless K at 1400 °C
+  values:
+    method_class: model_derived
+    quantity_as_printed: equilibrium constants for vaporization reactions
+    temperature_as_printed: 1400 °C
+    schema_gap: no quantity enum for equilibrium constant K
+    reactions:
+    - equation: '1'
+      locator:
+        equation: '1'
+        page: 1
+        published_page: 74
+        pdf_page_index: 0
+      reaction_as_printed: Na2O (l) → 2 Na (g) + 1/2 O2 (g)
+      K_as_printed: 9.5 × 10^-5
+    - equation: '3'
+      locator:
+        equation: '3'
+        page: 2
+        published_page: 75
+        pdf_page_index: 1
+      reaction_as_printed: B2O3 (l) → B2O3 (g)
+      K_as_printed: 5.6 × 10^-4
+    - equation: '4'
+      locator:
+        equation: '4'
+        page: 2
+        published_page: 75
+        pdf_page_index: 1
+      reaction_as_printed: NaBO2 (l) → NaBO2 (g)
+      K_as_printed: 5.7 × 10^-2
+  context_id: matousek-1998-silicate-vaporization-reactions::context::matousek_1998_other_equilibrium_constants
+  work_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de
+  source_id: matousek-1998-silicate-vaporization-reactions
+  species: SiO2
+- observation_id: matousek_1998_quoted_sulfate_vaporization_threshold
+  type: relation
+  locator:
+    page: 5
+    published_page: 78
+    pdf_page_index: 4
+    section: Vaporization in an atmosphere containing SO2
+    equation: '21'
+  units: Pa
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Sanders, Wilke, Hurwitz & Haller [20] (1981)
+    quantity_as_printed: SO2 partial-pressure condition for sodium sulfate vaporization
+    pressure_condition_as_printed: < 500 Pa
+    result_as_printed: Na2SO4 molecules vaporize slowly and congruently; the decomposing reaction is negligible.
+  context_id: matousek-1998-silicate-vaporization-reactions::context::matousek_1998_quoted_sulfate_vaporization_threshold
+  work_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de
+  source_id: matousek-1998-silicate-vaporization-reactions
+  species: SiO2
+- observation_id: matousek_1998_table1_model_melt_vapor_species
+  type: relation
+  locator:
+    table: '1'
+    page: 1
+    published_page: 74
+    pdf_page_index: 0
+  units: K and gas species identities as printed
+  values:
+    method_class: quoted_attributed
+    evidence_class: quoted_attributed
+    attribution: Stoljarova and Semenov [8]
+    quantity_as_printed: equilibrium composition of vapors above model melts
+    rows:
+    - melt_type_as_printed: Na2O·x SiO2 (x = 1 - 4)
+      temperature_range_as_printed: 1163 - 1500 K
+      gas_species_as_printed:
+      - Na
+      - O2
+    - melt_type_as_printed: Na2O-B2O3
+      temperature_as_printed: 1248 K
+      gas_species_as_printed:
+      - NaBO2
+      - (NaBO2)2
+    - melt_type_as_printed: SiO2-B2O3
+      temperature_range_as_printed: 1390 - 1590 K
+      gas_species_as_printed:
+      - B2O3
+    - melt_type_as_printed: Na2O-CaO-SiO2
+      temperature_range_as_printed: 1240 - 1670 K
+      gas_species_as_printed:
+      - Na
+      - O2
+    - melt_type_as_printed: Na2O-B2O3-SiO2
+      temperature_as_printed: 1100 K
+      gas_species_as_printed:
+      - Na
+      - NaBO2
+      - (NaBO2)2
+    - melt_type_as_printed: Na2O-K2O-CaO-SiO2
+      temperature_range_as_printed: 1240 - 1670 K
+      gas_species_as_printed:
+      - Na
+      - K
+      - O2
+    - melt_type_as_printed: PbO-SiO2
+      temperature_as_printed: 1773 K
+      gas_species_as_printed:
+      - PbO
+      - (PbO)2
+    note: Gas species are listed qualitatively; no abundance values are printed.
+  context_id: matousek-1998-silicate-vaporization-reactions::context::matousek_1998_table1_model_melt_vapor_species
+  work_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de
+  source_id: matousek-1998-silicate-vaporization-reactions
+  species: SiO2
+- observation_id: matousek_1998_table2_lead_oxide_equilibrium_constants
+  type: relation
+  locator:
+    table: '2'
+    page: 2
+    published_page: 75
+    pdf_page_index: 1
+  units: dimensionless equilibrium constant K at 1400 °C
+  values:
+    method_class: model_derived
+    quantity_as_printed: equilibrium constants for lead oxide vaporization reactions
+    temperature_as_printed: 1400 °C
+    schema_gap: no quantity enum for equilibrium constant K
+    rows:
+    - reaction_as_printed: PbO (l) → PbO (g)
+      K_as_printed: 9.4 × 10^-2
+    - reaction_as_printed: PbO (l) → 1/2 (PbO)2 (g)
+      K_as_printed: 3.0 × 10^-1
+    - reaction_as_printed: PbO (l) → 1/3 (PbO)3 (g)
+      K_as_printed: 2.6 × 10^-1
+    - reaction_as_printed: PbO (l) → 1/4 (PbO)4 (g)
+      K_as_printed: 3.4 × 10^-1
+  context_id: matousek-1998-silicate-vaporization-reactions::context::matousek_1998_table2_lead_oxide_equilibrium_constants
+  work_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de
+  source_id: matousek-1998-silicate-vaporization-reactions
+  species: SiO2
+- observation_id: matousek_1998_table3_alkali_free_melt_vapor_species
+  type: relation
+  locator:
+    table: '3'
+    page: 2
+    published_page: 75
+    pdf_page_index: 1
+  units: K and gas species identities as printed
+  values:
+    method_class: quoted_unattributed
+    quantity_as_printed: equilibrium composition of vapors above model alkali-free melts
+    rows:
+    - melt_type_as_printed: CaO-SiO2
+      temperature_range_as_printed: 1933 - 2133 K
+      gas_species_as_printed:
+      - Ca
+      - CaO
+      - SiO
+      - SiO2
+      - O
+      - CaSiO3
+    - melt_type_as_printed: MgO-SiO2
+      temperature_range_as_printed: 1873 - 1973 K
+      gas_species_as_printed:
+      - Mg
+      - O
+      - Si
+    - melt_type_as_printed: CaO-Al2O3
+      temperature_as_printed: 2060 K
+      gas_species_as_printed:
+      - Ca
+      - Al
+      - O
+      - Al2O3
+      - AlO
+    - melt_type_as_printed: CaO-Al2O3-SiO2
+      temperature_range_as_printed: 1833 - 2033 K
+      gas_species_as_printed:
+      - Ca
+      - CaO
+      - SiO
+      - SiO2
+      - O
+      - CaSiO3
+    - melt_type_as_printed: CaO-MgO-Al2O3
+      temperature_as_printed: 1960 K
+      gas_species_as_printed:
+      - Ca
+      - Mg
+      - O
+    note: The table caption does not name an underlying source for these rows.
+  context_id: matousek-1998-silicate-vaporization-reactions::context::matousek_1998_table3_alkali_free_melt_vapor_species
+  work_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de
+  source_id: matousek-1998-silicate-vaporization-reactions
+  species: SiO2
+- observation_id: matousek_1998_water_vapor_equilibrium_constants
+  type: relation
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    equations: 8-12
+  units: dimensionless K at 1400 °C
+  values:
+    method_class: model_derived
+    quantity_as_printed: equilibrium constants for water-vapor reactions
+    temperature_as_printed: 1400 °C
+    schema_gap: no quantity enum for equilibrium constant K
+    reactions:
+    - equation: '8'
+      reaction_as_printed: Na2O (l) + H2O (g) → 2 NaOH (g)
+      K_as_printed: '3.7'
+    - equation: '9'
+      reaction_as_printed: K2O (l) + H2O (g) → 2 KOH (g)
+      K_as_printed: 4.5 × 10^3
+    - equation: '10'
+      reaction_as_printed: B2O3 (l) + H2O (g) → 2 HBO2 (g)
+      K_as_printed: 1.3 × 10^-2
+    - equation: '11'
+      reaction_as_printed: B2O3 (l) + 3 H2O (g) → 2 H3BO3 (g)
+      K_as_printed: 1.2 × 10^-4
+    - equation: '12'
+      locator:
+        equation: '12'
+        page: 4
+        published_page: 77
+        pdf_page_index: 3
+      reaction_as_printed: PbO (l) + H2O (g) → Pb(OH)2 (g)
+      K_as_printed: 4.7 × 10^-1
+  context_id: matousek-1998-silicate-vaporization-reactions::context::matousek_1998_water_vapor_equilibrium_constants
+  work_id: 19943dab28c9bf2711028b6a3d9c5a707136de87b6e32c766564dec7032179de
+  source_id: matousek-1998-silicate-vaporization-reactions
+  species: SiO2

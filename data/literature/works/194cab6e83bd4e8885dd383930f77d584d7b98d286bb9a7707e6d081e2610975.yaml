@@ -1,0 +1,849 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  citation: Shornikov, S. I., Ivanova, M. A., and Minaeva, M. S. (2020), “Thermodynamic properties of the MgO–FeO melts,”
+    Experiment in Geosciences 26(1), 74–77.
+  source_ids:
+  - shornikov-2020-mgo-feo-melts
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:shornikov-2020-mgo-feo-melts
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975::shornikov-2020-mgo-feo-melts
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  locator:
+    page: 2
+    published_page: 75
+    pdf_page_index: 1
+    table: '2'
+    note: row_label=MgO; column_header=Condensed phases  $\Delta G^{\circ}_{2500}$ , kJ/mol; row=1
+context:
+- observation_id: shornikov_2020_fig3_panel_a_series_1-3_curve
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    figure: '3'
+    panel: a
+    series: 1–3
+    note: Figure 3 panel a, series 1–3, attributed to Shashkina & Gerasimov (1953); no curve points sampled.
+  units: as plotted
+  attribution: Shashkina & Gerasimov (1953)
+  values:
+    quantity: unscored_figure_context
+    reason: Attributed smooth curve retained without numeric points; no schema token represents the panel’s total and partial
+      quantities together.
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_fig3_panel_a_series_1-3_curve
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_fig3_panel_a_series_4-6_curve
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    figure: '3'
+    panel: a
+    series: 4–6
+    note: Figure 3 panel a, series 4–6, attributed to Hasegawa et al. (2006); no curve points sampled.
+  units: as plotted
+  attribution: Hasegawa et al. (2006)
+  values:
+    quantity: unscored_figure_context
+    reason: Attributed smooth curve retained without numeric points; no schema token represents the panel’s total and partial
+      quantities together.
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_fig3_panel_a_series_4-6_curve
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_fig3_panel_a_series_7_curve
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    figure: '3'
+    panel: a
+    series: '7'
+    note: Figure 3 panel a, series 7, attributed to Merli et al. (2015); no curve points sampled.
+  units: as plotted
+  attribution: Merli et al. (2015)
+  values:
+    quantity: unscored_figure_context
+    reason: Attributed smooth curve retained without numeric points; no schema token represents the panel’s total and partial
+      quantities together.
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_fig3_panel_a_series_7_curve
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_fig3_panel_a_unkeyed_black_markers
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    figure: '3'
+    panel: a
+    note: 'Figure 3 caption: enthalpy of solid-solution formation / partial enthalpy in the MgO–FeO system; 9 black-circle
+      markers with error bars, no numeric points stored.'
+  units: as plotted
+  values:
+    quantity: unscored_figure_context
+    reason: markers not keyed to a source or to a total/partial quantity in the caption
+  attribution: not identified by the caption
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_fig3_panel_a_unkeyed_black_markers
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_fig3_panel_b_series_1-3_curve
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    figure: '3'
+    panel: b
+    series: 1–3
+    note: Figure 3 panel b, series 1–3, attributed to Shashkina & Gerasimov (1953); no curve points sampled.
+  units: as plotted
+  attribution: Shashkina & Gerasimov (1953)
+  values:
+    quantity: unscored_figure_context
+    reason: Attributed smooth curve retained without numeric points; no schema token represents the panel’s total and partial
+      quantities together.
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_fig3_panel_b_series_1-3_curve
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_fig3_panel_b_series_4-6_curve
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    figure: '3'
+    panel: b
+    series: 4–6
+    note: Figure 3 panel b, series 4–6, attributed to Hasegawa et al. (2006); no curve points sampled.
+  units: as plotted
+  attribution: Hasegawa et al. (2006)
+  values:
+    quantity: unscored_figure_context
+    reason: Attributed smooth curve retained without numeric points; no schema token represents the panel’s total and partial
+      quantities together.
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_fig3_panel_b_series_4-6_curve
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_fig3_panel_b_series_7_curve
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    figure: '3'
+    panel: b
+    series: '7'
+    note: Figure 3 panel b, series 7, attributed to Merli et al. (2015); no curve points sampled.
+  units: as plotted
+  attribution: Merli et al. (2015)
+  values:
+    quantity: unscored_figure_context
+    reason: Attributed smooth curve retained without numeric points; no schema token represents the panel’s total and partial
+      quantities together.
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_fig3_panel_b_series_7_curve
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_fig3_panel_b_unkeyed_black_markers
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    figure: '3'
+    panel: b
+    note: 'Figure 3 caption: entropy of solid-solution formation / partial entropy in the MgO–FeO system; 9 black-circle markers
+      with error bars, no numeric points stored.'
+  units: as plotted
+  values:
+    quantity: unscored_figure_context
+    reason: markers not keyed to a source or to a total/partial quantity in the caption
+  attribution: not identified by the caption
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_fig3_panel_b_unkeyed_black_markers
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_fig4a_unkeyed_black_markers
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    figure: '4'
+    panel: a
+    marker_count: 11
+    note: Figure 4 panel a has 11 unlabeled black dots on or near the calculated activity curves; no numeric points stored.
+  units: as plotted
+  values:
+    quantity: unscored_figure_context
+    reason: markers are not keyed to a component or source in the caption
+  attribution: not identified by the caption
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_fig4a_unkeyed_black_markers
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_fig4b_series1_mixing_energy_curve
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    figure: '4'
+    panel: b
+    series: '1'
+    note: Figure 4 caption identifies mixing energy at 2000 K; smooth curve not sampled.
+  units: kJ/mol as plotted
+  attribution: present study
+  values:
+    quantity: unscored_figure_context
+    reason: No mixing-energy quantity token exists in the current schema; curve retained without numeric samples.
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_fig4b_series1_mixing_energy_curve
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_fig4b_series2_mixing_energy_curve
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    figure: '4'
+    panel: b
+    series: '2'
+    note: Figure 4 caption identifies mixing energy at 2473 K; smooth curve not sampled.
+  units: kJ/mol as plotted
+  attribution: present study
+  values:
+    quantity: unscored_figure_context
+    reason: No mixing-energy quantity token exists in the current schema; curve retained without numeric samples.
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_fig4b_series2_mixing_energy_curve
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_fig4b_series3_mixing_energy_curve
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    figure: '4'
+    panel: b
+    series: '3'
+    note: Figure 4 caption identifies mixing energy at 2773 K; smooth curve not sampled.
+  units: kJ/mol as plotted
+  attribution: present study
+  values:
+    quantity: unscored_figure_context
+    reason: No mixing-energy quantity token exists in the current schema; curve retained without numeric samples.
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_fig4b_series3_mixing_energy_curve
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_fig4b_series4_mixing_energy_curve
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    figure: '4'
+    panel: b
+    series: '4'
+    note: Figure 4 caption identifies mixing energy at 2773 K; smooth curve not sampled.
+  units: kJ/mol as plotted
+  attribution: Wu et al. (1993)
+  values:
+    quantity: unscored_figure_context
+    reason: No mixing-energy quantity token exists in the current schema; curve retained without numeric samples.
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_fig4b_series4_mixing_energy_curve
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_fig4b_series5_mixing_energy_curve
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    figure: '4'
+    panel: b
+    series: '5'
+    note: Figure 4 caption identifies mixing energy at 2000 K; smooth curve not sampled.
+  units: kJ/mol as plotted
+  attribution: present study
+  values:
+    quantity: unscored_figure_context
+    reason: No mixing-energy quantity token exists in the current schema; curve retained without numeric samples.
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_fig4b_series5_mixing_energy_curve
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_fig4b_series6_mixing_energy_curve
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    figure: '4'
+    panel: b
+    series: '6'
+    note: Figure 4 caption identifies mixing energy at 2473 K; smooth curve not sampled.
+  units: kJ/mol as plotted
+  attribution: present study
+  values:
+    quantity: unscored_figure_context
+    reason: No mixing-energy quantity token exists in the current schema; curve retained without numeric samples.
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_fig4b_series6_mixing_energy_curve
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_fig4b_series7_mixing_energy_curve
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    figure: '4'
+    panel: b
+    series: '7'
+    note: Figure 4 caption identifies mixing energy at 2773 K; smooth curve not sampled.
+  units: kJ/mol as plotted
+  attribution: present study
+  values:
+    quantity: unscored_figure_context
+    reason: No mixing-energy quantity token exists in the current schema; curve retained without numeric samples.
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_fig4b_series7_mixing_energy_curve
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_fig4b_series8_mixing_energy_curve
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    figure: '4'
+    panel: b
+    series: '8'
+    note: Figure 4 caption identifies mixing energy at 2773 K; smooth curve not sampled.
+  units: kJ/mol as plotted
+  attribution: Wu et al. (1993)
+  values:
+    quantity: unscored_figure_context
+    reason: No mixing-energy quantity token exists in the current schema; curve retained without numeric samples.
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_fig4b_series8_mixing_energy_curve
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_fig4b_series9_mixing_energy_curve
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    figure: '4'
+    panel: b
+    series: '9'
+    note: Figure 4 caption identifies mixing energy at 2473 K; smooth curve not sampled.
+  units: kJ/mol as plotted
+  attribution: Merli et al. (2015)
+  values:
+    quantity: unscored_figure_context
+    reason: No mixing-energy quantity token exists in the current schema; curve retained without numeric samples.
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_fig4b_series9_mixing_energy_curve
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_table1_prior_study_row_01
+  type: thermodynamic_context
+  locator:
+    page: 1
+    published_page: 74
+    pdf_page_index: 0
+    table: '1'
+    row: 1
+    note: Table 1 experimental-conditions summary; ranges retained as printed.
+  units: T, K; FeO, mol %; samples as printed
+  values:
+    quantity: prior_feo_activity_experimental_conditions
+    method_class: quoted_attributed
+    method_as_printed: $H_2O / H_2$  equilibrium
+    T_as_printed: 1133–1333
+    FeO_as_printed: 0–100
+    number_of_samples_as_printed: '18'
+    reference_as_printed: Shashkina & Gerasimov, 1953
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_table1_prior_study_row_01
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: FeO
+- observation_id: shornikov_2020_table1_prior_study_row_02
+  type: thermodynamic_context
+  locator:
+    page: 1
+    published_page: 74
+    pdf_page_index: 0
+    table: '1'
+    row: 2
+    note: Table 1 experimental-conditions summary; ranges retained as printed.
+  units: T, K; FeO, mol %; samples as printed
+  values:
+    quantity: prior_feo_activity_experimental_conditions
+    method_class: quoted_attributed
+    method_as_printed: CO /  $CO_2$  equilibrium
+    T_as_printed: 1073–1273
+    FeO_as_printed: 10–95
+    number_of_samples_as_printed: '9'
+    reference_as_printed: Schmahl et al., 1961
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_table1_prior_study_row_02
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: FeO
+- observation_id: shornikov_2020_table1_prior_study_row_03
+  type: thermodynamic_context
+  locator:
+    page: 1
+    published_page: 74
+    pdf_page_index: 0
+    table: '1'
+    row: 3
+    note: Table 1 experimental-conditions summary; ranges retained as printed.
+  units: T, K; FeO, mol %; samples as printed
+  values:
+    quantity: prior_feo_activity_experimental_conditions
+    method_class: quoted_attributed
+    method_as_printed: E. m. f.
+    T_as_printed: 1073–1273
+    FeO_as_printed: 10–90
+    number_of_samples_as_printed: '6'
+    reference_as_printed: Engell, 1962
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_table1_prior_study_row_03
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: FeO
+- observation_id: shornikov_2020_table1_prior_study_row_04
+  type: thermodynamic_context
+  locator:
+    page: 1
+    published_page: 74
+    pdf_page_index: 0
+    table: '1'
+    row: 4
+    note: Table 1 experimental-conditions summary; ranges retained as printed.
+  units: T, K; FeO, mol %; samples as printed
+  values:
+    quantity: prior_feo_activity_experimental_conditions
+    method_class: quoted_attributed
+    method_as_printed: $CO_2 / H_2$  equilibrium
+    T_as_printed: 1373–1573
+    FeO_as_printed: 5–95
+    number_of_samples_as_printed: '8'
+    reference_as_printed: Hahn & Muan, 1962
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_table1_prior_study_row_04
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: FeO
+- observation_id: shornikov_2020_table1_prior_study_row_05
+  type: thermodynamic_context
+  locator:
+    page: 2
+    published_page: 75
+    pdf_page_index: 1
+    table: '1'
+    row: 5
+    note: Continuation of Table 1; row numbering continues from printed page 74.
+  units: T, K; FeO, mol %; samples as printed
+  values:
+    quantity: prior_feo_activity_experimental_conditions
+    method_class: quoted_attributed
+    method_as_printed: E. m. f.
+    T_as_printed: 1173–1473
+    FeO_as_printed: 30–89
+    number_of_samples_as_printed: '7'
+    reference_as_printed: Gordeev et al., 1965
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_table1_prior_study_row_05
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: FeO
+- observation_id: shornikov_2020_table1_prior_study_row_06
+  type: thermodynamic_context
+  locator:
+    page: 2
+    published_page: 75
+    pdf_page_index: 1
+    table: '1'
+    row: 6
+    note: Continuation of Table 1; row numbering continues from printed page 74.
+  units: T, K; FeO, mol %; samples as printed
+  values:
+    quantity: prior_feo_activity_experimental_conditions
+    method_class: quoted_attributed
+    method_as_printed: $H_2O / H_2$  equilibrium
+    T_as_printed: '1123'
+    FeO_as_printed: 4–73
+    number_of_samples_as_printed: '6'
+    reference_as_printed: Aubry et al., 1965
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_table1_prior_study_row_06
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: FeO
+- observation_id: shornikov_2020_table1_prior_study_row_07
+  type: thermodynamic_context
+  locator:
+    page: 2
+    published_page: 75
+    pdf_page_index: 1
+    table: '1'
+    row: 7
+    note: Continuation of Table 1; row numbering continues from printed page 74.
+  units: T, K; FeO, mol %; samples as printed
+  values:
+    quantity: prior_feo_activity_experimental_conditions
+    method_class: quoted_attributed
+    method_as_printed: $CO_2 / H_2$  equilibrium
+    T_as_printed: '1433'
+    FeO_as_printed: 20–80
+    number_of_samples_as_printed: '5'
+    reference_as_printed: Katsura & Kimura, 1965
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_table1_prior_study_row_07
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: FeO
+- observation_id: shornikov_2020_table1_prior_study_row_08
+  type: thermodynamic_context
+  locator:
+    page: 2
+    published_page: 75
+    pdf_page_index: 1
+    table: '1'
+    row: 8
+    note: Continuation of Table 1; row numbering continues from printed page 74.
+  units: T, K; FeO, mol %; samples as printed
+  values:
+    quantity: prior_feo_activity_experimental_conditions
+    method_class: quoted_attributed
+    method_as_printed: $CO_2 / H_2$  equilibrium
+    T_as_printed: 1373–1573
+    FeO_as_printed: 30–80
+    number_of_samples_as_printed: '5'
+    reference_as_printed: Nafziger & Muan, 1967
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_table1_prior_study_row_08
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: FeO
+- observation_id: shornikov_2020_table1_prior_study_row_09
+  type: thermodynamic_context
+  locator:
+    page: 2
+    published_page: 75
+    pdf_page_index: 1
+    table: '1'
+    row: 9
+    note: Continuation of Table 1; row numbering continues from printed page 74.
+  units: T, K; FeO, mol %; samples as printed
+  values:
+    quantity: prior_feo_activity_experimental_conditions
+    method_class: quoted_attributed
+    method_as_printed: $H_2O / H_2$  equilibrium
+    T_as_printed: '1123'
+    FeO_as_printed: 10–90
+    number_of_samples_as_printed: '9'
+    reference_as_printed: Berthet & Perrot, 1970
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_table1_prior_study_row_09
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: FeO
+- observation_id: shornikov_2020_table1_prior_study_row_10
+  type: thermodynamic_context
+  locator:
+    page: 2
+    published_page: 75
+    pdf_page_index: 1
+    table: '1'
+    row: 10
+    note: Continuation of Table 1; row numbering continues from printed page 74.
+  units: T, K; FeO, mol %; samples as printed
+  values:
+    quantity: prior_feo_activity_experimental_conditions
+    method_class: quoted_attributed
+    method_as_printed: E. m. f.
+    T_as_printed: 1073–1373
+    FeO_as_printed: 30–90
+    number_of_samples_as_printed: '5'
+    reference_as_printed: Abbattista et al., 1973
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_table1_prior_study_row_10
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: FeO
+- observation_id: shornikov_2020_table1_prior_study_row_11
+  type: thermodynamic_context
+  locator:
+    page: 2
+    published_page: 75
+    pdf_page_index: 1
+    table: '1'
+    row: 11
+    note: Continuation of Table 1; row numbering continues from printed page 74.
+  units: T, K; FeO, mol %; samples as printed
+  values:
+    quantity: prior_feo_activity_experimental_conditions
+    method_class: quoted_attributed
+    method_as_printed: $CO_2 / H_2$  equilibrium
+    T_as_printed: '1433'
+    FeO_as_printed: 15–65
+    number_of_samples_as_printed: '5'
+    reference_as_printed: Saha & Biggar, 1974
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_table1_prior_study_row_11
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: FeO
+- observation_id: shornikov_2020_table1_prior_study_row_12
+  type: thermodynamic_context
+  locator:
+    page: 2
+    published_page: 75
+    pdf_page_index: 1
+    table: '1'
+    row: 12
+    note: Continuation of Table 1; row numbering continues from printed page 74.
+  units: T, K; FeO, mol %; samples as printed
+  values:
+    quantity: prior_feo_activity_experimental_conditions
+    method_class: quoted_attributed
+    method_as_printed: E. m. f.
+    T_as_printed: 1050–1400
+    FeO_as_printed: 15–85
+    number_of_samples_as_printed: '7'
+    reference_as_printed: Srecec et al., 1987
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_table1_prior_study_row_12
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: FeO
+- observation_id: shornikov_2020_table1_prior_study_row_13
+  type: thermodynamic_context
+  locator:
+    page: 2
+    published_page: 75
+    pdf_page_index: 1
+    table: '1'
+    row: 13
+    note: Continuation of Table 1; row numbering continues from printed page 74.
+  units: T, K; FeO, mol %; samples as printed
+  values:
+    quantity: prior_feo_activity_experimental_conditions
+    method_class: quoted_attributed
+    method_as_printed: $CO_2 / H_2$  equilibrium
+    T_as_printed: '1573'
+    FeO_as_printed: 10–85
+    number_of_samples_as_printed: '8'
+    reference_as_printed: Srecec et al., 1987
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_table1_prior_study_row_13
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: FeO
+- observation_id: shornikov_2020_table1_prior_study_row_14
+  type: thermodynamic_context
+  locator:
+    page: 2
+    published_page: 75
+    pdf_page_index: 1
+    table: '1'
+    row: 14
+    note: Continuation of Table 1; row numbering continues from printed page 74.
+  units: T, K; FeO, mol %; samples as printed
+  values:
+    quantity: prior_feo_activity_experimental_conditions
+    method_class: quoted_attributed
+    method_as_printed: E. m. f.
+    T_as_printed: 1373–1573
+    FeO_as_printed: 12–90
+    number_of_samples_as_printed: '9'
+    reference_as_printed: Hasegawa et al., 2006
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_table1_prior_study_row_14
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: FeO
+- observation_id: shornikov_2020_text_calculation_temperature_range
+  type: thermodynamic_context
+  locator:
+    page: 1
+    published_page: 74
+    pdf_page_index: 0
+    note: Abstract states that thermodynamic-property calculations used this temperature range.
+  units: K
+  values:
+    quantity: printed_prose_numeric_context
+    calculation_temperature_range_K_as_printed: 1600–3200
+  attribution: present study
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_text_calculation_temperature_range
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_text_delta_gamma_discrepancy
+  type: thermodynamic_context
+  locator:
+    page: 1
+    published_page: 74
+    pdf_page_index: 0
+    note: Text compares previous FeO activity-coefficient results and states delta gamma FeO is about 0.3 at 25 mol % FeO.
+  units: dimensionless delta gamma; FeO mol %
+  values:
+    quantity: printed_prose_numeric_context
+    delta_gamma_FeO_as_printed: ~ 0.3
+    FeO_mol_pct_as_printed: '25'
+    statement_as_printed: δγFeO ~ 0.3 at 25 mol % FeO
+  attribution: Shornikov et al. (2020), discussion of prior measurements
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_text_delta_gamma_discrepancy
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_text_mgfe2o3_decomposition_bound
+  type: thermodynamic_context
+  locator:
+    page: 1
+    published_page: 74
+    pdf_page_index: 0
+    note: Text says the decomposition temperature does not exceed 1300 K and has not been determined experimentally.
+  units: K
+  values:
+    quantity: printed_prose_numeric_context
+    decomposition_temperature_upper_bound_K_as_printed: '1300'
+    decomposition_temperature_qualifier_as_printed: do not exceed
+    experimentally_determined_as_printed: not determined experimentally
+  attribution: Carter (1959)
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_text_mgfe2o3_decomposition_bound
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgFe2O3
+- observation_id: shornikov_2020_text_mgfeo2_decomposition_bound
+  type: thermodynamic_context
+  locator:
+    page: 1
+    published_page: 74
+    pdf_page_index: 0
+    note: Text says the decomposition temperature does not exceed 1300 K and has not been determined experimentally.
+  units: K
+  values:
+    quantity: printed_prose_numeric_context
+    decomposition_temperature_upper_bound_K_as_printed: '1300'
+    decomposition_temperature_qualifier_as_printed: do not exceed
+    experimentally_determined_as_printed: not determined experimentally
+  attribution: Yamauchi et al. (2014)
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_text_mgfeo2_decomposition_bound
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgFeO2
+- observation_id: shornikov_2020_text_mixing_energy_comparison
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    note: Text compares the mixing energies against Merli and Wu over the concentration region.
+  units: kJ/mol; K
+  values:
+    quantity: printed_prose_numeric_context
+    Merli_comparison_temperature_K_as_printed: '2500'
+    Wu_comparison_temperature_K_as_printed: '2773'
+    maximum_difference_kJ_mol_as_printed: '2'
+    maximum_difference_qualifier_as_printed: do not exceed
+  attribution: Merli et al. (2015) and Wu et al. (1993), compared with present study
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_text_mixing_energy_comparison
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_text_mixing_energy_minimum
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    note: Text reports the Fig 4b mixing-energy minimum at two temperatures.
+  units: kJ/mol
+  values:
+    quantity: printed_prose_numeric_context
+    minimum_at_2000_K_as_printed: –10
+    minimum_at_2773_K_as_printed: –15
+  attribution: present study
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_text_mixing_energy_minimum
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_text_present_study_ideal_range
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    note: Text reports present-study ideal behavior over this FeO concentration interval.
+  units: mol % FeO
+  values:
+    quantity: printed_prose_numeric_context
+    FeO_concentration_range_mol_pct_as_printed: 80–100
+  attribution: present study
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_text_present_study_ideal_range
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt
+- observation_id: shornikov_2020_text_wu_near_ideal_range
+  type: thermodynamic_context
+  locator:
+    page: 3
+    published_page: 76
+    pdf_page_index: 2
+    note: Text reports Wu et al. assumed almost-ideal melt behavior over this temperature interval.
+  units: K
+  values:
+    quantity: printed_prose_numeric_context
+    temperature_range_K_as_printed: 2473–3073
+  attribution: Wu et al. (1993)
+  context_id: shornikov-2020-mgo-feo-melts::context::shornikov_2020_text_wu_near_ideal_range
+  work_id: 194cab6e83bd4e8885dd383930f77d584d7b98d286bb9a7707e6d081e2610975
+  source_id: shornikov-2020-mgo-feo-melts
+  species: MgO-FeO_melt

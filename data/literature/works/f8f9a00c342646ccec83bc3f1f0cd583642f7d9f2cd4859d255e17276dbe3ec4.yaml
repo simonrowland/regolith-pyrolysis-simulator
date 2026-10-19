@@ -1,0 +1,496 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: f8f9a00c342646ccec83bc3f1f0cd583642f7d9f2cd4859d255e17276dbe3ec4
+  citation: Shornikov, S. I., & Yakovlev, O. I. (2025). Condensation parameters of perovskite as the least volatile compound
+    of CAIs matter. Experiment in Geosciences, 31(1), 32–34.
+  source_ids:
+  - shornikov-2025-perovskite-condensation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:shornikov-2025-perovskite-condensation
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: f8f9a00c342646ccec83bc3f1f0cd583642f7d9f2cd4859d255e17276dbe3ec4::shornikov-2025-perovskite-condensation
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f8f9a00c342646ccec83bc3f1f0cd583642f7d9f2cd4859d255e17276dbe3ec4
+  locator:
+    page: 3
+    published_page: 33
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=O; column_header=Partial pressure  $p_i$ , atm
+context:
+- observation_id: shornikov_2025_figure1_panel_a
+  type: figure_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 33
+    figure: '1'
+    panel: A
+  units: logarithmic axis as printed; temperature in K
+  values:
+    quantity: partial_pressure
+    species_as_printed:
+    - O
+    - O2
+    - Ca
+    - CaO
+    - TiO
+    - TiO2
+    - CaTiO3
+    phase: gas
+    temperature_axis_as_printed: T, K (top); 10^4/T, K^-1 (bottom)
+    value_axis_as_printed: lg p_i, atm
+    caption_as_printed: Fig. 1. Dependences of the logarithm of the partial pressures (A) and the mole fractions (B) of the
+      vapor species over perovskite vs. the reverse temperature.
+    panel: A
+    series:
+    - species: O
+      attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      representation: continuous curve
+      marker_count: 0
+    - species: O2
+      attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      representation: continuous curve
+      marker_count: 0
+    - species: Ca
+      attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      representation: continuous curve
+      marker_count: 0
+    - species: CaO
+      attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      representation: continuous curve
+      marker_count: 0
+    - species: TiO
+      attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      representation: continuous curve
+      marker_count: 0
+    - species: TiO2
+      attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      representation: continuous curve
+      marker_count: 0
+    - species: CaTiO3
+      attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      representation: continuous curve
+      marker_count: 0
+    marker_count_note: No discrete markers are drawn in the 600-dpi render.
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2025-perovskite-condensation::context::shornikov_2025_figure1_panel_a
+  work_id: f8f9a00c342646ccec83bc3f1f0cd583642f7d9f2cd4859d255e17276dbe3ec4
+  source_id: shornikov-2025-perovskite-condensation
+  species: CaTiO3
+- observation_id: shornikov_2025_figure1_panel_b
+  type: figure_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 33
+    figure: '1'
+    panel: B
+  units: logarithmic axis as printed; temperature in K
+  values:
+    quantity: vapor_mole_fraction
+    species_as_printed:
+    - O
+    - O2
+    - Ca
+    - CaO
+    - TiO
+    - TiO2
+    - CaTiO3
+    phase: gas
+    temperature_axis_as_printed: T, K (top); 10^4/T, K^-1 (bottom)
+    value_axis_as_printed: lg x_i, mol
+    caption_as_printed: Fig. 1. Dependences of the logarithm of the partial pressures (A) and the mole fractions (B) of the
+      vapor species over perovskite vs. the reverse temperature.
+    panel: B
+    series:
+    - species: O
+      attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      representation: continuous curve
+      marker_count: 0
+    - species: O2
+      attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      representation: continuous curve
+      marker_count: 0
+    - species: Ca
+      attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      representation: continuous curve
+      marker_count: 0
+    - species: CaO
+      attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      representation: continuous curve
+      marker_count: 0
+    - species: TiO
+      attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      representation: continuous curve
+      marker_count: 0
+    - species: TiO2
+      attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      representation: continuous curve
+      marker_count: 0
+    - species: CaTiO3
+      attribution: Shornikov (2019, 2019a, 2020); Glushko et al. (1978–1982)
+      representation: continuous curve
+      marker_count: 0
+    marker_count_note: No discrete markers are drawn in the 600-dpi render.
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2025-perovskite-condensation::context::shornikov_2025_figure1_panel_b
+  work_id: f8f9a00c342646ccec83bc3f1f0cd583642f7d9f2cd4859d255e17276dbe3ec4
+  source_id: shornikov-2025-perovskite-condensation
+  species: CaTiO3
+- observation_id: shornikov_2025_ion_source_temperature_limit_context
+  type: method
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 33
+    section: Experimental methods
+  units: K
+  values:
+    quantity: modified_ion_source_temperature_limit
+    method_class: quoted_attributed
+    attribution: Shornikov et al. (2000)
+    ion_source_temperature_limit_K: 3000
+    quote_as_printed: The mass spectrometer MI-1201 was equipped with a modified ion source for high-temperature studies (up
+      to a temperature of 3000 K). The design of the developed ion source and the methodological features of experiment were
+      described in detail earlier (Shornikov et al., 2000).
+  context_id: shornikov-2025-perovskite-condensation::context::shornikov_2025_ion_source_temperature_limit_context
+  work_id: f8f9a00c342646ccec83bc3f1f0cd583642f7d9f2cd4859d255e17276dbe3ec4
+  source_id: shornikov-2025-perovskite-condensation
+  species: CaTiO3
+- observation_id: shornikov_2025_perovskite_evaporation_temperature_range_context
+  type: method
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 33
+    section: Experimental methods
+  units: K
+  values:
+    quantity: perovskite_evaporation_temperature_range
+    method_class: quoted_attributed
+    attribution: Shornikov (2019, 2019a, 2020)
+    temperature_range_K:
+    - 1791
+    - 2441
+    quote_as_printed: CaTiO3 perovskite evaporation from a Knudsen effusion molybdenum cell was studied by mass spectrometry
+      in the temperature range of 1791–2441 K (Shornikov, 2019, 2019a, 2020).
+  context_id: shornikov-2025-perovskite-condensation::context::shornikov_2025_perovskite_evaporation_temperature_range_context
+  work_id: f8f9a00c342646ccec83bc3f1f0cd583642f7d9f2cd4859d255e17276dbe3ec4
+  source_id: shornikov-2025-perovskite-condensation
+  species: CaTiO3
+- observation_id: shornikov_2025_table1_ca_xi2400_over_xi1800_refusal
+  type: refusal
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    row_label: Ca
+    column_header: $x_{i,2400}$  /
+    published_page: 33
+    note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature observation
+      token.
+  units: dimensionless ratio as printed
+  values:
+    quantity: refused_source_content
+    method_class: method_only
+    refused:
+    - item: xi,2400 / xi,1800 concentration ratio
+      reason: schema_gap_ratio_across_temperatures
+      species_as_printed: Ca
+      value_as_printed: '0.3'
+      numerator_temperature_K_as_printed: 2400 K
+      denominator_temperature_K_as_printed: 1800 K
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: Ca
+        column_header: $x_{i,2400}$  /
+        published_page: 33
+        note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature observation
+          token.
+  context_id: shornikov-2025-perovskite-condensation::context::shornikov_2025_table1_ca_xi2400_over_xi1800_refusal
+  work_id: f8f9a00c342646ccec83bc3f1f0cd583642f7d9f2cd4859d255e17276dbe3ec4
+  source_id: shornikov-2025-perovskite-condensation
+  species: Ca
+- observation_id: shornikov_2025_table1_cao_xi2400_over_xi1800_refusal
+  type: refusal
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    row_label: CaO
+    column_header: $x_{i,2400}$  /
+    published_page: 33
+    note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature observation
+      token.
+  units: dimensionless ratio as printed
+  values:
+    quantity: refused_source_content
+    method_class: method_only
+    refused:
+    - item: xi,2400 / xi,1800 concentration ratio
+      reason: schema_gap_ratio_across_temperatures
+      species_as_printed: CaO
+      value_as_printed: '4.3'
+      numerator_temperature_K_as_printed: 2400 K
+      denominator_temperature_K_as_printed: 1800 K
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: CaO
+        column_header: $x_{i,2400}$  /
+        published_page: 33
+        note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature observation
+          token.
+  context_id: shornikov-2025-perovskite-condensation::context::shornikov_2025_table1_cao_xi2400_over_xi1800_refusal
+  work_id: f8f9a00c342646ccec83bc3f1f0cd583642f7d9f2cd4859d255e17276dbe3ec4
+  source_id: shornikov-2025-perovskite-condensation
+  species: CaO
+- observation_id: shornikov_2025_table1_catio3_xi2400_over_xi1800_refusal
+  type: refusal
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    row_label: $CaTiO_3$
+    column_header: $x_{i,2400}$  /
+    published_page: 33
+    note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature observation
+      token.
+  units: dimensionless ratio as printed
+  values:
+    quantity: refused_source_content
+    method_class: method_only
+    refused:
+    - item: xi,2400 / xi,1800 concentration ratio
+      reason: schema_gap_ratio_across_temperatures
+      species_as_printed: CaTiO3
+      value_as_printed: '945'
+      numerator_temperature_K_as_printed: 2400 K
+      denominator_temperature_K_as_printed: 1800 K
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $CaTiO_3$
+        column_header: $x_{i,2400}$  /
+        published_page: 33
+        note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature observation
+          token.
+  context_id: shornikov-2025-perovskite-condensation::context::shornikov_2025_table1_catio3_xi2400_over_xi1800_refusal
+  work_id: f8f9a00c342646ccec83bc3f1f0cd583642f7d9f2cd4859d255e17276dbe3ec4
+  source_id: shornikov-2025-perovskite-condensation
+  species: CaTiO3
+- observation_id: shornikov_2025_table1_o2_xi2400_over_xi1800_refusal
+  type: refusal
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    row_label: $O_2$
+    column_header: $x_{i,2400}$  /
+    published_page: 33
+    note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature observation
+      token.
+  units: dimensionless ratio as printed
+  values:
+    quantity: refused_source_content
+    method_class: method_only
+    refused:
+    - item: xi,2400 / xi,1800 concentration ratio
+      reason: schema_gap_ratio_across_temperatures
+      species_as_printed: O2
+      value_as_printed: '1.1'
+      numerator_temperature_K_as_printed: 2400 K
+      denominator_temperature_K_as_printed: 1800 K
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $O_2$
+        column_header: $x_{i,2400}$  /
+        published_page: 33
+        note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature observation
+          token.
+  context_id: shornikov-2025-perovskite-condensation::context::shornikov_2025_table1_o2_xi2400_over_xi1800_refusal
+  work_id: f8f9a00c342646ccec83bc3f1f0cd583642f7d9f2cd4859d255e17276dbe3ec4
+  source_id: shornikov-2025-perovskite-condensation
+  species: O2
+- observation_id: shornikov_2025_table1_o_xi2400_over_xi1800_refusal
+  type: refusal
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    row_label: O
+    column_header: $x_{i,2400}$  /
+    published_page: 33
+    note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature observation
+      token.
+  units: dimensionless ratio as printed
+  values:
+    quantity: refused_source_content
+    method_class: method_only
+    refused:
+    - item: xi,2400 / xi,1800 concentration ratio
+      reason: schema_gap_ratio_across_temperatures
+      species_as_printed: O
+      value_as_printed: '0.6'
+      numerator_temperature_K_as_printed: 2400 K
+      denominator_temperature_K_as_printed: 1800 K
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: O
+        column_header: $x_{i,2400}$  /
+        published_page: 33
+        note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature observation
+          token.
+  context_id: shornikov-2025-perovskite-condensation::context::shornikov_2025_table1_o_xi2400_over_xi1800_refusal
+  work_id: f8f9a00c342646ccec83bc3f1f0cd583642f7d9f2cd4859d255e17276dbe3ec4
+  source_id: shornikov-2025-perovskite-condensation
+  species: O
+- observation_id: shornikov_2025_table1_ti_xi2400_over_xi1800_refusal
+  type: refusal
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    row_label: Ti
+    column_header: $x_{i,2400}$  /
+    published_page: 33
+    note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature observation
+      token.
+  units: dimensionless ratio as printed
+  values:
+    quantity: refused_source_content
+    method_class: method_only
+    refused:
+    - item: xi,2400 / xi,1800 concentration ratio
+      reason: schema_gap_ratio_across_temperatures
+      species_as_printed: Ti
+      value_as_printed: '56'
+      numerator_temperature_K_as_printed: 2400 K
+      denominator_temperature_K_as_printed: 1800 K
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: Ti
+        column_header: $x_{i,2400}$  /
+        published_page: 33
+        note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature observation
+          token.
+  context_id: shornikov-2025-perovskite-condensation::context::shornikov_2025_table1_ti_xi2400_over_xi1800_refusal
+  work_id: f8f9a00c342646ccec83bc3f1f0cd583642f7d9f2cd4859d255e17276dbe3ec4
+  source_id: shornikov-2025-perovskite-condensation
+  species: Ti
+- observation_id: shornikov_2025_table1_tio2_xi2400_over_xi1800_refusal
+  type: refusal
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    row_label: $TiO_2$
+    column_header: $x_{i,2400}$  /
+    published_page: 33
+    note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature observation
+      token.
+  units: dimensionless ratio as printed
+  values:
+    quantity: refused_source_content
+    method_class: method_only
+    refused:
+    - item: xi,2400 / xi,1800 concentration ratio
+      reason: schema_gap_ratio_across_temperatures
+      species_as_printed: TiO2
+      value_as_printed: '1.6'
+      numerator_temperature_K_as_printed: 2400 K
+      denominator_temperature_K_as_printed: 1800 K
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: $TiO_2$
+        column_header: $x_{i,2400}$  /
+        published_page: 33
+        note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature observation
+          token.
+  context_id: shornikov-2025-perovskite-condensation::context::shornikov_2025_table1_tio2_xi2400_over_xi1800_refusal
+  work_id: f8f9a00c342646ccec83bc3f1f0cd583642f7d9f2cd4859d255e17276dbe3ec4
+  source_id: shornikov-2025-perovskite-condensation
+  species: TiO2
+- observation_id: shornikov_2025_table1_tio_xi2400_over_xi1800_refusal
+  type: refusal
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    row_label: TiO
+    column_header: $x_{i,2400}$  /
+    published_page: 33
+    note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature observation
+      token.
+  units: dimensionless ratio as printed
+  values:
+    quantity: refused_source_content
+    method_class: method_only
+    refused:
+    - item: xi,2400 / xi,1800 concentration ratio
+      reason: schema_gap_ratio_across_temperatures
+      species_as_printed: TiO
+      value_as_printed: '6.1'
+      numerator_temperature_K_as_printed: 2400 K
+      denominator_temperature_K_as_printed: 1800 K
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row_label: TiO
+        column_header: $x_{i,2400}$  /
+        published_page: 33
+        note: The printed column is xi,2400 / xi,1800; this ratio spans two temperatures and has no single-temperature observation
+          token.
+  context_id: shornikov-2025-perovskite-condensation::context::shornikov_2025_table1_tio_xi2400_over_xi1800_refusal
+  work_id: f8f9a00c342646ccec83bc3f1f0cd583642f7d9f2cd4859d255e17276dbe3ec4
+  source_id: shornikov-2025-perovskite-condensation
+  species: TiO

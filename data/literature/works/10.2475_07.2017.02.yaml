@@ -1,0 +1,1106 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2475/07.2017.02
+  citation: 'Sack, R. O. and Ghiorso, M. S. (2017). Ti3+- and Ti4+-rich fassaites at the birth of the solar system: Thermodynamics
+    and applications. American Journal of Science, 317(7), 807–845.'
+  source_ids:
+  - sack-ghiorso-2017-fassaite-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:sack-ghiorso-2017-fassaite-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2475/07.2017.02
+experiments: []
+context:
+- observation_id: sack_ghiorso_2017_fig10_gibbs_energy_of_mixing
+  type: figure_record
+  locator:
+    page: 25
+    published_page: 831
+    pdf_page_index: 24
+    figure: '10'
+    panel: whole figure; no lettered panel
+  phase: grossmanite–CATS fassaite solid solution
+  units: figure-only; plotted coordinates not digitized
+  values:
+    quantity: unavailable
+    printed_quantity: Gibbs energy of mixing
+    schema_gap: No Gibbs-energy-of-mixing quantity token exists; this record is unscored context.
+    species: grossmanite (CaTiAlSiO6)–CATS (CaAl2SiO6)
+    model_system_as_published: Di–Gr–AlBf–CATS fassaite solid solution
+    model_endmembers_as_published: diopside (CaMgSi2O6), grossmanite (CaTiAlSiO6), alumino-buffonite (CaMg1/2Ti1/2AlSiO6),
+      and CATS (CaAl2SiO6)
+    plotted_subsystem_as_published: Gr–CATS binary
+    temperature_as_published: 1473 K
+    axes_as_printed:
+    - x: X4FAS
+    - y: Gibbs energy of mixing Ḡmix (kJ/gfw)
+    caption_summary: 1473 K, Gibbs energy of mixing of stable, metastable, and unstable portions of the Gr–CATS binary compared
+      with ideal mixing and with W24 = 0. The Gibbs energy of mixing is calculated from equations (13) and (16) for parameter
+      values in Table 3. Unstable curve portions for W24 = 0.0 and 7.5 kJ/gfw are dashed. The caption notes that CATS is known
+      to be metastable at low pressure and that stability of grossmanite–CATS solutions has not been established experimentally.
+    attribution: Sack and Ghiorso (2017), as stated in caption.
+    series:
+    - name: calculated stable, metastable, and unstable curves
+      method_class: model_derived
+      marker_count: 0
+      attribution: Sack and Ghiorso (2017).
+    - name: ideal-mixing curve
+      method_class: model_derived
+      marker_count: 0
+      attribution: Sack and Ghiorso (2017).
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_fig10_gibbs_energy_of_mixing
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: SiO2
+- observation_id: sack_ghiorso_2017_fig11_diopside_grossmanite_gap
+  type: figure_record
+  locator:
+    page: 27
+    published_page: 833
+    pdf_page_index: 26
+    figure: '11'
+    panel: whole figure; no lettered panel
+  phase: diopside–grossmanite fassaite solid solution
+  units: figure-only; plotted coordinates not digitized
+  values:
+    quantity: unavailable
+    printed_quantity: temperature–composition miscibility gap
+    schema_gap: No phase-boundary quantity token exists; this record is unscored context.
+    species: diopside (CaMgSi2O6)–grossmanite (CaTiAlSiO6)
+    model_system_as_published: Di–Gr–AlBf–CATS fassaite solid solution
+    model_endmembers_as_published: diopside (CaMgSi2O6), grossmanite (CaTiAlSiO6), alumino-buffonite (CaMg1/2Ti1/2AlSiO6),
+      and CATS (CaAl2SiO6)
+    plotted_subsystem_as_published: Di–Gr binary
+    temperature_as_published: plotted temperature range 1450–1550 K
+    axes_as_printed:
+    - x: X2FAS
+    - y: T (K)
+    caption_summary: Calculated miscibility gap in Di–Gr fassaites compared with experimental data. The miscibility gap is
+      calculated using parameter values in Table 3 and is a consequence of a change from a disordered Al–Si distribution in
+      grossmanite to a partially ordered one in diopside–grossmanite solid solutions with intermediate X2.
+    attribution: Current-study calculated gap compared with cited experimental constraints.
+    series:
+    - name: calculated diopside–grossmanite miscibility gap
+      method_class: model_derived
+      marker_count: 0
+      attribution: Sack and Ghiorso (2017).
+    - name: experimental comparison constraints
+      method_class: quoted_attributed
+      marker_count: 0
+      attribution: Specific sources are not named in this caption.
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_fig11_diopside_grossmanite_gap
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: SiO2
+- observation_id: sack_ghiorso_2017_fig12_composite_fassaite_gaps
+  type: figure_record
+  locator:
+    page: 28
+    published_page: 834
+    pdf_page_index: 27
+    figure: '12'
+    panel: whole figure; no lettered panel
+  phase: Di–Gr–AlBf–CATS fassaite solid solution
+  units: figure-only; plotted coordinates not digitized
+  values:
+    quantity: equilibrium_phase_composition
+    species: Di–Gr–AlBf–CATS fassaite solid solution
+    model_system_as_published: Di–Gr–AlBf–CATS fassaite solid solution
+    model_endmembers_as_published: diopside (CaMgSi2O6), grossmanite (CaTiAlSiO6), alumino-buffonite (CaMg1/2Ti1/2AlSiO6),
+      and CATS (CaAl2SiO6)
+    temperature_as_published: 1473 K; selected gaps at 1505 K
+    axes_as_printed:
+    - Projected fassaite tetrahedron with vertices Diopside, Gross+CATS, and Alumino Buffonite.
+    - Composition constraints and calculated miscibility-gap curves.
+    caption_summary: Composite of calculated miscibility gaps in stable and metastable Di–Gr–AlBf–CATS fassaites at 1473 K,
+      with selected gaps at 1505 K, compared with mean compositions of fassaites coexisting with melilite in different types
+      of Allende refractory inclusions considered by Grossman and others (2008, Table 7) and canonical fassaites closer to
+      the Gr–AlBf binary join, including Bischoff and Palme (1987) and Ma and Rossman (2009). Orange curves from Figure 2
+      are approximate phase boundaries inferred by Yang (1976). Dashed black curves represent the upper buffonite gap at 1505
+      K; dotted or short-dashed curves represent its metastable extension at 1473 K. The thermodynamic evaluation yields a
+      slightly lower estimate for CATS solubility in AlBf than Yang's graphical extrapolation.
+    attribution: Composition data and Yang's boundaries are attributed by series; the composite calculated gaps are from this
+      study.
+    series:
+    - name: Grossman and others (2008), mean compositions
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Symbols overlap with other plotted composition series.
+      attribution: Grossman and others (2008), Table 7, as cited.
+    - name: Bischoff and Palme (1987), canonical fassaites
+      method_class: quoted_attributed
+      marker_count: 2
+      attribution: Bischoff and Palme (1987), as cited in the caption.
+    - name: Ma and Rossman (2009), canonical fassaites
+      method_class: quoted_attributed
+      marker_count: 1
+      attribution: Ma and Rossman (2009), as cited in the caption.
+    - name: Yang (1976) approximate phase boundaries
+      method_class: model_derived
+      marker_count: 0
+      attribution: Yang (1976), as cited in the caption.
+    - name: current-study calculated miscibility gaps
+      method_class: model_derived
+      marker_count: 0
+      attribution: Sack and Ghiorso (2017).
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_fig12_composite_fassaite_gaps
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: SiO2
+- observation_id: sack_ghiorso_2017_fig13_solar_gas_oxygen_fugacity
+  type: figure_record
+  locator:
+    page: 34
+    published_page: 840
+    pdf_page_index: 33
+    figure: '13'
+    panel: whole figure; no lettered panel
+  phase: solar gas undergoing condensation
+  units: figure-only; plotted values not digitized
+  values:
+    quantity: unavailable
+    printed_quantity: log10 fO2
+    schema_gap: No log10 oxygen-fugacity quantity token exists; this record is unscored context.
+    species: solar gas; comparison uses fassaite and melilite compositions
+    model_system_as_published: Di–Gr–AlBf–CATS fassaite solid solution
+    model_endmembers_as_published: diopside (CaMgSi2O6), grossmanite (CaTiAlSiO6), alumino-buffonite (CaMg1/2Ti1/2AlSiO6),
+      and CATS (CaAl2SiO6)
+    temperature_as_published: plotted from approximately 1400 K to 1800 K; cited fassaite/melilite estimate at 1509 K
+    pressure_as_published: Ptot = 10^-3 atm
+    axes_as_printed:
+    - x: T (K)
+    - y: log10 fO2
+    caption_summary: Log10 fO2 versus temperature for a solar gas undergoing condensation at Ptot of 10^-3 atm for two different
+      estimates of the solar C/O ratio compared with a calibration of the iron–wüstite oxygen buffer curve, IW (Myers and
+      Eugster, 1983), the log10 fO2 value computed by Grossman and others (2008) for mean compositions of fassaites and melilites
+      in different types of Allende refractory inclusions (their Table 7) for an assumed temperature of 1509 K, and the corresponding
+      calculated result using equation (24), indicated by a downward-pointing arrow because equation (25) indicates oxygen
+      fugacities were even lower. Modified from Figure 2 of Grossman and others (2008).
+    attribution: IW calibration is attributed to Myers and Eugster (1983); comparator value to Grossman and others (2008);
+      the equation (24) result to Sack and Ghiorso (2017).
+    series:
+    - name: solar-gas condensation curve, C/O = 0.43
+      method_class: model_derived
+      marker_count: 0
+      attribution: Sack and Ghiorso (2017), as shown in the figure.
+    - name: solar-gas condensation curve, C/O = 0.58
+      method_class: model_derived
+      marker_count: 0
+      attribution: Sack and Ghiorso (2017), as shown in the figure.
+    - name: iron–wüstite oxygen buffer curve
+      method_class: quoted_attributed
+      marker_count: 0
+      attribution: Myers and Eugster (1983), as cited in the caption.
+    - name: Grossman and others (2008) calculated comparator
+      method_class: quoted_attributed
+      marker_count: 1
+      attribution: Grossman and others (2008), Table 7, as cited.
+    - name: current-study equation (24) result and downward arrow
+      method_class: model_derived
+      marker_count: 1
+      attribution: Sack and Ghiorso (2017).
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_fig13_solar_gas_oxygen_fugacity
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: SiO2
+- observation_id: sack_ghiorso_2017_fig1_fassaite_compositions
+  type: figure_record
+  locator:
+    page: 4
+    published_page: 810
+    pdf_page_index: 3
+    figure: '1'
+    panel: whole figure; no lettered panel
+  phase: fassaite solid solution
+  units: figure-only; composition coordinates not digitized
+  values:
+    quantity: equilibrium_phase_composition
+    species: Di–Gr–AlBf–CATS fassaite solid solution
+    model_system_as_published: Di–Gr–AlBf–CATS fassaite solid solution
+    model_endmembers_as_published: diopside (CaMgSi2O6), grossmanite (CaTiAlSiO6), alumino-buffonite (CaMg1/2Ti1/2AlSiO6),
+      and CATS (CaAl2SiO6)
+    endmembers_as_published: diopside, grossmanite, alumino-buffonite, CATS
+    temperature_as_published: 1473 K, 1503 K, and schematic 1511 K
+    axes_as_printed:
+    - Ternary fassaite composition projection with vertices Diopside, Grossmanite, and Alumino Buffonite.
+    - Natural compositions projected from the CATS apex.
+    caption_summary: 'Comparison of CAI fassaite composition data with a schematic extension of the Di–AlBf gap of Sack and
+      Ghiorso (1994a, small purple circles) into the Di–Gr–AlBf ternary subsystem (green curves) to highlight the prominent
+      gap between high- and low-Ti fassaite compositions. This extension is based on two improbable assumptions: equivalent
+      critical temperatures (1511 K) for Di–AlBf and Di–Gr solid solutions (W12 = 41.68 kJ/gfw with random Si–Al mixing),
+      and simple, continuous two-phase regions connecting these binary miscibility gaps. Accordingly, this representation
+      is meant to highlight the composition gap only, and it is anticipated that any resemblance to the actual phase diagram
+      is unlikely, if not coincidental, as, except for Di–AlBf, the schematic binodes are not based on physical evidence or
+      rigorous thermodynamic analysis. Compositions of natural fassaites are projected from the CATS apex of the diopside–grossmanite–alumino-buffonite–CATS
+      tetrahedron onto the diopside–grossmanite–alumino-buffonite face. Dashed lines are tielines connecting Ti-rich fassaite
+      cores with diopsidic, Wark–Lovering rims reported by Wark and Lovering (1982), Meeker and others (1983), and Dyl and
+      others (2011), compositions of coexisting sectors in zoned fassaites estimated from a graph in Simon and others (2003),
+      and CAI fassaite data reported by Grossman (1975), El Goresy and others (1985), Beckett (ms, 1986), Bischoff and Palme
+      (1987), Simon and Grossman (2006), and Simon and others (2001, 2007). Finally, the bright red star represents the type
+      specimen for the mineral grossmanite (Ma and Rossman, 2009), a specimen which is richer in alumino-buffonite than in
+      grossmanite.'
+    attribution: Plotted compositions are attributed to the cited sources listed in the series; schematic curves and assumptions
+      are from this study.
+    series:
+    - name: Sack and Ghiorso (1994a), small purple circles
+      method_class: quoted_attributed
+      marker_count: 10
+      attribution: Sack and Ghiorso (1994a), as cited in the caption.
+    - name: Dyl and others (2011), open purple squares
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Overlapping symbols in the dense composition cluster.
+      attribution: Dyl and others (2011), as cited in the caption.
+    - name: Ma and Rossman (2009), red star
+      method_class: quoted_attributed
+      marker_count: 1
+      attribution: Ma and Rossman (2009), as cited in the caption.
+    - name: Simon and others (2007), inverted triangles
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Overlapping symbols in the dense composition cluster.
+      attribution: Simon and others (2007), as cited in the caption.
+    - name: Simon and Grossman (2006), upright triangles
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Overlapping symbols in the dense composition cluster.
+      attribution: Simon and Grossman (2006), as cited in the caption.
+    - name: Simon and others (2003), red circles
+      method_class: quoted_attributed
+      marker_count: 2
+      attribution: Simon and others (2003), as cited in the caption.
+    - name: Simon and others (1991), open purple squares
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Overlapping symbols in the dense composition cluster.
+      attribution: Simon and others (1991), as shown in the legend.
+    - name: Bischoff and Palme (1987), filled blue circles
+      method_class: quoted_attributed
+      marker_count: 2
+      attribution: Bischoff and Palme (1987), as cited in the caption.
+    - name: Beckett (ms, 1986), open hexagons
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Overlapping symbols in the dense composition cluster.
+      attribution: Beckett (ms, 1986), as cited in the caption.
+    - name: El Goresy and others (1985), open circles
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Overlapping symbols in the dense composition cluster.
+      attribution: El Goresy and others (1985), as cited in the caption.
+    - name: Meeker and others (1983), green diamonds
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Overlapping symbols in the dense composition cluster.
+      attribution: Meeker and others (1983), as cited in the caption.
+    - name: Wark and Lovering (1982), orange diamonds
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Overlapping symbols in the dense composition cluster.
+      attribution: Wark and Lovering (1982), as cited in the caption.
+    - name: Grossman (1975), open circles
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Overlapping symbols in the dense composition cluster.
+      attribution: Grossman (1975), as cited in the caption.
+    - name: schematic miscibility gaps and projected tielines
+      method_class: model_derived
+      marker_count: 0
+      attribution: Sack and Ghiorso (2017).
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_fig1_fassaite_compositions
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: SiO2
+- observation_id: sack_ghiorso_2017_fig2_fassaite_phase_relations
+  type: figure_record
+  locator:
+    page: 7
+    published_page: 813
+    pdf_page_index: 6
+    figure: '2'
+    panel: whole figure; no lettered panel
+  phase: fassaite solid solution
+  units: figure-only; plotted coordinates not digitized
+  values:
+    quantity: equilibrium_phase_composition
+    species: Di–AlBf–CATS fassaite ternary
+    model_system_as_published: Di–Gr–AlBf–CATS fassaite solid solution
+    model_endmembers_as_published: diopside (CaMgSi2O6), grossmanite (CaTiAlSiO6), alumino-buffonite (CaMg1/2Ti1/2AlSiO6),
+      and CATS (CaAl2SiO6)
+    plotted_subsystem_as_published: Di–AlBf–CATS ternary
+    temperature_as_published: experimental 1497–1511 K; calculated 1473, 1500, and 1505 K
+    axes_as_printed:
+    - Ternary composition with vertices Di, AlBf, and CATS.
+    - Phase fields, miscibility gaps, and tielines.
+    caption_summary: Calculated phase relations compared with experimental constraints in the Di–AlBf–CATS fassaite ternary.
+      Red diamonds connected by red lines represent experimental fassaite pairs produced at temperatures between 1501 and
+      1508 K (Yang, 1975); red circles are homogeneous fassaites produced between 1497 and 1511 K. Dashed lines with temperature
+      labels are the calculated binodes of Sack and Ghiorso (1994a). Green and black curves are the calculated binodes at
+      1505 K for W13 = 17.23, W14 = 0 and W34 = 24 kJ/gfw and for s = 0, and for the values of W13, W14, W34, ΔH̄4*Dis, ΔW13,
+      ΔW34, Δ²W13, Δ²W14, and Δ²W34 given in Table 3. Dashed blue curves represent the 1473 and 1505 K AlBf–CATS miscibility
+      gap, metastable with respect to spinel, melilite, anorthite, perovskite and hibonite or less CATS-rich fassaite. Continuous
+      and dashed green lines indicate tielines for the diopside–alumino-buffonite gap and stable and metastable portions of
+      the alumino-buffonite–CATS gap calculated for s = 0. Black lines are representative tielines calculated for the UBG
+      with the parameters in Table 3. Orange curves are approximate phase boundaries inferred from experimental constraints
+      by Yang (1976).
+    attribution: Yang (1975, 1976), Sack and Ghiorso (1994a), and this study, as stated in caption.
+    series:
+    - name: Yang (1975) experimental fassaite pairs, red diamonds
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Individual diamonds overlap in the plotted experimental cluster.
+      attribution: Yang (1975), as cited in the caption.
+    - name: Yang (1975) homogeneous fassaites, red circles
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Individual circles overlap in the plotted experimental cluster.
+      attribution: Yang (1975), as cited in the caption.
+    - name: Sack and Ghiorso (1994a) calculated binodes
+      method_class: model_derived
+      marker_count: 0
+      attribution: Sack and Ghiorso (1994a), as cited in the caption.
+    - name: current-study calculated binodes, gaps, and tielines
+      method_class: model_derived
+      marker_count: 0
+      attribution: Sack and Ghiorso (2017).
+    - name: Yang (1976) approximate phase boundaries
+      method_class: model_derived
+      marker_count: 0
+      attribution: Yang (1976), inferred from cited experimental constraints.
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_fig2_fassaite_phase_relations
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: SiO2
+- observation_id: sack_ghiorso_2017_fig3_configurational_entropy
+  type: figure_record
+  locator:
+    page: 14
+    published_page: 820
+    pdf_page_index: 13
+    figure: '3'
+    panel: whole figure; no lettered panel
+  phase: diopside–CATS solid solution
+  units: figure-only; plotted coordinates not digitized
+  values:
+    quantity: S
+    printed_quantity: configurational entropy of diopside–CATS solid solutions
+    species: diopside (CaMgSi2O6)–CATS (CaAl2SiO6)
+    model_system_as_published: Di–Gr–AlBf–CATS fassaite solid solution
+    model_endmembers_as_published: diopside (CaMgSi2O6), grossmanite (CaTiAlSiO6), alumino-buffonite (CaMg1/2Ti1/2AlSiO6),
+      and CATS (CaAl2SiO6)
+    plotted_subsystem_as_published: diopside–CATS binary
+    temperature_as_published: 1473 K and 1700 K; comparison data near 1700 K
+    axes_as_printed:
+    - x: X4FAS
+    - y: configurational entropy S̄IC (J/gfw–K)
+    caption_summary: Configurational entropy of diopside–CATS solid solutions calculated at 1473 and 1700 K (purple, red,
+      and thicker dashed black curves) compared with computational constraints of Cohen (1986), circles with error bars, Vinograd
+      (2001), solid squares, and Warren and others (2001), diamonds, for temperatures near 1700 K, with the curve for pyroxenes
+      with a disordered distribution of Al and Si between tetrahedral sites (dashed curve), and with the empirical fit of
+      Benisek and others (2007), thinner black curve.
+    attribution: Calculated entropy curves are from this study; plotted comparison data and fit are attributed by series.
+    series:
+    - name: Sack and Ghiorso (2017) calculated curves at 1473 K and 1700 K
+      method_class: model_derived
+      marker_count: 0
+      attribution: Sack and Ghiorso (2017).
+    - name: Cohen (1986), circles with error bars
+      method_class: quoted_attributed
+      marker_count: 4
+      attribution: Cohen (1986), as cited in the caption.
+    - name: Vinograd (2001), solid squares
+      method_class: quoted_attributed
+      marker_count: 3
+      attribution: Vinograd (2001), as cited in the caption.
+    - name: Warren and others (2001), diamonds
+      method_class: quoted_attributed
+      marker_count: 1
+      attribution: Warren and others (2001), as cited in the caption.
+    - name: Benisek and others (2007) empirical fit
+      method_class: model_derived
+      marker_count: 0
+      attribution: Benisek and others (2007), as cited in the caption.
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_fig3_configurational_entropy
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: SiO2
+- observation_id: sack_ghiorso_2017_fig4_enthalpy_of_mixing
+  type: figure_record
+  locator:
+    page: 15
+    published_page: 821
+    pdf_page_index: 14
+    figure: '4'
+    panel: whole figure; no lettered panel
+  phase: diopside–CATS solid solution
+  units: figure-only; plotted coordinates not digitized
+  values:
+    quantity: unavailable
+    printed_quantity: enthalpy of mixing
+    schema_gap: No enthalpy-of-mixing quantity token exists; this record is unscored context.
+    species: diopside (CaMgSi2O6)–CATS (CaAl2SiO6)
+    model_system_as_published: Di–Gr–AlBf–CATS fassaite solid solution
+    model_endmembers_as_published: diopside (CaMgSi2O6), grossmanite (CaTiAlSiO6), alumino-buffonite (CaMg1/2Ti1/2AlSiO6),
+      and CATS (CaAl2SiO6)
+    plotted_subsystem_as_published: diopside–CATS binary
+    temperature_as_published: 1073 K, 1273 K, 1473 K, and 1700 K
+    axes_as_printed:
+    - x: X4FAS
+    - y: enthalpy of mixing H̄Mix (kJ/gfw)
+    caption_summary: Enthalpy of mixing of diopside–CATS solid solutions calculated for temperatures of 1073, 1273, 1473,
+      and 1700 K compared with calorimetric constraints of Newton and others (1977, open squares) and Benisek and others (2007,
+      solid circles), as summarized by Benisek and others (2007, figure 5B). Black curves were calculated using equations
+      (14) and (13) with ΔH̄4*Dis = 16.84, ΔW14 = −4, Δ²W14 = 65, and W14 = 16 kJ/gfw. Red curves use the same parameters
+      except W14 = 22 kJ/gfw. Thicker dashed black curves use the parameter values in Table 3.
+    attribution: Calculated curves are from this study; calorimetric constraints are attributed by series.
+    series:
+    - name: current-study calculated curves
+      method_class: model_derived
+      marker_count: 0
+      attribution: Sack and Ghiorso (2017).
+    - name: Newton and others (1977), open squares
+      method_class: quoted_attributed
+      marker_count: 5
+      attribution: Newton and others (1977), as cited in the caption.
+    - name: Benisek and others (2007), solid circles
+      method_class: quoted_attributed
+      marker_count: 7
+      attribution: Benisek and others (2007), as cited in the caption.
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_fig4_enthalpy_of_mixing
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: SiO2
+- observation_id: sack_ghiorso_2017_fig5_fassaite_constraints
+  type: figure_record
+  locator:
+    page: 18
+    published_page: 824
+    pdf_page_index: 17
+    figure: '5'
+    panel: whole figure; no lettered panel
+  phase: quaternary Di–Gr–AlBf–CATS fassaite solid solution
+  units: figure-only; plotted coordinates not digitized
+  values:
+    quantity: equilibrium_phase_composition
+    species: Di–Gr–AlBf–CATS fassaite solid solution
+    model_system_as_published: Di–Gr–AlBf–CATS fassaite solid solution
+    model_endmembers_as_published: diopside (CaMgSi2O6), grossmanite (CaTiAlSiO6), alumino-buffonite (CaMg1/2Ti1/2AlSiO6),
+      and CATS (CaAl2SiO6)
+    temperature_as_published: Beckett experiments at 1482–1517 K
+    axes_as_printed:
+    - Projected fassaite tetrahedron on a plane perpendicular to the Gr–CATS binary.
+    - Endmember labels include Diopside, Gross+CATS, and Alumino Buffonite.
+    caption_summary: Real and projected constraints on miscibility gaps in quaternary Di–Gr–AlBf–CATS fassaites in a projection
+      of the fassaite tetrahedron on to a plane perpendicular to the Gr–CATS binary. Fassaites produced in Beckett's (ms,
+      1986) experiments are indicated by blue circles with the experimental temperature (1482 to 1517 K). Green triangle represents
+      homogeneous fassaite cores in Bocce Ball 1 (Connolly and others, 2006), and the larger circles with black rims are fassaites
+      from CAIs enclosed in CAI 3N from CV3 chondrite Northwest Africa 3118 (Ivanova and others, 2015). Remaining symbols
+      for CAI fassaites correspond to those used in Figure 1. Numbers inside these and other symbols indicate 100 times inferred
+      fassaite X2fas/(X2fas + X4fas) ratios. Red arrow tips show possible and guessed layer-contact compositions. Orange curves
+      are approximate phase boundaries inferred by Yang (1976). Error bars indicate compositional uncertainties associated
+      with 5 and 10 percent uncertainties in Ti3+/(Ti3+ + Ti4+) ratio for a nominal composition with X2fas = X3fas = X4fas
+      = 0.25.
+    attribution: Composition data and phase-boundary sources are attributed by series; projected and imagined constraints
+      are identified as such in the caption.
+    series:
+    - name: Beckett (ms, 1986), blue circles
+      method_class: quoted_attributed
+      marker_count: 6
+      attribution: Beckett (ms, 1986), as cited in the caption.
+    - name: Connolly and others (2006), green triangle
+      method_class: quoted_attributed
+      marker_count: 1
+      attribution: Connolly and others (2006), as cited in the caption.
+    - name: Ivanova and others (2015), large black-rimmed circles
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Dense composition symbols; some overlap.
+      attribution: Ivanova and others (2015), as cited in the caption.
+    - name: other CAI fassaite compositions from Figure 1
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Dense overlapping symbols from multiple cited sources.
+      attribution: Sources listed in the Figure 1 caption.
+    - name: imagined layer-contact compositions and tieline
+      method_class: model_derived
+      marker_count: 2
+      attribution: Current-study conjecture, described as possible and guessed in caption.
+    - name: approximate phase boundaries from Yang (1976)
+      method_class: model_derived
+      marker_count: 0
+      attribution: Yang (1976), as cited in the caption.
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_fig5_fassaite_constraints
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: SiO2
+- observation_id: sack_ghiorso_2017_fig6_intermediate_potential_gaps
+  type: figure_record
+  locator:
+    page: 21
+    published_page: 827
+    pdf_page_index: 20
+    figure: '6'
+    panel: whole figure; no lettered panel
+  phase: quaternary fassaite solid solution
+  units: figure-only; plotted coordinates not digitized
+  values:
+    quantity: equilibrium_phase_composition
+    species: Di–Gr–AlBf–CATS fassaite solid solution
+    model_system_as_published: Di–Gr–AlBf–CATS fassaite solid solution
+    model_endmembers_as_published: diopside (CaMgSi2O6), grossmanite (CaTiAlSiO6), alumino-buffonite (CaMg1/2Ti1/2AlSiO6),
+      and CATS (CaAl2SiO6)
+    temperature_as_published: 1473 K, 1482 K, and 1502 K
+    axes_as_printed:
+    - Projected fassaite tetrahedron on a plane perpendicular to the Gr–CATS binary.
+    - Endmember labels Diopside, Gross+CATS, and Alumino Buffonite.
+    caption_summary: Calculated miscibility gaps at intermediate Ti(Al)-1 exchange potentials compared with experimental constraints
+      on the extent of single-fassaite fields of Beckett (ms, 1986) in a projection of the fassaite tetrahedron on to a plane
+      perpendicular to the Gr–CATS binary. Beckett's experimental fassaites (blue circles) are indicated by their temperatures
+      (1482–1517 K) and the numbers in them indicate 100 times their X2fas/(X2fas + X4fas) ratios. Calculated gaps are for
+      reference Gr–CATS solid solutions with X2ref ratios of 0.33 at 1482 and 1502 K, 0.36 at 1473 and 1502 K, and 0.37 at
+      1502 K. Orange curves are from Figure 2; dashed lines are representative extreme two-fassaite tielines; error bars are
+      from Figure 5; the LBG is not represented.
+    attribution: Beckett (ms, 1986), Yang (1976), Sack and Ghiorso (2017), as stated.
+    series:
+    - name: Beckett (ms, 1986), blue circles
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Dense composition symbols; some overlap.
+      attribution: Beckett (ms, 1986), as cited in the caption.
+    - name: calculated intermediate-potential miscibility gaps
+      method_class: model_derived
+      marker_count: 0
+      attribution: Sack and Ghiorso (2017).
+    - name: approximate phase boundaries from Figure 2
+      method_class: model_derived
+      marker_count: 0
+      attribution: Current-study reproduction of the Figure 2 curves.
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_fig6_intermediate_potential_gaps
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: SiO2
+- observation_id: sack_ghiorso_2017_fig7_high_potential_gaps
+  type: figure_record
+  locator:
+    page: 22
+    published_page: 828
+    pdf_page_index: 21
+    figure: '7'
+    panel: whole figure; no lettered panel
+  phase: quaternary fassaite solid solution
+  units: figure-only; plotted coordinates not digitized
+  values:
+    quantity: equilibrium_phase_composition
+    species: Di–Gr–AlBf–CATS fassaite solid solution
+    model_system_as_published: Di–Gr–AlBf–CATS fassaite solid solution
+    model_endmembers_as_published: diopside (CaMgSi2O6), grossmanite (CaTiAlSiO6), alumino-buffonite (CaMg1/2Ti1/2AlSiO6),
+      and CATS (CaAl2SiO6)
+    temperature_as_published: 1473 K
+    axes_as_printed:
+    - Projected fassaite tetrahedron on a plane perpendicular to the Gr–CATS binary.
+    - Endmember labels Diopside, Gross+CATS, and Alumino Buffonite.
+    caption_summary: Calculated miscibility gaps at high Ti(Al)-1 exchange potentials and 1473 K compared with composition
+      data for fassaites in Wark–Lovering rims (open symbols) and primary fassaite cores (filled symbols), as defined by composition
+      data reported by Wark and Lovering (1982, green), Meeker and others (1983, orange), and Dyl and others (2011, purple).
+      Also shown are CAI fassaites reported by El Goresy and others (1985) and Bischoff and Palme (1987), and the type specimen
+      for grossmanite (Ma and Rossman, 2009). Numbers in symbols indicate 100 times the inferred X2fas/(X2fas + X4fas) ratios.
+      Calculated gaps use X2ref of 0.40, 0.46, and 0.49 at 1473 K. Orange curves are from Figure 2; dashed lines are representative
+      extreme two-fassaite tielines; error bars are from Figure 5; the LBG is not represented.
+    attribution: Composition data are attributed to cited sources; miscibility gaps and tielines are current-study calculations.
+    series:
+    - name: Wark and Lovering (1982), open/filled green symbols
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Multiple open and filled symbols overlap in the cluster.
+      attribution: Wark and Lovering (1982), as cited in the caption.
+    - name: Meeker and others (1983), open/filled orange symbols
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Multiple open and filled symbols overlap in the cluster.
+      attribution: Meeker and others (1983), as cited in the caption.
+    - name: Dyl and others (2011), open/filled purple symbols
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Multiple open and filled symbols overlap in the cluster.
+      attribution: Dyl and others (2011), as cited in the caption.
+    - name: El Goresy and others (1985)
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Overlapping composition symbols.
+      attribution: El Goresy and others (1985), as cited in the caption.
+    - name: Bischoff and Palme (1987)
+      method_class: quoted_attributed
+      marker_count: 2
+      attribution: Bischoff and Palme (1987), as cited in the caption.
+    - name: Ma and Rossman (2009), type specimen
+      method_class: quoted_attributed
+      marker_count: 1
+      attribution: Ma and Rossman (2009), as cited in the caption.
+    - name: calculated high-potential miscibility gaps and tielines
+      method_class: model_derived
+      marker_count: 0
+      attribution: Sack and Ghiorso (2017).
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_fig7_high_potential_gaps
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: SiO2
+- observation_id: sack_ghiorso_2017_fig8_low_potential_gaps
+  type: figure_record
+  locator:
+    page: 23
+    published_page: 829
+    pdf_page_index: 22
+    figure: '8'
+    panel: whole figure; no lettered panel
+  phase: quaternary fassaite solid solution
+  units: figure-only; plotted coordinates not digitized
+  values:
+    quantity: equilibrium_phase_composition
+    species: Di–Gr–AlBf–CATS fassaite solid solution
+    model_system_as_published: Di–Gr–AlBf–CATS fassaite solid solution
+    model_endmembers_as_published: diopside (CaMgSi2O6), grossmanite (CaTiAlSiO6), alumino-buffonite (CaMg1/2Ti1/2AlSiO6),
+      and CATS (CaAl2SiO6)
+    temperature_as_published: 1473 K
+    axes_as_printed:
+    - Projected fassaite tetrahedron on a plane perpendicular to the Gr–CATS binary.
+    - Endmember labels Diopside, Gross+CATS, and Alumino Buffonite.
+    caption_summary: Calculated miscibility gaps at low Ti(Al)-1 exchange potentials at 1473 K compared with composition data
+      for the homogeneous fassaite core in Bocce Ball 1 (Connolly and others, 2006), fassaites in coexisting sectors of a
+      Type B fassaite from Allende (Simon and others, 2003), CAI fassaites reported by Simon and Grossman (2006), and fassaites
+      from smaller CAIs enclosed in CAI 3N from CV3 chondrite Northwest Africa 3118 (Ivanova and others, 2015). Calculated
+      gaps are for Ti(Al)-1 exchange potentials with X2ref = 0.18, 0.25, and 0.29 at 1473 K. Orange curves are from Figure
+      2; dashed lines are representative extreme two-fassaite tielines; error bars are from Figure 5; the LBG is not represented.
+    attribution: Composition data are attributed to cited sources; gaps are current-study calculations.
+    series:
+    - name: Connolly and others (2006)
+      method_class: quoted_attributed
+      marker_count: 1
+      attribution: Connolly and others (2006), as cited in the caption.
+    - name: Simon and others (2003)
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Composition symbols overlap in the plotted cluster.
+      attribution: Simon and others (2003), as cited in the caption.
+    - name: Simon and Grossman (2006)
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Composition symbols overlap in the plotted cluster.
+      attribution: Simon and Grossman (2006), as cited in the caption.
+    - name: Ivanova and others (2015)
+      method_class: quoted_attributed
+      marker_count: unknown
+      marker_count_reason: Composition symbols overlap in the plotted cluster.
+      attribution: Ivanova and others (2015), as cited in the caption.
+    - name: calculated low-potential miscibility gaps and tielines
+      method_class: model_derived
+      marker_count: 0
+      attribution: Sack and Ghiorso (2017).
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_fig8_low_potential_gaps
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: SiO2
+- observation_id: sack_ghiorso_2017_fig9_configurational_entropy
+  type: figure_record
+  locator:
+    page: 24
+    published_page: 830
+    pdf_page_index: 23
+    figure: '9'
+    panel: whole figure; no lettered panel
+  phase: diopside–grossmanite solid solution
+  units: figure-only; plotted coordinates not digitized
+  values:
+    quantity: S
+    printed_quantity: configurational entropy
+    species: diopside (CaMgSi2O6)–grossmanite (CaTiAlSiO6)
+    model_system_as_published: Di–Gr–AlBf–CATS fassaite solid solution
+    model_endmembers_as_published: diopside (CaMgSi2O6), grossmanite (CaTiAlSiO6), alumino-buffonite (CaMg1/2Ti1/2AlSiO6),
+      and CATS (CaAl2SiO6)
+    plotted_subsystem_as_published: Di–Gr binary
+    temperature_as_published: 1473 K
+    axes_as_printed:
+    - x: X2FAS
+    - y: configurational entropy S̄IC (J/gfw–K)
+    caption_summary: Configurational entropy of diopside–grossmanite solid solutions calculated for 1473 K using equations
+      (8) and (15) and various values of ΔH̄2*Dis and Δ²W12. ΔW12 is given by equation (11). Dashed curve is calculated using
+      parameter values given in Table 3.
+    attribution: Sack and Ghiorso (2017), as stated in caption.
+    series:
+    - name: calculated parameter-variation entropy curves
+      method_class: model_derived
+      marker_count: 0
+      attribution: Sack and Ghiorso (2017).
+    - name: Table 3 parameter curve
+      method_class: model_derived
+      marker_count: 0
+      attribution: Sack and Ghiorso (2017).
+    numeric_points: none
+    digitisation: deferred to a figure pass
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_fig9_configurational_entropy
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: SiO2
+- observation_id: sack_ghiorso_2017_table3_mixing_parameters
+  type: thermodynamic_model_parameters
+  locator:
+    page: 17
+    published_page: 823
+    pdf_page_index: 16
+    table: '3'
+  phase: fassaite solid solution
+  units: kJ/gfw
+  values:
+    quantity: thermodynamic mixing parameters
+    species: Di–Gr–AlBf–CATS fassaite solid solution
+    endmembers_as_published: diopside (CaMgSi2O6), grossmanite (CaTiAlSiO6), alumino-buffonite (CaMg1/2Ti1/2AlSiO6), and CATS
+      (CaAl2SiO6)
+    model: Sack and Ghiorso (2017) fassaite thermodynamic model
+    rows:
+    - parameter_as_published: ΔH̄₂*Dis
+      value_as_published: 10.84 ± 1
+      method_class: model_derived
+      attribution: Current study; fitted/model parameter.
+    - parameter_as_published: ΔH̄₄*Dis
+      value_as_published: '16.84'
+      method_class: quoted_attributed
+      footnote_marks: §, **
+      attribution: § Cohen (1986), Vinograd (2001), and Warren and others (2001); ** Benisek and others (2007).
+    - parameter_as_published: W12
+      value_as_published: '20'
+      method_class: model_derived
+      attribution: Current study; fitted/model parameter.
+    - parameter_as_published: W13
+      value_as_published: '16.23'
+      method_class: quoted_attributed
+      footnote_marks: '*'
+      attribution: '* Sack and Ghiorso (1994a).'
+    - parameter_as_published: W14
+      value_as_published: 17 ± 1
+      method_class: quoted_attributed
+      footnote_marks: '**, §§'
+      attribution: §§ Yang (1975); ** Benisek and others (2007).
+    - parameter_as_published: W23
+      value_as_published: '1'
+      method_class: model_derived
+      attribution: Current study; fitted/model parameter.
+    - parameter_as_published: W24
+      value_as_published: '7.5'
+      method_class: model_derived
+      attribution: Current study; fitted/model parameter.
+    - parameter_as_published: W34
+      value_as_published: 25.6 ± 2
+      method_class: model_derived
+      attribution: Current study; fitted/model parameter.
+    - parameter_as_published: ΔW14
+      value_as_published: −2 ± 1
+      method_class: quoted_attributed
+      footnote_marks: §
+      attribution: § Cohen (1986), Vinograd (2001), and Warren and others (2001).
+    - parameter_as_published: ΔW34
+      value_as_published: −3 ± 2
+      method_class: model_derived
+      attribution: Current study; fitted/model parameter.
+    - parameter_as_published: Δ²W12
+      value_as_published: '103'
+      method_class: model_derived
+      attribution: Current study; fitted/model parameter.
+    - parameter_as_published: Δ²W13
+      value_as_published: 25 ± 10
+      method_class: quoted_attributed
+      footnote_marks: §, §§, **
+      attribution: § Cohen (1986), Vinograd (2001), and Warren and others (2001); §§ Yang (1975); ** Benisek and others (2007).
+    - parameter_as_published: Δ²W14
+      value_as_published: 75 ± 5
+      method_class: quoted_attributed
+      footnote_marks: §
+      attribution: § Cohen (1986), Vinograd (2001), and Warren and others (2001).
+    - parameter_as_published: Δ²W23
+      value_as_published: −79
+      method_class: model_derived
+      attribution: Current study; fitted/model parameter.
+    - parameter_as_published: Δ²W24
+      value_as_published: −60
+      method_class: model_derived
+      attribution: Current study; fitted/model parameter.
+    - parameter_as_published: Δ²W34
+      value_as_published: −55 ± 15
+      method_class: quoted_attributed
+      footnote_marks: §, §§, **
+      attribution: § Cohen (1986), Vinograd (2001), and Warren and others (2001); §§ Yang (1975); ** Benisek and others (2007).
+    uncertainty_note: Uncertainties are retained only where printed.
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_table3_mixing_parameters
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: SiO2
+- observation_id: sack_ghiorso_2017_table4_akermanite_adopted_properties
+  type: adopted_endmember_thermodynamic_properties
+  locator:
+    page: 29
+    published_page: 835
+    pdf_page_index: 28
+    table: '4'
+  phase: akermanite endmember
+  units: as printed by property
+  values:
+    quantity: adopted thermodynamic properties
+    phase_as_published: Akermanite
+    formula_as_published: Ca2MgSi2O7
+    filing_container_reason: CaO is first among the tied largest oxide coefficients in the akermanite formula.
+    system_as_published: melilite endmember used with the fassaite model
+    formation_enthalpy_298_15:
+      value_as_published: −3860441
+      units: J
+      method_class: quoted_attributed
+      attribution: Berman (1988), Table 4 footnote 1.
+    standard_entropy_298_15:
+      value_as_published: '212.00'
+      units: J/K
+      method_class: quoted_attributed
+      attribution: Berman (1988), Table 4 footnote 1.
+    heat_capacity:
+      expression_as_published: C̄p° = k0 + k1/√T + k2/T² + k3/T³ (J/K)
+      header_scales_as_published: k1×10^-2; k2×10^-5; k3×10^-7
+      coefficients_as_published:
+        k0: '307.06'
+        k1×10^-2: −29.388
+        k2×10^-5: '0.0'
+        k3×10^-7: −4.079
+      method_class: quoted_attributed
+      attribution: Berman (1988), Table 4 footnote 1.
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_table4_akermanite_adopted_properties
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: CaO
+- observation_id: sack_ghiorso_2017_table4_alumino_buffonite_adopted_properties
+  type: adopted_endmember_thermodynamic_properties
+  locator:
+    page: 29
+    published_page: 835
+    pdf_page_index: 28
+    table: '4'
+  phase: alumino-buffonite endmember
+  units: as printed by property
+  values:
+    quantity: adopted thermodynamic properties
+    phase_as_published: Alumino–Buffonite
+    formula_as_published: CaTi1/2AlSiO6
+    formula_elsewhere_as_published: CaMg1/2Ti1/2AlSiO6
+    filing_container_reason: CaO is first among the tied largest oxide coefficients under the Table 4 formula; the table/introduction
+      formula discrepancy is preserved below.
+    formula_note: Table 4 prints CaTi1/2AlSiO6, while the introduction gives CaMg1/2Ti1/2AlSiO6. Both forms are preserved
+      as printed; neither is silently substituted for the other.
+    system_as_published: Di–Gr–AlBf–CATS fassaite model; alumino-buffonite endmember
+    formation_enthalpy_298_15:
+      value_as_published: −3283830
+      units: J
+      method_class: quoted_attributed
+      attribution: Sack and Ghiorso (1994c), Table 4 footnote 3.
+    standard_entropy_298_15:
+      value_as_published: '143.745'
+      units: J/K
+      method_class: quoted_attributed
+      attribution: Sack and Ghiorso (1994c), Table 4 footnote 3.
+    heat_capacity:
+      expression_as_published: C̄p° = k0 + k1/√T + k2/T² + k3/T³ (J/K)
+      header_scales_as_published: k1×10^-2; k2×10^-5; k3×10^-7
+      coefficients_as_published:
+        k0: '297.499'
+        k1×10^-2: −13.5596
+        k2×10^-5: −67.0219
+        k3×10^-7: '75.9082'
+      method_class: quoted_attributed
+      attribution: Sack and Ghiorso (1994c), Table 4 footnote 3.
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_table4_alumino_buffonite_adopted_properties
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: CaO
+- observation_id: sack_ghiorso_2017_table4_cats_adopted_properties
+  type: adopted_endmember_thermodynamic_properties
+  locator:
+    page: 29
+    published_page: 835
+    pdf_page_index: 28
+    table: '4'
+  phase: CATS endmember
+  units: as printed by property
+  values:
+    quantity: adopted thermodynamic properties
+    phase_as_published: CATS
+    formula_as_published: CaAl2SiO6
+    filing_container_reason: CaO is first among the tied oxide coefficients in the CATS endmember formula.
+    system_as_published: Di–Gr–AlBf–CATS fassaite model; CATS endmember
+    formation_enthalpy_298_15:
+      value_as_published: −3298767
+      units: J
+      method_class: quoted_attributed
+      attribution: Berman (1988), Etzel and others (2007), and this study; Table 4 footnote 4.
+    standard_entropy_298_15:
+      value_as_published: '135.30'
+      units: J/K
+      method_class: quoted_attributed
+      attribution: Berman (1988), Etzel and others (2007), and this study; Table 4 footnote 4.
+    heat_capacity:
+      expression_as_published: C̄p° = k0 + k1/√T + k2/T² + k3/T³ (J/K)
+      header_scales_as_published: k1×10^-2; k2×10^-5; k3×10^-7
+      coefficients_as_published:
+        k0: '298.93'
+        k1×10^-2: −13.936
+        k2×10^-5: −81.530
+        k3×10^-7: '102.650'
+      method_class: quoted_attributed
+      attribution: Berman (1988), Etzel and others (2007), and this study; Table 4 footnote 4.
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_table4_cats_adopted_properties
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: CaO
+- observation_id: sack_ghiorso_2017_table4_diopside_adopted_properties
+  type: adopted_endmember_thermodynamic_properties
+  locator:
+    page: 29
+    published_page: 835
+    pdf_page_index: 28
+    table: '4'
+  phase: diopside endmember
+  units: as printed by property
+  values:
+    quantity: adopted thermodynamic properties
+    phase_as_published: Diopside
+    formula_as_published: CaMgSi2O6
+    filing_container_reason: SiO2 has the largest oxide coefficient in CaO.MgO.2SiO2.
+    system_as_published: Di–Gr–AlBf–CATS fassaite model; Di endmember
+    formation_enthalpy_298_15:
+      value_as_published: −3200583
+      units: J
+      method_class: quoted_attributed
+      attribution: Berman (1988) and Berman and Brown (1985); Table 4 footnotes 1 and 2.
+    standard_entropy_298_15:
+      value_as_published: '141.60'
+      units: J/K
+      method_class: quoted_attributed
+      attribution: Berman (1988) and Berman and Brown (1985); Table 4 footnotes 1 and 2.
+    heat_capacity:
+      expression_as_published: C̄p° = k0 + k1/√T + k2/T² + k3/T³ (J/K)
+      header_scales_as_published: k1×10^-2; k2×10^-5; k3×10^-7
+      coefficients_as_published:
+        k0: '305.52'
+        k1×10^-2: −16.050
+        k2×10^-5: −70.870
+        k3×10^-7: −87.550
+      method_class: quoted_attributed
+      attribution: Berman and Brown (1985); Table 4 footnote 2.
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_table4_diopside_adopted_properties
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: SiO2
+- observation_id: sack_ghiorso_2017_table4_grossmanite_adopted_properties
+  type: adopted_endmember_thermodynamic_properties
+  locator:
+    page: 29
+    published_page: 835
+    pdf_page_index: 28
+    table: '4'
+  phase: grossmanite endmember
+  units: as printed by property
+  values:
+    quantity: adopted thermodynamic properties
+    phase_as_published: Grossmanite
+    formula_as_published: CaTiAlSiO6
+    filing_container_reason: CaO is first among the tied largest oxide coefficients in the printed endmember formula.
+    system_as_published: Di–Gr–AlBf–CATS fassaite model; Grossmanite endmember
+    formation_enthalpy_298_15:
+      value_as_published: −3191414
+      units: J
+      method_class: model_derived
+      attribution: Footnote 5; from equation (24).
+    standard_entropy_298_15:
+      value_as_published: '175.3085'
+      units: J/K
+      method_class: model_derived
+      attribution: Footnote 6; derived by the printed oxide-entropy expression.
+      derivation_as_published: S̄₂′° = S̄₄′° − 1/2 S̄Al2O3° + S̄TiO2° + (S̄Fe3O4° − 3/2 S̄Fe2O3°).
+    heat_capacity:
+      expression_as_published: C̄p° = k0 + k1/√T + k2/T² + k3/T³ (J/K)
+      header_scales_as_published: k1×10^-2; k2×10^-5; k3×10^-7
+      coefficients_as_published:
+        k0: '303.861'
+        k1×10^-2: −14.826
+        k2×10^-5: −71.2559
+        k3×10^-7: '90.731'
+      method_class: model_derived
+      attribution: Superscript 6, as printed for Grossmanite in Table 4.
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_table4_grossmanite_adopted_properties
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: CaO
+- observation_id: sack_ghiorso_2017_table4_spinel_adopted_properties
+  type: adopted_endmember_thermodynamic_properties
+  locator:
+    page: 29
+    published_page: 835
+    pdf_page_index: 28
+    table: '4'
+  phase: spinel endmember
+  units: as printed by property
+  values:
+    quantity: adopted thermodynamic properties
+    phase_as_published: Spinel
+    formula_as_published: MgAl2O4
+    filing_container_reason: MgO is first among the tied oxide coefficients in the spinel formula.
+    system_as_published: spinel comparator used with the fassaite model
+    formation_enthalpy_298_15:
+      value_as_published: −2300313
+      units: J
+      method_class: quoted_attributed
+      attribution: Berman (1988), Table 4 footnote 1.
+    standard_entropy_298_15:
+      value_as_published: '84.535'
+      units: J/K
+      method_class: quoted_attributed
+      attribution: Berman (1988), Table 4 footnote 1.
+    heat_capacity:
+      expression_as_published: C̄p° = k0 + k1/√T + k2/T² + k3/T³ (J/K)
+      header_scales_as_published: k1×10^-2; k2×10^-5; k3×10^-7
+      coefficients_as_published:
+        k0: '235.90'
+        k1×10^-2: −17.666
+        k2×10^-5: −17.104
+        k3×10^-7: '4.062'
+      method_class: quoted_attributed
+      attribution: Berman (1988), Table 4 footnote 1.
+  context_id: sack-ghiorso-2017-fassaite-thermodynamics::context::sack_ghiorso_2017_table4_spinel_adopted_properties
+  work_id: 10.2475/07.2017.02
+  source_id: sack-ghiorso-2017-fassaite-thermodynamics
+  species: MgO

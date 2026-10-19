@@ -1,0 +1,5440 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/renggli-2022-te-evaporation.yaml
+observations:
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1141.15:row=te_868a:h=d0e1e08b779b
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1141.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '5874'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1141.15:row=te_868a:h=d0e1e08b779b
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=DB05
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1141.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB05
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '868'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB05
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB05
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB05
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1141.15:row=te_868c:h=ebec65d54ae5
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1141.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '7661'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1141.15:row=te_868c:h=ebec65d54ae5
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=DB06
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1141.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB06
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '868'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB06
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB06
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB06
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-12.77'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1285.15:row=te_1012a:h=fad919b3fa26
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1285.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '4573'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1285.15:row=te_1012a:h=fad919b3fa26
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=DB07
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1285.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB07
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1012'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB07
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB07
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB07
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1285.15:row=te_1012b:h=e7893255bad5
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1285.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '7237'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1285.15:row=te_1012b:h=e7893255bad5
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=DB08
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1285.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB08
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1012'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB08
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB08
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB08
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-8.86'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1285.15:row=te_1012c:h=95581101cf08
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1285.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '5679'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1285.15:row=te_1012c:h=95581101cf08
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=DB09
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1285.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB09
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1012'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB09
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB09
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB09
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-10.36'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1285.15:row=te_1012d:h=be010ec2baab
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1285.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '6519'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1285.15:row=te_1012d:h=be010ec2baab
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=DB10
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1285.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB10
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1012'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB10
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB10
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB10
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-12.36'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1285.15:row=te_1012e:h=7da7a871922e
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1285.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '4141'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1285.15:row=te_1012e:h=7da7a871922e
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=DB11
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1285.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB11
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1012'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB11
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB11
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB11
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-14.36'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1285.15:row=te_1012f:h=cbd2cd1d9a07
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1285.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '5801'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1285.15:row=te_1012f:h=cbd2cd1d9a07
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=DB12
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1285.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB12
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1012'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB12
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB12
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB12
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-16.36'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181a:h=f39bca2ddd97
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1454.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1507'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181a:h=f39bca2ddd97
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CO08
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1454.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO08
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1181'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO08
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO08
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO08
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181b:h=0cdd034c42b8
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1454.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1053'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181b:h=0cdd034c42b8
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CO09
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1454.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO09
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1181'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO09
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO09
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO09
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-6.91'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181c:h=96a1c129d870
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1454.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1326'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181c:h=96a1c129d870
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=DB13
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1454.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB13
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1181'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB13
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB13
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB13
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-8.41'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181d:h=01610f9a2f8a
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1454.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1026'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181d:h=01610f9a2f8a
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CO10
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1454.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO10
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1181'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO10
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO10
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO10
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-10.41'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181e:h=fe3965530c9a
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1454.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1905'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181e:h=fe3965530c9a
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CO11
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1454.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO11
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1181'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO11
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO11
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO11
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-12.41'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181f:h=9dfb3480b852
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1454.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1331'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181f:h=9dfb3480b852
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=DB14
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1454.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB14
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1181'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB14
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB14
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB14
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-14.41'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181f:h=e601b6bdde2a
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1454.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '2236'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181f:h=e601b6bdde2a
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CO12
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1454.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO12
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1181'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO12
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO12
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO12
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-14.41'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1469.15:row=te_1196a:h=2d9e7528c1bb
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1469.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1364'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1469.15:row=te_1196a:h=2d9e7528c1bb
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=DB15
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1469.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB15
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1196'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB15
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB15
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB15
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1469.15:row=te_1196c:h=893d8185986c
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1469.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '339'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1469.15:row=te_1196c:h=893d8185986c
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CR02
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1469.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR02
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1196'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR02
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR02
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR02
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-7.84'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1547.15:row=te_1274a:h=eb2b1e7b83f3
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1547.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '47.6'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1547.15:row=te_1274a:h=eb2b1e7b83f3
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CO02
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1547.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO02
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1274'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO02
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO02
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO02
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1547.15:row=te_1274b:h=89884bd58d09
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1547.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '71.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1547.15:row=te_1274b:h=89884bd58d09
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CO03
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1547.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO03
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1274'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO03
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO03
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO03
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-5.8'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1547.15:row=te_1274c:h=917a39ae8fb0
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1547.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '23.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1547.15:row=te_1274c:h=917a39ae8fb0
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CO04
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1547.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO04
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1274'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO04
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO04
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO04
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-7.3'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1547.15:row=te_1274d:h=b4b7afeb5a5f
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1547.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '197'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1547.15:row=te_1274d:h=b4b7afeb5a5f
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CO05
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1547.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO05
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1274'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO05
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO05
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO05
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-9.3'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1547.15:row=te_1274e:h=bc2dbc367643
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1547.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '361'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1547.15:row=te_1274e:h=bc2dbc367643
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CO06
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1547.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO06
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1274'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO06
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO06
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO06
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-11.3'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1547.15:row=te_1274f:h=19f3b4608757
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1547.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '581'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1547.15:row=te_1274f:h=19f3b4608757
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CO07
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1547.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO07
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1274'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO07
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CO07
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CO07
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-13.3'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1574.15:row=te_1301c:h=d6633b33746d
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1574.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '3.2'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1574.15:row=te_1301c:h=d6633b33746d
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CR03
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1574.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR03
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1301'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR03
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR03
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR03
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-6.79'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353a:h=0237d70d6690
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1626.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '0.7'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353a:h=0237d70d6690
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CR04
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1626.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR04
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1353'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR04
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR04
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR04
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353b:h=49318c5b02d5
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1626.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '2'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353b:h=49318c5b02d5
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CR05
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1626.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR05
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1353'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR05
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR05
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR05
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-4.8'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353b:h=a3bd1655f277
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1626.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '3.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353b:h=a3bd1655f277
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=DB20
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1626.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB20
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1353'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB20
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB20
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB20
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-4.8'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353c:h=7d2f8afc2a9c
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1626.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1.1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353c:h=7d2f8afc2a9c
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CR06
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1626.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR06
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1353'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR06
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR06
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR06
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-6.3'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353d:h=85d631bca0e6
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1626.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '60.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353d:h=85d631bca0e6
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CR07
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1626.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR07
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1353'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR07
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR07
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR07
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-8.3'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353e:h=521ab228dd32
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1626.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '61.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353e:h=521ab228dd32
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CR08
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1626.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR08
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1353'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR08
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR08
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR08
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-10.3'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353f:h=dd617767b8cd
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1626.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '13.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353f:h=dd617767b8cd
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CR09
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1626.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR09
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1353'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR09
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR09
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR09
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-12.3'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1681.15:row=te_1408a:h=d189c872e3b1
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1681.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1.4'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1681.15:row=te_1408a:h=d189c872e3b1
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=DB22
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1681.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB22
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1408'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB22
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB22
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB22
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1681.15:row=te_1408c:h=7e2d7ee2d7b4
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1681.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '3.6'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1681.15:row=te_1408c:h=7e2d7ee2d7b4
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=DB23
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1681.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB23
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1408'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB23
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB23
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB23
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-5.84'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1681.15:row=te_1408c:h=cb5617d63850
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1681.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1.1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1681.15:row=te_1408c:h=cb5617d63850
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CR10
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1681.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR10
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1408'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR10
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR10
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR10
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-5.84'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1732.15:row=te_1459c:h=5e40ed73fcc6
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1732.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1732.15:row=te_1459c:h=5e40ed73fcc6
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=CR11
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1732.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR11
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1459'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR11
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=CR11
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=CR11
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-5.4'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)
+- observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1732.15:row=te_1459c:h=611eae02b854
+  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Te
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1732.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '900'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '3.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1732.15:row=te_1459c:h=611eae02b854
+  source_id: renggli-2022-te-evaporation
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+    note: row=DB24
+  read_from: unknown:renggli-2022-te-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1732.15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB24
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1459'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB24
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 6
+              published_page: 40
+              pdf_page_index: 5
+              table: '1'
+              note: row=DB24
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    atmosphere:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+      locator:
+        page: 2
+        published_page: 36
+        pdf_page_index: 1
+        section: Experimental methods
+    time_min:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+        note: row=DB24
+    log_fO2_nominal:
+      state:
+        tag: value
+        value: '-5.4'
+      locator:
+        page: 6
+        published_page: 40
+        pdf_page_index: 5
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:renggli-2022-te-evaporation
+    parameters: []
+    output_unit: µg/g (ppm)

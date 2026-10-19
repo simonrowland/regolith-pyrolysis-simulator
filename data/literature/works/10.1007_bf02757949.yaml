@@ -1,0 +1,808 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1007/bf02757949
+  citation: Zaitsev, A. I., Shelkova, N. E., and Mogutnov, B. M. (2000). Thermodynamics of Na2O-SiO2 Melts. Inorganic Materials
+    36(6), 529–543.
+  source_ids:
+  - zaitsev-2000-sodium-silicate-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:zaitsev-2000-sodium-silicate-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1007/bf02757949
+experiments:
+- experiment_id: 10.1007/bf02757949::zaitsev-2000-sodium-silicate-thermodynamics
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/bf02757949
+  locator:
+    page: 7
+    published_page: 535
+    pdf_page_index: 6
+    table: '4'
+context:
+- observation_id: zaitsev_2000_figure10_metastable_miscibility_gap
+  type: figure
+  locator:
+    page: 12
+    published_page: 540
+    pdf_page_index: 11
+    figure: '10'
+  units: K and mole fraction as plotted
+  values:
+    quantity: unavailable
+    printed_quantity: metastable liquid miscibility gap in Na2O-SiO2
+    method_class: figure_only
+    admission_status: figure_only
+    species: Na2O-SiO2 binary system
+    phase: liquid
+    temperature: varies on the T axis
+    axes:
+      x: x(Na2O)
+      y: T, K
+    panel: none_stated
+    caption: Metastable liquid miscibility gap in the Na2O-SiO2 system; curve is calculated, points show experimental data
+      from references [49-54].
+    series:
+    - name: (1) [49]
+      marker_count: 7
+      attribution: '[49]'
+    - name: (2) [50]
+      marker_count: 3
+      attribution: '[50]'
+    - name: (3) [51]
+      marker_count: 4
+      attribution: '[51]'
+    - name: (4) [53]
+      marker_count: 4
+      attribution: '[53]'
+    - name: (5) [52]
+      marker_count: 3
+      attribution: '[52]'
+    - name: (6) [54]
+      marker_count: 6
+      attribution: '[54]'
+    - name: calculated gap curve
+      marker_count: 0
+      attribution: this work
+    points: []
+    attribution: this work and cited data as shown by series
+    digitisation: deferred to a figure pass
+  context_id: zaitsev-2000-sodium-silicate-thermodynamics::context::zaitsev_2000_figure10_metastable_miscibility_gap
+  work_id: 10.1007/bf02757949
+  source_id: zaitsev-2000-sodium-silicate-thermodynamics
+  species: SiO2
+- observation_id: zaitsev_2000_figure1_partial_gibbs_energy
+  type: figure
+  locator:
+    page: 3
+    published_page: 531
+    pdf_page_index: 2
+    figure: '1'
+  units: kJ/mol as plotted
+  values:
+    quantity: unavailable
+    printed_quantity: partial Gibbs energy of Na2O
+    method_class: figure_only
+    admission_status: figure_only
+    species: Na2O
+    phase: two-phase condensed assemblages
+    temperature: varies on the T axis
+    axes:
+      x: T, K
+      y: -Delta G(Na2O), kJ/mol
+    panel: none_stated
+    caption: Partial Gibbs energy of Na2O as a function of temperature for the N3S8 + SiO2 and N3S8 + NS2 two-phase regions.
+    series:
+    - name: (1) x(SiO2)=0.805, Nb cell, D=0.203 mm
+      marker_count: 18
+    - name: (2) x(SiO2)=0.733, Ta cell, D=0.314 mm
+      marker_count: 8
+    - name: (3) x(SiO2)=0.709, Nb cell, D=0.247 mm
+      marker_count: 16
+    - name: (4) x(SiO2)=0.671, Ta cell, D=0.356 mm
+      marker_count: 20
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: zaitsev-2000-sodium-silicate-thermodynamics::context::zaitsev_2000_figure1_partial_gibbs_energy
+  work_id: 10.1007/bf02757949
+  source_id: zaitsev-2000-sodium-silicate-thermodynamics
+  species: Na2O
+- observation_id: zaitsev_2000_figure2_partial_gibbs_energy
+  type: figure
+  locator:
+    page: 3
+    published_page: 531
+    pdf_page_index: 2
+    figure: '2'
+  units: kJ/mol as plotted
+  values:
+    quantity: unavailable
+    printed_quantity: partial Gibbs energy of Na2O
+    method_class: figure_only
+    admission_status: figure_only
+    species: Na2O
+    phase: two-phase condensed assemblage
+    temperature: varies on the T axis
+    axes:
+      x: T, K
+      y: -Delta G(Na2O), kJ/mol
+    panel: none_stated
+    caption: Partial Gibbs energy of Na2O as a function of temperature for the NS + NS2 two-phase region.
+    series:
+    - name: (1) x(SiO2)=0.625, Nb cell, D=0.322 mm
+      marker_count: 18
+    - name: (2) x(SiO2)=0.573, Ta cell, D=0.208 mm
+      marker_count: 20
+    - name: (3) x(SiO2)=0.524, Mo cell, D=0.351 mm
+      marker_count: 17
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: zaitsev-2000-sodium-silicate-thermodynamics::context::zaitsev_2000_figure2_partial_gibbs_energy
+  work_id: 10.1007/bf02757949
+  source_id: zaitsev-2000-sodium-silicate-thermodynamics
+  species: Na2O
+- observation_id: zaitsev_2000_figure3_partial_gibbs_energy
+  type: figure
+  locator:
+    page: 4
+    published_page: 532
+    pdf_page_index: 3
+    figure: '3'
+  units: kJ/mol as plotted
+  values:
+    quantity: unavailable
+    printed_quantity: partial Gibbs energy of Na2O
+    method_class: figure_only
+    admission_status: figure_only
+    species: Na2O
+    phase: two-phase condensed assemblages
+    temperature: varies on the T axis
+    axes:
+      x: T, K
+      y: -Delta G(Na2O), kJ/mol
+    panel: none_stated
+    caption: Partial Gibbs energy of Na2O as a function of temperature for the N3S2 + NS, N3S2 + N2S, and N2S + NS two-phase
+      regions.
+    series:
+    - name: (1) x(SiO2)=0.477, Nb cell, D=0.311 mm
+      marker_count: 12
+    - name: (2) x(SiO2)=0.430, Ta cell, D=0.203 mm
+      marker_count: 12
+    - name: (3) x(SiO2)=0.450, Mo cell, D=0.207 mm
+      marker_count: 9
+    - name: (4) x(SiO2)=0.405, Mo cell, D=0.351 mm
+      marker_count: 10
+    - name: (5) x(SiO2)=0.382, Nb cell, D=0.209 mm
+      marker_count: 15
+    - name: (6) x(SiO2)=0.382, Ta cell, D=0.314 mm
+      marker_count: 11
+    - name: (7) x(SiO2)=0.360, Mo cell, D=0.248 mm
+      marker_count: 14
+    - name: (8) x(SiO2)=0.349, Ni cell, D=0.212 mm
+      marker_count: 14
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: zaitsev-2000-sodium-silicate-thermodynamics::context::zaitsev_2000_figure3_partial_gibbs_energy
+  work_id: 10.1007/bf02757949
+  source_id: zaitsev-2000-sodium-silicate-thermodynamics
+  species: Na2O
+- observation_id: zaitsev_2000_figure4_silicate_formation_functions
+  type: figure
+  locator:
+    page: 5
+    published_page: 533
+    pdf_page_index: 4
+    figure: '4'
+  units: kJ/mol as plotted
+  values:
+    quantity: unavailable
+    printed_quantity: formation thermodynamic functions of sodium silicates
+    method_class: model_derived
+    admission_status: figure_only
+    species: sodium silicates in the Na2O-SiO2 binary
+    phase: solid phases and neighboring phase transformations
+    temperature: 1070 K for Delta_f G-prime; caption gives no separate T for series 1 and 2
+    axes:
+      x: x(SiO2)
+      y: -Delta_f H, -Delta_f G, -Delta_f G-prime (kJ/mol)
+    panel: none_stated
+    caption: 'Thermodynamic functions of formation of sodium silicates from beta-Na2O and quartz: (1) Delta_f G; (2) Delta_f
+      H; (3) Delta_f G-prime at 1070 K.'
+    series:
+    - name: (1) Delta_f G
+      marker_count: 7
+    - name: (2) Delta_f H
+      marker_count: 6
+    - name: (3) Delta_f G-prime at 1070 K
+      marker_count: 7
+    points: []
+    attribution: model results of this work
+    digitisation: deferred to a figure pass
+  context_id: zaitsev-2000-sodium-silicate-thermodynamics::context::zaitsev_2000_figure4_silicate_formation_functions
+  work_id: 10.1007/bf02757949
+  source_id: zaitsev-2000-sodium-silicate-thermodynamics
+  species: SiO2
+- observation_id: zaitsev_2000_figure5_alpha_function
+  type: figure
+  locator:
+    page: 6
+    published_page: 534
+    pdf_page_index: 5
+    figure: '5'
+  units: as plotted
+  values:
+    quantity: unavailable
+    printed_quantity: -alpha(Na2O) = -ln(gamma(Na2O))/[1-x(Na2O)]^2
+    method_class: figure_only
+    admission_status: figure_only
+    species: Na2O
+    phase: liquid
+    temperature: 1473 K
+    axes:
+      x: x(SiO2)
+      y: -alpha(Na2O)
+    panel: none_stated
+    caption: Composition dependence of alpha(Na2O) at 1473 K.
+    series:
+    - name: this work square-symbol series
+      marker_count: 11
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: zaitsev-2000-sodium-silicate-thermodynamics::context::zaitsev_2000_figure5_alpha_function
+  work_id: 10.1007/bf02757949
+  source_id: zaitsev-2000-sodium-silicate-thermodynamics
+  species: Na2O
+- observation_id: zaitsev_2000_figure6_na2o_activity
+  type: figure
+  locator:
+    page: 6
+    published_page: 534
+    pdf_page_index: 5
+    figure: '6'
+  units: as plotted; log activity axis
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: figure_only
+    species: Na2O
+    phase: liquid
+    temperature: series-specific temperatures in the caption
+    axes:
+      x: x(Na2O)
+      y: log(a(Na2O))
+    panel: none_stated
+    caption: Na2O activity in Na2O-SiO2 melts with respect to pure liquid Na2O. This work and earlier data are listed by series
+      in the caption.
+    series:
+    - name: I, this work, 1573 K curve
+      marker_count: 0
+    - name: II, this work, 1473 K curve
+      marker_count: 0
+    - name: III, this work, 1373 K curve
+      marker_count: 0
+    - name: IV, 1573 K [33]
+      marker_count: 0
+    - name: V, 1673 K [33]
+      marker_count: 0
+    - name: (1), 1450 K [26]
+      marker_count: 3
+    - name: (2), 1373 K [30]
+      marker_count: 3
+    - name: (3), 1573 K [30]
+      marker_count: 3
+    - name: (4), 1773 K [30]
+      marker_count: 3
+    - name: (5), 1293 K [36]
+      marker_count: 3
+    - name: (6), 1423 K [36]
+      marker_count: 3
+    - name: (7), 1373 K [37]
+      marker_count: 3
+    - name: (8), 1323 K [29]
+      marker_count: 3
+    - name: (9), 1573 K [34]
+      marker_count: 3
+    - name: (10), 1473 K [34]
+      marker_count: 3
+    - name: (11), 1373 K [34]
+      marker_count: 3
+    - name: (12), 1473 K [27]
+      marker_count: 3
+    - name: (13), 1473 K [25]
+      marker_count: 3
+    - name: (14), 1173 K [28]
+      marker_count: 3
+    - name: (15), 1273 K [28]
+      marker_count: 3
+    - name: (16), 1373 K [28]
+      marker_count: 3
+    - name: (17), 1273 K [31, 32]
+      marker_count: 3
+    - name: (18), 1373 K [31, 32]
+      marker_count: 3
+    - name: (19), 1473 K [31, 32]
+      marker_count: 3
+    - name: (20), 1473 K [24]
+      marker_count: 3
+    points: []
+    attribution: this work and cited data as shown by series
+    digitisation: deferred to a figure pass
+  context_id: zaitsev-2000-sodium-silicate-thermodynamics::context::zaitsev_2000_figure6_na2o_activity
+  work_id: 10.1007/bf02757949
+  source_id: zaitsev-2000-sodium-silicate-thermodynamics
+  species: Na2O
+- observation_id: zaitsev_2000_figure7_silica_activity
+  type: figure
+  locator:
+    page: 8
+    published_page: 536
+    pdf_page_index: 7
+    figure: '7'
+  units: as plotted; log activity axis
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: figure_only
+    species: SiO2
+    phase: liquid
+    temperature: series-specific temperatures in the caption
+    axes:
+      x: x(Na2O)
+      y: log(a(SiO2))
+    panel: none_stated
+    caption: SiO2 activity in Na2O-SiO2 melts with respect to pure liquid silica.
+    series:
+    - name: I, this work, 1573 K curve
+      marker_count: 0
+    - name: II, this work, 1473 K curve
+      marker_count: 0
+    - name: III, this work, 1373 K curve
+      marker_count: 0
+    - name: IV, 1473 K [34]
+      marker_count: 0
+    - name: V, 1573 K [33]
+      marker_count: 0
+    - name: VI, 1673 K [33]
+      marker_count: 0
+    - name: (1), 1073 K [24]
+      marker_count: 3
+    - name: (2), 1473 K [24]
+      marker_count: 3
+    - name: (3), 1473 K [25]
+      marker_count: 3
+    - name: (4), 1573 K [30]
+      marker_count: 3
+    - name: (5), 1293 K [36]
+      marker_count: 3
+    - name: (6), 1423 K [36]
+      marker_count: 3
+    - name: (7), 1323 K [29]
+      marker_count: 3
+    points: []
+    attribution: this work and cited data as shown by series
+    digitisation: deferred to a figure pass
+  context_id: zaitsev-2000-sodium-silicate-thermodynamics::context::zaitsev_2000_figure7_silica_activity
+  work_id: 10.1007/bf02757949
+  source_id: zaitsev-2000-sodium-silicate-thermodynamics
+  species: SiO2
+- observation_id: zaitsev_2000_figure8_total_formation_functions
+  type: figure
+  locator:
+    page: 8
+    published_page: 536
+    pdf_page_index: 7
+    figure: '8'
+  units: kJ/mol as plotted
+  values:
+    quantity: unavailable
+    printed_quantity: total thermodynamic functions of formation of Na2O-SiO2 melts
+    method_class: figure_only
+    admission_status: figure_only
+    species: Na2O-SiO2 liquid melt
+    phase: liquid
+    temperature: series-specific temperatures in the caption
+    axes:
+      x: x(Na2O)
+      y: -Delta_f G, -Delta_f H (kJ/mol)
+    panel: none_stated
+    caption: Composition dependences of the total thermodynamic functions of formation of Na2O-SiO2 melts. This work and earlier
+      data are labeled by function and temperature in the caption.
+    series:
+    - name: (IV) this work, -Delta_f H, 1473 K
+      marker_count: 0
+    - name: (V) this work, -Delta_f G, 1473 K
+      marker_count: 0
+    - name: (I) -Delta_f H, 1300 K [31]
+      marker_count: 0
+    - name: (1) -Delta_f G, 1293 K [31]
+      marker_count: 3
+    - name: (2) -Delta_f G, 1423 K [31]
+      marker_count: 3
+    - name: (II) -Delta_f G, 1573 K [28]
+      marker_count: 0
+    - name: (III) -Delta_f G, 1673 K [28]
+      marker_count: 0
+    - name: (3) -Delta_f G, 1473 K [18]
+      marker_count: 3
+    - name: (4) -Delta_f H, 1473 K [18]
+      marker_count: 3
+    - name: (5) -Delta_f G, 1323 K [24]
+      marker_count: 3
+    - name: (6) -Delta_f H, 1323 K [24]
+      marker_count: 3
+    points: []
+    attribution: this work and cited data as shown by series
+    digitisation: deferred to a figure pass
+  context_id: zaitsev-2000-sodium-silicate-thermodynamics::context::zaitsev_2000_figure8_total_formation_functions
+  work_id: 10.1007/bf02757949
+  source_id: zaitsev-2000-sodium-silicate-thermodynamics
+  species: SiO2
+- observation_id: zaitsev_2000_figure9_binary_phase_diagram
+  type: figure
+  locator:
+    page: 11
+    published_page: 539
+    pdf_page_index: 10
+    figure: '9'
+  units: K and mole fraction as plotted
+  values:
+    quantity: unavailable
+    printed_quantity: Na2O-SiO2 phase diagram
+    method_class: figure_only
+    admission_status: figure_only
+    species: Na2O-SiO2 binary system
+    phase: solid, liquid, and mixed-phase fields as labeled
+    temperature: varies on the T axis
+    axes:
+      x: mole fraction from Na2O to SiO2
+      y: T, K
+    panel: none_stated
+    caption: Na2O-SiO2 phase diagram calculated in this work (solid lines). Open circles show data obtained by Kracek [13];
+      earlier invariant point data [13-17] are given in parentheses.
+    series:
+    - name: calculated phase boundaries
+      marker_count: 0
+      attribution: this work
+    - name: open circles from Kracek [13]
+      marker_count: 7
+      attribution: '[13]'
+    - name: invariant point annotations in parentheses
+      marker_count: 0
+      attribution: '[13-17]'
+    points: []
+    attribution: this work and cited data as shown by series
+    digitisation: deferred to a figure pass
+  context_id: zaitsev-2000-sodium-silicate-thermodynamics::context::zaitsev_2000_figure9_binary_phase_diagram
+  work_id: 10.1007/bf02757949
+  source_id: zaitsev-2000-sodium-silicate-thermodynamics
+  species: SiO2
+- observation_id: zaitsev_2000_table1_partial_thermodynamic_functions
+  type: thermodynamic_values
+  locator:
+    page: 4
+    published_page: 532
+    pdf_page_index: 3
+    table: '1'
+  units: Delta T in K; -Delta H(Na2O) in J/mol; Delta S(Na2O) in J/(mol K)
+  values:
+    quantity: partial thermodynamic functions of Na2O in solid phase mixtures
+    admission_status: typed_unavailable
+    method_class: measured_reduced
+    standard_state: beta-Na2O
+    rows_as_printed: 'phase mixture | Delta T(K) | -Delta H(Na2O) (J/mol) | Delta S(Na2O) (J/(mol K))
+
+      N3S8 + SiO2 | 974-1071 | 213800 ± 2800 | 24.55 ± 2.70
+
+      NS2 + N3S8 | 973-1078 | 242600 ± 2160 | -5.00 ± 2.10
+
+      NS + NS2 | 953-1110 | 240500 ± 1040 | -26.30 ± 1.00
+
+      N3S2 + NS | 1068-1285 | 90800 ± 1680 | 39.90 ± 1.40
+
+      N2S + N3S2 | 1072-1271 | 210200 ± 2270 | -72.20 ± 1.90
+
+      N2S + NS | 942-1063 | 150520 ± 2330 | -16.10 ± 2.30'
+    note: Table 1 partial functions are retained as printed; the negative enthalpy header and partial entropy do not map without
+      a distinct row-level quantity convention.
+  context_id: zaitsev-2000-sodium-silicate-thermodynamics::context::zaitsev_2000_table1_partial_thermodynamic_functions
+  work_id: 10.1007/bf02757949
+  source_id: zaitsev-2000-sodium-silicate-thermodynamics
+  species: SiO2
+- observation_id: zaitsev_2000_table2_formation_functions_from_oxides
+  type: thermodynamic_values
+  locator:
+    page: 4
+    published_page: 532
+    pdf_page_index: 3
+    table: '2'
+  units: Delta T in K; -Delta_f H in J/mol; Delta_f S in J/(mol K)
+  values:
+    quantity: sodium silicate formation functions from quartz and beta-Na2O
+    admission_status: typed_unavailable
+    method_class: model_derived
+    formation_reaction_as_printed: from quartz and beta-Na2O
+    rows_as_printed: 'phase | Delta T(K) | -Delta_f H (J/mol) | Delta_f S (J/(mol K))
+
+      N3S8 | 974-1071 | 58300 ± 755 | 6.70 ± 0.70
+
+      NS2 | 973-1078 | 73660 ± 715 | 5.70 ± 0.70
+
+      NS | 953-1110 | 115400 ± 600 | -2.30 ± 0.60
+
+      N3S2 | 1068-1285 | 110500 ± 580 | 6.15 ± 0.55
+
+      N2S | 942-1271 | 127100 ± 620 | -6.90 ± 0.60'
+    note: These formation values are from oxides and are not delta_fH from elements or absolute S; they remain unscored context.
+  context_id: zaitsev-2000-sodium-silicate-thermodynamics::context::zaitsev_2000_table2_formation_functions_from_oxides
+  work_id: 10.1007/bf02757949
+  source_id: zaitsev-2000-sodium-silicate-thermodynamics
+  species: SiO2
+- observation_id: zaitsev_2000_table3_standard_thermodynamic_functions
+  type: standard_thermodynamic_functions
+  locator:
+    page: 5
+    published_page: 533
+    pdf_page_index: 4
+    table: '3'
+  units: mixed as printed; see per-column units
+  values:
+    quantity: standard thermodynamic functions
+    admission_status: typed_unavailable
+    reason: Table 3 compares calculated standard thermodynamic functions with values cited from [22]; this context record
+      preserves the printed comparison without treating calculated or attributed values as measurements from this paper.
+    rows:
+    - formula_as_printed: NS2
+      source_as_printed: This work
+      S_standard_at_298_15_K_J_per_mol_K: 165.4 ± 4.0
+      minus_delta_fH_from_oxides_kJ_per_mol: 227.4 ± 5
+      delta_fS_from_oxides_J_per_mol_K: 7.3 ± 3.0
+      delta_fH_from_elements_kJ_per_mol: '2464.2'
+    - formula_as_printed: NS2
+      source_as_printed: '[22]'
+      S_standard_at_298_15_K_J_per_mol_K: '164.055'
+      minus_delta_fH_from_oxides_kJ_per_mol: '230.54'
+      delta_fS_from_oxides_J_per_mol_K: '6.03'
+      delta_fH_from_elements_kJ_per_mol: '2467.3'
+    - formula_as_printed: NS
+      source_as_printed: This work
+      S_standard_at_298_15_K_J_per_mol_K: 114.8 ± 3.0
+      minus_delta_fH_from_oxides_kJ_per_mol: 228.1 ± 5
+      delta_fS_from_oxides_J_per_mol_K: −1.7 ± 2.0
+      delta_fH_from_elements_kJ_per_mol: '1554.0'
+    - formula_as_printed: NS
+      source_as_printed: '[22]'
+      S_standard_at_298_15_K_J_per_mol_K: '113.805'
+      minus_delta_fH_from_oxides_kJ_per_mol: '230.120'
+      delta_fS_from_oxides_J_per_mol_K: −2.76
+      delta_fH_from_elements_kJ_per_mol: '1556.03'
+    - formula_as_printed: N2S
+      source_as_printed: This work
+      S_standard_at_298_15_K_J_per_mol_K: 194.1 ± 5.0
+      minus_delta_fH_from_oxides_kJ_per_mol: 363.0 ± 8
+      delta_fS_from_oxides_J_per_mol_K: 2.4 ± 4.0
+      delta_fH_from_elements_kJ_per_mol: '2104.0'
+    - formula_as_printed: N2S
+      source_as_printed: '[22]'
+      S_standard_at_298_15_K_J_per_mol_K: '195.811'
+      minus_delta_fH_from_oxides_kJ_per_mol: '359.8'
+      delta_fS_from_oxides_J_per_mol_K: '4.15'
+      delta_fH_from_elements_kJ_per_mol: '2100.8'
+  attribution_for_bracket_22: Knacke, O., Kubaschewski, O., and Hesselmann, K., Thermochemical Properties of Inorganic Substances,
+    2nd ed., Springer, 1991.
+  row_evidence:
+    this_work: model_derived
+    '[22]': quoted_attributed
+  note: The oxide-formation columns are from oxides, not elemental formation. The row-specific text values remain as printed
+    and are not scored.
+  context_id: zaitsev-2000-sodium-silicate-thermodynamics::context::zaitsev_2000_table3_standard_thermodynamic_functions
+  work_id: 10.1007/bf02757949
+  source_id: zaitsev-2000-sodium-silicate-thermodynamics
+  species: SiO2
+- observation_id: zaitsev_2000_table4_calculated_activities
+  type: table
+  locator:
+    page: 7
+    published_page: 535
+    pdf_page_index: 6
+    table: '4'
+  units: dimensionless activity
+  values:
+    quantity: calculated Na2O and SiO2 activities
+    method_class: model_derived
+    admission_status: typed_unavailable
+    rows_as_printed: 'x(SiO2) | T(K) | calculated a(SiO2) | calculated a(Na2O)
+
+      0.805 | 1473 | 0.854 | 7.13 x 10^-10
+
+      0.805 | 1573 | 0.845 | 2.65 x 10^-9
+
+      0.753 | 1273 | 0.729 | 5.35 x 10^-11
+
+      0.753 | 1473 | 0.712 | 1.34 x 10^-9
+
+      0.753 | 1673 | 0.702 | 2.65 x 10^-8
+
+      0.709 | 1273 | 0.536 | 1.22 x 10^-10
+
+      0.709 | 1473 | 0.536 | 2.89 x 10^-9
+
+      0.709 | 1673 | 0.537 | 3.24 x 10^-8
+
+      0.671 | 1173 | 0.337 | 4.72 x 10^-11
+
+      0.671 | 1373 | 0.355 | 1.66 x 10^-9
+
+      0.671 | 1573 | 0.370 | 2.38 x 10^-8
+
+      0.625 | 1173 | 0.152 | 2.05 x 10^-10
+
+      0.625 | 1373 | 0.176 | 6.04 x 10^-9
+
+      0.625 | 1573 | 0.196 | 7.65 x 10^-8
+
+      0.573 | 1273 | 0.0574 | 6.13 x 10^-9
+
+      0.573 | 1473 | 0.0698 | 1.01 x 10^-7
+
+      0.573 | 1573 | 0.0756 | 3.16 x 10^-7
+
+      0.524 | 1373 | 0.0160 | 1.46 x 10^-7
+
+      0.524 | 1473 | 0.0180 | 5.17 x 10^-7
+
+      0.524 | 1573 | 0.0201 | 1.56 x 10^-6
+
+      0.477 | 1373 | 1.77 x 10^-3 | 1.31 x 10^-6
+
+      0.477 | 1473 | 2.16 x 10^-3 | 4.33 x 10^-6
+
+      0.430 | 1373 | 3.07 x 10^-4 | 5.67 x 10^-6
+
+      0.430 | 1473 | 3.83 x 10^-4 | 1.83 x 10^-5
+
+      0.405 | 1423 | 1.40 x 10^-4 | 1.98 x 10^-5
+
+      0.405 | 1473 | 1.56 x 10^-4 | 3.44 x 10^-5
+
+      0.382 | 1383 | 4.73 x 10^-5 | 2.43 x 10^-5
+
+      0.382 | 1423 | 5.20 x 10^-5 | 3.71 x 10^-5
+
+      0.349 | 1373 | 3.80 x 10^-6 | 8.62 x 10^-5'
+    note: Calculated values are retained as model_derived context and are not scored observations.
+  context_id: zaitsev-2000-sodium-silicate-thermodynamics::context::zaitsev_2000_table4_calculated_activities
+  work_id: 10.1007/bf02757949
+  source_id: zaitsev-2000-sodium-silicate-thermodynamics
+  species: SiO2
+- observation_id: zaitsev_2000_table5_negative_log_na2o_activity
+  type: thermodynamic_values
+  locator:
+    page: 9
+    published_page: 537
+    pdf_page_index: 8
+    table: '5'
+  units: -log[a(Na2O)] as printed; dimensionless logarithm
+  values:
+    quantity: negative log activity of Na2O
+    admission_status: typed_unavailable
+    schema_gap: no existing store token for the printed negative-log activity form
+    sources_as_printed:
+    - this work
+    - '[39]'
+    reference_39_as_printed: Rudnyi, E. B., Vovk, O. M., Sidorov, L. N., et al., Activity of the Alkali Oxide in Soda-Silica
+      Melts by the Ionic-Molecular Equilibrium Method, Fiz. Khim. Stekla, 1988, 14(2), 218–225.
+    footnotes:
+      '*': Melt-tridymite equilibrium.
+      '**': Determined by extrapolating melt properties to the stability field of sodium metasilicate.
+    rows_as_printed: 'x(Na2O) | T(K) | this work -log[a(Na2O)] | [39] -log[a(Na2O)]
+
+      0.103* | 1430 | 9.394 | 9.823
+
+      0.103* | 1473 | 9.158 | 9.770
+
+      0.254 | 1430 | 9.094 | 9.572
+
+      0.254 | 1473 | 8.827 | 9.515
+
+      0.254 | 1515 | 8.580 | 8.981
+
+      0.254 | 1557 | 8.348 | 8.790
+
+      0.303 | 1344 | 9.261 | 9.090
+
+      0.303 | 1387 | 8.966 | 8.859
+
+      0.303 | 1430 | 8.689 | 8.590
+
+      0.303 | 1473 | 8.429 | 8.286
+
+      0.303 | 1515 | 8.188 | 8.065
+
+      0.402 | 1255 | 8.674 | 8.143
+
+      0.402 | 1344 | 8.062 | 7.756
+
+      0.402 | 1387 | 7.794 | 7.596
+
+      0.402 | 1430 | 7.543 | 7.374
+
+      0.402 | 1473 | 7.305 | 7.392
+
+      0.500** | 1255 | 7.080 | 6.558
+
+      0.500** | 1300 | 6.784 | 6.236
+
+      0.500** | 1344 | 6.512 | 5.841
+
+      0.500 | 1387 | 6.264 | 5.641
+
+      0.500 | 1430 | 6.030 | 5.576
+
+      0.500 | 1473 | 5.810 | 5.429'
+  context_id: zaitsev-2000-sodium-silicate-thermodynamics::context::zaitsev_2000_table5_negative_log_na2o_activity
+  work_id: 10.1007/bf02757949
+  source_id: zaitsev-2000-sodium-silicate-thermodynamics
+  species: Na2O
+- observation_id: zaitsev_2000_table6_partial_molar_entropy
+  type: thermodynamic_values
+  locator:
+    page: 9
+    published_page: 537
+    pdf_page_index: 8
+    table: '6'
+  units: kJ/(mol K)
+  values:
+    quantity: partial molar entropy of Na2O
+    admission_status: typed_unavailable
+    schema_gap: no existing store token for partial molar entropy
+    rows_as_printed: 'x(Na2O) | this work Delta S(Na2O) | [34] Delta S(Na2O)
+
+      0.4 | 11.2 ± 1.5 | -58.2 ± 1.2
+
+      0.45 | -18.9 ± 1.5 | -34.3 ± 1.2
+
+      0.5 | -28.8 ± 1.5 | -19.7 ± 0.6
+
+      0.55 | -39.2 ± 1.5 | -1.1 ± 0.2'
+    note: '[34] values are quoted attributed; printed unit is kJ/(mol K).'
+  context_id: zaitsev-2000-sodium-silicate-thermodynamics::context::zaitsev_2000_table6_partial_molar_entropy
+  work_id: 10.1007/bf02757949
+  source_id: zaitsev-2000-sodium-silicate-thermodynamics
+  species: Na2O

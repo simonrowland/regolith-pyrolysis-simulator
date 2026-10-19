@@ -1,0 +1,3890 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  citation: Ryś, M. (2007). Investigation of Thermodynamic Properties of Alkali Metals in Oxide Systems Relevant to Coal Slags.
+    PhD thesis, RWTH Aachen University.
+  source_ids:
+  - rys-2007-alkali-oxide-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:rys-2007-alkali-oxide-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3::rys-2007-alkali-oxide-thermodynamics
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  locator:
+    page: 82
+    published_page: 70
+    pdf_page_index: 81
+    table: '7'
+context:
+- observation_id: rys_2007_appendix_table1_kp_r39_r40
+  type: thermodynamic_example
+  locator:
+    page: 137
+    published_page: 125
+    pdf_page_index: 136
+    table: '1'
+  units: dimensionless as printed
+  values:
+    quantity_names_as_printed:
+    - Kp(r.39)
+    - Kp(r.40)
+    admission_status: typed_unavailable
+    reason: The store has no quantity token for the printed linear reaction equilibrium constants Kp; retained in context.
+    method_class: measured_reduced
+    reactions:
+      Kp(r.39): Na2O(s) = 2Na(g) + 1/2O2(g)
+      Kp(r.40): Na2O(s) = Na(g) + NaO(g)
+    rows:
+    - source_row: 1
+      sample_as_printed: Na2O_1
+      T_K_as_printed: 1137,158
+      Kp_r39_as_printed: 5,17E-12
+      Kp_r40_as_printed: 1,64E-13
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '1'
+    - source_row: 2
+      sample_as_printed: Na2O_1
+      T_K_as_printed: 1129,007
+      Kp_r39_as_printed: 2,51E-12
+      Kp_r40_as_printed: 1,19E-13
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '1'
+    - source_row: 3
+      sample_as_printed: Na2O_1
+      T_K_as_printed: 1115,761
+      Kp_r39_as_printed: 9,65E-13
+      Kp_r40_as_printed: 6,08E-14
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '1'
+    - source_row: 4
+      sample_as_printed: Na2O_1
+      T_K_as_printed: 1107,61
+      Kp_r39_as_printed: 5,18E-13
+      Kp_r40_as_printed: 1,73E-14
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '1'
+    - source_row: 5
+      sample_as_printed: Na2O_1
+      T_K_as_printed: 1098,44
+      Kp_r39_as_printed: 1,83E-13
+      Kp_r40_as_printed: 1,11E-14
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '1'
+    - source_row: 6
+      sample_as_printed: Na2O_1
+      T_K_as_printed: 1092,327
+      Kp_r39_as_printed: 1,12E-13
+      Kp_r40_as_printed: 8,14E-15
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '1'
+    - source_row: 7
+      sample_as_printed: Na2O_1
+      T_K_as_printed: 1075,005
+      Kp_r39_as_printed: 4,46E-14
+      Kp_r40_as_printed: 3,45E-15
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '1'
+    - source_row: 8
+      sample_as_printed: Na2O_1
+      T_K_as_printed: 1063,798
+      Kp_r39_as_printed: null
+      Kp_r40_as_printed: 2,81E-15
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '1'
+    - source_row: 9
+      sample_as_printed: Na2O_1
+      T_K_as_printed: 1050,552
+      Kp_r39_as_printed: null
+      Kp_r40_as_printed: null
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '1'
+    - source_row: 10
+      sample_as_printed: Na2O_1
+      T_K_as_printed: 1044,438
+      Kp_r39_as_printed: 6,12E-15
+      Kp_r40_as_printed: 1,51E-15
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '1'
+    - source_row: 11
+      sample_as_printed: Na2O_1
+      T_K_as_printed: 1038,325
+      Kp_r39_as_printed: 3,72E-15
+      Kp_r40_as_printed: 4,87E-16
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '1'
+    - source_row: 12
+      sample_as_printed: Na2O_1
+      T_K_as_printed: 1028,136
+      Kp_r39_as_printed: null
+      Kp_r40_as_printed: null
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '1'
+    - source_row: 13
+      sample_as_printed: Na2O_1
+      T_K_as_printed: 1022,023
+      Kp_r39_as_printed: null
+      Kp_r40_as_printed: null
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '1'
+    - source_row: 14
+      sample_as_printed: Na2O_1
+      T_K_as_printed: 1012,853
+      Kp_r39_as_printed: null
+      Kp_r40_as_printed: null
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '1'
+    - source_row: 15
+      sample_as_printed: Na2O_1
+      T_K_as_printed: 1130,026
+      Kp_r39_as_printed: 1,45E-12
+      Kp_r40_as_printed: 8,02E-14
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '1'
+    - source_row: 16
+      sample_as_printed: Na2O_1
+      T_K_as_printed: 1102,516
+      Kp_r39_as_printed: null
+      Kp_r40_as_printed: 2,14E-14
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '1'
+    - source_row: 17
+      sample_as_printed: Na2O_1
+      T_K_as_printed: 1069,911
+      Kp_r39_as_printed: null
+      Kp_r40_as_printed: null
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '1'
+    - source_row: 18
+      sample_as_printed: Na2O_1
+      T_K_as_printed: 1016,928
+      Kp_r39_as_printed: null
+      Kp_r40_as_printed: null
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '1'
+    - source_row: 19
+      sample_as_printed: Na2O_1
+      T_K_as_printed: 1138,177
+      Kp_r39_as_printed: 2,24E-12
+      Kp_r40_as_printed: 1,31E-13
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '1'
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_appendix_table1_kp_r39_r40
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_appendix_table2_kp_r39_r40
+  type: thermodynamic_example
+  locator:
+    page: 137
+    published_page: 125
+    pdf_page_index: 136
+    table: '2'
+  units: dimensionless as printed
+  values:
+    quantity_names_as_printed:
+    - Kp(r.39)
+    - Kp(r.40)
+    admission_status: typed_unavailable
+    reason: The store has no quantity token for the printed linear reaction equilibrium constants Kp; retained in context.
+    method_class: measured_reduced
+    reactions:
+      Kp(r.39): Na2O(s) = 2Na(g) + 1/2O2(g)
+      Kp(r.40): Na2O(s) = Na(g) + NaO(g)
+    rows:
+    - source_row: 1
+      sample_as_printed: Na2O_2
+      T_K_as_printed: 1135,121
+      Kp_r39_as_printed: null
+      Kp_r40_as_printed: null
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '2'
+    - source_row: 2
+      sample_as_printed: Na2O_2
+      T_K_as_printed: 1120,856
+      Kp_r39_as_printed: 2,79E-12
+      Kp_r40_as_printed: 1,38E-13
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '2'
+    - source_row: 3
+      sample_as_printed: Na2O_2
+      T_K_as_printed: 1115,761
+      Kp_r39_as_printed: 1,85E-12
+      Kp_r40_as_printed: 1,16E-13
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '2'
+    - source_row: 4
+      sample_as_printed: Na2O_2
+      T_K_as_printed: 1106,591
+      Kp_r39_as_printed: 1,02E-12
+      Kp_r40_as_printed: 6,98E-14
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '2'
+    - source_row: 5
+      sample_as_printed: Na2O_2
+      T_K_as_printed: 1094,365
+      Kp_r39_as_printed: 2,86E-13
+      Kp_r40_as_printed: 1,86E-14
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '2'
+    - source_row: 6
+      sample_as_printed: Na2O_2
+      T_K_as_printed: 1089,27
+      Kp_r39_as_printed: 1,69E-13
+      Kp_r40_as_printed: 1,45E-14
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '2'
+    - source_row: 7
+      sample_as_printed: Na2O_2
+      T_K_as_printed: 1133,083
+      Kp_r39_as_printed: 3,81E-12
+      Kp_r40_as_printed: 2,03E-13
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '2'
+    - source_row: 8
+      sample_as_printed: Na2O_2
+      T_K_as_printed: 1106,591
+      Kp_r39_as_printed: 1,09E-12
+      Kp_r40_as_printed: 5,03E-14
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '2'
+    - source_row: 9
+      sample_as_printed: Na2O_2
+      T_K_as_printed: 1072,968
+      Kp_r39_as_printed: 7,38E-14
+      Kp_r40_as_printed: 5,18E-15
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '2'
+    - source_row: 10
+      sample_as_printed: Na2O_2
+      T_K_as_printed: 1144,291
+      Kp_r39_as_printed: 6,44E-12
+      Kp_r40_as_printed: 2,76E-13
+      locator:
+        page: 137
+        published_page: 125
+        pdf_page_index: 136
+        table: '2'
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_appendix_table2_kp_r39_r40
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_appendix_table3_kp_r39_r40
+  type: thermodynamic_example
+  locator:
+    page: 138
+    published_page: 126
+    pdf_page_index: 137
+    table: '3'
+  units: dimensionless as printed
+  values:
+    quantity_names_as_printed:
+    - Kp(r.39)
+    - Kp(r.40)
+    admission_status: typed_unavailable
+    reason: The store has no quantity token for the printed linear reaction equilibrium constants Kp; retained in context.
+    method_class: measured_reduced
+    reactions:
+      Kp(r.39): Na2O(s) = 2Na(g) + 1/2O2(g)
+      Kp(r.40): Na2O(s) = Na(g) + NaO(g)
+    rows:
+    - source_row: 1
+      sample_as_printed: Na2O_3
+      T_K_as_printed: 1136,139
+      Kp_r39_as_printed: 2,80E-12
+      Kp_r40_as_printed: 1,39E-13
+      locator:
+        page: 138
+        published_page: 126
+        pdf_page_index: 137
+        table: '3'
+    - source_row: 2
+      sample_as_printed: Na2O_3
+      T_K_as_printed: 1122,894
+      Kp_r39_as_printed: 1,94E-12
+      Kp_r40_as_printed: 6,97E-14
+      locator:
+        page: 138
+        published_page: 126
+        pdf_page_index: 137
+        table: '3'
+    - source_row: 3
+      sample_as_printed: Na2O_3
+      T_K_as_printed: 1109,648
+      Kp_r39_as_printed: 1,25E-12
+      Kp_r40_as_printed: 7,38E-14
+      locator:
+        page: 138
+        published_page: 126
+        pdf_page_index: 137
+        table: '3'
+    - source_row: 4
+      sample_as_printed: Na2O_3
+      T_K_as_printed: 1098,44
+      Kp_r39_as_printed: 3,22E-13
+      Kp_r40_as_printed: 1,80E-14
+      locator:
+        page: 138
+        published_page: 126
+        pdf_page_index: 137
+        table: '3'
+    - source_row: 5
+      sample_as_printed: Na2O_3
+      T_K_as_printed: 1084,176
+      Kp_r39_as_printed: 1,15E-13
+      Kp_r40_as_printed: 7,62E-15
+      locator:
+        page: 138
+        published_page: 126
+        pdf_page_index: 137
+        table: '3'
+    - source_row: 6
+      sample_as_printed: Na2O_3
+      T_K_as_printed: 1067,873
+      Kp_r39_as_printed: 5,17E-14
+      Kp_r40_as_printed: 3,55E-15
+      locator:
+        page: 138
+        published_page: 126
+        pdf_page_index: 137
+        table: '3'
+    - source_row: 7
+      sample_as_printed: Na2O_3
+      T_K_as_printed: 1051,571
+      Kp_r39_as_printed: 1,75E-14
+      Kp_r40_as_printed: 1,27E-15
+      locator:
+        page: 138
+        published_page: 126
+        pdf_page_index: 137
+        table: '3'
+    - source_row: 8
+      sample_as_printed: Na2O_3
+      T_K_as_printed: 1043,42
+      Kp_r39_as_printed: null
+      Kp_r40_as_printed: null
+      locator:
+        page: 138
+        published_page: 126
+        pdf_page_index: 137
+        table: '3'
+    - source_row: 9
+      sample_as_printed: Na2O_3
+      T_K_as_printed: 1029,155
+      Kp_r39_as_printed: null
+      Kp_r40_as_printed: null
+      locator:
+        page: 138
+        published_page: 126
+        pdf_page_index: 137
+        table: '3'
+    - source_row: 10
+      sample_as_printed: Na2O_3
+      T_K_as_printed: 1017,947
+      Kp_r39_as_printed: null
+      Kp_r40_as_printed: null
+      locator:
+        page: 138
+        published_page: 126
+        pdf_page_index: 137
+        table: '3'
+    - source_row: 11
+      sample_as_printed: Na2O_3
+      T_K_as_printed: 1131,045
+      Kp_r39_as_printed: 1,85E-12
+      Kp_r40_as_printed: 8,37E-14
+      locator:
+        page: 138
+        published_page: 126
+        pdf_page_index: 137
+        table: '3'
+    - source_row: 12
+      sample_as_printed: Na2O_3
+      T_K_as_printed: 1100,478
+      Kp_r39_as_printed: 5,10E-13
+      Kp_r40_as_printed: 2,20E-14
+      locator:
+        page: 138
+        published_page: 126
+        pdf_page_index: 137
+        table: '3'
+    - source_row: 13
+      sample_as_printed: Na2O_3
+      T_K_as_printed: 1058,703
+      Kp_r39_as_printed: 2,95E-14
+      Kp_r40_as_printed: 1,86E-15
+      locator:
+        page: 138
+        published_page: 126
+        pdf_page_index: 137
+        table: '3'
+    - source_row: 14
+      sample_as_printed: Na2O_3
+      T_K_as_printed: 1146,328
+      Kp_r39_as_printed: 6,00E-12
+      Kp_r40_as_printed: 2,37E-13
+      locator:
+        page: 138
+        published_page: 126
+        pdf_page_index: 137
+        table: '3'
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_appendix_table3_kp_r39_r40
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure10_figure_record
+  type: figure
+  locator:
+    page: 26
+    published_page: 14
+    pdf_page_index: 25
+    figure: '10'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Two variants of the phase equilibrium diagram of the quasi-binary system NaAlO2-Al2O3 deduced from a critical
+      evaluation of available data [22].
+    species: NaAlO2-Al2O3 system
+    phase: phase fields as shown
+    temperature: variable; temperature / °C
+    axes:
+      x: composition as labeled
+      y: temperature / °C
+    panel: none_stated
+    series:
+    - name: phase boundaries and invariant points
+      marker_count: 0
+    points: []
+    attribution: '[22]'
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure10_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure11_figure_record
+  type: figure
+  locator:
+    page: 29
+    published_page: 17
+    pdf_page_index: 28
+    figure: '11'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Equilibrium diagram of the system Na2O-Al2O3-SiO2 with fields of the primary crystalline phases, isotherms and
+      temperatures of binary and ternary invariant points (after [23]).
+    species: Na2O-Al2O3-SiO2 system
+    phase: phase fields as shown
+    temperature: variable; temperature / °C
+    axes:
+      x: composition as labeled
+      y: temperature / °C
+    panel: none_stated
+    series:
+    - name: phase boundaries and invariant points
+      marker_count: 0
+    points: []
+    attribution: '[23]'
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure11_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure12_figure_record
+  type: figure
+  locator:
+    page: 30
+    published_page: 18
+    pdf_page_index: 29
+    figure: '12'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Quasi-binary system albite-silicon dioxide [23].
+    species: albite-SiO2 system
+    phase: phase fields as shown
+    temperature: variable; temperature / °C
+    axes:
+      x: composition as labeled
+      y: temperature / °C
+    panel: none_stated
+    series:
+    - name: phase boundaries and invariant points
+      marker_count: 0
+    points: []
+    attribution: '[23]'
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure12_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure13_figure_record
+  type: figure
+  locator:
+    page: 31
+    published_page: 19
+    pdf_page_index: 30
+    figure: '13'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Quasi-binary system sodium disilicate-albite [23].
+    species: sodium disilicate-albite system
+    phase: phase fields as shown
+    temperature: variable; temperature / °C
+    axes:
+      x: composition as labeled
+      y: temperature / °C
+    panel: none_stated
+    series:
+    - name: phase boundaries and invariant points
+      marker_count: 0
+    points: []
+    attribution: '[23]'
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure13_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure14_figure_record
+  type: figure
+  locator:
+    page: 31
+    published_page: 19
+    pdf_page_index: 30
+    figure: '14'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Quasi-binary system albite-corundum [23].
+    species: albite-Al2O3 system
+    phase: phase fields as shown
+    temperature: variable; temperature / °C
+    axes:
+      x: composition as labeled
+      y: temperature / °C
+    panel: none_stated
+    series:
+    - name: phase boundaries and invariant points
+      marker_count: 0
+    points: []
+    attribution: '[23]'
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure14_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure15_figure_record
+  type: figure
+  locator:
+    page: 32
+    published_page: 20
+    pdf_page_index: 31
+    figure: '15'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Quasi-binary system nepheline/carnegieite-albite [30].
+    species: nepheline/carnegieite-albite system
+    phase: phase fields as shown
+    temperature: variable; temperature / °C
+    axes:
+      x: composition as labeled
+      y: temperature / °C
+    panel: none_stated
+    series:
+    - name: phase boundaries and invariant points
+      marker_count: 0
+    points: []
+    attribution: '[30]'
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure15_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure16_figure_record
+  type: figure
+  locator:
+    page: 34
+    published_page: 22
+    pdf_page_index: 33
+    figure: '16'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Quasi-binary system sodium metasilicate-nepheline/carnegieite [31].
+    species: sodium metasilicate-nepheline/carnegieite system
+    phase: phase fields as shown
+    temperature: variable; temperature / °C
+    axes:
+      x: composition as labeled
+      y: temperature / °C
+    panel: none_stated
+    series:
+    - name: phase boundaries and invariant points
+      marker_count: 0
+    points: []
+    attribution: '[31]'
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure16_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure17_figure_record
+  type: figure
+  locator:
+    page: 35
+    published_page: 23
+    pdf_page_index: 34
+    figure: '17'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Quasi-binary system sodium disilicate-carnegieite/nepheline [31].
+    species: sodium disilicate-carnegieite/nepheline system
+    phase: phase fields as shown
+    temperature: variable; temperature / °C
+    axes:
+      x: composition as labeled
+      y: temperature / °C
+    panel: none_stated
+    series:
+    - name: phase boundaries and invariant points
+      marker_count: 0
+    points: []
+    attribution: '[31]'
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure17_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure18_figure_record
+  type: figure
+  locator:
+    page: 35
+    published_page: 23
+    pdf_page_index: 34
+    figure: '18'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Quasi-binary system carnegieite/nepheline-corundum [23].
+    species: carnegieite/nepheline-corundum system
+    phase: phase fields as shown
+    temperature: variable; temperature / °C
+    axes:
+      x: composition as labeled
+      y: temperature / °C
+    panel: none_stated
+    series:
+    - name: phase boundaries and invariant points
+      marker_count: 0
+    points: []
+    attribution: '[23]'
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure18_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure19_figure_record
+  type: figure
+  locator:
+    page: 36
+    published_page: 24
+    pdf_page_index: 35
+    figure: '19'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Quasi-binary system carnegieite-sodium aluminate [23].
+    species: carnegieite-sodium aluminate system
+    phase: phase fields as shown
+    temperature: variable; temperature / °C
+    axes:
+      x: composition as labeled
+      y: temperature / °C
+    panel: none_stated
+    series:
+    - name: phase boundaries and invariant points
+      marker_count: 0
+    points: []
+    attribution: '[23]'
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure19_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure1_figure_record
+  type: figure
+  locator:
+    page: 13
+    published_page: 1
+    pdf_page_index: 12
+    figure: '1'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: The different sources of world electricity generation in percent (2004) [1].
+    species: world electricity generation sources (2004)
+    phase: not applicable
+    temperature: not applicable
+    axes: pie chart; source categories and percentage labels; no axes
+    panel: none_stated
+    series:
+    - name: world electricity-generation sources
+      marker_count: 0
+    points: []
+    attribution: '[1]'
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure1_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure20_figure_record
+  type: figure
+  locator:
+    page: 40
+    published_page: 28
+    pdf_page_index: 39
+    figure: '20'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Schematic representation of the Knudsen cell mass spectrometer system.
+    species: Knudsen-cell mass spectrometer apparatus
+    phase: not applicable
+    temperature: not applicable
+    axes: no plotted axes
+    panel: none_stated
+    series:
+    - name: no plotted series
+      marker_count: not_applicable
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure20_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure21_figure_record
+  type: figure
+  locator:
+    page: 42
+    published_page: 30
+    pdf_page_index: 41
+    figure: '21'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: The scheme of Knudsen cell.
+    species: Knudsen cell apparatus
+    phase: not applicable
+    temperature: not applicable
+    axes: no plotted axes
+    panel: none_stated
+    series:
+    - name: no plotted series
+      marker_count: not_applicable
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure21_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure22_figure_record
+  type: figure
+  locator:
+    page: 50
+    published_page: 38
+    pdf_page_index: 49
+    figure: '22'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: The calibration curve of the pyrometer – silver.
+    species: silver (Ag) pyrometer calibration
+    phase: Ag(s)/Ag(l) calibration transition
+    temperature: variable; calibration across the Ag melting point
+    axes: no printed axis labels; Ag+ ion intensity recorded versus time as described in the text
+    panel: none_stated
+    series:
+    - name: Ag+ ion intensity calibration trace
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure22_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure23_figure_record
+  type: figure
+  locator:
+    page: 55
+    published_page: 43
+    pdf_page_index: 54
+    figure: '23'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Block diagram of a DTA apparatus.
+    species: differential thermal analysis apparatus
+    phase: not applicable
+    temperature: not applicable
+    axes: no plotted axes
+    panel: none_stated
+    series:
+    - name: no plotted series
+      marker_count: not_applicable
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure23_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure24_figure_record
+  type: figure
+  locator:
+    page: 57
+    published_page: 45
+    pdf_page_index: 56
+    figure: '24'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: DTA responses to melting (and freezing) with onset temperature.
+    species: DTA melting and freezing response
+    phase: melting/freezing response
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA *10-2 /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA heating trace
+      marker_count: 0
+    - name: DTA cooling trace
+      marker_count: 0
+    - name: TG trace
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure24_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure25_figure_record
+  type: figure
+  locator:
+    page: 59
+    published_page: 47
+    pdf_page_index: 58
+    figure: '25'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Phase diagram and DTA curve.
+    species: hypothetical binary A-B melt and solid phases
+    phase: A(s), B(s), and liquid (schematic)
+    temperature: variable; panel a temperature diagram and panel b cooling
+    axes:
+      panel_a: A-B composition (no axis title); temperature diagram
+      panel_b:
+        x: decreasing temperature
+        y: DSC response
+    panel: a,b
+    series:
+    - name: panel a phase diagram
+      marker_count: 0
+    - name: panel b DSC response
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure25_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure26_figure_record
+  type: figure
+  locator:
+    page: 60
+    published_page: 48
+    pdf_page_index: 59
+    figure: '26'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Schematic DTA response on cooling.
+    species: DTA response on cooling
+    phase: not applicable
+    temperature: variable; see temperature axis or thermal path
+    axes: no plotted axes
+    panel: none_stated
+    series:
+    - name: no plotted series
+      marker_count: not_applicable
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure26_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure27_figure_record
+  type: figure
+  locator:
+    page: 64
+    published_page: 52
+    pdf_page_index: 63
+    figure: '27'
+  units: as plotted
+  values:
+    quantity: mass_loss_fraction_vs_T
+    method_class: figure_only
+    admission_status: figure_only
+    caption: STA measurement of the sample 60Na2O-40Al2O3 made by carbonate preparation. The theoretical degree of mass loss
+      is 25.29%.
+    species: 60Na2O-40Al2O3 made by carbonate preparation
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure27_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure28_figure_record
+  type: figure
+  locator:
+    page: 66
+    published_page: 54
+    pdf_page_index: 65
+    figure: '28'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: XRD pattern of the prepared sodium oxide. The peak about 20° is formed because of the foil, which covered the
+      sample.
+    species: sodium oxide powder
+    phase: solid sample; phase identities not assigned
+    temperature: not applicable (XRD pattern)
+    axes:
+      x: 2Theta
+      y: intensity
+    panel: none_stated
+    series:
+    - name: XRD trace
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure28_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure29_figure_record
+  type: figure
+  locator:
+    page: 67
+    published_page: 55
+    pdf_page_index: 66
+    figure: '29'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: XRD pattern of the prepared sodium oxide – second measurement of the same sample (see text) after 20 minutes.
+    species: sodium oxide powder
+    phase: solid sample; phase identities not assigned
+    temperature: not applicable (XRD pattern)
+    axes:
+      x: 2Theta
+      y: intensity
+    panel: none_stated
+    series:
+    - name: XRD trace
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure29_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure2_figure_record
+  type: figure
+  locator:
+    page: 13
+    published_page: 1
+    pdf_page_index: 12
+    figure: '2'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: The amount of coal in electricity generation in selected countries [1].
+    species: coal in electricity generation by selected country
+    phase: not applicable
+    temperature: not applicable
+    axes:
+      x: selected countries
+      y: coal share of electricity generation / %
+    panel: none_stated
+    series:
+    - name: coal share by country
+      marker_count: 0
+    points: []
+    attribution: '[1]'
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure2_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure30_figure_record
+  type: figure
+  locator:
+    page: 68
+    published_page: 56
+    pdf_page_index: 67
+    figure: '30'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Schematic quasi-ternary Na2O-Al2O3-SiO2 system with prepared compositions.
+    species: Na2O-Al2O3-SiO2 quasi-ternary system
+    phase: phase not stated; sample may be multiphase
+    temperature: not applicable
+    axes: no plotted axes
+    panel: none_stated
+    series:
+    - name: no plotted series
+      marker_count: not_applicable
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure30_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure31_figure_record
+  type: figure
+  locator:
+    page: 71
+    published_page: 59
+    pdf_page_index: 70
+    figure: '31'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: The sample capsules (a) and sample in DTA crucible (b).
+    species: sample capsules and DTA crucible
+    phase: not applicable
+    temperature: not applicable
+    axes: no plotted axes
+    panel: none_stated
+    series:
+    - name: no plotted series
+      marker_count: not_applicable
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure31_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure32_figure_record
+  type: figure
+  locator:
+    page: 73
+    published_page: 61
+    pdf_page_index: 72
+    figure: '32'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: X-ray diffraction pattern of the samples 72Na2O-28SiO2.
+    species: 72Na2O-28SiO2 sample
+    phase: solid sample; phase identities not assigned
+    temperature: not applicable (XRD pattern)
+    axes:
+      x: 2Theta
+      y: intensity
+    panel: none_stated
+    series:
+    - name: XRD trace
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure32_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure33_figure_record
+  type: figure
+  locator:
+    page: 73
+    published_page: 61
+    pdf_page_index: 72
+    figure: '33'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: X-ray diffraction pattern of the samples 96Na2O-4SiO2.
+    species: 96Na2O-4SiO2 sample
+    phase: solid sample; phase identities not assigned
+    temperature: not applicable (XRD pattern)
+    axes:
+      x: 2Theta
+      y: intensity
+    panel: none_stated
+    series:
+    - name: XRD trace
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure33_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure34_figure_record
+  type: figure
+  locator:
+    page: 75
+    published_page: 63
+    pdf_page_index: 74
+    figure: '34'
+  units: as plotted
+  values:
+    quantity: mass_loss_fraction_vs_T
+    method_class: figure_only
+    admission_status: figure_only
+    caption: DTA and TG measurement of the sample 72Na2O-28SiO2. The heating rate was 5K/min.
+    species: 72Na2O-28SiO2
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure34_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure35_figure_record
+  type: figure
+  locator:
+    page: 76
+    published_page: 64
+    pdf_page_index: 75
+    figure: '35'
+  units: as plotted
+  values:
+    quantity: mass_loss_fraction_vs_T
+    method_class: figure_only
+    admission_status: figure_only
+    caption: DTA and TG measurement of the sample 78Na2O-22SiO2. The heating rate was 5K/min.
+    species: 78Na2O-22SiO2
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure35_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure36_figure_record
+  type: figure
+  locator:
+    page: 77
+    published_page: 65
+    pdf_page_index: 76
+    figure: '36'
+  units: as plotted
+  values:
+    quantity: mass_loss_fraction_vs_T
+    method_class: figure_only
+    admission_status: figure_only
+    caption: DTA and TG measurement of the sample 80Na2O-20SiO2. The heating rate was 5K/min.
+    species: 80Na2O-20SiO2
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure36_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure37_figure_record
+  type: figure
+  locator:
+    page: 77
+    published_page: 65
+    pdf_page_index: 76
+    figure: '37'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Separation of overlapping peaks. Sample 80Na2O-20SiO2.
+    species: 80Na2O-20SiO2
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature/°C
+      y: DTA/(uV/mg)
+    panel: none_stated
+    series:
+    - name: as captioned
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure37_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure38_figure_record
+  type: figure
+  locator:
+    page: 78
+    published_page: 66
+    pdf_page_index: 77
+    figure: '38'
+  units: as plotted
+  values:
+    quantity: mass_loss_fraction_vs_T
+    method_class: figure_only
+    admission_status: figure_only
+    caption: DTA and TG measurement of the sample 83Na2O-17SiO2. The heating rate was 5K/min.
+    species: 83Na2O-17SiO2
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure38_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure39_figure_record
+  type: figure
+  locator:
+    page: 79
+    published_page: 67
+    pdf_page_index: 78
+    figure: '39'
+  units: as plotted
+  values:
+    quantity: mass_loss_fraction_vs_T
+    method_class: figure_only
+    admission_status: figure_only
+    caption: DTA and TG measurement of the sample 87Na2O-13SiO2. The heating was rate 5K/min.
+    species: 87Na2O-13SiO2
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure39_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure3_figure_record
+  type: figure
+  locator:
+    page: 14
+    published_page: 2
+    pdf_page_index: 13
+    figure: '3'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: The top ten producers of coal [1].
+    species: hard-coal production by country
+    phase: not applicable
+    temperature: not applicable
+    axes:
+      x: countries
+      y: hard-coal production / Mt
+    panel: none_stated
+    series:
+    - name: hard-coal production by country
+      marker_count: 0
+    points: []
+    attribution: '[1]'
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure3_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure40_figure_record
+  type: figure
+  locator:
+    page: 79
+    published_page: 67
+    pdf_page_index: 78
+    figure: '40'
+  units: as plotted
+  values:
+    quantity: mass_loss_fraction_vs_T
+    method_class: figure_only
+    admission_status: figure_only
+    caption: DTA and TG measurement of the sample 90Na2O-10SiO2. The heating rate was 5K/min.
+    species: 90Na2O-10SiO2
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure40_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure41_figure_record
+  type: figure
+  locator:
+    page: 80
+    published_page: 68
+    pdf_page_index: 79
+    figure: '41'
+  units: as plotted
+  values:
+    quantity: mass_loss_fraction_vs_T
+    method_class: figure_only
+    admission_status: figure_only
+    caption: DTA and TG measurement of the sample 96Na2O-4SiO2. The heating rate was 5K/min.
+    species: 96Na2O-4SiO2
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure41_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure42_figure_record
+  type: figure
+  locator:
+    page: 83
+    published_page: 71
+    pdf_page_index: 82
+    figure: '42'
+  units: as plotted
+  values:
+    quantity: mass_loss_fraction_vs_T
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Low temperature part of STA measurements (sample 70Na2O-30SiO2).
+    species: 70Na2O-30SiO2)
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure42_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure43_figure_record
+  type: figure
+  locator:
+    page: 84
+    published_page: 72
+    pdf_page_index: 83
+    figure: '43'
+  units: as plotted
+  values:
+    quantity: mass_loss_fraction_vs_T
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Low temperature part of STA measurements (sample 96Na2O-4SiO2).
+    species: 96Na2O-4SiO2)
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure43_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure44_figure_record
+  type: figure
+  locator:
+    page: 84
+    published_page: 72
+    pdf_page_index: 83
+    figure: '44'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: XRD diagram of the sample 72Na2O-28SiO2 after STA measurements.
+    species: 72Na2O-28SiO2 sample after STA
+    phase: solid sample; phase identities not assigned
+    temperature: not applicable (XRD pattern)
+    axes:
+      x: 2Theta
+      y: intensity
+    panel: none_stated
+    series:
+    - name: XRD trace
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure44_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure45_figure_record
+  type: figure
+  locator:
+    page: 85
+    published_page: 73
+    pdf_page_index: 84
+    figure: '45'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: XRD diagram of the sample 96Na2O-4SiO2 after STA measurements.
+    species: 96Na2O-4SiO2 sample after STA
+    phase: solid sample; phase identities not assigned
+    temperature: not applicable (XRD pattern)
+    axes:
+      x: 2Theta
+      y: intensity
+    panel: none_stated
+    series:
+    - name: XRD trace
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure45_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure46_figure_record
+  type: figure
+  locator:
+    page: 86
+    published_page: 74
+    pdf_page_index: 85
+    figure: '46'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: DTA and TG measurements of pure sodium oxide.
+    species: pure Na2O
+    phase: solid sample; phase identities not assigned
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure46_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure47_figure_record
+  type: figure
+  locator:
+    page: 86
+    published_page: 74
+    pdf_page_index: 85
+    figure: '47'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: STA measurement of commercial available sodium oxide.
+    species: commercial Na2O
+    phase: solid sample; phase identities not assigned
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure47_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure48_figure_record
+  type: figure
+  locator:
+    page: 89
+    published_page: 77
+    pdf_page_index: 88
+    figure: '48'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Thermal effects detected on the samples in the high Na2O concentration part of the Na2O-SiO2 system.
+    species: Na2O-SiO2 system thermal effects
+    phase: phase fields as shown
+    temperature: variable; temperature / °C
+    axes:
+      x: composition as labeled
+      y: temperature / °C
+    panel: none_stated
+    series:
+    - name: phase boundaries and invariant points
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure48_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure49_figure_record
+  type: figure
+  locator:
+    page: 90
+    published_page: 78
+    pdf_page_index: 89
+    figure: '49'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Quasi-ternary system Na2O-SiO2-NaOH.
+    species: Na2O-SiO2-NaOH quasi-ternary system
+    phase: phase fields as shown
+    temperature: not applicable
+    axes: Na2O-SiO2-NaOH composition triangle; no Cartesian axes
+    panel: none_stated
+    series:
+    - name: no plotted series
+      marker_count: not_applicable
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure49_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure4_figure_record
+  type: figure
+  locator:
+    page: 16
+    published_page: 4
+    pdf_page_index: 15
+    figure: '4'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: The combined cycle power system PPCC.
+    species: combined-cycle power system PPCC
+    phase: not applicable
+    temperature: not applicable
+    axes: no plotted axes (process-flow schematic)
+    panel: none_stated
+    series:
+    - name: no plotted series
+      marker_count: not_applicable
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure4_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure50_figure_record
+  type: figure
+  locator:
+    page: 90
+    published_page: 78
+    pdf_page_index: 89
+    figure: '50'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Phase diagram of the NaOH-Na2O system [64].
+    species: NaOH-Na2O system
+    phase: phase fields as shown
+    temperature: variable; temperature / °C
+    axes:
+      x: composition as labeled
+      y: temperature / °C
+    panel: none_stated
+    series:
+    - name: phase boundaries and invariant points
+      marker_count: 0
+    points: []
+    attribution: '[64]'
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure50_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure51_figure_record
+  type: figure
+  locator:
+    page: 92
+    published_page: 80
+    pdf_page_index: 91
+    figure: '51'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Diffraction pattern of the sample 68 Na2O-32SiO2.
+    species: 68Na2O-32SiO2 sample
+    phase: solid sample; phase identities not assigned
+    temperature: not applicable (XRD pattern)
+    axes:
+      x: 2Theta
+      y: intensity
+    panel: none_stated
+    series:
+    - name: XRD trace
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure51_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure52_figure_record
+  type: figure
+  locator:
+    page: 93
+    published_page: 81
+    pdf_page_index: 92
+    figure: '52'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: DTA and TG measurement of the sample 68Na2O-32SiO2. The heating rate was 5K/min.
+    species: 68Na2O-32SiO2
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure52_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure53_figure_record
+  type: figure
+  locator:
+    page: 93
+    published_page: 81
+    pdf_page_index: 92
+    figure: '53'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Diffraction pattern of the sample 63Na2O-37SiO2.
+    species: 63Na2O-37SiO2 sample
+    phase: solid sample; phase identities not assigned
+    temperature: not applicable (XRD pattern)
+    axes:
+      x: 2Theta
+      y: intensity
+    panel: none_stated
+    series:
+    - name: XRD trace
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure53_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure54_figure_record
+  type: figure
+  locator:
+    page: 94
+    published_page: 82
+    pdf_page_index: 93
+    figure: '54'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: DTA and TG measurement of the sample 63Na2O-37SiO2. The heating rate was 5K/min.
+    species: 63Na2O-37SiO2
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure54_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure55_figure_record
+  type: figure
+  locator:
+    page: 95
+    published_page: 83
+    pdf_page_index: 94
+    figure: '55'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: DTA and TG measurement of the sample 50Na2O-50SiO2. The heating rate was 5K/min.
+    species: 50Na2O-50SiO2
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure55_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure56_figure_record
+  type: figure
+  locator:
+    page: 95
+    published_page: 83
+    pdf_page_index: 94
+    figure: '56'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: DTA and TG measurement of the sample 56Na2O-44SiO2. The heating rate was 5K/min.
+    species: 56Na2O-44SiO2
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure56_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure57_figure_record
+  type: figure
+  locator:
+    page: 96
+    published_page: 84
+    pdf_page_index: 95
+    figure: '57'
+  units: as plotted
+  values:
+    printed_quantity:
+      state: unknown
+      reason: no_stored_quantitative_property
+    method_class: figure_only
+    admission_status: figure_only
+    caption: XRD patterns of the samples 45Na2O-55SiO2 and 40Na2O-60SiO2.
+    species: 45Na2O-55SiO2 and 40Na2O-60SiO2 samples
+    phase: solid sample; phase identities not assigned
+    temperature: not applicable (XRD pattern)
+    axes:
+      x: 2Theta
+      y: intensity
+    panel: none_stated
+    series:
+    - name: XRD trace
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure57_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure58_figure_record
+  type: figure
+  locator:
+    page: 96
+    published_page: 84
+    pdf_page_index: 95
+    figure: '58'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: STA measurement of the sample 45Na2O-55SiO2. The heating rate was 5K/min.
+    species: 45Na2O-55SiO2
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure58_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure59_figure_record
+  type: figure
+  locator:
+    page: 97
+    published_page: 85
+    pdf_page_index: 96
+    figure: '59'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: DTA and TG measurement of the sample 40Na2O-60SiO2. The heating rate was 5K/min.
+    species: 40Na2O-60SiO2
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure59_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure5_figure_record
+  type: figure
+  locator:
+    page: 19
+    published_page: 7
+    pdf_page_index: 18
+    figure: '5'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Phase diagram of the Na2SiO3- SiO2 system according to Morey and Bowen [2].
+    species: Na2SiO3-SiO2 system
+    phase: phase fields as shown
+    temperature: variable; temperature / °C
+    axes:
+      x: composition as labeled
+      y: temperature / °C
+    panel: none_stated
+    series:
+    - name: phase boundaries and invariant points
+      marker_count: 0
+    points: []
+    attribution: '[2]'
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure5_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure60_figure_record
+  type: figure
+  locator:
+    page: 100
+    published_page: 88
+    pdf_page_index: 99
+    figure: '60'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: DTA and TG measurement of the sample 62Na2O-38Al2O3. The heating rate was 5 K/min.
+    species: 62Na2O-38Al2O3
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure60_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure61_figure_record
+  type: figure
+  locator:
+    page: 100
+    published_page: 88
+    pdf_page_index: 99
+    figure: '61'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: DTA and TG measurement of the sample 62Na2O-38Al2O3 after annealing in the STA apparatus. The heating rate was
+      5 K/min.
+    species: 62Na2O-38Al2O3 after annealing in the STA apparatus
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure61_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure62_figure_record
+  type: figure
+  locator:
+    page: 101
+    published_page: 89
+    pdf_page_index: 100
+    figure: '62'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: STA measurement of the sample 75Na2O-25Al2O3. The heating rate was 5 K/min.
+    species: 75Na2O-25Al2O3
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure62_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure63_figure_record
+  type: figure
+  locator:
+    page: 102
+    published_page: 90
+    pdf_page_index: 101
+    figure: '63'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Thermal effects detected on the samples in the high Na2O concentration part of the Na2O-Al2O3 system.
+    species: Na2O-Al2O3 system thermal effects
+    phase: phase fields as shown
+    temperature: variable; temperature / °C
+    axes:
+      x: composition as labeled
+      y: temperature / °C
+    panel: none_stated
+    series:
+    - name: phase boundaries and invariant points
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure63_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure64_figure_record
+  type: figure
+  locator:
+    page: 105
+    published_page: 93
+    pdf_page_index: 104
+    figure: '64'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: STA measurement of the sample NaAlSi_4. The heating rate was 5K/min.
+    species: NaAlSi_4
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure64_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure65_figure_record
+  type: figure
+  locator:
+    page: 105
+    published_page: 93
+    pdf_page_index: 104
+    figure: '65'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: STA measurement of the sample NaAlSi_C. The heating rate was 5K/min.
+    species: NaAlSi_C
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure65_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure66_figure_record
+  type: figure
+  locator:
+    page: 106
+    published_page: 94
+    pdf_page_index: 105
+    figure: '66'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: STA measurement of the sample NaAlSi_B. The heating rate was 5K/min.
+    species: NaAlSi_B
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure66_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure67_figure_record
+  type: figure
+  locator:
+    page: 106
+    published_page: 94
+    pdf_page_index: 105
+    figure: '67'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: STA measurement of the sample NaAlSi_A. The heating rate was 5K/min.
+    species: NaAlSi_A
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure67_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure68_figure_record
+  type: figure
+  locator:
+    page: 107
+    published_page: 95
+    pdf_page_index: 106
+    figure: '68'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: STA measurement of the sample NaAlO2. The heating rate was 5K/min.
+    species: NaAlO2
+    phase: phase not stated; sample may be multiphase
+    temperature: variable; see temperature axis or thermal path
+    axes:
+      x: Temperature / °C
+      y: TG /%
+      secondary_y: DTA /(uV/mg)
+    panel: none_stated
+    series:
+    - name: DTA and TG traces
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure68_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure69_figure_record
+  type: figure
+  locator:
+    page: 109
+    published_page: 97
+    pdf_page_index: 108
+    figure: '69'
+  units: as plotted
+  values:
+    quantity: ion_intensity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Ion current intensities versus reciprocal temperature obtained on vaporizing Na2O.
+    species: Na+, NaO+, Na2O+ from Na2O vapor
+    phase: vapor
+    temperature: 1040–1150 K
+    axes:
+      x: 10000/T (K)
+      y: ln I(i)*T (mV*K)
+    panel: none_stated
+    series:
+    - name: Na+
+      marker_count: 0
+    - name: NaO+
+      marker_count: 0
+    - name: Na2O+
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure69_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure6_figure_record
+  type: figure
+  locator:
+    page: 21
+    published_page: 9
+    pdf_page_index: 20
+    figure: '6'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Equilibrium phase diagram of the binary system sodium oxide-silicon oxide (after Kracek [4]).
+    species: Na2O-SiO2 system
+    phase: phase fields as shown
+    temperature: variable; temperature / °C
+    axes:
+      x: composition as labeled
+      y: temperature / °C
+    panel: none_stated
+    series:
+    - name: phase boundaries and invariant points
+      marker_count: 0
+    points: []
+    attribution: '[4]'
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure6_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure70_figure_record
+  type: figure
+  locator:
+    page: 110
+    published_page: 98
+    pdf_page_index: 109
+    figure: '70'
+  units: Pa as plotted
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Partial pressure of the gaseous species obtained during Na2O vaporization.
+    species: Na(g), NaO(g), Na2O(g), O2 effusion
+    phase: gas
+    temperature: 1040–1150 K
+    axes:
+      x: 10000/T (K)
+      y: ln p(i) (Pa)
+    panel: none_stated
+    series:
+    - name: Na
+      marker_count: 0
+    - name: NaO
+      marker_count: 0
+    - name: Na2O
+      marker_count: 0
+    - name: O2eff
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure70_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure71_figure_record
+  type: figure
+  locator:
+    page: 111
+    published_page: 99
+    pdf_page_index: 110
+    figure: '71'
+  units: dimensionless as plotted
+  values:
+    printed_quantity: ln Kp (r.39); no matching logarithmic-equilibrium-constant token
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Temperature dependence of the equilibrium constant obtained for reaction (39).
+    species: Na2O(s), Na(g), O2(g)
+    phase: solid and gas
+    temperature: 1040–1150 K
+    axes:
+      x: 10000/T (K)
+      y: ln Kp (r.39)
+    panel: none_stated
+    series:
+    - name: reaction 39
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure71_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure72_figure_record
+  type: figure
+  locator:
+    page: 111
+    published_page: 99
+    pdf_page_index: 110
+    figure: '72'
+  units: dimensionless as plotted
+  values:
+    printed_quantity: ln Kp (r.40); no matching logarithmic-equilibrium-constant token
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Temperature dependence of the equilibrium constant obtained for reaction (40).
+    species: Na2O(s), Na(g), NaO(g)
+    phase: solid and gas
+    temperature: 1040–1150 K
+    axes:
+      x: 10000/T (K)
+      y: ln Kp (r.40)
+    panel: none_stated
+    series:
+    - name: reaction 40
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure72_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure73_figure_record
+  type: figure
+  locator:
+    page: 116
+    published_page: 104
+    pdf_page_index: 115
+    figure: '73'
+  units: as plotted
+  values:
+    quantity: ion_intensity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Ion current intensities depending on reciprocal temperature obtained for sample NaAlSi_5.
+    species: Na+, NaO+, Na2O+ above NaAlSi_5
+    phase: gas
+    temperature: variable; see plotted axis
+    axes:
+      x: 10000/T (K)
+      y: ln I(i)*T (mV*K)
+    panel: none_stated
+    series:
+    - name: Na+
+      marker_count: 0
+    - name: NaO+
+      marker_count: 0
+    - name: Na2O+
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure73_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure74_figure_record
+  type: figure
+  locator:
+    page: 116
+    published_page: 104
+    pdf_page_index: 115
+    figure: '74'
+  units: Pa as plotted
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Partial pressure of Na(g) obtained on vaporizing from sample NaAlSi_5.
+    species: Na(g)
+    phase: gas
+    temperature: variable; see plotted axis
+    axes:
+      x: 10000/T (K)
+      y: ln p(Na) (Pa)
+    panel: none_stated
+    series:
+    - name: Na
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure74_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure75_figure_record
+  type: figure
+  locator:
+    page: 117
+    published_page: 105
+    pdf_page_index: 116
+    figure: '75'
+  units: dimensionless as plotted
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Thermodynamic activities of Na2O in samples NaAlSi_1, _2, _3, _4 of the ternary Na2O-Al2O3-SiO2 system.
+    species: Na2O
+    phase: Na2O-Al2O3-SiO2 melt samples
+    temperature: variable; reciprocal-temperature axis
+    axes:
+      x: 10000/T (K)
+      y: ln a(Na2O)
+    panel: none_stated
+    series:
+    - name: NaAlSi_1
+      marker_count: 0
+    - name: NaAlSi_2
+      marker_count: 0
+    - name: NaAlSi_3
+      marker_count: 0
+    - name: NaAlSi_4
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure75_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure76_figure_record
+  type: figure
+  locator:
+    page: 118
+    published_page: 106
+    pdf_page_index: 117
+    figure: '76'
+  units: dimensionless as plotted
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Thermodynamic activities of Na2O in samples NaAlSi_4 of the ternary Na2O-Al2O3-SiO2 system.
+    species: Na2O
+    phase: Na2O-Al2O3-SiO2 sample
+    temperature: variable; reciprocal-temperature axis
+    axes:
+      x: 10000/T (K)
+      y: ln a(Na2O)
+    panel: none_stated
+    series:
+    - name: NaAlSi_4_repeat_measurements
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure76_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure77_figure_record
+  type: figure
+  locator:
+    page: 119
+    published_page: 107
+    pdf_page_index: 118
+    figure: '77'
+  units: dimensionless as plotted
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Comparison of experimental Na2O activity in samples NaAlSi_1, _2, _3, _4 with FACT and FZJ database data.
+    species: Na2O
+    phase: Na2O-Al2O3-SiO2 samples
+    temperature: 1750 K
+    axes:
+      x: mol % Na2O
+      y: log10 a(Na2O)
+    panel: none_stated
+    series:
+    - name: this work - experimental data
+      marker_count: 4
+    - name: FACT
+      marker_count: 0
+    - name: FZJ
+      marker_count: 0
+    points: []
+    attribution: FACT [57]; FZJ [67]
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure77_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure78_figure_record
+  type: figure
+  locator:
+    page: 120
+    published_page: 108
+    pdf_page_index: 119
+    figure: '78'
+  units: dimensionless as plotted
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Thermodynamic activities of Na2O in samples NaAlSi_2, _5, _6 of the ternary Na2O-Al2O3-SiO2 system.
+    species: Na2O
+    phase: Na2O-Al2O3-SiO2 melt samples
+    temperature: variable; reciprocal-temperature axis
+    axes:
+      x: 10000/T (K)
+      y: ln a(Na2O)
+    panel: none_stated
+    series:
+    - name: NaAlSi_2
+      marker_count: 0
+    - name: NaAlSi_5
+      marker_count: 0
+    - name: NaAlSi_6
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure78_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure79_figure_record
+  type: figure
+  locator:
+    page: 121
+    published_page: 109
+    pdf_page_index: 120
+    figure: '79'
+  units: dimensionless as plotted
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Comparison of experimental Na2O activity in samples NaAlSi_2, _5, _6 with FACT and FZJ database data.
+    species: Na2O
+    phase: Na2O-Al2O3-SiO2 samples
+    temperature: 1750 K
+    axes:
+      x: mol % Na2O
+      y: log10 a(Na2O)
+    panel: none_stated
+    series:
+    - name: this work - experimental data
+      marker_count: 3
+    - name: FACT
+      marker_count: 0
+    - name: FZJ
+      marker_count: 0
+    points: []
+    attribution: FACT [57]; FZJ [67]
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure79_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure7_figure_record
+  type: figure
+  locator:
+    page: 22
+    published_page: 10
+    pdf_page_index: 21
+    figure: '7'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Stability of Na6Si8O19 [6].
+    species: Na6Si8O19 stability in the sodium silicate system
+    phase: phase fields as shown
+    temperature: variable; temperature / °C
+    axes:
+      x: composition as labeled
+      y: temperature / °C
+    panel: none_stated
+    series:
+    - name: phase boundaries and invariant points
+      marker_count: 0
+    points: []
+    attribution: '[6]'
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure7_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure80_figure_record
+  type: figure
+  locator:
+    page: 122
+    published_page: 110
+    pdf_page_index: 121
+    figure: '80'
+  units: as plotted
+  values:
+    quantity: ion_intensity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Ion current intensities depending on reciprocal temperature obtained for sample NaKAlSi_2.
+    species: Na+, K+ above NaKAlSi_2
+    phase: gas
+    temperature: variable; reciprocal-temperature axis
+    axes:
+      x: 10000/T (K)
+      y: ln I(i)*T (mV*K)
+    panel: none_stated
+    series:
+    - name: Na
+      marker_count: 0
+    - name: K
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure80_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure81_figure_record
+  type: figure
+  locator:
+    page: 123
+    published_page: 111
+    pdf_page_index: 122
+    figure: '81'
+  units: Pa as plotted
+  values:
+    quantity: partial_pressure
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Partial pressure of Na(g) and K(g) obtained on vaporizing from sample NaKAlSi_2.
+    species: Na(g), K(g)
+    phase: gas
+    temperature: variable; reciprocal-temperature axis
+    axes:
+      x: 10000/T (K)
+      y: ln p(i) (Pa)
+    panel: none_stated
+    series:
+    - name: Na
+      marker_count: 0
+    - name: K
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure81_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure82_figure_record
+  type: figure
+  locator:
+    page: 124
+    published_page: 112
+    pdf_page_index: 123
+    figure: '82'
+  units: dimensionless as plotted
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Thermodynamic activities of Na2O in samples NaKAlSi_1, _2, _5 of the quaternary system.
+    species: Na2O
+    phase: Na2O-K2O-Al2O3-SiO2 melt samples
+    temperature: variable; reciprocal-temperature axis
+    axes:
+      x: 10000/T (K)
+      y: ln a(Na2O)
+    panel: none_stated
+    series:
+    - name: NaKAlSi_1
+      marker_count: 0
+    - name: NaKAlSi_2
+      marker_count: 0
+    - name: NaKAlSi_5
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure82_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure83_figure_record
+  type: figure
+  locator:
+    page: 124
+    published_page: 112
+    pdf_page_index: 123
+    figure: '83'
+  units: dimensionless as plotted
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Thermodynamic activities of K2O in samples NaKAlSi_1, _2, _5 of the quaternary system.
+    species: K2O
+    phase: Na2O-K2O-Al2O3-SiO2 melt samples
+    temperature: variable; reciprocal-temperature axis
+    axes:
+      x: 10000/T (K)
+      y: ln a(K2O)
+    panel: none_stated
+    series:
+    - name: NaKAlSi_1
+      marker_count: 0
+    - name: NaKAlSi_2
+      marker_count: 0
+    - name: NaKAlSi_5
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure83_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure84_figure_record
+  type: figure
+  locator:
+    page: 125
+    published_page: 113
+    pdf_page_index: 124
+    figure: '84'
+  units: dimensionless as plotted
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Comparison of Na2O activity in samples Na(K)AlSi_1.
+    species: Na2O
+    phase: ternary and quaternary melt samples
+    temperature: variable; reciprocal-temperature axis
+    axes:
+      x: 10000/T (K)
+      y: ln a(Na2O)
+    panel: none_stated
+    series:
+    - name: NaAlSi_1
+      marker_count: 0
+    - name: NaKAlSi_1
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure84_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure85_figure_record
+  type: figure
+  locator:
+    page: 125
+    published_page: 113
+    pdf_page_index: 124
+    figure: '85'
+  units: dimensionless as plotted
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Comparison of Na2O activity in samples Na(K)AlSi_2.
+    species: Na2O
+    phase: ternary and quaternary melt samples
+    temperature: variable; reciprocal-temperature axis
+    axes:
+      x: 10000/T (K)
+      y: ln a(Na2O)
+    panel: none_stated
+    series:
+    - name: NaAlSi_2
+      marker_count: 0
+    - name: NaKAlSi_2
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure85_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure86_figure_record
+  type: figure
+  locator:
+    page: 126
+    published_page: 114
+    pdf_page_index: 125
+    figure: '86'
+  units: dimensionless as plotted
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Comparison of Na2O activity in samples Na(K)AlSi_5.
+    species: Na2O
+    phase: ternary and quaternary melt samples
+    temperature: variable; reciprocal-temperature axis
+    axes:
+      x: 10000/T (K)
+      y: ln a(Na2O)
+    panel: none_stated
+    series:
+    - name: NaAlSi_5
+      marker_count: 0
+    - name: NaKAlSi_5
+      marker_count: 0
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure86_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure87_figure_record
+  type: figure
+  locator:
+    page: 127
+    published_page: 115
+    pdf_page_index: 126
+    figure: '87'
+  units: dimensionless as plotted
+  values:
+    quantity: activity
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Comparison of Na2O activity in samples of the ternary NaAlSi and quaternary NaKAlSi systems.
+    species: Na2O
+    phase: ternary and quaternary melt samples
+    temperature: 1750 K
+    axes:
+      x: mol % Na2O
+      y: log10 a(Na2O)
+    panel: none_stated
+    series:
+    - name: ternary NaAlSi samples
+      marker_count: 3
+    - name: quaternary NaKAlSi samples
+      marker_count: 3
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure87_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_figure8_figure_record
+  type: figure
+  locator:
+    page: 23
+    published_page: 11
+    pdf_page_index: 22
+    figure: '8'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: High sodium oxide concentration part of the binary system [9]. The range between 100-66.67% Na2O was estimated.
+    species: Na2O-SiO2 system, high-Na2O concentration region
+    phase: phase fields as shown
+    temperature: variable; temperature / °C
+    axes:
+      x: composition as labeled
+      y: temperature / °C
+    panel: none_stated
+    series:
+    - name: phase boundaries and invariant points
+      marker_count: 0
+    points: []
+    attribution: '[9]'
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure8_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_figure9_figure_record
+  type: figure
+  locator:
+    page: 25
+    published_page: 13
+    pdf_page_index: 24
+    figure: '9'
+  units: as plotted
+  values:
+    quantity: transition_temperature
+    method_class: figure_only
+    admission_status: figure_only
+    caption: The phase diagram of system NaAlO2-Al2O3 proposed by Rolin and Thanh [21].
+    species: NaAlO2-Al2O3 system
+    phase: phase fields as shown
+    temperature: variable; temperature / °C
+    axes:
+      x: composition as labeled
+      y: temperature / °C
+    panel: none_stated
+    series:
+    - name: phase boundaries and invariant points
+      marker_count: 0
+    points: []
+    attribution: '[21]'
+    digitisation: deferred to a figure pass
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_figure9_figure_record
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_table10b_negative_p_k_as_printed
+  type: literature_context
+  locator:
+    page: 142
+    published_page: 130
+    pdf_page_index: 141
+    table: 10b
+  units: Pa as printed
+  values:
+    quantity_name_as_printed: p K
+    sample_as_printed: NaKAlSi_1
+    T_K_as_printed: 1818,802
+    p_Na_Pa_as_printed: 0,07845
+    a_Na2O_as_printed: 1,20E-13
+    p_K_Pa_as_printed: -0,43143
+    a_K2O:
+      state: unknown
+      reason: table_cell_blank
+    reason: The printed p K value is negative; retained as printed and not typed as a partial pressure.
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_table10b_negative_p_k_as_printed
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_table17_naalsi6_extrapolated_activity
+  type: thermodynamic_example
+  locator:
+    page: 120
+    published_page: 108
+    pdf_page_index: 119
+    table: '17'
+  units: dimensionless activity as printed
+  values:
+    quantity: activity
+    method_class: model_derived
+    sample_as_printed: NaAlSi_6
+    composition_mol:
+      Na2O: '0.4353'
+      Al2O3: '0.0804'
+      SiO2: '0.4843'
+    composition_mol_basis: printed_mole_fraction
+    T_K: 1750
+    T_range_K_as_printed: 1380–1690
+    activity_as_printed: '1.544E-7'
+    reason: The 1750 K value is explicitly described as extrapolated from measurements ending at 1690 K.
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_table17_naalsi6_extrapolated_activity
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_table7_nonliquidus_thermal_effects
+  type: transition_event_results
+  locator:
+    page: 82
+    published_page: 70
+    pdf_page_index: 81
+    table: '7'
+  units: °C as printed
+  values:
+    quantity: transition_temperature
+    method_class: measured_tabulated
+    admission_status: typed_unavailable
+    reason: 't-1326: the transition schema cannot yet retain composition for non-liquidus transitions.'
+    events:
+      T1: structure change of Na2O
+      T2: thermal effect (event not further identified in the table)
+      T3: eutectic
+      T4: eutectic
+      T5: structure change of Na4SiO4
+    rows:
+    - sample: 96Na2O-4SiO2
+      composition_mole_percent:
+        Na2O: '95.98'
+        SiO2: '4.01'
+      T1_C:
+      - 750
+      - 747
+      T2_C:
+      - 795
+      - 780
+    - sample: 92Na2O-8SiO2
+      composition_mole_percent:
+        Na2O: '91.96'
+        SiO2: '8.04'
+      T1_C:
+      - 751
+      - 745
+      T3_C:
+      - 842
+      - 840
+    - sample: 90Na2O-10SiO2
+      composition_mole_percent:
+        Na2O: '89.98'
+        SiO2: '10.02'
+      T1_C:
+      - 752
+      - 746
+      T3_C:
+      - 853
+      - 852
+    - sample: 87Na2O-13SiO2
+      composition_mole_percent:
+        Na2O: '87.16'
+        SiO2: '12.84'
+      T1_C:
+      - 750
+      - 745
+      T3_C:
+      - 826
+      - 837
+    - sample: 85Na2O-15SiO2
+      composition_mole_percent:
+        Na2O: '84.90'
+        SiO2: '15.10'
+      T1_C:
+      - 747
+      - 747
+      T2_C:
+      - null
+      - 812
+      T3_C:
+      - 859
+      - 867
+    - sample: 83Na2O-17SiO2
+      composition_mole_percent:
+        Na2O: '83.53'
+        SiO2: '16.47'
+      T1_C:
+      - 746
+      - 753
+      T2_C:
+      - 780
+      - 800
+      T4_C:
+      - 849
+      - 854
+    - sample: 82Na2O-18SiO2
+      composition_mole_percent:
+        Na2O: '81.97'
+        SiO2: '18.03'
+      T1_C:
+      - 748
+      - 742
+      T4_C:
+      - 853
+      - 858
+    - sample: 80Na2O-20SiO2
+      composition_mole_percent:
+        Na2O: '79.98'
+        SiO2: '20.02'
+      T1_C:
+      - 751
+      - 747
+      T2_C:
+      - null
+      - 816
+      T4_C:
+      - 865
+      - 866
+    - sample: 78Na2O-22SiO2
+      composition_mole_percent:
+        Na2O: '77.89'
+        SiO2: '22.11'
+      T1_C:
+      - 747
+      - 743
+      T2_C:
+      - null
+      - 803
+      T4_C:
+      - 866
+      - 863
+    - sample: 76Na2O-24SiO2
+      composition_mole_percent:
+        Na2O: '75.98'
+        SiO2: '24.02'
+      T1_C:
+      - 751
+      - 745
+      T4_C:
+      - 825
+      - 841
+    - sample: 73.5Na2O-26.5SiO2
+      composition_mole_percent:
+        Na2O: '73.50'
+        SiO2: '26.50'
+      T4_C:
+      - 878
+      - 879
+      T5_C:
+      - 962
+      - 954
+    - sample: 72Na2O-28SiO2
+      composition_mole_percent:
+        Na2O: '71.98'
+        SiO2: '28.02'
+      T1_C:
+      - null
+      - 742
+      T4_C:
+      - 860
+      - 853
+      T5_C:
+      - 958
+      - 950
+    - sample: 70Na2O-30SiO2
+      composition_mole_percent:
+        Na2O: '69.98'
+        SiO2: '30.02'
+      T1_C:
+      - 750
+      - 748
+      T4_C:
+      - 857
+      - 837
+      T5_C:
+      - 957
+      - 953
+    column_order:
+    - up
+    - down
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_table7_nonliquidus_thermal_effects
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_table9_nonliquidus_thermal_effects
+  type: transition_event_results
+  locator:
+    page: 97
+    published_page: 85
+    pdf_page_index: 96
+    table: '9'
+  units: °C as printed
+  values:
+    quantity: transition_temperature
+    method_class: measured_tabulated
+    admission_status: typed_unavailable
+    reason: 't-1326: the transition schema cannot yet retain composition for non-liquidus transitions.'
+    rows:
+    - sample: 68Na2O-32SiO2
+      composition_mole_percent:
+        Na2O: '67.99'
+        SiO2: '32.01'
+      phases: Na4SiO4
+      structure_change_C:
+      - 956
+      - 950
+    - sample: 67Na2O-33SiO2
+      composition_mole_percent:
+        Na2O: '66.56'
+        SiO2: '33.44'
+      phases: Na4SiO4
+      structure_change_C:
+      - 960
+      - 952
+    - sample: 63Na2O-37SiO2
+      composition_mole_percent:
+        Na2O: '62.98'
+        SiO2: '37.02'
+      phases: Na4SiO4 + Na6Si2O7
+      eutectic_C:
+      - 1029
+      - null
+      structure_change_C:
+      - 958
+      - 949
+    - sample: 56Na2O-44SiO2
+      phases: Na6Si2O7 + Na2SiO3
+      composition:
+        state:
+          tag: unknown
+          reason: printed_components_total_96_percent_no_reconstruction
+      eutectic_C:
+      - 1009
+      - 1004
+    - sample: 50Na2O-50SiO2
+      composition_mole_percent:
+        Na2O: '50.23'
+        SiO2: '49.77'
+      phases: Na2SiO3
+    - sample: 45Na2O-55SiO2
+      composition_mole_percent:
+        Na2O: '44.96'
+        SiO2: '55.04'
+      phases: Na2SiO3 + Na2Si2O5
+      eutectic_C:
+      - 814
+      - 786
+    - sample: 40Na2O-60SiO2
+      composition_mole_percent:
+        Na2O: '39.98'
+        SiO2: '60.02'
+      phases: Na2SiO3 + Na2Si2O5
+      eutectic_C:
+      - 811
+      - 758
+    column_order:
+    - up
+    - down
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_table9_nonliquidus_thermal_effects
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: SiO2
+- observation_id: rys_2007_tables10_11_15_18_sample_data
+  type: composition
+  locator:
+    page: 104
+    published_page: 92
+    pdf_page_index: 103
+    table: '11'
+  units: mol% as printed
+  values:
+    table10_thermal_treatment_and_XRD:
+      1100_C:
+        NaAlSi_A: Na1.95Al1.95Si0.05O4 + NaAlO2
+        NaAlSi_C: Na1.55Al1.55Si0.45O4
+      1220_C:
+        NaAlSi_A: Na1.95Al1.95Si0.05O4 + NaAlO2
+        NaAlSi_C: Na1.55Al1.55Si0.45O4 + Na1.45Al1.45Si0.55O4
+      1330_C:
+        NaAlSi_A: —
+        NaAlSi_C: Na1.45Al1.45Si0.55O4
+      1470_C:
+        NaAlSi_A: Na1.95Al1.95Si0.05O4 + NaAlO2
+        NaAlSi_C: —
+      1530_C:
+        NaAlSi_A: Na1.95Al1.95Si0.05O4 + NaAlO2
+        NaAlSi_C: Na1.45Al1.45Si0.55O4
+    table11_NaAlSiO4_NaAlO2:
+    - sample: NaAlSi_4
+      Na2O: '26.45'
+      Al2O3: '24.65'
+      SiO2: '48.90'
+    - sample: NaAlSi_A
+      Na2O: '46.87'
+      Al2O3: '42.44'
+      SiO2: '10.69'
+    - sample: NaAlSi_B
+      Na2O: '39.98'
+      Al2O3: '35.15'
+      SiO2: '24.86'
+    - sample: NaAlSi_C
+      Na2O: '32.65'
+      Al2O3: '28.18'
+      SiO2: '39.17'
+    table15_Na2O_Al2O3_SiO2:
+    - sample: NaAlSi_1
+      Na2O: '7.05'
+      Al2O3: '6.48'
+      SiO2: '86.47'
+    - sample: NaAlSi_2
+      Na2O: '13.52'
+      Al2O3: '12.51'
+      SiO2: '73.97'
+    - sample: NaAlSi_3
+      Na2O: '20.17'
+      Al2O3: '19.00'
+      SiO2: '60.83'
+    - sample: NaAlSi_4
+      Na2O: '26.28'
+      Al2O3: '24.11'
+      SiO2: '49.61'
+    - sample: NaAlSi_5
+      Na2O: '7.22'
+      Al2O3: '13.65'
+      SiO2: '79.14'
+    - sample: NaAlSi_6
+      Na2O: '43.53'
+      Al2O3: '8.04'
+      SiO2: '48.43'
+    table18_Na2O_K2O_Al2O3_SiO2:
+    - sample: NaKAlSi_1
+      Na2O: '3.80'
+      Al2O3: '6.47'
+      SiO2: '86.59'
+      K2O: '3.14'
+    - sample: NaKAlSi_2
+      Na2O: '7.23'
+      Al2O3: '11.71'
+      SiO2: '75.28'
+      K2O: '5.78'
+    - sample: NaKAlSi_5
+      Na2O: '4.00'
+      Al2O3: '13.25'
+      SiO2: '79.53'
+      K2O: '3.22'
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_tables10_11_15_18_sample_data
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_tables12_13_14_na2o_vaporization_enthalpies
+  type: thermodynamic_example
+  locator:
+    page: 112
+    published_page: 100
+    pdf_page_index: 111
+    table: '12'
+  units: kJ/mol as printed
+  values:
+    quantity: enthalpy_of_vaporization_2nd_law
+    method_class: model_derived
+    rows:
+    - reaction: Na2O(s) = 2Na(g) + 1/2O2(g) (r.39)
+      fit_coefficients_A_as_printed:
+      - 45,1150
+      - 46,3519
+      - 38,8733
+      fit_coefficients_B_as_printed:
+      - -8,1449
+      - -8,2126
+      - -7,3939
+      Tm_K:
+      - 1100
+      - 1109
+      - 1101
+      delta_H_Tm_kJ_mol_as_printed:
+      - 677,167
+      - 682,791
+      - 614,731
+      delta_H_298_kJ_mol_as_printed: 680.37 ± 37.87
+      IVTANTHERMO_delta_H_298_kJ_mol_as_printed: '629.570'
+    - reaction: Na2O(s) = Na(g) + NaO(g) (r.40)
+      fit_coefficients_A_as_printed:
+      - 27,0160
+      - 35,0094
+      - 29,0299
+      fit_coefficients_B_as_printed:
+      - -6,4514
+      - -7,2685
+      - -6,6562
+      Tm_K:
+      - 1098
+      - 1109
+      - 1101
+      delta_H_Tm_kJ_mol_as_printed:
+      - 536,373
+      - 604,300
+      - 553,398
+      delta_H_298_kJ_mol_as_printed: 585.89 ± 35.57
+      IVTANTHERMO_delta_H_298_kJ_mol_as_printed: '628.568'
+    table13_third_law_delta_H_298_kJ_mol_as_printed:
+      reaction_39_this_work: 612.423 ± 4.03
+      reaction_39_IVTANTHERMO: '629.570'
+      reaction_40_this_work: 609.207 ± 3.58
+      reaction_40_IVTANTHERMO: '628.568'
+    table14_reaction_40_comparison:
+      second_law_this_work_kJ_mol: 585.89 ± 35.57
+      third_law_this_work_kJ_mol: 609.207 ± 3.58
+      Hildenbrand_and_Murad_66_third_law_kcal_mol: '150.0'
+    attribution: IVTANTHERMO [65]; Hildenbrand and Murad [66], as cited in the thesis.
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_tables12_13_14_na2o_vaporization_enthalpies
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_tables1_5_background_and_preparation
+  type: literature_context
+  locator:
+    page: 16
+    published_page: 4
+    pdf_page_index: 15
+    table: '1'
+  units: as printed
+  values:
+    method_class: quoted_unattributed
+    note: Table 1 gives background coal and ash composition ranges, not measurements made in this thesis.
+    coal_elements_mass_percent:
+      C: 75–85
+      H: 4.8–5.5
+      O: 8.8–10
+      N: 1.4–2.3
+      S: 0.3–1.5
+      ash_contents: 5–10
+    ash_oxides_mass_percent:
+      SiO2: 18.3–52.3
+      Al2O3: 10.7–33.5
+      CaO: 2.9–25
+      Na2O: 0.7–3.8
+      K2O: 0.8–2.9
+      P2O5: 0.4–4.1
+    other_tables:
+      table2_ionization_cross_sections_cm2_as_printed:
+        Ag: '5.35'
+        Ni: '5.08'
+        Na: '3.5'
+        NaO: '2.275'
+        Na2O: '7.35'
+        K: '5.3'
+      table2_attribution: References [52–56]
+      table3_pressure_calibration_factors:
+        Ag: '4.34E-08'
+        Ni: '1.34E-07'
+      table3_units: k
+      table3_average_as_printed: 8.8908 E-8
+      table4_transition_reference_materials_C:
+        Au: 1064, freezing/melting point
+        Ag: 962, freezing/melting point
+        SrCO3: 928, structure change
+        BaCO3: 808, structure change
+        K2CrO4: 665, structure change
+        K2SO4: 582, structure change
+        SiO2: 571, structure change
+      table4_attribution: ICTA material 760 [58]
+      table5_estimated_melting_points_C:
+        NaAlSi_1:
+          value_C: 1250
+          approximate: true
+        NaAlSi_2:
+          value_C: 1100
+          approximate: true
+        NaAlSi_3:
+          value_C: 1300
+          approximate: true
+        NaAlSi_4:
+          value_C: 1550
+          approximate: true
+        NaAlSi_5:
+          value_C: 1600
+          approximate: true
+        NaAlSi_6:
+          value_C: 1000
+          approximate: true
+        NaKAlSi_1:
+          value_C: 1250
+          approximate: true
+        NaKAlSi_2:
+          value_C: 1100
+          approximate: true
+        NaKAlSi_5:
+          value_C: 1040
+          approximate: true
+      table5_method_class: author_estimate
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_tables1_5_background_and_preparation
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O
+- observation_id: rys_2007_tables6_8_sample_compositions
+  type: composition
+  locator:
+    page: 72
+    published_page: 60
+    pdf_page_index: 71
+    table: '6'
+  units: mol% as printed
+  values:
+    rows:
+      table6_Na2O_SiO2:
+      - sample: 96Na2O-4SiO2
+        Na2O: 95.98 (-0.1%)
+        SiO2: '4.01'
+      - sample: 92Na2O-8SiO2
+        Na2O: 91.96 (-0.4%)
+        SiO2: '8.04'
+      - sample: 90Na2O-10SiO2
+        Na2O: 89.98 (-0.2%)
+        SiO2: '10.02'
+      - sample: 87Na2O-13SiO2
+        Na2O: 87.16 (-0.5%)
+        SiO2: '12.84'
+      - sample: 85Na2O-15SiO2
+        Na2O: 84.90 (-0.3%)
+        SiO2: '15.10'
+      - sample: 83Na2O-17SiO2
+        Na2O: 83.53 (-0.4%)
+        SiO2: '16.47'
+      - sample: 82Na2O-18SiO2
+        Na2O: 81.97 (-0.1%)
+        SiO2: '18.03'
+      - sample: 80Na2O-20SiO2
+        Na2O: 79.98 (-0.4%)
+        SiO2: '20.02'
+      - sample: 78Na2O-22SiO2
+        Na2O: 77.89 (-0.2%)
+        SiO2: '22.11'
+      - sample: 76Na2O-24SiO2
+        Na2O: 75.98 (-0.6%)
+        SiO2: '24.02'
+      - sample: 73.5Na2O-26.5SiO2
+        Na2O: 73.50 (-0.1%)
+        SiO2: '26.50'
+      - sample: 72Na2O-28SiO2
+        Na2O: 71.98 (-0.3%)
+        SiO2: '28.02'
+      - sample: 70Na2O-30SiO2
+        Na2O: 69.98 (-0.2%)
+        SiO2: '30.02'
+      table8_Na2O_SiO2:
+      - sample: 68Na2O-32SiO2
+        Na2O: 67.99 (-0.5%)
+        SiO2: '32.01'
+      - sample: 67Na2O-33SiO2
+        Na2O: 66.56 (-0.3%)
+        SiO2: '33.44'
+      - sample: 63Na2O-37SiO2
+        Na2O: 62.98 (-0.1%)
+        SiO2: '37.02'
+      - sample: 56Na2O-44SiO2
+        Na2O: 55.86 (-0.2%)
+        SiO2: '40.14'
+        composition_state: incomplete_unknown
+        note: Printed components total 96%; no missing oxide fraction inferred.
+      - sample: 50Na2O-50SiO2
+        Na2O: 50.23 (-0.2%)
+        SiO2: '49.77'
+      - sample: 45Na2O-55SiO2
+        Na2O: 44.96 (-0.3%)
+        SiO2: '55.04'
+      - sample: 40Na2O-60SiO2
+        Na2O: 39.98 (-0.1%)
+        SiO2: '60.02'
+  context_id: rys-2007-alkali-oxide-thermodynamics::context::rys_2007_tables6_8_sample_compositions
+  work_id: a862c5fd2ba013e20245f05ca8eb3abba38addc1d76f4233cdd31b518397b3e3
+  source_id: rys-2007-alkali-oxide-thermodynamics
+  species: Na2O

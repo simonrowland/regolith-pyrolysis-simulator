@@ -1,0 +1,1163 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1111/ijag.16627
+  citation: Baborák, Yembele, Varak, Ory, Véron, Pitcher, Allix, Nekvindova, and Zandona (2023), Key melt properties for controlled
+    synthesis of glass beads by aerodynamic levitation coupled to laser heating, International Journal of Applied Glass Science.
+  source_ids:
+  - baborak-2023-alkali-silicate-levitation-evaporation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:baborak-2023-alkali-silicate-levitation-evaporation
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1111/ijag.16627
+experiments:
+- experiment_id: 10.1111/ijag.16627::baborak-2023-alkali-silicate-levitation-evaporation
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1111/ijag.16627
+  locator:
+    published_page: 459
+    pdf_page_index: 4
+    table: '1'
+    note: row=LS2; column=Tg
+context:
+- observation_id: baborak_2023_dsc_rate_matching_and_viscosity_relation
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 3
+    published_page: 458
+    section: 2.2 Glass characterization
+  units: K, K min−1, Pa s, log10(Pa s)
+  values:
+    quantity: DSC_and_rate_matching_viscosity_method
+    method_class: method_only
+    dsc_instrument: SETARAM Multi HTC 1600
+    dsc_sample_mass_mg:
+      value: 500
+      approximate: true
+    crucibles: Pt
+    simple_upscan_endpoint_K: 1173
+    simple_upscan_rate_K_per_min: 10
+    rate_matching_protocol: Heat past the glass transition for melt relaxation; cool at 10 K min−1 to constrain thermal history;
+      measure on a second upscan at 10 K min−1.
+    transition_onset_method: double-tangent method on the heat-flow curve
+    onset_viscosity_relation_as_printed: log10 η(Tonset) = −log10 |qc,h| + Konset
+    Konset_as_printed: 11.20 (±.15) Pa s
+    qc_h_as_printed: 10 K min−1
+    log10_eta_Tonset_as_printed: 11.98 Pa s ≈ 12 Pa s
+    glass_transition_viscosity_as_printed: η ≈ 10^12 Pa s
+    schema_gap: The paper prints logarithmic viscosity calibrations; the simulator has no quantity token for these log-valued
+      measurements.
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_dsc_rate_matching_and_viscosity_relation
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_evaporation_tendency_text_ranges
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 5
+    published_page: 460
+    section: Results
+  units: dimensionless
+  values:
+    quantity: evaporation_tendency_text_ranges
+    method_class: model_derived
+    printed_statements:
+      Li2O_revap_range: 0.7 to 1.1
+      Na2O_revap_range: 0.8 to 1.3
+      K2O_revap_range: 1.0 to 1.3
+      delta_evap_range: lowest values in Li2O-bearing samples (~0.1); highest values in K2O-bearing samples (up to ~0.5)
+    approximate_values:
+      Li2O_delta_evap_low:
+        value: '0.1'
+        approximate: true
+      K2O_delta_evap_high:
+        value: '0.5'
+        approximate: true
+        bound: upper
+    schema_gap: revap and Δevap are not represented by existing quantity tokens.
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_evaporation_tendency_text_ranges
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_experimental_method_and_pyrometer_temperatures
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 2
+    published_page: 457
+    section: Experimental
+  units: °C, K, μm, s, mass percent, mm
+  values:
+    quantity: aerodynamic_levitation_laser_synthesis_conditions
+    method_class: method_only
+    reference_glass_preparation: LS2, NS2, and KS2 were melted at 1623 K for 1 h; melting was repeated after crushing the
+      sample to fine powder.
+    material_preparation: 2 g of precursor powders mixed with cornstarch at 5% by mass and water; pellets dried for 2 h at
+      473 K.
+    ADL_pellet_mass_mg_as_printed: 35 ± 5
+    levitation_gas: oxygen
+    laser: two CO2 lasers at 10.6 μm
+    total_heating_time_s:
+      value: 45
+      approximate: true
+    pyrometer_wavelength_um: '0.9'
+    pyrometer_uncertainty_K: ±100 K at maximum laser power without an accurate sample-specific emissivity calibration
+    alkali_silicate_pyrometer_maximums_C:
+      MS2:
+        value: 1500
+        approximate: true
+        compositions:
+        - LS2
+        - NS2
+        - KS2
+      MS4:
+        value: 1700
+        approximate: true
+        compositions:
+        - LS4
+        - NS4
+        - KS4
+      MS8:
+        value: 1800
+        approximate: true
+        compositions:
+        - LS8
+        - NS8
+        - KS8
+    supplemental_samples_pyrometer_C:
+      LB2: 1050
+      NP: 1125
+    LB2_intentional_high_temperature_C:
+      value: 1200
+      approximate: true
+    results_temperature_range_K_as_printed: about 1800 K for lower-silica samples; up to 2100 K to prepare lower M2O compositions
+    free_cooling_points_as_printed:
+    - temperature_K: 1801
+      time_s: 47
+    - temperature_K: 1070
+      time_s: 50
+    representative_bead_diameter_mm:
+      value: 2
+      approximate: true
+    bead_count_per_composition_for_mass_loss_statistics: 10
+    mass_loss_method: Dried pellet mass was compared with the resulting bead mass. Expected bead mass subtracts the cornstarch
+      and CO2 removed during melting; drying assumes all water was lost at 200°C.
+    analyzed_beads_per_composition: 1
+    acquisitions_per_bead: 4
+    analyzed_spot: one central and three near the bead edges
+    schema_gap: No stored quantity represents pyrometer readings, synthesis conditions, or evaporation indices; values remain
+      context.
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_experimental_method_and_pyrometer_temperatures
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_figure1_metadata
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 2
+    published_page: 457
+    figure: '1'
+  units: time s; radiance temperature °C and K
+  values:
+    quantity: figure_record
+    method_class: figure_only
+    admission_status: figure_only
+    typed_quantity_as_printed: time_temperature_curve
+    identity:
+      species: LS2, NS2, and KS2 alkali-silicate glass beads
+      phase: levitated melt/bead during ADL synthesis
+      temperature: measured pyrometer reading
+    caption: 'Example of time-temperature curves acquired with a .9-μm pyrometer during ADL synthesis of LS2, NS2, and KS2
+      glass beads, schematically separated into four main stages: prereaction, melting, temperature homogenization and fining,
+      quenching. The pyrometer reading (light color shades) is noisy due to instabilities during the levitation. The signal
+      was smoothed (thick curves) using a Savitzky-Golay filter94 (second polynomial order). The rate of the free cooling
+      was estimated between the beginning of the quench (1801 K at 47 s) and the end of signal detection (1070 K at 50 s).'
+    axes_as_printed: time (s); radiance temperature (°C, K)
+    panels:
+    - panel: single
+      series:
+      - name: LS2
+        marker_count: 0
+      - name: NS2
+        marker_count: 0
+      - name: KS2
+        marker_count: 0
+    attribution: authors' pyrometer measurements
+    digitisation: deferred to a figure pass
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_figure1_metadata
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_figure2_metadata
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 5
+    published_page: 460
+    figure: '2'
+  units: heat flow a.u.; log10 η in Pa s; temperature °C and K
+  values:
+    quantity: figure_record
+    method_class: figure_only
+    admission_status: figure_only
+    typed_quantity_as_printed:
+    - transition_temperature
+    - viscosity
+    identity:
+      species: LS2, NS2, and KS2
+      phase: glass for DSC and melt for viscosity
+      temperature: DSC upscans and fitted viscosity curves
+    caption: (A) Heat flow curves obtained during differential scanning calorimetry (DSC) upscans at 10 K min−1 applied to
+      samples LS2, NS2, and KS2 synthesized by conventional melt-quenching; a shaded area labeled as Tt marks the glass transition
+      region, while Tc labels the onset of crystallization. (B) w-MYEGA fits (fit parameters in Table 1) of the full viscosity
+      curves of LS2, NS2, and KS2, based on the Tg values determined within this work and high-temperature viscosity data
+      from literature.61,63 Horizontal arrows signal the viscosity at Tm for each composition.
+    axes_as_printed: 'Panel A: heat flow (a.u.) versus temperature (°C and K). Panel B: log10 η (Pa s) versus temperature
+      (°C and K).'
+    panels:
+    - panel: A
+      series:
+      - name: LS2
+        marker_count: 0
+      - name: NS2
+        marker_count: 0
+      - name: KS2
+        marker_count: 0
+    - panel: B
+      series:
+      - name: LS2 w-MYEGA curve
+        marker_count: 0
+      - name: LS2 this-work Tg marker
+        marker_count: 1
+      - name: LS2 literature viscosity markers
+        marker_count: 12
+      - name: NS2 w-MYEGA curve
+        marker_count: 0
+      - name: NS2 this-work Tg marker
+        marker_count: 1
+      - name: NS2 literature viscosity markers
+        marker_count: 7
+      - name: KS2 w-MYEGA curve
+        marker_count: 0
+      - name: KS2 this-work Tg marker
+        marker_count: 1
+      - name: KS2 literature viscosity markers
+        marker_count: 8
+    attribution: DSC measured in this work; viscosity fits model-derived using high-temperature literature data refs. 61 and
+      63
+    schema_gap: Heat flow a.u. and logarithmic viscosity curves are not stored as scored values in this record.
+    digitisation: deferred to a figure pass
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_figure2_metadata
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_figure3_metadata
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 5
+    published_page: 460
+    figure: '3'
+  units: dimensionless
+  values:
+    quantity: figure_record
+    method_class: figure_only
+    admission_status: figure_only
+    typed_quantity_as_printed:
+    - revap
+    - delta_evap
+    identity:
+      species: nine Li2O/Na2O/K2O–SiO2 glasses
+      phase: target glass compositions
+      temperature: component and glass melting temperatures from phase diagrams
+    caption: (A) revap (Equation 4) and (B) Δevap (Equation 5) parameters computed for the compositions analyzed within this
+      work, using data from literature.73–75 Vertical arrows in the (A) panel correspond to the Δevap values plotted in (B).
+    panels:
+    - panel: A
+      axes_as_printed: revap versus sample identity
+      series:
+      - name: Li2O
+        marker_count: 3
+      - name: Na2O
+        marker_count: 3
+      - name: K2O
+        marker_count: 3
+      - name: SiO2
+        marker_count: 9
+    - panel: B
+      axes_as_printed: Δevap versus nominal M2O content (mol%)
+      series:
+      - name: Li2O–SiO2 glasses
+        marker_count: 3
+      - name: Na2O–SiO2 glasses
+        marker_count: 3
+      - name: K2O–SiO2 glasses
+        marker_count: 3
+    attribution: derived by the authors from phase-diagram melting temperatures in refs. 73–75
+    schema_gap: revap and Δevap have no matching quantity token.
+    digitisation: deferred to a figure pass
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_figure3_metadata
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_figure4_metadata
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 6
+    published_page: 461
+    figure: '4'
+  units: mm
+  values:
+    quantity: figure_record
+    method_class: figure_only
+    admission_status: figure_only
+    typed_quantity_as_printed: glass-bead photographs
+    identity:
+      species: LS2, LS4, LS8, NS2, NS4, NS8, KS2, KS4, and KS8
+      phase: synthesized glass beads
+      temperature: synthesis conditions not shown in the photographs
+    caption: Pictures of beads synthesized by ADL. Visible influence of silica content and different alkali oxides. The distance
+      between the vertical black bars is 1 mm.
+    panels:
+    - panel: 3-by-3 montage
+      series:
+      - name: Li2O row
+        marker_count: 0
+      - name: Na2O row
+        marker_count: 0
+      - name: K2O row
+        marker_count: 0
+    bead_photo_count: 36
+    attribution: authors' photographs
+    digitisation: deferred to a figure pass
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_figure4_metadata
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_figure5_metadata
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 6
+    published_page: 461
+    figure: '5'
+  units: measured mass / expected mass × 100; mass loss %; revap dimensionless
+  values:
+    quantity: figure_record
+    method_class: figure_only
+    admission_status: figure_only
+    typed_quantity_as_printed:
+    - mass_loss_fraction
+    - revap
+    identity:
+      species: LS2, LS4, LS8, NS2, NS4, NS8, KS2, KS4, and KS8
+      phase: synthesized glass beads
+      temperature: ADL synthesis
+    caption: (A) Comparison between measured and expected masses of glass beads synthesized by ADL, as a function of their
+      nominal M2O (M = Li, Na, K) content; error bars correspond to the standard deviation over 10 measured beads. (B) Correlation
+      between the average mass loss of each target composition and the revap value of its most volatile component (alkali
+      oxide M2O).
+    panels:
+    - panel: A
+      axes_as_printed: measured mass / expected mass × 100 versus nominal M2O content (mol%)
+      series:
+      - name: Li2O–SiO2 glass beads
+        marker_count: 3
+      - name: Na2O–SiO2 glass beads
+        marker_count: 3
+      - name: K2O–SiO2 glass beads
+        marker_count: 3
+    - panel: B
+      axes_as_printed: average mass loss (%) versus revap for the most volatile component
+      series:
+      - name: Li2O–SiO2 glass beads
+        marker_count: 3
+      - name: Na2O–SiO2 glass beads
+        marker_count: 3
+      - name: K2O–SiO2 glass beads
+        marker_count: 3
+    attribution: measured bead masses in this work; revap from phase diagrams in refs. 73–75
+    digitisation: deferred to a figure pass
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_figure5_metadata
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_figure6_metadata
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 6
+    published_page: 461
+    figure: '6'
+  units: M2O mol%; alkali-oxide loss %; Δevap dimensionless
+  values:
+    quantity: figure_record
+    method_class: figure_only
+    admission_status: figure_only
+    typed_quantity_as_printed:
+    - residue_component_composition
+    - delta_evap
+    identity:
+      species: nine Li2O/Na2O/K2O–SiO2 glass bead compositions
+      phase: measured representative beads and nominal target compositions
+      temperature: synthesis conditions not individually printed
+    caption: (A) Comparison between nominal M2O content (M = Li, Na, K) of the nine samples synthesized by ADL and the values
+      measured by laser ablation inductively coupled plasma mass spectrometry (LA-ICP-MS) on representative beads; (B) correlation
+      between the M2O loss in each of the measured beads and the Δevap value of the respective target composition.
+    panels:
+    - panel: A
+      axes_as_printed: measured M2O content (mol%) versus nominal M2O content (mol%)
+      series:
+      - name: Li2O–SiO2 glass beads
+        marker_count: 3
+      - name: Na2O–SiO2 glass beads
+        marker_count: 3
+      - name: K2O–SiO2 glass beads
+        marker_count: 3
+    - panel: B
+      axes_as_printed: M2O loss (%) versus Δevap
+      series:
+      - name: Li2O–SiO2 glass beads
+        marker_count: 3
+      - name: Na2O–SiO2 glass beads
+        marker_count: 3
+      - name: K2O–SiO2 glass beads
+        marker_count: 3
+    attribution: LA-ICP-MS measured compositions in this work; Δevap derived from phase-diagram data
+    digitisation: deferred to a figure pass
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_figure6_metadata
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_figure7_metadata
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 7
+    published_page: 462
+    figure: '7'
+  units: melting temperature °C and K; log10 η(Tm) Pa s
+  values:
+    quantity: figure_record
+    method_class: figure_only
+    admission_status: figure_only
+    typed_quantity_as_printed:
+    - transition_temperature
+    - viscosity
+    identity:
+      species: LS2, NS2, KS2 and representative glass-forming melts
+      phase: liquid at melting
+      temperature: melting temperature Tm
+    caption: Correlation between melting temperatures Tm and viscosity at Tm log10 η(Tm) for a range of representative glass-forming
+      melts, based on viscosity data from this work (LS2, NS2, and KS2) and reliable literature sources (see related to text
+      for references).
+    axes_as_printed: log10 η(Tm) versus melting temperature Tm (°C; K top axis)
+    series:
+    - name: NaTe2O4.5
+      marker_count: 1
+    - name: PbO·SiO2
+      marker_count: 1
+    - name: TeO2
+      marker_count: 1
+    - name: LS2
+      marker_count: 1
+    - name: NS2
+      marker_count: 1
+    - name: KS2
+      marker_count: 1
+    - name: CaMgSi2O6
+      marker_count: 1
+    - name: LS3
+      marker_count: 1
+    - name: NS3
+      marker_count: 1
+    - name: Mg2Al4Si5O18
+      marker_count: 1
+    - name: CaAl2Si2O8
+      marker_count: 1
+    - name: CaAl2O4
+      marker_count: 1
+    - name: YAG
+      marker_count: 1
+    - name: SiO2
+      marker_count: 1
+    - name: GeO2
+      marker_count: 1
+    attribution: LS2, NS2, and KS2 viscosity data from this work; other glass-former values from literature
+    schema_gap: The plotted log-viscosity and melting-temperature pairs are not digitized.
+    digitisation: deferred to a figure pass
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_figure7_metadata
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_figure8_metadata
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 7
+    published_page: 462
+    figure: '8'
+  units: dimensionless
+  values:
+    quantity: figure_record
+    method_class: figure_only
+    admission_status: figure_only
+    typed_quantity_as_printed:
+    - revap
+    - delta_evap
+    identity:
+      species: soda-lime glass, LB2, LG2, LT2, NB2, NG2, NT2, CaAl2O4, YAG
+      phase: representative glass-forming compositions
+      temperature: component melting temperatures from literature
+    caption: 'revap parameters computed for some representative glass-forming substances (LB2: Li2O·2B2O3, LG2: Li2O·2GeO2,
+      LT2: Li2O·2TeO2, NB2: Na2O·2B2O3, NG2: Na2O·2GeO2, NT2: Na2O·2TeO2, YAG: 3Y2O3·5Al2O3); vertical arrows are a graphical
+      representation of Δevap. Melting temperatures were obtained from previous literature.73–75,79–81,95–100 See also Figure
+      3A for a complete symbol legend.'
+    axes_as_printed: revap versus composition; vertical arrows represent Δevap
+    series:
+    - name: Li2O
+      marker_count: 3
+    - name: Na2O
+      marker_count: 4
+    - name: K2O
+      marker_count: 0
+    - name: SiO2
+      marker_count: 1
+    - name: CaO
+      marker_count: 2
+    - name: B2O3
+      marker_count: 2
+    - name: GeO2
+      marker_count: 2
+    - name: TeO2
+      marker_count: 2
+    - name: Al2O3
+      marker_count: 2
+    - name: Y2O3
+      marker_count: 1
+    attribution: derived by the authors from earlier phase-diagram data, refs. 73–75, 79–81, and 95–100
+    schema_gap: revap and Δevap have no matching quantity token.
+    digitisation: deferred to a figure pass
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_figure8_metadata
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_figure9_composition_context
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 8
+    published_page: 463
+    figure: '9'
+  units: mol% as printed in figure axes
+  values:
+    quantity: measured_glass_composition_context
+    method_class: measured_direct
+    samples:
+    - sample_id: NP
+      nominal_composition_as_published: Na2O·P2O5
+      analyzed_composition:
+        tag: unknown
+        reason: numeric_composition_points_in_figure_9_deferred_by_wave_7_ruling
+    - sample_id: LB2
+      nominal_composition_as_published: Li2O·2B2O3
+      analyzed_composition:
+        tag: unknown
+        reason: numeric_composition_points_in_figure_9_deferred_by_wave_7_ruling
+    - sample_id: LB2_high_temperature_bead_ML_45_percent
+      analyzed_composition:
+        tag: unknown
+        reason: numeric_composition_points_in_figure_9_deferred_by_wave_7_ruling
+    basis: LA-ICP-MS molar Li2O and B2O3 or Na2O and P2O5 plotted in panel A; panel B recalculates the Li2O and B2O3 mole
+      content for two LB2 beads.
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_figure9_composition_context
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: Li2B4O7
+- observation_id: baborak_2023_figure9_metadata
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 8
+    published_page: 463
+    figure: '9'
+  units: oxide mol%; mass loss % of expected mass
+  values:
+    quantity: figure_record
+    method_class: figure_only
+    admission_status: figure_only
+    typed_quantity_as_printed:
+    - residue_component_composition
+    - mass_loss_fraction
+    identity:
+      species: NP (Na2O·P2O5) and LB2 (Li2O·2B2O3)
+      phase: synthesized glass beads
+      temperature: nominal synthesis and intentionally higher-temperature LB2 melts
+    caption: (A) Results of laser ablation inductively coupled plasma mass spectrometry (LA-ICP-MS) measurements performed
+      on glass beads synthesized by the ADL method for Na2O·P2O5 (NP) and Li2O·2B2O3 (LB2) compositions. The data points labeled
+      as “NP, ICP” and “LB2, ICP” correspond to the average of several beads synthesized without evident signs of evaporation
+      (pictures are provided as onsets). In the case of LB2, two beads were intentionally melted at higher temperatures to
+      induce volatilization, with mass losses (ML) up to 45% of the expected mass. (B) LA-ICP-MS results for the beads that
+      underwent mass losses up to 45%, recalculated in terms of the actual molar Li2O and B2O3 content of the two samples.
+    panels:
+    - panel: A
+      axes_as_printed: Li2O or Na2O content (mol%) versus B2O3 or P2O5 content (mol%)
+      series:
+      - name: NP nominal and NP ICP mean
+        marker_count: 2
+      - name: LB2 nominal and LB2 ICP mean
+        marker_count: 2
+      - name: LB2 ICP ML=45%
+        marker_count: 1
+    - panel: B
+      axes_as_printed: Oxide content (mol); scale 0.00–0.30
+      series:
+      - name: final Li2O
+        marker_count: 0
+      - name: Li2O loss
+        marker_count: 0
+      - name: final B2O3
+        marker_count: 0
+      - name: B2O3 loss
+        marker_count: 0
+    attribution: LA-ICP-MS measurements and bead mass measurements from this work
+    digitisation: deferred to a figure pass
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_figure9_metadata
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_ks2_evaporation_tendency_table2
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 4
+    published_page: 459
+    table: '2'
+    row: KS2
+  units: dimensionless
+  values:
+    quantity: evaporation_tendency_indices
+    method_class: model_derived
+    sample_id: KS2
+    composition_as_published: K2O·2SiO2
+    Tm_K: 1309
+    Tm_method_class: quoted_attributed
+    Tm_attribution: Literature refs. 73–75 (phase diagrams)
+    revap_M2O_as_printed: '1.1'
+    revap_SiO2_as_printed: '0.66'
+    delta_evap_as_printed: '0.44'
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_ks2_evaporation_tendency_table2
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_ks2_viscosity_fit_table1
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 4
+    published_page: 459
+    table: '1'
+    row: KS2
+  units: as printed
+  values:
+    quantity: viscosity_fit_and_glass_stability_parameters
+    method_class: model_derived
+    sample_id: KS2
+    composition_as_published: K2O·2SiO2
+    Kgl_as_printed: 1.03 ± .03
+    Kgl_definition: Kgl = (Tc − Tg) / (Tm − Tc); Hrubý glass-stability parameter
+    fragility_index_m_as_printed: 34.6 ± .9
+    log10_eta_infinity_Pa_s_as_printed: −2.2 ± .3
+    log10_eta_Tm_Pa_s_as_printed: '2.4'
+    log10_eta_Tm_text_as_printed: '2.38'
+    model: w-MYEGA
+    fit_method: Only log10 η∞ and m were varied; Tg was fixed to the DSC value; high-temperature viscosity data were taken
+      from refs. 61 and 63.
+    schema_gap: Printed logarithmic viscosity values and Kgl/m have no matching quantity token; retained as printed context.
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_ks2_viscosity_fit_table1
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: K2Si2O5
+- observation_id: baborak_2023_ks4_evaporation_tendency_table2
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 4
+    published_page: 459
+    table: '2'
+    row: KS4
+  units: dimensionless
+  values:
+    quantity: evaporation_tendency_indices
+    method_class: model_derived
+    sample_id: KS4
+    composition_as_published: K2O·4SiO2
+    Tm_K: 1248
+    Tm_method_class: quoted_attributed
+    Tm_attribution: Literature refs. 73–75 (phase diagrams)
+    revap_M2O_as_printed: '1.05'
+    revap_SiO2_as_printed: '0.63'
+    delta_evap_as_printed: '0.42'
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_ks4_evaporation_tendency_table2
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_ks8_evaporation_tendency_table2
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 4
+    published_page: 459
+    table: '2'
+    row: KS8
+  units: dimensionless
+  values:
+    quantity: evaporation_tendency_indices
+    method_class: model_derived
+    sample_id: KS8
+    composition_as_published: K2O·8SiO2
+    Tm_K: 1553
+    Tm_method_class: quoted_attributed
+    Tm_attribution: Literature refs. 73–75 (phase diagrams)
+    revap_M2O_as_printed: '1.31'
+    revap_SiO2_as_printed: '0.78'
+    delta_evap_as_printed: '0.52'
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_ks8_evaporation_tendency_table2
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_lb2_high_temperature_mass_loss
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 8
+    published_page: 463
+    figure: '9'
+    section: Discussion
+  phase: glass
+  units: percent of expected mass
+  values:
+    quantity: mass_loss_fraction
+    method_class: measured_direct
+    sample_id: LB2
+    mass_loss_wt_pct_as_printed:
+      value: 45
+      bound: upper
+    pyrometer_temperature_C_as_printed:
+      value: 1200
+      approximate: true
+    mass_loss_bound_as_printed: up to 45% of the expected mass
+    condition_as_printed: two LB2 beads intentionally melted at higher temperatures to induce volatilization
+    measurement: bead mass relative to expected mass; individual values are figure-only and not digitized
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_lb2_high_temperature_mass_loss
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: Li2B4O7
+- observation_id: baborak_2023_lb2_np_table3_context
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 7
+    published_page: 462
+    table: '3'
+  units: as printed
+  values:
+    quantity: table3_approximate_log_viscosities_and_evaporation_indices
+    method_class: quoted_attributed
+    rows:
+    - sample_id: LB2
+      composition_as_published: Li2O·2B2O3
+      log10_eta_Tm_Pa_s_as_printed: <0
+      log_viscosity_method_class: quoted_attributed
+      log_viscosity_attribution: Refs. 103 and 63, as cited in the Table 3 caption
+      revap_Li2O_as_printed: '0.69'
+      revap_B2O3_as_printed: '1.61'
+      delta_evap_as_printed: '0.92'
+      evaporation_indices_method_class: model_derived
+    - sample_id: NP
+      composition_as_published: Na2O·P2O5
+      log10_eta_Tm_Pa_s_as_printed:
+        value: '0.3'
+        approximate: true
+      log_viscosity_method_class: quoted_attributed
+      log_viscosity_attribution: Refs. 103 and 63, as cited in the Table 3 caption
+      revap_Na2O_as_printed: '0.64'
+      revap_P2O5_as_printed: '1.06'
+      delta_evap_as_printed: '0.42'
+      evaporation_indices_method_class: model_derived
+    melting_temperature_attribution: Refs. 96, 101, and 102, as cited in the Table 3 caption
+    definition: revap = Tm,Σ / Tm; Δevap = revap,max − revap,min.
+    schema_gap: Log viscosity, revap, and Δevap are not represented by existing quantity tokens; the printed values are retained
+      here.
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_lb2_np_table3_context
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: Li2Si2O5
+- observation_id: baborak_2023_ls2_evaporation_tendency_table2
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 4
+    published_page: 459
+    table: '2'
+    row: LS2
+  units: dimensionless
+  values:
+    quantity: evaporation_tendency_indices
+    method_class: model_derived
+    sample_id: LS2
+    composition_as_published: Li2O·2SiO2
+    Tm_K: 1306
+    Tm_method_class: quoted_attributed
+    Tm_attribution: Literature refs. 73–75 (phase diagrams)
+    revap_M2O_as_printed: '0.76'
+    revap_SiO2_as_printed: '0.66'
+    delta_evap_as_printed: '0.11'
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_ls2_evaporation_tendency_table2
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_ls2_viscosity_fit_table1
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 4
+    published_page: 459
+    table: '1'
+    row: LS2
+  units: as printed
+  values:
+    quantity: viscosity_fit_and_glass_stability_parameters
+    method_class: model_derived
+    sample_id: LS2
+    composition_as_published: Li2O·2SiO2
+    Kgl_as_printed: 0.24 ± .02
+    Kgl_definition: Kgl = (Tc − Tg) / (Tm − Tc); Hrubý glass-stability parameter
+    fragility_index_m_as_printed: 41.4 ± .7
+    log10_eta_infinity_Pa_s_as_printed: −1.5 ± .1
+    log10_eta_Tm_Pa_s_as_printed: '1.5'
+    log10_eta_Tm_text_as_printed: '1.51'
+    model: w-MYEGA
+    fit_method: Only log10 η∞ and m were varied; Tg was fixed to the DSC value; high-temperature viscosity data were taken
+      from refs. 61 and 63.
+    schema_gap: Printed logarithmic viscosity values and Kgl/m have no matching quantity token; retained as printed context.
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_ls2_viscosity_fit_table1
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: Li2Si2O5
+- observation_id: baborak_2023_ls4_evaporation_tendency_table2
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 4
+    published_page: 459
+    table: '2'
+    row: LS4
+  units: dimensionless
+  values:
+    quantity: evaporation_tendency_indices
+    method_class: model_derived
+    sample_id: LS4
+    composition_as_published: Li2O·4SiO2
+    Tm_K: 1633
+    Tm_method_class: quoted_attributed
+    Tm_attribution: Literature refs. 73–75 (phase diagrams)
+    revap_M2O_as_printed: '0.95'
+    revap_SiO2_as_printed: '0.82'
+    delta_evap_as_printed: '0.13'
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_ls4_evaporation_tendency_table2
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_ls8_evaporation_tendency_table2
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 4
+    published_page: 459
+    table: '2'
+    row: LS8
+  units: dimensionless
+  values:
+    quantity: evaporation_tendency_indices
+    method_class: model_derived
+    sample_id: LS8
+    composition_as_published: Li2O·8SiO2
+    Tm_K: 1788
+    Tm_method_class: quoted_attributed
+    Tm_attribution: Literature refs. 73–75 (phase diagrams)
+    revap_M2O_as_printed: '1.04'
+    revap_SiO2_as_printed: '0.9'
+    delta_evap_as_printed: '0.14'
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_ls8_evaporation_tendency_table2
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_ns2_evaporation_tendency_table2
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 4
+    published_page: 459
+    table: '2'
+    row: NS2
+  units: dimensionless
+  values:
+    quantity: evaporation_tendency_indices
+    method_class: model_derived
+    sample_id: NS2
+    composition_as_published: Na2O·2SiO2
+    Tm_K: 1148
+    Tm_method_class: quoted_attributed
+    Tm_attribution: Literature refs. 73–75 (phase diagrams)
+    revap_M2O_as_printed: '0.82'
+    revap_SiO2_as_printed: '0.58'
+    delta_evap_as_printed: '0.24'
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_ns2_evaporation_tendency_table2
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_ns2_viscosity_fit_table1
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 4
+    published_page: 459
+    table: '1'
+    row: NS2
+  units: as printed
+  values:
+    quantity: viscosity_fit_and_glass_stability_parameters
+    method_class: model_derived
+    sample_id: NS2
+    composition_as_published: Na2O·2SiO2
+    Kgl_as_printed: 0.81 ± .03
+    Kgl_definition: Kgl = (Tc − Tg) / (Tm − Tc); Hrubý glass-stability parameter
+    fragility_index_m_as_printed: 37.1 ± .9
+    log10_eta_infinity_Pa_s_as_printed: −1.8 ± .2
+    log10_eta_Tm_Pa_s_as_printed: '2.9'
+    log10_eta_Tm_text_as_printed: '2.94'
+    model: w-MYEGA
+    fit_method: Only log10 η∞ and m were varied; Tg was fixed to the DSC value; high-temperature viscosity data were taken
+      from refs. 61 and 63.
+    schema_gap: Printed logarithmic viscosity values and Kgl/m have no matching quantity token; retained as printed context.
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_ns2_viscosity_fit_table1
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: Na2Si2O5
+- observation_id: baborak_2023_ns4_evaporation_tendency_table2
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 4
+    published_page: 459
+    table: '2'
+    row: NS4
+  units: dimensionless
+  values:
+    quantity: evaporation_tendency_indices
+    method_class: model_derived
+    sample_id: NS4
+    composition_as_published: Na2O·4SiO2
+    Tm_K: 1738
+    Tm_method_class: quoted_attributed
+    Tm_attribution: Literature refs. 73–75 (phase diagrams)
+    revap_M2O_as_printed: '1.24'
+    revap_SiO2_as_printed: '0.88'
+    delta_evap_as_printed: '0.36'
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_ns4_evaporation_tendency_table2
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_ns8_evaporation_tendency_table2
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 4
+    published_page: 459
+    table: '2'
+    row: NS8
+  units: dimensionless
+  values:
+    quantity: evaporation_tendency_indices
+    method_class: model_derived
+    sample_id: NS8
+    composition_as_published: Na2O·8SiO2
+    Tm_K: 1808
+    Tm_method_class: quoted_attributed
+    Tm_attribution: Literature refs. 73–75 (phase diagrams)
+    revap_M2O_as_printed: '1.29'
+    revap_SiO2_as_printed: '0.91'
+    delta_evap_as_printed: '0.38'
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_ns8_evaporation_tendency_table2
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_ns8_ks8_alkali_loss_text
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 5
+    published_page: 460
+    section: Results
+  units: percent of initial alkali oxide content
+  values:
+    quantity: residue_component_composition
+    method_class: measured_direct
+    samples:
+    - NS8
+    - KS8
+    alkali_oxide_loss_percent_as_printed:
+      value: 80
+      bound: upper
+    measurement: LA-ICP-MS on one representative bead for each composition
+    statement_as_printed: SiO2-rich matrices such as NS8 and KS8 lost up to 80% of their initial alkali oxide content.
+    note: The individual measured compositions are plotted in Figure 6 and are deferred; this group bound is not a reconstructed
+      composition.
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_ns8_ks8_alkali_loss_text
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: Na2Si2O5
+- observation_id: baborak_2023_sample_nominal_and_analyzed_compositions
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 5
+    published_page: 460
+    figure: '6'
+    section: Results
+  units: mol% M2O as plotted; nominal formula ratio as printed
+  values:
+    quantity: nominal_and_analyzed_alkali_silicate_compositions
+    method_class: measured_direct
+    analysis_method: LA-ICP-MS, one representative bead for each of nine nominal compositions
+    samples:
+    - sample_id: LS2
+      nominal: Li2O·2SiO2
+      analyzed:
+        tag: unknown
+        reason: numeric_composition_points_in_figure_6_deferred_by_wave_7_ruling
+    - sample_id: LS4
+      nominal: Li2O·4SiO2
+      analyzed:
+        tag: unknown
+        reason: numeric_composition_points_in_figure_6_deferred_by_wave_7_ruling
+    - sample_id: LS8
+      nominal: Li2O·8SiO2
+      analyzed:
+        tag: unknown
+        reason: numeric_composition_points_in_figure_6_deferred_by_wave_7_ruling
+    - sample_id: NS2
+      nominal: Na2O·2SiO2
+      analyzed:
+        tag: unknown
+        reason: numeric_composition_points_in_figure_6_deferred_by_wave_7_ruling
+    - sample_id: NS4
+      nominal: Na2O·4SiO2
+      analyzed:
+        tag: unknown
+        reason: numeric_composition_points_in_figure_6_deferred_by_wave_7_ruling
+    - sample_id: NS8
+      nominal: Na2O·8SiO2
+      analyzed:
+        tag: unknown
+        reason: numeric_composition_points_in_figure_6_deferred_by_wave_7_ruling
+    - sample_id: KS2
+      nominal: K2O·2SiO2
+      analyzed:
+        tag: unknown
+        reason: numeric_composition_points_in_figure_6_deferred_by_wave_7_ruling
+    - sample_id: KS4
+      nominal: K2O·4SiO2
+      analyzed:
+        tag: unknown
+        reason: numeric_composition_points_in_figure_6_deferred_by_wave_7_ruling
+    - sample_id: KS8
+      nominal: K2O·8SiO2
+      analyzed:
+        tag: unknown
+        reason: numeric_composition_points_in_figure_6_deferred_by_wave_7_ruling
+    printed_basis: Nominal batch composition is the oxide formula-unit ratio; Figure 6 axes give nominal and LA-ICP-MS measured
+      M2O content in mol%.
+    schema_gap: Per-sample analytical mole fractions are plotted only and deferred under the wave-7 figure ruling.
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_sample_nominal_and_analyzed_compositions
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: K2Si2O5
+- observation_id: baborak_2023_table2_evaporation_index_definitions
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 4
+    published_page: 459
+    table: '2'
+  units: dimensionless
+  values:
+    quantity: evaporation_tendency_indices
+    method_class: method_only
+    definition_revap: revap = Tm,Σ / Tm, where Tm,Σ is the melting point of the target multicomponent glass and Tm is the
+      melting point of a given oxide component.
+    definition_delta_evap: Δevap = revap,max − revap,min, the difference between the highest and lowest revap among all components
+      of the target glass.
+    table2_melting_temperatures_attribution: Literature refs. 73–75 (phase diagrams), as cited in the Table 2 caption
+    schema_gap: revap and Δevap have no matching quantity token; values are retained verbatim as derived context, not scored
+      quantities.
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_table2_evaporation_index_definitions
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_text_evaporation_thresholds
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 8
+    published_page: 463
+    section: Discussion
+  units: dimensionless revap and Δevap
+  values:
+    quantity: evaporation_tendency_thresholds
+    method_class: model_derived
+    statements_as_printed:
+    - Non-negligible high-temperature evaporation should be expected for revap values significantly exceeding ~.8, although
+      this threshold may vary with composition, ADL setup, levitation gas, desired final bead size, and melting procedure.
+    - Δevap values above ~.2 signaled a high risk of compositional drift for the Na2O- and K2O-bearing samples synthesized
+      within this work.
+    approximate_values:
+      revap_threshold:
+        value: '0.8'
+        approximate: true
+      delta_evap_threshold:
+        value: '0.2'
+        approximate: true
+    schema_gap: revap and Δevap are not typed by existing quantity enums.
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_text_evaporation_thresholds
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: SiO2
+- observation_id: baborak_2023_text_mass_loss_na_k_upper_bound
+  type: thermodynamic_context
+  locator:
+    pdf_page_index: 5
+    published_page: 460
+    section: Results
+  units: percent of expected bead mass
+  values:
+    quantity: mass_loss_fraction
+    method_class: measured_direct
+    sample_group_as_printed: Na2O- and K2O-containing beads
+    mass_loss_wt_pct_as_printed:
+      value: 20
+      approximate: true
+      bound: upper
+    statement_as_printed: Na2O- and especially K2O-containing beads exhibited mass losses up to roughly 20%.
+    note: Composition-specific plotted data in Figure 5 are deferred; this prose bound is not assigned to individual samples.
+  context_id: baborak-2023-alkali-silicate-levitation-evaporation::context::baborak_2023_text_mass_loss_na_k_upper_bound
+  work_id: 10.1111/ijag.16627
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  species: Na2Si2O5

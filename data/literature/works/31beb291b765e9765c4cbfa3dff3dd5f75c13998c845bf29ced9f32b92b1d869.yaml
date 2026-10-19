@@ -1,0 +1,1156 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869
+  citation: Shornikov, S. I. (2016), Thermodynamic properties of the CaO–MgO–SiO2 melts, Experiment in Geosciences, vol. 22,
+    no. 1, pp. 40–42.
+  source_ids:
+  - shornikov-2016-cao-mgo-silicate
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:shornikov-2016-cao-mgo-silicate
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869::shornikov-2016-cao-mgo-silicate
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869
+  locator:
+    page: 2
+    published_page: 41
+    pdf_page_index: 1
+    table: '2'
+    note: row_label=CaO; column_header=Condensed phases  $\Delta_f G^{\circ}_{2000},$  kJ/mole
+context:
+- observation_id: shornikov_2016_fig2a_series1_mixing_energy
+  type: figure_mixing_energy
+  locator:
+    page: 3
+    pdf_page_index: 2
+    figure: '2'
+    panel: a
+    marker: black open square
+    note: Figure 2 panel a, the 2MgO·3SiO2–CaO join. Symbol 1 is black open square at 1873 K. Ordinate is the mixing energy,
+      kJ/mole, on a linear axis. Model curve. Numeric samples are not stored.
+  units: kJ/mole
+  values:
+    quantity_as_printed: ΔG^m, kJ/mole
+    method_class: figure_only
+    temperature_K_as_printed: '1873'
+    join_as_printed: 2MgO·3SiO2–CaO
+    attribution: 'Figure 2 caption: symbols 1-3 were obtained in the present study. The text compares these curves with Rein
+      and Chipman, 1965 and with Shornikov et al., 1997. The plotted mixing energy is not a formation energy.'
+    schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read is
+      context and is not stored as delta_fG. The model curve was not sampled, so this record has no numeric points.
+    points: []
+  context_id: shornikov-2016-cao-mgo-silicate::context::shornikov_2016_fig2a_series1_mixing_energy
+  work_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869
+  source_id: shornikov-2016-cao-mgo-silicate
+  species: CaO-MgO-SiO2
+- observation_id: shornikov_2016_fig2a_series2_mixing_energy
+  type: figure_mixing_energy
+  locator:
+    page: 3
+    pdf_page_index: 2
+    figure: '2'
+    panel: a
+    marker: red open circle
+    note: Figure 2 panel a, the 2MgO·3SiO2–CaO join. Symbol 2 is red open circle at 1973 K. Ordinate is the mixing energy,
+      kJ/mole, on a linear axis. Model curve. Numeric samples are not stored.
+  units: kJ/mole
+  values:
+    quantity_as_printed: ΔG^m, kJ/mole
+    method_class: figure_only
+    temperature_K_as_printed: '1973'
+    join_as_printed: 2MgO·3SiO2–CaO
+    attribution: 'Figure 2 caption: symbols 1-3 were obtained in the present study. The text compares these curves with Rein
+      and Chipman, 1965 and with Shornikov et al., 1997. The plotted mixing energy is not a formation energy.'
+    schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read is
+      context and is not stored as delta_fG. The model curve was not sampled, so this record has no numeric points.
+    points: []
+  context_id: shornikov-2016-cao-mgo-silicate::context::shornikov_2016_fig2a_series2_mixing_energy
+  work_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869
+  source_id: shornikov-2016-cao-mgo-silicate
+  species: CaO-MgO-SiO2
+- observation_id: shornikov_2016_fig2a_series3_mixing_energy
+  type: figure_mixing_energy
+  locator:
+    page: 3
+    pdf_page_index: 2
+    figure: '2'
+    panel: a
+    marker: blue open triangle
+    note: Figure 2 panel a, the 2MgO·3SiO2–CaO join. Symbol 3 is blue open triangle at 2073 K. Ordinate is the mixing energy,
+      kJ/mole, on a linear axis. Model curve. Numeric samples are not stored.
+  units: kJ/mole
+  values:
+    quantity_as_printed: ΔG^m, kJ/mole
+    method_class: figure_only
+    temperature_K_as_printed: '2073'
+    join_as_printed: 2MgO·3SiO2–CaO
+    attribution: 'Figure 2 caption: symbols 1-3 were obtained in the present study. The text compares these curves with Rein
+      and Chipman, 1965 and with Shornikov et al., 1997. The plotted mixing energy is not a formation energy.'
+    schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read is
+      context and is not stored as delta_fG. The model curve was not sampled, so this record has no numeric points.
+    points: []
+  context_id: shornikov-2016-cao-mgo-silicate::context::shornikov_2016_fig2a_series3_mixing_energy
+  work_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869
+  source_id: shornikov-2016-cao-mgo-silicate
+  species: CaO-MgO-SiO2
+- observation_id: shornikov_2016_fig2a_series4_mixing_energy
+  type: figure_mixing_energy
+  locator:
+    page: 3
+    pdf_page_index: 2
+    figure: '2'
+    panel: a
+    marker: black filled circle
+    note: Figure 2 panel a, the 2MgO·3SiO2–CaO join. Symbol 4 is black filled circle at 1873 K. Ordinate is the mixing energy,
+      kJ/mole, on a linear axis.
+  units: kJ/mole
+  values:
+    quantity_as_printed: ΔG^m, kJ/mole
+    method_class: figure_only
+    temperature_K_as_printed: '1873'
+    join_as_printed: 2MgO·3SiO2–CaO
+    attribution: 'Figure 2 caption: symbol 4 is Rein and Chipman, 1965, at 1873 K. This paper does not reprint their numbers.'
+    schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read is
+      context and is not stored as delta_fG.
+    points:
+    - delta_Gm_kJ_per_mole_read: '-31'
+      delta_Gm_kJ_per_mole_read_2: '-31'
+      read_disagreement_kJ_per_mole: '0.014'
+      read_uncertainty_kJ_per_mole: '0.007'
+      x_mole_pct_read: '17.02'
+      x_mole_pct_read_2: '16.98'
+      embedded_px_read_1:
+      - '299'
+      - '264'
+      embedded_px_read_2:
+      - '298.6'
+      - '264.15'
+      page_600dpi_px_read_1:
+      - '1204.7'
+      - '1260.1'
+      page_600dpi_px_read_2:
+      - '1203.5'
+      - '1260.5'
+      printed_composition_mole_pct: CaO = 17.02 mole % on the 2MgO·3SiO2–CaO join. The caption prints this axis only.
+      T_K: '1873'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: 'Figure 2 caption: 1873 K for symbols 1 and 4, 1973 K for symbol 2, 2073 K for symbol 3.'
+        composition:
+          state:
+            tag: unknown
+            reason: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are
+              not stored as a mole fraction.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are not
+              stored as a mole fraction.
+      schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read
+        is context and is not stored as delta_fG.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '2'
+        panel: a
+        marker: black filled circle
+        note: Figure 2 panel a, symbol 4 (black filled circle).
+    - delta_Gm_kJ_per_mole_read: '-33'
+      delta_Gm_kJ_per_mole_read_2: '-33'
+      read_disagreement_kJ_per_mole: '0.004'
+      read_uncertainty_kJ_per_mole: '0.002'
+      x_mole_pct_read: '19.94'
+      x_mole_pct_read_2: '19.99'
+      embedded_px_read_1:
+      - '332'
+      - '286'
+      embedded_px_read_2:
+      - '332.58'
+      - '285.96'
+      page_600dpi_px_read_1:
+      - '1303.8'
+      - '1326.1'
+      page_600dpi_px_read_2:
+      - '1305.5'
+      - '1326'
+      printed_composition_mole_pct: CaO = 19.94 mole % on the 2MgO·3SiO2–CaO join. The caption prints this axis only.
+      T_K: '1873'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: 'Figure 2 caption: 1873 K for symbols 1 and 4, 1973 K for symbol 2, 2073 K for symbol 3.'
+        composition:
+          state:
+            tag: unknown
+            reason: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are
+              not stored as a mole fraction.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are not
+              stored as a mole fraction.
+      schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read
+        is context and is not stored as delta_fG.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '2'
+        panel: a
+        marker: black filled circle
+        note: Figure 2 panel a, symbol 4 (black filled circle).
+    - delta_Gm_kJ_per_mole_read: '-35'
+      delta_Gm_kJ_per_mole_read_2: '-35'
+      read_disagreement_kJ_per_mole: '0.021'
+      read_uncertainty_kJ_per_mole: '0.011'
+      x_mole_pct_read: '22.95'
+      x_mole_pct_read_2: '22.98'
+      embedded_px_read_1:
+      - '366'
+      - '306'
+      embedded_px_read_2:
+      - '366.39'
+      - '305.77'
+      page_600dpi_px_read_1:
+      - '1405.8'
+      - '1386.2'
+      page_600dpi_px_read_2:
+      - '1407'
+      - '1385.5'
+      printed_composition_mole_pct: CaO = 22.95 mole % on the 2MgO·3SiO2–CaO join. The caption prints this axis only.
+      T_K: '1873'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: 'Figure 2 caption: 1873 K for symbols 1 and 4, 1973 K for symbol 2, 2073 K for symbol 3.'
+        composition:
+          state:
+            tag: unknown
+            reason: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are
+              not stored as a mole fraction.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are not
+              stored as a mole fraction.
+      schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read
+        is context and is not stored as delta_fG.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '2'
+        panel: a
+        marker: black filled circle
+        note: Figure 2 panel a, symbol 4 (black filled circle).
+    - delta_Gm_kJ_per_mole_read: '-37'
+      delta_Gm_kJ_per_mole_read_2: '-37'
+      read_disagreement_kJ_per_mole: '0.008'
+      read_uncertainty_kJ_per_mole: '0.004'
+      x_mole_pct_read: '25.96'
+      x_mole_pct_read_2: '26.01'
+      embedded_px_read_1:
+      - '400'
+      - '324'
+      embedded_px_read_2:
+      - '400.54'
+      - '323.91'
+      page_600dpi_px_read_1:
+      - '1507.9'
+      - '1440.3'
+      page_600dpi_px_read_2:
+      - '1509.5'
+      - '1440'
+      printed_composition_mole_pct: CaO = 25.96 mole % on the 2MgO·3SiO2–CaO join. The caption prints this axis only.
+      T_K: '1873'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: 'Figure 2 caption: 1873 K for symbols 1 and 4, 1973 K for symbol 2, 2073 K for symbol 3.'
+        composition:
+          state:
+            tag: unknown
+            reason: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are
+              not stored as a mole fraction.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are not
+              stored as a mole fraction.
+      schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read
+        is context and is not stored as delta_fG.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '2'
+        panel: a
+        marker: black filled circle
+        note: Figure 2 panel a, symbol 4 (black filled circle).
+    - delta_Gm_kJ_per_mole_read: '-38'
+      delta_Gm_kJ_per_mole_read_2: '-38'
+      read_disagreement_kJ_per_mole: '0.035'
+      read_uncertainty_kJ_per_mole: '0.018'
+      x_mole_pct_read: '28.97'
+      x_mole_pct_read_2: '29.00'
+      embedded_px_read_1:
+      - '434'
+      - '339'
+      embedded_px_read_2:
+      - '434.35'
+      - '339.39'
+      page_600dpi_px_read_1:
+      - '1610'
+      - '1485.3'
+      page_600dpi_px_read_2:
+      - '1611'
+      - '1486.5'
+      printed_composition_mole_pct: CaO = 28.97 mole % on the 2MgO·3SiO2–CaO join. The caption prints this axis only.
+      T_K: '1873'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: 'Figure 2 caption: 1873 K for symbols 1 and 4, 1973 K for symbol 2, 2073 K for symbol 3.'
+        composition:
+          state:
+            tag: unknown
+            reason: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are
+              not stored as a mole fraction.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are not
+              stored as a mole fraction.
+      schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read
+        is context and is not stored as delta_fG.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '2'
+        panel: a
+        marker: black filled circle
+        note: Figure 2 panel a, symbol 4 (black filled circle).
+    - delta_Gm_kJ_per_mole_read: '-39'
+      delta_Gm_kJ_per_mole_read_2: '-39'
+      read_disagreement_kJ_per_mole: '0.019'
+      read_uncertainty_kJ_per_mole: '0.009'
+      x_mole_pct_read: '31.98'
+      x_mole_pct_read_2: '32.01'
+      embedded_px_read_1:
+      - '468'
+      - '351'
+      embedded_px_read_2:
+      - '468.32'
+      - '351.21'
+      page_600dpi_px_read_1:
+      - '1712'
+      - '1521.4'
+      page_600dpi_px_read_2:
+      - '1713'
+      - '1522'
+      printed_composition_mole_pct: CaO = 31.98 mole % on the 2MgO·3SiO2–CaO join. The caption prints this axis only.
+      T_K: '1873'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: 'Figure 2 caption: 1873 K for symbols 1 and 4, 1973 K for symbol 2, 2073 K for symbol 3.'
+        composition:
+          state:
+            tag: unknown
+            reason: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are
+              not stored as a mole fraction.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are not
+              stored as a mole fraction.
+      schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read
+        is context and is not stored as delta_fG.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '2'
+        panel: a
+        marker: black filled circle
+        note: Figure 2 panel a, symbol 4 (black filled circle).
+    - delta_Gm_kJ_per_mole_read: '-40'
+      delta_Gm_kJ_per_mole_read_2: '-40'
+      read_disagreement_kJ_per_mole: '0.078'
+      read_uncertainty_kJ_per_mole: '0.039'
+      x_mole_pct_read: '34.99'
+      x_mole_pct_read_2: '35.02'
+      embedded_px_read_1:
+      - '502'
+      - '358'
+      embedded_px_read_2:
+      - '502.3'
+      - '358.87'
+      page_600dpi_px_read_1:
+      - '1814.1'
+      - '1542.4'
+      page_600dpi_px_read_2:
+      - '1815'
+      - '1545'
+      printed_composition_mole_pct: CaO = 34.99 mole % on the 2MgO·3SiO2–CaO join. The caption prints this axis only.
+      T_K: '1873'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: 'Figure 2 caption: 1873 K for symbols 1 and 4, 1973 K for symbol 2, 2073 K for symbol 3.'
+        composition:
+          state:
+            tag: unknown
+            reason: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are
+              not stored as a mole fraction.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are not
+              stored as a mole fraction.
+      schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read
+        is context and is not stored as delta_fG.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '2'
+        panel: a
+        marker: black filled circle
+        note: Figure 2 panel a, symbol 4 (black filled circle).
+    - delta_Gm_kJ_per_mole_read: '-40'
+      delta_Gm_kJ_per_mole_read_2: '-40'
+      read_disagreement_kJ_per_mole: '0.078'
+      read_uncertainty_kJ_per_mole: '0.039'
+      x_mole_pct_read: '38.00'
+      x_mole_pct_read_2: '37.82'
+      embedded_px_read_1:
+      - '536'
+      - '363'
+      embedded_px_read_2:
+      - '533.95'
+      - '363.86'
+      page_600dpi_px_read_1:
+      - '1916.2'
+      - '1557.4'
+      page_600dpi_px_read_2:
+      - '1910'
+      - '1560'
+      printed_composition_mole_pct: CaO = 38.00 mole % on the 2MgO·3SiO2–CaO join. The caption prints this axis only.
+      T_K: '1873'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: 'Figure 2 caption: 1873 K for symbols 1 and 4, 1973 K for symbol 2, 2073 K for symbol 3.'
+        composition:
+          state:
+            tag: unknown
+            reason: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are
+              not stored as a mole fraction.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are not
+              stored as a mole fraction.
+      schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read
+        is context and is not stored as delta_fG.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '2'
+        panel: a
+        marker: black filled circle
+        note: Figure 2 panel a, symbol 4 (black filled circle).
+    - delta_Gm_kJ_per_mole_read: '-40'
+      delta_Gm_kJ_per_mole_read_2: '-40'
+      read_disagreement_kJ_per_mole: '0.108'
+      read_uncertainty_kJ_per_mole: '0.054'
+      x_mole_pct_read: '41.01'
+      x_mole_pct_read_2: '40.92'
+      embedded_px_read_1:
+      - '570'
+      - '361'
+      embedded_px_read_2:
+      - '568.92'
+      - '362.2'
+      page_600dpi_px_read_1:
+      - '2018.2'
+      - '1551.4'
+      page_600dpi_px_read_2:
+      - '2015'
+      - '1555'
+      printed_composition_mole_pct: CaO = 41.01 mole % on the 2MgO·3SiO2–CaO join. The caption prints this axis only.
+      T_K: '1873'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: 'Figure 2 caption: 1873 K for symbols 1 and 4, 1973 K for symbol 2, 2073 K for symbol 3.'
+        composition:
+          state:
+            tag: unknown
+            reason: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are
+              not stored as a mole fraction.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are not
+              stored as a mole fraction.
+      schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read
+        is context and is not stored as delta_fG.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '2'
+        panel: a
+        marker: black filled circle
+        note: Figure 2 panel a, symbol 4 (black filled circle).
+  context_id: shornikov-2016-cao-mgo-silicate::context::shornikov_2016_fig2a_series4_mixing_energy
+  work_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869
+  source_id: shornikov-2016-cao-mgo-silicate
+  species: CaO-MgO-SiO2
+- observation_id: shornikov_2016_fig2b_series1_mixing_energy
+  type: figure_mixing_energy
+  locator:
+    page: 3
+    pdf_page_index: 2
+    figure: '2'
+    panel: b
+    marker: black open square
+    note: Figure 2 panel b, the CaO·MgO–SiO2 join. Symbol 1 is black open square at 1873 K. Ordinate is the mixing energy,
+      kJ/mole, on a linear axis. Model curve. Numeric samples are not stored.
+  units: kJ/mole
+  values:
+    quantity_as_printed: ΔG^m, kJ/mole
+    method_class: figure_only
+    temperature_K_as_printed: '1873'
+    join_as_printed: CaO·MgO–SiO2
+    attribution: 'Figure 2 caption: symbols 1-3 were obtained in the present study. The text compares these curves with Rein
+      and Chipman, 1965 and with Shornikov et al., 1997. The plotted mixing energy is not a formation energy.'
+    schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read is
+      context and is not stored as delta_fG. The model curve was not sampled, so this record has no numeric points.
+    points: []
+  context_id: shornikov-2016-cao-mgo-silicate::context::shornikov_2016_fig2b_series1_mixing_energy
+  work_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869
+  source_id: shornikov-2016-cao-mgo-silicate
+  species: CaO-MgO-SiO2
+- observation_id: shornikov_2016_fig2b_series2_mixing_energy
+  type: figure_mixing_energy
+  locator:
+    page: 3
+    pdf_page_index: 2
+    figure: '2'
+    panel: b
+    marker: red open circle
+    note: Figure 2 panel b, the CaO·MgO–SiO2 join. Symbol 2 is red open circle at 1973 K. Ordinate is the mixing energy, kJ/mole,
+      on a linear axis. Model curve. Numeric samples are not stored.
+  units: kJ/mole
+  values:
+    quantity_as_printed: ΔG^m, kJ/mole
+    method_class: figure_only
+    temperature_K_as_printed: '1973'
+    join_as_printed: CaO·MgO–SiO2
+    attribution: 'Figure 2 caption: symbols 1-3 were obtained in the present study. The text compares these curves with Rein
+      and Chipman, 1965 and with Shornikov et al., 1997. The plotted mixing energy is not a formation energy.'
+    schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read is
+      context and is not stored as delta_fG. The model curve was not sampled, so this record has no numeric points.
+    points: []
+  context_id: shornikov-2016-cao-mgo-silicate::context::shornikov_2016_fig2b_series2_mixing_energy
+  work_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869
+  source_id: shornikov-2016-cao-mgo-silicate
+  species: CaO-MgO-SiO2
+- observation_id: shornikov_2016_fig2b_series3_mixing_energy
+  type: figure_mixing_energy
+  locator:
+    page: 3
+    pdf_page_index: 2
+    figure: '2'
+    panel: b
+    marker: blue open triangle
+    note: Figure 2 panel b, the CaO·MgO–SiO2 join. Symbol 3 is blue open triangle at 2073 K. Ordinate is the mixing energy,
+      kJ/mole, on a linear axis. Model curve. Numeric samples are not stored.
+  units: kJ/mole
+  values:
+    quantity_as_printed: ΔG^m, kJ/mole
+    method_class: figure_only
+    temperature_K_as_printed: '2073'
+    join_as_printed: CaO·MgO–SiO2
+    attribution: 'Figure 2 caption: symbols 1-3 were obtained in the present study. The text compares these curves with Rein
+      and Chipman, 1965 and with Shornikov et al., 1997. The plotted mixing energy is not a formation energy.'
+    schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read is
+      context and is not stored as delta_fG. The model curve was not sampled, so this record has no numeric points.
+    points: []
+  context_id: shornikov-2016-cao-mgo-silicate::context::shornikov_2016_fig2b_series3_mixing_energy
+  work_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869
+  source_id: shornikov-2016-cao-mgo-silicate
+  species: CaO-MgO-SiO2
+- observation_id: shornikov_2016_fig2b_series4_mixing_energy
+  type: figure_mixing_energy
+  locator:
+    page: 3
+    pdf_page_index: 2
+    figure: '2'
+    panel: b
+    marker: black filled circle
+    note: Figure 2 panel b, the CaO·MgO–SiO2 join. Symbol 4 is black filled circle at 1873 K. Ordinate is the mixing energy,
+      kJ/mole, on a linear axis.
+  units: kJ/mole
+  values:
+    quantity_as_printed: ΔG^m, kJ/mole
+    method_class: figure_only
+    temperature_K_as_printed: '1873'
+    join_as_printed: CaO·MgO–SiO2
+    attribution: 'Figure 2 caption: symbol 4 is Rein and Chipman, 1965, at 1873 K. This paper does not reprint their numbers.'
+    schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read is
+      context and is not stored as delta_fG.
+    points:
+    - delta_Gm_kJ_per_mole_read: '-37'
+      delta_Gm_kJ_per_mole_read_2: '-37'
+      read_disagreement_kJ_per_mole: '0.005'
+      read_uncertainty_kJ_per_mole: '0.002'
+      x_mole_pct_read: '33.96'
+      x_mole_pct_read_2: '33.96'
+      embedded_px_read_1:
+      - '862'
+      - '204'
+      embedded_px_read_2:
+      - '862.06'
+      - '203.89'
+      page_600dpi_px_read_1:
+      - '2894.8'
+      - '1079.8'
+      page_600dpi_px_read_2:
+      - '2895'
+      - '1079.5'
+      printed_composition_mole_pct: SiO2 = 33.96 mole % on the CaO·MgO–SiO2 join. The caption prints this axis only.
+      T_K: '1873'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: 'Figure 2 caption: 1873 K for symbols 1 and 4, 1973 K for symbol 2, 2073 K for symbol 3.'
+        composition:
+          state:
+            tag: unknown
+            reason: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are
+              not stored as a mole fraction.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are not
+              stored as a mole fraction.
+      schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read
+        is context and is not stored as delta_fG.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '2'
+        panel: b
+        marker: black filled circle
+        note: Figure 2 panel b, symbol 4 (black filled circle).
+    - delta_Gm_kJ_per_mole_read: '-39'
+      delta_Gm_kJ_per_mole_read_2: '-39'
+      read_disagreement_kJ_per_mole: '0.008'
+      read_uncertainty_kJ_per_mole: '0.004'
+      x_mole_pct_read: '36.98'
+      x_mole_pct_read_2: '36.97'
+      embedded_px_read_1:
+      - '911'
+      - '229'
+      embedded_px_read_2:
+      - '910.86'
+      - '229.19'
+      page_600dpi_px_read_1:
+      - '3041.9'
+      - '1154.9'
+      page_600dpi_px_read_2:
+      - '3041.5'
+      - '1155.5'
+      printed_composition_mole_pct: SiO2 = 36.98 mole % on the CaO·MgO–SiO2 join. The caption prints this axis only.
+      T_K: '1873'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: 'Figure 2 caption: 1873 K for symbols 1 and 4, 1973 K for symbol 2, 2073 K for symbol 3.'
+        composition:
+          state:
+            tag: unknown
+            reason: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are
+              not stored as a mole fraction.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are not
+              stored as a mole fraction.
+      schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read
+        is context and is not stored as delta_fG.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '2'
+        panel: b
+        marker: black filled circle
+        note: Figure 2 panel b, symbol 4 (black filled circle).
+    - delta_Gm_kJ_per_mole_read: '-39'
+      delta_Gm_kJ_per_mole_read_2: '-39'
+      read_disagreement_kJ_per_mole: '0.020'
+      read_uncertainty_kJ_per_mole: '0.010'
+      x_mole_pct_read: '39.94'
+      x_mole_pct_read_2: '39.94'
+      embedded_px_read_1:
+      - '959'
+      - '232'
+      embedded_px_read_2:
+      - '958.99'
+      - '231.52'
+      page_600dpi_px_read_1:
+      - '3186'
+      - '1163.9'
+      page_600dpi_px_read_2:
+      - '3186'
+      - '1162.5'
+      printed_composition_mole_pct: SiO2 = 39.94 mole % on the CaO·MgO–SiO2 join. The caption prints this axis only.
+      T_K: '1873'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: 'Figure 2 caption: 1873 K for symbols 1 and 4, 1973 K for symbol 2, 2073 K for symbol 3.'
+        composition:
+          state:
+            tag: unknown
+            reason: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are
+              not stored as a mole fraction.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are not
+              stored as a mole fraction.
+      schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read
+        is context and is not stored as delta_fG.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '2'
+        panel: b
+        marker: black filled circle
+        note: Figure 2 panel b, symbol 4 (black filled circle).
+    - delta_Gm_kJ_per_mole_read: '-38'
+      delta_Gm_kJ_per_mole_read_2: '-38'
+      read_disagreement_kJ_per_mole: '0.002'
+      read_uncertainty_kJ_per_mole: '0.001'
+      x_mole_pct_read: '42.97'
+      x_mole_pct_read_2: '42.95'
+      embedded_px_read_1:
+      - '1008'
+      - '218'
+      embedded_px_read_2:
+      - '1007.79'
+      - '218.04'
+      page_600dpi_px_read_1:
+      - '3333.1'
+      - '1121.9'
+      page_600dpi_px_read_2:
+      - '3332.5'
+      - '1122'
+      printed_composition_mole_pct: SiO2 = 42.97 mole % on the CaO·MgO–SiO2 join. The caption prints this axis only.
+      T_K: '1873'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: 'Figure 2 caption: 1873 K for symbols 1 and 4, 1973 K for symbol 2, 2073 K for symbol 3.'
+        composition:
+          state:
+            tag: unknown
+            reason: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are
+              not stored as a mole fraction.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are not
+              stored as a mole fraction.
+      schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read
+        is context and is not stored as delta_fG.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '2'
+        panel: b
+        marker: black filled circle
+        note: Figure 2 panel b, symbol 4 (black filled circle).
+    - delta_Gm_kJ_per_mole_read: '-37'
+      delta_Gm_kJ_per_mole_read_2: '-37'
+      read_disagreement_kJ_per_mole: '0.003'
+      read_uncertainty_kJ_per_mole: '0.002'
+      x_mole_pct_read: '45.93'
+      x_mole_pct_read_2: '45.93'
+      embedded_px_read_1:
+      - '1056'
+      - '192'
+      embedded_px_read_2:
+      - '1056.09'
+      - '192.07'
+      page_600dpi_px_read_1:
+      - '3477.2'
+      - '1043.8'
+      page_600dpi_px_read_2:
+      - '3477.5'
+      - '1044'
+      printed_composition_mole_pct: SiO2 = 45.93 mole % on the CaO·MgO–SiO2 join. The caption prints this axis only.
+      T_K: '1873'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: 'Figure 2 caption: 1873 K for symbols 1 and 4, 1973 K for symbol 2, 2073 K for symbol 3.'
+        composition:
+          state:
+            tag: unknown
+            reason: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are
+              not stored as a mole fraction.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are not
+              stored as a mole fraction.
+      schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read
+        is context and is not stored as delta_fG.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '2'
+        panel: b
+        marker: black filled circle
+        note: Figure 2 panel b, symbol 4 (black filled circle).
+    - delta_Gm_kJ_per_mole_read: '-35'
+      delta_Gm_kJ_per_mole_read_2: '-35'
+      read_disagreement_kJ_per_mole: '0.002'
+      read_uncertainty_kJ_per_mole: '0.001'
+      x_mole_pct_read: '48.95'
+      x_mole_pct_read_2: '48.92'
+      embedded_px_read_1:
+      - '1105'
+      - '157'
+      embedded_px_read_2:
+      - '1104.56'
+      - '156.95'
+      page_600dpi_px_read_1:
+      - '3624.3'
+      - '938.7'
+      page_600dpi_px_read_2:
+      - '3623'
+      - '938.5'
+      printed_composition_mole_pct: SiO2 = 48.95 mole % on the CaO·MgO–SiO2 join. The caption prints this axis only.
+      T_K: '1873'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: 'Figure 2 caption: 1873 K for symbols 1 and 4, 1973 K for symbol 2, 2073 K for symbol 3.'
+        composition:
+          state:
+            tag: unknown
+            reason: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are
+              not stored as a mole fraction.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are not
+              stored as a mole fraction.
+      schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read
+        is context and is not stored as delta_fG.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '2'
+        panel: b
+        marker: black filled circle
+        note: Figure 2 panel b, symbol 4 (black filled circle).
+    - delta_Gm_kJ_per_mole_read: '-34'
+      delta_Gm_kJ_per_mole_read_2: '-34'
+      read_disagreement_kJ_per_mole: '0.000'
+      x_mole_pct_read: '51.91'
+      x_mole_pct_read_2: '51.91'
+      embedded_px_read_1:
+      - '1153'
+      - '116'
+      embedded_px_read_2:
+      - '1153.03'
+      - '116'
+      page_600dpi_px_read_1:
+      - '3768.4'
+      - '815.5'
+      page_600dpi_px_read_2:
+      - '3768.5'
+      - '815.5'
+      printed_composition_mole_pct: SiO2 = 51.91 mole % on the CaO·MgO–SiO2 join. The caption prints this axis only.
+      T_K: '1873'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: 'Figure 2 caption: 1873 K for symbols 1 and 4, 1973 K for symbol 2, 2073 K for symbol 3.'
+        composition:
+          state:
+            tag: unknown
+            reason: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are
+              not stored as a mole fraction.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are not
+              stored as a mole fraction.
+      schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read
+        is context and is not stored as delta_fG.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '2'
+        panel: b
+        marker: black filled circle
+        note: Figure 2 panel b, symbol 4 (black filled circle).
+    - delta_Gm_kJ_per_mole_read: '-32'
+      delta_Gm_kJ_per_mole_read_2: '-32'
+      read_disagreement_kJ_per_mole: '0.002'
+      read_uncertainty_kJ_per_mole: '0.001'
+      x_mole_pct_read: '54.87'
+      x_mole_pct_read_2: '54.90'
+      embedded_px_read_1:
+      - '1201'
+      - '69'
+      embedded_px_read_2:
+      - '1201.5'
+      - '69.05'
+      page_600dpi_px_read_1:
+      - '3912.5'
+      - '674.3'
+      page_600dpi_px_read_2:
+      - '3914'
+      - '674.5'
+      printed_composition_mole_pct: SiO2 = 54.87 mole % on the CaO·MgO–SiO2 join. The caption prints this axis only.
+      T_K: '1873'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1873'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: 'Figure 2 caption: 1873 K for symbols 1 and 4, 1973 K for symbol 2, 2073 K for symbol 3.'
+        composition:
+          state:
+            tag: unknown
+            reason: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are
+              not stored as a mole fraction.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            figure: '2'
+            note: Printed composition is mole percent. AmountBasis has no mole-percent token, so these mole percents are not
+              stored as a mole fraction.
+      schema_gap: The ordinate is the mixing energy delta G^m in kJ/mole. Quantity has no mixing-energy token, so the read
+        is context and is not stored as delta_fG.
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '2'
+        panel: b
+        marker: black filled circle
+        note: Figure 2 panel b, symbol 4 (black filled circle).
+  context_id: shornikov-2016-cao-mgo-silicate::context::shornikov_2016_fig2b_series4_mixing_energy
+  work_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869
+  source_id: shornikov-2016-cao-mgo-silicate
+  species: CaO-MgO-SiO2
+- observation_id: shornikov_2016_prose_4kJ_per_mole
+  type: prose_mixing_energy_comparison
+  locator:
+    page: 2
+    pdf_page_index: 1
+    note: Right column, the sentence comparing the calculated mixing energy with Shornikov et al., 1997. PDF page 2, published
+      page 41.
+  units: kJ/mole
+  values:
+    quantity_as_printed: mixing energy difference
+    value_as_printed: 4 kJ/mole approximately
+    method_class: quoted_attributed
+    schema_gap: The sentence gives an approximate difference of mixing energies. Quantity has no mixing-energy token, so the
+      printed 4 kJ/mole is context and is not stored as delta_fG.
+    attribution: 'Printed sentence: the values differ from data obtained by the Knudsen mass-spectrometric effusion method
+      [Shornikov et al., 1997] by on 4 kJ/mole approximately.'
+  context_id: shornikov-2016-cao-mgo-silicate::context::shornikov_2016_prose_4kJ_per_mole
+  work_id: 31beb291b765e9765c4cbfa3dff3dd5f75c13998c845bf29ced9f32b92b1d869
+  source_id: shornikov-2016-cao-mgo-silicate
+  species: CaO-MgO-SiO2

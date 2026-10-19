@@ -1,0 +1,1924 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  citation: Jimmy Gran and Du Sichen (2012), "Experimental study on the liquidus of ladle slags", Ninth International Conference
+    on Molten Slags, Fluxes and Salts (MOLTEN12), paper W170.
+  source_ids:
+  - gran-sichen-2012-molten12-ladle-slag-liquidus
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:gran-sichen-2012-molten12-ladle-slag-liquidus
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def::gran-sichen-2012-molten12-ladle-slag-liquidus
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  locator:
+    pdf_page_index: 3
+    table: '1'
+    note: row=6
+context:
+- type: method
+  observation_id: gran_2012_experimental_method
+  locator:
+    pdf_page_index: 1
+  units: as printed
+  values:
+    statement_as_printed: About 0.5 g oxide charges were equilibrated for 36 hours, quenched in cold water, and analyzed by
+      EPMA at 15 kV, 50 nA, and a 1 um probe with ZAF correction.
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_experimental_method
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: SiO2
+- type: figure_record
+  observation_id: gran_2012_fig1_figure_only
+  locator:
+    pdf_page_index: 2
+    figure: '1'
+  units: as printed
+  species: SiO2
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  phase: experimental apparatus
+  panel: single apparatus schematic
+  axes_as_printed: none
+  series: []
+  attribution: present work
+  temperature_as_printed: not stated
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Figure 1. The experimental setup used in the phase diagram study, 1. gas outlet; 2. Silicone rubber stopper;
+      3. alumina reaction tube; 4. Furnace shell; 5. Pt-wire holding the crucibles; 6. Pt-crucibles containing the samples;
+      7. B-type thermocouple; 8. Gas inlet.
+  digitisation: deferred to a figure pass
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_fig1_figure_only
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+- type: figure_record
+  observation_id: gran_2012_fig2_figure_only
+  locator:
+    pdf_page_index: 2
+    figure: '2'
+  units: as printed
+  species: SiO2
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  phase: liquid + MgO + CaO
+  panel: single SEM microphotograph
+  axes_as_printed: none
+  series: []
+  attribution: present work
+  temperature_K: 1873
+  temperature_basis: sample 46 value from Table 1
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: figure_only
+    admission_status: figure_only
+    caption: 'Figure 2. SEM microphotograph showing the coexistence of liquid, MgO and CaO (sample 46). Dark phase: MgO, Light
+      grey phase: CaO, Grey matrix: super cooled liquid.'
+  digitisation: deferred to a figure pass
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_fig2_figure_only
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+- type: figure_record
+  observation_id: gran_2012_fig3_figure_only
+  locator:
+    pdf_page_index: 4
+    figure: '3'
+  units: as printed
+  species: SiO2
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  phase: liquidus in the 25 mass% Al2O3 section
+  panel: single ternary projection
+  axes_as_printed: 'x: Mass % MgO; left: Mass % CaO; right: Mass % SiO2'
+  series:
+  - name: CaO 1873 K
+    marker_count: 6
+    attribution: present work
+  - name: MgO+CaO 1873 K
+    marker_count: 2
+    attribution: present work
+  - name: MgO 1873 K
+    marker_count: 6
+    attribution: present work
+  - name: 2CaO.SiO2 1873 K
+    marker_count: 2
+    attribution: present work
+  - name: experimental liquidus lines 1873 K
+    marker_count: 0
+    attribution: present work
+  attribution: present work
+  temperature_K: 1873
+  values:
+    quantity: liquidus_composition
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Figure 3. Graphical presentation of the experimental results projected on the section of 25 mass% Al2O3 in the
+      quaternary Al2O3-CaO-MgO-SiO2 system.
+  digitisation: deferred to a figure pass
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_fig3_figure_only
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+- type: figure_record
+  observation_id: gran_2012_fig4_figure_only
+  locator:
+    pdf_page_index: 4
+    figure: '4'
+  units: as printed
+  species: SiO2
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  phase: liquidus in the 30 mass% Al2O3 section
+  panel: single ternary projection
+  axes_as_printed: 'x: Mass % MgO; left: Mass % CaO; right: Mass % SiO2'
+  series:
+  - name: 2CaO.SiO2 1773 K
+    marker_count: 6
+    attribution: present work
+  - name: 3CaO.SiO2 1773 K
+    marker_count: 0
+    attribution: present work
+  - name: CaO 1773 K
+    marker_count: 5
+    attribution: present work
+  - name: MgO 1773 K
+    marker_count: 9
+    attribution: present work
+  - name: CaO+MgO 1773 K
+    marker_count: 1
+    attribution: present work
+  - name: MgO+spinel 1773 K
+    marker_count: 1
+    attribution: present work
+  - name: CaO 1873 K
+    marker_count: 7
+    attribution: present work
+  - name: MgO 1873 K
+    marker_count: 8
+    attribution: present work
+  - name: liquidus lines 1773 K
+    marker_count: 0
+    attribution: present work
+  - name: liquidus lines 1873 K
+    marker_count: 0
+    attribution: present work
+  attribution: present work
+  temperature_K:
+  - 1773
+  - 1873
+  values:
+    quantity: liquidus_composition
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Figure 4. Graphical presentation of the experimental results projected on the section of 30 mass% Al2O3 in the
+      quaternary Al2O3-CaO-MgO-SiO2 system.
+  digitisation: deferred to a figure pass
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_fig4_figure_only
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+- type: figure_record
+  observation_id: gran_2012_fig5_figure_only
+  locator:
+    pdf_page_index: 5
+    figure: '5'
+  units: as printed
+  species: SiO2
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  phase: liquidus in the 35 mass% Al2O3 section
+  panel: single ternary projection
+  axes_as_printed: 'x: Mass % MgO; left: Mass % CaO; right: Mass % SiO2'
+  series:
+  - name: CaO 1773 K
+    marker_count: 4
+    attribution: present work
+  - name: CaO 1873 K
+    marker_count: 2
+    attribution: present work
+  - name: MgO+CaO 1873 K
+    marker_count: 1
+    attribution: present work
+  - name: MgO 1773 K
+    marker_count: 6
+    attribution: present work
+  - name: MgO 1873 K
+    marker_count: 5
+    attribution: present work
+  - name: MgO+spinel 1873 K
+    marker_count: 1
+    attribution: present work
+  - name: spinel 1873 K
+    marker_count: 1
+    attribution: present work
+  - name: liquidus lines 1773 K
+    marker_count: 0
+    attribution: present work
+  - name: liquidus lines 1873 K
+    marker_count: 0
+    attribution: present work
+  attribution: present work
+  temperature_K:
+  - 1773
+  - 1873
+  values:
+    quantity: liquidus_composition
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Figure 5. Graphical presentation of the experimental results projected on the section of 35 mass% Al2O3 in the
+      quaternary Al2O3-CaO-MgO-SiO2 system.
+  digitisation: deferred to a figure pass
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_fig5_figure_only
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+- type: figure_record
+  observation_id: gran_2012_fig6_figure_only
+  locator:
+    pdf_page_index: 6
+    figure: '6'
+  units: as printed
+  species: SiO2
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  phase: liquidus in the 25 mass% Al2O3 section
+  panel: single ternary comparison projection
+  axes_as_printed: 'x: Mass % MgO; left: Mass % CaO; right: Mass % SiO2'
+  series:
+  - name: CaO 1873 K
+    marker_count: 6
+    attribution: present work
+  - name: MgO+CaO 1873 K
+    marker_count: 2
+    attribution: present work
+  - name: MgO 1873 K
+    marker_count: 6
+    attribution: present work
+  - name: 2CaO.SiO2 1873 K
+    marker_count: 2
+    attribution: present work
+  - name: Osborn et al. [2] liquidus isotherms 1500–2400 K
+    marker_count: 0
+    attribution: Osborn et al. [2]
+  attribution: present work and Osborn et al. [2]
+  temperature_K: 1873
+  reference_isotherms_K:
+  - 1500
+  - 1600
+  - 1700
+  - 1800
+  - 1900
+  - 2000
+  - 2100
+  - 2200
+  - 2300
+  - 2400
+  values:
+    quantity: liquidus_composition
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Figure 6. A comparison between the present experimental results with the phase diagram suggested by Osborn et
+      al. [2] for 25 mass% Al2O3.
+  digitisation: deferred to a figure pass
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_fig6_figure_only
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+- type: figure_record
+  observation_id: gran_2012_fig7_figure_only
+  locator:
+    pdf_page_index: 6
+    figure: '7'
+  units: as printed
+  species: SiO2
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  phase: liquidus in the 30 mass% Al2O3 section
+  panel: single ternary comparison projection
+  axes_as_printed: 'x: Weight % MgO; left: Weight % CaO; right: Weight % SiO2'
+  series:
+  - name: 2CaO.SiO2 1773 K
+    marker_count: 6
+    attribution: present work
+  - name: 3CaO.SiO2 1773 K
+    marker_count: 0
+    attribution: present work
+  - name: CaO 1773 K
+    marker_count: 5
+    attribution: present work
+  - name: MgO 1773 K
+    marker_count: 9
+    attribution: present work
+  - name: CaO+MgO 1773 K
+    marker_count: 1
+    attribution: present work
+  - name: MgO+spinel 1773 K
+    marker_count: 1
+    attribution: present work
+  - name: CaO 1873 K
+    marker_count: 7
+    attribution: present work
+  - name: MgO 1873 K
+    marker_count: 8
+    attribution: present work
+  - name: Osborn et al. [2] liquidus isotherms 1400–2400 K
+    marker_count: 0
+    attribution: Osborn et al. [2]
+  attribution: present work and Osborn et al. [2]
+  temperature_K:
+  - 1773
+  - 1873
+  reference_isotherms_K:
+  - 1400
+  - 1500
+  - 1600
+  - 1700
+  - 1800
+  - 1900
+  - 2000
+  - 2100
+  - 2200
+  - 2300
+  - 2400
+  values:
+    quantity: liquidus_composition
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Figure 7. A comparison between the present experimental results with the phase diagram suggested by Osborn et
+      al. [2] for 30 mass% Al2O3.
+  digitisation: deferred to a figure pass
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_fig7_figure_only
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+- type: figure_record
+  observation_id: gran_2012_fig8_figure_only
+  locator:
+    pdf_page_index: 6
+    figure: '8'
+  units: as printed
+  species: SiO2
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  phase: liquidus in the 35 mass% Al2O3 section
+  panel: single ternary comparison projection
+  axes_as_printed: 'x: Mass % MgO; left: Mass % CaO; right: Mass % SiO2'
+  series:
+  - name: CaO 1773 K
+    marker_count: 4
+    attribution: present work
+  - name: CaO 1873 K
+    marker_count: 2
+    attribution: present work
+  - name: MgO+CaO 1873 K
+    marker_count: 1
+    attribution: present work
+  - name: MgO 1773 K
+    marker_count: 6
+    attribution: present work
+  - name: MgO 1873 K
+    marker_count: 5
+    attribution: present work
+  - name: MgO+spinel 1873 K
+    marker_count: 1
+    attribution: present work
+  - name: spinel 1873 K
+    marker_count: 1
+    attribution: present work
+  - name: Osborn et al. [2] liquidus isotherms 1400–2400 K
+    marker_count: 0
+    attribution: Osborn et al. [2]
+  attribution: present work and Osborn et al. [2]
+  temperature_K:
+  - 1773
+  - 1873
+  reference_isotherms_K:
+  - 1400
+  - 1500
+  - 1600
+  - 1700
+  - 1800
+  - 1900
+  - 2000
+  - 2100
+  - 2200
+  - 2300
+  - 2400
+  values:
+    quantity: liquidus_composition
+    method_class: figure_only
+    admission_status: figure_only
+    caption: Figure 8. A comparison between the present experimental results with the phase diagram suggested by Osborn et
+      al. [2] for 35 mass% Al2O3.
+  digitisation: deferred to a figure pass
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_fig8_figure_only
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+- type: activity_estimate
+  observation_id: gran_2012_prose_a_Al2O3_1873
+  locator:
+    page: 9
+    published_page: 9
+    pdf_page_index: 8
+  units: dimensionless
+  temperature_K: 1873
+  standard_state: pure solid Al2O3 at 1873 K
+  values:
+    quantity: activity
+    quantity_as_published: a_Al2O3
+    method_class: model_derived
+    admission_status: parked
+    value_as_printed: '0.0402'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_prose_a_Al2O3_1873
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: SiO2
+- type: activity_estimate
+  observation_id: gran_2012_prose_a_AlO1_5_1873
+  locator:
+    page: 9
+    published_page: 9
+    pdf_page_index: 8
+  units: dimensionless
+  temperature_K: 1873
+  standard_state: AlO1.5 activity related to Al2O3 activity at 1873 K
+  values:
+    quantity: activity
+    quantity_as_published: a_AlO1.5
+    method_class: model_derived
+    admission_status: parked
+    value_as_printed: '0.201'
+    approximate: true
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_prose_a_AlO1_5_1873
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: SiO2
+- type: activity_estimate
+  observation_id: gran_2012_prose_f_AlO1_5_1773
+  locator:
+    page: 9
+    published_page: 9
+    pdf_page_index: 8
+  units: dimensionless
+  temperature_K: 1773
+  values:
+    quantity: activity_coefficient
+    quantity_as_published: f_AlO1.5
+    method_class: model_derived
+    admission_status: parked
+    value_as_printed: '188'
+    approximate: true
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_prose_f_AlO1_5_1773
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: SiO2
+- type: activity_estimate
+  observation_id: gran_2012_prose_f_AlO1_5_1873
+  locator:
+    page: 9
+    published_page: 9
+    pdf_page_index: 8
+  units: dimensionless
+  temperature_K: 1873
+  values:
+    quantity: activity_coefficient
+    quantity_as_published: f_AlO1.5
+    method_class: model_derived
+    admission_status: parked
+    value_as_printed: '86'
+    approximate: true
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_prose_f_AlO1_5_1873
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: SiO2
+- type: activity_estimate
+  observation_id: gran_2012_t2_s001_activity
+  locator:
+    pdf_page_index: 9
+    table: '2'
+    row: '1'
+  sample_no: 1
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_001
+  assemblage_as_printed: Equilibria (liquid + MgO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.873'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00013(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00023(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.995'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t2_s001_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t2_s002_activity
+  locator:
+    pdf_page_index: 9
+    table: '2'
+    row: '2'
+  sample_no: 2
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_002
+  assemblage_as_printed: Equilibria (liquid + MgO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.436'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00198(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00367(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.996'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t2_s002_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t2_s003_activity
+  locator:
+    pdf_page_index: 9
+    table: '2'
+    row: '3'
+  sample_no: 3
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_003
+  assemblage_as_printed: Equilibria (liquid + MgO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.749'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00024(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00044(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.995'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t2_s003_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t2_s004_activity
+  locator:
+    pdf_page_index: 9
+    table: '2'
+    row: '4'
+  sample_no: 4
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_004
+  assemblage_as_printed: Equilibria (liquid + MgO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.644'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00168(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00312(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.995'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t2_s004_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t2_s005_activity
+  locator:
+    pdf_page_index: 9
+    table: '2'
+    row: '5'
+  sample_no: 5
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_005
+  assemblage_as_printed: Equilibria (liquid + MgO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.222'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.02078(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.03852(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.995'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t2_s005_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t2_s006_activity
+  locator:
+    pdf_page_index: 9
+    table: '2'
+    row: '6'
+  sample_no: 6
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_006
+  assemblage_as_printed: Equilibria (liquid + MgO + spinel) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.254'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.03715(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.06887(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.994'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t2_s006_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: SiO2
+- type: activity_estimate
+  observation_id: gran_2012_t2_s007_activity
+  locator:
+    pdf_page_index: 9
+    table: '2'
+    row: '7'
+  sample_no: 7
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_007
+  assemblage_as_printed: Equilibria (liquid + MgO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.412'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00863(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.01601(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.995'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t2_s007_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t2_s008_activity
+  locator:
+    pdf_page_index: 9
+    table: '2'
+    row: '8'
+  sample_no: 8
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_008
+  assemblage_as_printed: Equilibria (liquid + MgO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.269'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.01154(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.02139(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.995'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t2_s008_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t2_s009_activity
+  locator:
+    pdf_page_index: 9
+    table: '2'
+    row: '9'
+  sample_no: 9
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_009
+  assemblage_as_printed: Equilibria (liquid + MgO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.457'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00279(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00517(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.995'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t2_s009_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t2_s012_activity
+  locator:
+    pdf_page_index: 9
+    table: '2'
+    row: '12'
+  sample_no: 12
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_012
+  assemblage_as_printed: Equilibria (liquid + CaO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.988'
+      MgO: '0.344'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t2_s012_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t2_s013_activity
+  locator:
+    pdf_page_index: 9
+    table: '2'
+    row: '13'
+  sample_no: 13
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_013
+  assemblage_as_printed: Equilibria (liquid + MgO + CaO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.965'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00021(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00038(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.994'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t2_s013_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: SiO2
+- type: activity_estimate
+  observation_id: gran_2012_t2_s016_activity
+  locator:
+    pdf_page_index: 9
+    table: '2'
+    row: '16'
+  sample_no: 16
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_016
+  assemblage_as_printed: Equilibria (liquid + CaO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.990'
+      MgO: '0.288'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t2_s016_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t2_s017_activity
+  locator:
+    pdf_page_index: 9
+    table: '2'
+    row: '17'
+  sample_no: 17
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_017
+  assemblage_as_printed: Equilibria (liquid + MgO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.252'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00695(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.01288(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.996'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t2_s017_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t2_s018_activity
+  locator:
+    pdf_page_index: 9
+    table: '2'
+    row: '18'
+  sample_no: 18
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_018
+  assemblage_as_printed: Equilibria (liquid + CaO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.998'
+      MgO: '0.053'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t2_s018_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t2_s019_activity
+  locator:
+    pdf_page_index: 9
+    table: '2'
+    row: '19'
+  sample_no: 19
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_019
+  assemblage_as_printed: Equilibria (liquid + CaO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.980'
+      MgO: '0.579'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t2_s019_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t2_s021_activity
+  locator:
+    pdf_page_index: 9
+    table: '2'
+    row: '21'
+  sample_no: 21
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_021
+  assemblage_as_printed: Equilibria (liquid + CaO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.981'
+      MgO: '0.551'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t2_s021_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t3_s066_activity
+  locator:
+    pdf_page_index: 10
+    table: '3'
+    row: '66'
+  sample_no: 66
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_066
+  assemblage_as_printed: Equilibria (liquid + MgO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.802'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00043(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00080(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.995'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t3_s066_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t3_s067_activity
+  locator:
+    pdf_page_index: 10
+    table: '3'
+    row: '67'
+  sample_no: 67
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_067
+  assemblage_as_printed: Equilibria (liquid + MgO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.688'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00097(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00180(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.995'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t3_s067_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t3_s068_activity
+  locator:
+    pdf_page_index: 10
+    table: '3'
+    row: '68'
+  sample_no: 68
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_068
+  assemblage_as_printed: Equilibria (liquid + MgO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.516'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00188(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00349(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.996'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t3_s068_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t3_s069_activity
+  locator:
+    pdf_page_index: 10
+    table: '3'
+    row: '69'
+  sample_no: 69
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_069
+  assemblage_as_printed: Equilibria (liquid + MgO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.338'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00931(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.01725(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.995'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t3_s069_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t3_s070_activity
+  locator:
+    pdf_page_index: 10
+    table: '3'
+    row: '70'
+  sample_no: 70
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_070
+  assemblage_as_printed: Equilibria (liquid + MgO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.341'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.01456(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.02700(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.995'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t3_s070_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t3_s071_activity
+  locator:
+    pdf_page_index: 10
+    table: '3'
+    row: '71'
+  sample_no: 71
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_071
+  assemblage_as_printed: Equilibria (liquid + MgO + spinel) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.254'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.04201(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.07788(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.993'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t3_s071_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: SiO2
+- type: activity_estimate
+  observation_id: gran_2012_t3_s076_activity
+  locator:
+    pdf_page_index: 10
+    table: '3'
+    row: '76'
+  sample_no: 76
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_076
+  assemblage_as_printed: Equilibria (liquid + CaO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '1.000'
+      MgO: '0.005'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t3_s076_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t3_s077_activity
+  locator:
+    pdf_page_index: 10
+    table: '3'
+    row: '77'
+  sample_no: 77
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_077
+  assemblage_as_printed: Equilibria (liquid + MgO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.880'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00034(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00064(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.993'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t3_s077_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t3_s078_activity
+  locator:
+    pdf_page_index: 10
+    table: '3'
+    row: '78'
+  sample_no: 78
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_078
+  assemblage_as_printed: Equilibria (liquid + CaO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.998'
+      MgO: '0.066'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t3_s078_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t3_s079_activity
+  locator:
+    pdf_page_index: 10
+    table: '3'
+    row: '79'
+  sample_no: 79
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_079
+  assemblage_as_printed: Equilibria (liquid + CaO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.979'
+      MgO: '0.602'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t3_s079_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t3_s080_activity
+  locator:
+    pdf_page_index: 10
+    table: '3'
+    row: '80'
+  sample_no: 80
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_080
+  assemblage_as_printed: Equilibria (liquid + CaO) 1773 K
+  standard_state: pure solid oxides at 1773 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.972'
+      MgO: '0.813'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t3_s080_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s044_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '44'
+  sample_no: 44
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_044
+  assemblage_as_printed: Euilibria (liquid + MgO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.516'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00031(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00057(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.994'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s044_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s045_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '45'
+  sample_no: 45
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_045
+  assemblage_as_printed: Euilibria (liquid + MgO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.916'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00009(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00017(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.993'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s045_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s046_activity
+  locator:
+    pdf_page_index: 12
+    table: '4'
+    row: '46'
+  sample_no: 46
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_046
+  assemblage_as_printed: Equilibria (liquid + MgO + CaO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.953'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00008(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00015(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.993'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s046_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: SiO2
+- type: activity_estimate
+  observation_id: gran_2012_t4_s047_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '47'
+  sample_no: 47
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_047
+  assemblage_as_printed: Equilibria (liquid + CaO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.958'
+      MgO: '0.906'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s047_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s048_activity
+  locator:
+    pdf_page_index: 12
+    table: '4'
+    row: '48'
+  sample_no: 48
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_048
+  assemblage_as_printed: Equilibria (liquid + MgO + CaO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.953'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00009(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00017(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.993'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s048_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: SiO2
+- type: activity_estimate
+  observation_id: gran_2012_t4_s049_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '49'
+  sample_no: 49
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_049
+  assemblage_as_printed: Equilibria (liquid + CaO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.979'
+      MgO: '0.439'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s049_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s052_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '52'
+  sample_no: 52
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_052
+  assemblage_as_printed: Euilibria (liquid + MgO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.436'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00072(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00132(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.995'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s052_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s053_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '53'
+  sample_no: 53
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_053
+  assemblage_as_printed: Euilibria (liquid + MgO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.615'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00020(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00036(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.994'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s053_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s055_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '55'
+  sample_no: 55
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_055
+  assemblage_as_printed: Equilibria (liquid + CaO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.985'
+      MgO: '0.318'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s055_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s058_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '58'
+  sample_no: 58
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_058
+  assemblage_as_printed: Equilibria (liquid + CaO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.979'
+      MgO: '0.443'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s058_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s059_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '59'
+  sample_no: 59
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_059
+  assemblage_as_printed: Equilibria (liquid + CaO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.960'
+      MgO: '0.867'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s059_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s060_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '60'
+  sample_no: 60
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_060
+  assemblage_as_printed: Euilibria (liquid + MgO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.368'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00079(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00144(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.995'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s060_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s061_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '61'
+  sample_no: 61
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_061
+  assemblage_as_printed: Euilibria (liquid + MgO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.605'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00027(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00049(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.994'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s061_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s063_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '63'
+  sample_no: 63
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_063
+  assemblage_as_printed: Equilibria (liquid + CaO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.986'
+      MgO: '0.311'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s063_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s081_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '81'
+  sample_no: 81
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_081
+  assemblage_as_printed: Euilibria (liquid + MgO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.803'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00014(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00025(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.993'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s081_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s082_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '82'
+  sample_no: 82
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_082
+  assemblage_as_printed: Euilibria (liquid + MgO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.634'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00029(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00053(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.994'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s082_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s084_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '84'
+  sample_no: 84
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_084
+  assemblage_as_printed: Euilibria (liquid + MgO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.412'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00136(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00248(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.994'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s084_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s085_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '85'
+  sample_no: 85
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_085
+  assemblage_as_printed: Equilibria (liquid + CaO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.962'
+      MgO: '0.829'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s085_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s086_activity
+  locator:
+    pdf_page_index: 12
+    table: '4'
+    row: '86'
+  sample_no: 86
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_086
+  assemblage_as_printed: Equilibria (liquid + CaO) 1873 K continued..
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.985'
+      MgO: '0.322'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s086_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s087_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '87'
+  sample_no: 87
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_087
+  assemblage_as_printed: Euilibria (liquid + MgO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.530'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00074(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00135(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.994'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s087_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s088_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '88'
+  sample_no: 88
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_088
+  assemblage_as_printed: Euilibria (liquid + MgO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.810'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00025(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00045(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.993'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s088_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s089_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '89'
+  sample_no: 89
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_089
+  assemblage_as_printed: Euilibria (liquid + MgO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.283'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00755(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.01373(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.993'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s089_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s090_activity
+  locator:
+    pdf_page_index: 11
+    table: '4'
+    row: '90'
+  sample_no: 90
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_090
+  assemblage_as_printed: Euilibria (liquid + MgO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.340'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00449(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00817(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.993'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s090_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: MgO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s091_activity
+  locator:
+    pdf_page_index: 12
+    table: '4'
+    row: '91'
+  sample_no: 91
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_091
+  assemblage_as_printed: Equilibria (liquid + CaO) 1873 K continued..
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.976'
+      MgO: '0.508'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s091_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s093_activity
+  locator:
+    pdf_page_index: 12
+    table: '4'
+    row: '93'
+  sample_no: 93
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_093
+  assemblage_as_printed: Equilibria (liquid + CaO) 1873 K continued..
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.996'
+      MgO: '0.082'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s093_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s094_activity
+  locator:
+    pdf_page_index: 12
+    table: '4'
+    row: '94'
+  sample_no: 94
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_094
+  assemblage_as_printed: Equilibria (liquid + CaO) 1873 K continued..
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.970'
+      MgO: '0.640'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s094_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s095_activity
+  locator:
+    pdf_page_index: 12
+    table: '4'
+    row: '95'
+  sample_no: 95
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_095
+  assemblage_as_printed: Equilibria (liquid + CaO) 1873 K continued..
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '1.000'
+      MgO: '0.001'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s095_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: CaO
+- type: activity_estimate
+  observation_id: gran_2012_t4_s098_activity
+  locator:
+    pdf_page_index: 12
+    table: '4'
+    row: '98'
+  sample_no: 98
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_098
+  assemblage_as_printed: Equilibria (liquid + MgO + spinel) 1873K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.299'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.04023(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.07323(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.990'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s098_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: SiO2
+- type: activity_estimate
+  observation_id: gran_2012_t4_s100_activity
+  locator:
+    pdf_page_index: 12
+    table: '4'
+    row: '100'
+  sample_no: 100
+  system_as_printed: Al2O3-CaO-MgO-SiO2
+  assemblage_id: gran_2012_sample_100
+  assemblage_as_printed: Equilibria (liquid + MgO + CaO) 1873 K
+  standard_state: pure solid oxides at 1873 K
+  units: dimensionless
+  values:
+    quantity: activity
+    method_class: model_derived
+    values_as_printed:
+      CaO: '0.956'
+      Al2O3_alternative_estimates:
+      - value_as_printed: 0.00011(2)
+        data_source_as_printed: '[9]'
+      - value_as_printed: 0.00021(3)
+        data_source_as_printed: '[10]'
+      MgO: '0.992'
+  context_id: gran-sichen-2012-molten12-ladle-slag-liquidus::context::gran_2012_t4_s100_activity
+  work_id: 48f5f5acedfab4e27a53975c74983776be98459e224accbdd657943095aa0def
+  source_id: gran-sichen-2012-molten12-ladle-slag-liquidus
+  species: SiO2

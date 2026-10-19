@@ -1,0 +1,388 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 4eb407c89a377fd7f3fe97cc8ede1f550aaeda74eb5c9d62273f58085736ff15
+  citation: Shornikov, S. I., and Yakovlev, O. I. (2018). Thermodynamic Study of Double Inversion of MgO and SiO2 Relative
+    Fugacity at CAIs Evaporation. 49th Lunar and Planetary Science Conference, LPI Contribution No. 2083, abstract 1845.
+  source_ids:
+  - shornikov-2018-cai-double-inversion
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:shornikov-2018-cai-double-inversion
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: shornikov_2018_cited_experimental_temperature_ranges
+  type: cited_experimental_temperature_ranges
+  locator:
+    page: 1
+    pdf_page_index: 0
+    paragraph: Introduction
+    note: Ranges of experimental input or comparison data stated in the introduction.
+  units: K as printed
+  values:
+    quantity: cited_experimental_temperature_ranges
+    ranges:
+    - description: Oxide activities in CaO-MgO-FeO-Al2O3-TiO2-SiO2 melts studied by Knudsen mass-spectrometric effusion.
+      range_as_printed: 1600–2500 K
+      attribution_as_printed: '[1]'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Introduction
+    - description: Lunar alumina basalt evaporation in Knudsen tungsten effusion cells.
+      range_as_printed: 1577–2502 K
+      attribution_as_printed: '[3]'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Introduction
+    - description: Vacuum evaporation of synthetic oxide material with a solar composition using a graphite crucible.
+      range_as_printed: 1673–2273 K
+      attribution_as_printed: '[4]'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        paragraph: Introduction
+  context_id: shornikov-2018-cai-double-inversion::context::shornikov_2018_cited_experimental_temperature_ranges
+  work_id: 4eb407c89a377fd7f3fe97cc8ede1f550aaeda74eb5c9d62273f58085736ff15
+  source_id: shornikov-2018-cai-double-inversion
+  species: MgO
+- observation_id: shornikov_2018_double_inversion_thresholds
+  type: text_stated_model_result
+  locator:
+    page: 1
+    pdf_page_index: 0
+    paragraph: Results
+    note: Text immediately preceding the double-inversion discussion and Figs. 3-4.
+  units: mol % as printed
+  values:
+    quantity: double_inversion_thresholds_as_printed
+    method_class: model_derived
+    sample: 5aN-3
+    thresholds:
+    - sequence: first
+      Al2O3_mol_pct_as_printed: about 35
+      stated_effect: MgO predominance in the melt
+    - sequence: second
+      Al2O3_mol_pct_as_printed: about 60
+      stated_effect: SiO2 predominance in the melt
+    attribution: This paper's text and semi-empirical thermodynamic model.
+  context_id: shornikov-2018-cai-double-inversion::context::shornikov_2018_double_inversion_thresholds
+  work_id: 4eb407c89a377fd7f3fe97cc8ede1f550aaeda74eb5c9d62273f58085736ff15
+  source_id: shornikov-2018-cai-double-inversion
+  species: Al2O3
+- observation_id: shornikov_2018_figure1_residual_composition
+  type: figure_record
+  locator:
+    page: 1
+    pdf_page_index: 0
+    figure: '1'
+  units: x_i in mol % as printed
+  values:
+    quantity: residue_component_composition
+    species_as_printed: CaO, MgO, Al2O3, SiO2
+    phase_as_printed: residual melts
+    temperature_as_printed: 2173 K
+    axes_as_printed:
+      x: Wt loss, %
+      y: x_i, mol %
+    caption_as_printed: 'Fig. 1. The experimental (points) and calculated (lines) changes in residual melts of 5aN-3 (a),
+      CAI4 (b) and CAI B (c) at evaporation at 2173 K. Designations: 1 – CaO, 2 – MgO, 3 – Al2O3, 4 – SiO2.'
+    panel: a, b, c
+    series_list:
+    - a-1: CaO, 5aN-3
+    - a-2: MgO, 5aN-3
+    - a-3: Al2O3, 5aN-3
+    - a-4: SiO2, 5aN-3
+    - b-1: CaO, CAI4
+    - b-2: MgO, CAI4
+    - b-3: Al2O3, CAI4
+    - b-4: SiO2, CAI4
+    - c-1: CaO, CAI B
+    - c-2: MgO, CAI B
+    - c-3: Al2O3, CAI B
+    - c-4: SiO2, CAI B
+    marker_count_per_series:
+      a-1: 8
+      a-2: 9
+      a-3: 10
+      a-4: 9
+      b-1: 7
+      b-2: 6
+      b-3: 7
+      b-4: 7
+      c-1: 6
+      c-2: 6
+      c-3: 5
+      c-4: 6
+    attribution: Experimental points are associated in the preceding prose with 5aN-3 [5, 6], CAI4 [7], and CAI B [8]. The
+      calculated curves are presented in this work; no per-marker source is stated.
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2018-cai-double-inversion::context::shornikov_2018_figure1_residual_composition
+  work_id: 4eb407c89a377fd7f3fe97cc8ede1f550aaeda74eb5c9d62273f58085736ff15
+  source_id: shornikov-2018-cai-double-inversion
+  species: CaO
+- observation_id: shornikov_2018_figure2_mgO_sio2_molar_ratio
+  type: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '2'
+  units: molar ratio as printed
+  values:
+    quantity: component_mole_ratio
+    species_as_printed: MgO / SiO2
+    phase_as_printed: residual melts
+    temperature_as_printed: 2173 K
+    axes_as_printed:
+      x: Al2O3, mol %
+      y: MgO / SiO2, mol
+    caption_as_printed: Fig. 2. The experimental (1–3) and calculated (4–6) the MgO / SiO2 molar ratio changes in residual
+      melts of 5aN-3 (1, 4), CAI4 (2, 5) and CAI B (3, 6) at evaporation at 2173 K.
+    panel: single panel; no panel label printed
+    series_list:
+    - '1: 5aN-3 experimental'
+    - '2: CAI4 experimental'
+    - '3: CAI B experimental'
+    - '4: 5aN-3 calculated'
+    - '5: CAI4 calculated'
+    - '6: CAI B calculated'
+    marker_count_per_series:
+      '1': 8
+      '2': 6
+      '3': 5
+      '4': 0
+      '5': 0
+      '6': 0
+    attribution: Experimental points for 5aN-3, CAI4 and CAI B are associated in the preceding prose with references [5, 6],
+      [7], and [8], respectively; calculated curves are this work.
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2018-cai-double-inversion::context::shornikov_2018_figure2_mgO_sio2_molar_ratio
+  work_id: 4eb407c89a377fd7f3fe97cc8ede1f550aaeda74eb5c9d62273f58085736ff15
+  source_id: shornikov-2018-cai-double-inversion
+  species: MgO
+- observation_id: shornikov_2018_figure3_residual_compositions
+  type: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '3'
+  units: x_i in mol % as printed
+  values:
+    quantity: residue_component_composition
+    species_as_printed: CaO, MgO, SiO2
+    phase_as_printed: residual melts
+    temperature_as_printed: 2173 K
+    axes_as_printed:
+      x: Al2O3, mol %
+      y: x_i, mol %
+    caption_as_printed: 'Fig. 3. The experimental (1, 5, 9) and calculated (2-4, 6-8, 10-12) changes in residual melts of
+      5aN-3 (1, 2, 5, 6, 9, 10), 5aN-L (3, 7, 11), 5aN-H (4, 8, 12) at evaporation at 2173 K. Designations: 1-4 – CaO, 5-8
+      – MgO, 9-12 – SiO2.'
+    panel: single panel; no panel label printed
+    series_list:
+    - '1: CaO, 5aN-3 experimental'
+    - '2: CaO, 5aN-3 calculated'
+    - '3: CaO, 5aN-L calculated'
+    - '4: CaO, 5aN-H calculated'
+    - '5: MgO, 5aN-3 experimental'
+    - '6: MgO, 5aN-3 calculated'
+    - '7: MgO, 5aN-L calculated'
+    - '8: MgO, 5aN-H calculated'
+    - '9: SiO2, 5aN-3 experimental'
+    - '10: SiO2, 5aN-3 calculated'
+    - '11: SiO2, 5aN-L calculated'
+    - '12: SiO2, 5aN-H calculated'
+    marker_count_per_series:
+      '1': 6
+      '2': 0
+      '3': 0
+      '4': 0
+      '5': 5
+      '6': 0
+      '7': 0
+      '8': 0
+      '9': 5
+      '10': 0
+      '11': 0
+      '12': 0
+    attribution: Experimental points for 5aN-3 are associated in the preceding prose with references [5, 6]; the calculated
+      series are this work.
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2018-cai-double-inversion::context::shornikov_2018_figure3_residual_compositions
+  work_id: 4eb407c89a377fd7f3fe97cc8ede1f550aaeda74eb5c9d62273f58085736ff15
+  source_id: shornikov-2018-cai-double-inversion
+  species: CaO
+- observation_id: shornikov_2018_figure4_mgo_sio2_molar_ratio
+  type: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '4'
+  units: molar ratio as printed
+  values:
+    quantity: component_mole_ratio
+    species_as_printed: MgO / SiO2
+    phase_as_printed: residual melts
+    temperature_as_printed: 2173 K
+    axes_as_printed:
+      x: Al2O3, mol %
+      y: MgO / SiO2, mol
+    caption_as_printed: Fig. 4. The experimental (1) and calculated (2-4) MgO / SiO2 molar ratio changes in residual melts
+      of 5aN-3 (1, 2), 5aN-L (3) and 5aN-H (4) at evaporation at 2173 K.
+    panel: single panel; no panel label printed
+    series_list:
+    - '1: 5aN-3 experimental'
+    - '2: 5aN-3 calculated'
+    - '3: 5aN-L calculated'
+    - '4: 5aN-H calculated'
+    marker_count_per_series:
+      '1': 8
+      '2': 0
+      '3': 0
+      '4': 0
+    attribution: The experimental points are associated in the preceding prose with 5aN-3 references [5, 6]; the calculated
+      curves are this work.
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2018-cai-double-inversion::context::shornikov_2018_figure4_mgo_sio2_molar_ratio
+  work_id: 4eb407c89a377fd7f3fe97cc8ede1f550aaeda74eb5c9d62273f58085736ff15
+  source_id: shornikov-2018-cai-double-inversion
+  species: MgO
+- observation_id: shornikov_2018_figure5_mgo_sio2_activity_ratio
+  type: figure_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    figure: '5'
+  units: activity ratio as printed
+  values:
+    quantity: activity_ratio
+    species_as_printed: MgO / SiO2
+    phase_as_printed: residual melts
+    temperature_as_printed: 2173 K
+    axes_as_printed:
+      x: CaO, mol %
+      y: a_MgO / a_SiO2
+    caption_as_printed: Fig. 5. The calculated MgO / SiO2 activity ratio changes in residual melts of 5aN-3 (1), 5aN-L (2)
+      and 5aN-H (3) at evaporation at 2173 K.
+    panel: single panel; no panel label printed
+    series_list:
+    - '1: 5aN-3 calculated'
+    - '2: 5aN-L calculated'
+    - '3: 5aN-H calculated'
+    marker_count_per_series:
+      '1': 0
+      '2': 0
+      '3': 0
+    attribution: The calculated curves are this work.
+    digitisation: deferred to a figure pass
+  context_id: shornikov-2018-cai-double-inversion::context::shornikov_2018_figure5_mgo_sio2_activity_ratio
+  work_id: 4eb407c89a377fd7f3fe97cc8ede1f550aaeda74eb5c9d62273f58085736ff15
+  source_id: shornikov-2018-cai-double-inversion
+  species: MgO
+- observation_id: shornikov_2018_table1_initial_sample_compositions
+  type: initial_sample_composition_table
+  locator:
+    page: 1
+    pdf_page_index: 0
+    table: '1'
+    note: Table 1. The CAIs initial composition (mol %).
+  units: mol % as printed
+  values:
+    quantity: initial_sample_compositions_as_printed
+    species_scope_as_printed: CaO, MgO, Al2O3, SiO2
+    source_type_note: These are initial sample compositions for the evaporation study, retained as context rather than scored
+      thermodynamic observations.
+    row_count: 5
+    numeric_cell_count: 20
+    rows:
+    - row_number: 1
+      sample: 5aN-L
+      method_class: measured_tabulated
+      attribution: This work; no prior source is cited for this sample.
+      source_attribution_as_printed: No reference is attached to this sample in the table or preceding sentence.
+      composition_mol_pct:
+        CaO: '11.17'
+        MgO: '25.00'
+        Al2O3: '23.83'
+        SiO2: '40.00'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        note: Table 1 row 1; sample 5aN-L.
+    - row_number: 2
+      sample: 5aN-3
+      method_class: quoted_attributed
+      attribution: '[5, 6]'
+      source_attribution_as_printed: The preceding prose associates 5aN-3 with references [5, 6]; Table 1 itself has no row-level
+        citation.
+      composition_mol_pct:
+        CaO: '14.43'
+        MgO: '25.60'
+        Al2O3: '23.83'
+        SiO2: '36.14'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        note: Table 1 row 2; sample 5aN-3.
+    - row_number: 3
+      sample: 5aN-H
+      method_class: measured_tabulated
+      attribution: This work; no prior source is cited for this sample.
+      source_attribution_as_printed: No reference is attached to this sample in the table or preceding sentence.
+      composition_mol_pct:
+        CaO: '17.03'
+        MgO: '27.98'
+        Al2O3: '23.23'
+        SiO2: '31.76'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        note: Table 1 row 3; sample 5aN-H.
+    - row_number: 4
+      sample: CAI4
+      method_class: quoted_attributed
+      attribution: '[7]'
+      source_attribution_as_printed: The preceding prose associates CAI4 with reference [7]; Table 1 itself has no row-level
+        citation.
+      composition_mol_pct:
+        CaO: '24.10'
+        MgO: '24.32'
+        Al2O3: '15.52'
+        SiO2: '36.06'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        note: Table 1 row 4; sample CAI4.
+    - row_number: 5
+      sample: CAI B
+      method_class: quoted_attributed
+      attribution: '[8]'
+      source_attribution_as_printed: The preceding prose associates CAI B with reference [8]; Table 1 itself has no row-level
+        citation.
+      composition_mol_pct:
+        CaO: '26.76'
+        MgO: '17.05'
+        Al2O3: '11.41'
+        SiO2: '44.78'
+      locator:
+        page: 1
+        pdf_page_index: 0
+        table: '1'
+        note: Table 1 row 5; sample CAI B.
+  context_id: shornikov-2018-cai-double-inversion::context::shornikov_2018_table1_initial_sample_compositions
+  work_id: 4eb407c89a377fd7f3fe97cc8ede1f550aaeda74eb5c9d62273f58085736ff15
+  source_id: shornikov-2018-cai-double-inversion
+  species: CaO

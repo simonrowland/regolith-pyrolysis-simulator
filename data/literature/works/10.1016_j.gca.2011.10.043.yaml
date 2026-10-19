@@ -1,0 +1,1281 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.gca.2011.10.043
+  citation: Krawczynski M.J. and Grove T.L. (2012), Experimental investigation of the influence of oxygen fugacity on the
+    source depths for high titanium lunar ultramafic magmas. Geochimica et Cosmochimica Acta 79:1–19. DOI 10.1016/j.gca.2011.10.043.
+  source_ids:
+  - krawczynski-grove-2012-high-ti-lunar-melts
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:krawczynski-grove-2012-high-ti-lunar-melts
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.gca.2011.10.043
+experiments: []
+context:
+- observation_id: krawczynski_2012_figure_10_deferred
+  type: deferred_figure
+  locator:
+    page: 17
+    pdf_page_index: 16
+    published_page: 17
+    figure: '10'
+  units: depth as printed
+  values:
+    quantity: lunar_source_region_depth
+    method_class: figure_only
+    phase: lunar_interior
+    caption: Lunar-interior cross-section showing A15R, A17O, and Apollo 14 black-glass source regions; a star marks the A17O
+      best estimate.
+    panels:
+    - main
+    axes_as_printed:
+      x: lunar_interior_cross_section
+      y: depth
+    series:
+    - A15R_source_region
+    - A17O_source_region
+    - Apollo_14_black_glass_source_region
+    - A17O_best_estimate
+    marker_counts: not_counted
+    attribution: this_work
+    digitisation: deferred to a figure pass
+  context_id: krawczynski-grove-2012-high-ti-lunar-melts::context::krawczynski_2012_figure_10_deferred
+  work_id: 10.1016/j.gca.2011.10.043
+  source_id: krawczynski-grove-2012-high-ti-lunar-melts
+  species: SiO2
+- observation_id: krawczynski_2012_figure_1_deferred
+  type: deferred_figure
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 2
+    figure: '1'
+  units: FeO+MgO wt% and composition as printed
+  values:
+    quantity: lunar_glass_composition_comparison
+    method_class: figure_only
+    phase: glass
+    caption: Compositional variations between ultramafic picritic glass suites and high-Ti basalts of Apollo 11 and 17; data
+      from Papike et al. (1998).
+    panels:
+    - main
+    axes_as_printed:
+      x: FeO_plus_MgO_wt_pct
+      y: composition_as_printed
+    series:
+    - picritic_glass_suites
+    - Apollo_11_high_Ti_basalt
+    - Apollo_17_high_Ti_basalt
+    marker_counts: not_counted
+    attribution: Papike_et_al_1998
+    digitisation: deferred to a figure pass
+  context_id: krawczynski-grove-2012-high-ti-lunar-melts::context::krawczynski_2012_figure_1_deferred
+  work_id: 10.1016/j.gca.2011.10.043
+  source_id: krawczynski-grove-2012-high-ti-lunar-melts
+  species: SiO2
+- observation_id: krawczynski_2012_figure_2_deferred
+  type: deferred_figure
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 6
+    figure: '2'
+  units: photomicrograph and X-ray intensity map
+  values:
+    quantity: experimental_run_product_micrographs
+    method_class: figure_only
+    phase: glass_and_crystalline_phases
+    caption: Reflected-light images of graphite and Fe capsule fO2 sensor experiments, Mg X-ray map of D190, and electron
+      backscatter image of C318.
+    panels:
+    - A
+    - B
+    - C
+    - D
+    axes_as_printed:
+      A: none
+      B: none
+      C: Mg_X_ray_intensity
+      D: none
+    series:
+    - sensor_capsule_images
+    - D190_phase_map
+    - C318_backscatter_image
+    marker_counts:
+      A: 0
+      B: 0
+      C: not_counted
+      D: 0
+    attribution: this_work
+    digitisation: deferred to a figure pass
+  context_id: krawczynski-grove-2012-high-ti-lunar-melts::context::krawczynski_2012_figure_2_deferred
+  work_id: 10.1016/j.gca.2011.10.043
+  source_id: krawczynski-grove-2012-high-ti-lunar-melts
+  species: SiO2
+- observation_id: krawczynski_2012_figure_3_deferred
+  type: deferred_figure
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 7
+    figure: '3'
+  units: temperature °C and pressure GPa
+  values:
+    quantity: liquidus_phase_relations
+    method_class: figure_only
+    phase: silicate_melt_A15R
+    caption: Phase diagrams of A15R experiments in Fe-metal and graphite capsules; olivine–orthopyroxene multiple saturation
+      differs between capsule types.
+    panels:
+    - Fe_capsule
+    - graphite_capsule
+    axes_as_printed:
+      x: pressure_GPa
+      y: temperature_C
+    series:
+    - Fe_capsule_phase_fields
+    - graphite_capsule_phase_fields
+    - multiple_saturation_points
+    marker_counts: not_counted
+    attribution: this_work
+    digitisation: deferred to a figure pass
+  context_id: krawczynski-grove-2012-high-ti-lunar-melts::context::krawczynski_2012_figure_3_deferred
+  work_id: 10.1016/j.gca.2011.10.043
+  source_id: krawczynski-grove-2012-high-ti-lunar-melts
+  species: SiO2
+- observation_id: krawczynski_2012_figure_4_deferred
+  type: deferred_figure
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 7
+    figure: '4'
+  units: temperature °C and pressure GPa
+  values:
+    quantity: liquidus_phase_relations
+    method_class: figure_only
+    phase: silicate_melt_A17O
+    caption: Phase diagrams of A17O experiments in Fe-metal and graphite capsules; olivine–orthopyroxene multiple saturation
+      differs less than for A15R.
+    panels:
+    - Fe_capsule
+    - graphite_capsule
+    axes_as_printed:
+      x: pressure_GPa
+      y: temperature_C
+    series:
+    - Fe_capsule_phase_fields
+    - graphite_capsule_phase_fields
+    - multiple_saturation_points
+    marker_counts: not_counted
+    attribution: this_work
+    digitisation: deferred to a figure pass
+  context_id: krawczynski-grove-2012-high-ti-lunar-melts::context::krawczynski_2012_figure_4_deferred
+  work_id: 10.1016/j.gca.2011.10.043
+  source_id: krawczynski-grove-2012-high-ti-lunar-melts
+  species: SiO2
+- observation_id: krawczynski_2012_figure_5_deferred
+  type: deferred_figure
+  locator:
+    page: 13
+    pdf_page_index: 12
+    published_page: 13
+    figure: '5'
+  units: pressure GPa, temperature °C and oxygen fugacity relative to IW
+  values:
+    quantity: multiple_saturation_points
+    method_class: figure_only
+    phase: lunar_silicate_melt
+    caption: Simplified phase relations for A15R and orange glass experiments, capsule comparisons, and MSP data for lunar
+      ultramafic glasses.
+    panels:
+    - A
+    - B
+    - C
+    axes_as_printed:
+      A: pressure_GPa_and_temperature_C
+      B: pressure_GPa_and_temperature_C
+      C: multiple_saturation_point
+    series:
+    - graphite_capsule
+    - Fe_capsule
+    - orange_glass_estimate
+    - lunar_ultramafic_glasses
+    marker_counts: not_counted
+    attribution: this_work
+    digitisation: deferred to a figure pass
+  context_id: krawczynski-grove-2012-high-ti-lunar-melts::context::krawczynski_2012_figure_5_deferred
+  work_id: 10.1016/j.gca.2011.10.043
+  source_id: krawczynski-grove-2012-high-ti-lunar-melts
+  species: SiO2
+- observation_id: krawczynski_2012_figure_6_deferred
+  type: deferred_figure
+  locator:
+    page: 14
+    pdf_page_index: 13
+    published_page: 14
+    figure: '6'
+  units: temperature °C and Fe–Mg exchange coefficient
+  values:
+    quantity: olivine_melt_Fe_Mg_exchange_coefficient
+    method_class: figure_only
+    phase: olivine_and_glass
+    caption: Olivine–melt Fe–Mg exchange coefficient versus temperature; green glasses from Elkins-Tanton et al. (2003), red
+      and orange glasses from Tables 4 and 5.
+    panels:
+    - main
+    axes_as_printed:
+      x: temperature_C
+      y: olivine_melt_Fe_Mg_exchange_coefficient
+    series:
+    - graphite_capsule_diamonds
+    - Fe_metal_capsule_squares
+    - linear_regressions
+    - literature_glasses
+    marker_counts: not_counted
+    attribution: this_work_and_Elkins_Tanton_et_al_2003
+    digitisation: deferred to a figure pass
+  context_id: krawczynski-grove-2012-high-ti-lunar-melts::context::krawczynski_2012_figure_6_deferred
+  work_id: 10.1016/j.gca.2011.10.043
+  source_id: krawczynski-grove-2012-high-ti-lunar-melts
+  species: SiO2
+- observation_id: krawczynski_2012_figure_7_deferred
+  type: deferred_figure
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: 15
+    figure: '7'
+  units: ternary composition coordinates as printed
+  values:
+    quantity: liquid_composition_projection_scheme
+    method_class: figure_only
+    phase: silicate_melt
+    caption: Adapted projection scheme of Longhi et al. (1974), with schematic liquid compositions projected through different
+      (Fe,Mg)–Ti melt components.
+    panels:
+    - main
+    axes_as_printed:
+      x: Fe_Mg_Ti_composition_coordinates
+      y: SiO2_Oliv_composition_coordinates
+    series:
+    - schematic_liquid_compositions
+    - projection_components
+    marker_counts:
+      schematic_compositions: 3
+    attribution: Longhi_et_al_1974_adapted
+    digitisation: deferred to a figure pass
+  context_id: krawczynski-grove-2012-high-ti-lunar-melts::context::krawczynski_2012_figure_7_deferred
+  work_id: 10.1016/j.gca.2011.10.043
+  source_id: krawczynski-grove-2012-high-ti-lunar-melts
+  species: SiO2
+- observation_id: krawczynski_2012_figure_8_deferred
+  type: deferred_figure
+  locator:
+    page: 15
+    pdf_page_index: 14
+    published_page: 15
+    figure: '8'
+  units: ternary composition coordinates as printed
+  values:
+    quantity: multiple_saturation_point_composition
+    method_class: figure_only
+    phase: silicate_melt
+    caption: Enlarged Plag + Cpx–Olivine–Quartz pseudoternary diagram; filled symbols are graphite-capsule MSP compositions
+      projected through (Fe,Mg)TiO3 or (Fe,Mg)Ti2O5.
+    panels:
+    - main
+    axes_as_printed:
+      x: olivine_normative_composition
+      y: plag_cpx_quartz_composition
+    series:
+    - graphite_capsule_MSPs
+    - Fe_Mg_TiO3_projection
+    - Fe_Mg_Ti2O5_projection
+    marker_counts: not_counted
+    attribution: this_work
+    digitisation: deferred to a figure pass
+  context_id: krawczynski-grove-2012-high-ti-lunar-melts::context::krawczynski_2012_figure_8_deferred
+  work_id: 10.1016/j.gca.2011.10.043
+  source_id: krawczynski-grove-2012-high-ti-lunar-melts
+  species: SiO2
+- observation_id: krawczynski_2012_figure_9_deferred
+  type: deferred_figure
+  locator:
+    page: 16
+    pdf_page_index: 15
+    published_page: 16
+    figure: '9'
+  units: liquid density and depth as printed
+  values:
+    quantity: lunar_liquid_density_depth
+    method_class: model_derived
+    phase: liquid
+    caption: Calculated density–depth curves for A17O, A15R, A14B, and Apollo 15 group A glasses; high-Ti glass MSP ranges
+      are shown as thick bars.
+    panels:
+    - main
+    axes_as_printed:
+      x: depth
+      y: density
+    series:
+    - A17O
+    - A15R
+    - A14B
+    - Apollo_15_group_A
+    - MSP_ranges
+    - lunar_mantle_density
+    marker_counts: not_counted
+    attribution: this_work_and_cited_volume_sources
+    digitisation: deferred to a figure pass
+  context_id: krawczynski-grove-2012-high-ti-lunar-melts::context::krawczynski_2012_figure_9_deferred
+  work_id: 10.1016/j.gca.2011.10.043
+  source_id: krawczynski-grove-2012-high-ti-lunar-melts
+  species: SiO2
+- observation_id: krawczynski_2012_table_1_starting_compositions
+  type: experiment_series
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 3
+    table: '1'
+  units: oxide wt% as printed
+  values:
+    method_class: measured_direct
+    caption: Synthetic starting materials and natural compositions.
+    note: Starting-material composition identity is retained by its printed set names. Em dashes remain not reported rather
+      than zero.
+    rows:
+    - composition: natural_A15R
+      SiO2: '35.6'
+      TiO2: '13.8'
+      Al2O3: '7.15'
+      Cr2O3: '0.77'
+      FeO: '21.9'
+      MnO: '0.25'
+      MgO: '12.1'
+      CaO: '7.89'
+      Na2O: '0.49'
+      K2O: '0.12'
+      total: '100.07'
+    - composition: synthetic_A15R
+      SiO2: '35.8'
+      TiO2: '13.5'
+      Al2O3: '7.11'
+      Cr2O3: '0.74'
+      FeO: '22'
+      MnO: '0.24'
+      MgO: '12.5'
+      CaO: '7.74'
+      Na2O: '0.31'
+      K2O: —
+      total: '99.94'
+    - composition: natural_A17O
+      SiO2: '38.5'
+      TiO2: '9.12'
+      Al2O3: '5.79'
+      Cr2O3: '0.69'
+      FeO: '22.9'
+      MnO: —
+      MgO: '14.9'
+      CaO: '7.4'
+      Na2O: '0.38'
+      K2O: —
+      total: '99.68'
+    - composition: synthetic_A17O
+      SiO2: '38.9'
+      TiO2: '8.78'
+      Al2O3: '5.81'
+      Cr2O3: '0.67'
+      FeO: '22.3'
+      MnO: '0.27'
+      MgO: '15.7'
+      CaO: '7.37'
+      Na2O: '0.26'
+      K2O: —
+      total: '99.95'
+  context_id: krawczynski-grove-2012-high-ti-lunar-melts::context::krawczynski_2012_table_1_starting_compositions
+  work_id: 10.1016/j.gca.2011.10.043
+  source_id: krawczynski-grove-2012-high-ti-lunar-melts
+  species: SiO2
+- observation_id: krawczynski_2012_table_2_a15r_conditions_and_partitioning
+  type: experiment_series
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 4
+    table: '2'
+  units: °C, GPa, h, KD and % FeO loss/gain as printed
+  values:
+    method_class: measured_direct
+    caption: Run conditions and products for A15R starting material.
+    row_count: 26
+    printed_cells: '
+
+
+
+      Table 2
+
+      Run conditions and products for A15R starting material.
+
+      Run        Capsule       T (°C)     GPa     Time (h)      Phases (calculated mode)a                           Olv KDb      Opx
+      KD       Cpx KD      Ilm KD      Gt/Sp KD      % FeO loss/gain
+
+
+
+
+
+      M.J. Krawczynski, T.L. Grove / Geochimica et Cosmochimica Acta 79 (2012) 1–19
+
+      C321       Fe            1410       2        6.8          olv(2) + opx(4) + liq(93)                           0.270        0.252                                                1.3
+
+      C322       Fe            1440       2.3     16.2          olv(1) + opx(6) + liq(93)                           0.274        0.246                                                0.8
+
+      C323       Fe            1410       2.3     24.2          olv(3) + opx(3) + cpx(16) + gnt(3) + liq(75)        0.240        0.239                                0.396           2.1
+
+      C324       Fe            1380       1.7     24            olv(3) + opx(7) + liq(89)                           0.262        0.252                                                3.8
+
+      C326       Fe            1410       1.7     18.2          olv(6) + opx(3) + liq(90)                           0.261        0.241                                                2.3
+
+      C329       Fe            1440       2       18            olv(1) + opx(3) + liq(96)                           0.264        0.250                                                2.6
+
+      C333       Fe            1470       2        7.0          liq                                                                                                                   9.0
+
+      C346       Fe            1440       1.7     19.3          liq                                                                                                                  −0.8
+
+      B1058      Fe            1420       1.3     91.8          sp + esk + FeCr + liq
+
+      C361       C             1420       1.7     24            olv + sp + PtFe + liq
+
+      B1025      C + Pt        1350       0.8      4.6          olv + sp + liq                                      0.258
+
+      B1027      C + Pt        1320       0.8      4.7          olv(19) + opx(−14) + sp(?) + liq(94)                0.235        0.274                                               −0.1
+
+      C309       C + Pt        1350       1.95    14            opx(27) + cpx(−22) + sp(1) + ilm(−7) + liq(100)                  0.278        0.315       1.87        1.42           −1.7
+
+      C310       C + Pt        1320       1.7     21.5          opx(28) + cpx(−20) + sp(<1) + ilm(−6) + liq(98)                  0.269        0.297       1.73        1.18           −2.1
+
+      C311       C + Pt        1380       2       19.8          opx(6) + sp(2) + liq(93)                                         0.310                                1.54          −11.3
+
+      C312       C + Pt        1350       1.7     19.4          opx(7) + sp(2) + liq(93)                                         0.314                                1.63           −8.1
+
+      C313       C + Pt        1410       2       15.5          opx(−3) + sp(1) + liq(103)                                       0.333                                1.38           −7.5
+
+      C314       C + Pt        1380       1.7     15.1          opx(1) + sp(4) + liq(96)                                         0.276                                1.37          −10.5
+
+      C315       C + Pt        1440       2        7.9          liq                                                                                                                  −7.6
+
+      C316       C + Pt        1400       1.7      8.3          sp(2) + liq(98)                                                                                       1.30           −5.5
+
+      C317       C + Pt        1350       1.4     21.4          opx(4) + sp(3) + liq(94)                                         0.250                                1.30           −5.6
+
+      C318       C + Pt        1320       1.1     22.6          olv(10) + opx(−6) + sp(3) + liq(94)                 0.263        0.256                                1.37           −5.4
+
+      C319       C + Pt        1380       1.4      9.7          sp + liq
+
+      C320       C + Pt        1350       1.1      7            olv(1) + sp(3) + liq(97)                            0.271                                             1.41           −2.9
+
+      C332       C + Pt        1320       1.4     46.3          olv(4) + opx(13) + sp(2) + ilm(1) + liq(81)         0.249        0.227                    1.35        1.34           −0.4
+
+      C338       C + Pt        1365       1.25    24            sp + liq
+
+      (?) No sp observed in this experiment, but the mass balance has a Cr deficit and the position on the phase diagram suggests
+      there should be a small amount of it. Abbreviations: olv = olivine,
+
+      opx = orthopyroxene, cpx = clinopyroxene, sp = spinel, gt = garnet, ilm = ilmenite, esk = eskolaite, liq = quenched
+      melt.
+
+      a
+
+      '
+  context_id: krawczynski-grove-2012-high-ti-lunar-melts::context::krawczynski_2012_table_2_a15r_conditions_and_partitioning
+  work_id: 10.1016/j.gca.2011.10.043
+  source_id: krawczynski-grove-2012-high-ti-lunar-melts
+  species: SiO2
+- observation_id: krawczynski_2012_table_3_a17o_conditions_and_partitioning
+  type: experiment_series
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 5
+    table: '3'
+  units: °C, GPa, h, KD and % FeO loss/gain as printed
+  values:
+    method_class: measured_direct
+    caption: Run conditions and products for A17O starting material.
+    row_count: 28
+    printed_cells: 'Negative modes indicate a failure of the linear regression analysis.
+
+      b
+
+      KD is the Fe–Mg mineral–melt exchange coefficient.
+
+
+      Table 3
+
+      Run conditions and products for A17O starting material.
+
+      Run #         Capsule          T (°C)      GPa     Time (h)   Phases                                  Olv KD   Opx KD   Cpx
+      KD   Gt/Sp KD   % FeO loss/gain
+
+      D176          Fe               1550        3.1     18.1       olv(10) + opx(−11) + liq(103)           0.282    0.300                        −7.5
+
+      D187          Fe               1510        3.32    45.3       olv(9) + cpx(26) + gnt(11) + liq(55)    0.249             0.259    0.478      −2.3
+
+      D190          Fe               1550        3.15    23.1       olv(7) + opx(2) + cpx(7) + liq(84)      0.271    0.269    0.297               −2.2
+
+      C408          Fe               1535        2.85    19.8       olv(8) + liq(90)                        0.283                                 21.4
+
+
+
+
+
+      Experimentally derived source depths of lunar high-Ti magmas
+
+      D195          Fe               1570        3.15    10.5       liq(100)                                                                      −5.2
+
+      D198          Fe               1550        3.3      6.5       olv(5) + opx(18) + cpx(−13) + liq(90)   0.282    0.278    0.295               −1.9
+
+      D199          Fe               1570        3.31     7.4       olv(4) + opx(−2) + liq(98)              0.294    0.268                        −1.4
+
+      D233          Fe               1550        2.9      6         olv + liq
+
+      B1050         C                1390        1.3     17.1       olv(8) + liq(91)                        0.276                                 −1.5
+
+      C363          C                1380        1.5      6.7       olv(12) + opx(10) + sp(1) + liq(77)     0.278    0.239             1.35        0.5
+
+      C364          C                1360        1.3     13.4       olv(15) + opx(6) + sp(1) + liq(79)      0.281    0.243             1.41        0
+
+      C365          C                1340        1.3      8.8       olv(16) + opx(6) + sp(1) + liq(78)      0.292    0.247             1.48        0.4
+
+      C366          C                1420        1.7     15.8       olv + sp + liq                          0.301
+
+      C367          C                1405        1.5     22.5       olv(7) + sp(2) + liq(92)                0.348                      1.61       −6.1
+
+      C368          C                1410        1.3     21.7       olv(10) + sp(1) + liq(89)               0.293                      1.49       −1.6
+
+      C370          C                1420        1.6     12.6       olv(12) + opx(−4) + sp(<1) + liq(92)    0.296    0.263             1.41        0.1
+
+      C371          C                1430        1.9     26.2       olv(9) + opx(3) + liq(88)               0.289    0.253                         0.2
+
+      C373          C                1440        2.15     9.1       olv(8) + opx(14) + sp(<1) + liq(77)     0.256    0.225             1.09        0.9
+
+      C376          C                1460        2.15    19.7       olv(5) + opx(8) + liq(86)               0.289    0.249                         0.6
+
+      C380          C                1470        1.9     21.9       olv(2) + liq(98)                        0.332                                 −4.4
+
+      C381          C                1480        2.1     19.7       olv(4) + liq(96)                        0.324                                 −4.6
+
+      C382          C                1450        1.9     24.9       olv(9) + liq(91)                        0.302                                 −2.3
+
+      C388          C                1490        2.3     23         olv(7) + opx(−1) + liq(94)              0.280    0.252                        −0.2
+
+      C389          C                1510        2.3     20.7       olv(4) + liq(96)                        0.298                                 −3.7
+
+      C395          C                1540        2.5      8         olv(2) + opx(−1) + liq(100)             0.317    0.284                        −1.9
+
+      C396          C                1520        2.5     26.8       olv(6) + opx(−12) + liq(107)            0.354    0.313                        −2.5
+
+      C397          C                1560        2.5      8.7       liq(100)                                                                                 0.6
+
+      C409          C                1555        2.7     14.3       liq(100)                                                                                −4.5
+
+      '
+  context_id: krawczynski-grove-2012-high-ti-lunar-melts::context::krawczynski_2012_table_3_a17o_conditions_and_partitioning
+  work_id: 10.1016/j.gca.2011.10.043
+  source_id: krawczynski-grove-2012-high-ti-lunar-melts
+  species: SiO2
+- observation_id: krawczynski_2012_table_4_a15r_phase_compositions
+  type: experiment_series
+  locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 8
+    table: '4'
+  units: oxide wt% and 1-sigma errors as printed
+  values:
+    method_class: measured_direct
+    caption: EMP analyses of A15R experiments in oxide weight percents.
+    render_checked_source: 600 dpi PDF render confirmed table layout and selected cells
+    printed_cells: 'highest pressure with olivine as the first silicate to crystallize                                                                       tron
+      microprobe analyses on the amorphous regions over-
+
+      is 1.3 GPa. In the Fe-capsule, low fO2 experiments, the oliv-                                                                            lapping
+      with the small Cr-spinel inclusions. Compositions
+
+      ine stability field expands and olivine is stable at pressures                                                                           of
+      garnets from an experiment that was not pressure-
+
+      at least up to 2.3 GPa. Although there are no experiments                                                                                quenched,
+      and thus survived the quenching, were similar
+
+
+      8
+
+
+      Table 4
+
+      EMP analyses of A15R experiments in oxide weight percents.
+
+      Run        Phase      na    SiO2b            TiO2            Al2O3          Cr2O3          FeO          MnO           MgO            CaO            Na2O          Total
+
+      C321       glass      29    35.1     0.23    14.41   0.23    7.43    0.13   0.73    0.04   22.7   0.3   0.25   0.03   10.75   0.22   8.36    0.18   0.35   0.06   100.10
+
+      olv        12    37.7     0.34    0.23    0.01    0.12    0.01   0.40    0.01   22.3   0.4   0.18   0.02   39.05   0.59   0.26    0.01   –      –      100.19
+
+      opx        10    52.3     0.75    1.57    0.22    4.05    0.72   0.81    0.08   13.9   0.3   0.19   0.02   25.99   0.60   1.95    0.07   0.05   0.01   100.78
+
+      C322       glass      28    34.8     0.69    14.55   0.46    7.50    0.21   0.73    0.06   22.9   0.6   0.25   0.04   10.96   0.25   8.50    0.22   0.31   0.09   100.49
+
+      olv        4     38.1     0.28    0.24    0.04    0.11    0.01   0.41    0.01   22.2   0.3   0.23   0.04   38.79   0.30   0.27    0.04   0.02   0.02   100.38
+
+
+
+
+
+      M.J. Krawczynski, T.L. Grove / Geochimica et Cosmochimica Acta 79 (2012) 1–19
+
+      opx        4     52.2     0.06    1.65    0.06    4.24    0.14   0.88    0.02   13.5   0.2   0.16   0.03   26.20   0.29   2.01    0.08   0.06   0.03   100.92
+
+      C323       glass      43    32.0     0.33    17.57   0.59    7.42    0.10   0.65    0.05   24.3   0.6   0.27   0.04   9.07    0.15   8.27    0.18   0.46   0.09   100.04
+
+      olv        12    37.6     0.22    0.28    0.04    0.18    0.16   0.33    0.02   24.0   0.4   0.23   0.01   37.30   0.27   0.31    0.06   –      –      100.17
+
+      opx        6     50.9     0.64    1.78    0.21    5.05    0.61   0.86    0.09   15.3   0.4   0.18   0.02   23.84   0.45   2.24    0.11   0.04   0.03   100.18
+
+      cpx        17    50.0     0.46    2.11    0.25    5.10    0.53   0.91    0.06   13.8   0.5   0.21   0.04   19.06   0.55   8.84    0.65   0.29   0.03   100.24
+
+      gnt        15    38.9     0.19    3.02    0.19    20.17   0.25   2.55    0.12   15.3   0.3   0.32   0.02   14.39   0.29   6.26    0.19   0.00   0.01   100.90
+
+      C324       glass      11    34.5     0.57    13.82   0.82    7.73    0.27   0.71    0.08   23.4   0.6   0.31   0.02   9.57    0.29   8.85    0.29   0.42   0.08   99.34
+
+      olv        8     38.2     0.36    0.20    0.06    0.12    0.11   0.38    0.04   23.7   1.9   0.21   0.04   37.13   0.98   0.30    0.07   –      –      100.22
+
+      opx        7     50.9     0.83    1.71    0.24    4.38    0.68   1.02    0.10   15.5   0.7   0.20   0.04   25.13   0.29   2.12    0.31   0.02   0.03   100.99
+
+      C326       glass      27    35.5     1.99    14.46   0.77    7.79    0.76   0.64    0.40   22.9   1.4   0.26   0.12   9.75    1.37   8.69    0.65   0.34   0.19   100.38
+
+      olv        10    38.1     0.59    0.25    0.06    0.11    0.03   0.38    0.06   23.4   0.7   0.20   0.05   38.14   0.82   0.29    0.05   –      –      100.92
+
+      opx        5     51.4     0.73    1.69    0.26    4.18    0.43   0.88    0.09   14.6   0.4   0.17   0.02   25.67   0.78   2.02    0.36   0.05   0.02   100.62
+
+      C329       glass      15    35.6     0.51    13.57   0.64    7.23    0.37   0.72    0.10   22.9   0.7   0.30   0.05   11.25   0.40   8.13    0.25   0.36   0.13   100.11
+
+      olv        5     38.8     0.74    0.23    0.04    0.13    0.04   0.38    0.03   21.3   0.8   0.19   0.03   39.57   0.40   0.27    0.04   –      –      100.87
+
+      opx        5     52.0     0.44    1.55    0.35    3.82    0.94   0.74    0.12   13.7   0.3   0.15   0.03   26.93   0.44   1.93    0.18   0.06   0.04   100.97
+
+      C333       glass      20    35.3     0.65    13.06   0.66    7.08    0.22   0.73    0.07   24.0   0.9   0.26   0.14   12.11   0.34   7.79    0.36   0.32   0.10   100.70
+
+      C346       glass      15    36.0     0.33    13.53   0.20    7.10    0.08   0.70    0.03   21.7   0.2   0.23   0.02   12.16   0.09   7.77    0.08   0.37   0.05   99.56
+
+      B1058      glass      12    39.8     0.28    12.76   0.21    6.39    0.07   3.41    0.21   16.7   0.4   0.27   0.02   10.80   0.12   8.57    0.18   0.37   0.05   99.12
+
+      sp         17    0.1      0.03    7.30    1.24    4.73    1.55   57.41   3.54   21.6   0.4   0.30   0.02   8.97    0.63   0.02    0.01   –      –      100.46
+
+      FeCr       19    –        –       –       –       –       –      3.16    0.60   99.0   0.9   –      –      –       –      –       –      –      –      102.15
+
+      C361       glass      19    35.9     0.35    14.05   0.35    7.14    0.07   0.74    0.05   21.9   0.4   0.24   0.02   12.25   0.49   7.90    0.19   0.37   0.07   100.57
+
+      PtFe       16    –        –       –       –       –       Pt:    83.77   0.34   18.3   0.3   –      –      –       –      –       –      –      –      102.03
+
+      B1025      glass      20    36.4     0.40    13.90   0.18    7.36    0.12   0.45    0.03   21.6   0.3   0.26   0.02   11.31   0.12   8.13    0.12   0.29   0.14   99.72
+
+      olv        3     38.8     0.13    0.23    0.03    0.04    0.00   0.28    0.01   20.2   0.5   0.21   0.02   41.07   0.24   0.24    0.02   –      –      101.07
+
+      sp
+
+      B1027      glass      15    37.5     0.31    14.73   0.05    8.25    0.22   0.22    0.06   20.9   0.1   0.27   0.03   8.33    0.47   9.18    0.22   0.40   0.02   99.71
+
+      olv        10    38.2     0.29    0.28    0.06    0.06    0.01   0.21    0.02   22.5   0.6   0.21   0.03   38.20   0.42   0.25    0.02   –      –      99.89
+
+      opx        10    50.9     0.41    1.89    0.41    3.60    0.12   0.86    0.03   15.4   0.3   0.27   0.02   22.48   0.14   4.01    0.18   0.02   0.06   99.48
+
+      C309       glass      15    32.3     0.45    17.47   0.39    7.61    0.19   0.41    0.05   22.0   0.6   0.27   0.02   10.06   0.34   9.60    0.33   0.32   0.09   100.03
+
+      opx        10    51.2     0.79    1.13    0.15    4.89    0.81   0.90    0.12   15.0   0.2   0.21   0.02   24.63   0.38   2.32    0.04   0.11   0.05   100.30
+
+      cpx        10    49.6     0.66    1.76    0.15    6.05    0.39   0.96    0.08   12.6   0.6   0.22   0.02   18.35   0.83   10.66   1.15   0.30   0.04   100.48
+
+      ilm        7     0.1      0.02    51.51   0.35    1.99    0.04   4.84    0.09   32.4   0.5   0.22   0.03   7.93    0.07   0.29    0.03   –      –      99.32
+
+      sp         8     0.2      0.01    11.52   0.18    21.91   0.55   22.92   0.57   32.3   0.2   0.21   0.03   10.46   0.13   0.12    0.05   –      –      99.75
+
+      C310       glass      15    32.6     0.31    15.88   0.55    8.34    0.15   0.27    0.03   24.1   0.7   0.28   0.03   8.99    0.64   9.26    0.55   0.47   0.14   100.30
+
+      opx        10    49.3     0.32    1.41    0.08    6.26    0.47   0.81    0.03   16.7   0.3   0.23   0.02   23.17   0.32   2.34    0.11   0.03   0.03   100.25
+
+      cpx        15    48.6     0.52    1.91    0.19    6.57    0.53   0.76    0.05   13.8   0.5   0.22   0.02   17.31   0.72   10.41   0.92   0.18   0.03   99.76
+
+      ilm        6     0.2      0.08    53.17   0.32    1.60    0.08   2.85    0.13   34.3   0.2   0.24   0.02   7.38    0.31   0.29    0.05   –      –      100.05
+
+      sp         7     0.3      0.01    10.85   0.26    26.64   0.49   19.36   0.16   32.5   0.2   0.21   0.02   10.22   0.14   0.11    0.03   –      –      100.13
+
+
+      C311         glass       15     34.5     0.31    16.32    0.40   7.51      0.18    0.68    0.05   19.2   0.3   0.29   0.03   12.07   0.54   8.69   0.40   0.33   0.11   99.57
+
+      opx         10     52.1     0.55    1.03     0.07   4.34      0.37    1.21    0.08   13.0   0.3   0.21   0.02   26.40   0.47   1.84   0.13   0.09   0.04   100.22
+
+      sp          4      0.3      0.02    7.54     0.43   20.01     0.23    34.33   0.66   26.4   0.2   0.19   0.02   10.78   0.59   0.06   0.02   –      –      99.66
+
+      C312         glass       15     34.2     0.67    16.15    0.71   7.42      0.13    0.53    0.04   20.0   0.5   0.28   0.02   12.25   0.35   8.37   0.31   0.16   0.11   99.41
+
+      opx         11     51.2     0.45    1.23     0.07   4.25      0.18    1.02    0.06   13.4   0.2   0.18   0.02   26.27   0.55   1.97   0.19   0.05   0.02   99.58
+
+      sp          4      0.2      0.02    10.33    0.12   18.07     0.97    30.47   0.64   28.8   0.1   0.25   0.03   10.82   0.71   0.07   0.01   –      –      99.07
+
+      C313         glass       15     36.8     0.28    14.73    0.26   7.41      0.18    0.85    0.07   19.1   0.7   0.23   0.04   13.84   0.92   7.77   0.50   0.24   0.05   100.87
+
+      opx         1      52.4             1.02            4.12              1.32           12.8         0.18          27.87          1.66          0.03          101.41
+
+      sp          1      0.3              7.29            13.49             38.33          24.8         0.25          13.07          0.16          0.07          97.69
+
+      C314         glass       3      36.6     0.19    14.80    0.19   7.55      0.06    0.55    0.04   18.9   0.3   0.23   0.04   11.33   0.06   8.41   0.05   0.51   0.03   98.80
+
+      opx         12     52.6     0.80    1.12     0.12   3.66      0.56    1.11    0.10   12.6   0.3   0.20   0.02   27.38   1.04   1.66   0.17   0.04   0.02   100.30
+
+      sp          6      0.2      0.02    9.29     0.29   15.66     0.86    35.44   0.45   26.9   0.2   0.23   0.03   11.75   0.61   0.11   0.03   –      –      99.50
+
+      C315         glass       15     36.3     0.27    13.92    0.31   7.15      0.09    0.79    0.08   20.3   0.6   0.24   0.03   13.26   0.70   7.67   0.34   0.23   0.06   99.90
+
+
+
+
+
+      Experimentally derived source depths of lunar high-Ti magmas
+
+      C316         glass       5      36.3     0.12    13.68    0.16   7.17      0.03    0.58    0.04   20.3   0.4   0.24   0.02   12.24   0.11   7.86   0.09   0.38   0.07   98.70
+
+      sp          6      0.2      0.02    8.59     0.14   15.80     0.21    37.88   0.43   25.5   0.2   0.25   0.02   11.88   0.38   0.17   0.01   –      –      100.20
+
+      C317         glass       8      35.6     0.36    14.69    0.24   7.48      0.04    0.41    0.02   20.3   0.1   0.25   0.04   11.06   0.05   8.49   0.04   0.40   0.12   98.70
+
+      opx         16     52.2     0.37    1.19     0.08   3.31      0.15    1.06    0.04   12.7   0.2   0.20   0.03   27.60   0.58   1.57   0.11   0.02   0.02   99.80
+
+      sp          5      0.2      0.02    10.72    0.07   14.79     0.16    33.26   0.21   28.1   0.4   0.20   0.04   11.74   0.33   0.12   0.05   –      –      99.10
+
+      C318         glass       3      36.2     0.12    15.10    0.57   8.11      0.22    0.28    0.08   19.6   0.2   0.28   0.02   10.42   0.46   8.79   0.27   0.42   0.05   99.27
+
+      olv         4      38.6     0.33    0.26     0.07   0.07      0.01    0.21    0.02   20.1   0.4   0.24   0.04   40.50   0.27   0.25   0.01   –      –      100.26
+
+      opx         5      52.7     0.20    1.43     0.08   3.50      0.16    1.03    0.04   13.1   0.3   0.20   0.03   27.16   0.40   1.59   0.11   0.04   0.02   100.73
+
+      sp          4      0.2      0.01    12.55    0.31   12.52     0.20    31.09   0.22   30.1   0.2   0.26   0.01   11.72   0.12   0.13   0.05   –      –      98.63
+
+      C320         glass       18     37.0     0.27    13.42    0.30   7.06      0.08    0.49    0.04   20.9   0.2   0.25   0.03   11.48   0.15   7.73   0.15   0.54   0.09   98.86
+
+      olv         12     38.9     0.27    0.19     0.04   0.09      0.02    0.30    0.05   19.8   0.4   0.19   0.03   39.94   0.28   0.22   0.01   –      –      99.63
+
+      sp          7      0.1      0.02    11.78    0.20   12.47     0.14    36.35   0.45   27.7   0.3   0.23   0.02   10.78   0.47   0.10   0.03   –      –      99.52
+
+      C332         glass       46     33.7     0.44    15.95    0.22   7.88      0.08    0.25    0.03   22.2   0.2   0.27   0.03   8.79    0.12   9.49   0.15   0.45   0.08   98.94
+
+      olv         12     38.1     0.40    0.36     0.41   0.11      0.05    0.17    0.03   23.8   0.4   0.24   0.03   36.93   0.37   0.28   0.02   –      –      99.99
+
+      opx         12     51.4     0.61    1.33     0.12   4.22      0.47    0.85    0.10   14.7   0.2   0.20   0.02   25.63   0.60   2.19   0.09   0.06   0.02   100.65
+
+      ilm         10     0.1      0.02    53.96    0.41   1.30      0.03    3.44    0.12   31.7   0.5   0.23   0.02   9.26    0.30   0.12   0.03   –      –      100.12
+
+      sp          4      0.2      0.03    15.44    0.10   15.88     0.39    22.60   0.12   35.0   0.1   0.23   0.02   10.33   0.33   0.14   0.05   –      –      99.76
+
+      a
+
+      n = number of probe analyses.
+
+      '
+  context_id: krawczynski-grove-2012-high-ti-lunar-melts::context::krawczynski_2012_table_4_a15r_phase_compositions
+  work_id: 10.1016/j.gca.2011.10.043
+  source_id: krawczynski-grove-2012-high-ti-lunar-melts
+  species: SiO2
+- observation_id: krawczynski_2012_table_5_a17o_phase_compositions
+  type: experiment_series
+  locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: 10
+    table: '5'
+  units: oxide wt% and 1-sigma errors as printed
+  values:
+    method_class: measured_direct
+    caption: EMP analyses of A17O experiments in oxide weight percents.
+    render_checked_source: 600 dpi PDF render confirmed table layout and selected cells
+    printed_cells: 'b
+
+      Columns directly following the oxide wt% are 1-r errors from replicate analyses.
+
+
+
+
+
+      9
+
+
+      10
+
+      Table 5
+
+      EMP analyses of A17O experiments in oxide weight percents.
+
+      Run        Phase      n      SiO2           TiO2             Al2O3          Cr2O3          FeO           MnO           MgO            CaO           Na2O          Total
+
+      D176       glass      15     39.3    0.18   10.39    0.17    6.48    0.05   0.61    0.05   20.2   0.3    0.28   0.03   14.15   0.20   8.38   0.13   0.32   0.10   100.11
+
+      olv        10     39.2    0.14   0.17     0.02    0.10    0.01   0.30    0.02   17.3   0.3    0.19   0.02   42.97   0.30   0.27   0.02   –      –      100.46
+
+      opx        10     54.1    0.31   0.89     0.08    2.75    0.27   0.51    0.03   12.1   0.2    0.19   0.03   28.28   0.30   2.08   0.03   0.09   0.05   101.01
+
+      D187       glass      15     32.1    0.25   16.75    0.28    5.47    0.07   0.53    0.04   26.9   0.4    0.30   0.02   10.02   0.14   7.65   0.16   0.33   0.07   100.08
+
+      olv        9      37.5    0.30   0.25     0.03    0.17    0.15   0.27    0.02   24.4   0.6    0.24   0.03   36.62   0.35   0.34   0.04   –      –      99.89
+
+
+
+
+
+      M.J. Krawczynski, T.L. Grove / Geochimica et Cosmochimica Acta 79 (2012) 1–19
+
+      cpx        15     51.5    0.30   1.38     0.07    3.52    0.18   0.53    0.03   14.0   0.4    0.24   0.02   20.09   0.51   8.75   0.76   0.22   0.05   100.20
+
+      gnt        11     38.8    1.15   3.52     0.58    19.28   0.69   1.78    0.59   15.9   0.6    0.35   0.02   12.43   0.98   7.21   0.58   0.09   0.04   99.37
+
+      D190       glass      15     36.7    0.19   11.52    0.17    6.75    0.09   0.66    0.03   23.4   0.3    0.26   0.04   12.04   0.16   8.41   0.12   0.38   0.08   100.23
+
+      olv        10     38.4    0.19   0.17     0.02    0.13    0.01   0.32    0.01   20.9   0.3    0.26   0.02   39.53   0.17   0.32   0.01   –      –      100.00
+
+      opx        7      53.1    0.51   0.89     0.11    3.16    0.39   0.60    0.05   13.9   0.3    0.21   0.01   26.53   0.26   2.39   0.10   0.11   0.03   100.90
+
+      cpx        14     52.5    0.20   1.05     0.07    3.46    0.17   0.63    0.02   13.4   0.4    0.25   0.03   23.21   0.49   6.20   0.42   0.20   0.04   100.89
+
+      C408       glass      14     36.1    0.18   8.36     0.12    5.42    0.09   0.56    0.02   29.1   0.2    0.25   0.02   13.57   0.17   6.96   0.14   0.27   0.11   100.69
+
+      olv        5      37.9    0.43   0.12     0.03    0.11    0.02   0.28    0.03   23.2   0.6    0.21   0.02   38.28   0.51   0.32   0.02   –      –      100.45
+
+      D195       glass      15     39.3    0.17   8.85     0.15    5.84    0.05   0.61    0.03   21.7   0.2    0.31   0.02   15.47   0.16   7.28   0.14   0.22   0.09   99.55
+
+      D198       glass      28     37.4    0.33   10.74    0.33    6.64    0.12   0.64    0.05   23.0   0.40   0.30   0.02   12.66   0.19   8.65   0.15   0.25   0.07   100.24
+
+      olv        12     38.0    0.26   0.23     0.02    0.13    0.01   0.34    0.02   20.8   0.2    0.21   0.03   40.61   0.32   0.33   0.01   –      –      100.63
+
+      opx        12     53.4    0.48   0.71     0.14    2.97    0.48   0.35    0.04   13.5   0.4    0.14   0.02   26.74   0.36   2.31   0.15   0.07   0.03   100.13
+
+      cpx        15     53.0    0.47   0.98     0.08    3.14    0.21   0.54    0.02   13.0   0.7    0.21   0.03   24.24   0.73   5.57   0.94   0.13   0.03   100.86
+
+      D199       glass      13     39.0    0.16   9.57     0.19    6.11    0.10   0.67    0.03   22.6   0.3    0.29   0.03   14.34   0.17   8.14   0.05   0.19   0.03   100.89
+
+      olv        8      38.9    0.45   0.21     0.02    0.15    0.03   0.33    0.03   19.2   0.4    0.19   0.02   41.47   0.38   0.29   0.02   –      –      100.77
+
+      opx        12     54.4    0.47   0.70     0.11    2.65    0.43   0.29    0.03   12.0   0.2    0.14   0.02   28.37   0.42   1.99   0.05   0.06   0.02   100.61
+
+      B1050      glass      5      38.8    0.31   9.65     0.40    6.29    0.23   0.66    0.08   22.7   0.5    0.25   0.03   12.43   0.25   7.86   0.26   0.27   0.14   98.86
+
+      olv        5      38.4    0.28   0.11     0.06    0.07    0.01   0.29    0.03   20.5   0.7    0.23   0.04   40.60   0.58   0.24   0.04   –      –      100.44
+
+      C363       glass      27     37.1    0.38   11.27    0.23    7.11    0.10   0.42    0.04   23.8   0.3    0.28   0.03   9.89    0.31   9.25   0.12   0.42   0.07   99.54
+
+      olv        12     37.3    0.29   0.20     0.05    0.08    0.01   0.20    0.02   24.5   0.2    0.27   0.03   36.69   0.41   0.34   0.02   –      –      99.57
+
+      opx        14     52.8    0.76   0.99     0.12    2.88    0.69   1.01    0.18   14.8   0.2    0.22   0.02   25.70   0.41   2.20   0.13   0.01   0.02   100.59
+
+      sp         4      0.2     0.02   10.55    0.12    14.70   0.31   31.46   0.39   31.1   0.5    0.27   0.04   9.55    0.33   0.10   0.04   –      –      97.92
+
+      C364       glass      14     37.8    0.44   11.20    0.68    7.39    0.17   0.34    0.07   23.1   0.5    0.26   0.06   10.02   0.29   9.00   0.22   0.39   0.08   99.47
+
+      olv        13     37.6    0.56   0.13     0.04    0.08    0.03   0.23    0.05   24.0   0.7    0.22   0.03   37.01   0.83   0.27   0.03   –      –      99.62
+
+      opx        10     52.8    0.57   0.90     0.08    2.67    0.46   0.92    0.13   14.5   0.3    0.19   0.02   25.82   0.47   1.92   0.11   0.01   0.01   99.75
+
+      sp         2      0.5     0.36   9.85     0.05    12.74   0.28   34.2    0.11   31.9   0.1    0.34   0.02   9.79    0.62   0.12   0.02   –      –      99.51
+
+      C365       glass      11     37.7    0.44   11.20    0.44    7.29    0.16   0.32    0.04   23.0   0.3    0.25   0.02   9.81    0.55   9.04   0.21   0.39   0.05   99.08
+
+      olv        11     37.9    0.32   0.21     0.05    0.09    0.01   0.22    0.04   24.5   0.4    0.21   0.02   35.73   0.49   0.32   0.02   –      –      99.19
+
+      opx        12     52.3    0.46   1.03     0.06    3.08    0.32   0.98    0.09   14.7   0.2    0.17   0.02   25.34   0.30   2.01   0.14   0.01   0.01   99.58
+
+      sp         3      0.3     0.16   11.09    0.18    13.02   0.13   31.3    0.16   33.0   0.2    0.27   0.02   9.51    0.06   0.21   0.03   –      –      98.77
+
+      C366       glass      13     38.9    0.22   9.68     0.21    6.73    0.07   0.60    0.05   22.5   0.2    0.24   0.03   11.91   0.12   7.93   0.12   0.58   0.07   99.05
+
+      olv        11     38.1    0.26   0.15     0.02    0.09    0.01   0.35    0.02   21.8   0.1    0.18   0.03   38.37   0.25   0.26   0.01   0.01   0.01   99.33
+
+      sp
+
+      C367       glass      18     40.3    0.85   9.47     0.53    6.85    0.13   0.66    0.15   21.4   1.2    0.26   0.03   13.42   0.59   8.11   0.33   0.29   0.09   100.79
+
+      olv        11     38.1    0.27   0.10     0.03    0.08    0.01   0.30    0.02   21.5   0.3    0.17   0.03   38.66   0.24   0.24   0.01   –      –      99.13
+
+      sp         8      0.2     0.06   7.63     0.35    11.95   0.61   40.51   0.77   27.3   0.9    0.29   0.06   10.64   0.77   0.08   0.04   –      –      98.85
+
+      C368       glass      13     39.0    0.24   9.65     0.19    6.70    0.05   0.56    0.05   22.5   0.3    0.25   0.03   12.12   0.23   7.88   0.17   0.36   0.05   99.05
+
+      olv        10     38.4    0.34   0.10     0.01    0.07    0.01   0.30    0.01   21.1   0.2    0.18   0.02   38.93   0.49   0.23   0.01   –      –      99.32
+
+
+      sp      7    0.2    0.01   7.79    0.05   11.86   0.30   41.44   0.24   27.2   0.3    0.27   0.02   9.85    0.17   0.11   0.02   –      –      99.06
+
+      C370   glass   2    38.7   0.39   9.70    0.05   6.43    0.04   0.72    0.10   22.4   0.3    0.25   0.03   12.11   0.08   8.02   0.12   0.34   0.03   98.65
+
+      olv     4    38.5   0.53   0.11    0.02   0.07    0.01   0.28    0.01   21.5   0.6    0.19   0.03   39.36   0.21   0.24   0.02   –      –      100.29
+
+      opx     4    53.4   0.43   0.79    0.03   2.65    0.25   1.16    0.04   13.4   0.3    0.15   0.02   27.49   0.29   1.69   0.14   0.00   0.01   100.73
+
+      sp      4    0.2    0.03   7.63    0.14   12.63   0.42   39.95   0.69   27.8   0.4    0.24   0.02   10.65   0.24   0.04   0.03   –      –      99.19
+
+      C371   glass   16   38.0   0.29   10.01   0.20   6.70    0.07   0.70    0.05   23.3   0.2    0.28   0.03   11.95   0.21   8.42   0.13   0.45   0.11   99.80
+
+      olv     15   38.0   0.33   0.11    0.03   0.08    0.01   0.32    0.02   22.1   0.3    0.21   0.02   39.26   0.36   0.26   0.01   –      –      100.30
+
+      opx     14   53.4   0.58   0.76    0.10   2.64    0.41   1.13    0.14   13.4   0.2    0.20   0.03   27.23   0.56   1.83   0.05   0.06   0.03   100.60
+
+      C373   glass   19   36.2   0.36   11.07   0.19   6.88    0.10   0.63    0.05   24.8   0.5    0.30   0.04   10.28   0.61   9.12   0.17   0.40   0.10   99.67
+
+      olv     13   37.4   0.20   0.16    0.03   0.10    0.02   0.28    0.02   23.8   0.3    0.22   0.02   38.57   0.38   0.34   0.02   –      –      100.80
+
+      opx     12   52.6   0.35   0.89    0.03   3.52    0.11   1.18    0.05   14.2   0.2    0.21   0.02   26.25   0.20   2.19   0.15   0.05   0.02   101.10
+
+      sp      7    0.3    0.02   8.64    0.11   17.51   0.61   33.29   0.37   28.4   0.5    0.20   0.05   10.77   0.35   0.13   0.05   –      –      99.24
+
+      C376   glass   10   36.9   0.33   9.91    0.25   6.59    0.07   0.63    0.04   23.9   0.5    0.28   0.03   12.10   0.18   8.42   0.10   0.56   0.06   99.32
+
+
+
+
+
+      Experimentally derived source depths of lunar high-Ti magmas
+
+      olv     16   37.9   0.14   0.12    0.02   0.10    0.01   0.31    0.01   22.2   0.5    0.23   0.03   38.97   0.45   0.28   0.01   –      –      100.08
+
+      opx     14   53.2   0.43   0.71    0.04   2.80    0.23   1.03    0.06   13.4   0.3    0.20   0.02   27.28   0.27   1.84   0.04   0.03   0.02   100.49
+
+      C380   glass   43   39.3   0.59   9.47    0.24   6.23    0.10   0.74    0.11   22.1   0.88   0.27   0.03   14.54   0.65   7.80   0.25   0.18   0.06   100.61
+
+      olv     10   38.9   0.25   0.09    0.02   0.10    0.02   0.31    0.01   20.1   0.2    0.20   0.04   39.88   0.20   0.24   0.01   –      –      99.87
+
+      C381   glass   16   39.0   0.44   9.67    0.22   6.33    0.10   0.71    0.07   22.0   0.66   0.29   0.02   13.91   0.37   8.18   0.26   0.24   0.07   100.28
+
+      olv     10   38.3   0.17   0.10    0.03   0.09    0.01   0.34    0.02   20.3   0.2    0.20   0.02   39.81   0.25   0.26   0.02   –      –      99.45
+
+      C382   glass   11   38.7   0.25   9.68    0.24   6.48    0.04   0.64    0.05   22.3   0.3    0.30   0.03   12.47   0.44   8.05   0.11   0.50   0.15   99.16
+
+      olv     10   38.2   0.30   0.11    0.02   0.09    0.01   0.35    0.01   21.3   0.2    0.20   0.03   39.39   0.37   0.25   0.01   –      –      99.94
+
+      C388   glass   16   38.4   0.22   9.63    0.19   6.18    0.10   0.68    0.03   22.9   0.3    0.31   0.03   13.20   0.18   7.93   0.16   0.42   0.07   99.75
+
+      olv     4    39.2   0.16   0.13    0.02   0.07    0.01   0.34    0.01   19.8   0.5    0.22   0.02   40.76   0.23   0.27   0.01   –      –      100.87
+
+      opx     5    54.3   0.60   0.61    0.12   2.27    0.52   0.85    0.14   12.3   0.1    0.17   0.02   28.15   0.37   1.75   0.03   0.14   0.05   100.55
+
+      C389   glass   13   39.0   0.50   8.97    0.14   6.18    0.07   0.71    0.05   22.1   0.5    0.27   0.03   13.69   0.36   8.12   0.15   0.40   0.14   99.38
+
+      olv     14   38.3   0.23   0.10    0.03   0.09    0.01   0.31    0.01   19.8   0.3    0.18   0.03   41.17   0.28   0.26   0.02   –      –      100.18
+
+      C395   glass   12   38.7   0.60   9.47    0.25   6.21    0.13   0.73    0.08   22.5   0.9    0.28   0.04   14.80   0.45   8.14   0.33   0.13   0.08   100.99
+
+      olv     15   38.4   0.28   0.10    0.03   0.09    0.01   0.29    0.02   19.9   0.3    0.18   0.02   41.18   0.42   0.26   0.01   –      –      100.32
+
+      opx     11   53.8   0.40   0.61    0.07   2.52    0.29   0.87    0.09   12.3   0.3    0.16   0.04   28.51   0.47   1.74   0.04   0.03   0.02   100.55
+
+      C396   glass   19   39.9   1.10   8.79    0.61   6.51    0.16   0.81    0.09   21.2   1.3    0.29   0.03   15.19   0.80   7.77   0.26   0.29   0.09   100.83
+
+      olv     12   38.3   0.50   0.11    0.02   0.11    0.02   0.30    0.01   20.1   0.2    0.21   0.02   40.56   0.59   0.26   0.01   –      –      99.96
+
+      opx     10   54.4   0.49   0.63    0.06   2.73    0.26   0.88    0.08   12.3   0.2    0.18   0.03   28.10   0.38   1.67   0.16   0.03   0.01   100.92
+
+      C397   glass   16   38.5   0.18   8.55    0.17   5.71    0.05   0.68    0.04   23.1   0.2    0.25   0.03   15.41   0.16   7.40   0.13   0.23   0.07   99.86
+
+      C409   glass   17   38.8   0.80   8.95    0.32   5.89    0.14   0.72    0.08   22.0   1.0    0.25   0.02   16.12   1.11   7.43   0.37   0.34   0.43   100.65
+
+
+
+
+
+      11
+
+
+      12                        M.J. Krawczynski, T.L. Grove / Geochimica et Cosmochimica Acta 79 (2012) 1–19
+
+
+      to the broad beam analyses of exsolved and decomposed              experimentally studied, and ranges from 2.5 GPa in
+      graph-
+
+      garnets.                                                           ite capsules to 3.1 GPa for the Fe metal capsules.
+      Like the
+
+      A15R glass, there is garnet near the liquidus at high pres-
+
+      3.3.2. Apollo 17 orange glass                                      sure in the Fe capsule runs. In the highest pressure
+      and tem-
+
+      In Fig. 4 the influence of capsule material on phase equi-     perature experiments attempted here a sub-calcic augite
+      is a
+
+      libria is shown for the A17O starting material. In graphite        near-liquidus pyroxene phase. The lower calcium content
+      of
+
+      capsules, the A17O composition is saturated on its liquidus        the clinopyroxene is a function of the higher liquidus
+      tem-
+
+      with olivine and opx at 2.5 GPa and "1530 °C. At lower             peratures at these high pressures (Lindsley and Dixon,
+
+      pressure, olivine is the liquidus phase and at higher pressure     1976). Sub-calcic augite is also seen in some experiments
+
+      we infer opx as the liquidus phase. For Fe capsules the oliv-      on other low-Ti lunar glasses (Elkins-Tanton et al.,
+      2003).
+
+      ine stability field expands and olivine is the liquidus phase          The phase relations reported here are quite different
+
+      at pressures up to 3.1 GPa. At 3.1 GPa and "1560 °C oliv-          from those reported by Green et al. (1975), who determined
+
+      ine and opx are stable at the liquidus. Olivine coexisting         a MSP of 2.0 GPa. The MSP of 2.0 GPa is lower than
+      our
+
+      with opx is the stable liquidus assemblage to at least             result at high fO2 , and possibly represents the
+      slow nucle-
+
+      3.3 GPa. Clinopyroxene (sub-calcic augite) and garnet are          ation of olivine and/or possible Fe-loss through
+      reduction
+
+      also stable near the liquidus at pressures >3.1 GPa. The dif-      of Fe2+ by a smelting reaction facilitated by the
+      carbon in
+
+      ference in MSPs between graphite and Fe capsules for the           the mild steel capsules used by Green et al. (1975).
+      Reduc-
+
+      A17O glass is 0.6 GPa, smaller than the 0.9 GPa of the             tion of the FeO component of the melt leads to SiO2
+      enrich-
+
+      A15R glass.                                                        ment, and stabilizes opx to lower pressures by decreasing
+
+      the overall MgOþFeO
+
+      SiO2
+
+      of the melt. However, Green et al.
+
+      3.4. Comparison to previous experimental studies                   (1975) do not report compositions of minerals or
+      melts,
+
+      so it is not possible to definitively determine the reasons
+
+      The phase relations of the A15R glass were determined          for the difference observed here.
+
+      by Delano (1980), and those of the A17O glass were deter-
+
+      mined by Green et al. (1975). In both of these experimental                              4. DISCUSSION
+
+      studies experimental durations were short (5–120 min) com-
+
+      pared to the experimental durations used in this study. In         4.1. Effects of variable fO2 on phase equilibria
+
+      addition, the experiments of Green et al. (1975) were run
+
+      in a ‘mild steel’ capsule, an Fe–C alloy that will produce             The phase relations of these high-Ti lunar compositions
+
+      a smelting reaction, reducing FeO in the melt to Fe-metal,         are extremely sensitive to changes in the oxidation
+      state im-
+
+      significantly changing the bulk composition of the silicate        posed by the graphite and Fe metal capsule materials
+
+      portion of the starting material. Our experiments were car-        (Figs. 3 and 4). The reason for the sensitivity is
+      the high
+
+      ried out in graphite and spec-pure Fe capsules. These cap-         abundance of multiple valence elements Ti, Fe, and
+      Cr.
+
+      sule materials remain relatively inert with respect to the         We have measured the fO2 of our experiments in order
+      to
+
+      bulk composition of the silicate portion of the sample and         quantitatively constrain the effect of fO2 variations
+      on the
+
+      also control the fO2 of our system (see Section 3.1).              phase equilibria, and ultimately, the inferred depth
+      of origin
+
+      Experiments on the A15R glass in spec-pure Fe capsules         of such high-Ti magmas.
+
+      are generally similar to those by Delano (1980), who also              Both the A17O and A15R starting materials have
+      similar
+
+      used spec-pure Fe capsules. Our experiments produce an             FeO and Cr2O3 contents, but have different TiO2 contents.
+
+      olivine–opx multiple saturation point at 2.2 GPa. At similar       The controlled amounts of FeO and Cr2O3 allows us
+      to exam-
+
+      P and T conditions our boundaries for olivine and opx sta-         ine the effect of variable TiO2 concentration, oxidation
+      state,
+
+      bility are slightly different than those of Delano (1980),         and speciation on the pressure of olivine–opx MSPs.
+      The more
+
+      however the inferred point of coexistence of opx and olivine       oxidized experiments show lower pressure MSPs, in
+      both the
+
+      on the liquidus in our experiments is within 0.2 GPa of Del-       A17O and A15R glasses. The difference in the MSP
+      for the
+
+      ano ("2.4 GPa). The main difference between our Fe cap-            A15R glass is 50% greater than that observed for
+      the A17O
+
+      sule results and those of Delano is the presence of garnet         glass over the same range in fO2 , suggesting that
+      the higher
+
+      near the liquidus.                                                 TiO2 content ("40% greater) of the A15R enhances
+      the effects
+
+      The results on the A15R glass in graphite differ from those    of fO2 on the MSP. Thus we suggest that the black glass
+      of
+
+      of Delano (1980) in several respects. The liquidus phase is an     Apollo 14, which has more TiO2 than the A15R glass
+
+      oxide and not olivine or opx. Another difference is that the       (16.4 wt% TiO2), would show an even greater difference
+      in
+
+      MSP of olivine–opx is much lower in pressure (1.3 GPa).            MSP between graphite and Fe metal capsules (Fig.
+      5).
+
+      Ilmenite joins the crystallization sequence at lower tempera-          We suggest that the fO2 control on olivine–opx
+      equilbria
+
+      tures, well below the liquidus, and after a Cr–Ti spinel satu-     is caused by a shift in the TiO2:Ti2O3 ratio of the
+      experi-
+
+      rates, which is consistent with what Delano (1980)                 ment because Ti is the only major element that would
+
+      observed. A high calcium clinopyroxene joins the crystalliz-       change valence state at these reducing conditions,
+      as almost
+
+      ing assemblage of opx + spnl + ilmenite and the liquids in         all of the Fe is divalent over this range (Kress
+      and Carmi-
+
+      equilibrium with this assemblage may be analogous to low           chael, 1991). The partition coefficients for TiO''2
+      (* indicates
+
+      degree melts of late stage magma ocean cumulates.                  all of the element is calculated as a single valence)
+      as mea-
+
+      The MSP of the Apollo 17 orange glass occurs at the            sured by electron microprobe are Dolv–melt
+
+      Ti     = 0.017 ± 0.002
+
+      highest pressure of the three high-Ti glasses that have been       for A15R and Dolv–melt
+
+      Ti     = 0.014 ± 0.004  for A17O. Previous
+
+
+      Experimentally derived source depths of lunar high-Ti magmas                           13
+
+
+
+      A 1500                                                                          low fO2
+
+      Apollo 15 Red Glass                          Liq
+
+      Opx+Liq
+
+      Olv+Opx+Liq
+
+
+
+
+
+      Temperature (oC)
+
+      1400
+
+      Olv+Liq
+
+      ?                        +Grt/Spnl
+
+
+
+      Liq + Spnl
+
+      Opx+Liq
+
+      Olv+Liq
+
+      Olv+Opx+Liq            + Ilm + Cpx
+
+
+      1300
+
+      High fO2
+
+
+
+      1.0                   1.5                     2.0                2.5
+
+      Pressure (GPa)
+
+
+      B
+
+      High fO2
+
+      1550                                                                         Olv+Opx+
+
+      Opx+Liq                                Cpx+Liq
+
+      Olv+Liq
+
+
+
+
+
+      Temperature (oC)
+
+      Olv+Liq        Olv+Opx+Liq
+
+      +Grt, -Opx
+
+      1500
+
+      Olv+Opx+Liq
+
+      low fO2
+
+
+      1450
+
+      +Spnl
+
+      Apollo 17 Orange Glass
+
+
+      1400
+
+
+      2.5                             3.0
+
+      Pressure (GPa)
+
+
+      C                             Wagner and Grove 1997
+
+      16                               ∆MS > 1.0 GPa?
+
+
+
+
+      12
+
+      ∆MS = 0.9 GPa
+
+
+
+
+      TiO2 wt%             8
+
+      '
+  context_id: krawczynski-grove-2012-high-ti-lunar-melts::context::krawczynski_2012_table_5_a17o_phase_compositions
+  work_id: 10.1016/j.gca.2011.10.043
+  source_id: krawczynski-grove-2012-high-ti-lunar-melts
+  species: SiO2

@@ -1,0 +1,2181 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  citation: Shornikov, S. I., Archakov, I. Yu., and Shul’ts, M. M. (2003). A Mass Spectrometric Study of the Thermodynamic
+    Properties of Mullite. Russian Journal of Physical Chemistry, 77(7), 1044–1050.
+  source_ids:
+  - shornikov-2003-mullite-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:shornikov-2003-mullite-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_kems_table2
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 4
+    published_page: 1047
+    pdf_page_index: 3
+    table: '2'
+    note: Table title says determined in this work from solid-phase data.; row=1
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_kems_thermodynamic_series
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1950'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=31
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_01
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_digitization' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1100'
+      locator:
+        page: 3
+        published_page: 1046
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1, single panel; rendered at 600 dpi.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; rendered at 600 dpi.; panel=single; marker_symbol=square; series=1
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_02
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_curve' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; unmarked line.; panel=single; series=2
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_03
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_curve' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; unmarked line.; panel=single; series=3
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_04
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_digitization' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 3
+        published_page: 1046
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1, single panel; rendered at 600 dpi.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; rendered at 600 dpi.; panel=single; marker_symbol=filled circle; series=4
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_05
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_curve' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; unmarked line.; panel=single; series=5
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_06
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_digitization' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1900'
+      locator:
+        page: 3
+        published_page: 1046
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1, single panel; rendered at 600 dpi.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; rendered at 600 dpi.; panel=single; marker_symbol=filled triangle; series=6
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_07
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_curve' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; unmarked line.; panel=single; series=7
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_08
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_digitization' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2200'
+      locator:
+        page: 3
+        published_page: 1046
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1, single panel; rendered at 600 dpi.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; rendered at 600 dpi.; panel=single; marker_symbol=filled inverted triangle; series=8
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_09
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_curve' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; unmarked line.; panel=single; series=9
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_10
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_curve' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; unmarked line.; panel=single; series=10
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_11
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_curve' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; unmarked line.; panel=single; series=11
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_12
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_curve' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; unmarked line.; panel=single; series=12
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_13
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_curve' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; unmarked line.; panel=single; series=13
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_14
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_curve' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; unmarked line.; panel=single; series=14
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_15
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_curve' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; unmarked line.; panel=single; series=15
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_16
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_curve' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; unmarked line.; panel=single; series=16
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_17
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_digitization' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 3
+        published_page: 1046
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1, single panel; rendered at 600 dpi.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; rendered at 600 dpi.; panel=single; marker_symbol=filled diamond; series=17
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_18
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_digitization' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1900'
+      locator:
+        page: 3
+        published_page: 1046
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1, single panel; rendered at 600 dpi.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; rendered at 600 dpi.; panel=single; marker_symbol=square with cross; series=18
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_19
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_digitization' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1900'
+      locator:
+        page: 3
+        published_page: 1046
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1, single panel; rendered at 600 dpi.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; rendered at 600 dpi.; panel=single; marker_symbol=circle with cross; series=19
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_20
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_digitization' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 3
+        published_page: 1046
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1, single panel; rendered at 600 dpi.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; rendered at 600 dpi.; panel=single; marker_symbol=open triangle; series=20
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_21
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_digitization' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1700'
+      locator:
+        page: 3
+        published_page: 1046
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1, single panel; rendered at 600 dpi.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; rendered at 600 dpi.; panel=single; marker_symbol=crossed open triangle; series=21
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_22
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_curve' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; unmarked line.; panel=single; series=22
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_mullite_figure1_series_23
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'figure_digitization' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 3
+        published_page: 1046
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1, single panel; rendered at 600 dpi.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 3
+    published_page: 1046
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1, single panel; rendered at 600 dpi.; panel=single; marker_symbol=crossed diamond; series=23
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row01_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'recommended or estimated value' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=1
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row02_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'recommended or estimated value' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=2
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row03_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'recommended or estimated value' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=3
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row04_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'heterogeneous equilibria in slags' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=4
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row05_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solution calorimetry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=5
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row06_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'recommended or estimated value' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=6
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row07_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'heterogeneous equilibria in slags' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=7
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row08_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'recommended or estimated value' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=8
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row09_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solution calorimetry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '968'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=9
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row10_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solution calorimetry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '968'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=10
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row11_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'calculations from literature data' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=11
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row12_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'recommended or estimated value' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=12
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row13_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'calculations from literature data' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=13
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row14_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'recommended or estimated value' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=14
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row15_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'calculations from literature data' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=15
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row16_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solution calorimetry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=16
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row17_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'bomb calorimetry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=17
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row18_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'calculations from literature data' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=18
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row19_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solution calorimetry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '973'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=19
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row20_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Kapur–Froberg equation calculations' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=20
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row21_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'calculations from literature data' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1161'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=21
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row22_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'lattice model calculations' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '968'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=22
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row23_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'quasi-chemical model calculations' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=23
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row24_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'calculations from literature data' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1812'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=24
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row25_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Knudsen mass spectrometry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=25
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row26_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solution calorimetry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=26
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row27_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'parametric model calculations' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=27
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row28_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Knudsen mass spectrometry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1617'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=28
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_row29_reference
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'calculations from literature data' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1850'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=29
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_table1_this_work_row30
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'calculations from literature data' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1790'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    table: '1'
+    note: row=30
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_text_figure_range
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'author_stated_figure_interpretation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2100'
+      locator:
+        page: 2
+        published_page: 1045
+        pdf_page_index: 1
+        note: The authors' prose states the range from Figure 1.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 2
+    published_page: 1045
+    pdf_page_index: 1
+    note: The authors' prose states the range from Figure 1.
+- experiment_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff::experiment::shornikov_2003_text_ref66_melt_gibbs_extrapolation
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'extrapolation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no_numeric_temperature_printed
+      locator:
+        page: 4
+        published_page: 1047
+        pdf_page_index: 3
+        note: The sentence says "temperature of fusion of mullite" but prints no numeric temperature.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: e352344bfab4ad7d3fc27c96912d6b185b8c2a35ee1f969bfeb6d4d064d9edff
+  locator:
+    page: 4
+    published_page: 1047
+    pdf_page_index: 3
+    note: The sentence says "temperature of fusion of mullite" but prints no numeric temperature.

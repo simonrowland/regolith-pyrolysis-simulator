@@ -3359,8 +3359,8 @@ observations:
   experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'CaO_activity_figure_only'
+      tag: value
+      value: activity
     species:
       formula: CaO
       phase:
@@ -3373,12 +3373,682 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: unavailable
+    unavailable_reason: unmarked_curve_not_digitized
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: unmarked curve not digitized
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: This-work KEMS curve (1) at 1933 K; unmarked curve retained as typed figure-only evidence.; panel=a
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: This-work KEMS curve (1) at 1933 K; unmarked curve retained as typed figure-only evidence.; panel=a
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: This-work KEMS curve (1) at 1933 K; unmarked curve retained as typed figure-only evidence.; panel=a
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_curve2_2060k_figure_only
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2060'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: unmarked_curve_not_digitized
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: unmarked curve not digitized
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Curve (2) of Fig. 1(a), comparison at 2060 K, reference [4]. The caption names no marker symbol for this curve.;
+          panel=a
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Curve (2) of Fig. 1(a), comparison at 2060 K, reference [4]. The caption names no marker symbol for this curve.;
+      panel=a
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2060'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Curve (2) of Fig. 1(a), comparison at 2060 K, reference [4]. The caption names no marker symbol for this curve.;
+          panel=a
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_curve6_monte_carlo_1773k_figure_only
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: calculated_curve_not_digitized
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: calculated curve not digitized
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Curve (6) of Fig. 1(a), Monte Carlo calculation at 1773 K, reference [41].; panel=a
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Curve (6) of Fig. 1(a), Monte Carlo calculation at 1773 K, reference [41].; panel=a
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Curve (6) of Fig. 1(a), Monte Carlo calculation at 1773 K, reference [41].; panel=a
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_curve7_associated_1873k_figure_only
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: calculated_curve_not_digitized
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: calculated curve not digitized
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Curve (7) of Fig. 1(a), associated-solution calculation at 1873 K, reference [42].; panel=a
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Curve (7) of Fig. 1(a), associated-solution calculation at 1873 K, reference [42].; panel=a
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Curve (7) of Fig. 1(a), associated-solution calculation at 1873 K, reference [42].; panel=a
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_curve8_associated_1773k_figure_only
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: calculated_curve_not_digitized
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: calculated curve not digitized
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Curve (8) of Fig. 1(a), associated-solution calculation at 1773 K, reference [43].; panel=a
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Curve (8) of Fig. 1(a), associated-solution calculation at 1773 K, reference [43].; panel=a
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Curve (8) of Fig. 1(a), associated-solution calculation at 1773 K, reference [43].; panel=a
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_curve9_polymer_1773k_figure_only
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: calculated_curve_not_digitized
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: calculated curve not digitized
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Curve (9) of Fig. 1(a), polymer-model calculation at 1773 K, reference [44].; panel=a
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Curve (9) of Fig. 1(a), polymer-model calculation at 1773 K, reference [44].; panel=a
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Curve (9) of Fig. 1(a), polymer-model calculation at 1773 K, reference [44].; panel=a
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_series3_sulfide_1773k::T=1773:h=4ef7137f2c61
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.6594'
+        - - Al2O3
+          - '0.3406'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.49'
     approximate: false
   uncertainty:
     kind: none
@@ -3396,18 +4066,2197 @@ observations:
     published_page: 21
     pdf_page_index: 2
     figure: '1'
-    note: This-work KEMS curve (1) at 1933 K; figure also compares earlier measurements and models.
+    note: Figure 1(a), Series 3, filled circles; reference [31], 1773 K. Marked readings only.; panel=a; symbol=filled circles
   read_from: pdf:shornikov-1997-cao-alumina-vapor
   point_conditions:
     temperature_K:
       state:
         tag: value
-        value: '1933'
+        value: '1773'
       locator:
         published_page: 21
         pdf_page_index: 2
         figure: '1'
-        note: This-work KEMS curve (1) at 1933 K; figure also compares earlier measurements and models.
+        note: Figure 1(a), Series 3, filled circles; reference [31], 1773 K. Marked readings only.; panel=a; symbol=filled
+          circles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: figure_axis_mole_percent
+          components:
+          - - CaO
+            - '0.6594'
+          - - Al2O3
+            - '0.3406'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: x(CaO)=65.94 mole%; -log10(a_CaO)=0.313; independent pixel reads (1842.00,759.00) and (1842.00,759.00); read
+          uncertainty 0.001121 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-05.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-1997-cao-alumina-vapor
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_series3_sulfide_1773k::T=1773:h=98c802271d49
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.6819'
+        - - Al2O3
+          - '0.3181'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.64'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1(a), Series 3, filled circles; reference [31], 1773 K. Marked readings only.; panel=a; symbol=filled circles
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1(a), Series 3, filled circles; reference [31], 1773 K. Marked readings only.; panel=a; symbol=filled
+          circles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: figure_axis_mole_percent
+          components:
+          - - CaO
+            - '0.6819'
+          - - Al2O3
+            - '0.3181'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: x(CaO)=68.19 mole%; -log10(a_CaO)=0.192; independent pixel reads (1893.00,705.00) and (1893.00,705.00); read
+          uncertainty 0.001121 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-06.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-1997-cao-alumina-vapor
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_series3_sulfide_1773k::T=1773:h=af4d4a74b31d
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.6382'
+        - - Al2O3
+          - '0.3618'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.37'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1(a), Series 3, filled circles; reference [31], 1773 K. Marked readings only.; panel=a; symbol=filled circles
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1(a), Series 3, filled circles; reference [31], 1773 K. Marked readings only.; panel=a; symbol=filled
+          circles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: figure_axis_mole_percent
+          components:
+          - - CaO
+            - '0.6382'
+          - - Al2O3
+            - '0.3618'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: x(CaO)=63.82 mole%; -log10(a_CaO)=0.428; independent pixel reads (1794.00,810.00) and (1794.00,810.00); read
+          uncertainty 0.001121 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-04.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-1997-cao-alumina-vapor
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_series3_sulfide_1773k::T=1773:h=cb99fccad882
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.6012'
+        - - Al2O3
+          - '0.3988'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.25'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1(a), Series 3, filled circles; reference [31], 1773 K. Marked readings only.; panel=a; symbol=filled circles
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1(a), Series 3, filled circles; reference [31], 1773 K. Marked readings only.; panel=a; symbol=filled
+          circles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: figure_axis_mole_percent
+          components:
+          - - CaO
+            - '0.6012'
+          - - Al2O3
+            - '0.3988'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: x(CaO)=60.12 mole%; -log10(a_CaO)=0.609; independent pixel reads (1710.00,891.00) and (1710.00,891.00); read
+          uncertainty 0.001121 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-02.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-1997-cao-alumina-vapor
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_series3_sulfide_1773k::T=1773:h=d0671abd0505
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.6197'
+        - - Al2O3
+          - '0.3803'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1(a), Series 3, filled circles; reference [31], 1773 K. Marked readings only.; panel=a; symbol=filled circles
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1(a), Series 3, filled circles; reference [31], 1773 K. Marked readings only.; panel=a; symbol=filled
+          circles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: figure_axis_mole_percent
+          components:
+          - - CaO
+            - '0.6197'
+          - - Al2O3
+            - '0.3803'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: x(CaO)=61.97 mole%; -log10(a_CaO)=0.529; independent pixel reads (1752.00,855.00) and (1752.00,855.00); read
+          uncertainty 0.001121 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-03.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-1997-cao-alumina-vapor
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_series3_sulfide_1773k::T=1773:h=da4b6fa9676d
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.5813'
+        - - Al2O3
+          - '0.4187'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.2'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1(a), Series 3, filled circles; reference [31], 1773 K. Marked readings only.; panel=a; symbol=filled circles
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1(a), Series 3, filled circles; reference [31], 1773 K. Marked readings only.; panel=a; symbol=filled
+          circles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: figure_axis_mole_percent
+          components:
+          - - CaO
+            - '0.5813'
+          - - Al2O3
+            - '0.4187'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: x(CaO)=58.13 mole%; -log10(a_CaO)=0.690; independent pixel reads (1665.00,927.00) and (1665.00,927.00); read
+          uncertainty 0.001121 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-01.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-1997-cao-alumina-vapor
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_series3_sulfide_1773k::T=1773:h=ecec322edfd0
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.7097'
+        - - Al2O3
+          - '0.2903'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.9'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1(a), Series 3, filled circles; reference [31], 1773 K. Marked readings only.; panel=a; symbol=filled circles
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1(a), Series 3, filled circles; reference [31], 1773 K. Marked readings only.; panel=a; symbol=filled
+          circles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: figure_axis_mole_percent
+          components:
+          - - CaO
+            - '0.7097'
+          - - Al2O3
+            - '0.2903'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: x(CaO)=70.97 mole%; -log10(a_CaO)=0.044; independent pixel reads (1956.00,639.00) and (1956.00,639.00); read
+          uncertainty 0.001121 dex; audit shornikov_1997_cao_fig1_series3_sulfide_1773k-07.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-1997-cao-alumina-vapor
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_series4_sulfide_1873k::T=1873:h=15d00359fef9
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.3333'
+        - - Al2O3
+          - '0.6667'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.025'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1(a), Series 4, filled squares; reference [34], 1873 K. Marked readings only.; panel=a; symbol=filled squares
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1(a), Series 4, filled squares; reference [34], 1873 K. Marked readings only.; panel=a; symbol=filled
+          squares
+    composition:
+      state:
+        tag: value
+        value:
+          basis: figure_axis_mole_percent
+          components:
+          - - CaO
+            - '0.3333'
+          - - Al2O3
+            - '0.6667'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: x(CaO)=33.33 mole%; -log10(a_CaO)=1.597; independent pixel reads (1102.93,1331.50) and (1102.88,1331.50); read
+          uncertainty 0.001121 dex; audit shornikov_1997_cao_fig1_series4_sulfide_1873k-02.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-1997-cao-alumina-vapor
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_series4_sulfide_1873k::T=1873:h=64428b7da942
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.6327'
+        - - Al2O3
+          - '0.3673'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.47'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1(a), Series 4, filled squares; reference [34], 1873 K. Marked readings only.; panel=a; symbol=filled squares
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1(a), Series 4, filled squares; reference [34], 1873 K. Marked readings only.; panel=a; symbol=filled
+          squares
+    composition:
+      state:
+        tag: value
+        value:
+          basis: figure_axis_mole_percent
+          components:
+          - - CaO
+            - '0.6327'
+          - - Al2O3
+            - '0.3673'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: x(CaO)=63.27 mole%; -log10(a_CaO)=0.332; independent pixel reads (1781.50,767.44) and (1781.50,767.50); read
+          uncertainty 0.0001 dex; audit shornikov_1997_cao_fig1_series4_sulfide_1873k-05.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-1997-cao-alumina-vapor
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_series4_sulfide_1873k::T=1873:h=81c1a2dbf423
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.5035'
+        - - Al2O3
+          - '0.4965'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.11'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1(a), Series 4, filled squares; reference [34], 1873 K. Marked readings only.; panel=a; symbol=filled squares
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1(a), Series 4, filled squares; reference [34], 1873 K. Marked readings only.; panel=a; symbol=filled
+          squares
+    composition:
+      state:
+        tag: value
+        value:
+          basis: figure_axis_mole_percent
+          components:
+          - - CaO
+            - '0.5035'
+          - - Al2O3
+            - '0.4965'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: x(CaO)=50.35 mole%; -log10(a_CaO)=0.975; independent pixel reads (1488.65,1054.25) and (1488.58,1054.23); read
+          uncertainty 0.000022 dex; audit shornikov_1997_cao_fig1_series4_sulfide_1873k-03.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-1997-cao-alumina-vapor
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_series4_sulfide_1873k::T=1873:h=97da4c1c5c16
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.1443'
+        - - Al2O3
+          - '0.8557'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.01'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1(a), Series 4, filled squares; reference [34], 1873 K. Marked readings only.; panel=a; symbol=filled squares
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1(a), Series 4, filled squares; reference [34], 1873 K. Marked readings only.; panel=a; symbol=filled
+          squares
+    composition:
+      state:
+        tag: value
+        value:
+          basis: figure_axis_mole_percent
+          components:
+          - - CaO
+            - '0.1443'
+          - - Al2O3
+            - '0.8557'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: x(CaO)=14.43 mole%; -log10(a_CaO)=1.994; independent pixel reads (674.36,1508.36) and (674.37,1508.37); read
+          uncertainty 0.000011 dex; audit shornikov_1997_cao_fig1_series4_sulfide_1873k-01.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-1997-cao-alumina-vapor
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_series4_sulfide_1873k::T=1873:h=c4dfc0942eef
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.7504'
+        - - Al2O3
+          - '0.2496'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.91'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1(a), Series 4, filled squares; reference [34], 1873 K. Marked readings only.; panel=a; symbol=filled squares
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1(a), Series 4, filled squares; reference [34], 1873 K. Marked readings only.; panel=a; symbol=filled
+          squares
+    composition:
+      state:
+        tag: value
+        value:
+          basis: figure_axis_mole_percent
+          components:
+          - - CaO
+            - '0.7504'
+          - - Al2O3
+            - '0.2496'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: x(CaO)=75.04 mole%; -log10(a_CaO)=0.043; independent pixel reads (2048.17,638.38) and (2048.20,638.41); read
+          uncertainty 0.000034 dex; audit shornikov_1997_cao_fig1_series4_sulfide_1873k-06.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-1997-cao-alumina-vapor
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_series4_sulfide_1873k::T=1873:h=f553c602d179
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.6012'
+        - - Al2O3
+          - '0.3988'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.33'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1(a), Series 4, filled squares; reference [34], 1873 K. Marked readings only.; panel=a; symbol=filled squares
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1(a), Series 4, filled squares; reference [34], 1873 K. Marked readings only.; panel=a; symbol=filled
+          squares
+    composition:
+      state:
+        tag: value
+        value:
+          basis: figure_axis_mole_percent
+          components:
+          - - CaO
+            - '0.6012'
+          - - Al2O3
+            - '0.3988'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: x(CaO)=60.12 mole%; -log10(a_CaO)=0.482; independent pixel reads (1710.08,834.36) and (1710.14,834.39); read
+          uncertainty 0.000034 dex; audit shornikov_1997_cao_fig1_series4_sulfide_1873k-04.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-1997-cao-alumina-vapor
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_series5_emf_1773k::T=1773:h=4815f3a0e3ce
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.1448'
+        - - Al2O3
+          - '0.8552'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0057'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1(a), Series 5, open triangles; reference [18], 1773 K. Marked readings only.; panel=a; symbol=open triangles
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1(a), Series 5, open triangles; reference [18], 1773 K. Marked readings only.; panel=a; symbol=open triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: figure_axis_mole_percent
+          components:
+          - - CaO
+            - '0.1448'
+          - - Al2O3
+            - '0.8552'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: x(CaO)=14.48 mole%; -log10(a_CaO)=2.242; independent pixel reads (675.55,1619.08) and (675.50,1620.00); read
+          uncertainty 0.0010 dex; audit shornikov_1997_cao_fig1_series5_emf_1773k-01.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-1997-cao-alumina-vapor
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_series5_emf_1773k::T=1773:h=5378c792d7bc
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.503'
+        - - Al2O3
+          - '0.497'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.089'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1(a), Series 5, open triangles; reference [18], 1773 K. Marked readings only.; panel=a; symbol=open triangles
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1(a), Series 5, open triangles; reference [18], 1773 K. Marked readings only.; panel=a; symbol=open triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: figure_axis_mole_percent
+          components:
+          - - CaO
+            - '0.503'
+          - - Al2O3
+            - '0.497'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: x(CaO)=50.30 mole%; -log10(a_CaO)=1.052; independent pixel reads (1487.46,1088.48) and (1487.50,1089.00); read
+          uncertainty 0.0006 dex; audit shornikov_1997_cao_fig1_series5_emf_1773k-03.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-1997-cao-alumina-vapor
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_series5_emf_1773k::T=1773:h=a0c4bc68ffc7
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.7078'
+        - - Al2O3
+          - '0.2922'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.56'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1(a), Series 5, open triangles; reference [18], 1773 K. Marked readings only.; panel=a; symbol=open triangles
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1(a), Series 5, open triangles; reference [18], 1773 K. Marked readings only.; panel=a; symbol=open triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: figure_axis_mole_percent
+          components:
+          - - CaO
+            - '0.7078'
+          - - Al2O3
+            - '0.2922'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: x(CaO)=70.78 mole%; -log10(a_CaO)=0.248; independent pixel reads (1951.74,729.97) and (1952.50,730.50); read
+          uncertainty 0.0006 dex; audit shornikov_1997_cao_fig1_series5_emf_1773k-05.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-1997-cao-alumina-vapor
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_series5_emf_1773k::T=1773:h=aaab041f643a
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.6301'
+        - - Al2O3
+          - '0.3699'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.24'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1(a), Series 5, open triangles; reference [18], 1773 K. Marked readings only.; panel=a; symbol=open triangles
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1(a), Series 5, open triangles; reference [18], 1773 K. Marked readings only.; panel=a; symbol=open triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: figure_axis_mole_percent
+          components:
+          - - CaO
+            - '0.6301'
+          - - Al2O3
+            - '0.3699'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: x(CaO)=63.01 mole%; -log10(a_CaO)=0.618; independent pixel reads (1775.55,894.89) and (1775.50,895.00); read
+          uncertainty 0.0001 dex; audit shornikov_1997_cao_fig1_series5_emf_1773k-04.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-1997-cao-alumina-vapor
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_fig1_series5_emf_1773k::T=1773:h=f76a48a4d040
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO–Al2O3 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1773'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: no reference_state mapped from source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.3339'
+        - - Al2O3
+          - '0.6661'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.031'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 21
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1(a), Series 5, open triangles; reference [18], 1773 K. Marked readings only.; panel=a; symbol=open triangles
+  read_from: pdf:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773'
+      locator:
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: Figure 1(a), Series 5, open triangles; reference [18], 1773 K. Marked readings only.; panel=a; symbol=open triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: figure_axis_mole_percent
+          components:
+          - - CaO
+            - '0.3339'
+          - - Al2O3
+            - '0.6661'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 21
+        pdf_page_index: 2
+        figure: '1'
+        note: x(CaO)=33.39 mole%; -log10(a_CaO)=1.502; independent pixel reads (1104.13,1289.25) and (1104.50,1290.00); read
+          uncertainty 0.0008 dex; audit shornikov_1997_cao_fig1_series5_emf_1773k-02.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-1997-cao-alumina-vapor
+    parameters: []
+    output_unit: dimensionless activity
 - observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_gibbs_energy_fig2_figure_only
   experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
   identity:

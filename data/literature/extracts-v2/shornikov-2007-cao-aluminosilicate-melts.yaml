@@ -6,10 +6,10 @@ observations:
   experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_model_calculation_2000k
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Al2O3_activity_figure_only'
+      tag: value
+      value: activity
     species:
-      formula: CaO
+      formula: Al2O3
       phase:
         tag: unknown
         reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
@@ -20,12 +20,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '2000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: unavailable
+    unavailable_reason: unmarked_model_curve_not_digitized
     approximate: false
   uncertainty:
     kind: none
@@ -35,16 +77,27 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: unmarked model curve not digitized
+    decided_by:
+      worker: x-2007-cao-aluminosilicate-melts
+      date: '2026-10-04'
+      evidence:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Present-study calculated Al2O3 curves at 2000 K; unmarked model curves are not digitized.; panel=a and b; symbol=calculated
+          curves
   notices: []
   source_id: shornikov-2007-cao-aluminosilicate-melts
   locator:
-    page: 37
+    page: 3
     published_page: 37
     pdf_page_index: 2
     figure: '1'
-    note: Present-study calculated Al2O3 activity curve; numeric coordinates not digitized.
+    note: Present-study calculated Al2O3 curves at 2000 K; unmarked model curves are not digitized.; panel=a and b; symbol=calculated
+      curves
   read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
   point_conditions:
     temperature_K:
@@ -52,19 +105,20 @@ observations:
         tag: value
         value: '2000'
       locator:
-        page: 37
+        page: 3
         published_page: 37
         pdf_page_index: 2
         figure: '1'
-        note: Present-study calculated Al2O3 activity curve; numeric coordinates not digitized.
-- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers
+        note: Present-study calculated Al2O3 curves at 2000 K; unmarked model curves are not digitized.; panel=a and b; symbol=calculated
+          curves
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers::T=2033:h=1e971f39f786
   experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Al2O3_activity_figure_only'
+      tag: value
+      value: activity
     species:
-      formula: CaO
+      formula: Al2O3
       phase:
         tag: unknown
         reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
@@ -75,12 +129,63 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.3748'
+        - - Al2O3
+          - '0.3748'
+        - - SiO2
+          - '0.2504'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: point
+    point: '0.24'
     approximate: false
   uncertainty:
     kind: none
@@ -95,11 +200,12 @@ observations:
   notices: []
   source_id: shornikov-2007-cao-aluminosilicate-melts
   locator:
-    page: 37
+    page: 3
     published_page: 37
     pdf_page_index: 2
     figure: '1'
-    note: Experimental Al2O3 activity markers from reference [1]; numeric coordinates not digitized.
+    note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+      circles
   read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
   point_conditions:
     temperature_K:
@@ -107,17 +213,1250 @@ observations:
         tag: value
         value: '2033'
       locator:
-        page: 37
+        page: 3
         published_page: 37
         pdf_page_index: 2
         figure: '1'
-        note: Experimental Al2O3 activity markers from reference [1]; numeric coordinates not digitized.
+        note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+          circles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.3748'
+          - - Al2O3
+            - '0.3748'
+          - - SiO2
+            - '0.2504'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=37.48 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(Al2O3))=-0.618; independent pixel reads (2602.75,851.50)
+          and (2602.81,851.50); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-08.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers::T=2033:h=331c93614657
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.37'
+        - - Al2O3
+          - '0.13'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.09'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+      circles
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+          circles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.37'
+          - - Al2O3
+            - '0.13'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=13.00 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(Al2O3))=-1.045; independent pixel reads (1480.25,1005.50)
+          and (1480.19,1005.50); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-03.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers::T=2033:h=39492a3cdef8
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.4998'
+        - - Al2O3
+          - '0.4998'
+        - - SiO2
+          - '0.0004'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.18'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+      circles
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+          circles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.4998'
+          - - Al2O3
+            - '0.4998'
+          - - SiO2
+            - '0.0004'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=49.98 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(Al2O3))=-0.741; independent pixel reads (3175.75,896.00)
+          and (3175.74,896.12); read uncertainty 0.0002 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-10.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers::T=2033:h=64ff14391d71
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.43'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+      circles
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+          circles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=25.00 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(Al2O3))=-0.364; independent pixel reads (2029.75,760.00)
+          and (2029.78,760.45); read uncertainty 0.0006 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-05.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers::T=2033:h=84d9990488f1
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.4499'
+        - - Al2O3
+          - '0.4499'
+        - - SiO2
+          - '0.1002'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.2'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+      circles
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+          circles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.4499'
+          - - Al2O3
+            - '0.4499'
+          - - SiO2
+            - '0.1002'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=44.99 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(Al2O3))=-0.698; independent pixel reads (2946.75,880.25)
+          and (2946.76,880.24); read uncertainty 0.000014 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-09.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers::T=2033:h=b5ad411960be
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.3332'
+        - - Al2O3
+          - '0.3332'
+        - - SiO2
+          - '0.3336'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.26'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+      circles
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+          circles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.3332'
+          - - Al2O3
+            - '0.3332'
+          - - SiO2
+            - '0.3336'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=33.32 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(Al2O3))=-0.582; independent pixel reads (2411.75,838.75)
+          and (2411.76,838.76); read uncertainty 0.000014 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-07.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers::T=2033:h=d22287296040
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.3099'
+        - - Al2O3
+          - '0.1901'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.23'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+      circles
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+          circles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.3099'
+          - - Al2O3
+            - '0.1901'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=19.01 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(Al2O3))=-0.635; independent pixel reads (1755.75,857.75)
+          and (1755.75,857.76); read uncertainty 0.000014 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-04.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers::T=2033:h=df93c2df4fb4
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.3832'
+        - - Al2O3
+          - '0.1168'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.06'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+      circles
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+          circles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.3832'
+          - - Al2O3
+            - '0.1168'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=11.68 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(Al2O3))=-1.220; independent pixel reads (1419.75,1068.25)
+          and (1419.76,1068.24); read uncertainty 0.000014 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-02.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers::T=2033:h=e168ee72d5c2
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.4311'
+        - - Al2O3
+          - '0.0689'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.017'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+      circles
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+          circles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.4311'
+          - - Al2O3
+            - '0.0689'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=6.89 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(Al2O3))=-1.769; independent pixel reads (1200.25,1266.00)
+          and (1200.22,1266.00); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-01.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers::T=2033:h=ff7682a3d650
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.2998'
+        - - Al2O3
+          - '0.2998'
+        - - SiO2
+          - '0.4004'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.33'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+      circles
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental Al2O3 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=open
+          circles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.2998'
+          - - Al2O3
+            - '0.2998'
+          - - SiO2
+            - '0.4004'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=29.98 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(Al2O3))=-0.479; independent pixel reads (2259.00,801.50)
+          and (2259.50,802.00); read uncertainty 0.0007 dex; audit shornikov_2007_figure1_al2o3_activity_prior_markers-06.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
 - observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_calculated_curve
   experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_model_calculation_2000k
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'CaO_activity_figure_only'
+      tag: value
+      value: activity
     species:
       formula: CaO
       phase:
@@ -130,12 +1469,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '2000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: unavailable
+    unavailable_reason: unmarked_model_curve_not_digitized
     approximate: false
   uncertainty:
     kind: none
@@ -145,16 +1526,27 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: unmarked model curve not digitized
+    decided_by:
+      worker: x-2007-cao-aluminosilicate-melts
+      date: '2026-10-04'
+      evidence:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Present-study calculated CaO curves at 2000 K; unmarked model curves are not digitized.; panel=a and b; symbol=calculated
+          curves
   notices: []
   source_id: shornikov-2007-cao-aluminosilicate-melts
   locator:
-    page: 37
+    page: 3
     published_page: 37
     pdf_page_index: 2
     figure: '1'
-    note: Present-study calculated CaO activity curve; numeric coordinates not digitized.
+    note: Present-study calculated CaO curves at 2000 K; unmarked model curves are not digitized.; panel=a and b; symbol=calculated
+      curves
   read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
   point_conditions:
     temperature_K:
@@ -162,17 +1554,18 @@ observations:
         tag: value
         value: '2000'
       locator:
-        page: 37
+        page: 3
         published_page: 37
         pdf_page_index: 2
         figure: '1'
-        note: Present-study calculated CaO activity curve; numeric coordinates not digitized.
-- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers
+        note: Present-study calculated CaO curves at 2000 K; unmarked model curves are not digitized.; panel=a and b; symbol=calculated
+          curves
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers::T=2033:h=030010e36309
   experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'CaO_activity_figure_only'
+      tag: value
+      value: activity
     species:
       formula: CaO
       phase:
@@ -185,12 +1578,63 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.3101'
+        - - Al2O3
+          - '0.1899'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: point
+    point: '0.0082'
     approximate: false
   uncertainty:
     kind: none
@@ -205,11 +1649,12 @@ observations:
   notices: []
   source_id: shornikov-2007-cao-aluminosilicate-melts
   locator:
-    page: 37
+    page: 3
     published_page: 37
     pdf_page_index: 2
     figure: '1'
-    note: Experimental CaO activity markers from reference [1]; numeric coordinates not digitized.
+    note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      squares
   read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
   point_conditions:
     temperature_K:
@@ -217,19 +1662,1386 @@ observations:
         tag: value
         value: '2033'
       locator:
-        page: 37
+        page: 3
         published_page: 37
         pdf_page_index: 2
         figure: '1'
-        note: Experimental CaO activity markers from reference [1]; numeric coordinates not digitized.
+        note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          squares
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.3101'
+          - - Al2O3
+            - '0.1899'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=18.99 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(CaO))=-2.084; independent pixel reads (1755.00,1379.75)
+          and (1755.00,1379.75); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-05.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers::T=2033:h=115fce6fd77b
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.4498'
+        - - Al2O3
+          - '0.4498'
+        - - SiO2
+          - '0.1004'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.038'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      squares
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          squares
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.4498'
+          - - Al2O3
+            - '0.4498'
+          - - SiO2
+            - '0.1004'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=44.98 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(CaO))=-1.423; independent pixel reads (2946.50,1141.50)
+          and (2946.50,1141.50); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-10.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers::T=2033:h=15aabe82f9b3
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.2998'
+        - - Al2O3
+          - '0.2998'
+        - - SiO2
+          - '0.4004'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0063'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      squares
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          squares
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.2998'
+          - - Al2O3
+            - '0.2998'
+          - - SiO2
+            - '0.4004'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=29.98 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(CaO))=-2.199; independent pixel reads (2259.00,1421.00)
+          and (2259.00,1421.00); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-07.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers::T=2033:h=21d2d17fd42a
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.3748'
+        - - Al2O3
+          - '0.3748'
+        - - SiO2
+          - '0.2504'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.01'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      squares
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          squares
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.3748'
+          - - Al2O3
+            - '0.3748'
+          - - SiO2
+            - '0.2504'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=37.48 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(CaO))=-1.996; independent pixel reads (2602.75,1347.75)
+          and (2602.68,1347.68); read uncertainty 0.0001 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-09.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers::T=2033:h=39babcdd6daf
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.4311'
+        - - Al2O3
+          - '0.0689'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.021'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      squares
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          squares
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.4311'
+          - - Al2O3
+            - '0.0689'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=6.89 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(CaO))=-1.686; independent pixel reads (1200.25,1236.25)
+          and (1200.34,1235.97); read uncertainty 0.0004 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-02.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers::T=2033:h=4206062c003f
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.5'
+        - - Al2O3
+          - '0'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.022'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      squares
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          squares
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.5'
+          - - Al2O3
+            - '0'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=0.00 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(CaO))=-1.653; independent pixel reads (884.00,1224.50)
+          and (884.00,1224.50); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-01.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers::T=2033:h=4646d35c3581
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.4998'
+        - - Al2O3
+          - '0.4998'
+        - - SiO2
+          - '0.0004'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.098'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      squares
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          squares
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.4998'
+          - - Al2O3
+            - '0.4998'
+          - - SiO2
+            - '0.0004'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=49.98 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(CaO))=-1.010; independent pixel reads (3175.75,992.75)
+          and (3175.75,992.12); read uncertainty 0.0009 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-11.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers::T=2033:h=58a83653db7a
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0048'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      squares
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          squares
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=25.00 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(CaO))=-2.320; independent pixel reads (2030.00,1464.75)
+          and (2030.00,1464.75); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-06.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers::T=2033:h=71f934b2a755
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.37'
+        - - Al2O3
+          - '0.13'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.013'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      squares
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          squares
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.37'
+          - - Al2O3
+            - '0.13'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=13.00 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(CaO))=-1.896; independent pixel reads (1480.25,1311.75)
+          and (1480.32,1311.68); read uncertainty 0.0001 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-04.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers::T=2033:h=ac9b8a32cc7a
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.3332'
+        - - Al2O3
+          - '0.3332'
+        - - SiO2
+          - '0.3336'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.0081'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      squares
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          squares
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.3332'
+          - - Al2O3
+            - '0.3332'
+          - - SiO2
+            - '0.3336'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=33.32 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(CaO))=-2.093; independent pixel reads (2411.75,1382.75)
+          and (2411.68,1382.68); read uncertainty 0.0001 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-08.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers::T=2033:h=bdf7ded6a9b8
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: CaO
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.3832'
+        - - Al2O3
+          - '0.1168'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.015'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      squares
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental CaO markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          squares
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.3832'
+          - - Al2O3
+            - '0.1168'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=11.68 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(CaO))=-1.819; independent pixel reads (1419.75,1284.00)
+          and (1419.75,1284.00); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_cao_activity_prior_markers-03.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
 - observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_calculated_curve
   experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_model_calculation_2000k
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'SiO2_activity_figure_only'
+      tag: value
+      value: activity
     species:
-      formula: CaO
+      formula: SiO2
       phase:
         tag: unknown
         reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
@@ -240,12 +3052,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '2000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: unavailable
+    unavailable_reason: unmarked_model_curve_not_digitized
     approximate: false
   uncertainty:
     kind: none
@@ -255,16 +3109,27 @@ observations:
       value: figure_only
     original_method_class: figure_only
   admission:
-    status: pending
-    reason: source admission_status=figure_only is not a closed v2.1 token
+    status: rejected
+    reason: unmarked model curve not digitized
+    decided_by:
+      worker: x-2007-cao-aluminosilicate-melts
+      date: '2026-10-04'
+      evidence:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Present-study calculated SiO2 curves at 2000 K; unmarked model curves are not digitized.; panel=a and b; symbol=calculated
+          curves
   notices: []
   source_id: shornikov-2007-cao-aluminosilicate-melts
   locator:
-    page: 37
+    page: 3
     published_page: 37
     pdf_page_index: 2
     figure: '1'
-    note: Present-study calculated SiO2 activity curve; numeric coordinates not digitized.
+    note: Present-study calculated SiO2 curves at 2000 K; unmarked model curves are not digitized.; panel=a and b; symbol=calculated
+      curves
   read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
   point_conditions:
     temperature_K:
@@ -272,19 +3137,20 @@ observations:
         tag: value
         value: '2000'
       locator:
-        page: 37
+        page: 3
         published_page: 37
         pdf_page_index: 2
         figure: '1'
-        note: Present-study calculated SiO2 activity curve; numeric coordinates not digitized.
-- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers
+        note: Present-study calculated SiO2 curves at 2000 K; unmarked model curves are not digitized.; panel=a and b; symbol=calculated
+          curves
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers::T=2033:h=1cadc377e1e9
   experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'SiO2_activity_figure_only'
+      tag: value
+      value: activity
     species:
-      formula: CaO
+      formula: SiO2
       phase:
         tag: unknown
         reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
@@ -295,12 +3161,63 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.2999'
+        - - Al2O3
+          - '0.2999'
+        - - SiO2
+          - '0.4002'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: categorical
-    categorical: bound_not_point_ordering
+    kind: point
+    point: '0.3'
     approximate: false
   uncertainty:
     kind: none
@@ -315,11 +3232,12 @@ observations:
   notices: []
   source_id: shornikov-2007-cao-aluminosilicate-melts
   locator:
-    page: 37
+    page: 3
     published_page: 37
     pdf_page_index: 2
     figure: '1'
-    note: Experimental SiO2 activity markers from reference [1]; numeric coordinates not digitized.
+    note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      triangles
   read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
   point_conditions:
     temperature_K:
@@ -327,8 +3245,1241 @@ observations:
         tag: value
         value: '2033'
       locator:
-        page: 37
+        page: 3
         published_page: 37
         pdf_page_index: 2
         figure: '1'
-        note: Experimental SiO2 activity markers from reference [1]; numeric coordinates not digitized.
+        note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.2999'
+          - - Al2O3
+            - '0.2999'
+          - - SiO2
+            - '0.4002'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=29.99 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(SiO2))=-0.520; independent pixel reads (2259.17,816.33)
+          and (2259.28,816.31); read uncertainty 0.000028 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-07.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers::T=2033:h=22f81406b580
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.5'
+        - - Al2O3
+          - '0'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.18'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      triangles
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.5'
+          - - Al2O3
+            - '0'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=0.00 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(SiO2))=-0.745; independent pixel reads (884.17,897.33)
+          and (884.17,897.36); read uncertainty 0.000042 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-01.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers::T=2033:h=2e77d6c660c6
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.25'
+        - - Al2O3
+          - '0.25'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.52'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      triangles
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.25'
+          - - Al2O3
+            - '0.25'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=25.00 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(SiO2))=-0.281; independent pixel reads (2030.17,730.33)
+          and (2030.28,730.31); read uncertainty 0.000028 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-06.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers::T=2033:h=609f9dfc50ea
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.3831'
+        - - Al2O3
+          - '0.1169'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.27'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      triangles
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.3831'
+          - - Al2O3
+            - '0.1169'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=11.69 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(SiO2))=-0.568; independent pixel reads (1420.17,833.67)
+          and (1420.24,833.68); read uncertainty 0.000014 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-03.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers::T=2033:h=64cf4ead78d3
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.3749'
+        - - Al2O3
+          - '0.3749'
+        - - SiO2
+          - '0.2502'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.054'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      triangles
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.3749'
+          - - Al2O3
+            - '0.3749'
+          - - SiO2
+            - '0.2502'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=37.49 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(SiO2))=-1.267; independent pixel reads (2603.17,1085.33)
+          and (2603.28,1085.31); read uncertainty 0.000028 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-09.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers::T=2033:h=896b2a8cbf22
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.3101'
+        - - Al2O3
+          - '0.1899'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.39'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      triangles
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.3101'
+          - - Al2O3
+            - '0.1899'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=18.99 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(SiO2))=-0.409; independent pixel reads (1755.17,776.17)
+          and (1755.22,776.17); read uncertainty 0.001388 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-05.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers::T=2033:h=92a34f401afb
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.4311'
+        - - Al2O3
+          - '0.0689'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.21'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      triangles
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.4311'
+          - - Al2O3
+            - '0.0689'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=6.89 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(SiO2))=-0.677; independent pixel reads (1200.33,872.83)
+          and (1200.34,872.88); read uncertainty 0.0001 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-02.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers::T=2033:h=931b8693d2ff
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.4499'
+        - - Al2O3
+          - '0.4499'
+        - - SiO2
+          - '0.1002'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.011'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      triangles
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.4499'
+          - - Al2O3
+            - '0.4499'
+          - - SiO2
+            - '0.1002'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=44.99 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(SiO2))=-1.958; independent pixel reads (2946.67,1334.17)
+          and (2946.62,1334.20); read uncertainty 0.000042 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-10.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers::T=2033:h=ba96b59482db
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.3699'
+        - - Al2O3
+          - '0.1301'
+        - - SiO2
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      triangles
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.3699'
+          - - Al2O3
+            - '0.1301'
+          - - SiO2
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=13.01 mole% on printed join CaSiO3-CaAl2Si2O8; log10(a(SiO2))=-0.520; independent pixel reads (1480.67,816.33)
+          and (1480.61,816.29); read uncertainty 0.0001 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-04.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted
+- observation_id: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers::T=2033:h=f418bdf45723
+  experiment_id: 9e99b1ef5a08e1b237229b8e6e57bbd92847046fd9c51362d1e3d62c84075d6a::experiment::shornikov_2007_prior_kems_comparison_2033k
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '2033'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: not_stated_in_this_source
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.3333'
+        - - Al2O3
+          - '0.3333'
+        - - SiO2
+          - '0.3334'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.15'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: shornikov-2007-cao-aluminosilicate-melts
+  locator:
+    page: 3
+    published_page: 37
+    pdf_page_index: 2
+    figure: '1'
+    note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+      triangles
+  read_from: pdf:shornikov-2007-cao-aluminosilicate-melts
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2033'
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: Experimental SiO2 markers from reference [1], recorded separately for panels (a) and (b).; panel=a and b; symbol=filled
+          triangles
+    composition:
+      state:
+        tag: value
+        value:
+          basis: digitized_pseudobinary_oxide_mole_fraction
+          components:
+          - - CaO
+            - '0.3333'
+          - - Al2O3
+            - '0.3333'
+          - - SiO2
+            - '0.3334'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 37
+        pdf_page_index: 2
+        figure: '1'
+        note: x(Al2O3)=33.33 mole% on printed join CaAl2Si2O8-CaAl2O4; log10(a(SiO2))=-0.821; independent pixel reads (2412.17,924.83)
+          and (2412.21,924.89); read uncertainty 0.0001 dex; audit shornikov_2007_figure1_sio2_activity_prior_markers-08.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:shornikov-2007-cao-aluminosilicate-melts
+    parameters: []
+    output_unit: dimensionless activity; log10 activity as plotted

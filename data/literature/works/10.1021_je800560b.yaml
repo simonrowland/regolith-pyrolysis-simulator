@@ -1,0 +1,595 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1021/je800560b
+  citation: Ferguson, Frank T.; Nuth, Joseph A., III (2008). Vapor Pressure of Silicon Monoxide. Journal of Chemical & Engineering
+    Data 53(12):2824–2832.
+  source_ids:
+  - ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1021/je800560b
+experiments:
+- experiment_id: 10.1021/je800560b::ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Knudsen_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1021/je800560b
+  locator:
+    page: 5
+    published_page: 2828
+    pdf_page_index: 4
+    table: '1'
+context:
+- observation_id: ferguson_nuth_2008_figure_1
+  type: figure_only
+  locator:
+    figure: '1'
+    page: 2
+    pdf_page_index: 1
+    published_page: 2825
+  units: not applicable
+  values:
+    method_class: figure_only
+    typed_quantity: null
+    quantity_as_printed: none
+    species: SiO(g)
+    phase: apparatus
+    temperature_as_printed: not applicable
+    x_axis_as_printed: not applicable schematic
+    y_axis_as_printed: not applicable schematic
+    caption_as_printed: Figure 1. Schematic diagram of thermogravimetric balance and furnace assembly.
+    panel: single
+    series: []
+    digitisation: deferred to a figure pass
+  context_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::context::ferguson_nuth_2008_figure_1
+  work_id: 10.1021/je800560b
+  source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
+  species: SiO
+- observation_id: ferguson_nuth_2008_figure_2
+  type: figure_only
+  locator:
+    figure: '2'
+    page: 2
+    pdf_page_index: 1
+    published_page: 2825
+  units: not applicable
+  values:
+    method_class: figure_only
+    typed_quantity: null
+    quantity_as_printed: none
+    species: SiO(g)
+    phase: alumina effusion cell
+    temperature_as_printed: not applicable
+    x_axis_as_printed: not applicable schematic
+    y_axis_as_printed: not applicable schematic
+    caption_as_printed: Figure 2. Alumina effusion cell constructed from two closed-end tubes.
+    panel: single
+    series: []
+    digitisation: deferred to a figure pass
+  context_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::context::ferguson_nuth_2008_figure_2
+  work_id: 10.1021/je800560b
+  source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
+  species: SiO
+- observation_id: ferguson_nuth_2008_figure_3
+  type: figure_only
+  locator:
+    figure: '3'
+    page: 4
+    pdf_page_index: 3
+    published_page: 2827
+  units: temperature difference and K
+  values:
+    method_class: figure_only
+    typed_quantity: null
+    quantity_as_printed: furnace thermocouple accuracy
+    species: Cu calibration specimen
+    phase: Cu(s)/Cu(l) fusion
+    temperature_as_printed: copper fusion temperature
+    x_axis_as_printed: measured furnace temperature
+    y_axis_as_printed: DTA temperature difference
+    caption_as_printed: Figure 3. Test of the furnace thermocouple accuracy. A differential thermal analyzer (DTA) was used
+      to measure the fusion temperature of a copper sample at different heating rates. The solid vertical line denotes the
+      measured fusion temperature while the vertical dashed lines represent the ±5 K region about the true fusion temperature
+      of copper.
+    panel: single
+    series:
+    - name: DTA trace about 5 K/min
+      marker: curve
+      marker_count: 0
+    - name: DTA trace about 0.1 K/min
+      marker: curve
+      marker_count: 0
+    digitisation: deferred to a figure pass
+  context_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::context::ferguson_nuth_2008_figure_3
+  work_id: 10.1021/je800560b
+  source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
+  species: SiO
+- observation_id: ferguson_nuth_2008_figure_4
+  type: figure_only
+  locator:
+    figure: '4'
+    page: 6
+    pdf_page_index: 5
+    published_page: 2829
+  units: dimensionless
+  values:
+    method_class: figure_only
+    typed_quantity: evaporation_coefficient_alpha
+    species: SiO(g)
+    phase: amorphous SiO and Si + SiO2 mixed reservoir
+    temperature_as_printed: T/K
+    x_axis_as_printed: T/K
+    y_axis_as_printed: alpha
+    caption_as_printed: Figure 4. Plot of the calculated evaporation coefficient, R, for SiO taken from the series of vapor
+      pressure measurements with Knudsen cells of different effusion orifice sizes.
+    panel: single
+    series:
+    - name: current study calculated alpha
+      marker: circle
+      marker_count: 14
+    - name: curves shown without caption attribution
+      marker: line
+      marker_count: 0
+    attribution: Ferguson and Nuth (2008)
+    digitisation: deferred to a figure pass
+  context_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::context::ferguson_nuth_2008_figure_4
+  work_id: 10.1021/je800560b
+  source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
+  species: SiO
+- observation_id: ferguson_nuth_2008_figure_5
+  type: figure_only
+  locator:
+    figure: '5'
+    page: 6
+    pdf_page_index: 5
+    published_page: 2829
+  units: log10(P/Pa)
+  values:
+    method_class: figure_only
+    typed_quantity: null
+    quantity_as_printed: equilibrium vapor pressure Peq
+    species: SiO(g)
+    phase: SiO(am) evaporation comparison
+    temperature_as_printed: 10^4 K/T
+    x_axis_as_printed: 10^4 K/T
+    y_axis_as_printed: log10(P/Pa)
+    caption_as_printed: Figure 5. Comparison of available experimental data for SiO(am) evaporation. Shown in the figure are
+      experimental data reported in this work (circles), taken by Gel'd and Kochnev (triangles), and by Gunther (squares)
+      and Rocabois et al. (thick dashed line). A fit to the experimental data taken in this work is given by the solid line.
+    panel: single
+    series:
+    - name: current study
+      marker: circle
+      marker_count: 14
+    - name: Gel'd and Kochnev
+      marker: triangle
+      marker_count: 8
+    - name: Gunther
+      marker: square
+      marker_count: 17
+    - name: Rocabois et al. fit
+      marker: thick dashed line
+      marker_count: 0
+    - name: current study fit
+      marker: solid line
+      marker_count: 0
+    attribution: Gel'd and Kochnev [30]; Gunther [14]; Rocabois et al. [15]
+    identity_gap: mixed-reservoir pressure is not representable by current scored profiles
+    digitisation: deferred to a figure pass
+  context_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::context::ferguson_nuth_2008_figure_5
+  work_id: 10.1021/je800560b
+  source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
+  species: SiO
+- observation_id: ferguson_nuth_2008_figure_6
+  type: figure_only
+  locator:
+    figure: '6'
+    page: 7
+    pdf_page_index: 6
+    published_page: 2830
+  units: log10(P/Pa)
+  values:
+    method_class: figure_only
+    typed_quantity: null
+    quantity_as_printed: vapor pressure
+    species: SiO(g)
+    phase: SiO(am) evaporation comparison and thermodynamic assessments
+    temperature_as_printed: 10^4 K/T
+    x_axis_as_printed: 10^4 K/T
+    y_axis_as_printed: log10(P/Pa)
+    caption_as_printed: Figure 6. Comparison of the current experimental data for SiO(am) evaporation with thermodynamic assessments
+      of SiO vapor pressure. Shown in the figure are experimental data reported in this work (circles), taken by Gel'd and
+      Kochnev (triangles), and by Gunther (squares) and Rocabois et al. (thick solid line). Thermodynamic assessments of SiO
+      vapor pressure are shown by Schick (solid line and short dashed line), Kubaschewski (dotted line), and Schnurre et al.
+      (dashed-dotted line).
+    panel: single
+    series:
+    - name: current study
+      marker: circle
+      marker_count: 14
+    - name: Gel'd and Kochnev
+      marker: triangle
+      marker_count: 8
+    - name: Gunther
+      marker: square
+      marker_count: 17
+    - name: Rocabois et al.
+      marker: thick solid line
+      marker_count: 0
+    - name: Schick first estimate
+      marker: solid line
+      marker_count: 0
+    - name: Schick revised estimate
+      marker: short dashed line
+      marker_count: 0
+    - name: Kubaschewski estimate
+      marker: dotted line
+      marker_count: 0
+    - name: Schnurre et al.
+      marker: dashed-dotted line
+      marker_count: 0
+    attribution: Gel'd and Kochnev [30]; Gunther [14]; Rocabois et al. [15]; Schick [31]; Kubaschewski et al. [7]; Schnurre
+      et al. [9]
+    identity_gap: mixed-reservoir pressure assessments are not representable by current scored profiles
+    digitisation: deferred to a figure pass
+  context_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::context::ferguson_nuth_2008_figure_6
+  work_id: 10.1021/je800560b
+  source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
+  species: SiO
+- observation_id: ferguson_nuth_2008_quoted_prior_evaporation_coefficients
+  type: relation
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2829
+    section: Results
+  units: dimensionless alpha
+  values:
+    quantity_as_printed: evaporation coefficient
+    quotations:
+    - method_class: quoted_attributed
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 2825
+        section: Results
+      attribution: Gunther [14]
+      quote_as_printed: approximately 1/20 for SiO(am); about an order of magnitude lower for the Si + SiO2 mixture
+      amorphous_SiO_value:
+        value:
+          kind: point
+          printed: 1/20
+          approximate: true
+      mixture_relation: approximately one order of magnitude lower
+    - method_class: quoted_attributed
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 2828
+        section: Results
+      attribution: Rocabois et al. [15]
+      quote_as_printed: approximately 0.017 to 0.03 over 1175 to 1410 K
+      amorphous_SiO_range:
+        value:
+          kind: interval
+          low: '0.017'
+          high: '0.03'
+          approximate: true
+      temperature_range_K:
+      - 1175
+      - 1410
+      mixture_relation: evaporation coefficients about an order of magnitude lower
+    - method_class: quoted_attributed
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2829
+        section: Results
+      attribution: Fedkin et al. [29]
+      quote_as_printed: calculated this value to range from 0.12 to 0.21 over 1973 to 2273 K
+      value_range:
+        kind: interval
+        low: '0.12'
+        high: '0.21'
+      temperature_range_K:
+      - 1973
+      - 2273
+      model_material: complex ferromagnesian silicate mixture
+  context_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::context::ferguson_nuth_2008_quoted_prior_evaporation_coefficients
+  work_id: 10.1021/je800560b
+  source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
+  species: SiO
+- observation_id: ferguson_nuth_2008_quoted_thermodynamic_assessments
+  type: relation
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 2830
+    section: Results
+  units: kJ/mol and kJ/(mol K)
+  values:
+    assessments:
+    - method_class: quoted_attributed
+      attribution: Brewer and Edwards [32]
+      quote_as_printed: Delta H = 245.0 kJ/mol and Delta S = 0.1065 kJ/mol/K
+      delta_H_kJ_mol: '245'
+      delta_S_kJ_mol_K: '0.1065'
+      gibbs_expression_as_printed: Delta G°/(kJ mol-1) = 245.0 - 0.1065(T/K)
+      equation: '14'
+    - method_class: quoted_attributed
+      attribution: Schick [31]
+      gibbs_expression_as_printed: Delta G°/(kJ mol-1) = 324.4 - 0.1462(T/K)
+      equation: '15'
+      assessment_status: revised estimate recommended by Schick
+    - method_class: quoted_attributed
+      attribution: Kubaschewski et al. [7]
+      quote_as_printed: Delta sub H°(298.15 K) = 333 ± 25 kJ/mol
+      delta_subH_kJ_mol: 333
+      delta_subH_uncertainty_kJ_mol: 25
+      vapor_pressure_expression_as_printed: log10(P/Pa) = -(17750)/(T/K) - 2.77 log10(T/K) + 17.42
+      equation: '16'
+    - method_class: quoted_attributed
+      attribution: Schnurre et al. [9]
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 2831
+        section: Results
+      quote_as_printed: condensation distance approximately 4 mm at 1693 K for Delta T from 25 to 100 K
+      condensation_distance_mm:
+        value:
+          kind: point
+          point: 4
+          approximate: true
+      temperature_K: 1693
+      delta_T_range_K:
+      - 25
+      - 100
+      sublimation_temperature_at_1bar_K: 2070
+      assessment_status: thermodynamic assessment
+  context_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::context::ferguson_nuth_2008_quoted_thermodynamic_assessments
+  work_id: 10.1021/je800560b
+  source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
+  species: SiO
+- observation_id: ferguson_nuth_2008_rocabois_quoted_formation_enthalpy
+  type: relation
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 2830
+    section: Results
+  units: kJ/mol
+  values:
+    method_class: quoted_attributed
+    quantity_as_printed: standard enthalpy of formation of SiO(g) at 298.15 K
+    value_kJ_mol: '-96.3'
+    uncertainty_kJ_mol: '4.5'
+    attribution: Rocabois et al. [15]
+    quotation_as_printed: (-96.3 ± 4.5) kJ/mol reported by Rocabois et al.
+  context_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::context::ferguson_nuth_2008_rocabois_quoted_formation_enthalpy
+  work_id: 10.1021/je800560b
+  source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
+  species: SiO
+- observation_id: ferguson_nuth_2008_sample_identity
+  type: relation
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 2825
+    section: Experimental Materials
+  units: as printed
+  values:
+    quoted_material: commercial amorphous silicon monoxide powder
+    supplier: Alfa
+    stated_purity: 99.9%
+    grade: optical
+    mesh: 120
+    purity_basis: not stated
+    structure: small-domain mixture of Si and SiO2
+    phase_proportions:
+      tag: unknown
+      reason: the paper gives no phase amounts
+    note: paper analyzes reaction (2), 1/2 Si(s) + 1/2 SiO2(cr) -> SiO(g); high-cristobalite silica is assumed
+  context_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::context::ferguson_nuth_2008_sample_identity
+  work_id: 10.1021/je800560b
+  source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
+  species: SiO
+- observation_id: ferguson_nuth_2008_table2_fit_results
+  type: relation
+  locator:
+    table: '2'
+    page: 5
+    pdf_page_index: 4
+    published_page: 2828
+  units: R dimensionless; Peq Pa; delta_rxnH kJ/mol
+  values:
+    method_class: model_derived
+    quantity_as_printed: evaporation coefficient R; equilibrium vapor pressure Peq; third-law reaction enthalpy
+    reaction_as_printed: 1/2 Si(s) + 1/2 SiO2(cr) -> SiO(g)
+    identity_gap: mixed Si and high-cristobalite SiO2 reservoir; current scored alpha and pressure profiles do not fit
+    points:
+    - row: 1
+      T_K_as_printed: 1301
+      R: '0.019'
+      R_sigma: '0.008'
+      Peq_Pa: '0.5'
+      Peq_sigma_Pa: '0.2'
+      delta_rxnH_kJ_mol: 357
+      delta_rxnH_sigma_kJ_mol: 3
+    - row: 2
+      T_K_as_printed: 1315
+      R: '0.029'
+      R_sigma: '0.001'
+      Peq_Pa: '0.6'
+      Peq_sigma_Pa: '0.1'
+      delta_rxnH_kJ_mol: 359
+      delta_rxnH_sigma_kJ_mol: 2
+    - row: 3
+      T_K_as_printed: 1325
+      R: '0.032'
+      R_sigma: '0.009'
+      Peq_Pa: '0.8'
+      Peq_sigma_Pa: '0.1'
+      delta_rxnH_kJ_mol: 359
+      delta_rxnH_sigma_kJ_mol: 2
+    - row: 4
+      T_K_as_printed: 1335
+      R: '0.029'
+      R_sigma: '0.008'
+      Peq_Pa: '1'
+      Peq_sigma_Pa: '0.1'
+      delta_rxnH_kJ_mol: 359
+      delta_rxnH_sigma_kJ_mol: 2
+    - row: 5
+      T_K_as_printed: 1350
+      R: '0.033'
+      R_sigma: '0.008'
+      Peq_Pa: '1.4'
+      Peq_sigma_Pa: '0.2'
+      delta_rxnH_kJ_mol: 359
+      delta_rxnH_sigma_kJ_mol: 1
+    - row: 6
+      T_K_as_printed: 1364
+      R: '0.036'
+      R_sigma: '0.007'
+      Peq_Pa: '1.9'
+      Peq_sigma_Pa: '0.2'
+      delta_rxnH_kJ_mol: 360
+      delta_rxnH_sigma_kJ_mol: 1
+    - row: 7
+      T_K_as_printed: 1374
+      R: '0.036'
+      R_sigma: '0.007'
+      Peq_Pa: '2.4'
+      Peq_sigma_Pa: '0.2'
+      delta_rxnH_kJ_mol: 360
+      delta_rxnH_sigma_kJ_mol: 1
+    - row: 8
+      T_K_as_printed: 1399
+      R: '0.037'
+      R_sigma: '0.007'
+      Peq_Pa: '4'
+      Peq_sigma_Pa: '0.4'
+      delta_rxnH_kJ_mol: 360
+      delta_rxnH_sigma_kJ_mol: 1
+    - row: 9
+      T_K_as_printed: 1421
+      R: '0.039'
+      R_sigma: '0.008'
+      Peq_Pa: '6.3'
+      Peq_sigma_Pa: '0.6'
+      delta_rxnH_kJ_mol: 360
+      delta_rxnH_sigma_kJ_mol: 1
+    - row: 10
+      T_K_as_printed: 1433
+      R: '0.038'
+      R_sigma: '0.007'
+      Peq_Pa: '8.2'
+      Peq_sigma_Pa: '0.7'
+      delta_rxnH_kJ_mol: 359
+      delta_rxnH_sigma_kJ_mol: 1
+    - row: 11
+      T_K_as_printed: 1446
+      R: '0.037'
+      R_sigma: '0.007'
+      Peq_Pa: '10.9'
+      Peq_sigma_Pa: '0.1'
+      delta_rxnH_kJ_mol: 359
+      delta_rxnH_sigma_kJ_mol: 1
+    - row: 12
+      T_K_as_printed: 1470
+      R: '0.038'
+      R_sigma: '0.007'
+      Peq_Pa: 17
+      Peq_sigma_Pa: 2
+      delta_rxnH_kJ_mol: 359
+      delta_rxnH_sigma_kJ_mol: 1
+    - row: 13
+      T_K_as_printed: 1495
+      R: '0.043'
+      R_sigma: '0.008'
+      Peq_Pa: 26
+      Peq_sigma_Pa: 2
+      delta_rxnH_kJ_mol: 359
+      delta_rxnH_sigma_kJ_mol: 1
+    - row: 14
+      T_K_as_printed: 1519
+      R: '0.047'
+      R_sigma: '0.009'
+      Peq_Pa: 40
+      Peq_sigma_Pa: 3
+      delta_rxnH_kJ_mol: 360
+      delta_rxnH_sigma_kJ_mol: 1
+    point_columns:
+    - T_K_as_printed
+    - R
+    - R_sigma
+    - Peq_Pa
+    - Peq_sigma_Pa
+    - delta_rxnH_kJ_mol
+    - delta_rxnH_sigma_kJ_mol
+  context_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::context::ferguson_nuth_2008_table2_fit_results
+  work_id: 10.1021/je800560b
+  source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
+  species: SiO
+- observation_id: ferguson_nuth_2008_thermodynamic_fits
+  type: relation
+  locator:
+    equation: '13'
+    page: 6
+    pdf_page_index: 5
+    published_page: 2829
+  units: kJ/mol
+  values:
+    method_class: model_derived
+    reaction_as_printed: 1/2 Si(s) + 1/2 SiO2(cr) -> SiO(g)
+    log10_Peq_fit: log10(P/Pa) = (13.29 ± 0.39) - (17740 ± 550)/(T/K)
+    second_law_delta_rxnH_298_kJ_mol: 351
+    second_law_uncertainty_kJ_mol: 11
+    third_law_mean_delta_rxnH_298_kJ_mol: '359.1'
+    third_law_mean_uncertainty_kJ_mol: '2'
+    delta_fH_SiO_g_298_kJ_mol: '-93.6'
+    delta_fH_uncertainty_kJ_mol: '2'
+    enthalpy_results_locator:
+      page: 7
+      pdf_page_index: 6
+      published_page: 2830
+      section: Results
+    identity_gap: mixed-reservoir reaction is not safely represented by current profiles
+  context_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient::context::ferguson_nuth_2008_thermodynamic_fits
+  work_id: 10.1021/je800560b
+  source_id: ferguson-nuth-2008-sio-vapor-pressure-evaporation-coefficient
+  species: SiO

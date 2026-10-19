@@ -1,0 +1,99 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 2a16aefa234af255a96e6a151474e995281860715a533f28a3fbb764bab402a9
+  citation: Yakovlev, O.I. & Shornikov, S.I. (2024), Evaporation features of the outer zones of Ca-Al-inclusions of chondrites,
+    Experiment in Geosciences, 30(1), 30-32.
+  source_ids:
+  - yakovlev-2024-cai-vaporization
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:yakovlev-2024-cai-vaporization
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 2a16aefa234af255a96e6a151474e995281860715a533f28a3fbb764bab402a9::experiment::cai-type-b-evaporation
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: unknown
+        reason: CAI type B named; only a qualitative mineral profile and quoted akermanite fractions printed; no initial oxide
+          map
+      locator:
+        published_page: 30
+        pdf_page_index: 1
+        note: The paper names a CAI type B sample but does not print a complete initial-melt oxide composition map.
+    characterization:
+      state:
+        tag: value
+        value: 'Quoted mineral profile in Yakovlev and Shornikov (2024, p. 31): “an external monomineral rim consisting of
+          melilite rich in gehlenite”; the paper says the “typical profile of akermanite and δ25Mg between the core and rim
+          zones in CAI of subtype B1 (Allende 5241)” is from Kerekgyarto et al. (2016). Their quoted values are: “the akermanite
+          content in the core zone of the inclusion is approximately 50 wt. %, the akermanite content drops to 20 wt. % in
+          the mantle melilite zone, and up to 7 wt. % in the rim zone.” Yakovlev and Shornikov (2024) also state: “Subtype
+          B2 is similar in mineral composition to the core zone of subtype B1.” These are cited zonal profile values, not
+          an initial bulk oxide map.'
+      locator:
+        published_page: 31
+        pdf_page_index: 2
+        paragraph: Fig. 1 discussion; Kerekgyarto et al. (2016) citation
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 31
+        pdf_page_index: 2
+        note: Temperature is shown in Fig. 2A only.
+    pressure_environment:
+      state:
+        tag: unknown
+        reason: condition pressure_environment is not a scalar numeric value
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 2a16aefa234af255a96e6a151474e995281860715a533f28a3fbb764bab402a9
+  locator:
+    published_page: 31
+    pdf_page_index: 2
+    figure: '2'
+    note: CAI type B melt and residual-melt observations.
+  bench_id: 2a16aefa234af255a96e6a151474e995281860715a533f28a3fbb764bab402a9::bench::yakovlev-2024-knudsen-ms
+benches:
+- id: 2a16aefa234af255a96e6a151474e995281860715a533f28a3fbb764bab402a9::bench::yakovlev-2024-knudsen-ms
+  work_id: 2a16aefa234af255a96e6a151474e995281860715a533f28a3fbb764bab402a9
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometry
+    locator:
+      published_page: 30
+      pdf_page_index: 1
+      section: Abstract
+  other_facts: []

@@ -1,0 +1,3063 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2002-mullite-thermodynamics.yaml
+observations:
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_hf_barin
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2)' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-6820.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Barin et al. [52] (1993)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_hf_barin
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 4
+    published_page: S49
+    pdf_page_index: 3
+    table: '1'
+    note: row=19
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 4
+        published_page: S49
+        pdf_page_index: 3
+        table: '1'
+        note: row=19
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_hf_chase
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2)' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-6819.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chase [54] (1998)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_hf_chase
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 4
+    published_page: S49
+    pdf_page_index: 3
+    table: '1'
+    note: row=21
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 4
+        published_page: S49
+        pdf_page_index: 3
+        table: '1'
+        note: row=21
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_hf_kirshen
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2)' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-6823.5'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kirshen et al. [55] (1999)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_hf_kirshen
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 4
+    published_page: S49
+    pdf_page_index: 3
+    table: '1'
+    note: row=22
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 4
+        published_page: S49
+        pdf_page_index: 3
+        table: '1'
+        note: row=22
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_hf_kiseleva
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2)' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-6803.4'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_kJ_mol-1: '4.7'
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kiseleva et al. [45] (1983)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_hf_kiseleva
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 3
+    published_page: S48
+    pdf_page_index: 2
+    table: '1'
+    note: row=11
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 3
+        published_page: S48
+        pdf_page_index: 2
+        table: '1'
+        note: row=11
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_hf_neumann
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2)' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-7547.9'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Neumann [37] (1925)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_hf_neumann
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 3
+    published_page: S48
+    pdf_page_index: 2
+    table: '1'
+    note: row=1
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 3
+        published_page: S48
+        pdf_page_index: 2
+        table: '1'
+        note: row=1
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_hf_robie_hemingway
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2)' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-6819.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_kJ_mol-1: '10'
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Robie and Hemingway [53] (1995)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_hf_robie_hemingway
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 4
+    published_page: S49
+    pdf_page_index: 3
+    table: '1'
+    note: row=20
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 4
+        published_page: S49
+        pdf_page_index: 3
+        table: '1'
+        note: row=20
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_hf_zenkov
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2)' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-6817.8'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_kJ_mol-1: '6.8'
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Zenkov [44] (1981)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_hf_zenkov
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 3
+    published_page: S48
+    pdf_page_index: 2
+    table: '1'
+    note: row=10
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 3
+        published_page: S48
+        pdf_page_index: 2
+        table: '1'
+        note: row=10
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_s_barin
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2)' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '274.89'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Barin et al. [52] (1993)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_s_barin
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 4
+    published_page: S49
+    pdf_page_index: 3
+    table: '1'
+    note: row=19
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 4
+        published_page: S49
+        pdf_page_index: 3
+        table: '1'
+        note: row=19
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_s_chase
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2)' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '274.25'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chase [54] (1998)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_s_chase
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 4
+    published_page: S49
+    pdf_page_index: 3
+    table: '1'
+    note: row=21
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 4
+        published_page: S49
+        pdf_page_index: 3
+        table: '1'
+        note: row=21
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_s_holm_kleppa
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2)' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '269.58'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_J_per_mol_K: '2.09'
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Holm and Kleppa [42] (1966)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_s_holm_kleppa
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 3
+    published_page: S48
+    pdf_page_index: 2
+    table: '1'
+    note: row=8
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 3
+        published_page: S48
+        pdf_page_index: 2
+        table: '1'
+        note: row=8
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_s_kirshen
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2)' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '274.9'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kirshen et al. [55] (1999)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_s_kirshen
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 4
+    published_page: S49
+    pdf_page_index: 3
+    table: '1'
+    note: row=22
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 4
+        published_page: S49
+        pdf_page_index: 3
+        table: '1'
+        note: row=22
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_s_pankratz
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2)' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '254.39'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_J_per_mol_K: '3.35'
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Pankratz et al. [40] (1963)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_s_pankratz
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 3
+    published_page: S48
+    pdf_page_index: 2
+    table: '1'
+    note: row=4
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 3
+        published_page: S48
+        pdf_page_index: 2
+        table: '1'
+        note: row=4
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_s_robie_hemingway
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite (3Al2O3·2SiO2)' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '275'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_J_per_mol_K: '5'
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Robie and Hemingway [53] (1995)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_s_robie_hemingway
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 4
+    published_page: S49
+    pdf_page_index: 3
+    table: '1'
+    note: row=20
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 4
+        published_page: S49
+        pdf_page_index: 3
+        table: '1'
+        note: row=20
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_fusion_beregnoi
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite fusion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2123'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '85.69'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Beregnoi [65] (1970)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_fusion_beregnoi
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 5
+    published_page: S50
+    pdf_page_index: 4
+    table: '2'
+    note: row=1
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2123'
+      locator:
+        page: 5
+        published_page: S50
+        pdf_page_index: 4
+        table: '2'
+        note: row=1
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_fusion_bobkova
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite fusion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2123'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '63.98'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Bobkova [93] (1992), review
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_fusion_bobkova
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 5
+    published_page: S50
+    pdf_page_index: 4
+    table: '2'
+    note: row=6
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2123'
+      locator:
+        page: 5
+        published_page: S50
+        pdf_page_index: 4
+        table: '2'
+        note: row=6
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_fusion_galakhov
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite fusion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2183'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '163.18'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Galakhov et al. [91] (1982), immiscibility data
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_fusion_galakhov
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 5
+    published_page: S50
+    pdf_page_index: 4
+    table: '2'
+    note: row=3
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2183'
+      locator:
+        page: 5
+        published_page: S50
+        pdf_page_index: 4
+        table: '2'
+        note: row=3
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_fusion_klug
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite fusion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2123'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '63'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Klug et al. [31] (1987), review
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_fusion_klug
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 5
+    published_page: S50
+    pdf_page_index: 4
+    table: '2'
+    note: row=4
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2123'
+      locator:
+        page: 5
+        published_page: S50
+        pdf_page_index: 4
+        table: '2'
+        note: row=4
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_fusion_liska_danek
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite fusion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2123'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '37.66'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Liska and Danek [92] (1990), review
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_fusion_liska_danek
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 5
+    published_page: S50
+    pdf_page_index: 4
+    table: '2'
+    note: row=5
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2123'
+      locator:
+        page: 5
+        published_page: S50
+        pdf_page_index: 4
+        table: '2'
+        note: row=5
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_fusion_present
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite fusion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2180'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '74.84'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_kJ_mol-1: '1.63'
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    attribution: this study
+    model: author_estimate
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_fusion_present
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 5
+    published_page: S50
+    pdf_page_index: 4
+    table: '2'
+    note: row=8
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2180'
+      locator:
+        page: 5
+        published_page: S50
+        pdf_page_index: 4
+        table: '2'
+        note: row=8
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_fusion_risbud_pask
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite fusion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2101'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '112.97'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Risbud and Pask [90] (1977), phase diagram [89]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_fusion_risbud_pask
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 5
+    published_page: S50
+    pdf_page_index: 4
+    table: '2'
+    note: row=2
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2101'
+      locator:
+        page: 5
+        published_page: S50
+        pdf_page_index: 4
+        table: '2'
+        note: row=2
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_fusion_shornikov_archakov
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite fusion' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '2180'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '71.7'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_kJ_mol-1: '3.1'
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Shornikov and Archakov [94] (2000), mass spectrometric Knudsen effusion
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_fusion_shornikov_archakov
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 5
+    published_page: S50
+    pdf_page_index: 4
+    table: '2'
+    note: row=7
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2180'
+      locator:
+        page: 5
+        published_page: S50
+        pdf_page_index: 4
+        table: '2'
+        note: row=7
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_melting_beregnoi
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2123'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Beregnoi [65] (1970)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_melting_beregnoi
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 5
+    published_page: S50
+    pdf_page_index: 4
+    table: '2'
+    note: row=1
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2123'
+      locator:
+        page: 5
+        published_page: S50
+        pdf_page_index: 4
+        table: '2'
+        note: row=1
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_melting_bobkova
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2123'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Bobkova [93] (1992), review
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_melting_bobkova
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 5
+    published_page: S50
+    pdf_page_index: 4
+    table: '2'
+    note: row=6
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2123'
+      locator:
+        page: 5
+        published_page: S50
+        pdf_page_index: 4
+        table: '2'
+        note: row=6
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_melting_galakhov
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2183'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_K: 10
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Galakhov et al. [91] (1982), immiscibility data
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_melting_galakhov
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 5
+    published_page: S50
+    pdf_page_index: 4
+    table: '2'
+    note: row=3
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2183'
+      locator:
+        page: 5
+        published_page: S50
+        pdf_page_index: 4
+        table: '2'
+        note: row=3
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_melting_klug
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2123'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Klug et al. [31] (1987), review
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_melting_klug
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 5
+    published_page: S50
+    pdf_page_index: 4
+    table: '2'
+    note: row=4
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2123'
+      locator:
+        page: 5
+        published_page: S50
+        pdf_page_index: 4
+        table: '2'
+        note: row=4
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_melting_liska_danek
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2123'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Liska and Danek [92] (1990), review
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_melting_liska_danek
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 5
+    published_page: S50
+    pdf_page_index: 4
+    table: '2'
+    note: row=5
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2123'
+      locator:
+        page: 5
+        published_page: S50
+        pdf_page_index: 4
+        table: '2'
+        note: row=5
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_melting_present
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2180'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_K: 10
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    attribution: this study
+    model: author_estimate
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_melting_present
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 5
+    published_page: S50
+    pdf_page_index: 4
+    table: '2'
+    note: row=8
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2180'
+      locator:
+        page: 5
+        published_page: S50
+        pdf_page_index: 4
+        table: '2'
+        note: row=8
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_melting_risbud_pask
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2101'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_K: 10
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Risbud and Pask [90] (1977), phase diagram [89]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_melting_risbud_pask
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 5
+    published_page: S50
+    pdf_page_index: 4
+    table: '2'
+    note: row=2
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2101'
+      locator:
+        page: 5
+        published_page: S50
+        pdf_page_index: 4
+        table: '2'
+        note: row=2
+- observation_id: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_melting_shornikov_archakov
+  experiment_id: ece933166f9cb864786608fe206ce36e81e2c9b40058e115152d09983ad37747::shornikov-2002-mullite-thermodynamics
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Al2O3
+      phase:
+        tag: unknown
+        reason: phase string 'mullite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state a numeric total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '2180'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_K: 10
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Shornikov and Archakov [94] (2000), mass spectrometric Knudsen effusion
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_melting_shornikov_archakov
+  source_id: shornikov-2002-mullite-thermodynamics
+  locator:
+    page: 5
+    published_page: S50
+    pdf_page_index: 4
+    table: '2'
+    note: row=7
+  read_from: unknown:shornikov-2002-mullite-thermodynamics
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2180'
+      locator:
+        page: 5
+        published_page: S50
+        pdf_page_index: 4
+        table: '2'
+        note: row=7

@@ -1,0 +1,208 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/connolly-2016-si-o-liquid-vapor-caloric-vdw.yaml
+observations:
+- observation_id: connolly-2016-si-o-liquid-vapor-caloric-vdw::connolly_2016_kraus_a2_cp
+  experiment_id: 10.1002/2016je005059::connolly-2016-si-o-liquid-vapor-caloric-vdw
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1999'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '83.25'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kraus et al. [2012]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: connolly-2016-si-o-liquid-vapor-caloric-vdw::connolly_2016_kraus_a2_cp
+  source_id: connolly-2016-si-o-liquid-vapor-caloric-vdw
+  locator:
+    page: 24
+    published_page: 1664
+    pdf_page_index: 23
+    table: A2
+    note: row=Kraus et al. [2012]; column=c_m
+  read_from: unknown:connolly-2016-si-o-liquid-vapor-caloric-vdw
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1999'
+      locator:
+        page: 24
+        published_page: 1664
+        pdf_page_index: 23
+        table: A2
+        note: row=Kraus et al. [2012]; column=c_m
+- observation_id: connolly-2016-si-o-liquid-vapor-caloric-vdw::connolly_2016_kraus_a2_entropy
+  experiment_id: 10.1002/2016je005059::connolly-2016-si-o-liquid-vapor-caloric-vdw
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '1999'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '172.17'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Kraus et al. [2012]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - S
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: connolly-2016-si-o-liquid-vapor-caloric-vdw::connolly_2016_kraus_a2_entropy
+  source_id: connolly-2016-si-o-liquid-vapor-caloric-vdw
+  locator:
+    page: 24
+    published_page: 1664
+    pdf_page_index: 23
+    table: A2
+    note: row=Kraus et al. [2012]; column=s_m
+  read_from: unknown:connolly-2016-si-o-liquid-vapor-caloric-vdw
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1999'
+      locator:
+        page: 24
+        published_page: 1664
+        pdf_page_index: 23
+        table: A2
+        note: row=Kraus et al. [2012]; column=s_m

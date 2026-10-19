@@ -1,0 +1,565 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/shornikov-2020-perovskite-chemical-fractionation.yaml
+observations:
+- observation_id: shornikov-2020-perovskite-chemical-fractionation::shornikov_2020_fractionation_cao_vapor_pressure_2278k
+  experiment_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d::shornikov-2020-perovskite-chemical-fractionation
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2278'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '1.5340605'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Glushko et al. (1978–1982); Balducci et al. (1985)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2020-perovskite-chemical-fractionation::shornikov_2020_fractionation_cao_vapor_pressure_2278k
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  locator:
+    page: 2
+    published_page: 37
+    pdf_page_index: 1
+    section: Results
+    note: Pure-component vapor pressure reported for CaO.
+  read_from: unknown:shornikov-2020-perovskite-chemical-fractionation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2278'
+      locator:
+        page: 2
+        published_page: 37
+        pdf_page_index: 1
+        section: Results
+        note: Pure-component vapor pressure reported for CaO.
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - unknown:shornikov-2020-perovskite-chemical-fractionation
+    parameters: []
+    output_unit: Pa
+- observation_id: shornikov-2020-perovskite-chemical-fractionation::shornikov_2020_fractionation_tio2_vapor_pressure_2278k
+  experiment_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d::shornikov-2020-perovskite-chemical-fractionation
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2278'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '2.7378015'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Glushko et al. (1978–1982); Balducci et al. (1985)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2020-perovskite-chemical-fractionation::shornikov_2020_fractionation_tio2_vapor_pressure_2278k
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  locator:
+    page: 2
+    published_page: 37
+    pdf_page_index: 1
+    section: Results
+    note: Pure-component vapor pressure reported for TiO2.
+  read_from: unknown:shornikov-2020-perovskite-chemical-fractionation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2278'
+      locator:
+        page: 2
+        published_page: 37
+        pdf_page_index: 1
+        section: Results
+        note: Pure-component vapor pressure reported for TiO2.
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - unknown:shornikov-2020-perovskite-chemical-fractionation
+    parameters: []
+    output_unit: Pa
+- observation_id: shornikov-2020-perovskite-chemical-fractionation::shornikov_2020_fractionation_zhang_atomic_oxygen_pressure_2278k
+  experiment_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d::shornikov-2020-perovskite-chemical-fractionation
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2278'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0086430225'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Calculated from data obtained by Zhang et al. (2014)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2020-perovskite-chemical-fractionation::shornikov_2020_fractionation_zhang_atomic_oxygen_pressure_2278k
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  locator:
+    page: 3
+    published_page: 38
+    pdf_page_index: 2
+    figure: '2'
+    section: Results and discussion
+    note: Text assigns this calculated pO to the Zhang et al. (2014) symbols, series III, line 9.; panel=a
+  read_from: unknown:shornikov-2020-perovskite-chemical-fractionation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2278'
+      locator:
+        page: 3
+        published_page: 38
+        pdf_page_index: 2
+        figure: '2'
+        section: Results and discussion
+        note: Text assigns this calculated pO to the Zhang et al. (2014) symbols, series III, line 9.; panel=a
+  derivation:
+    relation: species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    inputs:
+    - unknown:shornikov-2020-perovskite-chemical-fractionation
+    parameters: []
+    output_unit: Pa
+- observation_id: shornikov-2020-perovskite-chemical-fractionation::shornikov_2020_fractionation_zhang_residual_melt_tio2
+  experiment_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d::shornikov-2020-perovskite-chemical-fractionation
+  identity:
+    quantity:
+      tag: value
+      value: equilibrium_phase_composition
+    species:
+      formula: CaTiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: mol % TiO2 in the residual perovskite melt, as printed
+    per:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use per
+    temperature_K:
+      tag: value
+      value: '2278'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile equilibrium_phase_composition does not use wall
+  value:
+    kind: point
+    point: '68.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Zhang et al. (2014)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2020-perovskite-chemical-fractionation::shornikov_2020_fractionation_zhang_residual_melt_tio2
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  locator:
+    page: 3
+    published_page: 38
+    pdf_page_index: 2
+    section: Results and discussion
+    note: Text reports the residual-melt TiO2 concentration after 83.40 wt% weight loss.
+  read_from: unknown:shornikov-2020-perovskite-chemical-fractionation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2278'
+      locator:
+        page: 3
+        published_page: 38
+        pdf_page_index: 2
+        section: Results and discussion
+    composition:
+      state:
+        tag: unknown
+        reason: Only the residual-melt TiO2 percentage is printed; a complete melt composition is not given.
+      locator:
+        page: 3
+        published_page: 38
+        pdf_page_index: 2
+        section: Results and discussion
+- observation_id: shornikov-2020-perovskite-chemical-fractionation::shornikov_2020_fractionation_zhang_weight_loss
+  experiment_id: 96d111f9986e7ab997ab2d1175ac6118f84f65fe47c8dcc541ba6c30ce7d585d::shornikov-2020-perovskite-chemical-fractionation
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: CaTiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2278'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.834'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Zhang et al. (2014)
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: shornikov-2020-perovskite-chemical-fractionation::shornikov_2020_fractionation_zhang_weight_loss
+  source_id: shornikov-2020-perovskite-chemical-fractionation
+  locator:
+    page: 3
+    published_page: 38
+    pdf_page_index: 2
+    figure: '1'
+    section: Results and discussion
+    note: Text reports weight loss and residual-melt TiO2 concentration together.; panel=a
+  read_from: unknown:shornikov-2020-perovskite-chemical-fractionation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2278'
+      locator:
+        page: 3
+        published_page: 38
+        pdf_page_index: 2
+        figure: '1'
+        section: Results and discussion
+        note: Text reports weight loss and residual-melt TiO2 concentration together.; panel=a
+    composition:
+      state:
+        tag: unknown
+        reason: The complete initial and residual melt compositions are not printed.
+      locator:
+        page: 3
+        published_page: 38
+        pdf_page_index: 2
+        section: Results and discussion
+    printed_composition:
+      state:
+        tag: value
+        value:
+          TiO2: 68.30 mol %
+      locator:
+        page: 3
+        published_page: 38
+        pdf_page_index: 2
+        section: Results and discussion

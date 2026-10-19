@@ -1,0 +1,1790 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/s0016-7037(01)00797-9
+  citation: Tachibana, S., Tsuchiyama, A., and Nagahara, H. (2002), "Experimental study of incongruent evaporation kinetics
+    of enstatite in vacuum and in hydrogen gas", Geochimica et Cosmochimica Acta 66(4):713–728.
+  source_ids:
+  - tachibana-2002-enstatite-evaporation-kinetics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:tachibana-2002-enstatite-evaporation-kinetics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/s0016-7037(01)00797-9
+experiments:
+- experiment_id: 10.1016/s0016-7037(01)00797-9::experiment::tachibana_2002_enstatite_h2_2p0e6
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    hydrogen_partial_pressure_bar:
+      state:
+        tag: value
+        value: '0.000002'
+      locator:
+        published_page: 721
+        pdf_page_index: 8
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.2'
+          approximate: false
+      locator:
+        published_page: 721
+        pdf_page_index: 8
+        table: '3'
+        note: Printed p(H2) = 0.0000020 bar; 1 bar = 1e5 Pa
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: represented_by_total_pressure_Pa
+      locator:
+        published_page: 715
+        pdf_page_index: 2
+        section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/s0016-7037(01)00797-9
+  locator:
+    published_page: 715
+    pdf_page_index: 2
+    section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
+- experiment_id: 10.1016/s0016-7037(01)00797-9::experiment::tachibana_2002_enstatite_h2_6p1e6
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    hydrogen_partial_pressure_bar:
+      state:
+        tag: value
+        value: '0.0000061'
+      locator:
+        published_page: 721
+        pdf_page_index: 8
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.61'
+          approximate: false
+      locator:
+        published_page: 721
+        pdf_page_index: 8
+        table: '3'
+        note: Printed p(H2) = 0.0000061 bar; 1 bar = 1e5 Pa
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: represented_by_total_pressure_Pa
+      locator:
+        published_page: 715
+        pdf_page_index: 2
+        section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/s0016-7037(01)00797-9
+  locator:
+    published_page: 715
+    pdf_page_index: 2
+    section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
+- experiment_id: 10.1016/s0016-7037(01)00797-9::experiment::tachibana_2002_enstatite_h2_7p2e7
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    hydrogen_partial_pressure_bar:
+      state:
+        tag: value
+        value: '0.00000072'
+      locator:
+        published_page: 721
+        pdf_page_index: 8
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.072'
+          approximate: false
+      locator:
+        published_page: 721
+        pdf_page_index: 8
+        table: '3'
+        note: Printed p(H2) = 0.00000072 bar; 1 bar = 1e5 Pa
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: represented_by_total_pressure_Pa
+      locator:
+        published_page: 715
+        pdf_page_index: 2
+        section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/s0016-7037(01)00797-9
+  locator:
+    published_page: 715
+    pdf_page_index: 2
+    section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
+context:
+- observation_id: tachibana_2002_equation6_arrhenius_fit
+  type: model_parameter
+  locator:
+    published_page: 720
+    pdf_page_index: 7
+    section: Diffusion-Controlled Evaporation
+    equation: '6'
+  units: ln(cm2 s^-1), kJ mol^-1 as printed
+  values:
+    quantity_as_printed: Arrhenius fit for κEn
+    method_class: model_derived
+    equation_as_printed: ln κEn(cm2 s^-1) = 5.26(±4.05) − 457(±58)(kJ/mole)/(RT)
+    intercept_as_printed: 5.26 (±4.05)
+    activation_energy_kJ_mol_as_printed: 457 (±58)
+    temperature_range_C_as_printed: 1400 to 1500
+    derivation_inputs: Table 2 constant XFo at 1400–1500°C and Table 4 kFo extrapolated from Hashimoto (1990)
+    quantity_token_gap: no existing quantity enum represents κEn or its activation energy
+    model_derived_values:
+    - name: predicted time to steady state at 1400°C from Eqn. 4, starting at t = 0
+      value:
+        kind: bound
+        bound_operator: '>'
+        bound_value: '600'
+        approximate: true
+      units: h
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_equation6_arrhenius_fit
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_experimental_conditions
+  type: method
+  locator:
+    published_page: 715
+    pdf_page_index: 2
+    section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
+  units: as printed
+  values:
+    quantity_as_printed: experimental setup and operating conditions
+    vacuum_furnace: Furnace 1 with tungsten mesh heater and turbo-molecular pumping was used for vacuum runs; furnace 2 with
+      a tantalum heater and separate sample and heater chambers was used for hydrogen runs.
+    hydrogen_furnace: Hydrogen flowed through the sample chamber under continuous evacuation; chamber pressure was held constant
+      by microvalve flow adjustment.
+    vacuum_pressure_before_heating_bar_as_printed: less than about 5 × 10^-9
+    vacuum_pressure_during_run_bar_as_printed: about 10^-9
+    hydrogen_chamber_base_pressure_bar_as_printed: about 5 × 10^-9
+    hydrogen_pressures_bar_as_printed:
+    - 7.2 × 10^-7
+    - 2.0 × 10^-6
+    - 6.1 × 10^-6
+    vacuum_pressure_at_room_temperature_furnace_1_bar_as_printed: ≤10^-10
+    vacuum_pressure_at_room_temperature_furnace_2_bar_as_printed: about 10^-9
+    vacuum_temperature_precision_C_as_printed: ±1
+    hydrogen_temperature_precision_C_as_printed: ±5
+    temperature_calibration_points_C_as_printed:
+    - Au 1064.43
+    - Ni 1455
+    - Pd 1554
+    vacuum_temperature_calibration_points_C_as_printed:
+    - Ni 1455
+    - Co 1494
+    vacuum_preheat_C_as_printed: 500
+    vacuum_preheat_duration_h_as_printed: 0.5 to 5
+    hydrogen_preheat_C_as_printed: about 500
+    hydrogen_preheat_duration_as_printed: a few hours
+    heatup_time_from_preheat_as_printed: about 15 min
+    sample_temperature_range_C_as_printed: 1300 to 1500
+    hydrogen_heating_duration_range_h_as_printed: 1 to 44
+    vacuum_heating_duration_range_h_as_printed: 2 to 240
+    weight_measurement_precision_mg_as_printed: ±0.1
+    surface_area_measurement_uncertainty_as_printed: about 30%
+    weight_box_change_as_printed: within the balance precision
+    surface_area_method_as_printed: image analysis assuming a perfect prism with flat surfaces
+    surface_attached_to_molybdenum_box: excluded from the reported initial surface area
+    approximate_values:
+    - name: vacuum pressure before heating
+      value:
+        kind: bound
+        bound_operator: <
+        bound_value: 5 × 10^-9
+        approximate: true
+      units: bar
+    - name: vacuum pressure during a run
+      value:
+        kind: point
+        point: 10^-9
+        approximate: true
+      units: bar
+    - name: H2 furnace base pressure before flow
+      value:
+        kind: point
+        point: 5 × 10^-9
+        approximate: true
+      units: bar
+    - name: vacuum-furnace-2 pressure at room temperature
+      value:
+        kind: point
+        point: 10^-9
+        approximate: true
+      units: bar
+    - name: H2 preheat temperature
+      value:
+        kind: point
+        point: '500'
+        approximate: true
+      units: °C
+    - name: H2 sample heat-up time
+      value:
+        kind: point
+        point: '15'
+        approximate: true
+      units: min
+    - name: H2 surface-area uncertainty
+      value:
+        kind: point
+        point: '30'
+        approximate: true
+      units: '%'
+    - name: vacuum sample heat-up rate
+      value:
+        kind: point
+        point: '20'
+        approximate: true
+      units: °C/min
+    - name: vacuum sample cooling time to room temperature
+      value:
+        kind: point
+        point: '1'
+        approximate: true
+      units: h
+    - name: SiO mean free path in vacuum at experimental conditions
+      value:
+        kind: point
+        point: '100'
+        approximate: true
+      units: m
+    - name: vacuum-furnace-1 thermocouple offset above sample
+      value:
+        kind: point
+        point: '5'
+        approximate: true
+      units: mm
+    method_token_gap: The paper describes high-temperature evaporation in flowing H2; no existing method token exactly represents
+      this procedure.
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_experimental_conditions
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_fig10_solar_nebula_model
+  type: figure_record
+  locator:
+    figure: '10'
+    published_page: 726
+    pdf_page_index: 13
+  units: μm and bar as printed
+  values:
+    quantity_as_printed: modeled steady-state forsterite-layer thickness X*Fo
+    quantity_token_gap: no existing quantity enum represents layer thickness
+    species_as_printed: forsterite layer on enstatite
+    phase_as_printed: crystalline residue layer
+    temperature_as_printed: 1000°C to 1500°C
+    axes_as_printed:
+      x: p(total) (bar), logarithmic
+      y: X*Fo (μm), logarithmic
+    caption: Thickness of the forsterite layer for steady-state enstatite evaporation, X*Fo, in an open system estimated as
+      a function of temperature and total pressure in the primitive solar nebula. This is the maximum thickness for diffusion-controlled
+      evaporation; κEn is from this study and the forsterite evaporation rate is from Tsuchiyama et al. (1999). Only a thin
+      layer is predicted because hydrogen enhances forsterite evaporation.
+    panel: main
+    series:
+    - label: X*Fo at 1500°C
+      attribution: present-study model with Tsuchiyama et al. (1999) kFo
+      method_class: model_derived
+      marker_as_printed: solid curve
+      marker_count: 0
+    - label: X*Fo at 1400°C
+      attribution: present-study model with Tsuchiyama et al. (1999) kFo
+      method_class: model_derived
+      marker_as_printed: long-dashed curve
+      marker_count: 0
+    - label: X*Fo at 1300°C
+      attribution: present-study model with Tsuchiyama et al. (1999) kFo
+      method_class: model_derived
+      marker_as_printed: dashed curve
+      marker_count: 0
+    - label: X*Fo at 1200°C
+      attribution: present-study model with Tsuchiyama et al. (1999) kFo
+      method_class: model_derived
+      marker_as_printed: dash-dot curve
+      marker_count: 0
+    - label: X*Fo at 1100°C
+      attribution: present-study model with Tsuchiyama et al. (1999) kFo
+      method_class: model_derived
+      marker_as_printed: dotted curve
+      marker_count: 0
+    - label: X*Fo at 1000°C
+      attribution: present-study model with Tsuchiyama et al. (1999) kFo
+      method_class: model_derived
+      marker_as_printed: small-dash curve
+      marker_count: 0
+    digitisation: deferred to a figure pass
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_fig10_solar_nebula_model
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_fig1_vacuum_residue_micrographs
+  type: figure_record
+  locator:
+    figure: '1'
+    published_page: 717
+    pdf_page_index: 4
+  units: as photographed
+  values:
+    quantity_as_printed: surface and cross-section micrographs of enstatite evaporation residue
+    species_as_printed: forsterite residue on enstatite
+    phase_as_printed: crystalline surface residue and enstatite substrate
+    temperature_as_printed: 1400°C, 1450°C, and 1500°C
+    axes_as_printed:
+      x: not applicable
+      y: not applicable
+    caption: SEM photomicrographs (secondary electron image) of surfaces of samples heated in vacuum (a–d) and an optical
+      photomicrograph (transmitted cross-polarized light) of a thin section of a sample (e). (a) 1500°C, 22 h; the whole surface
+      is covered with forsterite crystals and shows a step-like texture. (b) 1450°C, 55 h. (c) 1400°C, 194 h. (d) 1400°C,
+      10 h, with residual forsterite crystals on enstatite. (e) Cross section at 1500°C for 90 h in vacuum; the residue is
+      a polycrystalline layer with crystals between several and several tens of microns.
+    panel: a–e
+    series:
+    - label: panel a, 1500°C for 22 h, SEM surface
+      attribution: present study
+      marker_as_printed: micrograph, no data marker
+      marker_count: 0
+    - label: panel b, 1450°C for 55 h, SEM surface
+      attribution: present study
+      marker_as_printed: micrograph, no data marker
+      marker_count: 0
+    - label: panel c, 1400°C for 194 h, SEM surface
+      attribution: present study
+      marker_as_printed: micrograph, no data marker
+      marker_count: 0
+    - label: panel d, 1400°C for 10 h, SEM surface
+      attribution: present study
+      marker_as_printed: micrograph, no data marker
+      marker_count: 0
+    - label: panel e, 1500°C for 90 h, cross-section optical micrograph
+      attribution: present study
+      marker_as_printed: micrograph, no data marker
+      marker_count: 0
+    digitisation: deferred to a figure pass
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_fig1_vacuum_residue_micrographs
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_fig2_xrd_patterns
+  type: figure_record
+  locator:
+    figure: '2'
+    published_page: 717
+    pdf_page_index: 4
+  units: diffraction intensity as plotted; 2θ in degrees
+  values:
+    quantity_as_printed: X-ray diffraction patterns and phase identification
+    species_as_printed: forsterite and clinoenstatite in heated enstatite samples
+    phase_as_printed: forsterite plus clinoenstatite
+    temperature_as_printed: 1500°C
+    axes_as_printed:
+      x: 2θ (deg.)
+      y: diffraction intensity, no numerical unit shown
+    caption: XRD patterns of samples heated in vacuum and hydrogen gas. The diffraction pattern of forsterite is seen in addition
+      to that of clinoenstatite, which was transformed from protoenstatite during rapid cooling. (a) Vacuum at 1500°C for
+      94 h. (b) p(H2) = 2.0 × 10^-6 bar at 1500°C for 6 h.
+    panel: a–b
+    series:
+    - label: panel a vacuum XRD pattern, 1500°C for 94 h
+      attribution: present study
+      marker_as_printed: continuous diffraction trace
+      marker_count: 0
+    - label: panel b hydrogen-run XRD pattern, p(H2) = 2.0 × 10^-6 bar, 1500°C for 6 h
+      attribution: present study
+      marker_as_printed: continuous diffraction trace
+      marker_count: 0
+    digitisation: deferred to a figure pass
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_fig2_xrd_patterns
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_fig3_vacuum_residue_thickness
+  type: figure_record
+  locator:
+    figure: '3'
+    published_page: 719
+    pdf_page_index: 6
+  units: μm and h as printed
+  values:
+    quantity_as_printed: residual forsterite layer thickness XFo
+    quantity_token_gap: no existing quantity enum represents layer thickness
+    species_as_printed: forsterite layer on enstatite
+    phase_as_printed: crystalline layer on crystalline substrate
+    temperature_as_printed: 1400°C, 1450°C, and 1500°C
+    axes_as_printed:
+      x: Time (hr)
+      y: XFo (μm)
+    caption: 'Change of the thickness of the residual forsterite layer, XFo, with heating duration in vacuum experiments at
+      different temperatures. (a) 1400°C: thickness increases then becomes constant. (b) 1450°C: increases, decreases, then
+      approaches a constant. (c) 1500°C: increases, then decreases toward a constant; depletion is more abrupt than at 1450°C.
+      Error bars are 99% confidence levels.'
+    panel: a–c
+    series:
+    - label: panel a XFo at 1400°C
+      attribution: present study
+      marker_as_printed: filled circle with 99% confidence error bars
+      marker_count: 8
+    - label: panel b XFo at 1450°C
+      attribution: present study
+      marker_as_printed: open inverted triangle with 99% confidence error bars
+      marker_count: 7
+    - label: panel c XFo at 1500°C
+      attribution: present study
+      marker_as_printed: open square with 99% confidence error bars
+      marker_count: 9
+    digitisation: deferred to a figure pass
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_fig3_vacuum_residue_thickness
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_fig4_hydrogen_residue_micrographs
+  type: figure_record
+  locator:
+    figure: '4'
+    published_page: 720
+    pdf_page_index: 7
+  units: as photographed
+  values:
+    quantity_as_printed: SEM surface micrographs of enstatite heated in hydrogen gas
+    species_as_printed: enstatite with forsterite-stoichiometric surface material
+    phase_as_printed: crystalline sample surface
+    temperature_as_printed: 1400°C and 1500°C
+    axes_as_printed:
+      x: not applicable
+      y: not applicable
+    caption: SEM photomicrographs of samples heated in hydrogen gas. The surface is rough and textures are slightly different
+      from those in vacuum. (a) p(H2) = 2.0 × 10^-6 bar at 1500°C for 4 h. (b) p(H2) = 2.0 × 10^-6 bar at 1400°C for 3 h.
+    panel: a–b
+    series:
+    - label: panel a hydrogen-run surface, 1500°C for 4 h
+      attribution: present study
+      marker_as_printed: micrograph, no data marker
+      marker_count: 0
+    - label: panel b hydrogen-run surface, 1400°C for 3 h
+      attribution: present study
+      marker_as_printed: micrograph, no data marker
+      marker_count: 0
+    digitisation: deferred to a figure pass
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_fig4_hydrogen_residue_micrographs
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_fig5_hydrogen_areal_mass_loss
+  type: figure_record
+  locator:
+    figure: '5'
+    published_page: 722
+    pdf_page_index: 9
+  units: g cm^-2 and h as printed
+  values:
+    quantity: mass_loss_areal_density
+    species_as_printed: enstatite
+    phase_as_printed: crystalline sample
+    temperature_as_printed: 1300°C, 1400°C, and 1500°C
+    axes_as_printed:
+      x: Time (hr)
+      y: ΔW/S (g cm^-2)
+    caption: Weight loss per unit area ΔW/S of samples heated at 1500, 1400, and 1300°C in hydrogen gas. ΔW/S seems proportional
+      to heating duration; linear fitting lines are shown. (a) p(H2) = 6.1 × 10^-6 bar. (b) p(H2) = 2.0 × 10^-6 bar. (c) p(H2)
+      = 7.2 × 10^-7 bar. Error bars are estimated from uncertainties of weight and surface area.
+    panel: a–c
+    series:
+    - label: panel a p(H2) = 6.1 × 10^-6 bar, 1500°C measured values
+      attribution: present study
+      marker_as_printed: open square
+      marker_count: 3
+    - label: panel a p(H2) = 6.1 × 10^-6 bar, 1400°C measured values
+      attribution: present study
+      marker_as_printed: filled circle
+      marker_count: 3
+    - label: panel a p(H2) = 6.1 × 10^-6 bar, 1300°C measured values
+      attribution: present study
+      marker_as_printed: open diamond
+      marker_count: 3
+    - label: panel b p(H2) = 2.0 × 10^-6 bar, 1500°C measured values
+      attribution: present study
+      marker_as_printed: open square
+      marker_count: 3
+    - label: panel b p(H2) = 2.0 × 10^-6 bar, 1400°C measured values
+      attribution: present study
+      marker_as_printed: filled circle
+      marker_count: 3
+    - label: panel b p(H2) = 2.0 × 10^-6 bar, 1300°C measured values
+      attribution: present study
+      marker_as_printed: open diamond
+      marker_count: 3
+    - label: panel c p(H2) = 7.2 × 10^-7 bar, 1500°C measured values
+      attribution: present study
+      marker_as_printed: open square
+      marker_count: 3
+    - label: panel c p(H2) = 7.2 × 10^-7 bar, 1400°C measured values
+      attribution: present study
+      marker_as_printed: filled circle
+      marker_count: 3
+    - label: panel c p(H2) = 7.2 × 10^-7 bar, 1300°C measured values
+      attribution: present study
+      marker_as_printed: open diamond
+      marker_count: 3
+    - label: linear fit, one per T and H2 pressure
+      attribution: present study
+      marker_as_printed: fitted line
+      marker_count: 0
+    digitisation: deferred to a figure pass
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_fig5_hydrogen_areal_mass_loss
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_fig6_arrhenius_fit
+  type: figure_record
+  locator:
+    figure: '6'
+    published_page: 722
+    pdf_page_index: 9
+  units: ln(cm2 s^-1) and K^-1 as printed
+  values:
+    quantity_as_printed: diffusion-controlled evaporation rate constant κEn
+    quantity_token_gap: no existing quantity enum represents κEn
+    species_as_printed: enstatite
+    phase_as_printed: crystalline
+    temperature_as_printed: 1400°C to 1500°C
+    axes_as_printed:
+      x: 1/T × 10^4 (K^-1)
+      y: ln κEn (cm2 s^-1)
+    caption: Temperature dependence of the diffusion-controlled evaporation rate constant κEn. Each value is determined from
+      the constant thickness of the forsterite layer using Eqn. 5. The data show an Arrhenius relation with activation energy
+      457 ± 58 kJ/mol; errors are propagated from XFo uncertainties.
+    panel: main
+    series:
+    - label: κEn measurements at 1400°C, 1450°C, and 1500°C
+      attribution: present study
+      marker_as_printed: filled square with propagated error bar
+      marker_count: 3
+    - label: Arrhenius regression
+      attribution: present study
+      method_class: model_derived
+      marker_as_printed: dashed line
+      marker_count: 0
+    digitisation: deferred to a figure pass
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_fig6_arrhenius_fit
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_fig7_diffusion_models
+  type: figure_record
+  locator:
+    figure: '7'
+    published_page: 723
+    pdf_page_index: 10
+  units: as printed
+  values:
+    quantity_as_printed: four diffusion models for enstatite evaporation and forsterite formation
+    quantity_token_gap: no existing quantity enum represents the model schematic
+    species_as_printed: enstatite, forsterite, SiO(g), O2(g), Mg2+, Si4+, and O2−
+    phase_as_printed: forsterite layer over enstatite substrate and gas
+    temperature_as_printed: not stated
+    axes_as_printed:
+      x: not applicable
+      y: not applicable
+    caption: Schematic illustrations of four diffusion models for evaporation of enstatite and formation of forsterite to
+      satisfy reaction mass balance. Reactions at the forsterite surface and the forsterite– enstatite interface are shown;
+      ΔV = (VFo − VEn)/VEn.
+    panel: models 1–4
+    series:
+    - label: diffusion model 1
+      attribution: Imae et al. (1993) model framework
+      marker_as_printed: reaction schematic
+      marker_count: 0
+    - label: diffusion model 2
+      attribution: Imae et al. (1993) model framework
+      marker_as_printed: reaction schematic
+      marker_count: 0
+    - label: diffusion model 3
+      attribution: Imae et al. (1993) model framework
+      marker_as_printed: reaction schematic
+      marker_count: 0
+    - label: diffusion model 4
+      attribution: Imae et al. (1993) model framework
+      marker_as_printed: reaction schematic
+      marker_count: 0
+    digitisation: deferred to a figure pass
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_fig7_diffusion_models
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_fig8_modelled_vacuum_layer_thickness
+  type: figure_record
+  locator:
+    figure: '8'
+    published_page: 724
+    pdf_page_index: 11
+  units: μm and h as printed
+  values:
+    quantity_as_printed: forsterite layer thickness XFo and calculated XFo–t curves
+    quantity_token_gap: no existing quantity enum represents layer thickness
+    species_as_printed: forsterite layer on enstatite
+    phase_as_printed: crystalline residue layer
+    temperature_as_printed: 1450°C and 1500°C
+    axes_as_printed:
+      x: Time (hr)
+      y: XFo (μm)
+    caption: XFo and XFo–t curves calculated from Eqn. 4 using κEn from Eqn. 6 and kFo extrapolated from Hashimoto (1990).
+      The calculated patterns reproduce experimental depletion patterns. (a) 1500°C. (b) 1450°C.
+    panel: a–b
+    series:
+    - label: panel a measured XFo at 1500°C
+      attribution: present study
+      marker_as_printed: open square with error bar
+      marker_count: 5
+    - label: panel a calculated XFo–t model curve at 1500°C
+      attribution: present-study model
+      method_class: model_derived
+      marker_as_printed: dashed curve
+      marker_count: 0
+    - label: panel b measured XFo at 1450°C
+      attribution: present study
+      marker_as_printed: open inverted triangle with error bar
+      marker_count: 4
+    - label: panel b calculated XFo–t model curve at 1450°C
+      attribution: present-study model
+      method_class: model_derived
+      marker_as_printed: dashed curve
+      marker_count: 0
+    digitisation: deferred to a figure pass
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_fig8_modelled_vacuum_layer_thickness
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_fig9_forsterite_evaporation_rate_comparison
+  type: figure_record
+  locator:
+    figure: '9'
+    published_page: 725
+    pdf_page_index: 12
+  units: g cm^-2 s^-1 and bar as printed
+  values:
+    quantity_as_printed: forsterite evaporation rate versus total pressure
+    quantity_token_gap: no existing quantity enum represents the flux unit
+    species_as_printed: forsterite
+    phase_as_printed: crystalline
+    temperature_as_printed: 1300°C, 1400°C, 1500°C, and 1700°C
+    axes_as_printed:
+      x: p(total) (bar), logarithmic
+      y: J (g cm^-2 s^-1), logarithmic
+    caption: 'Evaporation rates of forsterite estimated in the present study as a function of hydrogen pressure and temperature,
+      with previous experimental rates for comparison: (1) Tsuchiyama et al. (1998); (2) Hashimoto (1990, 1998), Wang et al.
+      (1993, 1999), and Nagahara et al. (1997); (3) Nagahara and Ozawa (1996b). Broken curves show Tsuchiyama et al. (1998)
+      rates evaluated using theoretical rates and experimental data.'
+    panel: main
+    series:
+    - label: previous forsterite data at 1300°C (1)
+      attribution: Tsuchiyama et al. (1998)
+      marker_as_printed: filled diamond
+      marker_count: 1
+    - label: previous forsterite data at 1400°C (1)
+      attribution: Tsuchiyama et al. (1998)
+      marker_as_printed: open circle
+      marker_count: 1
+    - label: previous forsterite data at 1500°C (2)
+      attribution: Hashimoto (1990, 1998); Wang et al. (1993, 1999); Nagahara et al. (1997)
+      marker_as_printed: open square
+      marker_count: 5
+    - label: previous forsterite data at 1700°C (3)
+      attribution: Nagahara and Ozawa (1996b)
+      marker_as_printed: filled triangle
+      marker_count: 7
+    - label: present-study forsterite rates at 1300°C
+      attribution: present study
+      marker_as_printed: open diamond
+      marker_count: 3
+    - label: present-study forsterite rates at 1400°C
+      attribution: present study
+      marker_as_printed: filled circle
+      marker_count: 3
+    - label: present-study forsterite rates at 1500°C
+      attribution: present study
+      marker_as_printed: square with cross
+      marker_count: 3
+    - label: estimated forsterite rates at 1300°C
+      attribution: Tsuchiyama et al. (1998)
+      method_class: model_derived
+      marker_as_printed: broken curve
+      marker_count: 0
+    - label: estimated forsterite rates at 1400°C
+      attribution: Tsuchiyama et al. (1998)
+      method_class: model_derived
+      marker_as_printed: broken curve
+      marker_count: 0
+    - label: estimated forsterite rates at 1500°C
+      attribution: Tsuchiyama et al. (1998)
+      method_class: model_derived
+      marker_as_printed: broken curve
+      marker_count: 0
+    - label: estimated forsterite rates at 1700°C
+      attribution: Tsuchiyama et al. (1998)
+      method_class: model_derived
+      marker_as_printed: broken curve
+      marker_count: 0
+    digitisation: deferred to a figure pass
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_fig9_forsterite_evaporation_rate_comparison
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_forsterite_residue_composition
+  type: composition
+  locator:
+    published_page: 718
+    pdf_page_index: 5
+    section: Experiments in Hydrogen Gas
+  units: Mg/Si ratio and qualitative phase identity as printed
+  values:
+    quantity_as_printed: composition of the evaporation residue surface
+    evidence_class: measured_direct
+    analysis_method: EPMA
+    surface_Mg_over_Si_range_at_15_kV_12_nA_as_printed: between 1 (enstatite) and 2 (forsterite)
+    surface_composition_at_5_kV_5_nA_as_printed: forsterite stoichiometry
+    approximate_values:
+    - name: IR absorption feature associated with forsterite in residue
+      value:
+        kind: point
+        point: '610'
+        approximate: true
+      units: cm^-1
+    orthoenstatite_IR_absorption_feature_as_printed:
+      value:
+        kind: point
+        point: '405'
+      units: cm^-1
+      locator:
+        published_page: 716
+        pdf_page_index: 3
+    quantitative_analysis_limitation: Precise quantitative analysis was difficult because the surface was rough. The hydrogen-run
+      forsterite layer was too thin for optical thickness determination and is described as presumably submicron.
+    note: The source does not publish a complete oxide composition for the residue; no oxide proportions were reconstructed.
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_forsterite_residue_composition
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_solar_nebula_model_context
+  type: model_curve
+  locator:
+    published_page: 725
+    pdf_page_index: 12
+    figure: '10'
+    section: Application to Incongruent Evaporation of Enstatite under Kinetic Conditions in the Solar Nebula
+  units: μm, bar, and kJ/mol as printed
+  values:
+    quantity_as_printed: steady-state forsterite-layer thickness X*Fo
+    method_class: model_derived
+    model_inputs: Eqn. 5 using the present-study κEn and Tsuchiyama et al. (1999) kFo model
+    estimated_hydrogen_XFo_range_as_printed: 0.01 to 0.2
+    estimated_hydrogen_XFo_range_units: μm
+    open_system_XFo_upper_bound_as_printed: less than 0.1
+    open_system_XFo_units: μm
+    open_system_total_pressure_range_bar_as_printed: 10^-3 to 10^-6
+    open_system_gas_behavior_as_printed: evaporated gases are taken away immediately
+    kFo_activation_energy_by_regime_as_printed:
+      FED:
+        value:
+          kind: point
+          point: '600'
+          approximate: true
+        units: kJ/mol
+      HRD:
+        value:
+          kind: point
+          point: '300'
+          approximate: true
+        units: kJ/mol
+      HBD:
+        value:
+          kind: point
+          point: '520'
+          approximate: true
+        units: kJ/mol
+    magnesium_diffusion_relative_to_oxygen_and_silicon:
+      value:
+        kind: interval
+        interval_low: 10^3
+        interval_high: 10^7
+        approximate: true
+      units: ratio
+      qualifier_as_printed: about times faster
+    quoted_comparison:
+      claim_as_printed: evaporation rates of forsterite are almost one-tenth of ideal evaporation rates
+      value:
+        kind: point
+        point: '0.1'
+        approximate: true
+      units: ratio to ideal evaporation rate
+      method_class: quoted_attributed
+      attribution: Tsuchiyama et al. (1998)
+    kappa_en_activation_energy_restatement:
+      value:
+        kind: point
+        point: '458'
+      units: kJ/mol
+      method_class: model_derived
+      locator:
+        published_page: 726
+        pdf_page_index: 13
+      note: Discussion restatement of the fitted activation energy; Eqn. 6 retains 457 (±58) kJ/mol.
+    regime_definitions_as_printed:
+      FED: free evaporation dominated
+      HRD: hydrogen reaction dominated
+      HBD: H2O/H2 buffer dominated
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_solar_nebula_model_context
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_synthesized_enstatite_composition_table1
+  type: characterization
+  locator:
+    published_page: 715
+    pdf_page_index: 2
+    table: '1'
+  units: wt% as printed
+  values:
+    quantity_as_printed: composition of synthesized orthoenstatite crystals
+    analysis_count: 20
+    headers_as_printed:
+    - Element
+    - Average (wt%)
+    - Max (wt%)
+    - Min (wt%)
+    - cf. MgSiO3
+    rows_as_printed:
+    - - MgO
+      - '39.83'
+      - '40.44'
+      - '38.89'
+      - '40.15'
+    - - SiO2
+      - '60.04'
+      - '61.26'
+      - '58.77'
+      - '59.85'
+    - - V2O5
+      - '0.12'
+      - '0.34'
+      - '0.01'
+      - '0'
+    - - MoO3
+      - ND
+      - ND
+      - ND
+      - '0'
+    - - Li2O
+      - —
+      - —
+      - —
+      - '0'
+    - - Total
+      - '99.99'
+      - '101.26'
+      - '98.01'
+      - '100'
+    table_note_as_printed: Max, maximum; Min, minimum.
+    approximate_values:
+    - name: V2O5 impurity concentration described in text
+      value:
+        kind: point
+        point: '0.12'
+        approximate: true
+      units: wt%
+    - name: cooling rate from 700°C to room temperature during crystal synthesis
+      value:
+        kind: point
+        point: '50'
+        approximate: true
+      units: °C/h
+    quoted_attributed_values:
+      attribution: Ito (1975)
+      method_class: quoted_attributed
+      locator:
+        published_page: 715
+        pdf_page_index: 2
+        section: Synthesized enstatite composition
+      values:
+        Li2O:
+          value:
+            kind: point
+            point: '0.17'
+          units: wt%
+        V2O5:
+          value:
+            kind: point
+            point: '0.27'
+          units: wt%
+    author_inference_as_printed: Lithium was not measured; the authors infer that their synthesized crystals probably contain
+      a similar amount of Li2O to that reported by Ito (1975).
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_synthesized_enstatite_composition_table1
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_table2_vacuum_residue_layer_thickness
+  type: residual_layer_thickness
+  locator:
+    published_page: 718
+    pdf_page_index: 5
+    table: '2'
+  units: μm, h, and count as printed
+  values:
+    quantity_as_printed: residual forsterite layer thickness XFo
+    quantity_token_gap: no existing quantity enum represents layer thickness
+    headers_as_printed:
+    - T (°C)
+    - Time (hr)
+    - XFo (μm)
+    - Max XFo (μm)
+    - Min XFo (μm)
+    - No. analyses
+    - 99% confidence interval (μm)
+    rows_as_printed:
+    - - '1500'
+      - '5'
+      - almost covered
+      - —
+      - —
+      - —
+      - —
+    - - '1500'
+      - '14'
+      - '3.78'
+      - '6.44'
+      - '2.15'
+      - '71'
+      - '0.286'
+    - - '1500'
+      - '22'
+      - '3.90'
+      - '9.42'
+      - '1.63'
+      - '48'
+      - '0.793'
+    - - '1500'
+      - '30'
+      - '5.20'
+      - '11.33'
+      - '2.34'
+      - '35'
+      - '1.000'
+    - - '1500'
+      - '60'
+      - '6.14'
+      - '7.08'
+      - '5.14'
+      - '11'
+      - '0.604'
+    - - '1500'
+      - '90'
+      - '7.39'
+      - '15.23'
+      - '3.12'
+      - '37'
+      - '1.250'
+    - - '1500'
+      - '110'
+      - '5.96'
+      - '8.19'
+      - '2.85'
+      - '27'
+      - blank in source
+    - - '1500'
+      - '135'
+      - '3.47'
+      - '4.51'
+      - '2.36'
+      - '12'
+      - '0.753'
+    - - '1500'
+      - '150'
+      - '3.91'
+      - '8.96'
+      - '1.60'
+      - '43'
+      - '0.699'
+    - - '1500'
+      - '180'
+      - '3.60'
+      - '6.25'
+      - '1.74'
+      - '50'
+      - '0.431'
+    - - '1450'
+      - '30'
+      - '5.25'
+      - '7.22'
+      - '2.71'
+      - '28'
+      - '0.520'
+    - - '1450'
+      - '40'
+      - '5.98'
+      - '8.33'
+      - '3.89'
+      - '22'
+      - '0.770'
+    - - '1450'
+      - '55'
+      - '7.25'
+      - '13.89'
+      - '2.78'
+      - '35'
+      - '1.430'
+    - - '1450'
+      - '110'
+      - '7.34'
+      - '11.46'
+      - '4.10'
+      - '38'
+      - '0.846'
+    - - '1450'
+      - '150'
+      - '7.12'
+      - '12.36'
+      - '4.44'
+      - '64'
+      - '0.628'
+    - - '1450'
+      - '180'
+      - '5.92'
+      - '8.89'
+      - '3.13'
+      - '44'
+      - '0.462'
+    - - '1450'
+      - '240'
+      - '5.71'
+      - '12.08'
+      - '3.26'
+      - '44'
+      - '0.647'
+    - - '1400'
+      - '2'
+      - sporadic
+      - —
+      - —
+      - —
+      - —
+    - - '1400'
+      - '5'
+      - sporadic
+      - —
+      - —
+      - —
+      - —
+    - - '1400'
+      - '10'
+      - partially covered
+      - —
+      - —
+      - —
+      - —
+    - - '1400'
+      - '22'
+      - '2.84'
+      - '3.40'
+      - '2.29'
+      - '10'
+      - '0.555'
+    - - '1400'
+      - '35'
+      - '3.25'
+      - '4.19'
+      - '2.08'
+      - '57'
+      - '0.151'
+    - - '1400'
+      - '45'
+      - '4.55'
+      - '6.01'
+      - '2.47'
+      - '42'
+      - '0.301'
+    - - '1400'
+      - '70'
+      - '5.28'
+      - '6.51'
+      - '3.87'
+      - '134'
+      - '0.146'
+    - - '1400'
+      - '90'
+      - '6.54'
+      - '9.58'
+      - '4.51'
+      - '121'
+      - '0.229'
+    - - '1400'
+      - '120'
+      - '6.43'
+      - '8.33'
+      - '4.03'
+      - '85'
+      - '0.288'
+    - - '1400'
+      - '150'
+      - '6.42'
+      - '8.82'
+      - '4.44'
+      - '26'
+      - '0.581'
+    - - '1400'
+      - '194'
+      - '6.70'
+      - '8.75'
+      - '5.00'
+      - '85'
+      - '0.271'
+    - - '1300'
+      - '120'
+      - sporadic
+      - —
+      - —
+      - —
+      - —
+    note: XFo measured under an optical microscope; confidence intervals are 99% levels.
+    approximate_surface_coverage_times:
+    - temperature_C: '1400'
+      duration_h:
+        kind: interval
+        interval_low: '10'
+        interval_high: '20'
+        approximate: true
+    - temperature_C: '1500'
+      duration_h:
+        kind: point
+        point: '5'
+        approximate: true
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_table2_vacuum_residue_layer_thickness
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_table3_hydrogen_conditions_and_raw_results
+  type: table
+  locator:
+    published_page: 721
+    pdf_page_index: 8
+    table: '3'
+  units: g, cm, cm2, %, and g cm^-2 as printed
+  values:
+    quantity_as_printed: hydrogen-run conditions and raw mass-loss table
+    headers_as_printed:
+    - T (°C)
+    - Time (hr)
+    - c0 (cm)
+    - S (cm2)
+    - W0 (g)
+    - Wafter (g)
+    - ΔW (g)
+    - F (%)
+    - ΔW/S (g cm^-2)
+    parenthetical_semantics: Integer parentheticals follow every S cell and every ΔW/S cell. Neither the table note nor the
+      surrounding text defines their meaning; the complete cell strings are retained without assigning a meaning to those
+      integers.
+    pressure_group_1_bar_as_printed: 6.1 × 10^-6
+    pressure_group_2_bar_as_printed: 2.0 × 10^-6
+    pressure_group_3_bar_as_printed: 7.2 × 10^-7
+    rows_as_printed:
+    - - '1300'
+      - '8'
+      - '0.235'
+      - 0.0821 (135)
+      - '0.00693'
+      - '0.00638'
+      - '0.00055'
+      - '7.9'
+      - 0.00670 (117)
+    - - '1300'
+      - '16'
+      - '0.175'
+      - 0.0969 (185)
+      - '0.00837'
+      - '0.00767'
+      - '0.00070'
+      - '8.4'
+      - 0.00722 (141)
+    - - '1300'
+      - '19'
+      - '0.165'
+      - 0.0655 (144)
+      - '0.00453'
+      - '0.00388'
+      - '0.00065'
+      - '14.3'
+      - 0.00992 (223)
+    - - '1400'
+      - '3'
+      - '0.175'
+      - 0.0713 (149)
+      - '0.00498'
+      - '0.00437'
+      - '0.00061'
+      - '12.2'
+      - 0.00855 (184)
+    - - '1400'
+      - '6'
+      - '0.180'
+      - 0.0560 (116)
+      - '0.00362'
+      - '0.00302'
+      - '0.00060'
+      - '16.6'
+      - 0.01072 (228)
+    - - '1400'
+      - '4'
+      - '0.120'
+      - 0.0449 (142)
+      - '0.00206'
+      - '0.00166'
+      - '0.00040'
+      - '19.4'
+      - 0.00891 (290)
+    - - '1500'
+      - '1'
+      - '0.125'
+      - 0.0605 (160)
+      - '0.00403'
+      - '0.00351'
+      - '0.00052'
+      - '12.9'
+      - 0.00859 (232)
+    - - '1500'
+      - '2'
+      - '0.165'
+      - 0.1357 (244)
+      - '0.01333'
+      - '0.01165'
+      - '0.00168'
+      - '12.6'
+      - 0.01238 (224)
+    - - '1500'
+      - '3'
+      - '0.185'
+      - 0.0738 (158)
+      - '0.00546'
+      - '0.00415'
+      - '0.00131'
+      - '24.0'
+      - 0.01775 (383)
+    - - '1300'
+      - '11'
+      - '0.260'
+      - 0.0850 (136)
+      - '0.00528'
+      - '0.00496'
+      - '0.00032'
+      - '6.1'
+      - 0.00376 (70)
+    - - '1300'
+      - '18'
+      - '0.170'
+      - 0.0703 (144)
+      - '0.00384'
+      - '0.00367'
+      - '0.00017'
+      - '4.4'
+      - 0.00242 (66)
+    - - '1300'
+      - '25'
+      - '0.260'
+      - 0.1133 (166)
+      - '0.00845'
+      - '0.00755'
+      - '0.00090'
+      - '10.7'
+      - 0.00795 (120)
+    - - '1400'
+      - '3'
+      - '0.165'
+      - 0.0637 (144)
+      - '0.00331'
+      - '0.00316'
+      - '0.00015'
+      - '4.5'
+      - 0.00236 (72)
+    - - '1400'
+      - '9'
+      - '0.140'
+      - 0.0603 (161)
+      - '0.00373'
+      - '0.00329'
+      - '0.00044'
+      - '11.8'
+      - 0.00729 (201)
+    - - '1400'
+      - '16'
+      - '0.170'
+      - 0.0757 (170)
+      - '0.00516'
+      - '0.00398'
+      - '0.00118'
+      - '22.9'
+      - 0.01560 (353)
+    - - '1500'
+      - '1'
+      - '0.130'
+      - 0.0667 (161)
+      - '0.00387'
+      - '0.00352'
+      - '0.00035'
+      - '9.0'
+      - 0.00525 (135)
+    - - '1500'
+      - '2'
+      - '0.108'
+      - 0.0767 (202)
+      - '0.00472'
+      - '0.00409'
+      - '0.00063'
+      - '13.3'
+      - 0.00821 (220)
+    - - '1500'
+      - '4'
+      - '0.190'
+      - 0.0752 (148)
+      - '0.00498'
+      - '0.00386'
+      - '0.00112'
+      - '22.5'
+      - 0.01489 (296)
+    - - '1300'
+      - '11'
+      - '0.130'
+      - 0.0336 (91)
+      - '0.00162'
+      - '0.00157'
+      - '0.00005'
+      - '3.1'
+      - 0.00149 (101)
+    - - '1300'
+      - '23'
+      - '0.095'
+      - 0.0343 (117)
+      - '0.00174'
+      - '0.00167'
+      - '0.00007'
+      - '4.0'
+      - 0.00204 (114)
+    - - '1300'
+      - '44'
+      - '0.120'
+      - 0.0302 (96)
+      - '0.00128'
+      - '0.00109'
+      - '0.00019'
+      - '14.8'
+      - 0.00630 (225)
+    - - '1400'
+      - '16'
+      - '0.195'
+      - 0.0521 (115)
+      - '0.00280'
+      - '0.00238'
+      - '0.00042'
+      - '15.0'
+      - 0.00805 (187)
+    - - '1400'
+      - '20'
+      - '0.110'
+      - 0.0544 (151)
+      - '0.00351'
+      - '0.00329'
+      - '0.00085'
+      - '24.2'
+      - 0.01561 (436)
+    - - '1400'
+      - '24'
+      - '0.110'
+      - 0.0507 (135)
+      - '0.00351'
+      - '0.00279'
+      - '0.00072'
+      - '20.5'
+      - 0.01421 (383)
+    - - '1500'
+      - '1'
+      - '0.110'
+      - 0.1089 (252)
+      - '0.00906'
+      - '0.00883'
+      - '0.00023'
+      - '2.5'
+      - 0.00211 (57)
+    - - '1500'
+      - '2'
+      - '0.090'
+      - 0.0621 (189)
+      - '0.00371'
+      - '0.00346'
+      - '0.00025'
+      - '6.7'
+      - 0.00402 (132)
+    - - '1500'
+      - '3'
+      - '0.105'
+      - 0.0338 (104)
+      - '0.00185'
+      - '0.00165'
+      - '0.00020'
+      - '10.8'
+      - 0.00592 (204)
+    table_note_as_printed: p(H2) is hydrogen pressure; c0 is initial length along the c-axis; S is initial surface area excluding
+      the attached face; W0 and Wafter are before and after weights; ΔW is weight loss; F is evaporated fraction.
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_table3_hydrogen_conditions_and_raw_results
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_table4_enstatite_diffusion_rate_constant
+  type: model_parameter
+  locator:
+    published_page: 722
+    pdf_page_index: 9
+    table: '4'
+  units: cm2 s^-1
+  values:
+    quantity_as_printed: diffusion-controlled evaporation rate constant κEn
+    quantity_token_gap: no existing quantity enum represents κEn
+    method_class: model_derived
+    derivation_as_printed: κEn was obtained from Eqn. 5 using the steady forsterite-layer thicknesses and kFo extrapolated
+      from Hashimoto (1990).
+    rows_as_printed:
+    - - '1400'
+      - 9.54 (1.73) × 10^-13
+    - - '1450'
+      - 3.00 (0.48) × 10^-12
+    - - '1500'
+      - 6.21 (0.94) × 10^-12
+    headers_as_printed:
+    - T (°C)
+    - κEn (cm2 s^-1)
+    uncertainty_as_printed: parenthesized errors
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_table4_enstatite_diffusion_rate_constant
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_table4_forsterite_evaporation_rate_constant
+  type: model_parameter
+  locator:
+    published_page: 722
+    pdf_page_index: 9
+    table: '4'
+  units: cm s^-1
+  values:
+    quantity_as_printed: surface-reaction-controlled evaporation rate constant kFo
+    quantity_token_gap: no existing quantity enum represents kFo
+    method_class: quoted_attributed
+    attribution: Hashimoto (1990)
+    rows_as_printed:
+    - - '1400'
+      - 7.31 (1.31) × 10^-10
+    - - '1450'
+      - 2.58 (0.37) × 10^-9
+    - - '1500'
+      - 8.48 (0.96) × 10^-9
+    headers_as_printed:
+    - T (°C)
+    - kFo (cm s^-1)
+    table_note_as_printed: kFo extrapolated from Hashimoto (1990).
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_table4_forsterite_evaporation_rate_constant
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_table5_diffusion_comparison
+  type: comparison_table
+  locator:
+    published_page: 724
+    pdf_page_index: 11
+    table: '5'
+  units: kJ/mole, cm2 s^-1, and °C as printed
+  values:
+    quantity_as_printed: activation-energy and bulk-diffusion comparison
+    quantity_token_gap: no existing quantity enum represents activation energy or diffusion coefficient
+    headers_as_printed:
+    - Ea (kJ/mole)
+    - D0 (cm2 s^-1)
+    - T (°C)
+    - D at 1500°C (cm2 s^-1)
+    - D at 1400°C (cm2 s^-1)
+    - Reference
+    present_study_row_as_printed:
+    - 457 (58)
+    - —
+    - 1400–1500
+    - —
+    - —
+    - This study (κEn)
+    method_class_by_group:
+      present_study: model_derived
+      cited_rows: quoted_attributed
+    groups:
+    - isotope_as_printed: 16O
+      rows_as_printed:
+      - - 372 (13)
+        - 3.5 × 10^-3
+        - 1275–1630
+        - 3.79 × 10^-14
+        - 8.38 × 10^-15
+        - '1'
+      - - 323 (42)
+        - 5.6 × 10^-3
+        - 1150–1600
+        - 3.19 × 10^-14
+        - 8.62 × 10^-15
+        - '2'
+      - - 293 (42)
+        - 2.3 × 10^-6
+        - 1300–1600
+        - 5.31 × 10^-15
+        - 1.62 × 10^-15
+        - '3'
+      - - '475'
+        - '1.6'
+        - 1000–1510
+        - 1.60 × 10^-14
+        - 2.32 × 10^-15
+        - '4'
+    - isotope_as_printed: 30Si
+      rows_as_printed:
+      - - '176'
+        - 8.5 × 10^-9
+        - 1513–1723
+        - 5.52 × 10^-14
+        - 2.70 × 10^-14
+        - '4'
+      - - '377'
+        - 1.5 × 10^-6
+        - 1325–1725
+        - 1.16 × 10^-17
+        - 2.51 × 10^-18
+        - '5'
+    - isotope_as_printed: 26Mg
+      rows_as_printed:
+      - - '373'
+        - '4.1'
+        - 1373–1693
+        - 4.15 × 10^-11
+        - 9.14 × 10^-12
+        - '4'
+      - - '444'
+        - 1.5 × 10^3
+        - 1300–1400
+        - 1.23 × 10^-10
+        - 2.02 × 10^-11
+        - '6'
+      - - 400 (60)
+        - '9.6'
+        - 1000–1300
+        - 1.55 × 10^-11
+        - 3.07 × 10^-12
+        - '7'
+    references_as_printed:
+      '1': Reddy et al. (1980)
+      '2': Jaoul et al. (1980)
+      '3': Jaoul et al. (1983)
+      '4': Hallwig et al. (1982)
+      '5': Jaoul et al. (1981)
+      '6': Morioka (1981)
+      '7': Chakraborty et al. (1994)
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_table5_diffusion_comparison
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_table6_hydrogen_flux
+  type: evaporation_flux
+  locator:
+    published_page: 725
+    pdf_page_index: 12
+    table: '6'
+  units: g cm^-2 s^-1 as printed
+  values:
+    quantity_as_printed: evaporation rate J (mass loss flux)
+    quantity_token_gap: no existing quantity enum represents mass flux per area per time
+    method_class: model_derived
+    derivation_as_printed: slope J from the linear fit ΔW/S = Jt to Table 3 data
+    headers_as_printed:
+    - T (°C)
+    - J (g cm^-2 s^-1)
+    rows_as_printed:
+    - - '1300'
+      - 1.51 (0.18) × 10^-7
+    - - '1400'
+      - 5.85 (0.82) × 10^-7
+    - - '1500'
+      - 1.77 (0.22) × 10^-6
+    - - '1300'
+      - 6.29 (0.74) × 10^-8
+    - - '1400'
+      - 2.39 (0.37) × 10^-7
+    - - '1500'
+      - 1.13 (0.16) × 10^-6
+    - - '1300'
+      - 3.27 (0.92) × 10^-8
+    - - '1400'
+      - 1.59 (0.24) × 10^-7
+    - - '1500'
+      - 5.67 (0.57) × 10^-7
+    pressure_group_bar_as_printed:
+    - 6.1 × 10^-6
+    - 2.0 × 10^-6
+    - 7.2 × 10^-7
+    group_order: pressure group then T ascending
+    uncertainty_as_printed: parenthesized errors
+    quoted_attributed_values:
+      attribution: Carmichael, 1989
+      method_class: quoted_attributed
+      locator:
+        published_page: 725
+        pdf_page_index: 12
+      values:
+        average_enstatite_density:
+          value:
+            kind: point
+            point: '3.209'
+          units: g cm^-3
+        average_forsterite_density:
+          value:
+            kind: point
+            point: '3.213'
+          units: g cm^-3
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_table6_hydrogen_flux
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite
+- observation_id: tachibana_2002_textual_kinetics_results
+  type: thermodynamic_example
+  locator:
+    published_page: 718
+    pdf_page_index: 5
+    section: Results and Discussion
+  units: as printed
+  values:
+    quantity_as_printed: textual residue-thickness and evaporation results
+    approximate_values:
+    - name: steady XFo at 1400°C
+      value:
+        kind: point
+        point: '6'
+        approximate: true
+      units: μm
+      time_h:
+        kind: point
+        point: '90'
+        approximate: true
+    - name: steady XFo at 1450°C
+      value:
+        kind: point
+        point: '5.5'
+        approximate: true
+      units: μm
+      time_h:
+        kind: point
+        point: '70'
+        approximate: true
+    - name: steady XFo at 1500°C
+      value:
+        kind: point
+        point: '4'
+        approximate: true
+      units: μm
+      time_h:
+        kind: point
+        point: '90'
+        approximate: true
+    - name: SiO mean free path in hydrogen at 1300–1500°C
+      qualifier_as_printed: above approximately
+      value:
+        kind: bound
+        bound_operator: '>'
+        bound_value: '1'
+        approximate: true
+      units: m
+    - name: forsterite layer thickness in hydrogen runs
+      qualifier_as_printed: presumably submicron
+      value:
+        kind: bound
+        bound_operator: <
+        bound_value: '1'
+        approximate: true
+      units: μm
+    quoted_value:
+      quantity_as_printed: forsterite evaporation rate in vacuum at 1500°C
+      value_as_printed: '0.27'
+      units: μm/h along c-axis
+      method_class: quoted_attributed
+      attribution: Nagahara and Ozawa (1999)
+      supporting_text: about 30 μm of forsterite evaporates within 100 h at 1500°C.
+      supporting_values:
+        evaporated_thickness:
+          value:
+            kind: point
+            point: '30'
+            approximate: true
+          units: μm
+        duration_as_printed: within 100 h
+  context_id: tachibana-2002-enstatite-evaporation-kinetics::context::tachibana_2002_textual_kinetics_results
+  work_id: 10.1016/s0016-7037(01)00797-9
+  source_id: tachibana-2002-enstatite-evaporation-kinetics
+  species: enstatite

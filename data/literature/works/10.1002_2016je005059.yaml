@@ -1,0 +1,488 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1002/2016je005059
+  citation: 'Connolly, James A. D. (2016). Liquid-vapor phase relations in the Si-O system: A calorically constrained van
+    der Waals-type model. Journal of Geophysical Research: Planets, 121, 1641-1666.'
+  source_ids:
+  - connolly-2016-si-o-liquid-vapor-caloric-vdw
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:connolly-2016-si-o-liquid-vapor-caloric-vdw
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1002/2016je005059
+experiments:
+- experiment_id: 10.1002/2016je005059::connolly-2016-si-o-liquid-vapor-caloric-vdw
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1002/2016je005059
+  locator:
+    page: 24
+    published_page: 1664
+    pdf_page_index: 23
+    table: A2
+    note: row=Kraus et al. [2012]; column=s_m
+context:
+- type: figure_record
+  observation_id: connolly_2016_fig1_figure_only
+  locator:
+    page: 10
+    published_page: 1650
+    pdf_page_index: 9
+    figure: '1'
+  units: as printed
+  species_as_printed:
+  - Hg
+  - Rb
+  - hypothetical SiO2
+  - hypothetical Si
+  system_as_printed: Hg, Rb, hypothetical monospecies SiO2 and Si fluids
+  phase_as_printed: liquid-vapor boiling curves
+  panel: single panel
+  temperature_as_printed: varies along the T axis, 0-16000 K
+  axes_as_printed: 'x: T (K); y: p (Pa), logarithmic'
+  series:
+  - name: experimental Hg boiling curve
+    marker_count: 1
+    attribution: Huber et al. [2006]
+  - name: experimental Rb boiling curve
+    marker_count: 1
+    attribution: Dillon et al. [1966]; Pfeifer et al. [1979]
+  - name: ideal-gas v=0 curves
+    marker_count: 0
+    attribution: present work
+  - name: vWvW and regularized vWvW predictions across four fluids
+    marker_count: 16
+    attribution: present work
+  - name: CSvW and regularized CSvW predictions across four fluids
+    marker_count: 16
+    attribution: present work
+  - name: vWRK and regularized vWRK predictions across four fluids
+    marker_count: 16
+    attribution: present work
+  - name: CSRK and regularized CSRK predictions across four fluids
+    marker_count: 16
+    attribution: present work
+  values:
+    quantity: p_sat
+    method_class: model_derived
+    admission_status: figure_only
+    caption: Figure 1. Critical and boiling points predicted by the melting point parameterizations of the vW EoS for Hg,
+      Rb, and hypothetical monospecies SiO2 and Si fluids. The experimentally constrained boiling curves for Hg [Huber et
+      al., 2006] and Rb [Dillon et al., 1966; Pfeifer et al., 1979] and “ideal” boiling curves are shown for comparison. The
+      ideal curves are computed assuming that the volume of the liquid is insignificant, the ideal gas law for the vapor,
+      and the calorimetric data in Table A1. The ideal model should underestimate the Clapeyron slope of the boiling curve
+      and therefore provide an upper bound on boiling curve temperature as illustrated by the curves for Rb and Hg, which
+      also show that the ideal model provides a good approximation to the real boiling curves. The critical point predictions
+      of the regularized vW EoS are consistent with the trends indicated by the ideal models, whereas the unregularized vW
+      EoS predictions are scattered and, in the case of SiO2, lie consistently on the high-temperature side of the ideal boiling
+      curve.
+  digitisation: deferred to a figure pass
+  context_id: connolly-2016-si-o-liquid-vapor-caloric-vdw::context::connolly_2016_fig1_figure_only
+  work_id: 10.1002/2016je005059
+  source_id: connolly-2016-si-o-liquid-vapor-caloric-vdw
+  species: SiO2
+- type: figure_record
+  observation_id: connolly_2016_fig2_figure_only
+  locator:
+    page: 12
+    published_page: 1652
+    pdf_page_index: 11
+    figure: '2'
+  units: as printed
+  species_as_printed: Si-O system
+  system_as_printed: Si-O
+  phase_as_printed: modeled phase fields
+  panel: single panel
+  temperature_as_printed: varies along the T axis, 1600-3600 K
+  pressure_as_printed: 0.1 MPa
+  axes_as_printed: 'x: X_O (atomic fraction of oxygen); y: T (K)'
+  series:
+  - name: HSC-vWRK predicted phase fields
+    marker_count: 0
+    attribution: present work
+  - name: invariant conditions marked by red circles
+    marker_count: 5
+    attribution: Schnurre et al. [2004]
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: model_derived
+    admission_status: figure_only
+    caption: Figure 2. Isobaric (0.1 MPa) Si-O phase diagram predicted by the HSC-vWRK parameterization. The phase relations
+      differ insignificantly from those predicted by other parameterizations discussed in the text and/or the CSRK EoS. The
+      compositional variable X_O is the atomic fraction of oxygen. The red circles locate invariant conditions from the analysis
+      of Schnurre et al. [2004]. Although not visible at the scale of the diagrams, the oxygen-solubility predicted in Si-rich
+      liquid is consistent with that analysis.
+  digitisation: deferred to a figure pass
+  context_id: connolly-2016-si-o-liquid-vapor-caloric-vdw::context::connolly_2016_fig2_figure_only
+  work_id: 10.1002/2016je005059
+  source_id: connolly-2016-si-o-liquid-vapor-caloric-vdw
+  species: SiO2
+- type: figure_record
+  observation_id: connolly_2016_fig3_figure_only
+  locator:
+    page: 14
+    published_page: 1654
+    pdf_page_index: 13
+    figure: '3'
+  units: as printed
+  species_as_printed: Si-O system
+  system_as_printed: Si-O
+  phase_as_printed: modeled phase fields
+  panel: a-f
+  temperature_as_printed: varies along the T axis, approximately 3000-9000 K
+  axes_as_printed: 'x: X_O (atomic fraction of oxygen); y: T (K); p: 10^7, 10^8, and 10^9 Pa by panel'
+  series:
+  - name: HSC-vWRK at 10^7 Pa
+    marker_count: 0
+    attribution: present work
+  - name: HSC-vWRK at 10^8 Pa
+    marker_count: 0
+    attribution: present work
+  - name: HSC-vWRK at 10^9 Pa
+    marker_count: 0
+    attribution: present work
+  - name: SiO(l)-vWRK at 10^7 Pa
+    marker_count: 0
+    attribution: present work
+  - name: SiO(l)-vWRK at 10^8 Pa
+    marker_count: 0
+    attribution: present work
+  - name: SiO(l)-vWRK at 10^9 Pa
+    marker_count: 0
+    attribution: present work
+  values:
+    quantity: equilibrium_phase_composition
+    method_class: model_derived
+    admission_status: figure_only
+    caption: Figure 3. Isobaric Si-O phase diagrams at elevated pressure predicted by the HSC- and SiO(l)-vWRK parameterizations.
+      Phase relations predicted by the CSRK are similar but shifted to lower temperature. The vaporous geometry is defined
+      by the SiO-rich azeotrope that forms as a consequence of the stability of molecular SiO in the vapor at X_O ~ 0.5 and
+      the SiO2-rich negative azeotrope at X_O ~ 0.3. At 10-100 MPa, the vaporous is continuous from Si to compositions at
+      which supercritical O-rich fluids (F4) are stable. The SiO2-rich negative azeotrope (L2 = V) lies to the Si-rich side
+      of the SiO2 composition. The SiO(l) parameterization predicts stability of an SiO-rich liquid (L2). At 10 MPa (Figure
+      3d) the invariant reactions involving this liquid, with increasing temperature, are L1 + L2 = L1' (O-rich Si-liquid),
+      L2 + L3 = V, and L2 = L1 + V. The L1 + L1' and L1' + L2 fields at approximately 3100-3200 K are not labeled. At 100
+      MPa (Figure 3e) the reactions are L2 = V and L2 = L1 + V. The critical point for the SiO2-rich azeotropic boiling curve
+      occurs at pressures between 100 MPa (Figures 3b and 3d) and 1 GPa (Figures 3c and 3f; Table 3). The Shornikov and Low-c
+      parameterization phase relations are similar to the HSC result.
+  digitisation: deferred to a figure pass
+  context_id: connolly-2016-si-o-liquid-vapor-caloric-vdw::context::connolly_2016_fig3_figure_only
+  work_id: 10.1002/2016je005059
+  source_id: connolly-2016-si-o-liquid-vapor-caloric-vdw
+  species: SiO2
+- type: figure_record
+  observation_id: connolly_2016_fig4_figure_only
+  locator:
+    page: 15
+    published_page: 1655
+    pdf_page_index: 14
+    figure: '4'
+  units: as printed
+  species_as_printed: SiO2-rich fluid
+  system_as_printed: Si-O
+  phase_as_printed: azeotropic liquid-vapor boiling envelopes
+  panel: a-b
+  temperature_as_printed: varies along T axes, approximately 3100-6300 K
+  axes_as_printed: 'a: x S (J/K-kg), y T (K); b: x rho (kg/m^3), y T (K)'
+  series:
+  - name: vWRK and CSRK model envelopes
+    marker_count: 0
+    attribution: present work
+  - name: geometric-mean vWRK critical-point predictions
+    marker_count: 10
+    attribution: present work
+  - name: Kraus et al. shock-release coordinates, panel a cyan open squares
+    marker_count: 7
+    attribution: Kraus et al. [2012]
+  - name: Boslough shock-release coordinates reinterpreted by Kraus, panel a red/blue open squares
+    marker_count: 3
+    attribution: Boslough [1988]; Kraus et al. [2012]
+  - name: previous estimates marked by crosses, panel a
+    marker_count: 5
+    attribution: prior estimates named in Figure 4
+  - name: previous estimates marked by crosses, panel b
+    marker_count: 7
+    attribution: prior estimates named in Figure 4
+  - name: extrapolated molecular-dynamics density-temperature coordinates, panel b green x marks
+    marker_count: 4
+    attribution: Karki et al. [2007]; Iosilevskiy et al. [2014]
+  - name: MANEOS assumed critical density-temperature coordinate, panel b magenta x
+    marker_count: 1
+    attribution: Melosh [2007]
+  values:
+    panel_quantities:
+      a:
+        quantity_as_printed: specific entropy
+        units_as_printed: J/K-kg
+      b:
+        quantity: density
+        units_as_printed: kg/m^3
+    method_class: model_derived
+    admission_status: figure_only
+    schema_gap: panel a specific entropy is printed per mass (J/K-kg) and has no matching store token
+    caption: Figure 4. Entropy-temperature and density-temperature azeotropic boiling envelopes for SiO2-rich fluid predicted
+      by the various vWRK and CSRK parameterizations. The small filled circles indicate the vWRK critical point predictions
+      obtained by using the geometric rather than the harmonic mean mixing rule. Previous predictions indicated by crosses
+      (critical and/or boiling points; Table 3) and/or thin dashed curves. The open squares indicate s-T coordinates of shock
+      and release experiments by Kraus et al. [2012] (cyan) and Boslough [1988] (red and blue as reinterpreted by Kraus et
+      al.). Kraus et al. interpret the trend of rising temperature with entropy in their high entropy (>5000 J/K-kg) experiments
+      to indicate conditions on the vapor-rich side of the boiling envelope, in which case the recorded temperature would
+      likely be that of the compressed supercritical fluid. This interpretation implies that the high entropy experiments
+      provide an upper bound on the critical temperature; the CSRK predictions are consistent with this interpretation. The
+      green x symbols locate rho-T coordinates obtained by extrapolating the isochores for SiO2 obtained by molecular dynamics
+      simulations to zero pressure [Karki et al., 2007; Iosilevskiy et al., 2014], given that the relatively low pressures
+      of interest these coordinates should approximate the liquid density along the boiling curve. The magenta x symbol locates
+      the rho-T critical coordinate assumed for fitting the MANEOS [Melosh, 2007].
+  digitisation: deferred to a figure pass
+  context_id: connolly-2016-si-o-liquid-vapor-caloric-vdw::context::connolly_2016_fig4_figure_only
+  work_id: 10.1002/2016je005059
+  source_id: connolly-2016-si-o-liquid-vapor-caloric-vdw
+  species: SiO2
+- type: figure_record
+  observation_id: connolly_2016_fig5_figure_only
+  locator:
+    page: 16
+    published_page: 1656
+    pdf_page_index: 15
+    figure: '5'
+  units: as printed
+  species_as_printed: SiO2-rich fluid
+  system_as_printed: Si-O
+  phase_as_printed: azeotropic liquid-vapor boiling curves and species
+  panel: a-b
+  temperature_as_printed: varies along T axes, approximately 3200-6300 K
+  axes_as_printed: 'a: x T (K), y p (Pa, logarithmic); b: x T (K), y species mole fraction'
+  series:
+  - name: vW parameterization boiling curves and fluid-speciation curves
+    marker_count: 0
+    attribution: present work
+  - name: geometric-mean vWRK critical-point predictions, panel a
+    marker_count: 5
+    attribution: present work
+  - name: Melosh critical-point estimate, panel a magenta x
+    marker_count: 1
+    attribution: Melosh [2007]
+  - name: MANEOS Melosh estimates, panel a plus marks
+    marker_count: 3
+    attribution: Melosh [2007]
+  - name: MANEOS Kraus estimate, panel a plus mark
+    marker_count: 1
+    attribution: Kraus et al. [2012]
+  - name: SAHA-EoS estimate, panel a plus mark
+    marker_count: 1
+    attribution: Iosilevskiy et al. [2014]
+  - name: Bobrovskii estimate, panel a plus mark
+    marker_count: 1
+    attribution: Bobrovskii et al. [1974]
+  - name: Iosilevskiy species-composition markers, panel b
+    marker_count: 4
+    attribution: Iosilevskiy et al. [2014]
+  values:
+    quantity: p_sat
+    additional_quantity: equilibrium_phase_composition
+    method_class: model_derived
+    admission_status: figure_only
+    caption: Figure 5. The SiO2-rich azeotropic boiling curves and corresponding fluid speciation predicted by various vW
+      parameterizations. The small filled circles indicate the vWRK critical point predictions obtained by using the geometric
+      mean mixing rule rather than the harmonic mean. Previous predictions are indicated by crosses (critical and/or boiling
+      points) and/or thin dashed curves. In Figure 5b the solid and dashed curves indicate, respectively, liquid and vapor
+      speciation; the fine dashed line patterns near the critical temperature indicate where results have been extrapolated.
+      The estimated boiling curve (dashed green) of Schick [1960], used by Melosh [2007] to locate the MANEOS critical point
+      (magenta x symbol), neglects the liquid volume and speciation, the liquid is assumed to be pure SiO2, and the gas is
+      assumed to be ideal and consist of 67 mol% SiO + 33 mol% O2. The ideal + vWRK SiO2(l) boiling curve is computed from
+      the HSC parameterization, assuming a pure SiO2 vWRK liquid in equilibrium with an ideal multispecies vapor. The ideal
+      + high-c curve assumes a constant-volume, high heat capacity (5nR) model for the liquid, and ideal (HSC) multispecies
+      vapor. This curve illustrates the effect that the anomalously high heat capacities reported by Karki et al. [2007] would
+      have on the vW EoS predictions of the boiling-curve trajectory.
+  digitisation: deferred to a figure pass
+  context_id: connolly-2016-si-o-liquid-vapor-caloric-vdw::context::connolly_2016_fig5_figure_only
+  work_id: 10.1002/2016je005059
+  source_id: connolly-2016-si-o-liquid-vapor-caloric-vdw
+  species: SiO2
+- type: figure_record
+  observation_id: connolly_2016_fig6_figure_only
+  locator:
+    page: 17
+    published_page: 1657
+    pdf_page_index: 16
+    figure: '6'
+  units: as printed
+  species_as_printed: SiO2-rich fluid
+  system_as_printed: Si-O
+  phase_as_printed: liquid and vapor
+  panel: a-g
+  temperature_as_printed: varies along the T axes, approximately 3100-6300 K
+  axes_as_printed: 'All panels use x: T (K). a: z = pv/(RT), dimensionless; b: azeotropic composition n_Si/(n_Si+n_O); c:
+    molecules/atom; d: mean molecular weight (g/mol); e: c/(3nR); f: c/c_v; g: enthalpy of boiling (MJ/kg).'
+  series:
+  - name: HSC parameterization liquid and vapor curves
+    marker_count: 0
+    attribution: present work
+  - name: Shornikov parameterization liquid and vapor curves
+    marker_count: 0
+    attribution: present work
+  - name: SiO(l) parameterization liquid and vapor curves
+    marker_count: 0
+    attribution: present work
+  - name: Low-c parameterization liquid and vapor curves
+    marker_count: 0
+    attribution: present work
+  values:
+    quantity_as_printed: various thermodynamic properties listed per panel
+    panel_quantities:
+      a:
+        quantity_as_printed: compressibility factor z
+        units_as_printed: dimensionless
+      b:
+        quantity: equilibrium_phase_composition
+        units_as_printed: atomic fraction
+      c:
+        quantity_as_printed: molecules per atom
+        units_as_printed: molecules/atom
+      d:
+        quantity_as_printed: mean molecular weight
+        units_as_printed: g/mol
+      e:
+        quantity_as_printed: normalized heat capacity c/(3nR)
+        units_as_printed: dimensionless
+      f:
+        quantity_as_printed: heat-capacity ratio c/c_v
+        units_as_printed: dimensionless
+      g:
+        quantity_as_printed: enthalpy of boiling
+        units_as_printed: MJ/kg
+    method_class: model_derived
+    admission_status: figure_only
+    schema_gap: No quantity token fits the printed compressibility factor, molecules per atom, molecular weight, normalized
+      capacity ratios, or specific boiling enthalpy. These panels remain unscored context.
+    caption: Figure 6. Various properties of liquid (solid curves) and vapor (dashed curves) along the SiO2-rich azeotropic
+      boiling curves predicted by the HSC and SiO(l) vWRK parameterizations. As the liquid is nearly a binary SiO-SiO2 mixture,
+      the mole fraction of SiO in the liquid is approximately (1 - 2 X_Si)/X_Si, where X_Si is the bulk composition in Figure
+      6d.
+  digitisation: deferred to a figure pass
+  context_id: connolly-2016-si-o-liquid-vapor-caloric-vdw::context::connolly_2016_fig6_figure_only
+  work_id: 10.1002/2016je005059
+  source_id: connolly-2016-si-o-liquid-vapor-caloric-vdw
+  species: SiO2
+- type: figure_record
+  observation_id: connolly_2016_fig7_figure_only
+  locator:
+    page: 19
+    published_page: 1659
+    pdf_page_index: 18
+    figure: '7'
+  units: as printed
+  species_as_printed: silica composition
+  system_as_printed: Si-O
+  phase_as_printed: liquid-vapor phase field, isochores, and isentropes
+  panel: a-c
+  temperature_as_printed: varies along the T axes, approximately 3000-6500 K
+  axes_as_printed: 'a: x T (K), y p (Pa); b: x T (K), isochores; c: x T (K), isentropes'
+  series:
+  - name: HSC-vWRK silica-composition phase boundaries
+    marker_count: 0
+    attribution: present work
+  - name: SiO(l)-vWRK phase-field boundaries, panel a
+    marker_count: 0
+    attribution: present work
+  - name: MANEOS boiling curve, isochores, and isentropes
+    marker_count: 0
+    attribution: Melosh [2007]
+  values:
+    quantity: p_sat
+    panel_quantities:
+      b:
+        quantity: density
+        units_as_printed: kg/m^3
+      c:
+        quantity_as_printed: specific entropy
+        units_as_printed: J/K-kg
+    method_class: model_derived
+    admission_status: figure_only
+    schema_gap: panel c specific entropy is printed per mass and has no matching store token
+    caption: Figure 7. Pressure-temperature phase diagram section for the silica composition with corresponding isochores
+      and isentropes for the HSC-vWRK parameterization. Because the temperature of the Si-O vaporous is not a strong function
+      of composition in the vicinity of the SiO2-rich azeotrope, the upper temperature limit of the L2 + V field is essentially
+      coincident with the azeotropic boiling curve, which is superimposed on the section. Thin red curves in Figure 7a outline
+      the L2 + V field for the SiO(l) vWRK parameterization. The spreading of the isochores over an interval of 100-200 K
+      at the high-temperature limit of the L2 + V field indicates conditions over which divariant boiling is mechanically
+      significant. In Figures 7b and 7c, thin dashed curves show the MANEOS [Melosh, 2007] boiling curve, isentropes, and
+      isochores for stoichiometric silica.
+  digitisation: deferred to a figure pass
+  context_id: connolly-2016-si-o-liquid-vapor-caloric-vdw::context::connolly_2016_fig7_figure_only
+  work_id: 10.1002/2016je005059
+  source_id: connolly-2016-si-o-liquid-vapor-caloric-vdw
+  species: SiO2
+- observation_id: connolly_2016_kraus_table3_constraint
+  type: quoted_shock_estimate_set
+  locator:
+    page: 13
+    published_page: 1653
+    pdf_page_index: 12
+    table: '3'
+    row: Kraus
+  units: per-column as printed
+  species_as_printed: SiO2-rich fluid
+  phase_as_printed: boiling and critical point estimates
+  system_as_printed: Si-O
+  units_as_printed:
+    Tb: K
+    s_b,l: J/K-kg
+    s_b,g: J/K-kg
+    Tc: K
+    s_c: J/K-kg
+  values:
+    method_class: quoted_attributed
+    attribution: Kraus et al. [2012]
+    quantity_labels_as_printed:
+    - Tb
+    - s_b,l
+    - s_b,g
+    - Tc
+    - s_c
+    values_as_printed:
+      Tb: 3,177 ± 115 K
+      s_b,l: 3,552 ± 70 J/K-kg
+      s_b,g: 7,254 ± 8 J/K-kg
+      Tc: <4,961 ± 559 K
+      s_c: <5,798 ± 277 J/K-kg
+    confidence_level: not stated
+  note: The paper identifies “Kraus” as a critical s-T constraint derived by assuming the highest-pressure shock-release isentrope
+    intersects the vapor-rich side of the boiling envelope; its estimated boiling point and entropies are also shown. The
+    critical-temperature bound and specific entropy columns have no matching store quantity and remain unscored context.
+  context_id: connolly-2016-si-o-liquid-vapor-caloric-vdw::context::connolly_2016_kraus_table3_constraint
+  work_id: 10.1002/2016je005059
+  source_id: connolly-2016-si-o-liquid-vapor-caloric-vdw
+  species: SiO2

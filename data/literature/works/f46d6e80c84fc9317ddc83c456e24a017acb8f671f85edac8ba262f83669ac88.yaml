@@ -1,0 +1,437 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  citation: Shornikov, S. I., and M. S. Shornikova (2019), “Thermodynamic properties of the CaO–FeO melts,” Experiment in
+    Geosciences 25(1), 82–85.
+  source_ids:
+  - shornikov-2019-ca-feo-vapor
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:shornikov-2019-ca-feo-vapor
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::allen-snow-1955
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  locator:
+    page: 1
+    published_page: 82
+    pdf_page_index: 0
+    section: Introduction
+- experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Hydrogen-water gas mixture equilibria with slag, as described in the text.' is not a closed method token
+      (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  locator:
+    page: 3
+    published_page: 84
+    pdf_page_index: 2
+    figure: '2'
+    note: panel=a
+- experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Oxygen distribution between molten iron and slag, as described in the text.' is not a closed method token
+      (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  locator:
+    page: 3
+    published_page: 84
+    pdf_page_index: 2
+    figure: '2'
+    note: panel=b
+- experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::oelsen-maetz-1941
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  locator:
+    page: 1
+    published_page: 82
+    pdf_page_index: 0
+    section: Introduction
+- experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Present-study activity calculations within the ideal associated solution model.' is not a closed method
+      token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  locator:
+    page: 3
+    published_page: 84
+    pdf_page_index: 2
+    figure: '2'
+- experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-table1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'The paper reports present-study calculations within the theory of ideal associated solutions; the table
+      does not give per-row model input lineage.' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  locator:
+    page: 3
+    published_page: 84
+    pdf_page_index: 2
+    table: '1'
+- experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shugurov-2005
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  locator:
+    page: 2
+    published_page: 83
+    pdf_page_index: 1
+    section: Introduction
+- experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  locator:
+    page: 3
+    published_page: 84
+    pdf_page_index: 2
+    table: '1'
+    note: row_label=CaO; column_header=Condensed phases  $\Delta G^{\circ}_{1873}$ , kJ/mol
+context:
+- observation_id: shornikov_2019_cafeo2_sintering_temperature_range_srikanth_bazhin
+  type: thermodynamic_example
+  units: as reported
+  locator:
+    page: 1
+    pdf_page_index: 0
+    published_page: 82
+    section: Introduction
+  values:
+    sentence_as_published: When sintering the sludge at the temperature region 1173–1523 K in the composition of the synthesized
+      material (Srikanth et al. 2005), as well as in the waste of electrolysis production (Bazhin et al., 2017), it was found
+      the compound CaFeO2.
+    attribution: Srikanth et al. (2005) and Bazhin et al. (2017), as cited in the text.
+    reason_no_number: This is a process range, not one transition temperature; no numeric observation is scored.
+  context_id: shornikov-2019-ca-feo-vapor::context::shornikov_2019_cafeo2_sintering_temperature_range_srikanth_bazhin
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  source_id: shornikov-2019-ca-feo-vapor
+  species: CaFeO2
+- observation_id: shornikov_2019_fig3_cao_feo_minimum_mixing_energy_range
+  type: thermodynamic_example
+  units: as reported
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 84
+    section: Results
+    figure: '3'
+  values:
+    sentence_as_published: The minimum of the ΔGm values is in the region of the eutectic composition of solid solutions of
+      CaO and FeO (fields 4 and 7 in Fig. 1) and is in the range from –6.5 to –9.0 kJ/mol in the considered temperature range.
+    attribution: The present study, compared with Bjorkvall et al. (2001) and Wu et al. (1993), as described in the text.
+    reason_no_number: The source gives a range and the extract schema has no mixing-energy quantity; no numeric observation
+      is scored.
+  context_id: shornikov-2019-ca-feo-vapor::context::shornikov_2019_fig3_cao_feo_minimum_mixing_energy_range
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  source_id: shornikov-2019-ca-feo-vapor
+  species: CaO–FeO melt system
+- observation_id: shornikov_2019_fig3_cao_feo_panel_a_curve_1
+  type: thermodynamic_example
+  units: as reported
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 84
+    figure: '3'
+    curve: '1'
+  values:
+    caption_as_published: 'Fig. 3. The calculated mixing energy in the CaO–FeO melts at 1673 (1–3) and 1873 K (4–6): 1 and
+      4 –Wu et al. (1993), 2 and 5 –Bjorkvall et al. (2001), 3 and 6 – in the present study.'
+    attribution: Wu et al. (1993)
+    reason_no_number: This is an attributed model curve; the extract has no mixing-energy quantity and scores no curve coordinates.
+  context_id: shornikov-2019-ca-feo-vapor::context::shornikov_2019_fig3_cao_feo_panel_a_curve_1
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  source_id: shornikov-2019-ca-feo-vapor
+  species: CaO–FeO melt system
+- observation_id: shornikov_2019_fig3_cao_feo_panel_a_curve_2
+  type: thermodynamic_example
+  units: as reported
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 84
+    figure: '3'
+    curve: '2'
+  values:
+    caption_as_published: 'Fig. 3. The calculated mixing energy in the CaO–FeO melts at 1673 (1–3) and 1873 K (4–6): 1 and
+      4 –Wu et al. (1993), 2 and 5 –Bjorkvall et al. (2001), 3 and 6 – in the present study.'
+    attribution: Bjorkvall et al. (2001)
+    reason_no_number: This is an attributed model curve; the extract has no mixing-energy quantity and scores no curve coordinates.
+  context_id: shornikov-2019-ca-feo-vapor::context::shornikov_2019_fig3_cao_feo_panel_a_curve_2
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  source_id: shornikov-2019-ca-feo-vapor
+  species: CaO–FeO melt system
+- observation_id: shornikov_2019_fig3_cao_feo_panel_a_curve_3
+  type: thermodynamic_example
+  units: as reported
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 84
+    figure: '3'
+    curve: '3'
+  values:
+    caption_as_published: 'Fig. 3. The calculated mixing energy in the CaO–FeO melts at 1673 (1–3) and 1873 K (4–6): 1 and
+      4 –Wu et al. (1993), 2 and 5 –Bjorkvall et al. (2001), 3 and 6 – in the present study.'
+    attribution: the present study
+    reason_no_number: This is an attributed model curve; the extract has no mixing-energy quantity and scores no curve coordinates.
+  context_id: shornikov-2019-ca-feo-vapor::context::shornikov_2019_fig3_cao_feo_panel_a_curve_3
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  source_id: shornikov-2019-ca-feo-vapor
+  species: CaO–FeO melt system
+- observation_id: shornikov_2019_fig3_cao_feo_panel_b_curve_4
+  type: thermodynamic_example
+  units: as reported
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 84
+    figure: '3'
+    curve: '4'
+  values:
+    caption_as_published: 'Fig. 3. The calculated mixing energy in the CaO–FeO melts at 1673 (1–3) and 1873 K (4–6): 1 and
+      4 –Wu et al. (1993), 2 and 5 –Bjorkvall et al. (2001), 3 and 6 – in the present study.'
+    attribution: Wu et al. (1993)
+    reason_no_number: This is an attributed model curve; the extract has no mixing-energy quantity and scores no curve coordinates.
+  context_id: shornikov-2019-ca-feo-vapor::context::shornikov_2019_fig3_cao_feo_panel_b_curve_4
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  source_id: shornikov-2019-ca-feo-vapor
+  species: CaO–FeO melt system
+- observation_id: shornikov_2019_fig3_cao_feo_panel_b_curve_5
+  type: thermodynamic_example
+  units: as reported
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 84
+    figure: '3'
+    curve: '5'
+  values:
+    caption_as_published: 'Fig. 3. The calculated mixing energy in the CaO–FeO melts at 1673 (1–3) and 1873 K (4–6): 1 and
+      4 –Wu et al. (1993), 2 and 5 –Bjorkvall et al. (2001), 3 and 6 – in the present study.'
+    attribution: Bjorkvall et al. (2001)
+    reason_no_number: This is an attributed model curve; the extract has no mixing-energy quantity and scores no curve coordinates.
+  context_id: shornikov-2019-ca-feo-vapor::context::shornikov_2019_fig3_cao_feo_panel_b_curve_5
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  source_id: shornikov-2019-ca-feo-vapor
+  species: CaO–FeO melt system
+- observation_id: shornikov_2019_fig3_cao_feo_panel_b_curve_6
+  type: thermodynamic_example
+  units: as reported
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 84
+    figure: '3'
+    curve: '6'
+  values:
+    caption_as_published: 'Fig. 3. The calculated mixing energy in the CaO–FeO melts at 1673 (1–3) and 1873 K (4–6): 1 and
+      4 –Wu et al. (1993), 2 and 5 –Bjorkvall et al. (2001), 3 and 6 – in the present study.'
+    attribution: the present study
+    reason_no_number: This is an attributed model curve; the extract has no mixing-energy quantity and scores no curve coordinates.
+  context_id: shornikov-2019-ca-feo-vapor::context::shornikov_2019_fig3_cao_feo_panel_b_curve_6
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  source_id: shornikov-2019-ca-feo-vapor
+  species: CaO–FeO melt system

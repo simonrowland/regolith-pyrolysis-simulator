@@ -1,0 +1,2056 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/arutyunyan-2005-magnesium-silicate-activities.yaml
+observations:
+- observation_id: arutyunyan-2005-magnesium-silicate-activities::arutyunyan_2005_table2_mgo_activity_1873k::T=1873:h=3c41bed79963
+  experiment_id: 10.1134/1.2039976::experiment::arutyunyan_2005_kems_mgo_sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MgO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: periclase
+          charge:
+            tag: value
+            value: 0
+        component_basis: MgO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.55'
+        - - MgO
+          - '0.45'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.129'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is printed for the Table 2 activity cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-18'
+      evidence:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Six MgO activities; each point has its own row locator.
+  notices: []
+  source_id: arutyunyan-2005-magnesium-silicate-activities
+  locator:
+    published_page: 391
+    pdf_page_index: 2
+    table: '2'
+    note: Six MgO activities; each point has its own row locator.
+  read_from: unknown:arutyunyan-2005-magnesium-silicate-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.55'
+          - - MgO
+            - '0.45'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Printed binary x(SiO2) is 0.550; x(MgO) is its binary complement and is not separately printed.
+    phase_assemblage:
+      state:
+        tag: value
+        value: liquid
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Total pressure during the activity measurement is not reported.
+  derivation:
+    relation: Table 2 activities result from Gibbs–Duhem integration of the ionic-current intensity-ratio/composition relation
+      in Eq. (10). The initial MgO activity in the melt + Mg2SiO4 region is calculated from Eq. (9) and the silica activity.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless activity
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        figure: '2'
+        note: Numeric ion-current ratio/composition inputs are plotted in Figure 2 but not tabulated; digitisation is deferred.
+- observation_id: arutyunyan-2005-magnesium-silicate-activities::arutyunyan_2005_table2_mgo_activity_1873k::T=1873:h=c90cc7171c3f
+  experiment_id: 10.1134/1.2039976::experiment::arutyunyan_2005_kems_mgo_sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MgO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: periclase
+          charge:
+            tag: value
+            value: 0
+        component_basis: MgO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.528'
+        - - MgO
+          - '0.472'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.144'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is printed for the Table 2 activity cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-18'
+      evidence:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Six MgO activities; each point has its own row locator.
+  notices: []
+  source_id: arutyunyan-2005-magnesium-silicate-activities
+  locator:
+    published_page: 391
+    pdf_page_index: 2
+    table: '2'
+    note: Six MgO activities; each point has its own row locator.
+  read_from: unknown:arutyunyan-2005-magnesium-silicate-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.528'
+          - - MgO
+            - '0.472'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Printed binary x(SiO2) is 0.528; x(MgO) is its binary complement and is not separately printed.
+    phase_assemblage:
+      state:
+        tag: value
+        value: liquid
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Total pressure during the activity measurement is not reported.
+  derivation:
+    relation: Table 2 activities result from Gibbs–Duhem integration of the ionic-current intensity-ratio/composition relation
+      in Eq. (10). The initial MgO activity in the melt + Mg2SiO4 region is calculated from Eq. (9) and the silica activity.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless activity
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        figure: '2'
+        note: Numeric ion-current ratio/composition inputs are plotted in Figure 2 but not tabulated; digitisation is deferred.
+- observation_id: arutyunyan-2005-magnesium-silicate-activities::arutyunyan_2005_table2_mgo_activity_1873k::T=1873:h=d0df5473f0e6
+  experiment_id: 10.1134/1.2039976::experiment::arutyunyan_2005_kems_mgo_sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MgO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: periclase
+          charge:
+            tag: value
+            value: 0
+        component_basis: MgO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.563'
+        - - MgO
+          - '0.437'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.122'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is printed for the Table 2 activity cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-18'
+      evidence:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Six MgO activities; each point has its own row locator.
+  notices: []
+  source_id: arutyunyan-2005-magnesium-silicate-activities
+  locator:
+    published_page: 391
+    pdf_page_index: 2
+    table: '2'
+    note: Six MgO activities; each point has its own row locator.
+  read_from: unknown:arutyunyan-2005-magnesium-silicate-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.563'
+          - - MgO
+            - '0.437'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Printed binary x(SiO2) is 0.563; x(MgO) is its binary complement and is not separately printed.
+    phase_assemblage:
+      state:
+        tag: value
+        value: liquid
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Total pressure during the activity measurement is not reported.
+  derivation:
+    relation: Table 2 activities result from Gibbs–Duhem integration of the ionic-current intensity-ratio/composition relation
+      in Eq. (10). The initial MgO activity in the melt + Mg2SiO4 region is calculated from Eq. (9) and the silica activity.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless activity
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        figure: '2'
+        note: Numeric ion-current ratio/composition inputs are plotted in Figure 2 but not tabulated; digitisation is deferred.
+- observation_id: arutyunyan-2005-magnesium-silicate-activities::arutyunyan_2005_table2_mgo_activity_1873k::T=1873:h=d4947ae5d4cf
+  experiment_id: 10.1134/1.2039976::experiment::arutyunyan_2005_kems_mgo_sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MgO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: periclase
+          charge:
+            tag: value
+            value: 0
+        component_basis: MgO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.498'
+        - - MgO
+          - '0.502'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.171'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is printed for the Table 2 activity cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-18'
+      evidence:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Six MgO activities; each point has its own row locator.
+  notices: []
+  source_id: arutyunyan-2005-magnesium-silicate-activities
+  locator:
+    published_page: 391
+    pdf_page_index: 2
+    table: '2'
+    note: Six MgO activities; each point has its own row locator.
+  read_from: unknown:arutyunyan-2005-magnesium-silicate-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.498'
+          - - MgO
+            - '0.502'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Printed binary x(SiO2) is 0.498; x(MgO) is its binary complement and is not separately printed.
+    phase_assemblage:
+      state:
+        tag: value
+        value: liquid
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Total pressure during the activity measurement is not reported.
+  derivation:
+    relation: Table 2 activities result from Gibbs–Duhem integration of the ionic-current intensity-ratio/composition relation
+      in Eq. (10). The initial MgO activity in the melt + Mg2SiO4 region is calculated from Eq. (9) and the silica activity.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless activity
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        figure: '2'
+        note: Numeric ion-current ratio/composition inputs are plotted in Figure 2 but not tabulated; digitisation is deferred.
+- observation_id: arutyunyan-2005-magnesium-silicate-activities::arutyunyan_2005_table2_mgo_activity_1873k::T=1873:h=fd68bbd47682
+  experiment_id: 10.1134/1.2039976::experiment::arutyunyan_2005_kems_mgo_sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MgO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: periclase
+          charge:
+            tag: value
+            value: 0
+        component_basis: MgO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.511'
+        - - MgO
+          - '0.489'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.158'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is printed for the Table 2 activity cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-18'
+      evidence:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Six MgO activities; each point has its own row locator.
+  notices: []
+  source_id: arutyunyan-2005-magnesium-silicate-activities
+  locator:
+    published_page: 391
+    pdf_page_index: 2
+    table: '2'
+    note: Six MgO activities; each point has its own row locator.
+  read_from: unknown:arutyunyan-2005-magnesium-silicate-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.511'
+          - - MgO
+            - '0.489'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Printed binary x(SiO2) is 0.511; x(MgO) is its binary complement and is not separately printed.
+    phase_assemblage:
+      state:
+        tag: value
+        value: liquid
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Total pressure during the activity measurement is not reported.
+  derivation:
+    relation: Table 2 activities result from Gibbs–Duhem integration of the ionic-current intensity-ratio/composition relation
+      in Eq. (10). The initial MgO activity in the melt + Mg2SiO4 region is calculated from Eq. (9) and the silica activity.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless activity
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        figure: '2'
+        note: Numeric ion-current ratio/composition inputs are plotted in Figure 2 but not tabulated; digitisation is deferred.
+- observation_id: arutyunyan-2005-magnesium-silicate-activities::arutyunyan_2005_table2_mgo_activity_1873k::T=1873:h=fda221d3ece2
+  experiment_id: 10.1134/1.2039976::experiment::arutyunyan_2005_kems_mgo_sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: MgO
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: periclase
+          charge:
+            tag: value
+            value: 0
+        component_basis: MgO
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.486'
+        - - MgO
+          - '0.514'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.181'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is printed for the Table 2 activity cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-18'
+      evidence:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Six MgO activities; each point has its own row locator.
+  notices: []
+  source_id: arutyunyan-2005-magnesium-silicate-activities
+  locator:
+    published_page: 391
+    pdf_page_index: 2
+    table: '2'
+    note: Six MgO activities; each point has its own row locator.
+  read_from: unknown:arutyunyan-2005-magnesium-silicate-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.486'
+          - - MgO
+            - '0.514'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Printed binary x(SiO2) is 0.486; x(MgO) is its binary complement and is not separately printed.
+    phase_assemblage:
+      state:
+        tag: value
+        value: liquid + Mg2SiO4
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Total pressure during the activity measurement is not reported.
+  derivation:
+    relation: Table 2 activities result from Gibbs–Duhem integration of the ionic-current intensity-ratio/composition relation
+      in Eq. (10). The initial MgO activity in the melt + Mg2SiO4 region is calculated from Eq. (9) and the silica activity.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless activity
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        figure: '2'
+        note: Numeric ion-current ratio/composition inputs are plotted in Figure 2 but not tabulated; digitisation is deferred.
+- observation_id: arutyunyan-2005-magnesium-silicate-activities::arutyunyan_2005_table2_silica_activity_1873k::T=1873:h=0d3aa4982106
+  experiment_id: 10.1134/1.2039976::experiment::arutyunyan_2005_kems_mgo_sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.528'
+        - - MgO
+          - '0.472'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.865'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is printed for the Table 2 activity cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-18'
+      evidence:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Six SiO2 activities; each point has its own row locator.
+  notices: []
+  source_id: arutyunyan-2005-magnesium-silicate-activities
+  locator:
+    published_page: 391
+    pdf_page_index: 2
+    table: '2'
+    note: Six SiO2 activities; each point has its own row locator.
+  read_from: unknown:arutyunyan-2005-magnesium-silicate-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.528'
+          - - MgO
+            - '0.472'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Printed binary x(SiO2) is 0.528; x(MgO) is its binary complement and is not separately printed.
+    phase_assemblage:
+      state:
+        tag: value
+        value: liquid
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Total pressure during the activity measurement is not reported.
+  derivation:
+    relation: Table 2 activities result from Gibbs–Duhem integration of the ionic-current intensity-ratio/composition relation
+      in Eq. (10).
+    inputs: []
+    parameters: []
+    output_unit: dimensionless activity
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        figure: '2'
+        note: Numeric ion-current ratio/composition inputs are plotted in Figure 2 but not tabulated; digitisation is deferred.
+- observation_id: arutyunyan-2005-magnesium-silicate-activities::arutyunyan_2005_table2_silica_activity_1873k::T=1873:h=288271282e25
+  experiment_id: 10.1134/1.2039976::experiment::arutyunyan_2005_kems_mgo_sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.498'
+        - - MgO
+          - '0.502'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.737'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is printed for the Table 2 activity cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-18'
+      evidence:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Six SiO2 activities; each point has its own row locator.
+  notices: []
+  source_id: arutyunyan-2005-magnesium-silicate-activities
+  locator:
+    published_page: 391
+    pdf_page_index: 2
+    table: '2'
+    note: Six SiO2 activities; each point has its own row locator.
+  read_from: unknown:arutyunyan-2005-magnesium-silicate-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.498'
+          - - MgO
+            - '0.502'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Printed binary x(SiO2) is 0.498; x(MgO) is its binary complement and is not separately printed.
+    phase_assemblage:
+      state:
+        tag: value
+        value: liquid
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Total pressure during the activity measurement is not reported.
+  derivation:
+    relation: Table 2 activities result from Gibbs–Duhem integration of the ionic-current intensity-ratio/composition relation
+      in Eq. (10).
+    inputs: []
+    parameters: []
+    output_unit: dimensionless activity
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        figure: '2'
+        note: Numeric ion-current ratio/composition inputs are plotted in Figure 2 but not tabulated; digitisation is deferred.
+- observation_id: arutyunyan-2005-magnesium-silicate-activities::arutyunyan_2005_table2_silica_activity_1873k::T=1873:h=5465e32c755b
+  experiment_id: 10.1134/1.2039976::experiment::arutyunyan_2005_kems_mgo_sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.563'
+        - - MgO
+          - '0.437'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is printed for the Table 2 activity cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-18'
+      evidence:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Six SiO2 activities; each point has its own row locator.
+  notices: []
+  source_id: arutyunyan-2005-magnesium-silicate-activities
+  locator:
+    published_page: 391
+    pdf_page_index: 2
+    table: '2'
+    note: Six SiO2 activities; each point has its own row locator.
+  read_from: unknown:arutyunyan-2005-magnesium-silicate-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.563'
+          - - MgO
+            - '0.437'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Printed binary x(SiO2) is 0.563; x(MgO) is its binary complement and is not separately printed.
+    phase_assemblage:
+      state:
+        tag: value
+        value: liquid
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Total pressure during the activity measurement is not reported.
+  derivation:
+    relation: Table 2 activities result from Gibbs–Duhem integration of the ionic-current intensity-ratio/composition relation
+      in Eq. (10).
+    inputs: []
+    parameters: []
+    output_unit: dimensionless activity
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        figure: '2'
+        note: Numeric ion-current ratio/composition inputs are plotted in Figure 2 but not tabulated; digitisation is deferred.
+- observation_id: arutyunyan-2005-magnesium-silicate-activities::arutyunyan_2005_table2_silica_activity_1873k::T=1873:h=9483e8724dd2
+  experiment_id: 10.1134/1.2039976::experiment::arutyunyan_2005_kems_mgo_sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.55'
+        - - MgO
+          - '0.45'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.951'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is printed for the Table 2 activity cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-18'
+      evidence:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Six SiO2 activities; each point has its own row locator.
+  notices: []
+  source_id: arutyunyan-2005-magnesium-silicate-activities
+  locator:
+    published_page: 391
+    pdf_page_index: 2
+    table: '2'
+    note: Six SiO2 activities; each point has its own row locator.
+  read_from: unknown:arutyunyan-2005-magnesium-silicate-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.55'
+          - - MgO
+            - '0.45'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Printed binary x(SiO2) is 0.550; x(MgO) is its binary complement and is not separately printed.
+    phase_assemblage:
+      state:
+        tag: value
+        value: liquid
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Total pressure during the activity measurement is not reported.
+  derivation:
+    relation: Table 2 activities result from Gibbs–Duhem integration of the ionic-current intensity-ratio/composition relation
+      in Eq. (10).
+    inputs: []
+    parameters: []
+    output_unit: dimensionless activity
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        figure: '2'
+        note: Numeric ion-current ratio/composition inputs are plotted in Figure 2 but not tabulated; digitisation is deferred.
+- observation_id: arutyunyan-2005-magnesium-silicate-activities::arutyunyan_2005_table2_silica_activity_1873k::T=1873:h=9ab808f20709
+  experiment_id: 10.1134/1.2039976::experiment::arutyunyan_2005_kems_mgo_sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.486'
+        - - MgO
+          - '0.514'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.693'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is printed for the Table 2 activity cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-18'
+      evidence:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Six SiO2 activities; each point has its own row locator.
+  notices: []
+  source_id: arutyunyan-2005-magnesium-silicate-activities
+  locator:
+    published_page: 391
+    pdf_page_index: 2
+    table: '2'
+    note: Six SiO2 activities; each point has its own row locator.
+  read_from: unknown:arutyunyan-2005-magnesium-silicate-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.486'
+          - - MgO
+            - '0.514'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Printed binary x(SiO2) is 0.486; x(MgO) is its binary complement and is not separately printed.
+    phase_assemblage:
+      state:
+        tag: value
+        value: liquid + Mg2SiO4
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Total pressure during the activity measurement is not reported.
+  derivation:
+    relation: Table 2 activities result from Gibbs–Duhem integration of the ionic-current intensity-ratio/composition relation
+      in Eq. (10).
+    inputs: []
+    parameters: []
+    output_unit: dimensionless activity
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        figure: '2'
+        note: Numeric ion-current ratio/composition inputs are plotted in Figure 2 but not tabulated; digitisation is deferred.
+- observation_id: arutyunyan-2005-magnesium-silicate-activities::arutyunyan_2005_table2_silica_activity_1873k::T=1873:h=d7f45ceb283f
+  experiment_id: 10.1134/1.2039976::experiment::arutyunyan_2005_kems_mgo_sio2
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: cristobalite_high
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - SiO2
+          - '0.511'
+        - - MgO
+          - '0.489'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: point
+    point: '0.797'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty is printed for the Table 2 activity cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-10-18'
+      evidence:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Six SiO2 activities; each point has its own row locator.
+  notices: []
+  source_id: arutyunyan-2005-magnesium-silicate-activities
+  locator:
+    published_page: 391
+    pdf_page_index: 2
+    table: '2'
+    note: Six SiO2 activities; each point has its own row locator.
+  read_from: unknown:arutyunyan-2005-magnesium-silicate-activities
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - SiO2
+            - '0.511'
+          - - MgO
+            - '0.489'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Printed binary x(SiO2) is 0.511; x(MgO) is its binary complement and is not separately printed.
+    phase_assemblage:
+      state:
+        tag: value
+        value: liquid
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        table: '2'
+        note: Total pressure during the activity measurement is not reported.
+  derivation:
+    relation: Table 2 activities result from Gibbs–Duhem integration of the ionic-current intensity-ratio/composition relation
+      in Eq. (10).
+    inputs: []
+    parameters: []
+    output_unit: dimensionless activity
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        published_page: 391
+        pdf_page_index: 2
+        figure: '2'
+        note: Numeric ion-current ratio/composition inputs are plotted in Figure 2 but not tabulated; digitisation is deferred.

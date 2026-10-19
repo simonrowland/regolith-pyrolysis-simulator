@@ -1,0 +1,706 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1039/a809003c
+  citation: Zaitsev, A. I., Shelkova, N. E., Lyakishev, N. P., and Mogutnov, B. M. (1999). Thermodynamic properties and phase
+    equilibria in the Na2O-SiO2 system. Physical Chemistry Chemical Physics 1, 1899-1907.
+  source_ids:
+  - zaitsev-1999-na2o-sio2-pccp
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:zaitsev-1999-na2o-sio2-pccp
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1039/a809003c
+experiments:
+- experiment_id: 10.1039/a809003c::zaitsev-1999-na2o-sio2-pccp
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1039/a809003c
+  locator:
+    page: 3
+    published_page: 1901
+    pdf_page_index: 2
+    table: '1'
+context:
+- observation_id: zaitsev_1999_figure1_partial_gibbs_energy
+  type: figure
+  locator:
+    page: 3
+    published_page: 1901
+    pdf_page_index: 2
+    figure: '1'
+  units: J/mol as plotted
+  values:
+    quantity: partial Gibbs energy of Na2O
+    method_class: figure_only
+    admission_status: figure_only
+    species: Na2O
+    phase: two-phase solid/liquid assemblages
+    temperature: varies on the T axis
+    axes:
+      x: T, K
+      y: Delta G(Na2O), J/mol
+    panel: none_stated
+    caption: Temperature dependencies of the partial Gibbs energy of Na2O in the N3S2 + NS, N3S2 + N2S and N2S + NS two-phase
+      regions.
+    series:
+    - name: x(SiO2)=0.477; Nb cell; orifice 3.11e-4 m; asterisk
+      marker_count: 17
+    - name: x(SiO2)=0.430; Ta cell; orifice 2.03e-4 m; diamond
+      marker_count: 17
+    - name: x(SiO2)=0.450; Mo cell; orifice 2.07e-4 m; square
+      marker_count: 17
+    - name: x(SiO2)=0.405; Mo cell; orifice 3.51e-4 m; circle
+      marker_count: 17
+    - name: x(SiO2)=0.382; Nb cell; orifice 2.09e-4 m; plus
+      marker_count: 17
+    - name: x(SiO2)=0.382; Ta cell; orifice 3.14e-4 m; triangle
+      marker_count: 17
+    - name: x(SiO2)=0.360; Mo cell; orifice 2.48e-4 m; star
+      marker_count: 17
+    - name: x(SiO2)=0.349; Ni cell; orifice 2.12e-4 m; x
+      marker_count: 17
+    points: []
+    attribution: this work
+    digitisation: deferred to a figure pass
+  context_id: zaitsev-1999-na2o-sio2-pccp::context::zaitsev_1999_figure1_partial_gibbs_energy
+  work_id: 10.1039/a809003c
+  source_id: zaitsev-1999-na2o-sio2-pccp
+  species: Na2O
+- observation_id: zaitsev_1999_figure2_na2o_activity
+  type: figure
+  locator:
+    page: 5
+    published_page: 1903
+    pdf_page_index: 4
+    figure: '2'
+  units: log activity as plotted
+  values:
+    quantity: activity
+    printed_quantity: Na2O activity
+    method_class: figure_only
+    admission_status: figure_only
+    species: Na2O
+    phase: liquid
+    temperature: series-specific temperatures in the caption
+    axes:
+      x: x(Na2O)
+      y: log[a(Na2O)]
+    panel: none_stated
+    caption: Comparison of Na2O activities in the Na2O-SiO2 melt obtained in the present investigation at 1573, 1473 and 1373
+      K with the values available in the literature; the printed series include refs. 1-15.
+    series:
+    - name: present investigation, 1573 K curve
+      marker_count: 0
+    - name: present investigation, 1473 K curve
+      marker_count: 0
+    - name: present investigation, 1373 K curve
+      marker_count: 0
+    - name: Ref. 11, 1573 K curve (series 4)
+      marker_count: 0
+    - name: Ref. 11, 1673 K curve (series 5)
+      marker_count: 0
+    - name: Ref. 1, 1473 K
+      marker_count: 3
+    - name: Ref. 2, 1173 K
+      marker_count: 5
+    - name: Ref. 2, 1273 K
+      marker_count: 5
+    - name: Ref. 2, 1373 K
+      marker_count: 5
+    - name: Ref. 3, 1450 K
+      marker_count: 5
+    - name: Ref. 4, 1323 K
+      marker_count: 5
+    - name: Ref. 5, 1473 K
+      marker_count: 5
+    - name: Ref. 6, 1473 K
+      marker_count: 5
+    - name: Ref. 7, 1373 K
+      marker_count: 5
+    - name: Ref. 7, 1573 K
+      marker_count: 5
+    - name: Ref. 7, 1773 K
+      marker_count: 5
+    - name: Refs. 8 and 9, 1273 K
+      marker_count: 5
+    - name: Refs. 8 and 9, 1373 K
+      marker_count: 5
+    - name: Refs. 8 and 9, 1473 K
+      marker_count: 5
+    - name: Ref. 12, 1573 K
+      marker_count: 5
+    - name: Ref. 12, 1473 K
+      marker_count: 5
+    - name: Ref. 12, 1373 K
+      marker_count: 5
+    - name: Ref. 14, 1293 K
+      marker_count: 5
+    - name: Ref. 14, 1423 K
+      marker_count: 5
+    - name: Ref. 15, 1373 K
+      marker_count: 5
+    points: []
+    attribution: this work and cited data as shown by series
+    digitisation: deferred to a figure pass
+  context_id: zaitsev-1999-na2o-sio2-pccp::context::zaitsev_1999_figure2_na2o_activity
+  work_id: 10.1039/a809003c
+  source_id: zaitsev-1999-na2o-sio2-pccp
+  species: Na2O
+- observation_id: zaitsev_1999_figure3_sio2_activity
+  type: figure
+  locator:
+    page: 6
+    published_page: 1904
+    pdf_page_index: 5
+    figure: '3'
+  units: log activity as plotted
+  values:
+    quantity: activity
+    printed_quantity: SiO2 activity
+    method_class: figure_only
+    admission_status: figure_only
+    species: SiO2
+    phase: liquid
+    temperature: series-specific temperatures in the caption
+    axes:
+      x: x(Na2O)
+      y: log[a(SiO2)]
+    panel: none_stated
+    caption: Comparison of SiO2 activities in the Na2O-SiO2 melt obtained in the present investigation at 1373, 1473 and 1573
+      K with the values available in the literature; the printed series include refs. 1, 4, 5, 7, 11, 12 and 14.
+    series:
+    - name: present investigation, 1373 K curve
+      marker_count: 0
+    - name: present investigation, 1473 K curve
+      marker_count: 0
+    - name: present investigation, 1573 K curve
+      marker_count: 0
+    - name: Ref. 12, 1473 K
+      marker_count: 4
+    - name: Ref. 11, 1573 K
+      marker_count: 4
+    - name: Ref. 11, 1673 K
+      marker_count: 4
+    - name: Ref. 1, 1473 K
+      marker_count: 4
+    - name: Ref. 4, 1323 K
+      marker_count: 4
+    - name: Ref. 5, 1073 K
+      marker_count: 4
+    - name: Ref. 5, 1473 K
+      marker_count: 4
+    - name: Ref. 7, 1573 K
+      marker_count: 4
+    - name: Ref. 14, 1293 K
+      marker_count: 4
+    - name: Ref. 14, 1423 K
+      marker_count: 4
+    points: []
+    attribution: this work and cited data as shown by series
+    digitisation: deferred to a figure pass
+  context_id: zaitsev-1999-na2o-sio2-pccp::context::zaitsev_1999_figure3_sio2_activity
+  work_id: 10.1039/a809003c
+  source_id: zaitsev-1999-na2o-sio2-pccp
+  species: Na2O
+- observation_id: zaitsev_1999_figure4_integral_thermodynamic_functions
+  type: figure
+  locator:
+    page: 7
+    published_page: 1905
+    pdf_page_index: 6
+    figure: '4'
+  units: kJ/mol as plotted
+  values:
+    quantity: integral thermodynamic functions of the Na2O-SiO2 melt
+    method_class: figure_only
+    admission_status: figure_only
+    species: Na2O-SiO2 melt
+    phase: liquid
+    temperature: series-specific temperatures in the caption
+    axes:
+      x: x(Na2O)
+      y: -Delta_fG and -Delta_fH, kJ/mol
+    panel: none_stated
+    caption: Integral thermodynamic functions of the Na2O-SiO2 melt, including formation Gibbs energy and enthalpy at the
+      temperatures and literature comparisons listed by series in the caption.
+    series:
+    - name: present work, -Delta_fG, 1473 K curve
+      marker_count: 0
+    - name: present work, -Delta_fH, 1473 K curve
+      marker_count: 0
+    - name: Ref. 11, -Delta_fG, 1673 K
+      marker_count: 5
+    - name: Ref. 11, -Delta_fG, 1573 K
+      marker_count: 5
+    - name: Ref. 14, -Delta_fH, 1300 K
+      marker_count: 5
+    - name: Ref. 14, -Delta_fG, 1293 K
+      marker_count: 5
+    - name: Ref. 14, -Delta_fG, 1423 K
+      marker_count: 5
+    - name: Ref. 4, -Delta_fG, 1323 K
+      marker_count: 5
+    - name: Ref. 4, -Delta_fH, 1323 K
+      marker_count: 5
+    - name: Ref. 5, -Delta_fG, 1473 K
+      marker_count: 5
+    - name: Ref. 5, -Delta_fH, 1473 K
+      marker_count: 5
+    points: []
+    attribution: this work and cited data as shown by series
+    digitisation: deferred to a figure pass
+  context_id: zaitsev-1999-na2o-sio2-pccp::context::zaitsev_1999_figure4_integral_thermodynamic_functions
+  work_id: 10.1039/a809003c
+  source_id: zaitsev-1999-na2o-sio2-pccp
+  species: Na2O
+- observation_id: zaitsev_1999_figure5_phase_diagram
+  type: figure
+  locator:
+    page: 8
+    published_page: 1906
+    pdf_page_index: 7
+    figure: '5'
+  units: K as plotted
+  values:
+    quantity: phase diagram
+    printed_quantity: phase boundaries in the Na2O-SiO2 system
+    method_class: figure_only
+    admission_status: figure_only
+    species: Na2O-SiO2 system
+    phase: solid/liquid phase boundaries
+    temperature: varies on the T axis
+    axes:
+      x: x(SiO2)
+      y: T, K
+    panel: none_stated
+    caption: 'Phase diagram of the Na2O-SiO2 system: solid lines are the result of the present computation; data points are
+      experimental data from ref. 33 on the liquid saturation line, and coordinates of particular points from refs. 33-37
+      are printed in parentheses.'
+    series:
+    - name: present computation; solid phase boundaries
+      marker_count: 0
+    - name: Ref. 33, experimental silica-saturation data points
+      marker_count: 8
+    - name: Refs. 33-37, particular points labeled in parentheses
+      marker_count: 0
+    points: []
+    attribution: present computation and refs. 33-37 as printed
+    digitisation: deferred to a figure pass
+  context_id: zaitsev-1999-na2o-sio2-pccp::context::zaitsev_1999_figure5_phase_diagram
+  work_id: 10.1039/a809003c
+  source_id: zaitsev-1999-na2o-sio2-pccp
+  species: SiO2
+- observation_id: zaitsev_1999_figure6_immiscibility_region
+  type: figure
+  locator:
+    page: 8
+    published_page: 1906
+    pdf_page_index: 7
+    figure: '6'
+  units: K as plotted
+  values:
+    quantity: liquid immiscibility region
+    printed_quantity: metastable miscibility gap in liquid Na2O-SiO2
+    method_class: figure_only
+    admission_status: figure_only
+    species: Na2O-SiO2 system
+    phase: liquid
+    temperature: varies on the T axis
+    axes:
+      x: x(Na2O)
+      y: T, K
+    panel: none_stated
+    caption: 'Immiscibility region in the liquid phase of the Na2O-SiO2 system: solid line is the present computation; *,
+      ref. 54; square, ref. 51; plus, ref. 48; diamond, ref. 50; circle, ref. 49; triangle, ref. 52.'
+    series:
+    - name: present computation; solid line
+      marker_count: 0
+    - name: Ref. 54; asterisk
+      marker_count: 16
+    - name: Ref. 51; square
+      marker_count: 2
+    - name: Ref. 48; plus
+      marker_count: 8
+    - name: Ref. 50; diamond
+      marker_count: 8
+    - name: Ref. 49; circle
+      marker_count: 4
+    - name: Ref. 52; triangle
+      marker_count: 7
+    points: []
+    attribution: present computation and refs. 48-54 as printed
+    digitisation: deferred to a figure pass
+  context_id: zaitsev-1999-na2o-sio2-pccp::context::zaitsev_1999_figure6_immiscibility_region
+  work_id: 10.1039/a809003c
+  source_id: zaitsev-1999-na2o-sio2-pccp
+  species: SiO2
+- observation_id: zaitsev_1999_table1_model_activities
+  type: table
+  locator:
+    page: 3
+    published_page: 1901
+    pdf_page_index: 2
+    table: '1'
+  units: dimensionless activities
+  values:
+    quantity: associated-solution model activities of Na2O and SiO2
+    method_class: model_derived
+    admission_status: typed_unavailable
+    rows_as_printed: 'x(SiO2) | T(K) | model a(SiO2) | model a(Na2O)
+
+      0.805 | 1473 | 0.854 | 7.13e-10
+
+      0.805 | 1573 | 0.845 | 2.65e-9
+
+      0.753 | 1273 | 0.729 | 5.35e-11
+
+      0.753 | 1473 | 0.712 | 1.34e-9
+
+      0.753 | 1673 | 0.702 | 2.65e-8
+
+      0.709 | 1273 | 0.536 | 1.22e-10
+
+      0.709 | 1473 | 0.536 | 2.89e-9
+
+      0.709 | 1673 | 0.537 | 3.24e-8
+
+      0.671 | 1173 | 0.337 | 4.72e-11
+
+      0.671 | 1373 | 0.355 | 1.66e-9
+
+      0.671 | 1573 | 0.370 | 2.38e-8
+
+      0.625 | 1173 | 0.152 | 2.05e-10
+
+      0.625 | 1373 | 0.176 | 6.04e-9
+
+      0.625 | 1573 | 0.196 | 7.65e-8
+
+      0.573 | 1273 | 0.0574 | 6.13e-9
+
+      0.573 | 1473 | 0.0698 | 1.01e-7
+
+      0.573 | 1573 | 0.0756 | 3.16e-7
+
+      0.524 | 1373 | 0.0160 | 1.46e-7
+
+      0.524 | 1473 | 0.0180 | 5.17e-7
+
+      0.524 | 1573 | 0.0201 | 1.56e-6
+
+      0.477 | 1373 | 1.77e-3 | 1.31e-6
+
+      0.477 | 1473 | 2.16e-3 | 4.33e-6
+
+      0.430 | 1373 | 3.07e-4 | 5.67e-6
+
+      0.430 | 1473 | 3.83e-4 | 1.83e-5
+
+      0.405 | 1423 | 1.40e-4 | 1.98e-5
+
+      0.405 | 1473 | 1.56e-4 | 3.48e-5
+
+      0.382 | 1383 | 4.73e-5 | 2.44e-5
+
+      0.382 | 1423 | 5.20e-5 | 3.76e-5
+
+      0.349 | 1373 | 3.80e-6 | 8.55e-5'
+  context_id: zaitsev-1999-na2o-sio2-pccp::context::zaitsev_1999_table1_model_activities
+  work_id: 10.1039/a809003c
+  source_id: zaitsev-1999-na2o-sio2-pccp
+  species: SiO2
+- observation_id: zaitsev_1999_table2_na2o_partial_thermodynamic_functions
+  type: thermodynamic_functions
+  locator:
+    page: 4
+    published_page: 1902
+    pdf_page_index: 3
+    table: '2'
+  units: -Delta H in kJ/mol; Delta S in J/(mol K); T in K
+  values:
+    quantity: partial thermodynamic characteristics of Na2O
+    method_class: model_derived
+    admission_status: typed_unavailable
+    reason: Least-squares linear fits to experimental chemical-potential data in heterogeneous fields; these fitted functions
+      are retained in context and are not scored as point measurements.
+    rows_as_printed: 'field | T range | -Delta H | Delta S
+
+      N3S8 + SiO2 | 974-1071 | 213.8 +/- 2.8 | 24.55 +/- 2.70
+
+      NS2 + N3S8 | 973-1078 | 242.6 +/- 2.20 | -5.00 +/- 2.10
+
+      NS + NS2 | 953-1110 | 240.5 +/- 1.0 | -26.30 +/- 1.00
+
+      NS + N3S2 | 1068-1285 | 90.8 +/- 1.7 | 39.90 +/- 1.40
+
+      N2S + N3S2 | 1072-1271 | 210.2 +/- 2.3 | -72.20 +/- 1.90
+
+      N2S + NS | 942-1063 | 150.5 +/- 2.3 | -16.10 +/- 2.30'
+    standard_state: beta-Na2O
+    printed_reaction: Na2O component in each printed heterogeneous field
+  context_id: zaitsev-1999-na2o-sio2-pccp::context::zaitsev_1999_table2_na2o_partial_thermodynamic_functions
+  work_id: 10.1039/a809003c
+  source_id: zaitsev-1999-na2o-sio2-pccp
+  species: Na2O
+- observation_id: zaitsev_1999_table3_formation_from_oxides_sio2_host
+  type: thermodynamic_functions
+  locator:
+    page: 4
+    published_page: 1902
+    pdf_page_index: 3
+    table: '3'
+  units: -Delta H in kJ/mol; Delta S in J/(mol K); T in K
+  values:
+    quantity: formation functions from beta-Na2O and quartz
+    method_class: model_derived
+    admission_status: typed_unavailable
+    host_oxide: SiO2
+    reason: formation from oxides is not elemental delta_fH or absolute S
+    phase: solid silicate
+    reaction_as_printed: formation from beta-Na2O and quartz
+    rows_as_printed: '1/11 N3S8 | 974-1071 K | -Delta H 58.30 +/- 0.75 kJ/mol | Delta S 6.70 +/- 0.70 J/(mol K)
+
+      1/3 NS2 | 973-1078 K | -Delta H 73.66 +/- 0.71 kJ/mol | Delta S 5.70 +/- 0.70 J/(mol K)'
+  context_id: zaitsev-1999-na2o-sio2-pccp::context::zaitsev_1999_table3_formation_from_oxides_sio2_host
+  work_id: 10.1039/a809003c
+  source_id: zaitsev-1999-na2o-sio2-pccp
+  species: SiO2
+- observation_id: zaitsev_1999_table3_solid_silicate_formation_from_oxides
+  type: thermodynamic_functions
+  locator:
+    page: 4
+    published_page: 1902
+    pdf_page_index: 3
+    table: '3'
+  units: -Delta H in kJ/mol; Delta S in J/(mol K); T in K
+  values:
+    quantity: thermodynamic functions of formation from beta-Na2O and quartz
+    method_class: model_derived
+    admission_status: typed_unavailable
+    reason: Formation from oxides is not elemental delta_fH or absolute S. The printed reaction, phase, temperature range
+      and values are kept as unscored context under the oxide container selected by formula.
+    formation_reactants_as_printed: beta-Na2O and quartz
+    phase: solid silicate
+    host_oxide: Na2O
+    rows_as_printed: '1/2 NS | 953-1110 K | -Delta H 115.4 +/- 0.6 kJ/mol | Delta S -2.30 +/- 0.60 J/(mol K)
+
+      1/5 N3S2 | 1068-1285 K | -Delta H 110.5 +/- 0.6 kJ/mol | Delta S 6.15 +/- 0.55 J/(mol K)
+
+      1/3 N2S | 942-1271 K | -Delta H 127.1 +/- 0.6 kJ/mol | Delta S -6.90 +/- 0.60 J/(mol K)'
+  context_id: zaitsev-1999-na2o-sio2-pccp::context::zaitsev_1999_table3_solid_silicate_formation_from_oxides
+  work_id: 10.1039/a809003c
+  source_id: zaitsev-1999-na2o-sio2-pccp
+  species: Na2O
+- observation_id: zaitsev_1999_table4_na2o_negative_log_activity
+  type: log_activity_table
+  locator:
+    page: 6
+    published_page: 1904
+    pdf_page_index: 5
+    table: '4'
+  units: -log[a(Na2O)] as printed
+  values:
+    quantity: negative logarithm of Na2O activity
+    printed_header_as_published: -log[a(Na2O)]
+    method_class: mixed measured and model-derived comparison
+    admission_status: typed_unavailable
+    reason: The store has no token for printed negative log activity. Preserve every value and source as printed; do not exponentiate
+      the values.
+    footnotes:
+      a: data for the two-phase region tridymite + melt
+      b: calculated by extrapolation of liquid thermodynamic properties to the stability region of sodium metasilicate
+    rows_as_printed: 'x(Na2O) | T(K) | Present | Ref. 16
+
+      0.103 a | 1430 | 9.394 | 9.823
+
+      0.103 a | 1473 | 9.158 | 9.770
+
+      0.254 | 1430 | 9.094 | 9.572
+
+      0.254 | 1473 | 8.827 | 9.515
+
+      0.254 | 1515 | 8.580 | 8.981
+
+      0.254 | 1557 | 8.346 | 8.79
+
+      0.303 | 1344 | 9.261 | 9.090
+
+      0.303 | 1387 | 8.966 | 8.859
+
+      0.303 | 1430 | 8.689 | 8.590
+
+      0.303 | 1473 | 8.429 | 8.286
+
+      0.303 | 1515 | 8.188 | 8.065
+
+      0.402 | 1255 | 8.674 | 8.143
+
+      0.402 | 1344 | 8.062 | 7.756
+
+      0.402 | 1387 | 7.794 | 7.596
+
+      0.402 | 1430 | 7.543 | 7.374
+
+      0.402 | 1473 | 7.305 | 7.392
+
+      0.500 | 1255 | 7.080 b | 6.558
+
+      0.500 | 1300 | 6.784 b | 6.236
+
+      0.500 | 1344 | 6.512 b | 5.841
+
+      0.500 | 1387 | 6.264 | 5.641
+
+      0.500 | 1430 | 6.030 | 5.576
+
+      0.500 | 1473 | 5.810 | 5.429'
+  context_id: zaitsev-1999-na2o-sio2-pccp::context::zaitsev_1999_table4_na2o_negative_log_activity
+  work_id: 10.1039/a809003c
+  source_id: zaitsev-1999-na2o-sio2-pccp
+  species: Na2O
+- observation_id: zaitsev_1999_table5_partial_molar_entropy
+  type: table
+  locator:
+    page: 6
+    published_page: 1904
+    pdf_page_index: 5
+    table: '5'
+  units: -Delta S in J/(mol K) as printed
+  values:
+    quantity: partial molar entropy of Na2O
+    printed_header_as_published: -Delta S(Na2O)
+    method_class: measured_reduced and quoted_attributed
+    admission_status: typed_unavailable
+    reason: the store has no partial_molar_entropy quantity token
+    rows_as_printed: 'x(Na2O) | T(K) | Present -Delta S +/- J/(mol K) | Ref. 12 -Delta S +/- J/(mol K)
+
+      0.4 | 1473 | 11.2 +/- 1.5 | -58.2 +/- 1.2
+
+      0.45 | 1473 | -18.9 +/- 1.5 | -34.3 +/- 1.2
+
+      0.5 | 1473 | -28.8 +/- 1.5 | -19.7 +/- 0.6
+
+      0.55 | 1473 | -39.2 +/- 1.5 | -1.1 +/- 0.2'
+  context_id: zaitsev-1999-na2o-sio2-pccp::context::zaitsev_1999_table5_partial_molar_entropy
+  work_id: 10.1039/a809003c
+  source_id: zaitsev-1999-na2o-sio2-pccp
+  species: Na2O
+- observation_id: zaitsev_1999_table6_present_standard_functions
+  type: standard_thermodynamic_functions
+  locator:
+    page: 7
+    published_page: 1905
+    pdf_page_index: 6
+    table: '6'
+  units: mixed as printed; see per-column units
+  values:
+    quantity: calculated standard thermodynamic functions of sodium silicates
+    method_class: model_derived
+    admission_status: typed_unavailable
+    reason: The authors calculated these values from Table 3, compound heat capacities and component thermodynamic functions;
+      retained here without scoring the oxide-formation columns.
+    host_oxide: Na2O
+    rows_as_printed: 'NS | S298.15 114.8 +/- 3.0 J/(mol K) | -Delta_fH from oxides 228.1 +/- 5 kJ/mol | -Delta_fS from oxides
+      -1.7 +/- 2.0 J/(mol K) | -Delta_fH from elements 1554.0 kJ/mol
+
+      N2S | S298.15 194.1 +/- 5.0 J/(mol K) | -Delta_fH from oxides 363.0 +/- 8 kJ/mol | -Delta_fS from oxides 2.4 +/- 4.0
+      J/(mol K) | -Delta_fH from elements 2104.0 kJ/mol'
+  context_id: zaitsev-1999-na2o-sio2-pccp::context::zaitsev_1999_table6_present_standard_functions
+  work_id: 10.1039/a809003c
+  source_id: zaitsev-1999-na2o-sio2-pccp
+  species: Na2O
+- observation_id: zaitsev_1999_table6_present_standard_functions_sio2_host
+  type: standard_thermodynamic_functions
+  locator:
+    page: 7
+    published_page: 1905
+    pdf_page_index: 6
+    table: '6'
+  units: mixed as printed; see per-column units
+  values:
+    quantity: calculated standard thermodynamic functions of sodium disilicate
+    method_class: model_derived
+    admission_status: typed_unavailable
+    host_oxide: SiO2
+    reason: Present values are calculated from Table 3, compound heat capacities and component thermodynamic functions.
+    rows_as_printed: NS2 | S298.15 165.4 +/- 4.0 J/(mol K) | -Delta_fH from oxides 227.4 +/- 5 kJ/mol | -Delta_fS from oxides
+      7.3 +/- 3.0 J/(mol K) | -Delta_fH from elements 2464.2 kJ/mol
+  context_id: zaitsev-1999-na2o-sio2-pccp::context::zaitsev_1999_table6_present_standard_functions_sio2_host
+  work_id: 10.1039/a809003c
+  source_id: zaitsev-1999-na2o-sio2-pccp
+  species: SiO2
+- observation_id: zaitsev_1999_table6_ref17_oxide_formation_values
+  type: standard_thermodynamic_functions
+  locator:
+    page: 7
+    published_page: 1905
+    pdf_page_index: 6
+    table: '6'
+  units: mixed as printed; see per-column units
+  values:
+    quantity: formation functions from oxides
+    method_class: quoted_attributed
+    attribution: Ref. 17
+    admission_status: typed_unavailable
+    reason: Formation from oxides is not elemental delta_fH or absolute S; preserve the values as printed under the source's
+      reaction basis.
+    host_oxide: Na2O
+    rows_as_printed: 'NS | -Delta_fH 230.12 kJ/mol | -Delta_fS -2.76 J/(mol K)
+
+      N2S | -Delta_fH 359.8 kJ/mol | -Delta_fS 4.15 J/(mol K)'
+  context_id: zaitsev-1999-na2o-sio2-pccp::context::zaitsev_1999_table6_ref17_oxide_formation_values
+  work_id: 10.1039/a809003c
+  source_id: zaitsev-1999-na2o-sio2-pccp
+  species: Na2O
+- observation_id: zaitsev_1999_table6_ref17_oxide_formation_values_sio2_host
+  type: standard_thermodynamic_functions
+  locator:
+    page: 7
+    published_page: 1905
+    pdf_page_index: 6
+    table: '6'
+  units: mixed as printed; see per-column units
+  values:
+    quantity: formation functions from oxides
+    method_class: quoted_attributed
+    attribution: Ref. 17
+    admission_status: typed_unavailable
+    host_oxide: SiO2
+    reason: formation from oxides is not elemental delta_fH or absolute S
+    rows_as_printed: NS2 | -Delta_fH 230.54 kJ/mol | -Delta_fS 6.03 J/(mol K)
+  context_id: zaitsev-1999-na2o-sio2-pccp::context::zaitsev_1999_table6_ref17_oxide_formation_values_sio2_host
+  work_id: 10.1039/a809003c
+  source_id: zaitsev-1999-na2o-sio2-pccp
+  species: SiO2

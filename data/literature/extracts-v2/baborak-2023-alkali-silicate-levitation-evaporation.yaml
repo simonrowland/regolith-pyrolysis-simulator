@@ -1,0 +1,1451 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/baborak-2023-alkali-silicate-levitation-evaporation.yaml
+observations:
+- observation_id: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_ks2_t_liquidus_table1
+  experiment_id: 10.1111/ijag.16627::baborak-2023-alkali-silicate-levitation-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: K2Si2O5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: liquidus
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - K2O
+          - '0.3333333333333333'
+        - - SiO2
+          - '0.6666666666666666'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1309'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Literature refs. 73–75, phase diagrams cited in the Table 1 caption
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_ks2_t_liquidus_table1
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  locator:
+    published_page: 459
+    pdf_page_index: 4
+    table: '1'
+    note: row=KS2; column=Tm
+  read_from: unknown:baborak-2023-alkali-silicate-levitation-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1309'
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+        note: row=KS2; column=Tm
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: nominal formula-unit ratio as printed
+          components:
+          - - K2O
+            - '1'
+          - - SiO2
+            - '2'
+          amount_basis: mol_inventory
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+        note: Printed composition K2O·2SiO2
+- observation_id: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_ks2_tc_table1
+  experiment_id: 10.1111/ijag.16627::baborak-2023-alkali-silicate-levitation-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: K2Si2O5
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: crystallization_onset
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1043'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 5
+      note: Printed ±5 K; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_ks2_tc_table1
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  locator:
+    published_page: 459
+    pdf_page_index: 4
+    table: '1'
+    note: row=KS2; column=Tc
+  read_from: unknown:baborak-2023-alkali-silicate-levitation-evaporation
+  point_conditions:
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        published_page: 456
+        pdf_page_index: 1
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '1043'
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+        note: row=KS2; column=Tc
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: nominal formula-unit ratio as printed
+          components:
+          - - K2O
+            - '1'
+          - - SiO2
+            - '2'
+          amount_basis: mol_inventory
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+        note: Printed composition K2O·2SiO2
+- observation_id: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_ks2_tg_table1
+  experiment_id: 10.1111/ijag.16627::baborak-2023-alkali-silicate-levitation-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: K2Si2O5
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: glass_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '768'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 5
+      note: Printed ±5 K; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_ks2_tg_table1
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  locator:
+    published_page: 459
+    pdf_page_index: 4
+    table: '1'
+    note: row=KS2; column=Tg
+  read_from: unknown:baborak-2023-alkali-silicate-levitation-evaporation
+  point_conditions:
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        published_page: 456
+        pdf_page_index: 1
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '768'
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+        note: row=KS2; column=Tg
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: nominal formula-unit ratio as printed
+          components:
+          - - K2O
+            - '1'
+          - - SiO2
+            - '2'
+          amount_basis: mol_inventory
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+        note: Printed composition K2O·2SiO2
+- observation_id: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_lb2_t_liquidus_table3
+  experiment_id: 10.1111/ijag.16627::baborak-2023-alkali-silicate-levitation-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2B4O7
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1190'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Literature refs. 96, 101, and 102, as cited in the Table 3 caption
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_lb2_t_liquidus_table3
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  locator:
+    published_page: 462
+    pdf_page_index: 7
+    table: '3'
+    note: row=LB2; column=Tm
+  read_from: unknown:baborak-2023-alkali-silicate-levitation-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1190'
+      locator:
+        published_page: 462
+        pdf_page_index: 7
+        table: '3'
+        note: row=LB2; column=Tm
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 462
+        pdf_page_index: 7
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: nominal formula-unit ratio as printed
+          components:
+          - - Li2O
+            - '1'
+          - - B2O3
+            - '2'
+          amount_basis: mol_inventory
+      locator:
+        published_page: 462
+        pdf_page_index: 7
+        table: '3'
+        note: Printed composition Li2O·2B2O3
+- observation_id: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_ls2_t_liquidus_table1
+  experiment_id: 10.1111/ijag.16627::baborak-2023-alkali-silicate-levitation-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2Si2O5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: liquidus
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Li2O
+          - '0.3333333333333333'
+        - - SiO2
+          - '0.6666666666666666'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1306'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Literature refs. 73–75, phase diagrams cited in the Table 1 caption
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_ls2_t_liquidus_table1
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  locator:
+    published_page: 459
+    pdf_page_index: 4
+    table: '1'
+    note: row=LS2; column=Tm
+  read_from: unknown:baborak-2023-alkali-silicate-levitation-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1306'
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+        note: row=LS2; column=Tm
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: nominal formula-unit ratio as printed
+          components:
+          - - Li2O
+            - '1'
+          - - SiO2
+            - '2'
+          amount_basis: mol_inventory
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+        note: Printed composition Li2O·2SiO2
+- observation_id: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_ls2_tc_table1
+  experiment_id: 10.1111/ijag.16627::baborak-2023-alkali-silicate-levitation-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2Si2O5
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: crystallization_onset
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '837'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 5
+      note: Printed ±5 K; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_ls2_tc_table1
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  locator:
+    published_page: 459
+    pdf_page_index: 4
+    table: '1'
+    note: row=LS2; column=Tc
+  read_from: unknown:baborak-2023-alkali-silicate-levitation-evaporation
+  point_conditions:
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        published_page: 456
+        pdf_page_index: 1
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '837'
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+        note: row=LS2; column=Tc
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: nominal formula-unit ratio as printed
+          components:
+          - - Li2O
+            - '1'
+          - - SiO2
+            - '2'
+          amount_basis: mol_inventory
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+        note: Printed composition Li2O·2SiO2
+- observation_id: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_ls2_tg_table1
+  experiment_id: 10.1111/ijag.16627::baborak-2023-alkali-silicate-levitation-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Li2Si2O5
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: glass_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '726'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 5
+      note: Printed ±5 K; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_ls2_tg_table1
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  locator:
+    published_page: 459
+    pdf_page_index: 4
+    table: '1'
+    note: row=LS2; column=Tg
+  read_from: unknown:baborak-2023-alkali-silicate-levitation-evaporation
+  point_conditions:
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        published_page: 456
+        pdf_page_index: 1
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '726'
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+        note: row=LS2; column=Tg
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: nominal formula-unit ratio as printed
+          components:
+          - - Li2O
+            - '1'
+          - - SiO2
+            - '2'
+          amount_basis: mol_inventory
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+        note: Printed composition Li2O·2SiO2
+- observation_id: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_np_t_melting_table3
+  experiment_id: 10.1111/ijag.16627::baborak-2023-alkali-silicate-levitation-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: NaPO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: melting_point
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '900'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Literature refs. 96, 101, and 102, as cited in the Table 3 caption
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_np_t_melting_table3
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  locator:
+    published_page: 462
+    pdf_page_index: 7
+    table: '3'
+    note: row=NP; column=Tm
+  read_from: unknown:baborak-2023-alkali-silicate-levitation-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '900'
+      locator:
+        published_page: 462
+        pdf_page_index: 7
+        table: '3'
+        note: row=NP; column=Tm
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 462
+        pdf_page_index: 7
+        table: '3'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: nominal formula-unit ratio as printed
+          components:
+          - - Na2O
+            - '1'
+          - - P2O5
+            - '1'
+          amount_basis: mol_inventory
+      locator:
+        published_page: 462
+        pdf_page_index: 7
+        table: '3'
+        note: Printed composition Na2O·P2O5
+- observation_id: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_ns2_t_liquidus_table1
+  experiment_id: 10.1111/ijag.16627::baborak-2023-alkali-silicate-levitation-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: liquidus
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Na2O
+          - '0.3333333333333333'
+        - - SiO2
+          - '0.6666666666666666'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1148'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Literature refs. 73–75, phase diagrams cited in the Table 1 caption
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_ns2_t_liquidus_table1
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  locator:
+    published_page: 459
+    pdf_page_index: 4
+    table: '1'
+    note: row=NS2; column=Tm
+  read_from: unknown:baborak-2023-alkali-silicate-levitation-evaporation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1148'
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+        note: row=NS2; column=Tm
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: nominal formula-unit ratio as printed
+          components:
+          - - Na2O
+            - '1'
+          - - SiO2
+            - '2'
+          amount_basis: mol_inventory
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+        note: Printed composition Na2O·2SiO2
+- observation_id: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_ns2_tc_table1
+  experiment_id: 10.1111/ijag.16627::baborak-2023-alkali-silicate-levitation-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: crystallization_onset
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '916'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 5
+      note: Printed ±5 K; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_ns2_tc_table1
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  locator:
+    published_page: 459
+    pdf_page_index: 4
+    table: '1'
+    note: row=NS2; column=Tc
+  read_from: unknown:baborak-2023-alkali-silicate-levitation-evaporation
+  point_conditions:
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        published_page: 456
+        pdf_page_index: 1
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '916'
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+        note: row=NS2; column=Tc
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: nominal formula-unit ratio as printed
+          components:
+          - - Na2O
+            - '1'
+          - - SiO2
+            - '2'
+          amount_basis: mol_inventory
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+        note: Printed composition Na2O·2SiO2
+- observation_id: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_ns2_tg_table1
+  experiment_id: 10.1111/ijag.16627::baborak-2023-alkali-silicate-levitation-evaporation
+  identity:
+    quantity:
+      tag: value
+      value: transition_temperature
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: glass_transition
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: not_published
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '728'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: 5
+      note: Printed ±5 K; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: baborak-2023-alkali-silicate-levitation-evaporation::baborak_2023_ns2_tg_table1
+  source_id: baborak-2023-alkali-silicate-levitation-evaporation
+  locator:
+    published_page: 459
+    pdf_page_index: 4
+    table: '1'
+    note: row=NS2; column=Tg
+  read_from: unknown:baborak-2023-alkali-silicate-levitation-evaporation
+  point_conditions:
+    quench_state:
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        published_page: 456
+        pdf_page_index: 1
+        section: Experimental
+    temperature_K:
+      state:
+        tag: value
+        value: '728'
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+        note: row=NS2; column=Tg
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: nominal formula-unit ratio as printed
+          components:
+          - - Na2O
+            - '1'
+          - - SiO2
+            - '2'
+          amount_basis: mol_inventory
+      locator:
+        published_page: 459
+        pdf_page_index: 4
+        table: '1'
+        note: Printed composition Na2O·2SiO2

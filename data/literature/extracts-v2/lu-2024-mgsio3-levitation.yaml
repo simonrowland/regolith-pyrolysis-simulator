@@ -1,0 +1,6025 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/lu-2024-mgsio3-levitation.yaml
+observations:
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2423:row=m07:h=3ccab491f8d3
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2423'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '57.53'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2423:row=m07:h=3ccab491f8d3
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M07
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2423'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M07
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '57.53'
+          MgO: '40.37'
+          CaO: '1.32'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M07
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4829353064422787588034669337'
+          - - MgO
+            - '0.5051923801777863249876585315'
+          - - CaO
+            - '0.01187231337993491620887453463'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M07
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '57.53'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M07
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M07
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '40.37'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M07
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M07
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.32'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M07
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M07
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '300'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2423:row=m07:h=7347bf193348
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2423'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '40.37'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2423:row=m07:h=7347bf193348
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M07
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2423'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M07
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '57.53'
+          MgO: '40.37'
+          CaO: '1.32'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M07
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4829353064422787588034669337'
+          - - MgO
+            - '0.5051923801777863249876585315'
+          - - CaO
+            - '0.01187231337993491620887453463'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M07
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '57.53'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M07
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M07
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '40.37'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M07
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M07
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.32'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M07
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M07
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '300'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2423:row=m07:h=f6f9e86ac368
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2423'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1.32'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2423:row=m07:h=f6f9e86ac368
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M07
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2423'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M07
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '57.53'
+          MgO: '40.37'
+          CaO: '1.32'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M07
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4829353064422787588034669337'
+          - - MgO
+            - '0.5051923801777863249876585315'
+          - - CaO
+            - '0.01187231337993491620887453463'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M07
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '57.53'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M07
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M07
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '40.37'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M07
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M07
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.32'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M07
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M07
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '300'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2423:row=m08:h=6d07219dd766
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2423'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '49.91'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2423:row=m08:h=6d07219dd766
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M08
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2423'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M08
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '49.91'
+          MgO: '47.8'
+          CaO: '1.87'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M08
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4052083105995496239776265108'
+          - - MgO
+            - '0.5785249983569974260268332484'
+          - - CaO
+            - '0.01626669104345294999554024072'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M08
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '49.91'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M08
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M08
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '47.8'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M08
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M08
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.87'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M08
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M08
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '420'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2423:row=m08:h=e865e4927498
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2423'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '47.8'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2423:row=m08:h=e865e4927498
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M08
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2423'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M08
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '49.91'
+          MgO: '47.8'
+          CaO: '1.87'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M08
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4052083105995496239776265108'
+          - - MgO
+            - '0.5785249983569974260268332484'
+          - - CaO
+            - '0.01626669104345294999554024072'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M08
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '49.91'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M08
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M08
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '47.8'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M08
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M08
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.87'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M08
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M08
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '420'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2423:row=m08:h=ec4403c9d4c1
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2423'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1.87'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2423:row=m08:h=ec4403c9d4c1
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M08
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2423'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M08
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '49.91'
+          MgO: '47.8'
+          CaO: '1.87'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M08
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4052083105995496239776265108'
+          - - MgO
+            - '0.5785249983569974260268332484'
+          - - CaO
+            - '0.01626669104345294999554024072'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M08
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '49.91'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M08
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M08
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '47.8'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M08
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M08
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.87'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M08
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M08
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '420'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2423:row=m09:h=3ce2e554d496
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2423'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1.53'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2423:row=m09:h=3ce2e554d496
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M09
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2423'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M09
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '53.68'
+          MgO: '43.97'
+          CaO: '1.53'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M09
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4441231675688640206245843364'
+          - - MgO
+            - '0.5423140376716737187019523563'
+          - - CaO
+            - '0.01356279475946226067346330713'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M09
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '53.68'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M09
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M09
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '43.97'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M09
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M09
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.53'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M09
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M09
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '540'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2423:row=m09:h=7453364fc70b
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2423'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '53.68'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2423:row=m09:h=7453364fc70b
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M09
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2423'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M09
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '53.68'
+          MgO: '43.97'
+          CaO: '1.53'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M09
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4441231675688640206245843364'
+          - - MgO
+            - '0.5423140376716737187019523563'
+          - - CaO
+            - '0.01356279475946226067346330713'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M09
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '53.68'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M09
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M09
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '43.97'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M09
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M09
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.53'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M09
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M09
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '540'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2423:row=m09:h=7eb9db1b6821
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2423'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '43.97'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2423:row=m09:h=7eb9db1b6821
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M09
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2423'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M09
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '53.68'
+          MgO: '43.97'
+          CaO: '1.53'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M09
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4441231675688640206245843364'
+          - - MgO
+            - '0.5423140376716737187019523563'
+          - - CaO
+            - '0.01356279475946226067346330713'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M09
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '53.68'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M09
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M09
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '43.97'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M09
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M09
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.53'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M09
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M09
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '540'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2523:row=m04:h=10eb0c68c12e
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2523'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '57.07'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2523:row=m04:h=10eb0c68c12e
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M04
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2523'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M04
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '57.07'
+          MgO: '40.69'
+          CaO: '1.44'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M04
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4784889668278869059801071743'
+          - - MgO
+            - '0.5085752304070464112967455277'
+          - - CaO
+            - '0.0129358027650666827231472978'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M04
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '57.07'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M04
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M04
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '40.69'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M04
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M04
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.44'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M04
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M04
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '120'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2523:row=m04:h=626f30fce89c
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2523'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '40.69'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2523:row=m04:h=626f30fce89c
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M04
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2523'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M04
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '57.07'
+          MgO: '40.69'
+          CaO: '1.44'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M04
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4784889668278869059801071743'
+          - - MgO
+            - '0.5085752304070464112967455277'
+          - - CaO
+            - '0.0129358027650666827231472978'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M04
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '57.07'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M04
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M04
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '40.69'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M04
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M04
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.44'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M04
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M04
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '120'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2523:row=m04:h=6bde98cc67a9
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2523'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1.44'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2523:row=m04:h=6bde98cc67a9
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M04
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2523'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M04
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '57.07'
+          MgO: '40.69'
+          CaO: '1.44'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M04
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4784889668278869059801071743'
+          - - MgO
+            - '0.5085752304070464112967455277'
+          - - CaO
+            - '0.0129358027650666827231472978'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M04
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '57.07'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M04
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M04
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '40.69'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M04
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M04
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.44'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M04
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M04
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '120'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2523:row=m05:h=bfe273666ce5
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2523'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1.74'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2523:row=m05:h=bfe273666ce5
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M05
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2523'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M05
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '52.97'
+          MgO: '45.63'
+          CaO: '1.74'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M05
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4311516259292910566293383379'
+          - - MgO
+            - '0.5536738128858483715032808555'
+          - - CaO
+            - '0.01517456118486057186738080662'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M05
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '52.97'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M05
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M05
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '45.63'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M05
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M05
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.74'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M05
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M05
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '300'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2523:row=m05:h=c661663ffe68
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2523'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '45.63'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2523:row=m05:h=c661663ffe68
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M05
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2523'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M05
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '52.97'
+          MgO: '45.63'
+          CaO: '1.74'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M05
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4311516259292910566293383379'
+          - - MgO
+            - '0.5536738128858483715032808555'
+          - - CaO
+            - '0.01517456118486057186738080662'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M05
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '52.97'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M05
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M05
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '45.63'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M05
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M05
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.74'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M05
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M05
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '300'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2523:row=m05:h=e2bba62bd613
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2523'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '52.97'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2523:row=m05:h=e2bba62bd613
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M05
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2523'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M05
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '52.97'
+          MgO: '45.63'
+          CaO: '1.74'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M05
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4311516259292910566293383379'
+          - - MgO
+            - '0.5536738128858483715032808555'
+          - - CaO
+            - '0.01517456118486057186738080662'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M05
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '52.97'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M05
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M05
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '45.63'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M05
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M05
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.74'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M05
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M05
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '300'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2523:row=m06:h=8cbed07affa9
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2523'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1.97'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2523:row=m06:h=8cbed07affa9
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M06
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2523'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M06
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '48.55'
+          MgO: '49.62'
+          CaO: '1.97'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M06
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.3895483405282818561747931258'
+          - - MgO
+            - '0.5935158800732010611714388426'
+          - - CaO
+            - '0.01693577939851708265376803192'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M06
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '48.55'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M06
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M06
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '49.62'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M06
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M06
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.97'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M06
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M06
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '540'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2523:row=m06:h=bed2f30261df
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2523'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '49.62'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2523:row=m06:h=bed2f30261df
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M06
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2523'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M06
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '48.55'
+          MgO: '49.62'
+          CaO: '1.97'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M06
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.3895483405282818561747931258'
+          - - MgO
+            - '0.5935158800732010611714388426'
+          - - CaO
+            - '0.01693577939851708265376803192'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M06
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '48.55'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M06
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M06
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '49.62'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M06
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M06
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.97'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M06
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M06
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '540'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2523:row=m06:h=eda3fdfd570f
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2523'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '48.55'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2523:row=m06:h=eda3fdfd570f
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M06
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2523'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M06
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '48.55'
+          MgO: '49.62'
+          CaO: '1.97'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M06
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.3895483405282818561747931258'
+          - - MgO
+            - '0.5935158800732010611714388426'
+          - - CaO
+            - '0.01693577939851708265376803192'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M06
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '48.55'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M06
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M06
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '49.62'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M06
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M06
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.97'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M06
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M06
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '540'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2623:row=m01:h=2b089b2c39bd
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2623'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '53.62'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2623:row=m01:h=2b089b2c39bd
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M01
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2623'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M01
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '53.62'
+          MgO: '44.44'
+          CaO: '1.64'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M01
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4408601188942622544333546336'
+          - - MgO
+            - '0.5446926476946619064338088121'
+          - - CaO
+            - '0.01444723341107583913283655455'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M01
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '53.62'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M01
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M01
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '44.44'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M01
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M01
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.64'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M01
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M01
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '120'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2623:row=m01:h=680684cb24a1
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2623'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '44.44'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2623:row=m01:h=680684cb24a1
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M01
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2623'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M01
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '53.62'
+          MgO: '44.44'
+          CaO: '1.64'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M01
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4408601188942622544333546336'
+          - - MgO
+            - '0.5446926476946619064338088121'
+          - - CaO
+            - '0.01444723341107583913283655455'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M01
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '53.62'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M01
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M01
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '44.44'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M01
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M01
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.64'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M01
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M01
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '120'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2623:row=m01:h=b45d96a6ac5f
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2623'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '1.64'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2623:row=m01:h=b45d96a6ac5f
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M01
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2623'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M01
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '53.62'
+          MgO: '44.44'
+          CaO: '1.64'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M01
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4408601188942622544333546336'
+          - - MgO
+            - '0.5446926476946619064338088121'
+          - - CaO
+            - '0.01444723341107583913283655455'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M01
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '53.62'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M01
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M01
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '44.44'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M01
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M01
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '1.64'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M01
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M01
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '120'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2623:row=m02:h=a2ba55b058bf
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2623'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '46.32'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2623:row=m02:h=a2ba55b058bf
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M02
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2623'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M02
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '46.32'
+          MgO: '51.4'
+          CaO: '2.14'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M02
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.36985819713063844583154753'
+          - - MgO
+            - '0.6118335328701178559581995114'
+          - - CaO
+            - '0.01830826999924369821025295841'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M02
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.32'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M02
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M02
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '51.4'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M02
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M02
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.14'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M02
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M02
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '300'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2623:row=m02:h=c62188216056
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2623'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '51.4'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2623:row=m02:h=c62188216056
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M02
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2623'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M02
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '46.32'
+          MgO: '51.4'
+          CaO: '2.14'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M02
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.36985819713063844583154753'
+          - - MgO
+            - '0.6118335328701178559581995114'
+          - - CaO
+            - '0.01830826999924369821025295841'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M02
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.32'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M02
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M02
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '51.4'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M02
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M02
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.14'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M02
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M02
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '300'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2623:row=m02:h=e8217a6ecffe
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2623'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '2.14'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2623:row=m02:h=e8217a6ecffe
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M02
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2623'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M02
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '46.32'
+          MgO: '51.4'
+          CaO: '2.14'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M02
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.36985819713063844583154753'
+          - - MgO
+            - '0.6118335328701178559581995114'
+          - - CaO
+            - '0.01830826999924369821025295841'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M02
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '46.32'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M02
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M02
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '51.4'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M02
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M02
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.14'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M02
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M02
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '300'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2623:row=m03:h=3cd576a50b94
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2623'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '45.3'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2623:row=m03:h=3cd576a50b94
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M03
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2623'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M03
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '45.3'
+          MgO: '52.59'
+          CaO: '2.22'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M03
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.3593045527202548139990581443'
+          - - MgO
+            - '0.6218292517961611897197685765'
+          - - CaO
+            - '0.01886619548358399628117327883'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M03
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.3'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M03
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M03
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '52.59'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M03
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M03
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.22'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M03
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M03
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '420'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2623:row=m03:h=84ceedcbc0c7
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2623'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '2.22'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2623:row=m03:h=84ceedcbc0c7
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M03
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2623'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M03
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '45.3'
+          MgO: '52.59'
+          CaO: '2.22'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M03
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.3593045527202548139990581443'
+          - - MgO
+            - '0.6218292517961611897197685765'
+          - - CaO
+            - '0.01886619548358399628117327883'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M03
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.3'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M03
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M03
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '52.59'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M03
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M03
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.22'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M03
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M03
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '420'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%
+- observation_id: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2623:row=m03:h=f98e68cbf8d5
+  experiment_id: 10.2138/am-2023-9111::experiment::lu-2024-enstatite-levitation-series
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: glass
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: oxide_wt_percent
+    temperature_K:
+      tag: value
+      value: '2623'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: unknown
+      reason: source has no located total pressure for this run
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '52.59'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: lu-2024-mgsio3-levitation::lu_2024_table1_residue_composition::T=2623:row=m03:h=f98e68cbf8d5
+  source_id: lu-2024-mgsio3-levitation
+  locator:
+    page: 3
+    published_page: 1195
+    pdf_page_index: 2
+    table: '1'
+    note: row=M03
+  read_from: unknown:lu-2024-mgsio3-levitation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2623'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M03
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '45.3'
+          MgO: '52.59'
+          CaO: '2.22'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M03
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.3593045527202548139990581443'
+          - - MgO
+            - '0.6218292517961611897197685765'
+          - - CaO
+            - '0.01886619548358399628117327883'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+        note: row=M03
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.3'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M03
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M03
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '52.59'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M03
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M03
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '2.22'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M03
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 1195
+              pdf_page_index: 2
+              table: '1'
+              note: row=M03
+        output_unit: mole_fraction
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper reports argon flow but no total chamber pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+    atmosphere:
+      state:
+        tag: value
+        value:
+          species: Ar
+          flow_sccm:
+            tag: value
+            value: '600'
+          partial_pressure_Pa:
+            tag: unknown
+            reason: The paper reports gas composition in ppm, not partial pressure.
+      locator:
+        page: 2
+        published_page: 1194
+        pdf_page_index: 1
+        section: Methods
+        note: 99.999% Ar; gas contains approximately 1 ppm O2, 5 ppm N2 and 2 ppm H2O+CO+CO2.
+    duration_s:
+      state:
+        tag: value
+        value: '420'
+      locator:
+        page: 3
+        published_page: 1195
+        pdf_page_index: 2
+        table: '1'
+  derivation:
+    relation: identity:as_published
+    inputs:
+    - unknown:lu-2024-mgsio3-levitation
+    parameters: []
+    output_unit: wt%

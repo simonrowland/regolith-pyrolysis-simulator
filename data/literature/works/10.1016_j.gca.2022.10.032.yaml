@@ -1,0 +1,348 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.gca.2022.10.032
+  citation: Renggli, C. J., Hellmann, J. L., Burkhardt, C., Klemme, S., Berndt, J., Pangritz, P. et al. (2022). Tellurium
+    isotope fractionation during evaporation from silicate melts. Geochimica et Cosmochimica Acta 339, 35–45.
+  source_ids:
+  - renggli-2022-te-evaporation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: unknown:renggli-2022-te-evaporation
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.gca.2022.10.032
+experiments:
+- experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'gas_mixing_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.gca.2022.10.032
+  locator:
+    page: 2
+    published_page: 36
+    pdf_page_index: 1
+    section: Experimental methods
+  apparatus: {}
+  thermal_schedule: {}
+context:
+- observation_id: renggli_2022_figure_1_context
+  type: figure_only
+  locator:
+    page: 3
+    pdf_page_index: 2
+    figure: '1'
+  units: as printed; no numeric points
+  values:
+    quantity: elemental_profile_context
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    axes_as_printed: 'panel (e): elemental concentration profiles; panels (a–d): images'
+    caption_as_printed: 'Fig. 1. Characterization of starting materials and experimental samples. (a) and (b) show BSE images
+      of glass fragments of the starting material. Images (c) and (d) show BSE images of the polished cross-sections of experiments
+      in air at 1196 °C and 1301 °C respectively. (e) LA-ICP-MS measurements on the starting glass, and profiles from the
+      center of the experimental beads that are shown in c) and d). The profiles (75 lm step size) show no diffusional zonation
+      from the center (analysis #1) to the rim (analysis # 14).'
+    panel_series_marker_counts:
+    - series: starting glass and experimental bead profiles
+      marker_count: not stated in caption; values deferred
+    identity:
+      species: Te
+      phase: glass
+      temperature_as_printed: 1196 °C and 1301 °C for experimental profiles in panel (e)
+    attribution: Renggli et al. (2022), current study; model calculations are identified in the printed caption.
+  context_id: renggli-2022-te-evaporation::context::renggli_2022_figure_1_context
+  work_id: 10.1016/j.gca.2022.10.032
+  source_id: renggli-2022-te-evaporation
+  species: Te
+- observation_id: renggli_2022_figure_2_context
+  type: figure_only
+  locator:
+    page: 5
+    pdf_page_index: 4
+    figure: '2'
+  units: as printed; no numeric points
+  values:
+    quantity: evaporation_loss_and_isotope_fractionation_context
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    axes_as_printed: experimental Te loss and isotope fractionation versus temperature and oxygen fugacity (panel axes as
+      printed)
+    caption_as_printed: "Fig. 2. The depletion of Te in the residue glasses relative to the               CO-CO2 atmosphere.\
+      \ The calculation indicates that below logfO2 = composition of the bulk starting glass is reported as log(fTe), where\
+      \            \x014 the dominant Te gas species is Te2, with a minor contribution of fTe = [Te]residue/[Te]initial. Over\
+      \ the entire range of experimental con-        Te. In both gas species Te has an oxidation state of 0. At logfO2 = ditions\
+      \ from 868 to 1459 °C, log(fTe) varies from 0 to \x014, which cor-            \x013.1 (DFMQ+5.3) and above, the oxidation\
+      \ state of Te increases responds to absolute concentrations from the starting material                   and Te4+O2\
+      \ becomes the dominant Te gas species at highly oxidiz- (7589 lg/g) to 0.7 lg/g Te, or a loss of up to 99.991% of initial\
+      \                ing conditions, such as in air. The change in Te oxidation state and Te. We obtained electron microprobe\
+      \ and LA-ICP-MS profiles on                    speciation is comparable to that of Se, where the speciation change the\
+      \ cross-sectioned samples (e.g. Fig. 1e) of all experiments (full              to SeO2 occurs at logfO2 = \x014.2 (1200\
+      \ °C, 1 bar, DFMQ+4.2). In con- data in electronic supplement). Above 1200 °C we do not observe                  trast,\
+      \ S remains oxidized in the gas phase as SO2 to much lower any Te diffusion profiles, which implies that diffusion is\
+      \ not the               oxygen fugacities and the speciation in a water-free system rate-limiting factor of Te evaporation\
+      \ at high temperatures.                     changes to S2 and COS at logfO2 = \x0110.3 (1200 °C, 1 bar), which     In\
+      \ the low T runs (\x061250 °C) we observe occasional vesicles                  is equivalent to DFMQ\x011.9 (Fig. 4).\
+      \ (Fig. 1 c). However, we are not able to discern whether these bub-                   The redox dependent speciation\
+      \ of Te in aluminosilicate melts bles are remnants from bubbles in the starting glass (Fig. 1a & b), or           and\
+      \ glasses is unconstrained and data is needed. We infer the spe- whether they formed during the evaporation experiments.\
+      \ At                       ciation and oxidation state of Te by comparison with the better higher temperatures the melt\
+      \ viscosity decreases, and no bubbles                 constrained chalcogens S and Se. For S, X-ray absorption near-\
+      \ can be observed in the quenched samples (Fig. 1d).                               edge spectroscopy (XANES) identified\
+      \ two species, S6+ at oxidizing     Between 1000 and 1400 °C the Te loss increases as a function of              conditions\
+      \ above DFMQ+1, and S2\x01 below (Jugo et al., 2010; Wilke temperature (Fig. 2b). However, above 1400 °C, no further\
+      \ Te                     et al., 2011). The two species coexist only over a narrow fO2 range, depletion in the samples\
+      \ with increasing temperatures is observed.               where S has a solubility minimum in natural and synthetic\
+      \ glasses At the FMQ buffer, log(fTe) does not further decrease from 1350 to               (Backnaes and Deubener, 2011).\
+      \ Sulfur changes its oxidation state 1500 °C and reaches a minimum in the range of \x014 to \x013.3, which         \
+      \         from reduced to oxidized in silicate melts at \x033 logfO2 units above                                   \
+      \                                          39 \fC.J. Renggli, J.L. Hellmann, C. Burkhardt et al.                   \
+      \                                                            Geochimica et Cosmochimica Acta 339 (2022) 35–45"
+    panel_series_marker_counts:
+    - series: experimental samples (Table 1 runs)
+      marker_count: 36
+    identity:
+      species: Te
+      phase: glass
+      temperature_as_printed: 868–1459 °C experimental range
+    attribution: Renggli et al. (2022), current study; model calculations are identified in the printed caption.
+  context_id: renggli-2022-te-evaporation::context::renggli_2022_figure_2_context
+  work_id: 10.1016/j.gca.2022.10.032
+  source_id: renggli-2022-te-evaporation
+  species: Te
+- observation_id: renggli_2022_figure_3_context
+  type: figure_only
+  locator:
+    page: 5
+    pdf_page_index: 4
+    figure: '3'
+  units: as printed; no numeric points
+  values:
+    quantity: evaporation_loss_and_isotope_fractionation_context
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    axes_as_printed: experimental Te loss and isotope fractionation versus temperature and oxygen fugacity (panel axes as
+      printed)
+    caption_as_printed: Fig. 3. At 868–1181 °C and at 1353 °C the Te isotopic composition chips 1–4 as the reference composition
+      (Table 1).                                is not correlated with the oxygen fugacity, while at 1274 °C     We present
+      the Te isotopic compositions of the experiments as                D128/126Te increases with increasing fO2. However,
+      this is likely a D128/126Te, where the experimental data are normalized to the iso-               result of the strong
+      decrease in log(fTe) in these experiments topic composition of the initial mean (glass powder and glass                    (Fig.
+      2a), which in turn controls D128/126Te (Fig. 2c). chips) with d128/126Te = 0.28 ± 0.22 and [Te] = 6839 ± 1041 lg/g.
+    panel_series_marker_counts:
+    - series: experimental samples (Table 1 runs)
+      marker_count: 36
+    identity:
+      species: Te
+      phase: glass
+      temperature_as_printed: 868–1459 °C experimental range
+    attribution: Renggli et al. (2022), current study; model calculations are identified in the printed caption.
+  context_id: renggli-2022-te-evaporation::context::renggli_2022_figure_3_context
+  work_id: 10.1016/j.gca.2022.10.032
+  source_id: renggli-2022-te-evaporation
+  species: Te
+- observation_id: renggli_2022_figure_4_context
+  type: figure_only
+  locator:
+    page: 9
+    pdf_page_index: 8
+    figure: '4'
+  units: as printed; no numeric points
+  values:
+    quantity: gas_phase_speciation_context
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    axes_as_printed: calculated gas-phase speciation versus log fO2 at 1200 °C
+    caption_as_printed: "Fig. 4. Gas phase speciation of the chalcogen elements at 1200 °C, 1 bar, in a CO-CO2 atmosphere,\
+      \ as a function of logfO2. The vertical stippled lines indicate the oxygen fugacities of the Te evaporation experiments\
+      \ in air, and relative to the FMQ buffer. (a) Te; TeO2 is the predominant gas species at very high oxygen fugacities,\
+      \ whereas Te2 is the most abundant gas species at lower fO2. (b) Se; the transition from oxidized gas species (SeO2)\
+      \ to reduced species (Se2) occurs at slightly lower logfO2, compared to Te. (c) S; The speciation change of S occurs\
+      \ at much lower logfO2 (\x03FMQ\x012) compared to Te and Se. The complete speciation results at 1050, 1200, and 1300\
+      \ °C are provided in Supplement 2."
+    panel_series_marker_counts:
+    - series: Te gas species calculation
+      marker_count: 0
+    - series: Se gas species calculation
+      marker_count: 0
+    - series: S gas species calculation
+      marker_count: 0
+    identity:
+      species: Te, Se, S
+      phase: gas
+      temperature_as_printed: 1200 °C
+    attribution: Renggli et al. (2022), current study; model calculations are identified in the printed caption.
+  context_id: renggli-2022-te-evaporation::context::renggli_2022_figure_4_context
+  work_id: 10.1016/j.gca.2022.10.032
+  source_id: renggli-2022-te-evaporation
+  species: Te
+- observation_id: renggli_2022_figure_5_context
+  type: figure_only
+  locator:
+    page: 10
+    pdf_page_index: 9
+    figure: '5'
+  units: as printed; no numeric points
+  values:
+    quantity: equilibrium_constant_and_isotope_fractionation_context
+    method_class: figure_only
+    digitisation: deferred to a figure pass
+    axes_as_printed: (a) modified equilibrium constant K* versus temperature; (b) log(fTe) versus isotope-fractionation transform
+    caption_as_printed: "Fig. 5. (a) Modified equilibrium constant K* (Eq. (5)) of reaction (4) for the evaporation of TeO2\
+      \ from a melt at oxidizing conditions (in air) as a function of temperature. (b) Relationship between ln(fTe) vs 1000ln[(1\
+      \ + 10\x013d128/126Teres)/(1 + 10\x013d128/126Teini)] for experiments in air at 1196–1408 °C. The slope in the data\
+      \ relates to 1000(1 \x01 aK), where aK is the kinetic isotope fractionation between TeO2 in the gas phase and the residual\
+      \ TeO2 in the melt (aK = 0.99993)."
+    panel_series_marker_counts:
+    - series: (a) modified equilibrium constant calculation
+      marker_count: 0
+    - series: (b) air experiments
+      marker_count: 7
+    identity:
+      species: Te
+      phase: gas and glass
+      temperature_as_printed: variable; as plotted
+    attribution: Renggli et al. (2022), current study; model calculations are identified in the printed caption.
+  context_id: renggli-2022-te-evaporation::context::renggli_2022_figure_5_context
+  work_id: 10.1016/j.gca.2022.10.032
+  source_id: renggli-2022-te-evaporation
+  species: Te
+- observation_id: renggli_2022_table1_all_printed_cells
+  type: printed_data_context
+  locator:
+    page: 6
+    published_page: 40
+    pdf_page_index: 5
+    table: '1'
+  units: as printed
+  values:
+    quantity: experimental_conditions_and_results
+    method_class: measured_direct
+    note: Complete Table 1 transcription, including standards, starting materials, all experiment rows, isotope columns, fTe
+      ratios, log(fTe), and footnotes. The 36 experimental Te concentrations are also encoded as scored residue_ppm series
+      above.
+    table_as_printed: "Table 1\nExperimental conditions and results. In the text and figures we report the results as log(fTe),\
+      \ where fTe is the ratio of Te concentrations in the experiments to the glass powder\nstarting material DB02 (fTe =\
+      \ [Te]residue/[Te]initial). Isotopic compositions are reported as D128/126Te.\n\n      Lab-    Sample       Temp.a \
+      \      Weight     Log      DFMQ    Aliquotb   Te(lg/g)        Nc   d128/126Te      [Te]residue/[Te]initial   log   \
+      \  +2s.   \x012s.   D128/126\n                                                                                     \
+      \                                                                                          Te\n      ID      label \
+      \       (°C)         (mg)       (fO2)            (%)        (±2r)                (±2s.d.)d       (±2r)             \
+      \        (fTe)   d.     d.     (±2s.d.)\n      Te oxide\n      DB01 Te-ox_1                      6.3               \
+      \          0.1                        5    0.42 ± 0.02                                                     0.13 ± 0.22\n\
+      \      DC01 Te-ox_2                      8.7                         0.1                        4    0.43 ± 0.01   \
+      \                                                  0.14 ± 0.22\n      Starting material\n      DB02 Glass          \
+      \              20.6                        1.0        7589 ± 139      5    0.33 ± 0.01     1.11 ± 0.17             \
+      \  0.05    0.06   0.07   0.05 ± 0.22\n               powder\n      CO01 Glass_1                      11.9          \
+      \              0.5        6311 ± 175      5    0.09 ± 0.02     0.92 ± 0.14               \x010.03   0.06   0.07   \x01\
+      0.19 ± 0.22\n      DB03 Glass_2                      24.0                        1.0        6580 ± 110      5    0.30\
+      \ ± 0.01     0.96 ± 0.15               \x010.02   0.06   0.07   0.02 ± 0.22\n      CR01 Glass_3                    \
+      \  9.3                         1.0        6562 ± 183      5    0.37 ± 0.03     0.96 ± 0.15               \x010.02  \
+      \ 0.06   0.07   0.09 ± 0.22\n      DB04 Glass_4                      13.6                        1.0        7154 ± 145\
+      \      5    0.31 ± 0.02     1.05 ± 0.16               0.02    0.06   0.07   0.03 ± 0.22\n      Initial mean (±2s.d.)\
+      \                                                    6839 ± 1041     5    0.28 ± 0.22\n      Experiments at 868 °C\n\
+      \      DB05 Te_868a          868 ± 5     8.1        \x010.68    12.09   1.0        5874 ± 110      5    0.22 ± 0.02\
+      \     0.86 ± 0.13               \x010.07   0.06   0.07   \x010.07 ± 0.22\n      DB06 Te_868c          868 ± 5     8.2\
+      \        \x0112.77   0.00    1.0        7661 ± 159      5    0.32 ± 0.01     1.12 ± 0.17               0.05    0.06\
+      \   0.07   0.04 ± 0.22\n      Experiments at 1012 °C\n      DB07 Te_1012a         1012 ± 5    11.7       \x010.68  \
+      \  9.68    1.0        4573 ± 70       5    0.21 ± 0.01     0.67 ± 0.10               \x010.17   0.06   0.07   \x010.07\
+      \ ± 0.22\n      DB08 Te_1012b         1012 ± 5    8.4        \x018.86    1.50    1.0        7237 ± 127      5    0.19\
+      \ ± 0.01     1.06 ± 0.16               0.02    0.06   0.07   \x010.09 ± 0.22\n      DB09 Te_1012c         1012 ± 5 \
+      \   14.4       \x0110.36   0.00    1.0        5679 ± 75       5    0.18 ± 0.01     0.83 ± 0.13               \x010.08\
+      \   0.06   0.07   \x010.10 ± 0.22\n      DB10 Te_1012d         1012 ± 5    10.1       \x0112.36   \x012.00   1.0   \
+      \     6519 ± 95       5    0.29 ± 0.01     0.95 ± 0.15               \x010.02   0.06   0.07   0.00 ± 0.22\n      DB11\
+      \ Te_1012e         1012 ± 5    15.7       \x0114.36   \x014.00   1.0        4141 ± 55       5    0.07 ± 0.01     0.61\
+      \ ± 0.09               \x010.22   0.06   0.07   \x010.22 ± 0.22\n      DB12 Te_1012f         1012 ± 5    18.0      \
+      \ \x0116.36   \x016.00   1.0        5801 ± 109      4    0.23 ± 0.01     0.85 ± 0.13               \x010.07   0.06 \
+      \  0.07   \x010.06 ± 0.22\n      Experiments at 1181 °C\n      CO08 Te_1181a         1181 ± 5    19.3       \x010.68\
+      \    7.73    1.1        1507 ± 64       5    \x010.09 ± 0.01    0.22 ± 0.03               \x010.66   0.06   0.07   \x01\
+      0.38 ± 0.22\n      CO09 Te_1181b         1181 ± 5    5.5        \x016.91    1.50    1.7        1053 ± 31       5   \
+      \ 0.24 ± 0.01     0.15 ± 0.02               \x010.81   0.06   0.07   \x010.04 ± 0.22\n      DB13 Te_1181c         1181\
+      \ ± 5    9.1        \x018.41    0.00    5.0        1326 ± 34       4    0.33 ± 0.01     0.19 ± 0.03               \x01\
+      0.71   0.06   0.07   0.04 ± 0.22\n      CO10 Te_1181d         1181 ± 5    6.2        \x0110.41   \x012.00   1.7    \
+      \    1026 ± 24       5    0.22 ± 0.02     0.15 ± 0.02               \x010.82   0.06   0.07   \x010.06 ± 0.22\n     \
+      \ CO11 Te_1181e         1181 ± 5    13.3       \x0112.41   \x014.00   0.5        1905 ± 58       5    \x010.12 ± 0.01\
+      \    0.28 ± 0.04               \x010.56   0.06   0.07   \x010.40 ± 0.22\n      CO12 Te_1181f         1181 ± 5    15.9\
+      \       \x0114.41   \x016.00   0.3        2236 ± 70       5    \x010.03 ± 0.03    0.33 ± 0.05               \x010.49\
+      \   0.06   0.07   \x010.31 ± 0.22\n      DB14 Te_1181f         1181 ± 5    6.5        \x0114.41   \x016.00   5.0   \
+      \     1331 ± 33       4    0.52 ± 0.02     0.19 ± 0.03               \x010.71   0.06   0.07   0.24 ± 0.22\n        \
+      \       (rep.)\n      Experiments at 1196 °C\n      DB15 Te_1196a         1196 ± 5    27.9       \x010.68    7.16  \
+      \  5.0        1364 ± 103      3    0.90 ± 0.01     0.20 ± 0.03               \x010.70   0.07   0.08   0.62 ± 0.22\n\
+      \      CR02 Te_1196c         1196 ± 5    11.0       \x017.84    0.00    5.1        339 ± 6         5    0.81 ± 0.02\
+      \     0.050 ± 0.008             \x011.31   0.06   0.07   0.52 ± 0.22\n      Experiments at 1274 °C\n      CO02 Te_1274a\
+      \         1274 ± 5    17.6       \x010.68    6.62    11         47.6 ± 1.8      5    1.18 ± 0.02     0.0070 ± 0.0011\
+      \           \x012.16   0.06   0.07   0.89 ± 0.22\n      CO03 Te_1274b         1274 ± 5    7.0        \x015.80    1.50\
+      \    17         71.8 ± 2.2      5    1.15 ± 0.01     0.0105 ± 0.0016           \x011.98   0.06   0.07   0.86 ± 0.22\n\
+      \      CO04 Te_1274c         1274 ± 5    6.0        \x017.30    0.00    32         23.9 ± 0.9      5    1.40 ± 0.02\
+      \     0.0035 ± 0.0005           \x012.46   0.06   0.07   1.12 ± 0.22\n      CO05 Te_1274d         1274 ± 5    6.7  \
+      \      \x019.30    \x012.00   8.1        197 ± 5         5    0.58 ± 0.02     0.029 ± 0.004             \x011.54   0.06\
+      \   0.07   0.29 ± 0.22\n      CO06 Te_1274e         1274 ± 5    6.0        \x0111.30   \x014.00   6.8        361 ± 12\
+      \        5    0.62 ± 0.02     0.053 ± 0.008             \x011.28   0.06   0.07   0.34 ± 0.22\n      CO07 Te_1274f  \
+      \       1274 ± 5    9.5        \x0113.30   \x016.00   2.5        581 ± 18        5    0.33 ± 0.01     0.085 ± 0.013\
+      \             \x011.07   0.06   0.07   0.05 ± 0.22\n      Experiments at 1301 °C\n      CR03 Te_1301c         1301 ±\
+      \ 5    4.7        \x016.79    0.00    100        3.2 ± 1.5       1    0.85 ± 0.03     0.00047 ± 0.00023         \x01\
+      3.33   0.17   0.29   0.56 ± 0.22\n      Experiments at 1353 °C\n      CR04 Te_1353a         1353 ± 5    9.5        \x01\
+      0.68    5.62    100        0.7 ± 0.2       1    1.41 ± 0.03     0.00010 ± 0.00003         \x014.01   0.12   0.16   1.12\
+      \ ± 0.22\n      CR05 Te_1353b         1353 ± 5    18.2       \x014.80    1.50    100        2.0 ± 0.4       1    1.59\
+      \ ± 0.03     0.00030 ± 0.00007         \x013.53   0.09   0.12   1.31 ± 0.22\n      DB20 Te_1353b         1353 ± 5  \
+      \  25.5       \x014.80    1.50    100        3.3 ± 0.1       5    1.56 ± 0.03     0.00049 ± 0.00008         \x013.31\
+      \   0.06   0.07   1.28 ± 0.22\n               (rep.)\n      CR06 Te_1353c         1353 ± 5    11.2       \x016.30  \
+      \  0.00    100        1.1 ± 0.2       1    1.75 ± 0.03     0.00016 ± 0.00004         \x013.79   0.09   0.11   1.47 ±\
+      \ 0.22\n      CR07 Te_1353d         1353 ± 5    8.1        \x018.30    \x012.00   100        60.3 ± 1.7      5    1.49\
+      \ ± 0.02     0.0088 ± 0.0014           \x012.05   0.06   0.07   1.21 ± 0.22\n      CR08 Te_1353e         1353 ± 5  \
+      \  7.7        \x0110.30   \x014.00   100        61.3 ± 3.9      5    1.34 ± 0.01     0.0090 ± 0.0015           \x01\
+      2.05   0.07   0.08   1.06 ± 0.22\n      CR09 Te_1353f         1353 ± 5    12.1       \x0112.30   \x016.00   100    \
+      \    13.3 ± 3.9      5    1.50 ± 0.03     0.0019 ± 0.0006           \x012.71   0.13   0.18   1.21 ± 0.22\n      Experiments\
+      \ at 1408 °C\n      DB22 Te_1408a         1408 ± 5    14.4       \x010.68    5.16    100        1.4 ± 0.1       1  \
+      \  1.36 ± 0.03     0.00020 ± 0.00003         \x013.69   0.06   0.07   1.08 ± 0.22\n      CR10 Te_1408c         1408\
+      \ ± 5    10.3       \x015.84    0.00    100        1.1 ± 0.1       1    1.28 ± 0.03     0.00016 ± 0.00003         \x01\
+      3.80   0.06   0.08   0.99 ± 0.22\n      DB23 Te_1408c         1408 ± 5    27.1       \x015.84    0.00    100       \
+      \ 3.6 ± 0.2       4    1.46 ± 0.03     0.00053 ± 0.00009         \x013.28   0.07   0.08   1.18 ± 0.22\n            \
+      \   (rep.)\n      Experiments at 1459 °C\n      CR11 Te_1459c         1459 ± 5    8.5        \x015.40    0.00    100\
+      \        1.8 ± 0.3       1    1.44 ± 0.03     0.00026 ± 0.00006         \x013.59   0.09   0.12   1.15 ± 0.22\n     \
+      \ DB24 Te_1459c         1459 ± 5    35.0       \x015.40    0.00    100        3.9 ± 0.2       5    1.39 ± 0.01     0.00056\
+      \ ± 0.00009         \x013.25   0.07   0.08   1.11 ± 0.22\n               (rep.)\n  a\n    Corrected sample temperature.\n\
+      \  b\n    Aliquot used for Te isotope measurements using MC-ICPMS.\n  c\n    Number of analyses of the same sample digestion.\n\
+      \  d\n    For single measurements (n = 1) a maximum uncertainty of ±0.03 was estimated based on samples that were measured\
+      \ multiple times (n = 3–5).\n\n\n\n\nthe reduced to oxidized transition in the gas phase speciation                \
+      \               at a similar fO2 as Se, we infer that the redox change in the silicate\n(DFMQ+1 vs DFMQ\x011.9). Selenium\
+      \ is reduced as Se2\x01 below an                                   melt from Te2\x01 to Te4+ occurs at a similar fO2\
+      \ around DFMQ+2 to\noxidation transition in the range of DFMQ+1 – DFMQ+4 to Se4+, fol-                           DFMQ+6.\
+      \ We therefore suggest the evaporation reaction of Te at\nlowed by an additional oxidation step to Se6+ above DFMQ+9\
+      \                                   fO2 > DFMQ+4 as:\n(Wykes, 2014). Since Te changes its oxidation state in the gas\
+      \ phase\n\n                                                                                       40\n\fC.J. Renggli,\
+      \ J.L. Hellmann, C. Burkhardt et al.                                                                           Geochimica\
+      \ et Cosmochimica Acta 339 (2022) 35–45"
+  context_id: renggli-2022-te-evaporation::context::renggli_2022_table1_all_printed_cells
+  work_id: 10.1016/j.gca.2022.10.032
+  source_id: renggli-2022-te-evaporation
+  species: Te
