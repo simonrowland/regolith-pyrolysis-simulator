@@ -47,6 +47,29 @@ def test_table2_valence_cells_render_pins_and_migrate_with_conditions() -> None:
     assert len(points) == 32
     assert all(isinstance(point["value"], str) for point in points)
     assert all(point["value"] == point["as_printed"].rstrip("%") for point in points)
+    assert points[0]["locator"]["page"] == 4
+    assert points[0]["locator"]["published_page"] == 322
+    assert points[0]["locator"]["pdf_page_index"] == 3
+
+    locators = []
+
+    def collect_locators(value: object) -> None:
+        if isinstance(value, dict):
+            if "page" in value and "pdf_page_index" in value:
+                locators.append(value)
+            for item in value.values():
+                collect_locators(item)
+        elif isinstance(value, list):
+            for item in value:
+                collect_locators(item)
+
+    collect_locators(document)
+    assert len(locators) == 184
+    assert all(
+        locator["page"] == locator["pdf_page_index"] + 1
+        and "published_page" in locator
+        for locator in locators
+    )
     assert all(
         (point["point_conditions"]["atmosphere"]["state"]["value"] == "N2")
         == (point["quench_status"]["state"]["value"] == "not_stated")
