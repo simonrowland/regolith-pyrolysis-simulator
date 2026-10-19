@@ -5761,8 +5761,8 @@ species:
           negative_excess_chemical_potential_kJ_mol_as_printed:
           - '94.51'
           - '24.56'
-          - 17.21 54.05
-          delta_G_kJ_as_printed: '41.13'
+          - '17.21'
+          delta_G_kJ_as_printed: '54.05'
           delta_G_excess_kJ_as_printed: '41.13'
         - composition_mole_fraction:
             BaO: '0.30'
@@ -6276,8 +6276,9 @@ species:
           delta_G_excess_kJ_as_printed: '58.90'
         note: These are the authors’ equation-derived thermodynamic values, not formation enthalpies or formation
           Gibbs energies. The source column headers print negative chemical potentials. The born-digital text layer
-          turned seven minus signs into the digit 3 and omitted one separator between the final cells; all nine affected
-          numeric entries were corrected against the 600 dpi renders. Activity values are scored separately.
+          turned seven minus signs into the digit 3; the 0.30/0.10/0.60 composition at 1730 K also had missing
+          separators between the SiO2 excess potential and ΔG cells. These seven signs and three cells were checked
+          and corrected against the 600 dpi renders. Activity values are scored separately.
     - observation_id: tyurnina_2008_appearance_energies
       type: measurement_context
       locator:

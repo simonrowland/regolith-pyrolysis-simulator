@@ -37,6 +37,9 @@ def test_tyurnina_activities_migrate_with_temperature_series_and_composition():
     assert unsupported[56]["negative_excess_chemical_potential_kJ_mol_as_printed"][2] == "−7.04"
     assert unsupported[58]["negative_excess_chemical_potential_kJ_mol_as_printed"][2] == "−18.75"
     assert unsupported[59]["negative_excess_chemical_potential_kJ_mol_as_printed"][2] == "−14.44"
+    assert unsupported[25]["negative_excess_chemical_potential_kJ_mol_as_printed"][2] == "17.21"
+    assert unsupported[25]["delta_G_kJ_as_printed"] == "54.05"
+    assert unsupported[25]["delta_G_excess_kJ_as_printed"] == "41.13"
 
     migrator = Migrator(
         root=ROOT,
