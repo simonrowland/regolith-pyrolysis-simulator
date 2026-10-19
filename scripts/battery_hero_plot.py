@@ -187,6 +187,14 @@ class ScorePlotData:
     bin_width_K: float
 
 
+def _d139_exclusion_counts(data: ScorePlotData) -> tuple[tuple[str, int], ...]:
+    return tuple(
+        (engine, summary.excluded_d139_rows)
+        for engine in data.engines
+        if (summary := data.summaries[engine]).excluded_d139_rows
+    )
+
+
 @dataclass(frozen=True)
 class ElementAbundance:
     feedstock_id: str
@@ -2569,6 +2577,17 @@ def render_hero_charts(
                 " ThermoEngine comparison caveat: 140/147 rows pair pure-solid "
                 "data with its pure-liquid model reference; main's fix is pending."
             )
+        if rail == Rail.VAPOUR.value:
+            d139_counts = _d139_exclusion_counts(data)
+            if d139_counts:
+                counts = ", ".join(
+                    f"{engine} {_compact_count(count)}"
+                    for engine, count in d139_counts
+                )
+                caption += (
+                    "\nVapour scatter excludes uncalibrated KEMS p_partial rows "
+                    f"under d-139: {counts}; scorer all-numeric and same-row RMS include them."
+                )
         figure.text(
             0.5,
             0.018,
@@ -2630,9 +2649,8 @@ def render_plots(
         render_date=render_date,
     )
     d139_exclusions = [
-        f"{engine} {data.summaries[engine].excluded_d139_rows:,} uncalibrated KEMS p_partial"
-        for engine in data.engines
-        if data.summaries[engine].excluded_d139_rows
+        f"{engine} {count:,} uncalibrated KEMS p_partial"
+        for engine, count in _d139_exclusion_counts(data)
     ]
     if d139_exclusions:
         footer += "  |  excluded under d-139: " + ", ".join(d139_exclusions)
