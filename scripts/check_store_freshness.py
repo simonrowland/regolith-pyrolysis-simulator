@@ -137,6 +137,14 @@ CODE_INPUTS = (
 #     hard_issues=3334; j01 7/7). This acknowledges STORE outputs only; the
 #     scoring change (cell-balance residuals per engine) is covered by the
 #     commits' tests.
+#   b1d82d91d, a571c4a70: Stolyarova 1996 extraction.method text only.
+#     The sentences say the authors calculated p_O, p'_O and p''_O via
+#     Eqs. (7)–(9) (published p. 19; Table 2 footnote a, p. 20) from ion
+#     currents, Gurvich K and Mann cross-sections, and that the row inputs
+#     are not printed. Migration does not copy extraction.method into the
+#     store. A full regen at a571c4a70 was byte-identical to store commit
+#     d6fad0b93 (rows_in=51641 observations=128946 works=371 experiments=3863
+#     queue=88788 hard_issues=3268; git diff empty under store outputs).
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "80fad2bfa",
     "09c498b65",
@@ -147,6 +155,7 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "8d90cc936",
     "f522e152c", "da3640753", "e84b44277",
     "554fd0e07", "b746bcf30", "3a27c5abd",
+    "b1d82d91d", "a571c4a70",
 })
 
 
