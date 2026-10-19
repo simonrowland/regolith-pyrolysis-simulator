@@ -74,6 +74,9 @@ from simulator.diagnostic_helpers.species_rail import (  # noqa: E402
 )
 from simulator.feedstock_composition import resolve_feedstock_composition  # noqa: E402
 from simulator.battery.score import (  # noqa: E402
+    _battery_hero_binned_score_records,
+    _battery_hero_facet,
+    _battery_hero_minor_foulant_facets,
     _flagged_payload_strata,
     _battery_hero_sio2_mole_fraction,
     _battery_hero_sweet_spot_records,
@@ -116,11 +119,10 @@ TIER_STYLES: dict[str, dict[str, Any]] = {
 class EngineSummary:
     scored_rows: int = 0
     unique_points: int = 0
+    rms_dex: float | None = None
     species: set[str] = field(default_factory=set)
     min_temperature_K: float | None = None
     max_temperature_K: float | None = None
-    residual_square_sum: float = 0.0
-    rms_count: int = 0
     refusals: Counter[str] = field(default_factory=Counter)
     refused_by_rail: Counter[str] = field(default_factory=Counter)
     not_observable_by_rail: Counter[str] = field(default_factory=Counter)
@@ -129,13 +131,6 @@ class EngineSummary:
     missing_identity_rows: int = 0
     source_relations: Counter[str] = field(default_factory=Counter)
     versions: set[str] = field(default_factory=set)
-
-    @property
-    def rms_dex(self) -> float | None:
-        if not self.rms_count:
-            return None
-        return math.sqrt(self.residual_square_sum / self.rms_count)
-
 
 @dataclass(frozen=True)
 class BinPoint:
@@ -179,6 +174,7 @@ class ScorePlotData:
     hero_sweet_spot_cells: Mapping[
         tuple[str, str], tuple[Mapping[str, object], ...]
     ]
+    element_series: Mapping[tuple[str, str], tuple[BinPoint, ...]]
     x_limits: tuple[float, float]
     bin_width_K: float
 
@@ -190,12 +186,29 @@ class ElementAbundance:
     feedstock_elements: frozenset[str]
 
 
-@dataclass
-class _BinAccumulator:
-    residual_sum: float = 0.0
-    temperature_sum: float = 0.0
-    n: int = 0
-    flagged: bool = False
+def _bin_point_from_score_record(record: Mapping[str, object]) -> BinPoint:
+    return BinPoint(
+        bin_index=int(record["bin_index"]),
+        temperature_K=float(record["temperature_K"]),
+        residual_dex=float(record["residual_dex"]),
+        n=int(record["n"]),
+        flagged=bool(record["flagged"]),
+        composition_key=str(record["composition_key"]),
+        composition_label=str(record["composition_label"]),
+        observable=str(record["observable"]),
+        composition_sio2_mole_fraction=_finite_float(
+            record.get("composition_sio2_mole_fraction")
+        ),
+    )
+
+
+def _bin_points_by_key(
+    records: Mapping[tuple[str, ...], Sequence[Mapping[str, object]]],
+) -> dict[tuple[str, ...], tuple[BinPoint, ...]]:
+    return {
+        key: tuple(_bin_point_from_score_record(record) for record in points)
+        for key, points in records.items()
+    }
 
 
 def _state_value(value: object) -> object | None:
@@ -318,20 +331,6 @@ def _row_observable(row: Mapping[str, Any]) -> str:
     if "fe3" in normalized and ("sumfe" in normalized or "totalfe" in normalized):
         return "Fe3+/sumFe"
     return value
-
-
-def _hero_facet(rail: str, formula: str, observable: str) -> str:
-    if rail == Rail.REDOX.value:
-        return observable if observable != "unknown" else "unknown observable"
-    return formula if formula else "unknown species"
-
-
-def _minor_foulant_facets(formula: str) -> tuple[str, ...]:
-    elements = set(parse_formula_elements(formula) or ())
-    facets = [f"minor:{element}" for element in ("P", "S", "Cl", "C") if element in elements]
-    if elements.intersection({"Na", "K"}):
-        facets.append("minor:alkali_salts")
-    return tuple(facets)
 
 
 def _finite_float(value: object) -> float | None:
@@ -680,9 +679,9 @@ def read_scores(
                         identity = _row_identity(row)
                         composition_key, _composition_label = _composition_fields(identity)
                         observable = _row_observable(row)
-                        facets = [_hero_facet(rail, formula, observable)]
+                        facets = [_battery_hero_facet(rail, formula, observable)]
                         if rail == Rail.VAPOUR.value:
-                            facets.extend(_minor_foulant_facets(formula))
+                            facets.extend(_battery_hero_minor_foulant_facets(formula))
                         for facet in facets:
                             hero_refusals[
                                 (rail, facet, composition_key, engine, reason)
@@ -807,121 +806,24 @@ def read_scores(
         database.commit()
         if stamp is None:
             raise ValueError(f"{path}: empty score file")
-
-        bins: dict[
-            tuple[str, str, str, str, str, str, int], _BinAccumulator
-        ] = {}
-        hero_bins: dict[
-            tuple[str, str, str, str, str, str, int], _BinAccumulator
-        ] = {}
-        for row in database.execute(
-            """SELECT engine, species, rail, composition_key, composition_label,
-                      observable, MIN(temperature_K),
-                      MAX(flagged),
-                      AVG(residual_dex)
-                 FROM scored
-                GROUP BY engine, species, rail, composition_key, composition_label,
-                         observable, experiment, temperature_key
-                ORDER BY engine, species, rail, composition_key, observable,
-                         MIN(temperature_K)""",
-        ):
-            (
-                engine,
-                formula,
-                rail,
-                composition_key,
-                composition_label,
-                observable,
-                temperature,
-                flagged,
-                residual,
-            ) = row
-            if rail in selected:
-                summary = summaries[engine]
-                summary.unique_points += 1
-                summary.residual_square_sum += float(residual) ** 2
-                summary.rms_count += 1
-            bin_index = math.floor(float(temperature) / bin_width_K)
-            if rail in selected:
-                key = (
-                    engine,
-                    formula,
-                    rail,
-                    composition_key,
-                    composition_label,
-                    observable,
-                    bin_index,
-                )
-                accumulator = bins.setdefault(key, _BinAccumulator())
-                accumulator.residual_sum += float(residual)
-                accumulator.temperature_sum += float(temperature)
-                accumulator.n += 1
-                accumulator.flagged = accumulator.flagged or bool(flagged)
-            if rail in HERO_RAILS:
-                facets = [_hero_facet(rail, formula, observable)]
-                if rail == Rail.VAPOUR.value:
-                    facets.extend(_minor_foulant_facets(formula))
-                for facet in facets:
-                    key = (
-                        rail,
-                        facet,
-                        engine,
-                        composition_key,
-                        composition_label,
-                        observable,
-                        bin_index,
-                    )
-                    accumulator = hero_bins.setdefault(key, _BinAccumulator())
-                    accumulator.residual_sum += float(residual)
-                    accumulator.temperature_sum += float(temperature)
-                    accumulator.n += 1
-                    accumulator.flagged = accumulator.flagged or bool(flagged)
+        binned_records = _battery_hero_binned_score_records(
+            database,
+            selected_rails=selected_rails,
+            hero_rails=HERO_RAILS,
+            bin_width_K=bin_width_K,
+            composition_sio2_by_key=hero_composition_sio2,
+        )
         database.close()
 
     if stamp is None:
         raise ValueError(f"{path}: missing battery store stamp")
-
-    grouped: dict[tuple[str, str, str], list[BinPoint]] = defaultdict(list)
-    for key, accumulator in bins.items():
-        engine, formula, rail, composition_key, composition_label, observable, bin_index = key
-        grouped[(engine, formula, rail)].append(
-            BinPoint(
-                bin_index=bin_index,
-                temperature_K=accumulator.temperature_sum / accumulator.n,
-                residual_dex=accumulator.residual_sum / accumulator.n,
-                n=accumulator.n,
-                flagged=accumulator.flagged,
-                composition_key=composition_key,
-                composition_label=composition_label,
-                observable=observable,
-            )
-        )
-    series = {
-        key: tuple(sorted(points, key=lambda point: point.bin_index))
-        for key, points in grouped.items()
-    }
-    hero_grouped: dict[tuple[str, str, str, str], list[BinPoint]] = defaultdict(list)
-    for key, accumulator in hero_bins.items():
-        rail, facet, engine, composition_key, composition_label, observable, bin_index = key
-        hero_grouped[(rail, facet, engine, composition_key)].append(
-            BinPoint(
-                bin_index=bin_index,
-                temperature_K=accumulator.temperature_sum / accumulator.n,
-                residual_dex=accumulator.residual_sum / accumulator.n,
-                n=accumulator.n,
-                flagged=accumulator.flagged,
-                composition_key=composition_key,
-                composition_label=composition_label,
-                observable=observable,
-                composition_sio2_mole_fraction=hero_composition_sio2.get(
-                    composition_key
-                ),
-            )
-        )
-    hero_series = {
-        key: tuple(sorted(points, key=lambda point: point.bin_index))
-        for key, points in hero_grouped.items()
-    }
+    summary_records = binned_records["summaries"]
+    for engine, record in summary_records.items():
+        summaries[engine].unique_points = int(record["unique_points"])
+        summaries[engine].rms_dex = float(record["rms_dex"])
+    series = _bin_points_by_key(binned_records["series"])
+    hero_series = _bin_points_by_key(binned_records["hero_series"])
+    element_series = _bin_points_by_key(binned_records["element_series"])
     engines = tuple(sorted(summaries, key=lambda name: (name != "openimcc", name.casefold())))
     all_temperatures = [
         summary.min_temperature_K
@@ -972,6 +874,7 @@ def read_scores(
             key: tuple(cells)
             for key, cells in sorted(hero_sweet_spot_groups.items())
         },
+        element_series=element_series,
         x_limits=x_limits,
         bin_width_K=bin_width_K,
     )
@@ -1283,57 +1186,12 @@ def _plot_y(value: float) -> float:
     return min(Y_LIMITS[1], max(Y_LIMITS[0], value))
 
 
-@dataclass
-class _ElementAccumulator:
-    residual_sum: float = 0.0
-    temperature_sum: float = 0.0
-    n: int = 0
-    flagged: bool = False
-
-
 def element_view_series(
     data: ScorePlotData,
 ) -> dict[tuple[str, str], tuple[BinPoint, ...]]:
-    """Pool deduplicated species observations by each element they carry."""
+    """Return the scorer-owned pooled element rows for drawing."""
 
-    bins: dict[tuple[str, str, str, str, int], _ElementAccumulator] = {}
-    for (engine, formula, _rail), points in data.series.items():
-        elements = parse_formula_elements(formula) or ()
-        for element in set(elements):
-            for point in points:
-                accumulator = bins.setdefault(
-                    (
-                        engine,
-                        element,
-                        point.composition_key,
-                        point.composition_label,
-                        point.bin_index,
-                    ),
-                    _ElementAccumulator(),
-                )
-                accumulator.residual_sum += point.residual_dex * point.n
-                accumulator.temperature_sum += point.temperature_K * point.n
-                accumulator.n += point.n
-                accumulator.flagged = accumulator.flagged or point.flagged
-
-    grouped: dict[tuple[str, str], list[BinPoint]] = defaultdict(list)
-    for (engine, element, composition_key, composition_label, bin_index), accumulator in bins.items():
-        grouped[(engine, element)].append(
-            BinPoint(
-                bin_index=bin_index,
-                temperature_K=accumulator.temperature_sum / accumulator.n,
-                residual_dex=accumulator.residual_sum / accumulator.n,
-                n=accumulator.n,
-                flagged=accumulator.flagged,
-                composition_key=composition_key,
-                composition_label=composition_label,
-                observable="pooled",
-            )
-        )
-    return {
-        key: tuple(sorted(points, key=lambda point: point.bin_index))
-        for key, points in grouped.items()
-    }
+    return dict(data.element_series)
 
 
 def _major_elements(formula: str, abundance: ElementAbundance) -> tuple[str, ...]:
