@@ -242,6 +242,74 @@ def test_latex_numeric_cells_convert_and_compare(tmp_path: Path) -> None:
     assert [row["status"] for row in compared] == ["presence-only"] * 3
 
 
+def test_compare_typed_transition_temperature_in_cr_unqualified_table(
+    tmp_path: Path,
+) -> None:
+    csv_path = tmp_path / "p002-t01.csv"
+    with csv_path.open("w", encoding="utf-8", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=draft._CSV_FIELDS)
+        writer.writeheader()
+        writer.writerow({
+            "row": 1, "column": 1, "row_type": "header", "text": "Mineral",
+            "value_text": "Mineral", "mark": "", "numeric_column": 0,
+            "origin_row": 1, "origin_column": 1, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+        writer.writerow({
+            "row": 1, "column": 2, "row_type": "header", "text": "T_melt, K",
+            "value_text": "T_melt, K", "mark": "", "numeric_column": 1,
+            "origin_row": 1, "origin_column": 2, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+        writer.writerow({
+            "row": 2, "column": 1, "row_type": "body", "text": "CA",
+            "value_text": "CA", "mark": "", "numeric_column": 0,
+            "origin_row": 2, "origin_column": 1, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+        writer.writerow({
+            "row": 2, "column": 2, "row_type": "body", "text": "1877",
+            "value_text": "1877", "mark": "", "numeric_column": 1,
+            "origin_row": 2, "origin_column": 2, "rowspan": 1, "colspan": 1,
+            "flags": "[]",
+        })
+    index_path = tmp_path / "index.yaml"
+    index_path.write_text(yaml.safe_dump({
+        "tables": [{
+            "table_key": "p002-t01",
+            "pdf_page": 2,
+            "csv": csv_path.name,
+            "columns": [{"column": 2, "header": "T_melt, K"}],
+        }],
+    }))
+    extract = {
+        "species": {
+            "CaAl2O4": {
+                "observations": [{
+                    "observation_id": "transition_p002_t01_r02_c02",
+                    "type": "transition_point",
+                    "phase": "cr",
+                    "locator": {
+                        "pdf_page_index": 1,
+                        "table": "1",
+                    },
+                    "units": "K",
+                    "values": {
+                        "quantity": "transition_temperature",
+                        "T_m_K": "1877",
+                    },
+                }],
+            },
+        },
+    }
+
+    compared = draft.compare_extract_to_draft(extract, index_path)
+
+    assert [row["status"] for row in compared] == ["matched"]
+    assert compared[0]["matched_cell"]["row"] == 2
+    assert compared[0]["matched_cell"]["column"] == 2
+
+
 def test_nazarov_table_2_rowspan_temperature_header_is_not_a_body_row(
     tmp_path: Path,
 ) -> None:

@@ -1,0 +1,1520 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2015-cai-mineral-thermodynamics
+source:
+  citation: Shornikov and Yakovlev (2015), High-Temperature Thermodynamic Properties of CAI Minerals, 46th Lunar
+    and Planetary Science Conference, abstract 1270.
+  year: 2015
+  doi: null
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-18'
+  worker: w4a2-1018
+  provenance_path: data/literature/extracts/shornikov-2015-cai-mineral-thermodynamics-audit.md
+review_status: draft
+skipped_empty_or_dash:
+  total: 0
+  tables:
+  - page: 2
+    table_index: 1
+    count: 0
+species:
+  CaAl2O4:
+    observations:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r02_c04
+      type: transition_point
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: CA
+        column_header: $T_{melt}$ , K
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1877'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell; this is the reported transition temperature.
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        T_m_K: '1877'
+        property_kind: melting_point
+      phase: cr
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r02_c05
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: CA
+        column_header: $\Delta H_{melt}$ , kJ/mole
+      units: kJ/mole
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        value: '31.90'
+        T_fus_K: '1877'
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1877'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell for calcium aluminate; heat of fusion is associated with the liquid-phase
+              temperature where the cell has two entries.
+    context:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_oxide_formation_parameters
+      type: oxide_component_formation_thermodynamic_parameters
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: Table 1 ΔH_T and ΔS_T columns; the equation explaining these terms is Eq. (4).
+      units: ΔH_T in kJ/mole; ΔS_T in J/(mole·K) as printed
+      values:
+        quantity: delta_GT_parameters_for_oxide_component_formation
+        species_scope_as_printed: all twelve minerals in Table 1
+        method_class: quoted_attributed
+        attribution_as_printed: '[11–17]'
+        phase_as_printed: crystalline state
+        temperature_dependence_as_printed: ΔG_T = ΔH_T – T ΔS_T
+        reaction_as_printed: ΔG° = ∑ n_i ΔG°_i + ΔG_T ∑ n_i
+        reaction_terms_as_printed: >-
+          ΔG°_i is the standard Gibbs energy of formation of the i-th oxide;
+          n_i are the oxide mole numbers in the mineral.
+        assumption_as_printed: >-
+          ΔH_T and ΔS_T are assumed constant over a limited temperature
+          interval; numeric bounds are not printed.
+        rows:
+          - row_label: CA
+            mineral: calcium aluminate
+            formula: CaAl2O4
+            delta_H_T_kJ_per_mole: '-8.91'
+            delta_S_T_J_per_mole_K: '11.10'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: CA}
+          - row_label: CA2
+            mineral: grossite
+            formula: CaAl4O7
+            delta_H_T_kJ_per_mole: '-6.34'
+            delta_S_T_J_per_mole_K: '9.94'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: CA2}
+          - row_label: CA6
+            mineral: hibonite
+            formula: CaAl12O19
+            delta_H_T_kJ_per_mole: '-2.88'
+            delta_S_T_J_per_mole_K: '5.00'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: CA6}
+          - row_label: CT
+            mineral: perovskite
+            formula: CaTiO3
+            delta_H_T_kJ_per_mole: '-39.51'
+            delta_S_T_J_per_mole_K: '2.87'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: CT}
+          - row_label: MA
+            mineral: magnesium spinel
+            formula: MgAl2O4
+            delta_H_T_kJ_per_mole: '-13.29'
+            delta_S_T_J_per_mole_K: '4.38'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: MA}
+          - row_label: MS
+            mineral: enstatite
+            formula: MgSiO3
+            delta_H_T_kJ_per_mole: '-10.28'
+            delta_S_T_J_per_mole_K: '-0.07'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: MS}
+          - row_label: M2S
+            mineral: forsterite
+            formula: Mg2SiO4
+            delta_H_T_kJ_per_mole: '-21.76'
+            delta_S_T_J_per_mole_K: '-0.92'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: M2S}
+          - row_label: CMS2
+            mineral: diopside
+            formula: CaMgSi2O6
+            delta_H_T_kJ_per_mole: '-36.55'
+            delta_S_T_J_per_mole_K: '-3.15'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: CMS2}
+          - row_label: C2MS2
+            mineral: akermanite
+            formula: Ca2MgSi2O7
+            delta_H_T_kJ_per_mole: '-36.43'
+            delta_S_T_J_per_mole_K: '-2.41'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: C2MS2}
+          - row_label: C2AS
+            mineral: gehlenite
+            formula: Ca2Al2SiO7
+            delta_H_T_kJ_per_mole: '-37.33'
+            delta_S_T_J_per_mole_K: '2.11'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: C2AS}
+          - row_label: CAS2
+            mineral: anorthite
+            formula: CaAl2Si2O8
+            delta_H_T_kJ_per_mole: '-26.70'
+            delta_S_T_J_per_mole_K: '-1.10'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: CAS2}
+          - row_label: C3AS3
+            mineral: grossular
+            formula: Ca3Al2Si3O12
+            delta_H_T_kJ_per_mole: '-47.70'
+            delta_S_T_J_per_mole_K: '-10.98'
+            locator: {page: 2, pdf_page_index: 1, table: '1', row_label: C3AS3}
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_01_context
+      type: thermodynamic_example
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+      units: ΔG_T as plotted (kJ/mole); T (K)
+      values:
+        quantity: delta_fG
+        quantity_as_printed: ΔG_T
+        attribution: not stated in the caption; Figure 1 appears in this paper
+        method_class: model_derived
+        species: CaAl2O4
+        phase:
+          state:
+            tag: unknown
+            reason: not_stated
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+        temperature_range_as_plotted: 1000–2200 K
+        x_axis_as_printed: T, K
+        x_axis_tick_labels:
+        - '1000'
+        - '1200'
+        - '1400'
+        - '1600'
+        - '1800'
+        - '2000'
+        - '2200'
+        y_axis_as_printed: ΔG_T, kJ/mole
+        y_axis_tick_labels:
+        - −10
+        - −20
+        - −30
+        - −40
+        caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate,
+          2 – grossite, 3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside,
+          9 – akermanite, 10 – gehlenite, 11 – anorthite and 12 – grossular.'
+        panel: single panel; no panel label printed
+        series_list: &id001
+        - '1: calcium aluminate'
+        - '2: grossite'
+        - '3: hibonite'
+        - '4: perovskite'
+        - '5: magnesium spinel'
+        - '6: enstatite'
+        - '7: forsterite'
+        - '8: diopside'
+        - '9: akermanite'
+        - '10: gehlenite'
+        - '11: anorthite'
+        - '12: grossular'
+        marker_count_per_series: &id002
+          '1': 0
+          '2': 0
+          '3': 0
+          '4': 0
+          '5': 0
+          '6': 0
+          '7': 0
+          '8': 0
+          '9': 0
+          '10': 0
+          '11': 0
+          '12': 0
+        source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page
+          1).
+        digitisation: deferred to a figure pass
+  CaAl4O7:
+    observations:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r03_c04
+      type: transition_point
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: $CA_{2}$
+        column_header: $T_{melt}$ , K
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2035'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell; this is the reported transition temperature.
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        T_m_K: '2035'
+        property_kind: melting_point
+      phase: cr
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r03_c05
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: $CA_{2}$
+        column_header: $\Delta H_{melt}$ , kJ/mole
+      units: kJ/mole
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        value: '27.00'
+        T_fus_K: '2035'
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2035'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell for grossite; heat of fusion is associated with the liquid-phase temperature
+              where the cell has two entries.
+    context:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_02_context
+      type: thermodynamic_example
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+      units: ΔG_T as plotted (kJ/mole); T (K)
+      values:
+        quantity: delta_fG
+        quantity_as_printed: ΔG_T
+        attribution: not stated in the caption; Figure 1 appears in this paper
+        method_class: model_derived
+        species: CaAl4O7
+        phase:
+          state:
+            tag: unknown
+            reason: not_stated
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+        temperature_range_as_plotted: 1000–2200 K
+        x_axis_as_printed: T, K
+        x_axis_tick_labels:
+        - '1000'
+        - '1200'
+        - '1400'
+        - '1600'
+        - '1800'
+        - '2000'
+        - '2200'
+        y_axis_as_printed: ΔG_T, kJ/mole
+        y_axis_tick_labels:
+        - −10
+        - −20
+        - −30
+        - −40
+        caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate,
+          2 – grossite, 3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside,
+          9 – akermanite, 10 – gehlenite, 11 – anorthite and 12 – grossular.'
+        panel: single panel; no panel label printed
+        series_list: *id001
+        marker_count_per_series: *id002
+        source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page
+          1).
+        digitisation: deferred to a figure pass
+  CaAl12O19:
+    observations:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r04_c04_dissociation
+      type: transition_point
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: hibonite, T_melt cell, marker *; confirmed against the 600 dpi page render.
+      phase: cr
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2123'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell; this is the reported transition temperature.
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        T_m_K: '2123'
+        property_kind: dissociation_temperature
+        temperature_marker_as_printed: '*'
+        property_kind_as_printed: dissociation temperature
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r04_c04_liquid_phase
+      type: transition_point
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: hibonite, T_melt cell, marker **; confirmed against the 600 dpi page render.
+      phase: l
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2148'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell; this is the reported transition temperature.
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        T_m_K: '2148'
+        property_kind: liquid_phase_temperature
+        temperature_marker_as_printed: '**'
+        property_kind_as_printed: liquid phase temperature
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r04_c05
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: $CA_{6}$
+        column_header: $\Delta H_{melt}$ , kJ/mole
+      units: kJ/mole
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        value: '16.80'
+        T_fus_K: '2148'
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2148'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell for hibonite; heat of fusion is associated with the liquid-phase temperature
+              where the cell has two entries.
+    context:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_03_context
+      type: thermodynamic_example
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+      units: ΔG_T as plotted (kJ/mole); T (K)
+      values:
+        quantity: delta_fG
+        quantity_as_printed: ΔG_T
+        attribution: not stated in the caption; Figure 1 appears in this paper
+        method_class: model_derived
+        species: CaAl12O19
+        phase:
+          state:
+            tag: unknown
+            reason: not_stated
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+        temperature_range_as_plotted: 1000–2200 K
+        x_axis_as_printed: T, K
+        x_axis_tick_labels:
+        - '1000'
+        - '1200'
+        - '1400'
+        - '1600'
+        - '1800'
+        - '2000'
+        - '2200'
+        y_axis_as_printed: ΔG_T, kJ/mole
+        y_axis_tick_labels:
+        - −10
+        - −20
+        - −30
+        - −40
+        caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate,
+          2 – grossite, 3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside,
+          9 – akermanite, 10 – gehlenite, 11 – anorthite and 12 – grossular.'
+        panel: single panel; no panel label printed
+        series_list: *id001
+        marker_count_per_series: *id002
+        source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page
+          1).
+        digitisation: deferred to a figure pass
+  CaTiO3:
+    observations:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r05_c04
+      type: transition_point
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: CT
+        column_header: $T_{melt}$ , K
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2243'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell; this is the reported transition temperature.
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        T_m_K: '2243'
+        property_kind: melting_point
+      phase: cr
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r05_c05
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: CT
+        column_header: $\Delta H_{melt}$ , kJ/mole
+      units: kJ/mole
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        value: '96.68'
+        T_fus_K: '2243'
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2243'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell for perovskite; heat of fusion is associated with the liquid-phase temperature
+              where the cell has two entries.
+    context:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_04_context
+      type: thermodynamic_example
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+      units: ΔG_T as plotted (kJ/mole); T (K)
+      values:
+        quantity: delta_fG
+        quantity_as_printed: ΔG_T
+        attribution: not stated in the caption; Figure 1 appears in this paper
+        method_class: model_derived
+        species: CaTiO3
+        phase:
+          state:
+            tag: unknown
+            reason: not_stated
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+        temperature_range_as_plotted: 1000–2200 K
+        x_axis_as_printed: T, K
+        x_axis_tick_labels:
+        - '1000'
+        - '1200'
+        - '1400'
+        - '1600'
+        - '1800'
+        - '2000'
+        - '2200'
+        y_axis_as_printed: ΔG_T, kJ/mole
+        y_axis_tick_labels:
+        - −10
+        - −20
+        - −30
+        - −40
+        caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate,
+          2 – grossite, 3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside,
+          9 – akermanite, 10 – gehlenite, 11 – anorthite and 12 – grossular.'
+        panel: single panel; no panel label printed
+        series_list: *id001
+        marker_count_per_series: *id002
+        source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page
+          1).
+        digitisation: deferred to a figure pass
+  MgAl2O4:
+    observations:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r06_c04
+      type: transition_point
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: MA
+        column_header: $T_{melt}$ , K
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2408'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell; this is the reported transition temperature.
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        T_m_K: '2408'
+        property_kind: melting_point
+      phase: cr
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r06_c05
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: MA
+        column_header: $\Delta H_{melt}$ , kJ/mole
+      units: kJ/mole
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        value: '100.30'
+        T_fus_K: '2408'
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2408'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell for magnesium spinel; heat of fusion is associated with the liquid-phase temperature
+              where the cell has two entries.
+    context:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_05_context
+      type: thermodynamic_example
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+      units: ΔG_T as plotted (kJ/mole); T (K)
+      values:
+        quantity: delta_fG
+        quantity_as_printed: ΔG_T
+        attribution: not stated in the caption; Figure 1 appears in this paper
+        method_class: model_derived
+        species: MgAl2O4
+        phase:
+          state:
+            tag: unknown
+            reason: not_stated
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+        temperature_range_as_plotted: 1000–2200 K
+        x_axis_as_printed: T, K
+        x_axis_tick_labels:
+        - '1000'
+        - '1200'
+        - '1400'
+        - '1600'
+        - '1800'
+        - '2000'
+        - '2200'
+        y_axis_as_printed: ΔG_T, kJ/mole
+        y_axis_tick_labels:
+        - −10
+        - −20
+        - −30
+        - −40
+        caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate,
+          2 – grossite, 3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside,
+          9 – akermanite, 10 – gehlenite, 11 – anorthite and 12 – grossular.'
+        panel: single panel; no panel label printed
+        series_list: *id001
+        marker_count_per_series: *id002
+        source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page
+          1).
+        digitisation: deferred to a figure pass
+  MgSiO3:
+    observations:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r07_c04_dissociation
+      type: transition_point
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: enstatite, T_melt cell, marker *; confirmed against the 600 dpi page render.
+      phase: cr
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1836'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell; this is the reported transition temperature.
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        T_m_K: '1836'
+        property_kind: dissociation_temperature
+        temperature_marker_as_printed: '*'
+        property_kind_as_printed: dissociation temperature
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r07_c04_liquid_phase
+      type: transition_point
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: enstatite, T_melt cell, marker **; confirmed against the 600 dpi page render.
+      phase: l
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1850'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell; this is the reported transition temperature.
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        T_m_K: '1850'
+        property_kind: liquid_phase_temperature
+        temperature_marker_as_printed: '**'
+        property_kind_as_printed: liquid phase temperature
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r07_c05
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: MS
+        column_header: $\Delta H_{melt}$ , kJ/mole
+      units: kJ/mole
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        value: '25.93'
+        T_fus_K: '1850'
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1850'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell for enstatite; heat of fusion is associated with the liquid-phase temperature
+              where the cell has two entries.
+    context:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_06_context
+      type: thermodynamic_example
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+      units: ΔG_T as plotted (kJ/mole); T (K)
+      values:
+        quantity: delta_fG
+        quantity_as_printed: ΔG_T
+        attribution: not stated in the caption; Figure 1 appears in this paper
+        method_class: model_derived
+        species: MgSiO3
+        phase:
+          state:
+            tag: unknown
+            reason: not_stated
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+        temperature_range_as_plotted: 1000–2200 K
+        x_axis_as_printed: T, K
+        x_axis_tick_labels:
+        - '1000'
+        - '1200'
+        - '1400'
+        - '1600'
+        - '1800'
+        - '2000'
+        - '2200'
+        y_axis_as_printed: ΔG_T, kJ/mole
+        y_axis_tick_labels:
+        - −10
+        - −20
+        - −30
+        - −40
+        caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate,
+          2 – grossite, 3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside,
+          9 – akermanite, 10 – gehlenite, 11 – anorthite and 12 – grossular.'
+        panel: single panel; no panel label printed
+        series_list: *id001
+        marker_count_per_series: *id002
+        source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page
+          1).
+        digitisation: deferred to a figure pass
+  Mg2SiO4:
+    observations:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r08_c04
+      type: transition_point
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: $M_{2}S$
+        column_header: $T_{melt}$ , K
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2171'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell; this is the reported transition temperature.
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        T_m_K: '2171'
+        property_kind: melting_point
+      phase: cr
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r08_c05
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: $M_{2}S$
+        column_header: $\Delta H_{melt}$ , kJ/mole
+      units: kJ/mole
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        value: '38.00'
+        T_fus_K: '2171'
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '2171'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell for forsterite; heat of fusion is associated with the liquid-phase temperature
+              where the cell has two entries.
+    context:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_07_context
+      type: thermodynamic_example
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+      units: ΔG_T as plotted (kJ/mole); T (K)
+      values:
+        quantity: delta_fG
+        quantity_as_printed: ΔG_T
+        attribution: not stated in the caption; Figure 1 appears in this paper
+        method_class: model_derived
+        species: Mg2SiO4
+        phase:
+          state:
+            tag: unknown
+            reason: not_stated
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+        temperature_range_as_plotted: 1000–2200 K
+        x_axis_as_printed: T, K
+        x_axis_tick_labels:
+        - '1000'
+        - '1200'
+        - '1400'
+        - '1600'
+        - '1800'
+        - '2000'
+        - '2200'
+        y_axis_as_printed: ΔG_T, kJ/mole
+        y_axis_tick_labels:
+        - −10
+        - −20
+        - −30
+        - −40
+        caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate,
+          2 – grossite, 3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside,
+          9 – akermanite, 10 – gehlenite, 11 – anorthite and 12 – grossular.'
+        panel: single panel; no panel label printed
+        series_list: *id001
+        marker_count_per_series: *id002
+        source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page
+          1).
+        digitisation: deferred to a figure pass
+  CaMgSi2O6:
+    observations:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r09_c04
+      type: transition_point
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: $CMS_{2}$
+        column_header: $T_{melt}$ , K
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1665'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell; this is the reported transition temperature.
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        T_m_K: '1665'
+        property_kind: melting_point
+      phase: cr
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r09_c05
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: $CMS_{2}$
+        column_header: $\Delta H_{melt}$ , kJ/mole
+      units: kJ/mole
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        value: '34.43'
+        T_fus_K: '1665'
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1665'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell for diopside; heat of fusion is associated with the liquid-phase temperature
+              where the cell has two entries.
+    context:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_08_context
+      type: thermodynamic_example
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+      units: ΔG_T as plotted (kJ/mole); T (K)
+      values:
+        quantity: delta_fG
+        quantity_as_printed: ΔG_T
+        attribution: not stated in the caption; Figure 1 appears in this paper
+        method_class: model_derived
+        species: CaMgSi2O6
+        phase:
+          state:
+            tag: unknown
+            reason: not_stated
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+        temperature_range_as_plotted: 1000–2200 K
+        x_axis_as_printed: T, K
+        x_axis_tick_labels:
+        - '1000'
+        - '1200'
+        - '1400'
+        - '1600'
+        - '1800'
+        - '2000'
+        - '2200'
+        y_axis_as_printed: ΔG_T, kJ/mole
+        y_axis_tick_labels:
+        - −10
+        - −20
+        - −30
+        - −40
+        caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate,
+          2 – grossite, 3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside,
+          9 – akermanite, 10 – gehlenite, 11 – anorthite and 12 – grossular.'
+        panel: single panel; no panel label printed
+        series_list: *id001
+        marker_count_per_series: *id002
+        source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page
+          1).
+        digitisation: deferred to a figure pass
+  Ca2MgSi2O7:
+    observations:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r10_c04
+      type: transition_point
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: $C_{2}MS_{2}$
+        column_header: $T_{melt}$ , K
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1727'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell; this is the reported transition temperature.
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        T_m_K: '1727'
+        property_kind: melting_point
+      phase: cr
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r10_c05
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: $C_{2}MS_{2}$
+        column_header: $\Delta H_{melt}$ , kJ/mole
+      units: kJ/mole
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        value: '24.78'
+        T_fus_K: '1727'
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1727'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell for akermanite; heat of fusion is associated with the liquid-phase temperature
+              where the cell has two entries.
+    context:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_09_context
+      type: thermodynamic_example
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+      units: ΔG_T as plotted (kJ/mole); T (K)
+      values:
+        quantity: delta_fG
+        quantity_as_printed: ΔG_T
+        attribution: not stated in the caption; Figure 1 appears in this paper
+        method_class: model_derived
+        species: Ca2MgSi2O7
+        phase:
+          state:
+            tag: unknown
+            reason: not_stated
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+        temperature_range_as_plotted: 1000–2200 K
+        x_axis_as_printed: T, K
+        x_axis_tick_labels:
+        - '1000'
+        - '1200'
+        - '1400'
+        - '1600'
+        - '1800'
+        - '2000'
+        - '2200'
+        y_axis_as_printed: ΔG_T, kJ/mole
+        y_axis_tick_labels:
+        - −10
+        - −20
+        - −30
+        - −40
+        caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate,
+          2 – grossite, 3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside,
+          9 – akermanite, 10 – gehlenite, 11 – anorthite and 12 – grossular.'
+        panel: single panel; no panel label printed
+        series_list: *id001
+        marker_count_per_series: *id002
+        source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page
+          1).
+        digitisation: deferred to a figure pass
+  Ca2Al2SiO7:
+    observations:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r11_c04
+      type: transition_point
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: $C_{2}AS$
+        column_header: $T_{melt}$ , K
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1863'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell; this is the reported transition temperature.
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        T_m_K: '1863'
+        property_kind: melting_point
+      phase: cr
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r11_c05
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: $C_{2}AS$
+        column_header: $\Delta H_{melt}$ , kJ/mole
+      units: kJ/mole
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        value: '43.03'
+        T_fus_K: '1863'
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1863'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell for gehlenite; heat of fusion is associated with the liquid-phase temperature
+              where the cell has two entries.
+    context:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_10_context
+      type: thermodynamic_example
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+      units: ΔG_T as plotted (kJ/mole); T (K)
+      values:
+        quantity: delta_fG
+        quantity_as_printed: ΔG_T
+        attribution: not stated in the caption; Figure 1 appears in this paper
+        method_class: model_derived
+        species: Ca2Al2SiO7
+        phase:
+          state:
+            tag: unknown
+            reason: not_stated
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+        temperature_range_as_plotted: 1000–2200 K
+        x_axis_as_printed: T, K
+        x_axis_tick_labels:
+        - '1000'
+        - '1200'
+        - '1400'
+        - '1600'
+        - '1800'
+        - '2000'
+        - '2200'
+        y_axis_as_printed: ΔG_T, kJ/mole
+        y_axis_tick_labels:
+        - −10
+        - −20
+        - −30
+        - −40
+        caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate,
+          2 – grossite, 3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside,
+          9 – akermanite, 10 – gehlenite, 11 – anorthite and 12 – grossular.'
+        panel: single panel; no panel label printed
+        series_list: *id001
+        marker_count_per_series: *id002
+        source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page
+          1).
+        digitisation: deferred to a figure pass
+  CaAl2Si2O8:
+    observations:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r12_c04
+      type: transition_point
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: $CAS_{2}$
+        column_header: $T_{melt}$ , K
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1830'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell; this is the reported transition temperature.
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        T_m_K: '1830'
+        property_kind: melting_point
+      phase: cr
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r12_c05
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: $CAS_{2}$
+        column_header: $\Delta H_{melt}$ , kJ/mole
+      units: kJ/mole
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        value: '33.30'
+        T_fus_K: '1830'
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1830'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell for anorthite; heat of fusion is associated with the liquid-phase temperature
+              where the cell has two entries.
+    context:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_11_context
+      type: thermodynamic_example
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+      units: ΔG_T as plotted (kJ/mole); T (K)
+      values:
+        quantity: delta_fG
+        quantity_as_printed: ΔG_T
+        attribution: not stated in the caption; Figure 1 appears in this paper
+        method_class: model_derived
+        species: CaAl2Si2O8
+        phase:
+          state:
+            tag: unknown
+            reason: not_stated
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+        temperature_range_as_plotted: 1000–2200 K
+        x_axis_as_printed: T, K
+        x_axis_tick_labels:
+        - '1000'
+        - '1200'
+        - '1400'
+        - '1600'
+        - '1800'
+        - '2000'
+        - '2200'
+        y_axis_as_printed: ΔG_T, kJ/mole
+        y_axis_tick_labels:
+        - −10
+        - −20
+        - −30
+        - −40
+        caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate,
+          2 – grossite, 3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside,
+          9 – akermanite, 10 – gehlenite, 11 – anorthite and 12 – grossular.'
+        panel: single panel; no panel label printed
+        series_list: *id001
+        marker_count_per_series: *id002
+        source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page
+          1).
+        digitisation: deferred to a figure pass
+  Ca3Al2Si3O12:
+    observations:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r13_c04_dissociation
+      type: transition_point
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: grossular, T_melt cell, marker *; confirmed against the 600 dpi page render.
+      phase: cr
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1373'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell; this is the reported transition temperature.
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        T_m_K: '1373'
+        property_kind: dissociation_temperature
+        temperature_marker_as_printed: '*'
+        property_kind_as_printed: dissociation temperature
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r13_c04_liquid_phase
+      type: transition_point
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        note: grossular, T_melt cell, marker **; confirmed against the 600 dpi page render.
+      phase: l
+      units: K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell; this is the reported transition temperature.
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        T_m_K: '1673'
+        property_kind: liquid_phase_temperature
+        temperature_marker_as_printed: '**'
+        property_kind_as_printed: liquid phase temperature
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r13_c05
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        table: '1'
+        row_label: $C_{3}AS_{3}$
+        column_header: $\Delta H_{melt}$ , kJ/mole
+      units: kJ/mole
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        attribution: '[11–17]'
+        value: '71.00'
+        T_fus_K: '1673'
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            table: '1'
+            note: Table 1 T_melt cell for grossular; heat of fusion is associated with the liquid-phase temperature
+              where the cell has two entries.
+    context:
+    - observation_id: shornikov_2015_cai_mineral_thermodynamics_figure1_12_context
+      type: thermodynamic_example
+      locator:
+        page: 2
+        pdf_page_index: 1
+        figure: '1'
+      units: ΔG_T as plotted (kJ/mole); T (K)
+      values:
+        quantity: delta_fG
+        quantity_as_printed: ΔG_T
+        attribution: not stated in the caption; Figure 1 appears in this paper
+        method_class: model_derived
+        species: Ca3Al2Si3O12
+        phase:
+          state:
+            tag: unknown
+            reason: not_stated
+          locator:
+            page: 2
+            pdf_page_index: 1
+            figure: '1'
+        temperature_range_as_plotted: 1000–2200 K
+        x_axis_as_printed: T, K
+        x_axis_tick_labels:
+        - '1000'
+        - '1200'
+        - '1400'
+        - '1600'
+        - '1800'
+        - '2000'
+        - '2200'
+        y_axis_as_printed: ΔG_T, kJ/mole
+        y_axis_tick_labels:
+        - −10
+        - −20
+        - −30
+        - −40
+        caption: 'Figure 1. The temperature dependences of CAI mineral’s Gibbs energies: 1 – calcium aluminate,
+          2 – grossite, 3 – hibonite, 4 – perovskite, 5 – magnesium spinel, 6 – enstatite, 7 – forsterite, 8 – diopside,
+          9 – akermanite, 10 – gehlenite, 11 – anorthite and 12 – grossular.'
+        panel: single panel; no panel label printed
+        series_list: *id001
+        marker_count_per_series: *id002
+        source_scope_as_printed: The paper emphasizes high-temperature thermodynamic data higher than 1000 K (page
+          1).
+        digitisation: deferred to a figure pass
+fidelity_samples:
+- species: CaAl12O19
+  observable: transition_point
+  observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r04_c04_dissociation
+  field: T_m_K
+  value: '2123'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'
+- species: Ca3Al2Si3O12
+  observable: heat_capacity_and_heat_content_series
+  observation_id: shornikov_2015_cai_mineral_thermodynamics_p002_t01_r13_c05
+  field: value
+  value: '71.00'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    table: '1'

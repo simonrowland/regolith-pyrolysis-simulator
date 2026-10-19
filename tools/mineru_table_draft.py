@@ -755,6 +755,7 @@ def _numeric_points(extract: Mapping[str, Any]) -> list[dict[str, Any]]:
                 "pressure_Pa",
                 "activity",
                 "gamma",
+                "T_m_K",
             )
             stored_points = values.get("points") or []
             if stored_points:
@@ -856,8 +857,11 @@ def _phase_matches_column(phase: Any, column_header: str) -> bool:
     if phase is None:
         return True
     token = str(phase).strip().casefold()
+    if token == "cr":
+        token = "solid"
     if token not in {"gas", "liquid", "solid"}:
         return False
+    # A column with no phase qualifier cannot contradict the row phase.
     header_phases = {
         candidate
         for candidate in ("gas", "liquid", "solid")
