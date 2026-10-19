@@ -3553,8 +3553,12 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     # from the bar form used with P[atm] to 0.0018583*sqrt(2). The resulting
     # finite-series-resistance escape fraction moved with D_AB.
     assert partition["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
-        0.09838642054227477,
+        # d-177 (owner 2026-10-19): the lunar literature anchor dIW -1 [-2, -0.5]
+        # now uses its own interval (provenance band, b-899 r14 F1), so the melt
+        # reads BELOW iron saturation and precipitates native Fe (d-155): pool
+        # 36.99 -> 558.30 mol at unchanged vapour capacity 3.6396 mol, so the
+        # escape fraction falls ~15x. Was 0.09838642054227477 under d-156.
+        0.006519058105286739,
         rel=0.0,
         abs=1.0e-15,
     )
