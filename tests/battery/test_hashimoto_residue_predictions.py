@@ -288,16 +288,16 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
 
     assert primary.experiment_id == "hashimoto-1983-run-17c3-2"
     assert primary.primary_geometry_policy_id == "sphere_shrinking"
-    assert primary.primary_oxide_wt_pct == pytest.approx(
-        {
-            "SiO2": 43.881276678821,
-            "Al2O3": 4.425579151545,
-            "FeO": 17.057673774718,
-            "MgO": 31.092219439303,
-            "CaO": 3.543250955613,
-        },
-        abs=1e-9,
-    )
+    assert {
+        oxide: value.hex()
+        for oxide, value in primary.primary_oxide_wt_pct.items()
+    } == {
+        "SiO2": "0x1.5f0cdac992197p+5",
+        "Al2O3": "0x1.1b3cb0566fbffp+2",
+        "FeO": "0x1.10ec3b5604051p+4",
+        "MgO": "0x1.f179bb173dc7fp+4",
+        "CaO": "0x1.c5893f4ff0809p+1",
+    }
 
 
 def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
