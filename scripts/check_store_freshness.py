@@ -137,6 +137,14 @@ CODE_INPUTS = (
 #     hard_issues=3334; j01 7/7). This acknowledges STORE outputs only; the
 #     scoring change (cell-balance residuals per engine) is covered by the
 #     commits' tests.
+#   dbf438ba8: b-899 one melt redox state from the iron ledger. Its only
+#     migrate-input path is simulator/battery/residue.py, where the Hashimoto
+#     residue projection collapses Fe2O3 onto the printed FeOt basis
+#     (collapse_feot_composition) at prediction time; migration does not run
+#     that path. The landing train's full regen of b140 (b-899 + b-926 +
+#     openimcc 66ec4a3, studio-3) produced no store change (observations=126296
+#     queue=80926 hard_issues=3334; j01 7/7). This acknowledges STORE outputs
+#     only; the residue scoring change is covered by the commit's tests.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "80fad2bfa",
     "09c498b65",
@@ -147,6 +155,7 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "8d90cc936",
     "f522e152c", "da3640753", "e84b44277",
     "554fd0e07", "b746bcf30", "3a27c5abd",
+    "dbf438ba8",
 })
 
 
