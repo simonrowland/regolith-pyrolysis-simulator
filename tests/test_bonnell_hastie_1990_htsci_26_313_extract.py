@@ -19,6 +19,9 @@ def _document() -> dict:
 
 def test_table3_model_output_matches_rendered_cells() -> None:
     document = _document()
+    assert document["source"]["corpus_sha256"] == (
+        "40b156a7c4e3e4b83cbde7efe317f092edcf5f1d3a5f2d116eac6ceb10813f29"
+    )
     context = document["species"]["SiO2"]["context"]
     table = next(
         row
@@ -26,6 +29,7 @@ def test_table3_model_output_matches_rendered_cells() -> None:
         if row.get("observation_id") == "bonnell_hastie_1990_table3_model_output"
     )
     assert table["locator"]["pdf_page_index"] == 6
+    assert table["units"] == "per-column as printed"
     assert table["temperature_K"] == 1430.00
     assert table["pressure_atm_as_printed"] == "1.000"
     assert table["values"]["method_class"] == "model_derived"
@@ -55,6 +59,7 @@ def test_all_figure_panels_are_deferred_context_records_without_points() -> None
     }
     assert all(row["digitisation"] == "deferred to a figure pass" for row in figures)
     assert all(row["values"]["method_class"] == "model_derived" for row in figures)
+    assert all(row["units"] == "as printed" for row in figures)
     assert all(
         "points" not in row and "numeric_points" not in row
         for row in figures
