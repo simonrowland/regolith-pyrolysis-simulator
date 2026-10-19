@@ -1,11 +1,16 @@
 """Regression pins for Stolyarova et al. (1996) oxygen evidence and apparatus."""
 
-from pathlib import Path
 from copy import deepcopy
+from decimal import Decimal
+from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import EvidenceClass, RefusalReason
+from simulator.battery.enums import EvidenceClass, MetricOperation, ResidualStatus
+from simulator.battery.score import (
+    _e15_residual_point,
+    _reference_has_measured_evidence,
+)
 from tests.battery.test_migrate import _migrate_real_extract
 
 
@@ -55,6 +60,16 @@ def test_table2_oxygen_routes_keep_calculation_and_apparatus_evidence(tmp_path):
         observation["standard_state"]["tag"] == "unknown"
         for observation in observations
     )
+    for observation in observations:
+        derivation = observation["values"]["derivation"]
+        assert derivation["method"]["state"]["value"].startswith(
+            "K_ref = Gurvich K°(T)"
+        )
+        assert derivation["method"]["locator"]["equation"] == "7–9"
+        assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
+        assert derivation["raw_inputs"]["locator"]["note"] == (
+            "The row-wise ion-current inputs are not printed."
+        )
 
     bench = document["benches"][0]
     assert bench["cell_material_and_liner"]["state"]["tag"] == "unknown"
@@ -84,34 +99,36 @@ def test_table2_oxygen_routes_keep_calculation_and_apparatus_evidence(tmp_path):
         and observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
         for observation in oxygen_rows
     )
-    # Eqs. (7)–(9) use unprinted ion currents, so these model_derived rows have
-    # no legal derived_from parent. Pin that gap exactly; do not invent parents.
-    derived_from_detail = "derived observation requires derived_from"
-    issue_ids = []
-    for issue in migrated.validation.hard_issues:
-        assert issue.reason is RefusalReason.CONDITIONAL_FIELD
-        assert issue.detail == derived_from_detail
-        prefix = "observation["
-        suffix = "].derived_from"
-        assert issue.path.startswith(prefix) and issue.path.endswith(suffix)
-        issue_ids.append(issue.path[len(prefix):-len(suffix)])
-    assert sorted(issue_ids) == sorted(
-        observation.observation_id for observation in oxygen_rows
+    assert all(observation.derived_from is None for observation in oxygen_rows)
+    assert all(
+        observation.derivation is not None
+        and observation.derivation.has_located_unprinted_raw_inputs
+        and observation.derivation.has_located_method
+        for observation in oxygen_rows
     )
-    assert len(issue_ids) == len(set(issue_ids)) == 55
-    assert {
-        observation_id.split("::")[1]
-        for observation_id in issue_ids
-    } == {
-        "stolyarova_1996_table2_pO_1933k",
-        "stolyarova_1996_table2_pO_prime_1933k",
-        "stolyarova_1996_table2_pO_double_prime_1933k",
+    for observation in oxygen_rows:
+        temperature = observation.identity.temperature_K
+        assert temperature is not None and temperature.is_value
+        assert temperature.value == Decimal("1933")
+        composition = (observation.point_conditions or {}).get("composition")
+        assert composition is not None and composition.state.is_value
+        assert composition.locator is not None
+    oxygen_paths = tuple(
+        f"observation[{observation.observation_id}]"
+        for observation in oxygen_rows
+    )
+    assert not [
+        issue
+        for issue in migrated.validation.hard_issues
+        if issue.path.startswith(oxygen_paths)
+    ]
+
+    e15_probe = {
+        "status": ResidualStatus.MATCH.value,
+        "numeric": {"value": "1", "operation": MetricOperation.DEX.value},
     }
-    assert [
-        sum(observation_id.split("::")[1] == series for observation_id in issue_ids)
-        for series in (
-            "stolyarova_1996_table2_pO_1933k",
-            "stolyarova_1996_table2_pO_prime_1933k",
-            "stolyarova_1996_table2_pO_double_prime_1933k",
-        )
-    ] == [30, 10, 15]
+    assert all(
+        not _reference_has_measured_evidence(observation)
+        and _e15_residual_point(e15_probe, observation) is None
+        for observation in oxygen_rows
+    )
