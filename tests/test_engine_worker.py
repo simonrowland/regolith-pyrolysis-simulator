@@ -9,6 +9,7 @@ import subprocess
 import sys
 import threading
 import time
+from pathlib import Path
 
 import pytest
 
@@ -73,7 +74,13 @@ def _handle_recording_request(resource, request, _errlog):
     return request_id
 
 
-def _recording_worker(results, *, started=None, release=None):
+def _recording_worker(
+    results,
+    *,
+    started=None,
+    release=None,
+    diagnostic_log_path=None,
+):
     return WarmEngineWorker(
         name='recording worker',
         bootstrap=_bootstrap_recording_worker,
@@ -81,6 +88,7 @@ def _recording_worker(results, *, started=None, release=None):
         handler=_handle_recording_request,
         startup_timeout_s=_RENDEZVOUS_TIMEOUT_S,
         call_timeout_s=30.0,
+        diagnostic_log_path=diagnostic_log_path,
     )
 
 
@@ -468,6 +476,79 @@ def test_cancelled_pending_future_is_never_executed():
             results.get(timeout=0.1)
     finally:
         release_handler.set()
+        pool.close(cancel_pending=True)
+        results.close()
+        results.join_thread()
+
+
+@pytest.mark.timeout(20)
+def test_pool_timeout_log_only_records_assigned_request_outside_pool_lock(
+    monkeypatch,
+    tmp_path,
+):
+    context = multiprocessing.get_context('spawn')
+    results = context.Queue()
+    handler_started = context.Event()
+    release_handler = context.Event()
+    diagnostic_path = tmp_path / 'worker-diagnostics.log'
+    pool = EngineWorkerPool(
+        lambda _index: _recording_worker(
+            results,
+            started=handler_started,
+            release=release_handler,
+            diagnostic_log_path=diagnostic_path,
+        ),
+        size=1,
+    )
+    writer_entered = threading.Event()
+    release_writer = threading.Event()
+    original_open = Path.open
+
+    def gated_open(path, *args, **kwargs):
+        if Path(path) == diagnostic_path and args and args[0] == 'a':
+            writer_entered.set()
+            assert release_writer.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
+        return original_open(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, 'open', gated_open)
+    try:
+        active = pool.submit(
+            {'request_id': 'active', 'block': True},
+            timeout_s=30.0,
+        )
+        assert handler_started.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
+        pending = pool.submit({'request_id': 'pending'}, timeout_s=30.0)
+        assert pending.cancel() is True
+        assert pool._abort_request(
+            pending,
+            diagnostic_detail='{"request_id":"pending"}',
+        ) is False
+        assert diagnostic_path.read_text(encoding='utf-8') == ''
+
+        aborter = threading.Thread(
+            target=lambda: pool._abort_request(
+                active,
+                diagnostic_detail='{"request_id":"active"}',
+            ),
+            daemon=True,
+        )
+        aborter.start()
+        assert writer_entered.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
+        assert pool._active_requests_lock.acquire(timeout=1.0)
+        pool._active_requests_lock.release()
+        release_writer.set()
+        aborter.join(timeout=_RENDEZVOUS_TIMEOUT_S)
+        assert not aborter.is_alive()
+
+        with pytest.raises((EngineWorkerDied, EngineWorkerTimeout)):
+            active.result(timeout=_RENDEZVOUS_TIMEOUT_S)
+        lines = diagnostic_path.read_text(encoding='utf-8').splitlines()
+        assert [json.loads(line) for line in lines] == [
+            {'request_id': 'active'},
+        ]
+    finally:
+        release_handler.set()
+        release_writer.set()
         pool.close(cancel_pending=True)
         results.close()
         results.join_thread()
