@@ -1082,18 +1082,16 @@ def validate_observation(
     derivation = observation.derivation
     raw_inputs = derivation.raw_inputs if derivation is not None else None
     if raw_inputs is not None and not (
-        ev.is_value and ev.value is EvidenceClass.MEASURED_REDUCED
+        ev.is_value
+        and ev.value
+        in {EvidenceClass.MEASURED_REDUCED, EvidenceClass.MODEL_DERIVED}
     ):
-        detail = (
-            "raw_inputs not_printed declaration is invalid for model_derived evidence"
-            if ev.is_value and ev.value is EvidenceClass.MODEL_DERIVED
-            else "raw_inputs declaration is valid only for measured_reduced evidence"
-        )
         issues.append(
             _issue(
                 f"{path}.derivation.raw_inputs",
                 RefusalReason.CONDITIONAL_FIELD,
-                detail,
+                "raw_inputs declaration is valid only for measured_reduced or "
+                "model_derived evidence",
             )
         )
     if raw_inputs is not None and derivation is not None and derivation.inputs:
@@ -1162,11 +1160,7 @@ def validate_observation(
                         "raw_inputs not_printed declaration requires a locator",
                     )
                 )
-        if (
-            ev.value is EvidenceClass.MEASURED_REDUCED
-            and declares_unprinted_raw_inputs
-            and observation.derived_from
-        ):
+        if declares_unprinted_raw_inputs and observation.derived_from:
             issues.append(
                 _issue(
                     f"{path}.derivation.raw_inputs",
@@ -1174,15 +1168,52 @@ def validate_observation(
                     "raw_inputs not_printed declaration contradicts derived_from",
                 )
             )
+        if (
+            ev.value is EvidenceClass.MODEL_DERIVED
+            and declares_unprinted_raw_inputs
+        ):
+            if derivation is None or derivation.method is None:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation.method",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "model_derived raw_inputs not_printed declaration requires a method",
+                    )
+                )
+            elif derivation.method.locator is None:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation.method",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "model_derived raw_inputs method requires a locator",
+                    )
+                )
+            elif not derivation.has_located_method:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation.method",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "model_derived raw_inputs method requires a nonempty value",
+                    )
+                )
         has_resolved_lineage = any(
             parent in observations or parent in asset_ids
             for parent in observation.derived_from or ()
         )
+        raw_inputs_supply_lineage = (
+            derivation is not None
+            and derivation.has_located_unprinted_raw_inputs
+            and (
+                ev.value is EvidenceClass.MEASURED_REDUCED
+                or (
+                    ev.value is EvidenceClass.MODEL_DERIVED
+                    and derivation.has_located_method
+                )
+            )
+        )
         if not figure_only_without_value:
             if not has_resolved_lineage and not (
-                ev.value is EvidenceClass.MEASURED_REDUCED
-                and derivation is not None
-                and derivation.has_located_unprinted_raw_inputs
+                raw_inputs_supply_lineage
             ):
                 issues.append(
                     _issue(

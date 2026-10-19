@@ -231,8 +231,9 @@ species:
 
 `model_derived` and `measured_reduced` observations require a derivation
 recording the stated method; the observation's required `locator` locates that
-method. They also require `derived_from`, except a `measured_reduced`
-derivation may declare that the source does not print the raw inputs:
+method. They also require `derived_from`, except that either evidence class may
+declare that the source does not print the raw inputs. A `measured_reduced`
+declaration needs its own source locator:
 
 ```yaml
 locator: {page: 164, section: '3.3'}
@@ -246,12 +247,33 @@ derivation:
 
 When the source does not print raw inputs, omit `inputs` entirely. The paper
 is never an input, and no invented observation may stand in for the unprinted
-inputs.
+inputs. For `model_derived`, the derivation must also carry its method as a
+located `method` field. Its value names the printed calculation and the
+compiled references used; its locator identifies the printed equation and
+page. For example:
+
+```yaml
+derivation:
+  relation: "author calculation using the printed equilibrium equation"
+  output_unit: Pa
+  method:
+    state: {tag: value, value: "Eqs. (7)–(9) use Gurvich K°(T) and Mann cross-sections"}
+    locator:
+      page: 19
+      equation: "7–9"
+  raw_inputs:
+    state: {tag: value, value: not_printed}
+    locator:
+      page: 19
+      equation: "7–9"
+      note: "The row-wise ion currents are not printed."
+```
 
 `raw_inputs` is a typed `not_printed` value with its own source locator. It is
-valid only for `measured_reduced`, cannot appear with `derived_from`, and does
-not replace the required derivation method or locator. Model-derived rows
-always require `derived_from`.
+valid for `measured_reduced`, and for `model_derived` only when a nonempty
+located method is supplied. It cannot appear with derivation `inputs` or
+observation `derived_from`. A model-derived method locator does not replace
+the observation's required method locator.
 
 Exactly one of:
 

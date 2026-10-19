@@ -1010,12 +1010,8 @@ def _locator_from_plain(payload: object) -> Locator | None:
 def _derivation_inputs_requirement_error(
     derivation: Derivation, *, has_resolved_lineage: bool = False
 ) -> str | None:
-    if (
-        not derivation.inputs
-        and derivation.declares_unprinted_raw_inputs
-        and not derivation.has_located_unprinted_raw_inputs
-    ):
-        return "raw_inputs not_printed declaration requires a locator"
+    # validate_corpus owns raw_inputs evidence, method, and locator rules.
+    # Parsing only checks that a derivation has some declared input source.
     if (
         not derivation.inputs
         and derivation.raw_inputs is None
@@ -1071,6 +1067,10 @@ def _derivation_from_plain(
     parsed_raw_inputs = (
         _raw_inputs_from_plain(raw_inputs) if raw_inputs is not None else None
     )
+    raw_method = payload.get("method")
+    parsed_method = (
+        _located_from_plain(raw_method, str) if raw_method is not None else None
+    )
     relation = payload.get("relation", "identity")
     if relation is None or relation == "":
         if require_relation:
@@ -1090,6 +1090,7 @@ def _derivation_from_plain(
         output_unit=output_unit,
         pure_substance_reference=raw_marker,
         raw_inputs=parsed_raw_inputs,
+        method=parsed_method,
     )
     if require_inputs:
         requirement_error = _derivation_inputs_requirement_error(derivation)

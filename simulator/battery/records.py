@@ -430,6 +430,7 @@ class Derivation:
     # not declared — never a stamped false.
     pure_substance_reference: bool | None = None
     raw_inputs: Located[RawInputStatus] | None = None
+    method: Located[str] | None = None
 
     @property
     def declares_unprinted_raw_inputs(self) -> bool:
@@ -448,6 +449,16 @@ class Derivation:
             and self.raw_inputs.locator is not None
         )
 
+    @property
+    def has_located_method(self) -> bool:
+        return (
+            self.method is not None
+            and self.method.state.is_value
+            and isinstance(self.method.state.value, str)
+            and bool(self.method.state.value.strip())
+            and self.method.locator is not None
+        )
+
     def __post_init__(self) -> None:
         if not self.relation:
             raise ValueError("Derivation.relation is required")
@@ -457,6 +468,11 @@ class Derivation:
             self.pure_substance_reference, bool
         ):
             raise TypeError("Derivation.pure_substance_reference must be bool or absent")
+        if self.method is not None and (
+            not isinstance(self.method, Located)
+            or not isinstance(self.method.state, State)
+        ):
+            raise TypeError("Derivation.method must be a Located string or absent")
 
 
 @dataclass(frozen=True)

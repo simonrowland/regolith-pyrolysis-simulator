@@ -761,18 +761,32 @@ def _extract_observations(name: str) -> list[dict]:
     return found
 
 
-def _raw_inputs_extract(method_class: str, *, include_locator: bool = True) -> dict:
+def _raw_inputs_extract(
+    method_class: str,
+    *,
+    include_locator: bool = True,
+    include_method: bool = False,
+) -> dict:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     observation = extract["species"]["Na"]["observations"][0]
     observation["values"]["method_class"] = method_class
     raw_inputs = {"state": {"tag": "value", "value": "not_printed"}}
     if include_locator:
         raw_inputs["locator"] = {"page": 2, "section": "3.3"}
-    observation["values"]["derivation"] = {
+    derivation = {
         "relation": "calculated from measured quantities",
         "output_unit": "Pa",
         "raw_inputs": raw_inputs,
     }
+    if include_method:
+        derivation["method"] = {
+            "state": {
+                "tag": "value",
+                "value": "printed equation using Gurvich K°(T) and Mann cross-sections",
+            },
+            "locator": {"page": 2, "equation": "7"},
+        }
+    observation["values"]["derivation"] = derivation
     return extract
 
 
@@ -844,7 +858,7 @@ def test_production_migration_rejects_unlocated_unprinted_raw_input_declaration(
         (
             [],
             {"state": {"tag": "value", "value": "not_printed"}},
-            ".values.derivation",
+            ".derivation.raw_inputs",
             "requires a locator",
         ),
         (
@@ -859,7 +873,7 @@ def test_production_migration_rejects_unlocated_unprinted_raw_input_declaration(
         (
             None,
             {"state": {"tag": "value", "value": "not_printed"}},
-            ".values.derivation",
+            ".derivation.raw_inputs",
             "requires a locator",
         ),
     ],
@@ -1440,18 +1454,29 @@ def test_malformed_registry_inference_records_issue_without_dropping_value() -> 
     )
 
 
-def test_production_migration_rejects_model_derived_raw_input_declaration(
+def test_production_migration_accepts_model_derived_raw_input_method(
     tmp_path: Path,
 ) -> None:
     result = migrate(
-        _write_min_tree(tmp_path, _raw_inputs_extract("model_derived")),
+        _write_min_tree(
+            tmp_path,
+            _raw_inputs_extract("model_derived", include_method=True),
+        ),
         write=False,
     )
-    assert any(
-        issue.path.endswith(".derivation.raw_inputs")
-        and "invalid for model_derived" in issue.detail
-        for issue in result.validation.hard_issues
+    observation = next(iter(result.observations.values()))
+    assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert observation.derivation is not None
+    assert observation.derivation.method is not None
+    assert observation.derivation.method.state.value == (
+        "printed equation using Gurvich K°(T) and Mann cross-sections"
     )
+    assert observation.derivation.method.locator is not None
+    assert result.validation.hard_issues == ()
+    reloaded = observation_from_plain(
+        yaml.safe_load(yaml.safe_dump(to_plain(observation)))
+    )
+    assert reloaded.derivation == observation.derivation
 
 
 def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
