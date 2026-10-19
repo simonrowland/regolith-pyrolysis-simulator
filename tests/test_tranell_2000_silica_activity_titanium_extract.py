@@ -318,3 +318,45 @@ def test_rendered_tables_bind_every_cell_and_migrate_conditions() -> None:
                     _assert_row_conditions(point, point["row_as_printed"], table)
             elif observation["values"].get("row_as_printed"):
                 _assert_row_conditions(observation, observation["values"]["row_as_printed"], table)
+
+    composition_observations = [
+        observation
+        for block in document["species"].values()
+        for observation in block["observations"]
+        if observation["values"].get("quantity") == "equilibrium_phase_composition"
+    ]
+    assert sum(len(observation["values"]["points"]) for observation in composition_observations) == 238
+    for observation in composition_observations:
+        values = observation["values"]
+        material = (
+            "slag"
+            if observation["observation_id"].endswith(("cu_in_slag", "mo_in_slag"))
+            else "copper button"
+        )
+        assert observation["phase"] == "l"
+        assert values["basis_as_published"].endswith(f"in {material}; wt ppm")
+        for point in values["points"]:
+            assert point["sample_material_as_published"] == material
+            assert point["method_as_printed"] in {"GDMS", "ICP-AES", "X-ray fluorescence"}
+            assert "water" in point["quench_statement"]["text"]
+            assert "ex-situ" in point["quench_statement"]["text"]
+            assert point["quench_statement"]["locator"]["page"] == 2
+
+    migrated_compositions = [
+        row for row in rows
+        if row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    ]
+    assert len(migrated_compositions) == 238
+    assert all(row.identity.species.phase.is_value and row.identity.species.phase.value.value == "l"
+               for row in migrated_compositions)
+    migrated_titanium_redox = [
+        row for row in rows if row.identity.quantity.value is Quantity.VALENCE_RATIO
+    ]
+    assert len(migrated_titanium_redox) == 45
+    assert all(row.identity.species.phase.is_unknown for row in migrated_titanium_redox)
+    assert all(
+        "phase_as_measured" not in point
+        for observation in document["species"]["Ti"]["observations"]
+        if observation["values"].get("quantity") == "valence_ratio"
+        for point in observation["values"]["points"]
+    )

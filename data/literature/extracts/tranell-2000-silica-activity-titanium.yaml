@@ -1,3 +1,4 @@
+# Water-quenched assays retain their equilibrium liquid phase at experimental T; the post-quench Ti valence phase is unknown.
 schema_version: literature_extract.v1
 source_id: tranell-2000-silica-activity-titanium
 source:
@@ -46,15 +47,20 @@ species:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
         admission_status: admitted
-        basis_as_published: Cu concentration in l; wt ppm
+        basis_as_published: Cu concentration in slag; wt ppm
         method_as_printed: X-ray fluorescence
         points:
         - sample: Slag 1
+          sample_material_as_published: slag
           row_as_printed: '1'
           value: '1104'
           value_as_printed: '1104'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: &tranell_water_quench
+            text: The equilibrated sample was withdrawn from the furnace and quenched in water before ex-situ analysis.
+            quench_direction: not_stated
+            locator: {page: 2, pdf_page_index: 1, section: Experimental Procedure}
           point_conditions:
             temperature_K:
               state:
@@ -123,11 +129,13 @@ species:
             row: '1'
             column: Cu in slag (wt ppm)
         - sample: Slag 2
+          sample_material_as_published: slag
           row_as_printed: '2'
           value: '894'
           value_as_printed: '894'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -196,11 +204,13 @@ species:
             row: '2'
             column: Cu in slag (wt ppm)
         - sample: Slag 3
+          sample_material_as_published: slag
           row_as_printed: '3'
           value: '1489'
           value_as_printed: '1489'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -269,11 +279,13 @@ species:
             row: '3'
             column: Cu in slag (wt ppm)
         - sample: Slag 4
+          sample_material_as_published: slag
           row_as_printed: '4'
           value: '1060'
           value_as_printed: '1060'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -342,11 +354,13 @@ species:
             row: '4'
             column: Cu in slag (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: slag
           row_as_printed: '5'
           value: '950'
           value_as_printed: '950'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -415,11 +429,13 @@ species:
             row: '5'
             column: Cu in slag (wt ppm)
         - sample: Slag 6
+          sample_material_as_published: slag
           row_as_printed: '6'
           value: '791'
           value_as_printed: '791'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -488,11 +504,13 @@ species:
             row: '6'
             column: Cu in slag (wt ppm)
         - sample: Slag 7
+          sample_material_as_published: slag
           row_as_printed: '7'
           value: '884'
           value_as_printed: '884'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -561,11 +579,13 @@ species:
             row: '7'
             column: Cu in slag (wt ppm)
         - sample: Slag 8
+          sample_material_as_published: slag
           row_as_printed: '8'
           value: '1276'
           value_as_printed: '1276'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -634,11 +654,13 @@ species:
             row: '8'
             column: Cu in slag (wt ppm)
         - sample: Slag 9
+          sample_material_as_published: slag
           row_as_printed: '9'
           value: '780'
           value_as_printed: '780'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -707,11 +729,13 @@ species:
             row: '9'
             column: Cu in slag (wt ppm)
         - sample: Slag 10
+          sample_material_as_published: slag
           row_as_printed: '10'
           value: '1145'
           value_as_printed: '1145'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -780,11 +804,13 @@ species:
             row: '10'
             column: Cu in slag (wt ppm)
         - sample: Slag 11
+          sample_material_as_published: slag
           row_as_printed: '11'
           value: '1320'
           value_as_printed: '1320'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -853,11 +879,13 @@ species:
             row: '11'
             column: Cu in slag (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: slag
           row_as_printed: '12'
           value: '1850'
           value_as_printed: '1850'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -980,15 +1008,17 @@ species:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
         admission_status: admitted
-        basis_as_published: Mo concentration in l; wt ppm
+        basis_as_published: Mo concentration in copper button; wt ppm
         method_as_printed: GDMS
         points:
         - sample: Slag 1
+          sample_material_as_published: copper button
           row_as_printed: '1'
           value: '22.9'
           value_as_printed: '22.9'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -1057,11 +1087,13 @@ species:
             row: '1'
             column: XMo GDMS (wt ppm)
         - sample: Slag 2
+          sample_material_as_published: copper button
           row_as_printed: '2'
           value: '30.6'
           value_as_printed: '30.6'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -1130,11 +1162,13 @@ species:
             row: '2'
             column: XMo GDMS (wt ppm)
         - sample: Slag 3
+          sample_material_as_published: copper button
           row_as_printed: '3'
           value: '26.6'
           value_as_printed: '26.6'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -1203,11 +1237,13 @@ species:
             row: '3'
             column: XMo GDMS (wt ppm)
         - sample: Slag 4
+          sample_material_as_published: copper button
           row_as_printed: '4'
           value: '28.3'
           value_as_printed: '28.3'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -1276,11 +1312,13 @@ species:
             row: '4'
             column: XMo GDMS (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: copper button
           row_as_printed: '5'
           value: '25.5'
           value_as_printed: '25.5'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -1349,11 +1387,13 @@ species:
             row: '5'
             column: XMo GDMS (wt ppm)
         - sample: Slag 6
+          sample_material_as_published: copper button
           row_as_printed: '6'
           value: '26.7'
           value_as_printed: '26.7'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -1422,11 +1462,13 @@ species:
             row: '6'
             column: XMo GDMS (wt ppm)
         - sample: Slag 7
+          sample_material_as_published: copper button
           row_as_printed: '7'
           value: '30.2'
           value_as_printed: '30.2'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -1495,11 +1537,13 @@ species:
             row: '7'
             column: XMo GDMS (wt ppm)
         - sample: Slag 8
+          sample_material_as_published: copper button
           row_as_printed: '8'
           value: '29.5'
           value_as_printed: '29.5'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -1568,11 +1612,13 @@ species:
             row: '8'
             column: XMo GDMS (wt ppm)
         - sample: Slag 9
+          sample_material_as_published: copper button
           row_as_printed: '9'
           value: '29.1'
           value_as_printed: '29.1'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -1641,11 +1687,13 @@ species:
             row: '9'
             column: XMo GDMS (wt ppm)
         - sample: Slag 10
+          sample_material_as_published: copper button
           row_as_printed: '10'
           value: '24.3'
           value_as_printed: '24.3'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -1714,11 +1762,13 @@ species:
             row: '10'
             column: XMo GDMS (wt ppm)
         - sample: Slag 11
+          sample_material_as_published: copper button
           row_as_printed: '11'
           value: '25.6'
           value_as_printed: '25.6'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -1787,11 +1837,13 @@ species:
             row: '11'
             column: XMo GDMS (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: '12'
           value: '27.2'
           value_as_printed: '27.2'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -1860,11 +1912,13 @@ species:
             row: '12'
             column: XMo GDMS (wt ppm)
         - sample: Slag 1
+          sample_material_as_published: copper button
           row_as_printed: 1 (24h)
           value: '33'
           value_as_printed: '33'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -1933,11 +1987,13 @@ species:
             row: 1 (24h)
             column: XMo GDMS (wt ppm)
         - sample: Slag 2
+          sample_material_as_published: copper button
           row_as_printed: 2 (24h)
           value: '16.6'
           value_as_printed: '16.6'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -2006,11 +2062,13 @@ species:
             row: 2 (24h)
             column: XMo GDMS (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: copper button
           row_as_printed: 5 (24h)
           value: '29'
           value_as_printed: '29'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -2079,11 +2137,13 @@ species:
             row: 5 (24h)
             column: XMo GDMS (wt ppm)
         - sample: Slag 6
+          sample_material_as_published: copper button
           row_as_printed: 6 (24h)
           value: '32'
           value_as_printed: '32'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -2168,15 +2228,17 @@ species:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
         admission_status: admitted
-        basis_as_published: Mo concentration in l; wt ppm
+        basis_as_published: Mo concentration in slag; wt ppm
         method_as_printed: X-ray fluorescence
         points:
         - sample: Slag 1
+          sample_material_as_published: slag
           row_as_printed: '1'
           value: '51'
           value_as_printed: '51'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -2245,11 +2307,13 @@ species:
             row: '1'
             column: Mo in slag (wt ppm)
         - sample: Slag 2
+          sample_material_as_published: slag
           row_as_printed: '2'
           value: '90'
           value_as_printed: '90'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -2318,11 +2382,13 @@ species:
             row: '2'
             column: Mo in slag (wt ppm)
         - sample: Slag 3
+          sample_material_as_published: slag
           row_as_printed: '3'
           value: '81'
           value_as_printed: '81'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -2391,11 +2457,13 @@ species:
             row: '3'
             column: Mo in slag (wt ppm)
         - sample: Slag 4
+          sample_material_as_published: slag
           row_as_printed: '4'
           value: '110'
           value_as_printed: '110'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -2464,11 +2532,13 @@ species:
             row: '4'
             column: Mo in slag (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: slag
           row_as_printed: '5'
           value: '68'
           value_as_printed: '68'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -2537,11 +2607,13 @@ species:
             row: '5'
             column: Mo in slag (wt ppm)
         - sample: Slag 6
+          sample_material_as_published: slag
           row_as_printed: '6'
           value: '69'
           value_as_printed: '69'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -2610,11 +2682,13 @@ species:
             row: '6'
             column: Mo in slag (wt ppm)
         - sample: Slag 7
+          sample_material_as_published: slag
           row_as_printed: '7'
           value: '77'
           value_as_printed: '77'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -2683,11 +2757,13 @@ species:
             row: '7'
             column: Mo in slag (wt ppm)
         - sample: Slag 8
+          sample_material_as_published: slag
           row_as_printed: '8'
           value: '120'
           value_as_printed: '120'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -2756,11 +2832,13 @@ species:
             row: '8'
             column: Mo in slag (wt ppm)
         - sample: Slag 9
+          sample_material_as_published: slag
           row_as_printed: '9'
           value: '152'
           value_as_printed: '152'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -2829,11 +2907,13 @@ species:
             row: '9'
             column: Mo in slag (wt ppm)
         - sample: Slag 10
+          sample_material_as_published: slag
           row_as_printed: '10'
           value: '38'
           value_as_printed: '38'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -2902,11 +2982,13 @@ species:
             row: '10'
             column: Mo in slag (wt ppm)
         - sample: Slag 11
+          sample_material_as_published: slag
           row_as_printed: '11'
           value: '49'
           value_as_printed: '49'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -2975,11 +3057,13 @@ species:
             row: '11'
             column: Mo in slag (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: slag
           row_as_printed: '12'
           value: '98'
           value_as_printed: '98'
           T_K: '1873'
           method_as_printed: X-ray fluorescence
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -3064,15 +3148,17 @@ species:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
         admission_status: admitted
-        basis_as_published: Mo concentration in l; wt ppm
+        basis_as_published: Mo concentration in copper button; wt ppm
         method_as_printed: GDMS
         points:
         - sample: Slag 1
+          sample_material_as_published: copper button
           row_as_printed: '1'
           value: '185'
           value_as_printed: '185'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -3142,11 +3228,13 @@ species:
             row: '1'
             column: XMo GDMS (wt ppm)
         - sample: Slag 2
+          sample_material_as_published: copper button
           row_as_printed: '2'
           value: '120'
           value_as_printed: '120'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -3216,11 +3304,13 @@ species:
             row: '2'
             column: XMo GDMS (wt ppm)
         - sample: Slag 3
+          sample_material_as_published: copper button
           row_as_printed: '3'
           value: '97'
           value_as_printed: '97'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -3290,11 +3380,13 @@ species:
             row: '3'
             column: XMo GDMS (wt ppm)
         - sample: Slag 4
+          sample_material_as_published: copper button
           row_as_printed: '4'
           value: '94'
           value_as_printed: '94'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -3364,11 +3456,13 @@ species:
             row: '4'
             column: XMo GDMS (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: copper button
           row_as_printed: '5'
           value: '133'
           value_as_printed: '133'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -3438,11 +3532,13 @@ species:
             row: '5'
             column: XMo GDMS (wt ppm)
         - sample: Slag 9
+          sample_material_as_published: copper button
           row_as_printed: '9'
           value: '504'
           value_as_printed: '504'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -3512,11 +3608,13 @@ species:
             row: '9'
             column: XMo GDMS (wt ppm)
         - sample: Slag 10
+          sample_material_as_published: copper button
           row_as_printed: '10'
           value: '90'
           value_as_printed: '90'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -3586,11 +3684,13 @@ species:
             row: '10'
             column: XMo GDMS (wt ppm)
         - sample: Slag 11
+          sample_material_as_published: copper button
           row_as_printed: '11'
           value: '500'
           value_as_printed: '500'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -3660,11 +3760,13 @@ species:
             row: '11'
             column: XMo GDMS (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: '12'
           value: '162'
           value_as_printed: '162'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -3734,11 +3836,13 @@ species:
             row: '12'
             column: XMo GDMS (wt ppm)
         - sample: Slag 13
+          sample_material_as_published: copper button
           row_as_printed: '13'
           value: '205'
           value_as_printed: '205'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -3808,11 +3912,13 @@ species:
             row: '13'
             column: XMo GDMS (wt ppm)
         - sample: Slag 14
+          sample_material_as_published: copper button
           row_as_printed: '14'
           value: '179'
           value_as_printed: '179'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -3898,15 +4004,17 @@ species:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
         admission_status: admitted
-        basis_as_published: Mo concentration in l; wt ppm
+        basis_as_published: Mo concentration in copper button; wt ppm
         method_as_printed: ICP-AES
         points:
         - sample: Slag 1
+          sample_material_as_published: copper button
           row_as_printed: '1'
           value: '212'
           value_as_printed: '212'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -3976,11 +4084,13 @@ species:
             row: '1'
             column: XMo ICP (wt ppm)
         - sample: Slag 2
+          sample_material_as_published: copper button
           row_as_printed: '2'
           value: '200'
           value_as_printed: '200'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -4050,11 +4160,13 @@ species:
             row: '2'
             column: XMo ICP (wt ppm)
         - sample: Slag 3
+          sample_material_as_published: copper button
           row_as_printed: '3'
           value: '183'
           value_as_printed: '183'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -4124,11 +4236,13 @@ species:
             row: '3'
             column: XMo ICP (wt ppm)
         - sample: Slag 4
+          sample_material_as_published: copper button
           row_as_printed: '4'
           value: '196'
           value_as_printed: '196'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -4198,11 +4312,13 @@ species:
             row: '4'
             column: XMo ICP (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: copper button
           row_as_printed: '5'
           value: '171'
           value_as_printed: '171'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -4272,11 +4388,13 @@ species:
             row: '5'
             column: XMo ICP (wt ppm)
         - sample: Slag 6
+          sample_material_as_published: copper button
           row_as_printed: '6'
           value: '216'
           value_as_printed: '216'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -4346,11 +4464,13 @@ species:
             row: '6'
             column: XMo ICP (wt ppm)
         - sample: Slag 7
+          sample_material_as_published: copper button
           row_as_printed: '7'
           value: '202'
           value_as_printed: '202'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -4420,11 +4540,13 @@ species:
             row: '7'
             column: XMo ICP (wt ppm)
         - sample: Slag 8
+          sample_material_as_published: copper button
           row_as_printed: '8'
           value: '237'
           value_as_printed: '237'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -4494,11 +4616,13 @@ species:
             row: '8'
             column: XMo ICP (wt ppm)
         - sample: Slag 9
+          sample_material_as_published: copper button
           row_as_printed: '9'
           value: '330'
           value_as_printed: '330'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -4568,11 +4692,13 @@ species:
             row: '9'
             column: XMo ICP (wt ppm)
         - sample: Slag 10
+          sample_material_as_published: copper button
           row_as_printed: '10'
           value: '159'
           value_as_printed: '159'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -4642,11 +4768,13 @@ species:
             row: '10'
             column: XMo ICP (wt ppm)
         - sample: Slag 11
+          sample_material_as_published: copper button
           row_as_printed: '11'
           value: '258'
           value_as_printed: '258'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -4716,11 +4844,13 @@ species:
             row: '11'
             column: XMo ICP (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: '12'
           value: '196'
           value_as_printed: '196'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -4790,11 +4920,13 @@ species:
             row: '12'
             column: XMo ICP (wt ppm)
         - sample: Slag 13
+          sample_material_as_published: copper button
           row_as_printed: '13'
           value: '291'
           value_as_printed: '291'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -4864,11 +4996,13 @@ species:
             row: '13'
             column: XMo ICP (wt ppm)
         - sample: Slag 14
+          sample_material_as_published: copper button
           row_as_printed: '14'
           value: '322'
           value_as_printed: '322'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -4954,15 +5088,17 @@ species:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
         admission_status: admitted
-        basis_as_published: Mo concentration in l; wt ppm
+        basis_as_published: Mo concentration in copper button; wt ppm
         method_as_printed: GDMS
         points:
         - sample: Slag 2
+          sample_material_as_published: copper button
           row_as_printed: '2'
           value: '34.2'
           value_as_printed: '34.2'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -5036,11 +5172,13 @@ species:
             row: '2'
             column: XMo GDMS (wt ppm)
         - sample: Slag 3
+          sample_material_as_published: copper button
           row_as_printed: '3'
           value: '20.1'
           value_as_printed: '20.1'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -5114,11 +5252,13 @@ species:
             row: '3'
             column: XMo GDMS (wt ppm)
         - sample: Slag 4
+          sample_material_as_published: copper button
           row_as_printed: '4'
           value: '24.4'
           value_as_printed: '24.4'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -5192,11 +5332,13 @@ species:
             row: '4'
             column: XMo GDMS (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: copper button
           row_as_printed: '5'
           value: '16.4'
           value_as_printed: '16.4'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -5270,11 +5412,13 @@ species:
             row: '5'
             column: XMo GDMS (wt ppm)
         - sample: Slag 7
+          sample_material_as_published: copper button
           row_as_printed: '7'
           value: '17.5'
           value_as_printed: '17.5'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -5348,11 +5492,13 @@ species:
             row: '7'
             column: XMo GDMS (wt ppm)
         - sample: Slag 8
+          sample_material_as_published: copper button
           row_as_printed: '8'
           value: '24.3'
           value_as_printed: '24.3'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -5426,11 +5572,13 @@ species:
             row: '8'
             column: XMo GDMS (wt ppm)
         - sample: Slag 9
+          sample_material_as_published: copper button
           row_as_printed: '9'
           value: '24'
           value_as_printed: '24'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -5504,11 +5652,13 @@ species:
             row: '9'
             column: XMo GDMS (wt ppm)
         - sample: Slag 11
+          sample_material_as_published: copper button
           row_as_printed: '11'
           value: '32.9'
           value_as_printed: '32.9'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -5582,11 +5732,13 @@ species:
             row: '11'
             column: XMo GDMS (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: '12'
           value: '56.1'
           value_as_printed: '56.1'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -5676,15 +5828,17 @@ species:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
         admission_status: admitted
-        basis_as_published: Mo concentration in l; wt ppm
+        basis_as_published: Mo concentration in copper button; wt ppm
         method_as_printed: ICP-AES
         points:
         - sample: Slag 1
+          sample_material_as_published: copper button
           row_as_printed: '1'
           value: '200'
           value_as_printed: '200'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -5758,11 +5912,13 @@ species:
             row: '1'
             column: XMo ICP (wt ppm)
         - sample: Slag 2
+          sample_material_as_published: copper button
           row_as_printed: '2'
           value: '200'
           value_as_printed: '200'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -5836,11 +5992,13 @@ species:
             row: '2'
             column: XMo ICP (wt ppm)
         - sample: Slag 3
+          sample_material_as_published: copper button
           row_as_printed: '3'
           value: '170'
           value_as_printed: '170'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -5914,11 +6072,13 @@ species:
             row: '3'
             column: XMo ICP (wt ppm)
         - sample: Slag 4
+          sample_material_as_published: copper button
           row_as_printed: '4'
           value: '131'
           value_as_printed: '131'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -5992,11 +6152,13 @@ species:
             row: '4'
             column: XMo ICP (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: copper button
           row_as_printed: '5'
           value: '125'
           value_as_printed: '125'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -6070,11 +6232,13 @@ species:
             row: '5'
             column: XMo ICP (wt ppm)
         - sample: Slag 6
+          sample_material_as_published: copper button
           row_as_printed: '6'
           value: '220'
           value_as_printed: '220'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -6148,11 +6312,13 @@ species:
             row: '6'
             column: XMo ICP (wt ppm)
         - sample: Slag 7
+          sample_material_as_published: copper button
           row_as_printed: '7'
           value: '165'
           value_as_printed: '165'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -6226,11 +6392,13 @@ species:
             row: '7'
             column: XMo ICP (wt ppm)
         - sample: Slag 8
+          sample_material_as_published: copper button
           row_as_printed: '8'
           value: '190'
           value_as_printed: '190'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -6304,11 +6472,13 @@ species:
             row: '8'
             column: XMo ICP (wt ppm)
         - sample: Slag 9
+          sample_material_as_published: copper button
           row_as_printed: '9'
           value: '210'
           value_as_printed: '210'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -6382,11 +6552,13 @@ species:
             row: '9'
             column: XMo ICP (wt ppm)
         - sample: Slag 10
+          sample_material_as_published: copper button
           row_as_printed: '10'
           value: '230'
           value_as_printed: '230'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -6460,11 +6632,13 @@ species:
             row: '10'
             column: XMo ICP (wt ppm)
         - sample: Slag 11
+          sample_material_as_published: copper button
           row_as_printed: '11'
           value: '180'
           value_as_printed: '180'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -6538,11 +6712,13 @@ species:
             row: '11'
             column: XMo ICP (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: '12'
           value: '415'
           value_as_printed: '415'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -6616,11 +6792,13 @@ species:
             row: '12'
             column: XMo ICP (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: 12(2h)
           value: '185'
           value_as_printed: '185'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -6694,11 +6872,13 @@ species:
             row: 12(2h)
             column: XMo ICP (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: 12(6h)
           value: '195'
           value_as_printed: '195'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -6772,11 +6952,13 @@ species:
             row: 12(6h)
             column: XMo ICP (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: 12(18h)
           value: '170'
           value_as_printed: '170'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -6868,15 +7050,17 @@ species:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
         admission_status: admitted
-        basis_as_published: Si concentration in l; wt ppm
+        basis_as_published: Si concentration in copper button; wt ppm
         method_as_printed: GDMS
         points:
         - sample: Slag 1
+          sample_material_as_published: copper button
           row_as_printed: '1'
           value: '132.0'
           value_as_printed: '132.0'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -6945,11 +7129,13 @@ species:
             row: '1'
             column: XSi GDMS (wt ppm)
         - sample: Slag 2
+          sample_material_as_published: copper button
           row_as_printed: '2'
           value: '280.5'
           value_as_printed: '280.5'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -7018,11 +7204,13 @@ species:
             row: '2'
             column: XSi GDMS (wt ppm)
         - sample: Slag 3
+          sample_material_as_published: copper button
           row_as_printed: '3'
           value: '247.5'
           value_as_printed: '247.5'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -7091,11 +7279,13 @@ species:
             row: '3'
             column: XSi GDMS (wt ppm)
         - sample: Slag 4
+          sample_material_as_published: copper button
           row_as_printed: '4'
           value: '225.5'
           value_as_printed: '225.5'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -7164,11 +7354,13 @@ species:
             row: '4'
             column: XSi GDMS (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: copper button
           row_as_printed: '5'
           value: '71.5'
           value_as_printed: '71.5'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -7237,11 +7429,13 @@ species:
             row: '5'
             column: XSi GDMS (wt ppm)
         - sample: Slag 6
+          sample_material_as_published: copper button
           row_as_printed: '6'
           value: '110.5'
           value_as_printed: '110.5'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -7310,11 +7504,13 @@ species:
             row: '6'
             column: XSi GDMS (wt ppm)
         - sample: Slag 7
+          sample_material_as_published: copper button
           row_as_printed: '7'
           value: '286.5'
           value_as_printed: '286.5'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -7383,11 +7579,13 @@ species:
             row: '7'
             column: XSi GDMS (wt ppm)
         - sample: Slag 8
+          sample_material_as_published: copper button
           row_as_printed: '8'
           value: '300.0'
           value_as_printed: '300.0'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -7456,11 +7654,13 @@ species:
             row: '8'
             column: XSi GDMS (wt ppm)
         - sample: Slag 9
+          sample_material_as_published: copper button
           row_as_printed: '9'
           value: '79.5'
           value_as_printed: '79.5'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -7529,11 +7729,13 @@ species:
             row: '9'
             column: XSi GDMS (wt ppm)
         - sample: Slag 10
+          sample_material_as_published: copper button
           row_as_printed: '10'
           value: '149.5'
           value_as_printed: '149.5'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -7602,11 +7804,13 @@ species:
             row: '10'
             column: XSi GDMS (wt ppm)
         - sample: Slag 11
+          sample_material_as_published: copper button
           row_as_printed: '11'
           value: '321.8'
           value_as_printed: '321.8'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -7675,11 +7879,13 @@ species:
             row: '11'
             column: XSi GDMS (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: '12'
           value: '328.0'
           value_as_printed: '328.0'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -7748,11 +7954,13 @@ species:
             row: '12'
             column: XSi GDMS (wt ppm)
         - sample: Slag 1
+          sample_material_as_published: copper button
           row_as_printed: 1 (24h)
           value: '73'
           value_as_printed: '73'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -7821,11 +8029,13 @@ species:
             row: 1 (24h)
             column: XSi GDMS (wt ppm)
         - sample: Slag 2
+          sample_material_as_published: copper button
           row_as_printed: 2 (24h)
           value: '234'
           value_as_printed: '234'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -7894,11 +8104,13 @@ species:
             row: 2 (24h)
             column: XSi GDMS (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: copper button
           row_as_printed: 5 (24h)
           value: '52'
           value_as_printed: '52'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -7967,11 +8179,13 @@ species:
             row: 5 (24h)
             column: XSi GDMS (wt ppm)
         - sample: Slag 6
+          sample_material_as_published: copper button
           row_as_printed: 6 (24h)
           value: '102'
           value_as_printed: '102'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -8056,15 +8270,17 @@ species:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
         admission_status: admitted
-        basis_as_published: Si concentration in l; wt ppm
+        basis_as_published: Si concentration in copper button; wt ppm
         method_as_printed: ICP-AES
         points:
         - sample: Slag 1
+          sample_material_as_published: copper button
           row_as_printed: '1'
           value: '70'
           value_as_printed: '70'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -8133,11 +8349,13 @@ species:
             row: '1'
             column: XSi ICP (wt ppm)
         - sample: Slag 2
+          sample_material_as_published: copper button
           row_as_printed: '2'
           value: '255'
           value_as_printed: '255'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -8206,11 +8424,13 @@ species:
             row: '2'
             column: XSi ICP (wt ppm)
         - sample: Slag 3
+          sample_material_as_published: copper button
           row_as_printed: '3'
           value: '245'
           value_as_printed: '245'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -8279,11 +8499,13 @@ species:
             row: '3'
             column: XSi ICP (wt ppm)
         - sample: Slag 4
+          sample_material_as_published: copper button
           row_as_printed: '4'
           value: '240'
           value_as_printed: '240'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -8352,11 +8574,13 @@ species:
             row: '4'
             column: XSi ICP (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: copper button
           row_as_printed: '5'
           value: '65'
           value_as_printed: '65'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -8425,11 +8649,13 @@ species:
             row: '5'
             column: XSi ICP (wt ppm)
         - sample: Slag 6
+          sample_material_as_published: copper button
           row_as_printed: '6'
           value: '107'
           value_as_printed: '107'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -8498,11 +8724,13 @@ species:
             row: '6'
             column: XSi ICP (wt ppm)
         - sample: Slag 7
+          sample_material_as_published: copper button
           row_as_printed: '7'
           value: '295'
           value_as_printed: '295'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -8571,11 +8799,13 @@ species:
             row: '7'
             column: XSi ICP (wt ppm)
         - sample: Slag 8
+          sample_material_as_published: copper button
           row_as_printed: '8'
           value: '280'
           value_as_printed: '280'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -8644,11 +8874,13 @@ species:
             row: '8'
             column: XSi ICP (wt ppm)
         - sample: Slag 9
+          sample_material_as_published: copper button
           row_as_printed: '9'
           value: '130'
           value_as_printed: '130'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -8717,11 +8949,13 @@ species:
             row: '9'
             column: XSi ICP (wt ppm)
         - sample: Slag 10
+          sample_material_as_published: copper button
           row_as_printed: '10'
           value: '160'
           value_as_printed: '160'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -8790,11 +9024,13 @@ species:
             row: '10'
             column: XSi ICP (wt ppm)
         - sample: Slag 11
+          sample_material_as_published: copper button
           row_as_printed: '11'
           value: '290'
           value_as_printed: '290'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -8863,11 +9099,13 @@ species:
             row: '11'
             column: XSi ICP (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: '12'
           value: '290'
           value_as_printed: '290'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -10643,15 +10881,17 @@ species:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
         admission_status: admitted
-        basis_as_published: Si concentration in l; wt ppm
+        basis_as_published: Si concentration in copper button; wt ppm
         method_as_printed: GDMS
         points:
         - sample: Slag 1
+          sample_material_as_published: copper button
           row_as_printed: '1'
           value: '29'
           value_as_printed: '29'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -10721,11 +10961,13 @@ species:
             row: '1'
             column: XSi GDMS (wt ppm)
         - sample: Slag 2
+          sample_material_as_published: copper button
           row_as_printed: '2'
           value: '69'
           value_as_printed: '69'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -10795,11 +11037,13 @@ species:
             row: '2'
             column: XSi GDMS (wt ppm)
         - sample: Slag 3
+          sample_material_as_published: copper button
           row_as_printed: '3'
           value: '124'
           value_as_printed: '124'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -10869,11 +11113,13 @@ species:
             row: '3'
             column: XSi GDMS (wt ppm)
         - sample: Slag 4
+          sample_material_as_published: copper button
           row_as_printed: '4'
           value: '233'
           value_as_printed: '233'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -10943,11 +11189,13 @@ species:
             row: '4'
             column: XSi GDMS (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: copper button
           row_as_printed: '5'
           value: '46'
           value_as_printed: '46'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -11017,11 +11265,13 @@ species:
             row: '5'
             column: XSi GDMS (wt ppm)
         - sample: Slag 9
+          sample_material_as_published: copper button
           row_as_printed: '9'
           value: '68'
           value_as_printed: '68'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -11091,11 +11341,13 @@ species:
             row: '9'
             column: XSi GDMS (wt ppm)
         - sample: Slag 10
+          sample_material_as_published: copper button
           row_as_printed: '10'
           value: '90'
           value_as_printed: '90'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -11165,11 +11417,13 @@ species:
             row: '10'
             column: XSi GDMS (wt ppm)
         - sample: Slag 11
+          sample_material_as_published: copper button
           row_as_printed: '11'
           value: '197'
           value_as_printed: '197'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -11239,11 +11493,13 @@ species:
             row: '11'
             column: XSi GDMS (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: '12'
           value: '310'
           value_as_printed: '310'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -11313,11 +11569,13 @@ species:
             row: '12'
             column: XSi GDMS (wt ppm)
         - sample: Slag 13
+          sample_material_as_published: copper button
           row_as_printed: '13'
           value: '805'
           value_as_printed: '805'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -11387,11 +11645,13 @@ species:
             row: '13'
             column: XSi GDMS (wt ppm)
         - sample: Slag 14
+          sample_material_as_published: copper button
           row_as_printed: '14'
           value: '374'
           value_as_printed: '374'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -11477,15 +11737,17 @@ species:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
         admission_status: admitted
-        basis_as_published: Si concentration in l; wt ppm
+        basis_as_published: Si concentration in copper button; wt ppm
         method_as_printed: ICP-AES
         points:
         - sample: Slag 1
+          sample_material_as_published: copper button
           row_as_printed: '1'
           value: '27.9'
           value_as_printed: '27.9'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -11555,11 +11817,13 @@ species:
             row: '1'
             column: XSi ICP (wt ppm)
         - sample: Slag 2
+          sample_material_as_published: copper button
           row_as_printed: '2'
           value: '91.8'
           value_as_printed: '91.8'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -11629,11 +11893,13 @@ species:
             row: '2'
             column: XSi ICP (wt ppm)
         - sample: Slag 3
+          sample_material_as_published: copper button
           row_as_printed: '3'
           value: '103'
           value_as_printed: '103'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -11703,11 +11969,13 @@ species:
             row: '3'
             column: XSi ICP (wt ppm)
         - sample: Slag 4
+          sample_material_as_published: copper button
           row_as_printed: '4'
           value: '106'
           value_as_printed: '106'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -11777,11 +12045,13 @@ species:
             row: '4'
             column: XSi ICP (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: copper button
           row_as_printed: '5'
           value: '34.1'
           value_as_printed: '34.1'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -11851,11 +12121,13 @@ species:
             row: '5'
             column: XSi ICP (wt ppm)
         - sample: Slag 6
+          sample_material_as_published: copper button
           row_as_printed: '6'
           value: '85.5'
           value_as_printed: '85.5'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -11925,11 +12197,13 @@ species:
             row: '6'
             column: XSi ICP (wt ppm)
         - sample: Slag 7
+          sample_material_as_published: copper button
           row_as_printed: '7'
           value: '224'
           value_as_printed: '224'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -11999,11 +12273,13 @@ species:
             row: '7'
             column: XSi ICP (wt ppm)
         - sample: Slag 8
+          sample_material_as_published: copper button
           row_as_printed: '8'
           value: '251'
           value_as_printed: '251'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -12073,11 +12349,13 @@ species:
             row: '8'
             column: XSi ICP (wt ppm)
         - sample: Slag 9
+          sample_material_as_published: copper button
           row_as_printed: '9'
           value: '28.9'
           value_as_printed: '28.9'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -12147,11 +12425,13 @@ species:
             row: '9'
             column: XSi ICP (wt ppm)
         - sample: Slag 10
+          sample_material_as_published: copper button
           row_as_printed: '10'
           value: '60.6'
           value_as_printed: '60.6'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -12221,11 +12501,13 @@ species:
             row: '10'
             column: XSi ICP (wt ppm)
         - sample: Slag 11
+          sample_material_as_published: copper button
           row_as_printed: '11'
           value: '71.8'
           value_as_printed: '71.8'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -12295,11 +12577,13 @@ species:
             row: '11'
             column: XSi ICP (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: '12'
           value: '84.1'
           value_as_printed: '84.1'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -12369,11 +12653,13 @@ species:
             row: '12'
             column: XSi ICP (wt ppm)
         - sample: Slag 13
+          sample_material_as_published: copper button
           row_as_printed: '13'
           value: '118'
           value_as_printed: '118'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -12443,11 +12729,13 @@ species:
             row: '13'
             column: XSi ICP (wt ppm)
         - sample: Slag 14
+          sample_material_as_published: copper button
           row_as_printed: '14'
           value: '91'
           value_as_printed: '91'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -14028,15 +14316,17 @@ species:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
         admission_status: admitted
-        basis_as_published: Si concentration in l; wt ppm
+        basis_as_published: Si concentration in copper button; wt ppm
         method_as_printed: GDMS
         points:
         - sample: Slag 2
+          sample_material_as_published: copper button
           row_as_printed: '2'
           value: '150'
           value_as_printed: '150'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -14110,11 +14400,13 @@ species:
             row: '2'
             column: XSi GDMS (wt ppm)
         - sample: Slag 3
+          sample_material_as_published: copper button
           row_as_printed: '3'
           value: '148'
           value_as_printed: '148'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -14188,11 +14480,13 @@ species:
             row: '3'
             column: XSi GDMS (wt ppm)
         - sample: Slag 4
+          sample_material_as_published: copper button
           row_as_printed: '4'
           value: '430'
           value_as_printed: '430'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -14266,11 +14560,13 @@ species:
             row: '4'
             column: XSi GDMS (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: copper button
           row_as_printed: '5'
           value: '64.9'
           value_as_printed: '64.9'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -14344,11 +14640,13 @@ species:
             row: '5'
             column: XSi GDMS (wt ppm)
         - sample: Slag 7
+          sample_material_as_published: copper button
           row_as_printed: '7'
           value: '269'
           value_as_printed: '269'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -14422,11 +14720,13 @@ species:
             row: '7'
             column: XSi GDMS (wt ppm)
         - sample: Slag 8
+          sample_material_as_published: copper button
           row_as_printed: '8'
           value: '420'
           value_as_printed: '420'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -14500,11 +14800,13 @@ species:
             row: '8'
             column: XSi GDMS (wt ppm)
         - sample: Slag 9
+          sample_material_as_published: copper button
           row_as_printed: '9'
           value: '114'
           value_as_printed: '114'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -14578,11 +14880,13 @@ species:
             row: '9'
             column: XSi GDMS (wt ppm)
         - sample: Slag 11
+          sample_material_as_published: copper button
           row_as_printed: '11'
           value: '356'
           value_as_printed: '356'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -14656,11 +14960,13 @@ species:
             row: '11'
             column: XSi GDMS (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: '12'
           value: '526'
           value_as_printed: '526'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -14750,15 +15056,17 @@ species:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
         admission_status: admitted
-        basis_as_published: Si concentration in l; wt ppm
+        basis_as_published: Si concentration in copper button; wt ppm
         method_as_printed: ICP-AES
         points:
         - sample: Slag 1
+          sample_material_as_published: copper button
           row_as_printed: '1'
           value: '60'
           value_as_printed: '60'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -14832,11 +15140,13 @@ species:
             row: '1'
             column: XSi ICP (wt ppm)
         - sample: Slag 2
+          sample_material_as_published: copper button
           row_as_printed: '2'
           value: '115'
           value_as_printed: '115'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -14910,11 +15220,13 @@ species:
             row: '2'
             column: XSi ICP (wt ppm)
         - sample: Slag 3
+          sample_material_as_published: copper button
           row_as_printed: '3'
           value: '130'
           value_as_printed: '130'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -14988,11 +15300,13 @@ species:
             row: '3'
             column: XSi ICP (wt ppm)
         - sample: Slag 4
+          sample_material_as_published: copper button
           row_as_printed: '4'
           value: '235'
           value_as_printed: '235'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -15066,11 +15380,13 @@ species:
             row: '4'
             column: XSi ICP (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: copper button
           row_as_printed: '5'
           value: '55'
           value_as_printed: '55'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -15144,11 +15460,13 @@ species:
             row: '5'
             column: XSi ICP (wt ppm)
         - sample: Slag 6
+          sample_material_as_published: copper button
           row_as_printed: '6'
           value: '155'
           value_as_printed: '155'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -15222,11 +15540,13 @@ species:
             row: '6'
             column: XSi ICP (wt ppm)
         - sample: Slag 7
+          sample_material_as_published: copper button
           row_as_printed: '7'
           value: '180'
           value_as_printed: '180'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -15300,11 +15620,13 @@ species:
             row: '7'
             column: XSi ICP (wt ppm)
         - sample: Slag 8
+          sample_material_as_published: copper button
           row_as_printed: '8'
           value: '310'
           value_as_printed: '310'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -15378,11 +15700,13 @@ species:
             row: '8'
             column: XSi ICP (wt ppm)
         - sample: Slag 9
+          sample_material_as_published: copper button
           row_as_printed: '9'
           value: '90'
           value_as_printed: '90'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -15456,11 +15780,13 @@ species:
             row: '9'
             column: XSi ICP (wt ppm)
         - sample: Slag 10
+          sample_material_as_published: copper button
           row_as_printed: '10'
           value: '70'
           value_as_printed: '70'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -15534,11 +15860,13 @@ species:
             row: '10'
             column: XSi ICP (wt ppm)
         - sample: Slag 11
+          sample_material_as_published: copper button
           row_as_printed: '11'
           value: '240'
           value_as_printed: '240'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -15612,11 +15940,13 @@ species:
             row: '11'
             column: XSi ICP (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: '12'
           value: '355'
           value_as_printed: '355'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -15690,11 +16020,13 @@ species:
             row: '12'
             column: XSi ICP (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: 12(2h)
           value: '180'
           value_as_printed: '180'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -15768,11 +16100,13 @@ species:
             row: 12(2h)
             column: XSi ICP (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: 12(6h)
           value: '190'
           value_as_printed: '190'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -15846,11 +16180,13 @@ species:
             row: 12(6h)
             column: XSi ICP (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: 12(18h)
           value: '360'
           value_as_printed: '360'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -22435,15 +22771,17 @@ species:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
         admission_status: admitted
-        basis_as_published: Ti concentration in l; wt ppm
+        basis_as_published: Ti concentration in copper button; wt ppm
         method_as_printed: GDMS
         points:
         - sample: Slag 1
+          sample_material_as_published: copper button
           row_as_printed: '1'
           value: '0.008'
           value_as_printed: '0.008'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -22512,11 +22850,13 @@ species:
             row: '1'
             column: XTi GDMS (wt ppm)
         - sample: Slag 2
+          sample_material_as_published: copper button
           row_as_printed: '2'
           value: '0.005'
           value_as_printed: '0.005'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -22585,11 +22925,13 @@ species:
             row: '2'
             column: XTi GDMS (wt ppm)
         - sample: Slag 3
+          sample_material_as_published: copper button
           row_as_printed: '3'
           value: '0.003'
           value_as_printed: '0.003'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -22658,11 +23000,13 @@ species:
             row: '3'
             column: XTi GDMS (wt ppm)
         - sample: Slag 4
+          sample_material_as_published: copper button
           row_as_printed: '4'
           value: '0.002'
           value_as_printed: '0.002'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -22731,11 +23075,13 @@ species:
             row: '4'
             column: XTi GDMS (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: copper button
           row_as_printed: '5'
           value: '0.002'
           value_as_printed: '0.002'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -22804,11 +23150,13 @@ species:
             row: '5'
             column: XTi GDMS (wt ppm)
         - sample: Slag 6
+          sample_material_as_published: copper button
           row_as_printed: '6'
           value: '0.006'
           value_as_printed: '0.006'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -22877,11 +23225,13 @@ species:
             row: '6'
             column: XTi GDMS (wt ppm)
         - sample: Slag 7
+          sample_material_as_published: copper button
           row_as_printed: '7'
           value: '0.006'
           value_as_printed: '0.006'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -22950,11 +23300,13 @@ species:
             row: '7'
             column: XTi GDMS (wt ppm)
         - sample: Slag 8
+          sample_material_as_published: copper button
           row_as_printed: '8'
           value: '0.007'
           value_as_printed: '0.007'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -23023,11 +23375,13 @@ species:
             row: '8'
             column: XTi GDMS (wt ppm)
         - sample: Slag 9
+          sample_material_as_published: copper button
           row_as_printed: '9'
           value: '0.008'
           value_as_printed: '0.008'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -23096,11 +23450,13 @@ species:
             row: '9'
             column: XTi GDMS (wt ppm)
         - sample: Slag 10
+          sample_material_as_published: copper button
           row_as_printed: '10'
           value: '0.003'
           value_as_printed: '0.003'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -23169,11 +23525,13 @@ species:
             row: '10'
             column: XTi GDMS (wt ppm)
         - sample: Slag 11
+          sample_material_as_published: copper button
           row_as_printed: '11'
           value: '0.007'
           value_as_printed: '0.007'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -23242,11 +23600,13 @@ species:
             row: '11'
             column: XTi GDMS (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: '12'
           value: '0.050'
           value_as_printed: '0.050'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -23315,11 +23675,13 @@ species:
             row: '12'
             column: XTi GDMS (wt ppm)
         - sample: Slag 1
+          sample_material_as_published: copper button
           row_as_printed: 1 (24h)
           value: '0.002'
           value_as_printed: '0.002'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -23388,11 +23750,13 @@ species:
             row: 1 (24h)
             column: XTi GDMS (wt ppm)
         - sample: Slag 2
+          sample_material_as_published: copper button
           row_as_printed: 2 (24h)
           value: '0.005'
           value_as_printed: '0.005'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -23461,11 +23825,13 @@ species:
             row: 2 (24h)
             column: XTi GDMS (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: copper button
           row_as_printed: 5 (24h)
           value: '0.004'
           value_as_printed: '0.004'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -23534,11 +23900,13 @@ species:
             row: 5 (24h)
             column: XTi GDMS (wt ppm)
         - sample: Slag 6
+          sample_material_as_published: copper button
           row_as_printed: 6 (24h)
           value: '0.005'
           value_as_printed: '0.005'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -23623,15 +23991,17 @@ species:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
         admission_status: admitted
-        basis_as_published: Ti concentration in l; wt ppm
+        basis_as_published: Ti concentration in copper button; wt ppm
         method_as_printed: ICP-AES
         points:
         - sample: Slag 1
+          sample_material_as_published: copper button
           row_as_printed: '1'
           value: '0.7'
           value_as_printed: '0.7'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -23700,11 +24070,13 @@ species:
             row: '1'
             column: XTi ICP (wt ppm)
         - sample: Slag 2
+          sample_material_as_published: copper button
           row_as_printed: '2'
           value: '0.6'
           value_as_printed: '0.6'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -23773,11 +24145,13 @@ species:
             row: '2'
             column: XTi ICP (wt ppm)
         - sample: Slag 3
+          sample_material_as_published: copper button
           row_as_printed: '3'
           value: '0.1'
           value_as_printed: '0.1'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -23846,11 +24220,13 @@ species:
             row: '3'
             column: XTi ICP (wt ppm)
         - sample: Slag 4
+          sample_material_as_published: copper button
           row_as_printed: '4'
           value: '0.1'
           value_as_printed: '0.1'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -23919,11 +24295,13 @@ species:
             row: '4'
             column: XTi ICP (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: copper button
           row_as_printed: '5'
           value: '0.2'
           value_as_printed: '0.2'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -23992,11 +24370,13 @@ species:
             row: '5'
             column: XTi ICP (wt ppm)
         - sample: Slag 6
+          sample_material_as_published: copper button
           row_as_printed: '6'
           value: '0.3'
           value_as_printed: '0.3'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -24065,11 +24445,13 @@ species:
             row: '6'
             column: XTi ICP (wt ppm)
         - sample: Slag 7
+          sample_material_as_published: copper button
           row_as_printed: '7'
           value: '0.2'
           value_as_printed: '0.2'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -24138,11 +24520,13 @@ species:
             row: '7'
             column: XTi ICP (wt ppm)
         - sample: Slag 8
+          sample_material_as_published: copper button
           row_as_printed: '8'
           value: '0.4'
           value_as_printed: '0.4'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -24211,11 +24595,13 @@ species:
             row: '8'
             column: XTi ICP (wt ppm)
         - sample: Slag 9
+          sample_material_as_published: copper button
           row_as_printed: '9'
           value: '0.5'
           value_as_printed: '0.5'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -24284,11 +24670,13 @@ species:
             row: '9'
             column: XTi ICP (wt ppm)
         - sample: Slag 10
+          sample_material_as_published: copper button
           row_as_printed: '10'
           value: '0.3'
           value_as_printed: '0.3'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -24357,11 +24745,13 @@ species:
             row: '10'
             column: XTi ICP (wt ppm)
         - sample: Slag 11
+          sample_material_as_published: copper button
           row_as_printed: '11'
           value: '0.4'
           value_as_printed: '0.4'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -24430,11 +24820,13 @@ species:
             row: '11'
             column: XTi ICP (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: '12'
           value: '0.3'
           value_as_printed: '0.3'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -24533,7 +24925,6 @@ species:
           value: '0.204'
           value_as_published: '0.204'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -24614,7 +25005,6 @@ species:
           value: '0.303'
           value_as_published: '0.303'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -24695,7 +25085,6 @@ species:
           value: '0.455'
           value_as_published: '0.455'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -24776,7 +25165,6 @@ species:
           value: '0.632'
           value_as_published: '0.632'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -24857,7 +25245,6 @@ species:
           value: '0.180'
           value_as_published: '0.180'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -24938,7 +25325,6 @@ species:
           value: '0.218'
           value_as_published: '0.218'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -25019,7 +25405,6 @@ species:
           value: '0.400'
           value_as_published: '0.400'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -25100,7 +25485,6 @@ species:
           value: '0.469'
           value_as_published: '0.469'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -25181,7 +25565,6 @@ species:
           value: '0.189'
           value_as_published: '0.189'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -25262,7 +25645,6 @@ species:
           value: '0.242'
           value_as_published: '0.242'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -25343,7 +25725,6 @@ species:
           value: '0.413'
           value_as_published: '0.413'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -25424,7 +25805,6 @@ species:
           value: '0.516'
           value_as_published: '0.516'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -25505,7 +25885,6 @@ species:
           value: '0.176'
           value_as_published: '0.176'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -25586,7 +25965,6 @@ species:
           value: '0.242'
           value_as_published: '0.242'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -25667,7 +26045,6 @@ species:
           value: '0.140'
           value_as_published: '0.140'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -25748,7 +26125,6 @@ species:
           value: '0.220'
           value_as_published: '0.220'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -25841,15 +26217,17 @@ species:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
         admission_status: admitted
-        basis_as_published: Ti concentration in l; wt ppm
+        basis_as_published: Ti concentration in copper button; wt ppm
         method_as_printed: GDMS
         points:
         - sample: Slag 1
+          sample_material_as_published: copper button
           row_as_printed: '1'
           value: '0.07'
           value_as_printed: '0.07'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -25919,11 +26297,13 @@ species:
             row: '1'
             column: XTi GDMS (wt ppm)
         - sample: Slag 2
+          sample_material_as_published: copper button
           row_as_printed: '2'
           value: '0.18'
           value_as_printed: '0.18'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -25993,11 +26373,13 @@ species:
             row: '2'
             column: XTi GDMS (wt ppm)
         - sample: Slag 3
+          sample_material_as_published: copper button
           row_as_printed: '3'
           value: '0.32'
           value_as_printed: '0.32'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -26067,11 +26449,13 @@ species:
             row: '3'
             column: XTi GDMS (wt ppm)
         - sample: Slag 4
+          sample_material_as_published: copper button
           row_as_printed: '4'
           value: '0.02'
           value_as_printed: '0.02'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -26141,11 +26525,13 @@ species:
             row: '4'
             column: XTi GDMS (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: copper button
           row_as_printed: '5'
           value: '0.13'
           value_as_printed: '0.13'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -26215,11 +26601,13 @@ species:
             row: '5'
             column: XTi GDMS (wt ppm)
         - sample: Slag 9
+          sample_material_as_published: copper button
           row_as_printed: '9'
           value: '0.95'
           value_as_printed: '0.95'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -26289,11 +26677,13 @@ species:
             row: '9'
             column: XTi GDMS (wt ppm)
         - sample: Slag 10
+          sample_material_as_published: copper button
           row_as_printed: '10'
           value: '0.13'
           value_as_printed: '0.13'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -26363,11 +26753,13 @@ species:
             row: '10'
             column: XTi GDMS (wt ppm)
         - sample: Slag 11
+          sample_material_as_published: copper button
           row_as_printed: '11'
           value: '0.38'
           value_as_printed: '0.38'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -26437,11 +26829,13 @@ species:
             row: '11'
             column: XTi GDMS (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: '12'
           value: '0.8'
           value_as_printed: '0.8'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -26511,11 +26905,13 @@ species:
             row: '12'
             column: XTi GDMS (wt ppm)
         - sample: Slag 13
+          sample_material_as_published: copper button
           row_as_printed: '13'
           value: '0.15'
           value_as_printed: '0.15'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -26585,11 +26981,13 @@ species:
             row: '13'
             column: XTi GDMS (wt ppm)
         - sample: Slag 14
+          sample_material_as_published: copper button
           row_as_printed: '14'
           value: '0.08'
           value_as_printed: '0.08'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -26675,15 +27073,17 @@ species:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
         admission_status: admitted
-        basis_as_published: Ti concentration in l; wt ppm
+        basis_as_published: Ti concentration in copper button; wt ppm
         method_as_printed: ICP-AES
         points:
         - sample: Slag 1
+          sample_material_as_published: copper button
           row_as_printed: '1'
           value: '5.47'
           value_as_printed: '5.47'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -26753,11 +27153,13 @@ species:
             row: '1'
             column: XTi ICP (wt ppm)
         - sample: Slag 2
+          sample_material_as_published: copper button
           row_as_printed: '2'
           value: '0.06'
           value_as_printed: '0.06'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -26827,11 +27229,13 @@ species:
             row: '2'
             column: XTi ICP (wt ppm)
         - sample: Slag 3
+          sample_material_as_published: copper button
           row_as_printed: '3'
           value: '0.77'
           value_as_printed: '0.77'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -26901,11 +27305,13 @@ species:
             row: '3'
             column: XTi ICP (wt ppm)
         - sample: Slag 4
+          sample_material_as_published: copper button
           row_as_printed: '4'
           value: '0.36'
           value_as_printed: '0.36'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -26975,11 +27381,13 @@ species:
             row: '4'
             column: XTi ICP (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: copper button
           row_as_printed: '5'
           value: '0.13'
           value_as_printed: '0.13'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -27049,11 +27457,13 @@ species:
             row: '5'
             column: XTi ICP (wt ppm)
         - sample: Slag 6
+          sample_material_as_published: copper button
           row_as_printed: '6'
           value: '0.68'
           value_as_printed: '0.68'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -27123,11 +27533,13 @@ species:
             row: '6'
             column: XTi ICP (wt ppm)
         - sample: Slag 7
+          sample_material_as_published: copper button
           row_as_printed: '7'
           value: '0.67'
           value_as_printed: '0.67'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -27197,11 +27609,13 @@ species:
             row: '7'
             column: XTi ICP (wt ppm)
         - sample: Slag 8
+          sample_material_as_published: copper button
           row_as_printed: '8'
           value: '0.68'
           value_as_printed: '0.68'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -27271,11 +27685,13 @@ species:
             row: '8'
             column: XTi ICP (wt ppm)
         - sample: Slag 9
+          sample_material_as_published: copper button
           row_as_printed: '9'
           value: '109'
           value_as_printed: '109'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -27345,11 +27761,13 @@ species:
             row: '9'
             column: XTi ICP (wt ppm)
         - sample: Slag 10
+          sample_material_as_published: copper button
           row_as_printed: '10'
           value: '0.54'
           value_as_printed: '0.54'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -27419,11 +27837,13 @@ species:
             row: '10'
             column: XTi ICP (wt ppm)
         - sample: Slag 11
+          sample_material_as_published: copper button
           row_as_printed: '11'
           value: '1.61'
           value_as_printed: '1.61'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -27493,11 +27913,13 @@ species:
             row: '11'
             column: XTi ICP (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: '12'
           value: '3.62'
           value_as_printed: '3.62'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -27567,11 +27989,13 @@ species:
             row: '12'
             column: XTi ICP (wt ppm)
         - sample: Slag 13
+          sample_material_as_published: copper button
           row_as_printed: '13'
           value: '10.1'
           value_as_printed: '10.1'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -27641,11 +28065,13 @@ species:
             row: '13'
             column: XTi ICP (wt ppm)
         - sample: Slag 14
+          sample_material_as_published: copper button
           row_as_printed: '14'
           value: '3.31'
           value_as_printed: '3.31'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -27745,7 +28171,6 @@ species:
           value: '0.086'
           value_as_published: '0.086'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -27827,7 +28252,6 @@ species:
           value: '0.239'
           value_as_published: '0.239'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -27909,7 +28333,6 @@ species:
           value: '0.520'
           value_as_published: '0.520'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -27991,7 +28414,6 @@ species:
           value: '0.658'
           value_as_published: '0.658'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -28073,7 +28495,6 @@ species:
           value: '0.123'
           value_as_published: '0.123'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -28155,7 +28576,6 @@ species:
           value: '0.234'
           value_as_published: '0.234'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -28237,7 +28657,6 @@ species:
           value: '0.485'
           value_as_published: '0.485'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -28319,7 +28738,6 @@ species:
           value: '0.732'
           value_as_published: '0.732'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -28401,7 +28819,6 @@ species:
           value: '0.218'
           value_as_published: '0.218'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -28483,7 +28900,6 @@ species:
           value: '0.171'
           value_as_published: '0.171'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -28565,7 +28981,6 @@ species:
           value: '0.354'
           value_as_published: '0.354'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -28647,7 +29062,6 @@ species:
           value: '0.467'
           value_as_published: '0.467'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -28729,7 +29143,6 @@ species:
           value: '0.453'
           value_as_published: '0.453'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -28811,7 +29224,6 @@ species:
           value: '0.452'
           value_as_published: '0.452'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -28905,15 +29317,17 @@ species:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
         admission_status: admitted
-        basis_as_published: Ti concentration in l; wt ppm
+        basis_as_published: Ti concentration in copper button; wt ppm
         method_as_printed: GDMS
         points:
         - sample: Slag 2
+          sample_material_as_published: copper button
           row_as_printed: '2'
           value: '0.004'
           value_as_printed: '0.004'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -28987,11 +29401,13 @@ species:
             row: '2'
             column: XTi GDMS (wt ppm)
         - sample: Slag 3
+          sample_material_as_published: copper button
           row_as_printed: '3'
           value: '0.006'
           value_as_printed: '0.006'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -29065,11 +29481,13 @@ species:
             row: '3'
             column: XTi GDMS (wt ppm)
         - sample: Slag 4
+          sample_material_as_published: copper button
           row_as_printed: '4'
           value: '0.006'
           value_as_printed: '0.006'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -29143,11 +29561,13 @@ species:
             row: '4'
             column: XTi GDMS (wt ppm)
         - sample: Slag 5
+          sample_material_as_published: copper button
           row_as_printed: '5'
           value: '0.006'
           value_as_printed: '0.006'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -29221,11 +29641,13 @@ species:
             row: '5'
             column: XTi GDMS (wt ppm)
         - sample: Slag 7
+          sample_material_as_published: copper button
           row_as_printed: '7'
           value: '0.008'
           value_as_printed: '0.008'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -29299,11 +29721,13 @@ species:
             row: '7'
             column: XTi GDMS (wt ppm)
         - sample: Slag 8
+          sample_material_as_published: copper button
           row_as_printed: '8'
           value: '0.03'
           value_as_printed: '0.03'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -29377,11 +29801,13 @@ species:
             row: '8'
             column: XTi GDMS (wt ppm)
         - sample: Slag 9
+          sample_material_as_published: copper button
           row_as_printed: '9'
           value: '0.03'
           value_as_printed: '0.03'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -29455,11 +29881,13 @@ species:
             row: '9'
             column: XTi GDMS (wt ppm)
         - sample: Slag 11
+          sample_material_as_published: copper button
           row_as_printed: '11'
           value: '0.07'
           value_as_printed: '0.07'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -29533,11 +29961,13 @@ species:
             row: '11'
             column: XTi GDMS (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: '12'
           value: '0.06'
           value_as_printed: '0.06'
           T_K: '1873'
           method_as_printed: GDMS
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -29627,15 +30057,17 @@ species:
         quantity: equilibrium_phase_composition
         method_class: measured_direct
         admission_status: admitted
-        basis_as_published: Ti concentration in l; wt ppm
+        basis_as_published: Ti concentration in copper button; wt ppm
         method_as_printed: ICP-AES
         points:
         - sample: Slag 1
+          sample_material_as_published: copper button
           row_as_printed: '1'
           value: '1.9'
           value_as_printed: '1.9'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -29709,11 +30141,13 @@ species:
             row: '1'
             column: XTi ICP (wt ppm)
         - sample: Slag 6
+          sample_material_as_published: copper button
           row_as_printed: '6'
           value: '0.7'
           value_as_printed: '0.7'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -29787,11 +30221,13 @@ species:
             row: '6'
             column: XTi ICP (wt ppm)
         - sample: Slag 8
+          sample_material_as_published: copper button
           row_as_printed: '8'
           value: '0.9'
           value_as_printed: '0.9'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -29865,11 +30301,13 @@ species:
             row: '8'
             column: XTi ICP (wt ppm)
         - sample: Slag 9
+          sample_material_as_published: copper button
           row_as_printed: '9'
           value: '0.6'
           value_as_printed: '0.6'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -29943,11 +30381,13 @@ species:
             row: '9'
             column: XTi ICP (wt ppm)
         - sample: Slag 10
+          sample_material_as_published: copper button
           row_as_printed: '10'
           value: '12'
           value_as_printed: '12'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -30021,11 +30461,13 @@ species:
             row: '10'
             column: XTi ICP (wt ppm)
         - sample: Slag 11
+          sample_material_as_published: copper button
           row_as_printed: '11'
           value: '0.7'
           value_as_printed: '0.7'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -30099,11 +30541,13 @@ species:
             row: '11'
             column: XTi ICP (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: '12'
           value: '1'
           value_as_printed: '1'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -30177,11 +30621,13 @@ species:
             row: '12'
             column: XTi ICP (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: 12(2h)
           value: '1.4'
           value_as_printed: '1.4'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -30255,11 +30701,13 @@ species:
             row: 12(2h)
             column: XTi ICP (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: 12(6h)
           value: '3.7'
           value_as_printed: '3.7'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -30333,11 +30781,13 @@ species:
             row: 12(6h)
             column: XTi ICP (wt ppm)
         - sample: Slag 12
+          sample_material_as_published: copper button
           row_as_printed: 12(18h)
           value: '2.3'
           value_as_printed: '2.3'
           T_K: '1873'
           method_as_printed: ICP-AES
+          quench_statement: *tranell_water_quench
           point_conditions:
             temperature_K:
               state:
@@ -30441,7 +30891,6 @@ species:
           value: '0.092'
           value_as_published: '0.092'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -30527,7 +30976,6 @@ species:
           value: '0.262'
           value_as_published: '0.262'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -30613,7 +31061,6 @@ species:
           value: '0.530'
           value_as_published: '0.530'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -30699,7 +31146,6 @@ species:
           value: '0.691'
           value_as_published: '0.691'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -30785,7 +31231,6 @@ species:
           value: '0.101'
           value_as_published: '0.101'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -30871,7 +31316,6 @@ species:
           value: '0.283'
           value_as_published: '0.283'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -30957,7 +31401,6 @@ species:
           value: '0.402'
           value_as_published: '0.402'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -31043,7 +31486,6 @@ species:
           value: '0.685'
           value_as_published: '0.685'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -31129,7 +31571,6 @@ species:
           value: '0.188'
           value_as_published: '0.188'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -31215,7 +31656,6 @@ species:
           value: '0.296'
           value_as_published: '0.296'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -31301,7 +31741,6 @@ species:
           value: '0.483'
           value_as_published: '0.483'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -31387,7 +31826,6 @@ species:
           value: '0.690'
           value_as_published: '0.690'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -31473,7 +31911,6 @@ species:
           value: '0.567'
           value_as_published: '0.567'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -31559,7 +31996,6 @@ species:
           value: '0.562'
           value_as_published: '0.562'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
@@ -31645,7 +32081,6 @@ species:
           value: '0.568'
           value_as_published: '0.568'
           T_K: '1873'
-          phase_as_measured: quenched slag; whether the sample is glass is not stated
           quench_statement:
             text: The equilibrated sample was withdrawn from the furnace and quenched in water before analysis.
             preservation: not_stated
