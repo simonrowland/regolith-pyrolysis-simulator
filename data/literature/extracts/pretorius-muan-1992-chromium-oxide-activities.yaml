@@ -33124,7 +33124,7 @@ species:
       values:
         quantity: activity
         method_class: measured_direct
-        activity: '0.0007650000000000001'
+        activity: '0.000765'
         activity_as_published: "0.765 \xD7 10^-3"
         T_C: '1500'
         scale_factor:
@@ -33400,7 +33400,7 @@ species:
       values:
         quantity: activity
         method_class: measured_direct
-        activity: '0.0012900000000000001'
+        activity: '0.00129'
         activity_as_published: "1.29 \xD7 10^-3"
         T_C: '1500'
         scale_factor:
@@ -33745,7 +33745,7 @@ species:
       values:
         quantity: activity
         method_class: measured_direct
-        activity: '0.019899999999999998'
+        activity: '0.0199'
         activity_as_published: "19.9 \xD7 10^-3"
         T_C: '1500'
         scale_factor:
@@ -34297,7 +34297,7 @@ species:
       values:
         quantity: activity
         method_class: measured_direct
-        activity: '0.051100000000000007'
+        activity: '0.0511'
         activity_as_published: "5.11 \xD7 10^-2"
         T_C: '1500'
         scale_factor:
@@ -34573,7 +34573,7 @@ species:
       values:
         quantity: activity
         method_class: measured_direct
-        activity: '0.051100000000000007'
+        activity: '0.0511'
         activity_as_published: "5.11 \xD7 10^-2"
         T_C: '1500'
         scale_factor:
@@ -35351,6 +35351,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -35414,6 +35415,82 @@ species:
         uncertainty_as_published: (0.15)
         time_h_as_published: '48'
         container_as_published: Pt
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_11_metal_cr
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 11, Metal, Cr
+        column: Cr (wt%)
+      units: wt% Cr as printed
+      phase_label_as_published: Metal
+      phase_as_published: Metal
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.27'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1499'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 11
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 11, Metal, Cr
+            column: Cr (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Metal
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 11, Metal, Cr
+            column: Cr (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1499'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 11, Metal, Cr
+            column: Cr (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.56'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 11, Metal, Cr
+            column: Cr (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: Cr wt% in Metal as printed
+        component_as_published: Cr
+        value: '5.49'
+        value_as_published: 5.49(0.27)
+        T_C: '1499'
+        uncertainty_as_published: (0.27)
+        time_h_as_published: '72'
+        container_as_published: Pt
     - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_12_metal_cr
       type: equilibrium_phase_composition
       locator:
@@ -35426,10 +35503,11 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
-        as_published: '0.27'
+        as_published: '0.1'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
       T_C: '1500'
@@ -35483,81 +35561,6 @@ species:
         method_class: measured_direct
         basis_as_published: Cr wt% in Metal as printed
         component_as_published: Cr
-        value: '5.49'
-        value_as_published: 5.49(0.27)
-        T_C: '1500'
-        uncertainty_as_published: (0.27)
-        time_h_as_published: '50'
-        container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_13_metal_cr
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 13, Metal, Cr
-        column: Cr (wt%)
-      units: wt% Cr as printed
-      phase_label_as_published: Metal
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.1'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 13
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Metal, Cr
-            column: Cr (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Metal
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Metal, Cr
-            column: Cr (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1500'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Metal, Cr
-            column: Cr (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Metal, Cr
-            column: Cr (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: Cr wt% in Metal as printed
-        component_as_published: Cr
         value: '7.57'
         value_as_published: 7.57(0.1)
         T_C: '1500'
@@ -35576,6 +35579,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -35651,6 +35655,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -35714,7 +35719,83 @@ species:
         uncertainty_as_published: (0.19)
         time_h_as_published: '65'
         container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_5_metal_cr_p10
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c00_ccrs_23_metal_cr
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 23, Metal, Cr
+        column: Cr (wt%)
+      units: wt% Cr as printed
+      phase_label_as_published: Metal
+      phase_as_published: Metal
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.16'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1502'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 23
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Metal, Cr
+            column: Cr (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Metal
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Metal, Cr
+            column: Cr (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1502'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Metal, Cr
+            column: Cr (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.56'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Metal, Cr
+            column: Cr (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: Cr wt% in Metal as printed
+        component_as_published: Cr
+        value: '7.57'
+        value_as_published: 7.57(0.16)
+        T_C: '1502'
+        uncertainty_as_published: (0.16)
+        time_h_as_published: '48'
+        container_as_published: Pt
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c04_ccrs_5_metal_cr
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -35726,13 +35807,14 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
-        as_published: '0.16'
+        as_published: '0.28'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
+      T_C: '1499'
       point_conditions:
         sample_id:
           state:
@@ -35759,7 +35841,7 @@ species:
         temperature_C:
           state:
             tag: value
-            value: '1500'
+            value: '1499'
           locator:
             page: 10
             published_page: 1373
@@ -35770,88 +35852,13 @@ species:
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
             row: CCrS 5, Metal, Cr
-            column: Cr (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: Cr wt% in Metal as printed
-        component_as_published: Cr
-        value: '7.57'
-        value_as_published: 7.57(0.16)
-        T_C: '1500'
-        uncertainty_as_published: (0.16)
-        time_h_as_published: '48'
-        container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_12_metal_cr_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 12, Metal, Cr
-        column: Cr (wt%)
-      units: wt% Cr as printed
-      phase_label_as_published: Metal
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.28'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 12
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Metal, Cr
-            column: Cr (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Metal
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Metal, Cr
-            column: Cr (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1500'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Metal, Cr
-            column: Cr (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Metal, Cr
             column: Cr (wt%)
       values:
         quantity: equilibrium_phase_composition
@@ -35860,11 +35867,11 @@ species:
         component_as_published: Cr
         value: '8.94'
         value_as_published: 8.94(0.28)
-        T_C: '1500'
+        T_C: '1499'
         uncertainty_as_published: (0.28)
-        time_h_as_published: '50'
+        time_h_as_published: '48'
         container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_13_metal_cr_p10
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c05_ccrs_5_metal_cr
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -35872,28 +35879,29 @@ species:
         pdf_page_index: 9
         appendix: Appendix A
         table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 13, Metal, Cr
+        row: CCrS 5, Metal, Cr
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
         as_published: '0.33'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
+      T_C: '1502'
       point_conditions:
         sample_id:
           state:
             tag: value
-            value: CCrS 13
+            value: CCrS 5
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 13, Metal, Cr
+            row: CCrS 5, Metal, Cr
             column: Cr (wt%)
         phase_label_as_published:
           state:
@@ -35904,29 +35912,29 @@ species:
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 13, Metal, Cr
+            row: CCrS 5, Metal, Cr
             column: Cr (wt%)
         temperature_C:
           state:
             tag: value
-            value: '1500'
+            value: '1502'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 13, Metal, Cr
+            row: CCrS 5, Metal, Cr
             column: Cr (wt%)
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 13, Metal, Cr
+            row: CCrS 5, Metal, Cr
             column: Cr (wt%)
       values:
         quantity: equilibrium_phase_composition
@@ -35935,11 +35943,11 @@ species:
         component_as_published: Cr
         value: '14.66'
         value_as_published: 14.66(0.33)
-        T_C: '1500'
+        T_C: '1502'
         uncertainty_as_published: (0.33)
-        time_h_as_published: '50'
-        container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_14_metal_cr
+        time_h_as_published: '48'
+        container_as_published: Mo
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c06_ccrs_6_metal_cr
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -35947,10 +35955,11 @@ species:
         pdf_page_index: 9
         appendix: Appendix A
         table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 14, Metal, Cr
+        row: CCrS 6, Metal, Cr
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -35962,13 +35971,13 @@ species:
         sample_id:
           state:
             tag: value
-            value: CCrS 14
+            value: CCrS 6
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 14, Metal, Cr
+            row: CCrS 6, Metal, Cr
             column: Cr (wt%)
         phase_label_as_published:
           state:
@@ -35979,7 +35988,7 @@ species:
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 14, Metal, Cr
+            row: CCrS 6, Metal, Cr
             column: Cr (wt%)
         temperature_C:
           state:
@@ -35990,18 +35999,18 @@ species:
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 14, Metal, Cr
+            row: CCrS 6, Metal, Cr
             column: Cr (wt%)
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 14, Metal, Cr
+            row: CCrS 6, Metal, Cr
             column: Cr (wt%)
       values:
         quantity: equilibrium_phase_composition
@@ -36012,9 +36021,9 @@ species:
         value_as_published: 11.87(0.25)
         T_C: '1500'
         uncertainty_as_published: (0.25)
-        time_h_as_published: '60'
+        time_h_as_published: '48'
         container_as_published: Mo
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_18_metal_cr_p10
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c09_ccrs_8_metal_cr
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -36022,28 +36031,29 @@ species:
         pdf_page_index: 9
         appendix: Appendix A
         table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 18, Metal, Cr
+        row: CCrS 8, Metal, Cr
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
         as_published: '0.16'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1499'
+      T_C: '1498'
       point_conditions:
         sample_id:
           state:
             tag: value
-            value: CCrS 18
+            value: CCrS 8
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Metal, Cr
+            row: CCrS 8, Metal, Cr
             column: Cr (wt%)
         phase_label_as_published:
           state:
@@ -36054,29 +36064,29 @@ species:
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Metal, Cr
+            row: CCrS 8, Metal, Cr
             column: Cr (wt%)
         temperature_C:
           state:
             tag: value
-            value: '1499'
+            value: '1498'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Metal, Cr
+            row: CCrS 8, Metal, Cr
             column: Cr (wt%)
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Metal, Cr
+            row: CCrS 8, Metal, Cr
             column: Cr (wt%)
       values:
         quantity: equilibrium_phase_composition
@@ -36085,9 +36095,9 @@ species:
         component_as_published: Cr
         value: '13.44'
         value_as_published: 13.44(0.16)
-        T_C: '1499'
+        T_C: '1498'
         uncertainty_as_published: (0.16)
-        time_h_as_published: '65'
+        time_h_as_published: '49'
         container_as_published: Pt
     - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_18_metal_cr_p11
       type: equilibrium_phase_composition
@@ -36101,6 +36111,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -36176,6 +36187,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -36251,6 +36263,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -36326,6 +36339,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -36401,6 +36415,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -36476,6 +36491,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -36551,6 +36567,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -36626,6 +36643,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -36701,6 +36719,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -36776,6 +36795,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -36851,6 +36871,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -36926,6 +36947,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -37001,6 +37023,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -37076,6 +37099,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -37151,6 +37175,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -37226,6 +37251,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -37301,6 +37327,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -37376,6 +37403,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -37451,6 +37479,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -37526,6 +37555,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -37601,6 +37631,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -37676,6 +37707,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -37751,6 +37783,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -37826,6 +37859,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -37901,6 +37935,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -37976,6 +38011,7 @@ species:
         column: Cr (wt%)
       units: wt% Cr as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -38877,7 +38913,311 @@ species:
         uncertainty_as_published: (0.06)
         time_h_as_published: '65'
         container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_5_glass_sio2_p10
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c00_ccrs_23_glass_sio2
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 23, Glass, SiO2
+        column: SiO2 (wt%)
+      units: wt% SiO2 as printed
+      phase: glass
+      phase_label_as_published: Glass
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.13'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1502'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 23
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Glass, SiO2
+            column: SiO2 (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Glass
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Glass, SiO2
+            column: SiO2 (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1502'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Glass, SiO2
+            column: SiO2 (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.56'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Glass, SiO2
+            column: SiO2 (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: SiO2 wt% in Glass as printed
+        component_as_published: SiO2
+        value: '52.76'
+        value_as_published: 52.76(0.13)
+        T_C: '1502'
+        uncertainty_as_published: (0.13)
+        time_h_as_published: '48'
+        container_as_published: Pt
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c01_ccrs_1_glass_sio2
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 1, Glass, SiO2
+        column: SiO2 (wt%)
+      units: wt% SiO2 as printed
+      phase: glass
+      phase_label_as_published: Glass
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.13'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1502'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 1
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1, Glass, SiO2
+            column: SiO2 (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Glass
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1, Glass, SiO2
+            column: SiO2 (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1502'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1, Glass, SiO2
+            column: SiO2 (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1, Glass, SiO2
+            column: SiO2 (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: SiO2 wt% in Glass as printed
+        component_as_published: SiO2
+        value: '52.89'
+        value_as_published: 52.89(0.13)
+        T_C: '1502'
+        uncertainty_as_published: (0.13)
+        time_h_as_published: '48'
+        container_as_published: $SiO_2$
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c02_ccrs_1a_glass_sio2
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 1a, Glass, SiO2
+        column: SiO2 (wt%)
+      units: wt% SiO2 as printed
+      phase: glass
+      phase_label_as_published: Glass
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.16'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1502'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 1a
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1a, Glass, SiO2
+            column: SiO2 (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Glass
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1a, Glass, SiO2
+            column: SiO2 (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1502'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1a, Glass, SiO2
+            column: SiO2 (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1a, Glass, SiO2
+            column: SiO2 (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: SiO2 wt% in Glass as printed
+        component_as_published: SiO2
+        value: '43.67'
+        value_as_published: 43.67(0.16)
+        T_C: '1502'
+        uncertainty_as_published: (0.16)
+        time_h_as_published: '48'
+        container_as_published: Pt
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c03_ccrs_3_glass_sio2
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 3, Glass, SiO2
+        column: SiO2 (wt%)
+      units: wt% SiO2 as printed
+      phase: glass
+      phase_label_as_published: Glass
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.15'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1502'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 3
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 3, Glass, SiO2
+            column: SiO2 (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Glass
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 3, Glass, SiO2
+            column: SiO2 (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1502'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 3, Glass, SiO2
+            column: SiO2 (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 3, Glass, SiO2
+            column: SiO2 (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: SiO2 wt% in Glass as printed
+        component_as_published: SiO2
+        value: '43.04'
+        value_as_published: 43.04(0.15)
+        T_C: '1502'
+        uncertainty_as_published: (0.15)
+        time_h_as_published: '48'
+        container_as_published: Pt
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c04_ccrs_5_glass_sio2
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -38893,10 +39233,10 @@ species:
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
-        as_published: '0.13'
+        as_published: '0.21'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
+      T_C: '1499'
       point_conditions:
         sample_id:
           state:
@@ -38923,7 +39263,7 @@ species:
         temperature_C:
           state:
             tag: value
-            value: '1500'
+            value: '1499'
           locator:
             page: 10
             published_page: 1373
@@ -38934,7 +39274,7 @@ species:
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
@@ -38947,13 +39287,165 @@ species:
         method_class: measured_direct
         basis_as_published: SiO2 wt% in Glass as printed
         component_as_published: SiO2
-        value: '52.76'
-        value_as_published: 52.76(0.13)
-        T_C: '1500'
-        uncertainty_as_published: (0.13)
+        value: '43.48'
+        value_as_published: 43.48(0.21)
+        T_C: '1499'
+        uncertainty_as_published: (0.21)
         time_h_as_published: '48'
         container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_7_glass_sio2_p10
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c05_ccrs_5_glass_sio2
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 5, Glass, SiO2
+        column: SiO2 (wt%)
+      units: wt% SiO2 as printed
+      phase: glass
+      phase_label_as_published: Glass
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.13'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1502'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 5
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 5, Glass, SiO2
+            column: SiO2 (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Glass
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 5, Glass, SiO2
+            column: SiO2 (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1502'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 5, Glass, SiO2
+            column: SiO2 (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 5, Glass, SiO2
+            column: SiO2 (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: SiO2 wt% in Glass as printed
+        component_as_published: SiO2
+        value: '42.64'
+        value_as_published: 42.64(0.13)
+        T_C: '1502'
+        uncertainty_as_published: (0.13)
+        time_h_as_published: '48'
+        container_as_published: Mo
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c06_ccrs_6_glass_sio2
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 6, Glass, SiO2
+        column: SiO2 (wt%)
+      units: wt% SiO2 as printed
+      phase: glass
+      phase_label_as_published: Glass
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.37'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1500'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 6
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 6, Glass, SiO2
+            column: SiO2 (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Glass
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 6, Glass, SiO2
+            column: SiO2 (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1500'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 6, Glass, SiO2
+            column: SiO2 (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 6, Glass, SiO2
+            column: SiO2 (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: SiO2 wt% in Glass as printed
+        component_as_published: SiO2
+        value: '61.16'
+        value_as_published: 61.16(0.37)
+        T_C: '1500'
+        uncertainty_as_published: (0.37)
+        time_h_as_published: '48'
+        container_as_published: Mo
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c07_ccrs_7_glass_sio2
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -38969,10 +39461,10 @@ species:
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
-        as_published: '0.13'
+        as_published: '0.28'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1502'
+      T_C: '1501'
       point_conditions:
         sample_id:
           state:
@@ -38999,7 +39491,7 @@ species:
         temperature_C:
           state:
             tag: value
-            value: '1502'
+            value: '1501'
           locator:
             page: 10
             published_page: 1373
@@ -39010,7 +39502,7 @@ species:
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
@@ -39023,13 +39515,13 @@ species:
         method_class: measured_direct
         basis_as_published: SiO2 wt% in Glass as printed
         component_as_published: SiO2
-        value: '52.89'
-        value_as_published: 52.89(0.13)
-        T_C: '1502'
-        uncertainty_as_published: (0.13)
-        time_h_as_published: '48'
+        value: '53.52'
+        value_as_published: 53.52(0.28)
+        T_C: '1501'
+        uncertainty_as_published: (0.28)
+        time_h_as_published: '60'
         container_as_published: $SiO_2$
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_8_glass_sio2_p10
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c08_ccrs_8_glass_sio2
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -39045,10 +39537,10 @@ species:
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
-        as_published: '0.16'
+        as_published: '0.13'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1502'
+      T_C: '1501'
       point_conditions:
         sample_id:
           state:
@@ -39075,7 +39567,7 @@ species:
         temperature_C:
           state:
             tag: value
-            value: '1502'
+            value: '1501'
           locator:
             page: 10
             published_page: 1373
@@ -39086,469 +39578,13 @@ species:
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
             row: CCrS 8, Glass, SiO2
-            column: SiO2 (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: SiO2 wt% in Glass as printed
-        component_as_published: SiO2
-        value: '43.67'
-        value_as_published: 43.67(0.16)
-        T_C: '1502'
-        uncertainty_as_published: (0.16)
-        time_h_as_published: '48'
-        container_as_published: Mo
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_11_glass_sio2_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 11, Glass, SiO2
-        column: SiO2 (wt%)
-      units: wt% SiO2 as printed
-      phase: glass
-      phase_label_as_published: Glass
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.15'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1499'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 11
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 11, Glass, SiO2
-            column: SiO2 (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Glass
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 11, Glass, SiO2
-            column: SiO2 (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1499'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 11, Glass, SiO2
-            column: SiO2 (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 11, Glass, SiO2
-            column: SiO2 (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: SiO2 wt% in Glass as printed
-        component_as_published: SiO2
-        value: '43.04'
-        value_as_published: 43.04(0.15)
-        T_C: '1499'
-        uncertainty_as_published: (0.15)
-        time_h_as_published: '72'
-        container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_12_glass_sio2_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 12, Glass, SiO2
-        column: SiO2 (wt%)
-      units: wt% SiO2 as printed
-      phase: glass
-      phase_label_as_published: Glass
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.21'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 12
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Glass, SiO2
-            column: SiO2 (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Glass
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Glass, SiO2
-            column: SiO2 (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1500'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Glass, SiO2
-            column: SiO2 (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Glass, SiO2
-            column: SiO2 (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: SiO2 wt% in Glass as printed
-        component_as_published: SiO2
-        value: '43.48'
-        value_as_published: 43.48(0.21)
-        T_C: '1500'
-        uncertainty_as_published: (0.21)
-        time_h_as_published: '50'
-        container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_13_glass_sio2_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 13, Glass, SiO2
-        column: SiO2 (wt%)
-      units: wt% SiO2 as printed
-      phase: glass
-      phase_label_as_published: Glass
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.13'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 13
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Glass, SiO2
-            column: SiO2 (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Glass
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Glass, SiO2
-            column: SiO2 (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1500'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Glass, SiO2
-            column: SiO2 (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Glass, SiO2
-            column: SiO2 (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: SiO2 wt% in Glass as printed
-        component_as_published: SiO2
-        value: '42.64'
-        value_as_published: 42.64(0.13)
-        T_C: '1500'
-        uncertainty_as_published: (0.13)
-        time_h_as_published: '50'
-        container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_14_glass_sio2_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 14, Glass, SiO2
-        column: SiO2 (wt%)
-      units: wt% SiO2 as printed
-      phase: glass
-      phase_label_as_published: Glass
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.37'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 14
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 14, Glass, SiO2
-            column: SiO2 (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Glass
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 14, Glass, SiO2
-            column: SiO2 (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1500'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 14, Glass, SiO2
-            column: SiO2 (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 14, Glass, SiO2
-            column: SiO2 (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: SiO2 wt% in Glass as printed
-        component_as_published: SiO2
-        value: '61.16'
-        value_as_published: 61.16(0.37)
-        T_C: '1500'
-        uncertainty_as_published: (0.37)
-        time_h_as_published: '60'
-        container_as_published: Mo
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_15_glass_sio2_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 15, Glass, SiO2
-        column: SiO2 (wt%)
-      units: wt% SiO2 as printed
-      phase: glass
-      phase_label_as_published: Glass
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.28'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 15
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 15, Glass, SiO2
-            column: SiO2 (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Glass
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 15, Glass, SiO2
-            column: SiO2 (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1500'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 15, Glass, SiO2
-            column: SiO2 (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 15, Glass, SiO2
-            column: SiO2 (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: SiO2 wt% in Glass as printed
-        component_as_published: SiO2
-        value: '53.52'
-        value_as_published: 53.52(0.28)
-        T_C: '1500'
-        uncertainty_as_published: (0.28)
-        time_h_as_published: '60'
-        container_as_published: Mo
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_17_glass_sio2_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 17, Glass, SiO2
-        column: SiO2 (wt%)
-      units: wt% SiO2 as printed
-      phase: glass
-      phase_label_as_published: Glass
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.13'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1499'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 17
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 17, Glass, SiO2
-            column: SiO2 (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Glass
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 17, Glass, SiO2
-            column: SiO2 (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1499'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 17, Glass, SiO2
-            column: SiO2 (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 17, Glass, SiO2
             column: SiO2 (wt%)
       values:
         quantity: equilibrium_phase_composition
@@ -39557,11 +39593,11 @@ species:
         component_as_published: SiO2
         value: '42.26'
         value_as_published: 42.26(0.13)
-        T_C: '1499'
+        T_C: '1501'
         uncertainty_as_published: (0.13)
-        time_h_as_published: '65'
-        container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_18_glass_sio2_p10
+        time_h_as_published: '60'
+        container_as_published: Mo
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c09_ccrs_8_glass_sio2
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -39569,7 +39605,7 @@ species:
         pdf_page_index: 9
         appendix: Appendix A
         table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 18, Glass, SiO2
+        row: CCrS 8, Glass, SiO2
         column: SiO2 (wt%)
       units: wt% SiO2 as printed
       phase: glass
@@ -39580,18 +39616,18 @@ species:
         as_published: '0.17'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1499'
+      T_C: '1498'
       point_conditions:
         sample_id:
           state:
             tag: value
-            value: CCrS 18
+            value: CCrS 8
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Glass, SiO2
+            row: CCrS 8, Glass, SiO2
             column: SiO2 (wt%)
         phase_label_as_published:
           state:
@@ -39602,29 +39638,29 @@ species:
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Glass, SiO2
+            row: CCrS 8, Glass, SiO2
             column: SiO2 (wt%)
         temperature_C:
           state:
             tag: value
-            value: '1499'
+            value: '1498'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Glass, SiO2
+            row: CCrS 8, Glass, SiO2
             column: SiO2 (wt%)
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Glass, SiO2
+            row: CCrS 8, Glass, SiO2
             column: SiO2 (wt%)
       values:
         quantity: equilibrium_phase_composition
@@ -39633,9 +39669,9 @@ species:
         component_as_published: SiO2
         value: '43.13'
         value_as_published: 43.13(0.17)
-        T_C: '1499'
+        T_C: '1498'
         uncertainty_as_published: (0.17)
-        time_h_as_published: '65'
+        time_h_as_published: '49'
         container_as_published: Pt
     - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_14_glass_sio2_p11
       type: equilibrium_phase_composition
@@ -42755,7 +42791,311 @@ species:
         uncertainty_as_published: (0.18)
         time_h_as_published: '65'
         container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_5_glass_cao_p10
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c00_ccrs_23_glass_cao
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 23, Glass, CaO
+        column: CaO (wt%)
+      units: wt% CaO as printed
+      phase: glass
+      phase_label_as_published: Glass
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.37'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1502'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 23
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Glass, CaO
+            column: CaO (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Glass
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Glass, CaO
+            column: CaO (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1502'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Glass, CaO
+            column: CaO (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.56'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Glass, CaO
+            column: CaO (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: CaO wt% in Glass as printed
+        component_as_published: CaO
+        value: '36.28'
+        value_as_published: 36.28(0.37)
+        T_C: '1502'
+        uncertainty_as_published: (0.37)
+        time_h_as_published: '48'
+        container_as_published: Pt
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c01_ccrs_1_glass_cao
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 1, Glass, CaO
+        column: CaO (wt%)
+      units: wt% CaO as printed
+      phase: glass
+      phase_label_as_published: Glass
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.07'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1502'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 1
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1, Glass, CaO
+            column: CaO (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Glass
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1, Glass, CaO
+            column: CaO (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1502'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1, Glass, CaO
+            column: CaO (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1, Glass, CaO
+            column: CaO (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: CaO wt% in Glass as printed
+        component_as_published: CaO
+        value: '16.75'
+        value_as_published: 16.75(0.07)
+        T_C: '1502'
+        uncertainty_as_published: (0.07)
+        time_h_as_published: '48'
+        container_as_published: $SiO_2$
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c02_ccrs_1a_glass_cao
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 1a, Glass, CaO
+        column: CaO (wt%)
+      units: wt% CaO as printed
+      phase: glass
+      phase_label_as_published: Glass
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.24'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1502'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 1a
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1a, Glass, CaO
+            column: CaO (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Glass
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1a, Glass, CaO
+            column: CaO (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1502'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1a, Glass, CaO
+            column: CaO (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1a, Glass, CaO
+            column: CaO (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: CaO wt% in Glass as printed
+        component_as_published: CaO
+        value: '43.38'
+        value_as_published: 43.38(0.24)
+        T_C: '1502'
+        uncertainty_as_published: (0.24)
+        time_h_as_published: '48'
+        container_as_published: Pt
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c03_ccrs_3_glass_cao
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 3, Glass, CaO
+        column: CaO (wt%)
+      units: wt% CaO as printed
+      phase: glass
+      phase_label_as_published: Glass
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.11'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1502'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 3
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 3, Glass, CaO
+            column: CaO (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Glass
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 3, Glass, CaO
+            column: CaO (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1502'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 3, Glass, CaO
+            column: CaO (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 3, Glass, CaO
+            column: CaO (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: CaO wt% in Glass as printed
+        component_as_published: CaO
+        value: '42.88'
+        value_as_published: 42.88(0.11)
+        T_C: '1502'
+        uncertainty_as_published: (0.11)
+        time_h_as_published: '48'
+        container_as_published: Pt
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c04_ccrs_5_glass_cao
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -42771,10 +43111,10 @@ species:
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
-        as_published: '0.37'
+        as_published: '0.33'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
+      T_C: '1499'
       point_conditions:
         sample_id:
           state:
@@ -42801,7 +43141,7 @@ species:
         temperature_C:
           state:
             tag: value
-            value: '1500'
+            value: '1499'
           locator:
             page: 10
             published_page: 1373
@@ -42812,7 +43152,7 @@ species:
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
@@ -42825,13 +43165,165 @@ species:
         method_class: measured_direct
         basis_as_published: CaO wt% in Glass as printed
         component_as_published: CaO
-        value: '36.28'
-        value_as_published: 36.28(0.37)
-        T_C: '1500'
-        uncertainty_as_published: (0.37)
+        value: '55.14'
+        value_as_published: 55.14(0.33)
+        T_C: '1499'
+        uncertainty_as_published: (0.33)
         time_h_as_published: '48'
         container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_7_glass_cao_p10
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c05_ccrs_5_glass_cao
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 5, Glass, CaO
+        column: CaO (wt%)
+      units: wt% CaO as printed
+      phase: glass
+      phase_label_as_published: Glass
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.27'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1502'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 5
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 5, Glass, CaO
+            column: CaO (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Glass
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 5, Glass, CaO
+            column: CaO (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1502'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 5, Glass, CaO
+            column: CaO (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 5, Glass, CaO
+            column: CaO (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: CaO wt% in Glass as printed
+        component_as_published: CaO
+        value: '51.62'
+        value_as_published: 51.62(0.27)
+        T_C: '1502'
+        uncertainty_as_published: (0.27)
+        time_h_as_published: '48'
+        container_as_published: Mo
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c06_ccrs_6_glass_cao
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 6, Glass, CaO
+        column: CaO (wt%)
+      units: wt% CaO as printed
+      phase: glass
+      phase_label_as_published: Glass
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.41'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1500'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 6
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 6, Glass, CaO
+            column: CaO (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Glass
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 6, Glass, CaO
+            column: CaO (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1500'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 6, Glass, CaO
+            column: CaO (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 6, Glass, CaO
+            column: CaO (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: CaO wt% in Glass as printed
+        component_as_published: CaO
+        value: '31.66'
+        value_as_published: 31.66(0.41)
+        T_C: '1500'
+        uncertainty_as_published: (0.41)
+        time_h_as_published: '48'
+        container_as_published: Mo
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c07_ccrs_7_glass_cao
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -42847,10 +43339,10 @@ species:
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
-        as_published: '0.07'
+        as_published: '0.21'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1502'
+      T_C: '1501'
       point_conditions:
         sample_id:
           state:
@@ -42877,7 +43369,7 @@ species:
         temperature_C:
           state:
             tag: value
-            value: '1502'
+            value: '1501'
           locator:
             page: 10
             published_page: 1373
@@ -42888,7 +43380,7 @@ species:
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
@@ -42901,13 +43393,13 @@ species:
         method_class: measured_direct
         basis_as_published: CaO wt% in Glass as printed
         component_as_published: CaO
-        value: '16.75'
-        value_as_published: 16.75(0.07)
-        T_C: '1502'
-        uncertainty_as_published: (0.07)
-        time_h_as_published: '48'
+        value: '17.14'
+        value_as_published: 17.14(0.21)
+        T_C: '1501'
+        uncertainty_as_published: (0.21)
+        time_h_as_published: '60'
         container_as_published: $SiO_2$
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_8_glass_cao_p10
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c08_ccrs_8_glass_cao
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -42923,10 +43415,10 @@ species:
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
-        as_published: '0.24'
+        as_published: '0.25'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1502'
+      T_C: '1501'
       point_conditions:
         sample_id:
           state:
@@ -42953,7 +43445,7 @@ species:
         temperature_C:
           state:
             tag: value
-            value: '1502'
+            value: '1501'
           locator:
             page: 10
             published_page: 1373
@@ -42964,469 +43456,13 @@ species:
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
             row: CCrS 8, Glass, CaO
-            column: CaO (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: CaO wt% in Glass as printed
-        component_as_published: CaO
-        value: '43.38'
-        value_as_published: 43.38(0.24)
-        T_C: '1502'
-        uncertainty_as_published: (0.24)
-        time_h_as_published: '48'
-        container_as_published: Mo
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_11_glass_cao_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 11, Glass, CaO
-        column: CaO (wt%)
-      units: wt% CaO as printed
-      phase: glass
-      phase_label_as_published: Glass
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.11'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1499'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 11
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 11, Glass, CaO
-            column: CaO (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Glass
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 11, Glass, CaO
-            column: CaO (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1499'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 11, Glass, CaO
-            column: CaO (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 11, Glass, CaO
-            column: CaO (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: CaO wt% in Glass as printed
-        component_as_published: CaO
-        value: '42.88'
-        value_as_published: 42.88(0.11)
-        T_C: '1499'
-        uncertainty_as_published: (0.11)
-        time_h_as_published: '72'
-        container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_12_glass_cao_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 12, Glass, CaO
-        column: CaO (wt%)
-      units: wt% CaO as printed
-      phase: glass
-      phase_label_as_published: Glass
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.33'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 12
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Glass, CaO
-            column: CaO (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Glass
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Glass, CaO
-            column: CaO (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1500'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Glass, CaO
-            column: CaO (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Glass, CaO
-            column: CaO (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: CaO wt% in Glass as printed
-        component_as_published: CaO
-        value: '55.14'
-        value_as_published: 55.14(0.33)
-        T_C: '1500'
-        uncertainty_as_published: (0.33)
-        time_h_as_published: '50'
-        container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_13_glass_cao_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 13, Glass, CaO
-        column: CaO (wt%)
-      units: wt% CaO as printed
-      phase: glass
-      phase_label_as_published: Glass
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.27'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 13
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Glass, CaO
-            column: CaO (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Glass
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Glass, CaO
-            column: CaO (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1500'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Glass, CaO
-            column: CaO (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Glass, CaO
-            column: CaO (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: CaO wt% in Glass as printed
-        component_as_published: CaO
-        value: '51.62'
-        value_as_published: 51.62(0.27)
-        T_C: '1500'
-        uncertainty_as_published: (0.27)
-        time_h_as_published: '50'
-        container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_14_glass_cao_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 14, Glass, CaO
-        column: CaO (wt%)
-      units: wt% CaO as printed
-      phase: glass
-      phase_label_as_published: Glass
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.41'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 14
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 14, Glass, CaO
-            column: CaO (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Glass
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 14, Glass, CaO
-            column: CaO (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1500'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 14, Glass, CaO
-            column: CaO (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 14, Glass, CaO
-            column: CaO (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: CaO wt% in Glass as printed
-        component_as_published: CaO
-        value: '31.66'
-        value_as_published: 31.66(0.41)
-        T_C: '1500'
-        uncertainty_as_published: (0.41)
-        time_h_as_published: '60'
-        container_as_published: Mo
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_15_glass_cao_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 15, Glass, CaO
-        column: CaO (wt%)
-      units: wt% CaO as printed
-      phase: glass
-      phase_label_as_published: Glass
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.21'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 15
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 15, Glass, CaO
-            column: CaO (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Glass
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 15, Glass, CaO
-            column: CaO (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1500'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 15, Glass, CaO
-            column: CaO (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 15, Glass, CaO
-            column: CaO (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: CaO wt% in Glass as printed
-        component_as_published: CaO
-        value: '17.14'
-        value_as_published: 17.14(0.21)
-        T_C: '1500'
-        uncertainty_as_published: (0.21)
-        time_h_as_published: '60'
-        container_as_published: Mo
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_17_glass_cao_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 17, Glass, CaO
-        column: CaO (wt%)
-      units: wt% CaO as printed
-      phase: glass
-      phase_label_as_published: Glass
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.25'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1499'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 17
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 17, Glass, CaO
-            column: CaO (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Glass
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 17, Glass, CaO
-            column: CaO (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1499'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 17, Glass, CaO
-            column: CaO (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 17, Glass, CaO
             column: CaO (wt%)
       values:
         quantity: equilibrium_phase_composition
@@ -43435,11 +43471,11 @@ species:
         component_as_published: CaO
         value: '47.52'
         value_as_published: 47.52(0.25)
-        T_C: '1499'
+        T_C: '1501'
         uncertainty_as_published: (0.25)
-        time_h_as_published: '65'
-        container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_18_glass_cao_p10
+        time_h_as_published: '60'
+        container_as_published: Mo
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c09_ccrs_8_glass_cao
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -43447,7 +43483,7 @@ species:
         pdf_page_index: 9
         appendix: Appendix A
         table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 18, Glass, CaO
+        row: CCrS 8, Glass, CaO
         column: CaO (wt%)
       units: wt% CaO as printed
       phase: glass
@@ -43458,18 +43494,18 @@ species:
         as_published: '0.13'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1499'
+      T_C: '1498'
       point_conditions:
         sample_id:
           state:
             tag: value
-            value: CCrS 18
+            value: CCrS 8
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Glass, CaO
+            row: CCrS 8, Glass, CaO
             column: CaO (wt%)
         phase_label_as_published:
           state:
@@ -43480,29 +43516,29 @@ species:
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Glass, CaO
+            row: CCrS 8, Glass, CaO
             column: CaO (wt%)
         temperature_C:
           state:
             tag: value
-            value: '1499'
+            value: '1498'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Glass, CaO
+            row: CCrS 8, Glass, CaO
             column: CaO (wt%)
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Glass, CaO
+            row: CCrS 8, Glass, CaO
             column: CaO (wt%)
       values:
         quantity: equilibrium_phase_composition
@@ -43511,9 +43547,9 @@ species:
         component_as_published: CaO
         value: '52.95'
         value_as_published: 52.95(0.13)
-        T_C: '1499'
+        T_C: '1498'
         uncertainty_as_published: (0.13)
-        time_h_as_published: '65'
+        time_h_as_published: '49'
         container_as_published: Pt
     - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_14_glass_cao_p11
       type: equilibrium_phase_composition
@@ -46633,7 +46669,311 @@ species:
         uncertainty_as_published: (0.1)
         time_h_as_published: '65'
         container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_5_glass_cr2o3_p10
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c00_ccrs_23_glass_cr2o3
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 23, Glass, Cr2O3
+        column: Cr2O3 (wt%)
+      units: wt% Cr2O3 as printed
+      phase: glass
+      phase_label_as_published: Glass
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.16'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1502'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 23
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Glass
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1502'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.56'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: Cr2O3 wt% in Glass as printed
+        component_as_published: Cr2O3
+        value: '8.92'
+        value_as_published: 8.92(0.16)
+        T_C: '1502'
+        uncertainty_as_published: (0.16)
+        time_h_as_published: '48'
+        container_as_published: Pt
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c01_ccrs_1_glass_cr2o3
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 1, Glass, Cr2O3
+        column: Cr2O3 (wt%)
+      units: wt% Cr2O3 as printed
+      phase: glass
+      phase_label_as_published: Glass
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.32'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1502'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 1
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Glass
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1502'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: Cr2O3 wt% in Glass as printed
+        component_as_published: Cr2O3
+        value: '30.99'
+        value_as_published: 30.99(0.32)
+        T_C: '1502'
+        uncertainty_as_published: (0.32)
+        time_h_as_published: '48'
+        container_as_published: $SiO_2$
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c02_ccrs_1a_glass_cr2o3
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 1a, Glass, Cr2O3
+        column: Cr2O3 (wt%)
+      units: wt% Cr2O3 as printed
+      phase: glass
+      phase_label_as_published: Glass
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.23'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1502'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 1a
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1a, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Glass
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1a, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1502'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1a, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 1a, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: Cr2O3 wt% in Glass as printed
+        component_as_published: Cr2O3
+        value: '12.59'
+        value_as_published: 12.59(0.23)
+        T_C: '1502'
+        uncertainty_as_published: (0.23)
+        time_h_as_published: '48'
+        container_as_published: Pt
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c03_ccrs_3_glass_cr2o3
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 3, Glass, Cr2O3
+        column: Cr2O3 (wt%)
+      units: wt% Cr2O3 as printed
+      phase: glass
+      phase_label_as_published: Glass
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.09'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1502'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 3
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 3, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Glass
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 3, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1502'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 3, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 3, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: Cr2O3 wt% in Glass as printed
+        component_as_published: Cr2O3
+        value: '12.70'
+        value_as_published: 12.70(0.09)
+        T_C: '1502'
+        uncertainty_as_published: (0.09)
+        time_h_as_published: '48'
+        container_as_published: Pt
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c04_ccrs_5_glass_cr2o3
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -46649,10 +46989,10 @@ species:
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
-        as_published: '0.16'
+        as_published: '0.03'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
+      T_C: '1499'
       point_conditions:
         sample_id:
           state:
@@ -46679,7 +47019,7 @@ species:
         temperature_C:
           state:
             tag: value
-            value: '1500'
+            value: '1499'
           locator:
             page: 10
             published_page: 1373
@@ -46690,7 +47030,7 @@ species:
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
@@ -46703,13 +47043,165 @@ species:
         method_class: measured_direct
         basis_as_published: Cr2O3 wt% in Glass as printed
         component_as_published: Cr2O3
-        value: '8.92'
-        value_as_published: 8.92(0.16)
-        T_C: '1500'
-        uncertainty_as_published: (0.16)
+        value: '0.67'
+        value_as_published: 0.67(0.03)
+        T_C: '1499'
+        uncertainty_as_published: (0.03)
         time_h_as_published: '48'
         container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_7_glass_cr2o3_p10
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c05_ccrs_5_glass_cr2o3
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 5, Glass, Cr2O3
+        column: Cr2O3 (wt%)
+      units: wt% Cr2O3 as printed
+      phase: glass
+      phase_label_as_published: Glass
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.07'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1502'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 5
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 5, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Glass
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 5, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1502'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 5, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 5, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: Cr2O3 wt% in Glass as printed
+        component_as_published: Cr2O3
+        value: '5.91'
+        value_as_published: 5.91(0.07)
+        T_C: '1502'
+        uncertainty_as_published: (0.07)
+        time_h_as_published: '48'
+        container_as_published: Mo
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c06_ccrs_6_glass_cr2o3
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 6, Glass, Cr2O3
+        column: Cr2O3 (wt%)
+      units: wt% Cr2O3 as printed
+      phase: glass
+      phase_label_as_published: Glass
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.11'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1500'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 6
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 6, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Glass
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 6, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1500'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 6, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.50'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 6, Glass, Cr2O3
+            column: Cr2O3 (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: Cr2O3 wt% in Glass as printed
+        component_as_published: Cr2O3
+        value: '7.17'
+        value_as_published: 7.17(0.11)
+        T_C: '1500'
+        uncertainty_as_published: (0.11)
+        time_h_as_published: '48'
+        container_as_published: Mo
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c07_ccrs_7_glass_cr2o3
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -46725,10 +47217,10 @@ species:
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
-        as_published: '0.32'
+        as_published: '0.27'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1502'
+      T_C: '1501'
       point_conditions:
         sample_id:
           state:
@@ -46755,7 +47247,7 @@ species:
         temperature_C:
           state:
             tag: value
-            value: '1502'
+            value: '1501'
           locator:
             page: 10
             published_page: 1373
@@ -46766,7 +47258,7 @@ species:
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
@@ -46779,13 +47271,13 @@ species:
         method_class: measured_direct
         basis_as_published: Cr2O3 wt% in Glass as printed
         component_as_published: Cr2O3
-        value: '30.99'
-        value_as_published: 30.99(0.32)
-        T_C: '1502'
-        uncertainty_as_published: (0.32)
-        time_h_as_published: '48'
+        value: '30.31'
+        value_as_published: 30.31(0.27)
+        T_C: '1501'
+        uncertainty_as_published: (0.27)
+        time_h_as_published: '60'
         container_as_published: $SiO_2$
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_8_glass_cr2o3_p10
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c08_ccrs_8_glass_cr2o3
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -46801,10 +47293,10 @@ species:
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
-        as_published: '0.23'
+        as_published: '0.09'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1502'
+      T_C: '1501'
       point_conditions:
         sample_id:
           state:
@@ -46831,7 +47323,7 @@ species:
         temperature_C:
           state:
             tag: value
-            value: '1502'
+            value: '1501'
           locator:
             page: 10
             published_page: 1373
@@ -46842,469 +47334,13 @@ species:
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
             row: CCrS 8, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: Cr2O3 wt% in Glass as printed
-        component_as_published: Cr2O3
-        value: '12.59'
-        value_as_published: 12.59(0.23)
-        T_C: '1502'
-        uncertainty_as_published: (0.23)
-        time_h_as_published: '48'
-        container_as_published: Mo
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_11_glass_cr2o3_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 11, Glass, Cr2O3
-        column: Cr2O3 (wt%)
-      units: wt% Cr2O3 as printed
-      phase: glass
-      phase_label_as_published: Glass
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.09'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1499'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 11
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 11, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Glass
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 11, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1499'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 11, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 11, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: Cr2O3 wt% in Glass as printed
-        component_as_published: Cr2O3
-        value: '12.70'
-        value_as_published: 12.70(0.09)
-        T_C: '1499'
-        uncertainty_as_published: (0.09)
-        time_h_as_published: '72'
-        container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_12_glass_cr2o3_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 12, Glass, Cr2O3
-        column: Cr2O3 (wt%)
-      units: wt% Cr2O3 as printed
-      phase: glass
-      phase_label_as_published: Glass
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.03'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 12
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Glass
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1500'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: Cr2O3 wt% in Glass as printed
-        component_as_published: Cr2O3
-        value: '0.67'
-        value_as_published: 0.67(0.03)
-        T_C: '1500'
-        uncertainty_as_published: (0.03)
-        time_h_as_published: '50'
-        container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_13_glass_cr2o3_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 13, Glass, Cr2O3
-        column: Cr2O3 (wt%)
-      units: wt% Cr2O3 as printed
-      phase: glass
-      phase_label_as_published: Glass
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.07'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 13
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Glass
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1500'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: Cr2O3 wt% in Glass as printed
-        component_as_published: Cr2O3
-        value: '5.91'
-        value_as_published: 5.91(0.07)
-        T_C: '1500'
-        uncertainty_as_published: (0.07)
-        time_h_as_published: '50'
-        container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_14_glass_cr2o3_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 14, Glass, Cr2O3
-        column: Cr2O3 (wt%)
-      units: wt% Cr2O3 as printed
-      phase: glass
-      phase_label_as_published: Glass
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.11'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 14
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 14, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Glass
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 14, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1500'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 14, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 14, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: Cr2O3 wt% in Glass as printed
-        component_as_published: Cr2O3
-        value: '7.17'
-        value_as_published: 7.17(0.11)
-        T_C: '1500'
-        uncertainty_as_published: (0.11)
-        time_h_as_published: '60'
-        container_as_published: Mo
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_15_glass_cr2o3_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 15, Glass, Cr2O3
-        column: Cr2O3 (wt%)
-      units: wt% Cr2O3 as printed
-      phase: glass
-      phase_label_as_published: Glass
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.27'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 15
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 15, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Glass
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 15, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1500'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 15, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 15, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: Cr2O3 wt% in Glass as printed
-        component_as_published: Cr2O3
-        value: '30.31'
-        value_as_published: 30.31(0.27)
-        T_C: '1500'
-        uncertainty_as_published: (0.27)
-        time_h_as_published: '60'
-        container_as_published: Mo
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_17_glass_cr2o3_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 17, Glass, Cr2O3
-        column: Cr2O3 (wt%)
-      units: wt% Cr2O3 as printed
-      phase: glass
-      phase_label_as_published: Glass
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.09'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1499'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 17
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 17, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Glass
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 17, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1499'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 17, Glass, Cr2O3
-            column: Cr2O3 (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 17, Glass, Cr2O3
             column: Cr2O3 (wt%)
       values:
         quantity: equilibrium_phase_composition
@@ -47313,11 +47349,11 @@ species:
         component_as_published: Cr2O3
         value: '10.24'
         value_as_published: 10.24(0.09)
-        T_C: '1499'
+        T_C: '1501'
         uncertainty_as_published: (0.09)
-        time_h_as_published: '65'
-        container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_18_glass_cr2o3_p10
+        time_h_as_published: '60'
+        container_as_published: Mo
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c09_ccrs_8_glass_cr2o3
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -47325,7 +47361,7 @@ species:
         pdf_page_index: 9
         appendix: Appendix A
         table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 18, Glass, Cr2O3
+        row: CCrS 8, Glass, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
       phase: glass
@@ -47336,18 +47372,18 @@ species:
         as_published: '0.05'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1499'
+      T_C: '1498'
       point_conditions:
         sample_id:
           state:
             tag: value
-            value: CCrS 18
+            value: CCrS 8
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Glass, Cr2O3
+            row: CCrS 8, Glass, Cr2O3
             column: Cr2O3 (wt%)
         phase_label_as_published:
           state:
@@ -47358,29 +47394,29 @@ species:
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Glass, Cr2O3
+            row: CCrS 8, Glass, Cr2O3
             column: Cr2O3 (wt%)
         temperature_C:
           state:
             tag: value
-            value: '1499'
+            value: '1498'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Glass, Cr2O3
+            row: CCrS 8, Glass, Cr2O3
             column: Cr2O3 (wt%)
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Glass, Cr2O3
+            row: CCrS 8, Glass, Cr2O3
             column: Cr2O3 (wt%)
       values:
         quantity: equilibrium_phase_composition
@@ -47389,9 +47425,9 @@ species:
         component_as_published: Cr2O3
         value: '3.25'
         value_as_published: 3.25(0.05)
-        T_C: '1499'
+        T_C: '1498'
         uncertainty_as_published: (0.05)
-        time_h_as_published: '65'
+        time_h_as_published: '49'
         container_as_published: Pt
     - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_14_glass_cr2o3_p11
       type: equilibrium_phase_composition
@@ -48924,6 +48960,7 @@ species:
         row: CACrS 4, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -48999,6 +49036,7 @@ species:
         row: CACrS 7, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -49074,6 +49112,7 @@ species:
         row: CACrS 8, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -49149,6 +49188,7 @@ species:
         row: CACrS 22, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -49224,6 +49264,7 @@ species:
         row: CACrS 23, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -49299,6 +49340,7 @@ species:
         row: CACrS 24, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -49374,6 +49416,7 @@ species:
         row: CACrS 16, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -49449,6 +49492,7 @@ species:
         row: CACrS 18, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -49524,6 +49568,7 @@ species:
         row: CACrS 19, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -49599,6 +49644,7 @@ species:
         row: CACrS 20, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -50434,6 +50480,7 @@ species:
         row: CACrS 21, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -50509,6 +50556,7 @@ species:
         row: CACrS 7, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -50584,6 +50632,7 @@ species:
         row: CACrS 22, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -50659,6 +50708,7 @@ species:
         row: CACrS 23, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -50734,6 +50784,7 @@ species:
         row: CACrS 24, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -50809,6 +50860,7 @@ species:
         row: CACrS 16, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -50884,6 +50936,7 @@ species:
         row: CACrS 17, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -50959,6 +51012,7 @@ species:
         row: CACrS 18, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -51034,6 +51088,7 @@ species:
         row: CACrS 19, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -51109,6 +51164,7 @@ species:
         row: CACrS 20, Ses, Cr2O3
         column: Cr2O3 (wt%)
       units: wt% Cr2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -51187,6 +51243,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -51250,6 +51307,82 @@ species:
         uncertainty_as_published: (0.85)
         time_h_as_published: '48'
         container_as_published: Pt
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_11_metal_pt
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 11, Metal, Pt
+        column: Pt (wt%)
+      units: wt% Pt as printed
+      phase_label_as_published: Metal
+      phase_as_published: Metal
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.98'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1499'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 11
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 11, Metal, Pt
+            column: Pt (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Metal
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 11, Metal, Pt
+            column: Pt (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1499'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 11, Metal, Pt
+            column: Pt (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.56'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 11, Metal, Pt
+            column: Pt (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: Pt wt% in Metal as printed
+        component_as_published: Pt
+        value: '94.95'
+        value_as_published: 94.95(0.98)
+        T_C: '1499'
+        uncertainty_as_published: (0.98)
+        time_h_as_published: '72'
+        container_as_published: Pt
     - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_12_metal_pt
       type: equilibrium_phase_composition
       locator:
@@ -51262,10 +51395,11 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
-        as_published: '0.98'
+        as_published: '0.64'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
       T_C: '1500'
@@ -51319,81 +51453,6 @@ species:
         method_class: measured_direct
         basis_as_published: Pt wt% in Metal as printed
         component_as_published: Pt
-        value: '94.95'
-        value_as_published: 94.95(0.98)
-        T_C: '1500'
-        uncertainty_as_published: (0.98)
-        time_h_as_published: '50'
-        container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_13_metal_pt
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 13, Metal, Pt
-        column: Pt (wt%)
-      units: wt% Pt as printed
-      phase_label_as_published: Metal
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.64'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 13
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Metal, Pt
-            column: Pt (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Metal
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Metal, Pt
-            column: Pt (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1500'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Metal, Pt
-            column: Pt (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 13, Metal, Pt
-            column: Pt (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: Pt wt% in Metal as printed
-        component_as_published: Pt
         value: '93.96'
         value_as_published: 93.96(0.64)
         T_C: '1500'
@@ -51412,6 +51471,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -51487,6 +51547,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -51550,7 +51611,83 @@ species:
         uncertainty_as_published: (0.64)
         time_h_as_published: '65'
         container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_5_metal_pt_p10
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c00_ccrs_23_metal_pt
+      type: equilibrium_phase_composition
+      locator:
+        page: 10
+        published_page: 1373
+        pdf_page_index: 9
+        appendix: Appendix A
+        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
+        row: CCrS 23, Metal, Pt
+        column: Pt (wt%)
+      units: wt% Pt as printed
+      phase_label_as_published: Metal
+      phase_as_published: Metal
+      regime: quench_equilibration
+      uncertainty:
+        reported_status: printed
+        as_published: '0.62'
+        type: standard_deviation
+        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
+      T_C: '1502'
+      point_conditions:
+        sample_id:
+          state:
+            tag: value
+            value: CCrS 23
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Metal, Pt
+            column: Pt (wt%)
+        phase_label_as_published:
+          state:
+            tag: value
+            value: Metal
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Metal, Pt
+            column: Pt (wt%)
+        temperature_C:
+          state:
+            tag: value
+            value: '1502'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Metal, Pt
+            column: Pt (wt%)
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.56'
+          locator:
+            page: 10
+            published_page: 1373
+            pdf_page_index: 9
+            appendix: Appendix A
+            row: CCrS 23, Metal, Pt
+            column: Pt (wt%)
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: Pt wt% in Metal as printed
+        component_as_published: Pt
+        value: '91.02'
+        value_as_published: 91.02(0.62)
+        T_C: '1502'
+        uncertainty_as_published: (0.62)
+        time_h_as_published: '48'
+        container_as_published: Pt
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c04_ccrs_5_metal_pt
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -51562,13 +51699,14 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
-        as_published: '0.62'
+        as_published: '0.9'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
+      T_C: '1499'
       point_conditions:
         sample_id:
           state:
@@ -51595,7 +51733,7 @@ species:
         temperature_C:
           state:
             tag: value
-            value: '1500'
+            value: '1499'
           locator:
             page: 10
             published_page: 1373
@@ -51606,88 +51744,13 @@ species:
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
             row: CCrS 5, Metal, Pt
-            column: Pt (wt%)
-      values:
-        quantity: equilibrium_phase_composition
-        method_class: measured_direct
-        basis_as_published: Pt wt% in Metal as printed
-        component_as_published: Pt
-        value: '91.02'
-        value_as_published: 91.02(0.62)
-        T_C: '1500'
-        uncertainty_as_published: (0.62)
-        time_h_as_published: '48'
-        container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_12_metal_pt_p10
-      type: equilibrium_phase_composition
-      locator:
-        page: 10
-        published_page: 1373
-        pdf_page_index: 9
-        appendix: Appendix A
-        table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 12, Metal, Pt
-        column: Pt (wt%)
-      units: wt% Pt as printed
-      phase_label_as_published: Metal
-      regime: quench_equilibration
-      uncertainty:
-        reported_status: printed
-        as_published: '0.9'
-        type: standard_deviation
-        note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
-      point_conditions:
-        sample_id:
-          state:
-            tag: value
-            value: CCrS 12
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Metal, Pt
-            column: Pt (wt%)
-        phase_label_as_published:
-          state:
-            tag: value
-            value: Metal
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Metal, Pt
-            column: Pt (wt%)
-        temperature_C:
-          state:
-            tag: value
-            value: '1500'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Metal, Pt
-            column: Pt (wt%)
-        fO2_log:
-          state:
-            tag: value
-            value: '-9.56'
-          locator:
-            page: 10
-            published_page: 1373
-            pdf_page_index: 9
-            appendix: Appendix A
-            row: CCrS 12, Metal, Pt
             column: Pt (wt%)
       values:
         quantity: equilibrium_phase_composition
@@ -51696,11 +51759,11 @@ species:
         component_as_published: Pt
         value: '90.26'
         value_as_published: 90.26(0.9)
-        T_C: '1500'
+        T_C: '1499'
         uncertainty_as_published: (0.9)
-        time_h_as_published: '50'
+        time_h_as_published: '48'
         container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_13_metal_pt_p10
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c05_ccrs_5_metal_pt
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -51708,28 +51771,29 @@ species:
         pdf_page_index: 9
         appendix: Appendix A
         table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 13, Metal, Pt
+        row: CCrS 5, Metal, Pt
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
         as_published: '0.63'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1500'
+      T_C: '1502'
       point_conditions:
         sample_id:
           state:
             tag: value
-            value: CCrS 13
+            value: CCrS 5
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 13, Metal, Pt
+            row: CCrS 5, Metal, Pt
             column: Pt (wt%)
         phase_label_as_published:
           state:
@@ -51740,29 +51804,29 @@ species:
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 13, Metal, Pt
+            row: CCrS 5, Metal, Pt
             column: Pt (wt%)
         temperature_C:
           state:
             tag: value
-            value: '1500'
+            value: '1502'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 13, Metal, Pt
+            row: CCrS 5, Metal, Pt
             column: Pt (wt%)
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 13, Metal, Pt
+            row: CCrS 5, Metal, Pt
             column: Pt (wt%)
       values:
         quantity: equilibrium_phase_composition
@@ -51771,11 +51835,11 @@ species:
         component_as_published: Pt
         value: '87.07'
         value_as_published: 87.07(0.63)
-        T_C: '1500'
+        T_C: '1502'
         uncertainty_as_published: (0.63)
-        time_h_as_published: '50'
-        container_as_published: Pt
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_14_metal_pt
+        time_h_as_published: '48'
+        container_as_published: Mo
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c06_ccrs_6_metal_pt
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -51783,10 +51847,11 @@ species:
         pdf_page_index: 9
         appendix: Appendix A
         table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 14, Metal, Pt
+        row: CCrS 6, Metal, Pt
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -51798,13 +51863,13 @@ species:
         sample_id:
           state:
             tag: value
-            value: CCrS 14
+            value: CCrS 6
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 14, Metal, Pt
+            row: CCrS 6, Metal, Pt
             column: Pt (wt%)
         phase_label_as_published:
           state:
@@ -51815,7 +51880,7 @@ species:
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 14, Metal, Pt
+            row: CCrS 6, Metal, Pt
             column: Pt (wt%)
         temperature_C:
           state:
@@ -51826,18 +51891,18 @@ species:
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 14, Metal, Pt
+            row: CCrS 6, Metal, Pt
             column: Pt (wt%)
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 14, Metal, Pt
+            row: CCrS 6, Metal, Pt
             column: Pt (wt%)
       values:
         quantity: equilibrium_phase_composition
@@ -51848,9 +51913,9 @@ species:
         value_as_published: 90.06(0.75)
         T_C: '1500'
         uncertainty_as_published: (0.75)
-        time_h_as_published: '60'
+        time_h_as_published: '48'
         container_as_published: Mo
-    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_18_metal_pt_p10
+    - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_p10b2_c09_ccrs_8_metal_pt
       type: equilibrium_phase_composition
       locator:
         page: 10
@@ -51858,28 +51923,29 @@ species:
         pdf_page_index: 9
         appendix: Appendix A
         table: 'Appendix A EMPA of Equilibrium Phases in the System CaO-CrO $_{x}$ -SiO $_{2}$ \*'
-        row: CCrS 18, Metal, Pt
+        row: CCrS 8, Metal, Pt
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
         as_published: '0.8'
         type: standard_deviation
         note: The Appendix footnote states that the standard deviation of weight percent is given in parentheses.
-      T_C: '1499'
+      T_C: '1498'
       point_conditions:
         sample_id:
           state:
             tag: value
-            value: CCrS 18
+            value: CCrS 8
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Metal, Pt
+            row: CCrS 8, Metal, Pt
             column: Pt (wt%)
         phase_label_as_published:
           state:
@@ -51890,29 +51956,29 @@ species:
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Metal, Pt
+            row: CCrS 8, Metal, Pt
             column: Pt (wt%)
         temperature_C:
           state:
             tag: value
-            value: '1499'
+            value: '1498'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Metal, Pt
+            row: CCrS 8, Metal, Pt
             column: Pt (wt%)
         fO2_log:
           state:
             tag: value
-            value: '-9.56'
+            value: '-11.50'
           locator:
             page: 10
             published_page: 1373
             pdf_page_index: 9
             appendix: Appendix A
-            row: CCrS 18, Metal, Pt
+            row: CCrS 8, Metal, Pt
             column: Pt (wt%)
       values:
         quantity: equilibrium_phase_composition
@@ -51921,9 +51987,9 @@ species:
         component_as_published: Pt
         value: '88.41'
         value_as_published: 88.41(0.8)
-        T_C: '1499'
+        T_C: '1498'
         uncertainty_as_published: (0.8)
-        time_h_as_published: '65'
+        time_h_as_published: '49'
         container_as_published: Pt
     - observation_id: pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_18_metal_pt_p11
       type: equilibrium_phase_composition
@@ -51937,6 +52003,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -52012,6 +52079,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -52087,6 +52155,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -52162,6 +52231,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -52237,6 +52307,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -52312,6 +52383,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -52387,6 +52459,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -52462,6 +52535,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -52537,6 +52611,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -52612,6 +52687,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -52687,6 +52763,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -52762,6 +52839,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -52837,6 +52915,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -52912,6 +52991,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -52987,6 +53067,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -53062,6 +53143,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -53137,6 +53219,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -53212,6 +53295,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -53287,6 +53371,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -53362,6 +53447,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -53437,6 +53523,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -53512,6 +53599,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -53587,6 +53675,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -53662,6 +53751,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -53737,6 +53827,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -53812,6 +53903,7 @@ species:
         column: Pt (wt%)
       units: wt% Pt as printed
       phase_label_as_published: Metal
+      phase_as_published: Metal
       regime: quench_equilibration
       uncertainty:
         reported_status: printed
@@ -54648,6 +54740,7 @@ species:
         row: CACrS 4, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -54723,6 +54816,7 @@ species:
         row: CACrS 7, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -54798,6 +54892,7 @@ species:
         row: CACrS 8, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -54873,6 +54968,7 @@ species:
         row: CACrS 22, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -54948,6 +55044,7 @@ species:
         row: CACrS 23, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -55023,6 +55120,7 @@ species:
         row: CACrS 24, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -55098,6 +55196,7 @@ species:
         row: CACrS 16, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -55173,6 +55272,7 @@ species:
         row: CACrS 18, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -55248,6 +55348,7 @@ species:
         row: CACrS 19, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -55323,6 +55424,7 @@ species:
         row: CACrS 20, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -56158,6 +56260,7 @@ species:
         row: CACrS 21, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -56233,6 +56336,7 @@ species:
         row: CACrS 7, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -56308,6 +56412,7 @@ species:
         row: CACrS 22, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -56383,6 +56488,7 @@ species:
         row: CACrS 23, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -56458,6 +56564,7 @@ species:
         row: CACrS 24, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -56533,6 +56640,7 @@ species:
         row: CACrS 16, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -56608,6 +56716,7 @@ species:
         row: CACrS 17, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -56683,6 +56792,7 @@ species:
         row: CACrS 18, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -56758,6 +56868,7 @@ species:
         row: CACrS 19, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:
@@ -56833,6 +56944,7 @@ species:
         row: CACrS 20, Ses, Al2O3
         column: Al2O3 (wt%)
       units: wt% Al2O3 as printed
+      phase: cr
       phase_label_as_published: Ses
       regime: quench_equilibration
       uncertainty:

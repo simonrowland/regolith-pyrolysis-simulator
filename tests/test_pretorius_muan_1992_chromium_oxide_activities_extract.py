@@ -4,6 +4,7 @@ from pathlib import Path
 import yaml
 
 from literature_extract_assertions import assert_all_physical_locators
+from simulator.battery.enums import Phase
 from simulator.battery.migrate import Migrator
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
@@ -122,6 +123,19 @@ def test_isolated_migration_has_no_hard_issues_and_reaches_temperature_and_fugac
         "fO2_log" in (observation.point_conditions or {})
         for observation in result.observations.values()
     )
+    metal = result.observations[
+        "pretorius-muan-1992-chromium-oxide-activities::"
+        "pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_11_metal_cr"
+    ]
+    assert metal.identity.species.phase.is_unknown
+    assert metal.identity.species.phase.reason == (
+        "phase string 'Metal' is not in the closed automatic map"
+    )
+    sesquioxide = result.observations[
+        "pretorius-muan-1992-chromium-oxide-activities::"
+        "pretorius_muan_1992_chromium_oxide_activities_appendixc_cacrs_4_ses_al2o3"
+    ]
+    assert sesquioxide.identity.species.phase.value is Phase.CR
 
 
 def test_fidelity_pin_detects_a_mutated_gamma_cell():
