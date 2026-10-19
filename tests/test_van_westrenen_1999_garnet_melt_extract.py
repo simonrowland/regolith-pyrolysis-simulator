@@ -56,11 +56,13 @@ def test_table4_glass_major_and_trace_compositions_match_the_render():
     by_id = {row["observation_id"]: row for row in rows}
 
     assert len(rows) == 26
+    major_formulas = {"cao": "CaO", "mgo": "MgO", "al2o3": "Al2O3", "sio2": "SiO2"}
     for suffix, (value, sigma) in MAJOR_PINS.items():
         row = by_id[f"vw99_exp11_gl_{suffix}"]
         assert row["type"] == "equilibrium_phase_composition"
         assert row["phase"] == "l"
         assert row["units"] == "wt%"
+        assert row["values"]["formula"] == major_formulas[suffix]
         assert row["values"]["value"] == value
         assert row["uncertainty"]["value"] == sigma
         assert row["values"]["T_C"] == "1565"
@@ -70,6 +72,7 @@ def test_table4_glass_major_and_trace_compositions_match_the_render():
         assert row["type"] == "equilibrium_phase_composition"
         assert row["phase"] == "l"
         assert row["units"] == "ppm"
+        assert row["values"]["formula"] == element
         assert row["values"]["quantity"] == "equilibrium_phase_composition"
         assert row["values"]["method_class"] == "measured_direct"
         assert row["values"]["basis_as_published"] == f"{element} ppm in glass (Gl), Table 4"
@@ -100,8 +103,16 @@ def test_isolated_migration_has_no_hard_issues_and_carries_conditions_to_every_r
     assert len(result.experiments) == 1
     assert result.validation is not None
     assert result.validation.hard_issues == ()
+    expected_formula = {
+        **{suffix: formula for suffix, formula in {
+            "cao": "CaO", "mgo": "MgO", "al2o3": "Al2O3", "sio2": "SiO2",
+        }.items()},
+        **{suffix: element for suffix, (element, _value, _sigma) in TRACE_PINS.items()},
+    }
     required_conditions = {"temperature_K", "total_pressure_Pa", "composition"}
     for row in result.observations.values():
+        suffix = row.observation_id.split("gl_", 1)[1]
+        assert row.identity.species.formula == expected_formula[suffix]
         assert row.value.kind is ValueKind.POINT
         assert row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
         assert row.identity.species.phase.value is Phase.L
