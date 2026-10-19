@@ -35,6 +35,27 @@ experiments:
         published_page: 1744
         pdf_page_index: 0
         section: Results
+- experiment_id: georges-k-evaporation-k-free
+  method: controlled_potassium_partial_pressure_evaporation
+  locator:
+    page: 1
+    published_page: 1744
+    pdf_page_index: 0
+    section: Results
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '57.6'
+          Al2O3: '15.1'
+          CaO: '15.3'
+          MgO: '12'
+      locator:
+        page: 1
+        published_page: 1744
+        pdf_page_index: 0
+        section: Results
 - experiment_id: georges-k-condensation
   method: controlled_potassium_partial_pressure_condensation
   locator:
@@ -74,9 +95,10 @@ species:
         note: Measured results are retained in context because the existing residue-composition source fields have
           no K2O wt% field; no new quantity token or schema field was introduced.
         printed_values:
-          experiment_1_conditions: K-bearing silicate melt (44.2 wt% SiO2, 14.9 wt% Al2O3, 12.6 wt% CaO, 10.2 wt%
-            MgO, 18.1 wt% K2O), 1400°C, PO2 = 10^-16.2 atm, PK = 10^-3.5 atm.
-          experiment_1_result: Both experiments reach steady state after 150 minutes at 6.0 ± 0.5 wt% K2O.
+          experiment_1_conditions: K-free silicate melt (57.6 wt% SiO2, 15.1 wt% Al2O3, 15.3 wt% CaO, 12 wt% MgO)
+            and K-bearing silicate melt (44.2 wt% SiO2, 14.9 wt% Al2O3, 12.6 wt% CaO, 10.2 wt% MgO, 18.1 wt% K2O),
+            both at 1400°C, PO2 = 10^-16.2 atm and PK = 10^-3.5 atm.
+          experiment_1_result: Both compositions reach steady state after 150 minutes at 6.0 ± 0.5 wt% K2O.
           experiment_2_conditions: K-free silicate melt (57.6 wt% SiO2, 15.1 wt% Al2O3, 15.3 wt% CaO, 12 wt% MgO),
             1400°C, PO2 = 10^-12.9 atm, PK = 2.6 × 10^-4 atm; Fig. 2 inset prints PK = 10^-3.6 atm.
           experiment_2_result: Equilibrium is reached in less than 90 minutes with 11.2 wt% K2O in the melt.
