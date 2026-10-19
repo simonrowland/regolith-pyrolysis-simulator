@@ -247,6 +247,10 @@ def _digitized(value):
     return False
 
 
+def _has_measured_values(values):
+    return values.get("quantity") != "apparatus_and_pressure_regime"
+
+
 def _observation_values(document, locator_path):
     if any(part in {"point_conditions", "standard_state", "composition_role", "uncertainty"} for part in locator_path):
         return
@@ -269,7 +273,7 @@ def _observation_values(document, locator_path):
             observation = observation[int(component)] if isinstance(observation, list) else observation[component]
         if isinstance(observation, dict) and "values" in observation:
             values = observation["values"]
-            if _digitized(values):
+            if not _has_measured_values(values) or _digitized(values):
                 return
             yield from _numeric_values(values, published_only=True)
         return
@@ -288,6 +292,8 @@ def _generic_observation_values(document, locator_path):
         for component in locator_path[:index + 2]:
             observation = observation[int(component)] if isinstance(observation, list) else observation[component]
         values = observation.get("values", {}) if isinstance(observation, dict) else {}
+        if not _has_measured_values(values):
+            return ()
         return tuple(_numeric_values(values))
     return ()
 
@@ -549,6 +555,14 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
           f"{sum(row['class'] == 'derived' for row in value_skips)} derived")
     captured = capsys.readouterr()
     print(captured.out, end="")
+
+
+def test_reiss_apparatus_values_are_not_measured_observation_values():
+    path = ROOT / "data/literature/extracts/reiss-2019-thermal-extraction-nulht2m.yaml"
+    document = _yaml(path.read_text())
+    locator_path = ("species", "NU-LHT-2M", "observations", "2", "locator")
+    assert tuple(_observation_values(document, locator_path)) == ()
+    assert _generic_observation_values(document, locator_path) == ()
 
 
 def test_continued_table_checks_caption_page_and_data_page():
