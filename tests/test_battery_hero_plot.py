@@ -530,6 +530,66 @@ def test_deck_sweet_spot_uses_same_colors_across_engine_panels(
         assert openimcc_color == pytest.approx(magemin_color)
 
 
+def test_polymerisation_deck_facets_points_by_species_and_keeps_benchmark(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    _score_file(residuals)
+    data = read_scores(residuals)
+    points = tuple(
+        {
+            "chart": "polymerisation",
+            "engine": "openimcc",
+            "facet": facet,
+            "x_value": "1.0",
+            "y_value": "0.2",
+            "residual_dex": "0.2",
+            "flagged": False,
+        }
+        for facet in ("SiO2", "Ag", "P2O5")
+    )
+    data = replace(
+        data,
+        hero_deck_points=points,
+        hero_deck_metrics={
+            ("polymerisation", "openimcc"): {"n": 3},
+            ("polymerisation", "internal-analytical"): {"n": 0},
+        },
+        hero_deck_benchmarks={
+            ("polymerisation", "openimcc"): {
+                "benchmark_engine": "vaporock",
+                "n": 2,
+                "primary_rms_dex": "0.1",
+                "benchmark_rms_dex": "0.2",
+            }
+        },
+    )
+    drawn_facets: list[tuple[str, ...]] = []
+    original_draw = hero_plot._draw_hero_deck_scatter
+
+    def capture_facets(axis, plotted_points, *, engine_colors):
+        if plotted_points and plotted_points[0].get("chart") == "polymerisation":
+            drawn_facets.append(
+                tuple(sorted({str(point["facet"]) for point in plotted_points}))
+            )
+        original_draw(axis, plotted_points, engine_colors=engine_colors)
+
+    monkeypatch.setattr(hero_plot, "_draw_hero_deck_scatter", capture_facets)
+    files = hero_plot.render_hero_deck_charts(data, tmp_path / "deck")
+
+    point_facets = {str(point["facet"]) for point in points}
+    hero_order = hero_plot._hero_facets(data, "vapour")
+    ordered_facets = tuple(facet for facet in hero_order if facet in point_facets) + tuple(
+        sorted(point_facets - set(hero_order))
+    )
+    expected = tuple((facet,) for facet in ordered_facets)
+    assert tuple(drawn_facets) == expected
+    svg = Path(files["deck:polymerisation:svg"]).read_text(encoding="utf-8")
+    assert "Best comparison on chart rows" in svg
+    assert "vaporock" in svg
+
+
 def test_sio_deck_distinguishes_oxygen_sources_and_pO2_bins(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
