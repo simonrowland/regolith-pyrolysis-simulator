@@ -30,6 +30,18 @@ def test_krawczynski_2012_starting_compositions_and_migration() -> None:
     assert "C321       glass      29    35.1" in table_4["printed_cells"]
     table_5 = by_id["krawczynski_2012_table_5_a17o_phase_compositions"]["values"]
     assert "C409" in table_5["printed_cells"]
+    table_3 = by_id["krawczynski_2012_table_3_a17o_conditions_and_partitioning"]["values"]
+    cells = table_3["printed_cells"]
+    assert table_3["row_count"] == 28
+    assert "C396          C                1520        2.5     26.8" in cells
+    assert "C397          C                1560        2.5      8.7" in cells
+    assert "C409          C                1555        2.7     14.3" in cells
+    assert "opx(−12)" in cells and "−2.5" in cells and "liq(100)" in cells
+    for table in (table_2, table_3, table_5):
+        assert "!" not in table["printed_cells"]
+    assert "T (°C)" in table_2["printed_cells"]
+    assert "T (°C)" in cells
+    assert "1530 °C" in table_5["printed_cells"]
     assert len([row for row in context if row["type"] == "deferred_figure"]) == 10
 
     migrator = Migrator(root=ROOT, index={}, aliases={})
