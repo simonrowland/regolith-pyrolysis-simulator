@@ -161,9 +161,16 @@ def _as_decimal(value: object) -> Decimal | None:
     return result if result.is_finite() else None
 
 
-def _pdf_page_count(corpus: Path, source_id: str) -> tuple[int | None, str | None]:
-    pdf_path = corpus / "raw" / source_id / f"{source_id}.pdf"
-    if not pdf_path.is_file():
+def _pdf_page_count(
+    corpus: Path, source_ids: Iterable[str]
+) -> tuple[int | None, str | None]:
+    pdf_paths = [
+        corpus / "raw" / source_id / f"{source_id}.pdf"
+        for source_id in dict.fromkeys(source_ids)
+        if source_id
+    ]
+    pdf_path = next((path for path in pdf_paths if path.is_file()), None)
+    if pdf_path is None:
         return None, None
     try:
         result = subprocess.run(
@@ -220,7 +227,7 @@ def _locator_issues(
                 isinstance(key, str) and key.endswith("_locator")
             ):
                 continue
-            location = f"{path}.locator" if path else "locator"
+            location = f"{path}.{key}" if path else str(key)
             saw_locator = True
             if not isinstance(locator, Mapping):
                 hard_issues.append(f"{location} must be a mapping")
@@ -231,9 +238,13 @@ def _locator_issues(
                     hard_issues.append(
                         f"{location}.page_verification has unsupported value {verification!r}"
                     )
-                else:
+                elif pdf_page_count is None and pdf_error is None:
                     verification_issues.append(
                         f"{location}: physical page could not be verified because the PDF is absent"
+                    )
+                else:
+                    page_offset_issues.append(
+                        f"{location}.page_verification is invalid because a corpus PDF is present"
                     )
             index = locator.get("pdf_page_index")
             if index is None:
@@ -257,7 +268,11 @@ def _locator_issues(
                     f"0..{pdf_page_count - 1} page range"
                 )
             page = _as_decimal(locator.get("page"))
-            if (
+            if page is None and verification != "unverified_pdf_absent":
+                verification_issues.append(
+                    f"{location}.page is missing or invalid; physical page is unverified"
+                )
+            elif (
                 page is not None
                 and page != Decimal(index + 1)
                 and verification != "unverified_pdf_absent"
@@ -1028,7 +1043,14 @@ def evaluate_extract(
     migration_issues = _migrate_one(path, doc, report)
     _add(report, "isolated-migration", "HARD", migration_issues)
     source_id = path.stem
-    page_count, pdf_error = _pdf_page_count(corpus, source_id)
+    source = doc.get("source") if isinstance(doc, Mapping) else None
+    corpus_source_id = (
+        source.get("corpus_source_id") if isinstance(source, Mapping) else None
+    )
+    source_ids = [source_id]
+    if isinstance(corpus_source_id, str):
+        source_ids.append(corpus_source_id)
+    page_count, pdf_error = _pdf_page_count(corpus, source_ids)
     (
         locator_hard,
         locator_page_issues,

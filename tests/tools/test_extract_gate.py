@@ -183,6 +183,67 @@ def test_typed_missing_pdf_reason_skips_page_rule_with_counted_notice(tmp_path: 
     assert next(item for item in report.findings if item.check == "locator").severity == "HARD"
 
 
+def test_typed_missing_pdf_reason_does_not_skip_when_corpus_pdf_exists(
+    tmp_path: Path, monkeypatch
+):
+    corpus = tmp_path / "corpus"
+    pdf = corpus / "raw" / "fixture-original" / "fixture-original.pdf"
+    pdf.parent.mkdir(parents=True)
+    pdf.write_bytes(b"fixture")
+    monkeypatch.setattr(
+        gate.subprocess,
+        "run",
+        lambda *args, **kwargs: subprocess.CompletedProcess(
+            args[0], 0, stdout="Pages:          3\n", stderr=""
+        ),
+    )
+    doc = _document()
+    doc["source"]["corpus_source_id"] = "fixture-original"
+    locator = doc["species"]["Fe"]["observations"][0]["locator"]
+    locator.update(page=2, pdf_page_index=1, page_verification="unverified_pdf_absent")
+
+    report = _run_gate(tmp_path, doc, corpus=corpus)
+
+    finding = next(
+        item for item in report.findings if item.check == "locator-page-offset"
+    )
+    assert finding.severity == "HARD"
+    assert "page_verification is invalid" in finding.detail
+
+
+def test_locator_index_without_page_is_not_verified(tmp_path: Path):
+    doc = _document()
+    locator = doc["species"]["Fe"]["observations"][0]["locator"]
+    locator.pop("page")
+    report = _run_gate(tmp_path, doc)
+
+    finding = next(
+        item for item in report.findings if item.check == "locator-verification"
+    )
+    assert finding.severity == "SOFT"
+    assert ".page is missing or invalid; physical page is unverified" in finding.detail
+
+
+def test_page_verification_migrates_as_locator_field_not_note():
+    from simulator.battery.migrate import locator_from_mapping
+
+    locator = locator_from_mapping(
+        {
+            "page": 2,
+            "pdf_page_index": 1,
+            "page_verification": "unverified_pdf_absent",
+            "table": "I",
+        }
+    )
+
+    assert locator is not None
+    assert locator.page_verification == "unverified_pdf_absent"
+    assert locator.note is None
+    assert not validator._locator_ok(
+        {"page_verification": "unverified_pdf_absent"}
+    )
+
+
 def test_absent_corpus_pdf_only_warns_about_page_count(tmp_path: Path):
     report = _run_gate(tmp_path, _document())
     assert "locator" not in _checks(report)
