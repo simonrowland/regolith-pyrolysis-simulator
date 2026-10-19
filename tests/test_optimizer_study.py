@@ -5089,6 +5089,57 @@ def test_lookup_misses_feasible_legacy_row_without_extraction_binding(
     assert replayed is None
 
 
+def test_aborted_artifacts_skip_unbound_extraction_cache_rows(
+    tmp_path: Path,
+) -> None:
+    profile = copy.deepcopy(PROFILE)
+    profile["profile_id"] = "aborted-extraction-capture-probe"
+    profile["constraints"] = {
+        "gates": ["extraction_completeness"],
+        "target_species": ["SiO", "Fe", "Ca", "Al", "Mg", "Na"],
+        "extraction_min_fraction": 0.01,
+    }
+    constraints = physics_constraints_from_profile(profile)
+    schema = RecipeSchema()
+    patch = RecipePatch({}).validated(schema)
+    scored = _seed_safe_certified_evaluator(
+        patch,
+        FEEDSTOCK,
+        "internal-analytical",
+        profile=profile,
+        candidate_id="legacy-extraction-candidate",
+        constraints=constraints,
+    )
+    assert scored.feasible
+    assert not constraints.extraction_completeness(
+        SimpleNamespace(**scored.run_reference.trace)
+    ).feasible
+    out = tmp_path / "aborted-extraction-cache"
+    out.mkdir()
+    ResultStore(out / "cache.sqlite").store(
+        scored.eval_spec,
+        scored,
+        created_at="legacy",
+    )
+
+    study._write_empty_artifacts(
+        out,
+        profile=profile,
+        feedstock=FEEDSTOCK,
+        fidelity="internal-analytical",
+        definitions=study.objective_definitions(profile),
+        failure_counts={"evaluation_timeout": 1},
+        constraints=constraints,
+    )
+
+    summary = json.loads((out / "study.summary.json").read_text(encoding="utf-8"))
+    pareto = json.loads((out / "pareto.json").read_text(encoding="utf-8"))
+    leaderboard_rows = list(csv.DictReader((out / "leaderboard.csv").open()))
+    assert summary["evaluated"] == 0
+    assert pareto["pareto"] == []
+    assert leaderboard_rows == []
+
+
 def test_feasible_analytical_cache_hit_skips_evaluation_and_splits_keys(
     tmp_path: Path,
 ) -> None:
