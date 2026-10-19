@@ -222,6 +222,39 @@ def test_hero_aggregation_float_hex_pin_from_r4_pre_move_tip(tmp_path: Path) -> 
     assert element_points[12].n == 7
 
 
+def test_hero_element_pooling_float_hex_pin_preserves_leading_dot_formula(
+    tmp_path: Path,
+) -> None:
+    residuals = tmp_path / "leading-dot.jsonl"
+    _score_file(residuals)
+    row = _record(
+        engine="openimcc",
+        experiment="fe-dot",
+        formula="Fe.947O",
+        temperature_K=1050,
+        residual=0.3,
+    )
+    with residuals.open("a", encoding="utf-8") as target:
+        target.write(json.dumps(row) + "\n")
+
+    data = read_scores(residuals)
+    element_points = element_view_series(data)
+    iron = next(
+        point for point in element_points[("openimcc", "Fe")] if point.bin_index == 10
+    )
+    oxygen = next(
+        point for point in element_points[("openimcc", "O")] if point.bin_index == 10
+    )
+
+    # Captured with the pre-move plotter at 94a303798889ad5ceab7a4160f67040a29f22f2b.
+    assert iron.residual_dex.hex() == "0x1.3333333333333p-2"
+    assert iron.temperature_K.hex() == "0x1.0680000000000p+10"
+    assert iron.n == 1
+    assert oxygen.residual_dex.hex() == "0x1.3333333333334p-2"
+    assert oxygen.temperature_K.hex() == "0x1.0195555555555p+10"
+    assert oxygen.n == 3
+
+
 def test_refusal_status_legacy_spellings_are_counted(tmp_path: Path) -> None:
     residuals = tmp_path / "residuals.jsonl"
     rows: list[dict[str, object]] = [
