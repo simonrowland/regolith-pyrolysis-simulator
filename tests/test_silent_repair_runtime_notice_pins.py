@@ -347,29 +347,29 @@ def test_sr24_finite_capacity_and_fraction_repairs_preserve_calibration_status(
     ) == (0.0, 250.0, 1.0, "in_range")
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="SR24 status classification must not depend on the notice text",
-)
 def test_sr24_repair_notice_text_does_not_flip_calibration_status(monkeypatch) -> None:
     monkeypatch.setattr(
         SulfSatGate,
         "_finite_output_repair_notice",
         staticmethod(lambda **_kwargs: "operator repair note"),
     )
-    _sim, result = _sr24_simulator(monkeypatch, fe3_ratio=0.1)
+    sim, result = _sr24_simulator(monkeypatch, fe3_ratio=0.1)
 
     assert result.sulfur_saturation.calibration_status == "in_range"
     assert result.sulfur_saturation.warnings == [
         "operator repair note",
         "operator repair note",
     ]
+    _, _, _, _, redox_in_range = sim._sulfsat_gate._run_pysulfsat(
+        liquid_comp_wt=sim._melt_oxide_wt_pct(),
+        T_K=1200.0,
+        P_bar=1.0,
+        fO2_log=-10.0,
+        operator_fe3fet=None,
+    )
+    assert redox_in_range is True
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="SR24 numerical warnings must precede separately collected repair notes",
-)
 def test_sr24_repair_and_numerical_warning_keep_out_of_range_status(monkeypatch) -> None:
     monkeypatch.setattr(
         SulfSatGate,
