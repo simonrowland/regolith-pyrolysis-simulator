@@ -14,11 +14,18 @@ from decimal import Decimal
 
 import pytest
 
-from simulator.battery.enums import Engine, FO2Channel, MethodToken, ValueKind
+from simulator.battery.enums import (
+    CellMaterial,
+    Engine,
+    FO2Channel,
+    MethodToken,
+    ValueKind,
+)
 from simulator.battery.fo2_ladder import resolve_row_fo2
 from simulator.battery.records import FO2Control, State, Value
 from simulator.battery.score import (
     ScoreContext,
+    _cell_oxygen_class,
     composition_wt_pct,
     compile_residual,
     predict_with_engine,
@@ -50,6 +57,26 @@ def _assert_same_fo2(results):
     assert len({item.payload["fO2_route"] for item in ready}) == 1
     assert len({item.payload["fO2_borrowed"] for item in ready}) == 1
     return ready[0].payload
+
+
+def test_current_composition_and_cell_helpers_are_pinned_before_move() -> None:
+    weights = composition_wt_pct(
+        _composition(("FeO", "0.2"), ("SiO2", "0.8"))
+    )
+    assert weights is not None
+    assert {name: amount.hex() for name, amount in weights.items()} == {
+        "FeO": "0x1.70391a0b77b38p+4",
+        "SiO2": "0x1.33f1b97d22132p+6",
+    }
+    assert _cell_oxygen_class(None) == ("unknown", None)
+    assert _cell_oxygen_class((F.located(CellMaterial.PT),)) == ("inert", None)
+    assert _cell_oxygen_class((F.located(CellMaterial.MO),)) == (
+        "reactive",
+        "Mo",
+    )
+    assert _cell_oxygen_class(
+        (F.located(CellMaterial.MO), F.located(CellMaterial.W))
+    ) == ("reactive", None)
 
 
 def _feo_case(**kwargs):
