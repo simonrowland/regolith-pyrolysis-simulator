@@ -429,6 +429,40 @@ def test_deck_refusal_strip_includes_missing_scorer_axis(tmp_path: Path) -> None
     assert "no fO2 for this row" in redox_svg
 
 
+def test_deck_refusal_strip_height_scales_with_reason_count(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    _score_file(residuals)
+    data = read_scores(residuals)
+    reasons = 14
+    data.hero_deck_axis_refusals.update(
+        {
+            ("polymerisation", "openimcc", f"deck-reason-{index}"): 1
+            for index in range(reasons)
+        }
+    )
+
+    original_draw = hero_plot._draw_hero_refusals
+    measured_heights: list[tuple[int, float]] = []
+
+    def capture_height(axis, entries, *, engine_colors):
+        original_draw(axis, entries, engine_colors=engine_colors)
+        count = len({reason for _engine, reason, _count in entries})
+        if count >= reasons:
+            height_inches = axis.get_position().height * axis.figure.get_figheight()
+            measured_heights.append((count, height_inches))
+
+    monkeypatch.setattr(hero_plot, "_draw_hero_refusals", capture_height)
+    hero_plot.render_hero_deck_charts(data, tmp_path / "deck")
+
+    assert measured_heights
+    count, height_inches = measured_heights[0]
+    assert count >= reasons
+    assert height_inches >= count * 0.12
+
+
 @pytest.mark.parametrize("view", ("species", "element"))
 def test_clipped_flagged_points_keep_a_hollow_marker(tmp_path: Path, view: str) -> None:
     residuals = tmp_path / "residuals.jsonl"
