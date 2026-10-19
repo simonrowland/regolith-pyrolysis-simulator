@@ -42,7 +42,7 @@ from engines.magemin.domain import MAGEMinDomainGate
 import simulator.melt_backend.liquidus as liquidus_module
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import LiquidFractionInvalidError, MeltCompositionError
-from simulator.feedstock_composition import FEOT_FROM_FE2O3
+from simulator.feedstock_composition import FEOT_FROM_FE2O3, total_fe
 from simulator.fe_redox import (
     FE_FEO_BUFFER_STANDARD,
     REDOX_STATE_REFERENCE_T_K,
@@ -2571,6 +2571,19 @@ def test_magemin_ig_bulk_vector_feo_total_iron_provisions_redox_o():
     assert vector[feot_index] == pytest.approx(16.5 - feo_excess_o)
     assert vector[feot_index] + vector[oxygen_index] == pytest.approx(16.5)
     assert vector[oxygen_index] > 0.0
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="b-911: MAGEMin projection drops represented Fe",
+)
+def test_magemin_projection_preserves_owner_total_fe_in_feot():
+    backend = MAGEMinBackend()
+    composition = {"FeO": 10.0}
+
+    projection = backend._build_db_bulk_projection(composition, database="ig")
+
+    assert projection.composition_wt_pct["FeOt"] == total_fe(composition)
 
 
 def test_magemin_fake_bridge_populates_equilibrium_result(monkeypatch):
