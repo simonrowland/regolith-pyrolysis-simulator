@@ -956,6 +956,7 @@ def _migrate_one(path: Path, doc: object, report: GateReport) -> list[str]:
         return [report.migration_error]
 
     result = migrator.result
+    species_issues = _species_container_issues(doc, result.observations)
     kinds = Counter(
         observation.value.kind.value
         for observation in result.observations.values()
@@ -976,12 +977,103 @@ def _migrate_one(path: Path, doc: object, report: GateReport) -> list[str]:
         () if result.validation is None else result.validation.hard_issues
     )
     report.migration_hard_issues = len(hard_issues)
+    issues = []
     if hard_issues:
-        return [
+        issues.append(
             f"{len(hard_issues)} hard migration issue(s): "
             f"{hard_issues[0].path} {hard_issues[0].reason.value}"
-        ]
-    return []
+        )
+    issues.extend(species_issues)
+    return issues
+
+
+def _species_container_issues(doc: object, observations: Mapping[str, Any]) -> list[str]:
+    """Reject migrated rows whose printed species disagrees with their identity."""
+    if not isinstance(doc, Mapping):
+        return []
+    species_blocks = doc.get("species")
+    if not isinstance(species_blocks, Mapping):
+        return []
+
+    formulas = {
+        str(formula)
+        for formula in species_blocks
+        if parse_species_formula(str(formula)) is not None
+    }
+    issues: list[str] = []
+    for container, observation in migrate.iter_extract_observations(doc):
+        raw_id = str(observation.get("observation_id") or "")
+        migrated = observations.get(f"{doc.get('source_id', '')}::{raw_id}")
+        if migrated is None:
+            migrated = next(
+                (item for key, item in observations.items() if key.endswith(f"::{raw_id}")),
+                None,
+            )
+        if migrated is None:
+            continue
+        identity_formula = migrated.identity.species.formula
+        texts = [raw_id]
+        for key in ("label", "basis_as_published", "printed_label"):
+            value = observation.get(key)
+            if isinstance(value, str):
+                texts.append(value)
+        locator = observation.get("locator")
+        if isinstance(locator, Mapping):
+            for key in ("column", "header", "printed_header_as_published"):
+                value = locator.get(key)
+                if isinstance(value, str):
+                    texts.append(value)
+        values = observation.get("values")
+        if isinstance(values, Mapping):
+            for key in (
+                "label",
+                "basis_as_published",
+                "printed_label",
+                "printed_header_as_published",
+                "quantity",
+            ):
+                value = values.get(key)
+                if isinstance(value, str):
+                    texts.append(value)
+        named: set[str] = set()
+        for text in texts:
+            component_context = re.search(
+                r"\b(?:wt\.?%|ppm|activity|gamma)\b", text, re.I
+            )
+            row_formulas = {
+                formula
+                for formula in formulas
+                if text == raw_id or "O" in formula or component_context
+            }
+            for candidate in _CHEMICAL_FORMULA.findall(text):
+                if (
+                    parse_species_formula(candidate) is not None
+                    and (not candidate.startswith("X") or candidate.startswith("Xe"))
+                    and ("O" in candidate or component_context)
+                ):
+                    row_formulas.add(candidate)
+            folded = text.lower()
+            text_named: set[str] = set()
+            for formula in row_formulas:
+                token = re.sub(r"[^a-z0-9]", "", formula.lower())
+                if re.search(
+                    rf"(?<![a-z0-9]){re.escape(formula.lower())}(?![a-z0-9])",
+                    folded,
+                ) or (
+                    re.search(rf"(?:^|_){re.escape(token)}(?:_|$)", raw_id.lower())
+                ):
+                    text_named.add(formula)
+            if len(text_named) == 1 and container not in text_named:
+                named.update(text_named)
+        # Composition maps and coordinates are not species evidence.
+        if len(named) == 1:
+            row_species = next(iter(named))
+            if identity_formula != row_species:
+                issues.append(
+                    f"species.{container}.observations[{raw_id}] migrated as "
+                    f"{identity_formula}, while row names {row_species}"
+                )
+    return issues
 
 
 def evaluate_extract(

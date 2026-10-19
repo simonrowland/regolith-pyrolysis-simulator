@@ -91,6 +91,42 @@ def test_isolated_migration_reports_kinds_and_refusals(tmp_path: Path, monkeypat
     assert next(item for item in report.findings if item.check == "isolated-migration").severity == "HARD"
 
 
+def test_species_container_misfiling_is_hard_and_repair_mutation_clears_it(
+    tmp_path: Path,
+):
+    doc = _document()
+    doc["species"]["SiO2"] = {
+        "observations": [
+            {
+                "observation_id": "van_westrenen_glass_cao_wt_percent",
+                "type": "composition_point",
+                "locator": {"table": "2", "page": 3, "pdf_page_index": 2},
+                "phase": "glass",
+                "units": "wt%",
+                "basis_as_published": "CaO wt% in glass, Table 4",
+                "values": {"value": "12.4"},
+            }
+        ]
+    }
+
+    report = _run_gate(tmp_path, doc)
+    finding = next(
+        item for item in report.findings
+        if item.check == "isolated-migration"
+    )
+    assert finding.severity == "HARD"
+    assert "migrated as SiO2, while row names CaO" in finding.detail
+
+    # Mutation: put the same printed CaO row in its actual species container.
+    row = doc["species"]["SiO2"]["observations"].pop()
+    doc["species"]["CaO"] = {"observations": [row]}
+    repaired = _run_gate(tmp_path, doc)
+    assert not any(
+        "migrated as SiO2, while row names CaO" in item.detail
+        for item in repaired.findings
+    )
+
+
 def test_locator_requires_zero_based_pdf_page_index(tmp_path: Path):
     doc = _document()
     doc["extraction"]["date"] = "2026-10-18"
