@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import re
 from decimal import Decimal
 from pathlib import Path
 
+import yaml
+
 from simulator.battery.enums import IdentityEqualKind, Phase, Quantity, UncertaintyKind
 from simulator.battery.identity import identity_equal, profile_for, quantity_token
-from tests.battery.test_migrate import _migrate_real_extract
+from tests.battery.test_migrate import REPO_ROOT, _migrate_real_extract
 
 
 EXTRACT = "costa-2025-ree-cmas-glass-melt-thermochemistry.yaml"
@@ -37,8 +40,60 @@ def test_costa_table3_migrates_composition_temperature_and_source_conditions(
     assert result.validation is not None
     assert result.validation.hard_issues == ()
 
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts" / EXTRACT).read_text(
+            encoding="utf-8"
+        )
+    )
+    source_observations = source["species"]["CaO"]["observations"]
+    contexts = source["species"]["CaO"]["context"]
+    table2 = next(
+        context["values"]["rows"]
+        for context in contexts
+        if context["observation_id"] == "costa_2025_table2_stoichiometric_coefficients"
+    )
+
+    def coefficient(coefficients: dict[str, str], name: str) -> str:
+        printed = coefficients[name]
+        return format(Decimal(printed.split("(", 1)[0]).normalize(), "f")
+
+    formula_by_sample = {}
+    for row in table2:
+        coefficients = row["coefficients_as_printed"]
+        sample = row["sample"].casefold()
+        parts = [
+            ("Ca", coefficient(coefficients, "a")),
+            ("Mg", coefficient(coefficients, "b")),
+            ("Al", coefficient(coefficients, "c")),
+        ]
+        if coefficients["d"] != "—":
+            parts.append(
+                (row["sample"].split("-", 1)[0], coefficient(coefficients, "d"))
+            )
+        parts.extend(
+            (
+                ("Si", coefficient(coefficients, "e")),
+                ("O", coefficient(coefficients, "f")),
+            )
+        )
+        formula_by_sample[sample] = "".join(
+            f"{element}{amount}" for element, amount in parts
+        )
+
     for row in rows:
-        assert row.identity.species.formula == "CaO"
+        composition = row.point_conditions["composition"]
+        assert composition.locator.note is not None
+        sample = composition.locator.note.removeprefix("row=").casefold()
+        formula = row.identity.species.formula
+        source_observation = next(
+            observation
+            for observation in source_observations
+            if observation["observation_id"] in row.observation_id
+        )
+        normalized_formula = re.sub(
+            r"(\d+\.\d*?[1-9])0+(?=[A-Z]|$)", r"\1", formula
+        )
+        assert normalized_formula == formula_by_sample[sample]
         assert row.identity.composition.is_value
         assert "composition" in profile_for(row.identity).required
         assert row.locator.page == 11
@@ -69,6 +124,8 @@ def test_costa_table3_migrates_composition_temperature_and_source_conditions(
             assert quench.locator.page == 4
         elif "_tm_table3" in row.observation_id or "_heat_of_fusion_table3" in row.observation_id:
             assert row.identity.species.phase.value is Phase.CR
+            if quantity_token(row.identity) is Quantity.ENTHALPY_OF_FUSION:
+                assert source_observation["units"] == "kJ mol−1"
 
     y_l = _one(rows, "costa_2025_y_l_heat_of_fusion_table3")
     y_h = _one(rows, "costa_2025_y_h_heat_of_fusion_table3")

@@ -91,6 +91,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: &costa_cmas_formula Ca0.3234Mg0.1071Al0.1524Si0.4933O1.646
           quantity: transition_temperature
           property_kind: glass_transition
           transition_as_printed: onset glass transition (Tg)
@@ -162,6 +163,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: *costa_cmas_formula
           quantity: transition_temperature
           property_kind: crystallization_temperature
           transition_as_printed: onset crystallization (Tc)
@@ -230,6 +232,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: *costa_cmas_formula
           quantity: transition_temperature
           property_kind: melting_point
           transition_as_printed: onset melting (Tm)
@@ -295,6 +298,7 @@ species:
         regime: DSC melting endotherm
         units: kJ mol−1
         values:
+          formula: *costa_cmas_formula
           quantity: heat_of_fusion
           method_class: measured_direct
           delta_H_fus_kJ_mol-1: 31.01
@@ -365,6 +369,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: &costa_y_l_formula Ca0.3182Mg0.1054Al0.1502Y0.0297Si0.486O1.665
           quantity: transition_temperature
           property_kind: glass_transition
           transition_as_printed: onset glass transition (Tg)
@@ -435,6 +440,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: *costa_y_l_formula
           quantity: transition_temperature
           property_kind: crystallization_temperature
           transition_as_printed: onset crystallization (Tc)
@@ -505,6 +511,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: *costa_y_l_formula
           quantity: transition_temperature
           property_kind: melting_point
           transition_as_printed: onset melting (Tm)
@@ -572,6 +579,7 @@ species:
         regime: DSC melting endotherm
         units: kJ mol−1
         values:
+          formula: *costa_y_l_formula
           quantity: heat_of_fusion
           method_class: measured_direct
           delta_H_fus_kJ_mol-1: 18.54
@@ -644,6 +652,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: &costa_yb_l_formula Ca0.322Mg0.1057Al0.1484Yb0.0160Si0.490O1.654
           quantity: transition_temperature
           property_kind: glass_transition
           transition_as_printed: onset glass transition (Tg)
@@ -714,6 +723,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: *costa_yb_l_formula
           quantity: transition_temperature
           property_kind: crystallization_temperature
           transition_as_printed: onset crystallization (Tc)
@@ -784,6 +794,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: *costa_yb_l_formula
           quantity: transition_temperature
           property_kind: melting_point
           transition_as_printed: onset melting (Tm)
@@ -851,6 +862,7 @@ species:
         regime: DSC melting endotherm
         units: kJ mol−1
         values:
+          formula: *costa_yb_l_formula
           quantity: heat_of_fusion
           method_class: measured_direct
           delta_H_fus_kJ_mol-1: 23.44
@@ -923,6 +935,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: &costa_gd_l_formula Ca0.3224Mg0.1048Al0.1516Gd0.0173Si0.488O1.657
           quantity: transition_temperature
           property_kind: glass_transition
           transition_as_printed: onset glass transition (Tg)
@@ -993,6 +1006,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: *costa_gd_l_formula
           quantity: transition_temperature
           property_kind: crystallization_temperature
           transition_as_printed: onset crystallization (Tc)
@@ -1063,6 +1077,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: *costa_gd_l_formula
           quantity: transition_temperature
           property_kind: melting_point
           transition_as_printed: onset melting (Tm)
@@ -1130,6 +1145,7 @@ species:
         regime: DSC melting endotherm
         units: kJ mol−1
         values:
+          formula: *costa_gd_l_formula
           quantity: heat_of_fusion
           method_class: measured_direct
           delta_H_fus_kJ_mol-1: 23.31
@@ -1202,6 +1218,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: &costa_y_h_formula Ca0.3091Mg0.1008Al0.145Y0.0986Si0.468O1.711
           quantity: transition_temperature
           property_kind: glass_transition
           transition_as_printed: onset glass transition (Tg)
@@ -1272,6 +1289,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: *costa_y_h_formula
           quantity: transition_temperature
           property_kind: crystallization_temperature
           transition_as_printed: onset crystallization (Tc)
@@ -1342,6 +1360,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: *costa_y_h_formula
           quantity: transition_temperature
           property_kind: melting_point
           transition_as_printed: onset melting (Tm)
@@ -1409,6 +1428,7 @@ species:
         regime: DSC melting endotherm
         units: kJ mol−1
         values:
+          formula: *costa_y_h_formula
           quantity: heat_of_fusion
           method_class: measured_direct
           delta_H_fus_kJ_mol-1: 14.27
@@ -1481,6 +1501,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: &costa_yb_h_formula Ca0.312Mg0.1006Al0.1266Yb0.099Si0.475O1.701
           quantity: transition_temperature
           property_kind: glass_transition
           transition_as_printed: onset glass transition (Tg)
@@ -1551,6 +1572,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: *costa_yb_h_formula
           quantity: transition_temperature
           property_kind: crystallization_temperature
           transition_as_printed: onset crystallization (Tc)
@@ -1621,6 +1643,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: *costa_yb_h_formula
           quantity: transition_temperature
           property_kind: melting_point
           transition_as_printed: onset melting (Tm)
@@ -1688,6 +1711,7 @@ species:
         regime: DSC melting endotherm
         units: kJ mol−1
         values:
+          formula: *costa_yb_h_formula
           quantity: heat_of_fusion
           method_class: measured_direct
           delta_H_fus_kJ_mol-1: 19.13
@@ -1760,6 +1784,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: &costa_gd_h_formula Ca0.312Mg0.0932Al0.1444Gd0.1004Si0.472O1.716
           quantity: transition_temperature
           property_kind: glass_transition
           transition_as_printed: onset glass transition (Tg)
@@ -1830,6 +1855,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: *costa_gd_h_formula
           quantity: transition_temperature
           property_kind: crystallization_temperature
           transition_as_printed: onset crystallization (Tc)
@@ -1900,6 +1926,7 @@ species:
         regime: simultaneous DSC-TGA heating
         units: K
         values:
+          formula: *costa_gd_h_formula
           quantity: transition_temperature
           property_kind: melting_point
           transition_as_printed: onset melting (Tm)
@@ -1967,6 +1994,7 @@ species:
         regime: DSC melting endotherm
         units: kJ mol−1
         values:
+          formula: *costa_gd_h_formula
           quantity: heat_of_fusion
           method_class: measured_direct
           delta_H_fus_kJ_mol-1: 16.36
