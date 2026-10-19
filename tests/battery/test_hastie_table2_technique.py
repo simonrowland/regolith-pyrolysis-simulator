@@ -77,6 +77,28 @@ def test_live_table2_rows_emit_no_source_disagreement_notice(hastie) -> None:
     ]
 
 
+def test_table2_comment_row_citations_match_pdf_pages() -> None:
+    doc = load_cached_safe_yaml((EXTRACTS / EXTRACT).read_text(encoding="utf-8"))
+    row = next(
+        obs
+        for obs in doc["species"]["K"]["observations"]
+        if obs["observation_id"] == PARENT
+    )
+    rows = row["values"]["rows"]
+    cited_rows = (
+        (12, 30, 24, "Equation corresponds to [K2O] ~ 14."),
+        (13, 30, 24, "[K2O] 18.9-17.6."),
+        (14, 30, 24, "23.3-22.1 [K2O]."),
+        (16, 31, 25, "6[K2O]."),
+    )
+    for index, page, folio, quote in cited_rows:
+        locator = rows[index]["composition_role"]["locator"]
+        assert locator["page"] == page
+        assert locator["pdf_page_index"] == page - 1
+        assert locator["published_page"] == folio
+        assert rows[index]["composition_role"]["quote"] == quote
+
+
 def test_quoted_fits_experiment_carries_transpiration_from_printed_p22(hastie) -> None:
     experiment = _experiment(hastie, QUOTED_FITS)
     assert experiment.method.is_value
