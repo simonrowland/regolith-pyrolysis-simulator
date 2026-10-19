@@ -401,6 +401,14 @@ def test_hero_hollow_encoding_uses_only_scorer_flags(tmp_path: Path) -> None:
         residual=0.2,
         authority="extrapolated",
     )
+    bridge = _record(
+        engine="openimcc",
+        experiment="bridge-authority",
+        formula="SiO2",
+        temperature_K=1300,
+        residual=0.4,
+        authority="bridge",
+    )
     flagged = _record(
         engine="openimcc",
         experiment="scorer-flag",
@@ -417,6 +425,7 @@ def test_hero_hollow_encoding_uses_only_scorer_flags(tmp_path: Path) -> None:
     rows = [
         {"kind": "battery_store_stamp", "revision": "flag-sources"},
         ordinary,
+        bridge,
         flagged,
     ]
     residuals.write_text(
@@ -426,8 +435,24 @@ def test_hero_hollow_encoding_uses_only_scorer_flags(tmp_path: Path) -> None:
 
     ordinary_point = data.hero_series[("vapour", "SiO", "openimcc", "unknown")][0]
     flagged_point = data.hero_series[("vapour", "CaO", "openimcc", "unknown")][0]
+    bridge_point = data.series[("openimcc", "SiO2", "vapour")][0]
     assert not ordinary_point.flagged
     assert flagged_point.flagged
+    assert not bridge_point.flagged
+
+    tile_flagged_label = next(
+        handle.get_label()
+        for handle in hero_plot._legend_handles()
+        if handle.get_markerfacecolor() == "none"
+    )
+    hero_flagged_label = next(
+        handle.get_label()
+        for handle in _hero_legend_handles(
+            data, "vapour", _hero_engine_colors(data.engines)
+        )
+        if handle.get_markerfacecolor() == "#ffffff"
+    )
+    assert tile_flagged_label == hero_flagged_label == "flagged / extrapolated"
 
     figure, axis = plt.subplots()
     try:
@@ -454,6 +479,22 @@ def test_hero_hollow_encoding_uses_only_scorer_flags(tmp_path: Path) -> None:
         assert flagged_artist.get_edgecolors()[0] == pytest.approx(to_rgba("#123456"))
     finally:
         plt.close(figure)
+
+    tile_figure, tile_axis = plt.subplots()
+    try:
+        draw_panel(tile_axis, data, "openimcc", load_element_abundance())
+        bridge_marker = next(
+            artist
+            for artist in tile_axis.collections
+            if (artist.get_gid() or "").startswith(
+                "low-count-marker:series:openimcc:SiO2:vapour"
+            )
+        )
+        assert bridge_marker.get_facecolors()[0] == pytest.approx(
+            to_rgba(style_for_tier(TIER_MAJOR)["color"])
+        )
+    finally:
+        plt.close(tile_figure)
 
 
 def test_species_view_labels_major_curves_and_element_view_labels_elements(
