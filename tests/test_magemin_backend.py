@@ -28,6 +28,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from simulator.accounting.formulas import resolve_species_formula
 import simulator.engine_pool as engine_pool
 from simulator.engine_pool import (
     EngineWorkerDied,
@@ -42,7 +43,10 @@ from engines.magemin.domain import MAGEMinDomainGate
 import simulator.melt_backend.liquidus as liquidus_module
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import LiquidFractionInvalidError, MeltCompositionError
-from simulator.feedstock_composition import FEOT_FROM_FE2O3, total_fe
+from simulator.feedstock_composition import (
+    FEOT_FROM_FE2O3,
+    feot_equivalent_moles,
+)
 from simulator.fe_redox import (
     FE_FEO_BUFFER_STANDARD,
     REDOX_STATE_REFERENCE_T_K,
@@ -2554,36 +2558,28 @@ def test_magemin_explicit_fe2o3_does_not_apply_total_iron_o_provision():
 
 def test_magemin_ig_bulk_vector_feo_total_iron_provisions_redox_o():
     backend = MAGEMinBackend()
-    vector = backend._build_ig_bulk_vector(
-        {
-            "SiO2": 49.0,
-            "Al2O3": 14.0,
-            "CaO": 11.0,
-            "MgO": 8.0,
-            "FeO": 16.5,
-        }
-    )
+    composition = {
+        "SiO2": 49.0,
+        "Al2O3": 14.0,
+        "CaO": 11.0,
+        "MgO": 8.0,
+        "FeO": 16.5,
+    }
+    vector = backend._build_ig_bulk_vector(composition)
     feot_index = MAGEMinBackend._IG_BULK_ORDER.index("FeOt")
     oxygen_index = MAGEMinBackend._IG_BULK_ORDER.index("O")
 
     feo_excess_o = 16.5 * MAGEMinBackend._EXCESS_O_FROM_FEO_TOTAL_IRON_FACTOR
     assert vector[oxygen_index] == pytest.approx(feo_excess_o)
-    assert vector[feot_index] == pytest.approx(16.5 - feo_excess_o)
-    assert vector[feot_index] + vector[oxygen_index] == pytest.approx(16.5)
+    feo_molar_mass = resolve_species_formula("FeO").molar_mass_g_per_mol()
+    ledger_fe_moles = feot_equivalent_moles(
+        {"FeO": composition["FeO"] / feo_molar_mass}
+    )
+    magemin_fe_moles = feot_equivalent_moles(
+        {"FeO": vector[feot_index] / feo_molar_mass}
+    )
+    assert magemin_fe_moles == ledger_fe_moles
     assert vector[oxygen_index] > 0.0
-
-
-@pytest.mark.xfail(
-    strict=True,
-    reason="b-911: MAGEMin projection drops represented Fe",
-)
-def test_magemin_projection_preserves_owner_total_fe_in_feot():
-    backend = MAGEMinBackend()
-    composition = {"FeO": 10.0}
-
-    projection = backend._build_db_bulk_projection(composition, database="ig")
-
-    assert projection.composition_wt_pct["FeOt"] == total_fe(composition)
 
 
 def test_magemin_fake_bridge_populates_equilibrium_result(monkeypatch):

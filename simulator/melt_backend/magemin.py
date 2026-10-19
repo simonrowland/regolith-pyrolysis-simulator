@@ -2388,7 +2388,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     # MAGEMin still needs a nonzero ``O`` bulk component for the qfm buffer.
     # When no explicit ``Fe2O3`` is present, provision redox O from the total
     # iron inventory using the same half-O-per-Fe stoichiometry as explicit
-    # Fe2O3 excess oxygen (mass-conserving with the Fe2O3 path above).
+    # Fe2O3 excess oxygen. Keep the owner's full FeOt value; this O is a
+    # separate MAGEMin input and must not reduce the represented iron.
     _EXCESS_O_FROM_FEO_TOTAL_IRON_FACTOR = (
         _O_MOLAR_MASS_G_PER_MOL / (2.0 * _FEO_MOLAR_MASS_G_PER_MOL)
     )
@@ -3240,11 +3241,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         excess_o += fe2o3 * self._EXCESS_O_FROM_FE2O3_FACTOR
         if fe2o3 <= 0.0 and feo > 0.0:
             # FeO key is total-iron inventory (FeO_T), not literal FeO only.
-            # Peel buffer O from the FeOt slot so FeOt + O == feo (same
-            # mass bookkeeping as the explicit Fe2O3 fold above).
+            # Provision buffer O separately while retaining the owner's full
+            # FeO-equivalent iron in the FeOt slot.
             feo_excess_o = feo * self._EXCESS_O_FROM_FEO_TOTAL_IRON_FACTOR
             excess_o += feo_excess_o
-            feot -= feo_excess_o
 
         if feot > 0.0:
             source['FeOt'] = source.get('FeOt', 0.0) + feot
