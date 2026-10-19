@@ -140,6 +140,16 @@ species:
           phase: cr
           rows_as_printed: "T=1700–1900 K: ΔHT −5.58 ± 2.80 kJ/mol; ΔST 6.38 ± 1.50 J/(mol K), Rein and Chipman (1965). T=1260–1400 K: −0.30 ± 0.50; 9.30 ± 0.40, Popov et al. (1979). T=923–1223 K: −5.36 ± 0.27; 8.57 ± 0.22, Allibert et al. (1981). T=1200–1400 K: −10.50 ± 0.30; 7.90 ± 0.30, Skolis et al. (1983). T=1100–1500 K: −4.31 ± 0.42; 8.91 ± 0.28, Kumar and Kay (1985). T=1063 K: −8.53 ± 1.57; 4.83 ± 0.97, Geiger et al. (1988). T=1373–1873 K: −5.22 ± 0.18; 8.61 ± 0.18, Nagata et al. (1989). T=1562–1773 K: −6.14 ± 0.29; 8.15 ± 0.18, Zaitsev et al. (1990). T=1000–1200 K: −3.96 ± 0.03; 9.17 ± 0.13, Rog et al. (1993). T=1173 K: −4.67 ± 0.33; entropy not printed, Ayed et al. (1994). T=1833–2035 K: −6.34 ± 0.25; 9.94 ± 0.30, Shults and Shornikov (1995). T=2035–2100 K: 20.66 ± 1.26; 23.21 ± 0.62, Shornikov et al. (1997)."
   CaAl12O19:
+    context:
+      - observation_id: shornikov_2025_table4_hibonite_formation_from_oxides
+        type: thermodynamic_context
+        locator: {page: 7, published_page: 816, pdf_page_index: 6, table: "4"}
+        units: as printed
+        values:
+          quantity: enthalpy_and_entropy_of_hibonite_formation_from_oxides
+          method_class: quoted_attributed
+          note: These ΔHT and ΔST values are formation from oxides, not delta_fH or absolute S. Table caption also lists decomposition/melting values already partly represented as observations.
+          rows_as_printed: "T K: ΔHT kJ/mol; ΔST J/(mol K); reference. 1260–1400: −4.50 ± 0.50; 4.10 ± 0.40; Popov et al. 1979. 923–1223: −2.49 ± 0.19; 5.31 ± 0.16; Allibert et al. 1981. 1200–1400: −3.60 ± 0.20; 4.60 ± 0.20; Skolis et al. 1983. 1100–1500: −2.55 ± 0.12; 5.62 ± 0.08; Kumar and Kay 1985. 1063: −4.71 ± 1.39; 3.47 ± 0.40; Geiger et al. 1988. 1373–1873: −2.34 ± 0.15; 5.37 ± 0.15; Nagata et al. 1989. 1498–1650: −4.59 ± 0.22; 3.11 ± 0.14; Zaitsev et al. 1990. 1000–1200: −2.21 ± 0.04; 5.87 ± 0.01; Rog et al. 1993. 1173: −6.86 ± 0.43; entropy unavailable; Ayed et al. 1994. 1833–2033: −2.88 ± 0.25; 5.00 ± 0.20; Shults and Shornikov 1995. 2148–2200: 13.92 ± 0.96; 12.82 ± 0.46; Shornikov et al. 1997."
     observations:
       - observation_id: shornikov_2025_table4_shornikov_melting
         type: transition_point
@@ -177,6 +187,16 @@ species:
           delta_S_m_uncertainty_J_per_mol_K: 2.24
           note: "Table footnote: calculated accounting for ΔHm(Al2O3) = 118.407 kJ/mol (Bale et al., 2016)."
   CaTiO3:
+    context:
+      - observation_id: shornikov_2025_table5_perovskite_formation_from_oxides
+        type: thermodynamic_context
+        locator: {page: 8, published_page: 817, pdf_page_index: 7, table: "5"}
+        units: as printed
+        values:
+          quantity: enthalpy_and_entropy_of_perovskite_formation_from_oxides
+          method_class: quoted_attributed
+          note: These ΔHT and ΔST values are formation from oxides, not delta_fH or absolute S. Table melting observations are separately recorded.
+          rows_as_printed: "T K: ΔHT kJ/mol; ΔST J/(mol K); reference. 1180–1290: −26.88 ± 8.05; 11.07 ± 6.44; Golubenko and Rezukhina 1964. 888–972: −37.05 ± 3.28; 4.62 ± 3.54; Rezukhina et al. 1966. 1573–1993: −39.25 ± 0.15; 2.99 ± 0.08; Popov et al. 1979. 1068: −40.45 ± 1.15; entropy unavailable; Takayama-Muromachi and Navrotsky 1988. 1073: −40.43 ± 1.87; 4.37 ± 1.23; Prasanna and Navrotsky 1994. 1074: −43.78 ± 1.73; entropy unavailable; Linton et al. 1998. 1900: −36.20 ± 1.65; entropy unavailable; Woodfield et al. 1999. 973: −38.73 ± 1.34; entropy unavailable; Putnam et al. 1999. 1046: −42.38 ± 1.82; entropy unavailable; Putnam et al. 1999. 1078: −42.83 ± 3.12; entropy unavailable; Koito et al. 2000. 976: −42.86 ± 1.71; entropy unavailable; Helean et al. 2002. 900–1250: −40.07 ± 0.08; 3.15 ± 0.09; Jacob and Abraham 2009. 975: −42.25 ± 1.05; entropy unavailable; Navi et al. 2012. 975: −41.88 ± 1.36; entropy unavailable; Sahu et al. 2013. 1791–2241: −39.88 ± 0.54; 3.15 ± 0.28; Shornikov 2019. 2241–2398: 7.73 ± 1.76; 24.39 ± 0.76; Shornikov 2019."
     observations:
       - observation_id: shornikov_2025_table5_klimm_melting
         type: transition_point
@@ -215,6 +235,16 @@ species:
           delta_S_m_J_per_mol_K: 21.24
           delta_S_m_uncertainty_J_per_mol_K: 0.81
   MgSiO3:
+    context:
+      - observation_id: shornikov_2025_table7_enstatite_formation_from_oxides
+        type: thermodynamic_context
+        locator: {page: 11, published_page: 820, pdf_page_index: 10, table: "7"}
+        units: as printed
+        values:
+          quantity: enthalpy_and_entropy_of_enstatite_formation_from_oxides
+          method_class: quoted_attributed
+          note: These ΔHT and ΔST values are formation from oxides, not delta_fH or absolute S. First entropy uncertainty is printed with an unusual multiplier.
+          rows_as_printed: "T K: ΔHT kJ/mol; ΔST J/(mol K); reference. 1757–1849: 3.88 ± 8.56; 8.00 ± 4.7·1; Henderson and Taylor 1966. 1173: −17.05 ± 1.19; entropy unavailable; Shearer and Kleppa 1973. 1373–1573: −19.16 ± 0.27; 1.13 ± 0.25; Rog et al. 1974. 1170: −17.49 ± 0.56; entropy unavailable; Kiseleva et al. 1979, 1981. 1023: −17.97 ± 0.65; entropy unavailable; Chatillon-Colinet et al. 1983. 1873–1973: 21.71 ± 2.50; 20.00 ± 1.75; Kambayashi and Kato 1983, 1984. 1073: −16.95 ± 0.88; entropy unavailable; Brousse et al. 1984. 1790–1890: −32.74 ± 3.27; −10.29 ± 2.22; Stolyarova et al. 2004. 1571–1873: −15.42 ± 0.21; −0.07 ± 0.15; Zaitsev et al. 2006."
     observations:
       - observation_id: shornikov_2025_table7_stebbins_melting
         type: transition_point
@@ -268,6 +298,16 @@ species:
           delta_S_m_J_per_mol_K: 18.95
           delta_S_m_uncertainty_J_per_mol_K: 0.79
   Mg2SiO4:
+    context:
+      - observation_id: shornikov_2025_table8_forsterite_formation_from_oxides
+        type: thermodynamic_context
+        locator: {page: 12, published_page: 821, pdf_page_index: 11, table: "8"}
+        units: as printed
+        values:
+          quantity: enthalpy_and_entropy_of_forsterite_formation_from_oxides
+          method_class: quoted_attributed
+          note: These ΔHT and ΔST values are formation from oxides, not delta_fH or absolute S.
+          rows_as_printed: "T K: ΔHT kJ/mol; ΔST J/(mol K); reference. 965: −20.92 ± 1.40; entropy unavailable; Navrotsky 1971. 1173: −20.72 ± 1.16; entropy unavailable; Shearer and Kleppa 1973. 1373–1573: −19.47 ± 0.32; 1.51 ± 0.31; Rog et al. 1974. 970: −20.88 ± 0.38; entropy unavailable; Charlu et al. 1975. 1170: −19.94 ± 0.46; entropy unavailable; Kiseleva et al. 1979, 1981. 1873–1973: −25.80 ± 2.50; −3.67 ± 1.75; Kambayashi and Kato 1983, 1984. 1073: −19.85 ± 0.63; entropy unavailable; Brousse et al. 1984. 1790–1890: 9.63 ± 2.89; 14.09 ± 1.79; Stolyarova et al. 2004. 1571–1873: −21.00 ± 0.30; −0.73 ± 0.15; Zaitsev et al. 2006."
     observations:
       - observation_id: shornikov_2025_table8_navrotsky_melting
         type: transition_point
