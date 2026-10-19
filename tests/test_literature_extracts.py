@@ -611,9 +611,21 @@ def test_banya_watanabe_1977_row_conditions_and_feto_reference_migrate() -> None
     assert all(
         row.point_conditions["temperature_K"].state.is_value for row in table3 + table4
     )
-    assert all(
-        row.point_conditions["composition"].state.is_value for row in table3
-    )
+    source_table3 = {
+        row["observation_id"]: row
+        for row in source["species"]["FeO"]["observations"]
+        if "banya77_t3_run_" in row.get("observation_id", "")
+    }
+    for row in table3:
+        assert "composition" not in row.point_conditions
+        printed = row.point_conditions["printed_composition"]
+        assert printed.state.is_value
+        source_id = row.observation_id.rsplit("::", 1)[-1]
+        source_values = source_table3[source_id]["values"]["composition_wt_pct"]
+        assert dict(printed.state.value) == {
+            oxide: format(Decimal(str(value)).normalize(), "f")
+            for oxide, value in source_values.items()
+        }
 
     first_activity = next(
         row for row in table4 if row.observation_id.endswith("xp2o5_0_00")

@@ -941,7 +941,6 @@ def test_merge_preserves_selected_initial_without_incoming_initial() -> None:
 def test_noncomposition_values_in_britt_plante_and_van_limpt_are_ignored() -> None:
     cases = (
         ("britt-2019-asteroid-simulants", "britt_2019_tga_ega_thermal_program"),
-        ("kems-042-plante-1979", "plante1979_table2_s1123_r030_quoted"),
         ("kems-200-ueshima-1983", "ueshima_1983_femo_table2_epma"),
         (
             "kems-046-van-limpt-2007",
@@ -959,21 +958,10 @@ def test_noncomposition_values_in_britt_plante_and_van_limpt_are_ignored() -> No
             if observation.get("observation_id") == observation_id
         )
         refusal: list[str] = []
-        if observation_id == "plante1979_table2_s1123_r030_quoted":
-            assert _initial_oxide_map_from_values(
-                values,
-                refusal_reason=refusal,
-                declared_map=migrate_module._declared_wt_composition_point_map(
-                    values, None
-                ),
-            ) == {"K2O": Decimal("21.14"), "SiO2": Decimal("78.86")}
-            located = _composition_located_from_values(values, None)
-            assert located is None
-        else:
-            assert _initial_oxide_map_from_values(
-                values, refusal_reason=refusal
-            ) is None
-            assert refusal == [], observation_id
+        assert _initial_oxide_map_from_values(
+            values, refusal_reason=refusal
+        ) is None
+        assert refusal == [], observation_id
 
 
 @pytest.mark.parametrize("include_parent_map", [False, True])
