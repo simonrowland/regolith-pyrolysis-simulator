@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import csv
+from decimal import Decimal
 from pathlib import Path
 
 import yaml
@@ -199,6 +200,53 @@ def _assert_rendered_grid_matches(document: dict, audit_cells: dict, tables: dic
                     assert extracted.get(key, printed) == printed, (key, extracted.get(key))
                 else:
                     assert extracted[key] == printed, (key, extracted.get(key), printed)
+    _assert_typed_numeric_cells_match(document, tables)
+
+
+def _printed_numeric_cell(table: str, row: str, column: str, tables: dict) -> Decimal | None:
+    definition = tables[table]
+    column_index = definition["columns"].index(column)
+    row_values = next(values for label, values in definition["rows"] if label == row)
+    printed = row_values[column_index]
+    if printed in {"-", "*"} or printed.startswith("<"):
+        return None
+    return Decimal(printed.strip("()"))
+
+
+def _canonical_table_column(table: str, column: str, tables: dict = TABLES) -> str:
+    if column == "aSi (in copper)":
+        return tables[table]["columns"][8 if table == "II" else 7]
+    if column == "aSiO2 (in slag)":
+        return tables[table]["columns"][9 if table == "II" else 8]
+    return column
+
+
+def _table_column(table: str, item: dict, tables: dict = TABLES) -> str:
+    column = item.get("locator", {}).get("column")
+    return _canonical_table_column(table, column, tables)
+
+
+def _assert_typed_numeric_cells_match(document: dict, tables: dict) -> None:
+    for block in document["species"].values():
+        for observation in block["observations"]:
+            table = str(observation.get("locator", {}).get("table", ""))
+            if table not in tables:
+                continue
+            values = observation["values"]
+            points = values.get("points")
+            if isinstance(points, list):
+                numeric_items = [(point, point.get("value")) for point in points]
+            elif "activity" in values and values.get("row_as_printed"):
+                numeric_items = [(observation, values["activity"])]
+            else:
+                continue
+            for item, actual in numeric_items:
+                row = item.get("row_as_printed") or values.get("row_as_printed")
+                column = _table_column(table, item if item is not observation else observation, tables)
+                expected = _printed_numeric_cell(table, row, column, tables)
+                assert expected is not None, (table, row, column, actual)
+                assert isinstance(actual, (str, int, float))
+                assert Decimal(str(actual)) == expected, (table, row, column, actual, expected)
 
 
 def _assert_physical_locators(value: object) -> None:
@@ -240,6 +288,41 @@ def _assert_row_conditions(observation: dict, row_label: str, table: str) -> Non
         assert oxygen["approximate"] is True
 
 
+def _assert_migrated_numeric_values(document: dict, migrated_rows: list) -> None:
+    checked = 0
+    for block in document["species"].values():
+        for observation in block["observations"]:
+            table = str(observation.get("locator", {}).get("table", ""))
+            if table not in TABLES:
+                continue
+            values = observation["values"]
+            points = values.get("points")
+            if isinstance(points, list):
+                items = points
+            elif "activity" in values and values.get("row_as_printed"):
+                items = [observation]
+            else:
+                continue
+            expected = []
+            for item in items:
+                row = item.get("row_as_printed") or values.get("row_as_printed")
+                column = _table_column(table, item)
+                amount = _printed_numeric_cell(table, row, column, TABLES)
+                assert amount is not None, (table, row, column)
+                expected.append(amount)
+            prefix = f"{SOURCE_ID}::{observation['observation_id']}"
+            actual = [
+                row.value.point
+                for row in migrated_rows
+                if row.observation_id == prefix or row.observation_id.startswith(prefix + "::")
+            ]
+            assert len(actual) == len(expected), (observation["observation_id"], len(actual), len(expected))
+            assert all(amount is not None for amount in actual)
+            assert sorted(actual) == sorted(expected), (observation["observation_id"], actual, expected)
+            checked += len(actual)
+    assert checked == 367
+
+
 def test_rendered_tables_bind_every_cell_and_migrate_conditions() -> None:
     document = _document()
     audit_cells = _audit_cells()
@@ -275,6 +358,24 @@ def test_rendered_tables_bind_every_cell_and_migrate_conditions() -> None:
     else:
         raise AssertionError("mutating an extract cell did not fail")
 
+    numeric_only_mutation = copy.deepcopy(document)
+    numeric_only_assay = next(
+        observation
+        for observation in numeric_only_mutation["species"]["Si"]["observations"]
+        if observation.get("observation_id") == "tranell_2000_table_iii_xsi_icp"
+    )
+    numeric_only_point = next(
+        point for point in numeric_only_assay["values"]["points"]
+        if point["row_as_printed"] == "1"
+    )
+    numeric_only_point["value"] = "28.0"
+    try:
+        _assert_rendered_grid_matches(numeric_only_mutation, audit_cells)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("changing only the typed numeric value did not fail")
+
     source_species = {
         observation["observation_id"]: formula
         for formula, block in document["species"].items()
@@ -288,6 +389,7 @@ def test_rendered_tables_bind_every_cell_and_migrate_conditions() -> None:
     assert not result.validation.hard_issues
     rows = list(result.observations.values())
     assert len(rows) == 367
+    _assert_migrated_numeric_values(document, rows)
 
     for row in rows:
         local_id = row.observation_id.split(f"{SOURCE_ID}::", 1)[1]

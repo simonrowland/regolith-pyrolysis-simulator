@@ -93,6 +93,57 @@ TABLE5_B27_COMPOSITION = {
     "MgO": "6.84", "CaO": "10.65", "Na2O": "2.68", "K2O": "0.19",
 }
 
+# Fe2O3 and FeO cells transcribed independently from the 600 dpi render of
+# physical PDF page 5, Tables 4 and 5.
+TABLE45_RENDER_FE_OXIDES = {
+    "kc91_fe3_t4_Q01": ("16.93", "5.41"),
+    "kc91_fe3_t4_Q02": ("16.81", "5.41"),
+    "kc91_fe3_t4_Q03": ("16.73", "5.29"),
+    "kc91_fe3_t4_Q04": ("16.61", "5.29"),
+    "kc91_fe3_t4_Q05": ("20.45", "1.58"),
+    "kc91_fe3_t4_Q06": ("20.08", "1.83"),
+    "kc91_fe3_t4_Q11": ("19.46", "2.70"),
+    "kc91_fe3_t4_Q12": ("19.07", "2.69"),
+    "kc91_fe3_t4_Q13": ("19.06", "2.87"),
+    "kc91_fe3_t4_Q14": ("17.45", "2.84"),
+    "kc91_fe3_t4_Q15": ("19.40", "2.89"),
+    "kc91_fe3_t4_Q18": ("22.08", "3.39"),
+    "kc91_fe3_t4_Q19": ("19.63", "2.45"),
+    "kc91_fe3_t4_Q21": ("22.10", "0.14"),
+    "kc91_fe3_t4_Q22": ("21.99", "0.23"),
+    "kc91_fe3_t4_Q23": ("21.44", "0.34"),
+    "kc91_fe3_t4_Q27": ("37.58", "0.28"),
+    "kc91_fe3_t4_Q29": ("22.06", "0.27"),
+    "kc91_fe3_t4_Q31": ("33.31", "1.98"),
+    "kc91_fe3_t4_Q32": ("19.38", "2.77"),
+    "kc91_fe3_t4_Q34": ("22.58", "2.91"),
+    "kc91_fe3_t4_Q41": ("28.73", "5.98"),
+    "kc91_fe3_t4_Q42": ("16.46", "7.20"),
+    "kc91_fe3_t4_Q43": ("14.84", "6.69"),
+    "kc91_fe3_t4_Q44": ("17.34", "7.69"),
+    "kc91_fe3_t4_Q51": ("17.05", "5.10"),
+    "kc91_fe3_t4_Q52": ("13.75", "5.05"),
+    "kc91_fe3_t4_Q53": ("16.72", "5.00"),
+    "kc91_fe3_t4_Q61": ("15.50", "6.97"),
+    "kc91_fe3_t4_Q62": ("11.89", "6.33"),
+    "kc91_fe3_t4_Q64": ("12.44", "6.36"),
+    "kc91_fe3_t4_Q65": ("11.30", "5.82"),
+    "kc91_fe3_t4_Q66": ("10.59", "5.83"),
+    "kc91_fe3_t5_B27": ("9.54", "3.42"),
+    "kc91_fe3_t5_B34": ("10.01", "2.83"),
+    "kc91_fe3_t5_B44": ("8.39", "4.45"),
+    "kc91_fe3_t5_B54": ("8.41", "4.43"),
+    "kc91_fe3_t5_B64": ("7.59", "5.13"),
+    "kc91_fe3_t5_B74": ("6.82", "5.56"),
+    "kc91_fe3_t5_B76": ("7.56", "5.14"),
+    "kc91_fe3_t5_B79": ("8.18", "4.71"),
+    "kc91_fe3_t5_B82": ("8.91", "3.99"),
+    "kc91_fe3_t5_B105": ("0.52", "10.89"),
+    "kc91_fe3_t5_B108": ("2.11", "12.61"),
+    "kc91_fe3_t5_B118": ("1.82", "10.39"),
+    "kc91_fe3_t5_B120": ("1.80", "10.38"),
+}
+
 
 def _document() -> dict:
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
@@ -252,6 +303,17 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
     ]
     assert len(reduced) == 46
     assert all(record.evidence.class_.value is EvidenceClass.MEASURED_REDUCED for record in reduced)
+    assert len(TABLE45_RENDER_FE_OXIDES) == 46
+    for observation_id, (fe2o3, feo) in TABLE45_RENDER_FE_OXIDES.items():
+        source = rows_by_id[observation_id]
+        assert source["values"]["Fe2O3_wt_pct"] == fe2o3
+        assert source["values"]["FeO_wt_pct"] == feo
+        record = next(item for item in reduced if observation_id in item.observation_id)
+        expected_ratio = fe3_fe2_ratio_from_oxide_wt_pct(
+            Decimal(fe2o3), Decimal(feo)
+        )
+        assert expected_ratio is not None
+        assert record.value.point == expected_ratio
     assert all(record.identity.composition.is_value for record in reduced)
     assert all(
         record.identity.total_pressure_Pa.is_value
