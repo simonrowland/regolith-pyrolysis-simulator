@@ -109,6 +109,17 @@ def test_table2_oxygen_routes_keep_calculation_and_apparatus_evidence(tmp_path):
         for observation in oxygen_rows
     )
     for observation in oxygen_rows:
+        assert observation.derivation is not None
+        assert observation.derivation.method is not None
+        assert observation.derivation.raw_inputs is not None
+        for located in (
+            observation.derivation.method,
+            observation.derivation.raw_inputs,
+        ):
+            assert located.locator is not None
+            assert located.locator.pdf_page_index is not None
+            assert located.locator.page == located.locator.pdf_page_index + 1
+            assert (located.locator.page, located.locator.published_page) == (5, 19)
         temperature = observation.identity.temperature_K
         assert temperature is not None and temperature.is_value
         assert temperature.value == Decimal("1933")
