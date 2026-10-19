@@ -22,6 +22,7 @@ import time
 import types
 import warnings
 from concurrent.futures import Future
+from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
@@ -280,15 +281,16 @@ def _make_pooled_subprocess_backend(exception):
 
 
 @pytest.mark.parametrize(
-    ('database', 'capture_error'),
+    ('database', 'capture_error', 'nonfinite_projection'),
     [
-        pytest.param('ig', False, id='normal-database'),
-        pytest.param('ig' + (' ' * 9000), False, id='oversized-database'),
-        pytest.param('ig' + (' ' * 9000), True, id='capture-error'),
+        pytest.param('ig', False, False, id='normal-database'),
+        pytest.param('ig' + (' ' * 9000), False, False, id='oversized-database'),
+        pytest.param('ig' + (' ' * 9000), True, False, id='capture-error'),
+        pytest.param('ig', False, True, id='nonfinite-projection'),
     ],
 )
 def test_magemin_unfinished_pool_future_is_timed_out_and_aborted(
-    monkeypatch, database, capture_error,
+    monkeypatch, database, capture_error, nonfinite_projection,
 ):
     class RunningFuture(Future):
         cancel_attempted = False
@@ -333,6 +335,11 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted(
         'worker_startup_timeout_s': 0.05,
     }
     projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
+    if nonfinite_projection:
+        projection = replace(
+            projection,
+            vector=(float('nan'), *projection.vector[1:]),
+        )
     outcomes = []
 
     def call():
@@ -374,6 +381,8 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted(
             assert diagnostic['database_truncated'] is True
         else:
             assert diagnostic['argv'][0] == '/fake/MAGEMin'
+            if nonfinite_projection:
+                assert diagnostic['projected_bulk_vector_wt_pct'][0] == 'nan'
         if not capture_error and len(database) > 8192:
             assert diagnostic['argv_truncated'] is True
             assert diagnostic['database_truncated'] is True
@@ -403,7 +412,18 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted(
             waiter.join(timeout=1.0)
 
 
-def test_magemin_timeout_kills_and_reaps_a_hung_worker(tmp_path):
+@pytest.mark.parametrize(
+    'failure_kind',
+    [
+        pytest.param('capture-error', id='capture-error'),
+        pytest.param('log-oserror', id='log-oserror'),
+    ],
+)
+def test_magemin_timeout_kills_and_reaps_a_hung_worker(
+    tmp_path,
+    monkeypatch,
+    failure_kind,
+):
     diagnostic_log_path = tmp_path / 'magemin-diagnostics-0.log'
     pool = engine_pool.EngineWorkerPool(
         lambda index: engine_pool.WarmEngineWorker(
@@ -429,6 +449,25 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker(tmp_path):
         'warm_call_timeout_s': 0.05,
         'worker_startup_timeout_s': 2.0,
     }
+    if failure_kind == 'capture-error':
+        def fail_diagnostic_capture(**_kwargs):
+            raise RuntimeError('diagnostic capture failed')
+
+        monkeypatch.setattr(
+            backend,
+            '_magemin_timeout_diagnostic_detail',
+            fail_diagnostic_capture,
+        )
+    else:
+        original_open = Path.open
+
+        def fail_diagnostic_log_open(path, *args, **kwargs):
+            mode = args[0] if args else kwargs.get('mode', 'r')
+            if Path(path) == diagnostic_log_path and mode == 'a':
+                raise OSError('diagnostic log unavailable')
+            return original_open(path, *args, **kwargs)
+
+        monkeypatch.setattr(Path, 'open', fail_diagnostic_log_open)
     projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
     worker_pid = worker.process.pid
     outcomes = []
@@ -455,6 +494,8 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker(tmp_path):
         assert isinstance(outcomes[0], EngineWorkerTimeout)
         assert outcomes[0].phase == 'job'
         assert outcomes[0].timeout_s == pytest.approx(2.05)
+        assert outcomes[0].diagnostic_detail
+        assert outcomes[0].diagnostic_detail in str(outcomes[0])
         timeout_text = str(outcomes[0])
         for field in (
             'composition_mol',
@@ -469,16 +510,100 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker(tmp_path):
             'buffer_n',
             'database',
             'argv',
-            '--Temp=1200.000000',
-            '--Pres=0.001000',
-            '--db=ig',
         ):
             assert field in timeout_text
-        diagnostic_log = diagnostic_log_path.read_text(encoding='utf-8')
-        assert 'MAGEMin timed-out request:' in diagnostic_log
-        assert '--Temp=1200.000000' in diagnostic_log
-        assert 'projected_bulk' in diagnostic_log
+        if failure_kind == 'capture-error':
+            assert json.loads(outcomes[0].diagnostic_detail)[
+                'diagnostic_capture_error'
+            ] == 'RuntimeError'
+        else:
+            for arg in (
+                '--Temp=1200.000000',
+                '--Pres=0.001000',
+                '--db=ig',
+            ):
+                assert arg in timeout_text
+            diagnostic_log = diagnostic_log_path.read_text(encoding='utf-8')
+            assert outcomes[0].diagnostic_detail in diagnostic_log
         assert time.monotonic() - started_at < 2.5
+        assert worker.process is None
+        with pytest.raises(ProcessLookupError):
+            os.kill(worker_pid, 0)
+    finally:
+        pool.close(cancel_pending=True, timeout_s=3.0)
+        waiter.join(timeout=1.0)
+
+
+@pytest.mark.timeout(20)
+def test_magemin_unmodified_worker_timeout_captures_request(tmp_path):
+    diagnostic_log_path = tmp_path / 'magemin-diagnostics-0.log'
+    pool = engine_pool.EngineWorkerPool(
+        lambda index: engine_pool.WarmEngineWorker(
+            name=f'fake MAGEMin slot {index}',
+            bootstrap=_bootstrap_sleeping_magemin_worker,
+            handler=_handle_sleeping_magemin_request,
+            startup_timeout_s=2.0,
+            call_timeout_s=0.05,
+            diagnostic_log_path=diagnostic_log_path,
+        ),
+        size=1,
+    )
+    backend = _make_pooled_subprocess_backend(None)
+    backend._subprocess_pool = pool
+    backend._config = {
+        'warm_call_timeout_s': 0.05,
+        'worker_startup_timeout_s': 2.0,
+    }
+    projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
+    worker = pool.workers[0]
+    worker_pid = worker.process.pid
+    outcomes = []
+
+    def call():
+        try:
+            backend._call_magemin(
+                projection,
+                temperature_C=1200.0,
+                pressure_bar=1.0,
+                fO2_log=-8.0,
+                composition_mol={'SiO2': 0.5, 'MgO': 0.25},
+            )
+        except BaseException as exc:  # returned to the asserting thread
+            outcomes.append(exc)
+
+    waiter = threading.Thread(target=call, daemon=True)
+    waiter.start()
+    try:
+        waiter.join(timeout=3.0)
+        assert not waiter.is_alive(), 'worker timeout did not complete the future'
+        assert len(outcomes) == 1
+        timeout = outcomes[0]
+        assert isinstance(timeout, EngineWorkerTimeout)
+        assert timeout.worker_name == 'fake MAGEMin slot 0'
+        assert timeout.timeout_s == pytest.approx(0.05)
+        assert timeout.phase == 'job'
+        assert timeout.diagnostic_detail in str(timeout)
+        diagnostic = json.loads(timeout.diagnostic_detail)
+        assert diagnostic['composition_mol']
+        assert diagnostic['composition_wt_pct']
+        assert diagnostic['projected_bulk_vector_wt_pct']
+        assert diagnostic['oxide_names']
+        assert diagnostic['temperature_C'] == 1200.0
+        assert diagnostic['pressure_bar'] == 1.0
+        assert diagnostic['fO2_log'] == -8.0
+        assert diagnostic['buffer'] == 'qfm'
+        assert diagnostic['database'] == 'ig'
+        assert '--Temp=1200.000000' in diagnostic['argv']
+        assert len(timeout.diagnostic_detail) <= 8192
+
+        json_records = [
+            json.loads(line)
+            for line in diagnostic_log_path.read_text(
+                encoding='utf-8',
+            ).splitlines()
+            if line.lstrip().startswith('{')
+        ]
+        assert json_records == [diagnostic]
         assert worker.process is None
         with pytest.raises(ProcessLookupError):
             os.kill(worker_pid, 0)
