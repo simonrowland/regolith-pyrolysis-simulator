@@ -354,7 +354,7 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted():
         assert 'database' in pool.diagnostic_detail
         assert 'argv' in pool.diagnostic_detail
         assert '--Temp=1200.000000' in pool.diagnostic_detail
-        assert '--Pres=0.000100' in pool.diagnostic_detail
+        assert '--Pres=0.001000' in pool.diagnostic_detail
         assert '--db=ig' in pool.diagnostic_detail
         assert time.monotonic() - started_at < 0.25
     finally:
@@ -430,7 +430,7 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker(tmp_path):
             'database',
             'argv',
             '--Temp=1200.000000',
-            '--Pres=0.000100',
+            '--Pres=0.001000',
             '--db=ig',
         ):
             assert field in timeout_text
