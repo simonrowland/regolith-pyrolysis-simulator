@@ -22,8 +22,10 @@ def test_table_1_m01_residue_values_and_conditions_migrate() -> None:
     assert len(observations) == 27
     m01 = [o for o in observations if o.locator.note == "row=M01"]
     assert len(m01) == 3
-    assert {o.value.point for o in m01} == {
-        Decimal("53.62"), Decimal("44.44"), Decimal("1.64")
+    assert {o.identity.species.formula: o.value.point for o in m01} == {
+        "SiO2": Decimal("53.62"),
+        "MgO": Decimal("44.44"),
+        "CaO": Decimal("1.64"),
     }
     assert all(o.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION for o in m01)
     assert all(o.identity.temperature_K.value == Decimal("2623") for o in m01)
@@ -42,3 +44,8 @@ def test_all_figure_captions_are_deferred_without_numeric_points() -> None:
     assert all(row["values"]["digitisation"] == "deferred to a figure pass" for row in figures)
     assert all(row["values"]["identity"]["temperature_as_printed"] for row in figures)
     assert all(row["values"]["series"] for row in figures)
+    figure1 = next(row for row in figures if row["locator"]["figure"] == "1")
+    figure6 = next(row for row in figures if row["locator"]["figure"] == "6")
+    assert figure1["values"]["caption_as_printed"].startswith("FIGURE 1.")
+    assert "Methods" not in figure1["values"]["caption_as_printed"]
+    assert figure6["values"]["caption_as_printed"].startswith("FIGURE 6.")
