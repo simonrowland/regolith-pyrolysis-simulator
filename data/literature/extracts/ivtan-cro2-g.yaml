@@ -24,14 +24,14 @@ fidelity_samples:
     value: 44.651
     locator:
       page: 3
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: "877"
       note: "Table 877 row T=298.150; Cp=44.651 as printed"
   - path: species.CrO2.observations[ivtan_cro2_g_table877_functions].values.points[2].lg_K
     value: -162.3435
     locator:
       page: 3
-      pdf_page_index: 3
+      pdf_page_index: 2
       table: "877"
       note: "Table 877 row T=298.150; lg K°=-162.3435 as printed"
   - species: CrO2
@@ -41,7 +41,7 @@ fidelity_samples:
     value: -99.2
     locator:
       page: 2
-      pdf_page_index: 2
+      pdf_page_index: 1
       paragraph: thermochemical_quantities
       note: "DfH°(CrO2, g, 298.15 K) = -99.2 ± 15 kJ mol-1 as printed"
   - species: CrO2
@@ -51,7 +51,7 @@ fidelity_samples:
     value: 2
     locator:
       page: 4
-      pdf_page_index: 4
+      pdf_page_index: 3
       table: "877"
       note: "two printed F°(T) polynomial segments under Table 877"
 species:
@@ -62,7 +62,7 @@ species:
       locator:
         table: "877"
         page: 3
-        pdf_page_index: 3
+        pdf_page_index: 2
         source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
         record: CrO2(g)
         note: >
@@ -534,7 +534,7 @@ species:
       type: gibbs_table
       locator:
         page: 2
-        pdf_page_index: 2
+        pdf_page_index: 1
         paragraph: thermochemical_quantities
         table: "877"
         source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
@@ -601,7 +601,7 @@ species:
       type: gibbs_table
       locator:
         page: 3
-        pdf_page_index: 3
+        pdf_page_index: 2
         paragraph: gurvich_1982_comparison
         source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
         note: "[82ГУР/ВЕЙ] competing DfH° quoted on this page; not adopted here"
@@ -630,7 +630,7 @@ species:
       type: gibbs_table
       locator:
         page: 4
-        pdf_page_index: 4
+        pdf_page_index: 3
         table: "877"
         source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
         note: printed F°(T) polynomials under Table 877
