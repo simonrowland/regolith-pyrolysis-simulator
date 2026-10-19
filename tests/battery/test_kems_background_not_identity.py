@@ -454,15 +454,17 @@ def test_transpiration_still_inherits_experiment_total(tmp_path: Path) -> None:
 
 
 def test_knudsen_chamber_vacuum_not_commanded_oxygen_for_melt_activity() -> None:
-    """P1 pin (r2): Knudsen chamber background must not become commanded sample oxygen.
+    """Knudsen chamber background is excluded; open sample fO2 is borrowed.
 
     Film: FeO–SiO2 liquid activity, no stated sample oxygen, chamber total
-    0.0001 Pa with a during-run vacuum locator. Pre-fix tip supplies
-    fO2_log=-9 via vacuum_total_pressure_upper_bound → melt-activity payload →
-    Po2Request(mode='commanded'). That route must close for closed-token
-    knudsen_effusion; chamber evidence stays on the pressure_boundary waypoint.
+    0.0001 Pa with a during-run vacuum locator. Chamber pressure stays on the
+    pressure_boundary waypoint. This activity has no effusion closure: it is
+    not a vapour quantity and its bench records no cell material. Under d-180,
+    the open sample therefore receives numeric tier-4 intrinsic fO2.
     """
 
+    from simulator.battery.enums import Quantity
+    from simulator.battery.fo2_ladder import resolve_row_fo2
     from simulator.battery.generators.bench import (
         activity_request_for_engine,
         melt_activity_requests,
@@ -517,20 +519,41 @@ def test_knudsen_chamber_vacuum_not_commanded_oxygen_for_melt_activity() -> None
     )
     assert oxygen.selected is None or oxygen.selected.route != "vacuum_total_pressure_upper_bound"
 
+    assert bench.cell_materials is None
     inputs = collect_consumer_inputs(experiment, bench, observation)
-    melt = list(melt_activity_requests(inputs))
+    resolved = resolve_row_fo2(
+        experiment,
+        bench,
+        observation,
+        composition=observation.identity.composition.value,
+        quantity=Quantity.ACTIVITY,
+    )
+    assert resolved is not None
+    assert resolved.tier == 4
+    assert resolved.route == "intrinsic_melt_fO2"
+    assert resolved.borrowed is True
+    melt = list(
+        melt_activity_requests(
+            inputs,
+            experiment=experiment,
+            bench=bench,
+            observation=observation,
+        )
+    )
     commanded = [
         item.payload
         for item in melt
         if item.payload is not None and "fO2_log" in item.payload
     ]
-    assert not commanded, (
-        "melt-activity payload carried commanded fO2_log from knudsen chamber "
-        f"vacuum bound: {[item.get('fO2_log') for item in commanded]!r}"
-    )
+    assert commanded
+    assert all(item["fO2_log"] == resolved.log10_fO2_bar for item in commanded)
+    assert all(item["fO2_tier"] == 4 for item in commanded)
+    assert all(item["fO2_route"] == "intrinsic_melt_fO2" for item in commanded)
+    assert all(item["fO2_borrowed"] is True for item in commanded)
     openimcc = activity_request_for_engine(experiment, observation, "openimcc")
     assert openimcc is not None
-    assert openimcc.payload is None or "fO2_log" not in openimcc.payload
+    assert openimcc.payload is not None
+    assert openimcc.payload["fO2_log"] == resolved.log10_fO2_bar
 
 
 def test_non_knudsen_vacuum_bound_and_knudsen_row_oxygen_controls() -> None:
