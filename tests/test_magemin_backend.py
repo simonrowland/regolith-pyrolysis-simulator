@@ -11,6 +11,7 @@ real MAGEMin binary runs end to end when one is built locally.
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import subprocess
@@ -278,7 +279,12 @@ def _make_pooled_subprocess_backend(exception):
     return backend
 
 
-def test_magemin_unfinished_pool_future_is_timed_out_and_aborted():
+@pytest.mark.parametrize(
+    'database',
+    ['ig', 'ig' + (' ' * 9000)],
+    ids=['normal-database', 'oversized-database'],
+)
+def test_magemin_unfinished_pool_future_is_timed_out_and_aborted(database):
     class RunningFuture(Future):
         cancel_attempted = False
 
@@ -307,6 +313,7 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted():
     pool = PendingPool()
     backend = _make_pooled_subprocess_backend(None)
     backend._subprocess_pool = pool
+    backend._database = database
     backend._config = {
         'warm_call_timeout_s': 0.05,
         'worker_startup_timeout_s': 0.05,
@@ -321,7 +328,11 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted():
                 temperature_C=1200.0,
                 pressure_bar=1.0,
                 fO2_log=-8.0,
-                composition_mol={'SiO2': 0.5, 'MgO': 0.25},
+                composition_mol={
+                    'SiO2': 0.5,
+                    'MgO': 0.25,
+                    **{f'species-{index}': 0.01 for index in range(100)},
+                },
             )
         except BaseException as exc:  # returned to the asserting thread
             outcomes.append(exc)
@@ -343,6 +354,15 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted():
         assert pool.abort_calls == 1
         assert pool.diagnostic_detail is not None
         assert len(pool.diagnostic_detail) <= 8192
+        diagnostic = json.loads(pool.diagnostic_detail)
+        assert diagnostic['argv'][0] == '/fake/MAGEMin'
+        if len(database) > 8192:
+            assert diagnostic['argv_truncated'] is True
+            assert diagnostic['database_truncated'] is True
+        else:
+            assert diagnostic['database'] == database
+            assert diagnostic['argv'][2] == '--db=ig'
+        assert 'composition_mol_truncated":true' in pool.diagnostic_detail
         assert 'composition_mol' in pool.diagnostic_detail
         assert 'projected_bulk' in pool.diagnostic_detail
         assert 'oxide_names' in pool.diagnostic_detail
