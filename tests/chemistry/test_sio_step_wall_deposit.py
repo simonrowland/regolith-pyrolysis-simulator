@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from decimal import Decimal, localcontext
 from functools import lru_cache
 from typing import Any
 
@@ -679,6 +680,83 @@ def test_wall_route_depletes_partial_pressure_after_upstream_wall_capture(
     assert model.wall_species_partial_pressures_pa_by_segment["wall_2"][
         "Cr"
     ] == pytest.approx(expected_second_partial_pa, rel=1.0e-6)
+
+
+@pytest.mark.parametrize("stage_area_m2,budget_fraction", [
+    (1.0, None), (0.01, None), (0.0, 1.0 - 1.0e-8), (0.0, 1.0),
+])
+def test_wall_capture_fixed_point_matches_physical_quadratic_root(
+    stage_area_m2, budget_fraction, monkeypatch,
+) -> None:
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Cr": 10.0},
+        pipe_diameter_m=0.12,
+        gas_temperature_C=500.0,
+        campaign_name="C2A",
+        carrier_gas="N2",
+        stage_area_m2_by_stage={
+            str(stage.stage_number): stage_area_m2 for stage in model.train.stages
+        },
+    )
+    liner = model.pipe_segments[0].liner_material
+    model.pipe_segments = [
+        PipeSegment(
+            name=f"wall_{index}", upstream_stage="", downstream_stage="",
+            wall_temperature_C=500.0, length_m=1.0, inner_diameter_m=0.12,
+            declared_area_m2=1.0, liner_material=liner,
+        )
+        for index in (1, 2)
+    ]
+    model.lab_geometry = object()
+    if budget_fraction is not None:
+        # h=0, b/q=1-1e-8 gives rho ~= 0.9998; b=q additionally exercises
+        # the physical complete-capture endpoint rho=1 with exact root q.
+        monkeypatch.setattr(
+            condensation_module, "_pressure_isolated_capture_budget_kg",
+            lambda species, rate_kg_hr, *args, **kwargs: (
+                rate_kg_hr * budget_fraction
+            ),
+        )
+    captured_inputs = {}
+    resolve = model._resolve_wall_deposit_candidates_by_species_segment_kg
+
+    def record_inputs(**kwargs):
+        captured_inputs.update(kwargs["stage_route_by_species"]["Cr"])
+        return resolve(**kwargs)
+
+    monkeypatch.setattr(
+        model, "_resolve_wall_deposit_candidates_by_species_segment_kg",
+        record_inputs,
+    )
+    result = model.route(
+        EvaporationFlux(species_kg_hr={"Cr": 3.5}, total_kg_hr=3.5),
+        MeltState(temperature_C=1650.0),
+    )
+    # Independent analytic solution of the two supply-limited-wall balance;
+    # high precision avoids cancellation in the discriminant near rho=1.
+    with localcontext() as context:
+        context.prec = 60
+        q = Decimal("3.5")
+        h = sum(
+            Decimal(value)
+            for value in captured_inputs["hkl_condensed_by_stage"].values()
+        )
+        b = Decimal(captured_inputs["capture_budget_kg"])
+        expected = float(q - (q * q - b * q * q / (h + q)).sqrt())
+    assert result.wall_deposit_by_segment_species["wall_1"]["Cr"] == pytest.approx(
+        expected, rel=1.0e-12, abs=0.0,
+    )
+    wall_total = sum(
+        row.get("Cr", 0.0)
+        for row in result.wall_deposit_by_segment_species.values()
+    )
+    stage_total = result.condensed_for_species("Cr")
+    remaining = result.remaining_by_species.get("Cr", 0.0)
+    assert wall_total + stage_total + remaining == pytest.approx(
+        3.5, rel=1.0e-12, abs=0.0,
+    )
 
 
 def test_wall_deposition_saturation_and_hot_alkali_limits() -> None:

@@ -4101,106 +4101,37 @@ class CondensationModel:
                 }
             return stage_capture, wall_capture
 
-        def capture_delta(
-            previous_stage: Mapping[str, Mapping[int, float]],
-            previous_wall: Mapping[str, Mapping[str, float]],
-            current_stage: Mapping[str, Mapping[int, float]],
-            current_wall: Mapping[str, Mapping[str, float]],
-        ) -> float:
-            delta = 0.0
-            for species, inlet_rate in inlet_rates.items():
-                scale = max(1.0e-30, inlet_rate)
-                for stage_number in (
-                    set(previous_stage.get(species, {}))
-                    | set(current_stage.get(species, {}))
-                ):
-                    delta = max(
-                        delta,
-                        abs(
-                            float(
-                                previous_stage.get(species, {}).get(
-                                    stage_number,
-                                    0.0,
-                                )
-                            )
-                            - float(
-                                current_stage.get(species, {}).get(
-                                    stage_number,
-                                    0.0,
-                                )
-                            )
-                        )
-                        / scale,
-                    )
-                for segment_name in (
-                    set(previous_wall.get(species, {}))
-                    | set(current_wall.get(species, {}))
-                ):
-                    delta = max(
-                        delta,
-                        abs(
-                            float(
-                                previous_wall.get(species, {}).get(
-                                    segment_name,
-                                    0.0,
-                                )
-                            )
-                            - float(
-                                current_wall.get(species, {}).get(
-                                    segment_name,
-                                    0.0,
-                                )
-                            )
-                        )
-                        / scale,
-                    )
-            return delta
+        # There is one unknown per stage/segment/species, not one scalar:
+        # downstream mixture partial pressures couple the species. Solve the
+        # full capture vector with Anderson acceleration. Normalize each
+        # coordinate by its inlet mass so the residual is dimensionless.
+        coordinates = [
+            (species, kind, location)
+            for species in stage_route_by_species
+            if inlet_rates.get(species, 0.0) > 0.0
+            for kind, locations in (
+                ('stage', stage_route_by_species[species]['hkl_condensed_by_stage']),
+                ('wall', segment_names),
+            )
+            for location in locations
+        ]
+        species_indices = {
+            species: [i for i, key in enumerate(coordinates) if key[0] == species]
+            for species in stage_route_by_species
+        }
 
-        def relax_capture(
-            previous: Mapping[str, Mapping[Any, float]],
-            current: Mapping[str, Mapping[Any, float]],
-            factor: float,
-        ) -> dict[str, dict[Any, float]]:
-            relaxed: dict[str, dict[Any, float]] = {}
-            for species in set(previous) | set(current):
-                values: dict[Any, float] = {}
-                for location in (
-                    set(previous.get(species, {}))
-                    | set(current.get(species, {}))
-                ):
-                    old_value = float(
-                        previous.get(species, {}).get(location, 0.0)
-                    )
-                    new_value = float(
-                        current.get(species, {}).get(location, 0.0)
-                    )
-                    value = old_value + factor * (new_value - old_value)
-                    if value > 0.0:
-                        values[location] = value
-                relaxed[species] = values
-            return relaxed
-
-        stage_capture: dict[str, dict[int, float]] = {}
-        wall_capture: dict[str, dict[str, float]] = {}
-        converged = False
-        previous_delta: float | None = None
-        relaxation = 1.0
-        # Pure Cr, two supply-limited walls: inlet q, upstream capture x,
-        # stage candidate h, budget b (all kg over the routing interval).
-        # Raw wall candidates q and q-x are normalized to sum to q.
-        # Candidate normalization gives F(x)=b*q²/[(h+q)*(2q-x)]. Hence
-        # F'(x*)=x*/(2q-x*) is dimensionless and tends to 1 as h -> 0,
-        # b -> q. The physical root is x*=q-sqrt(q²-b*q²/(h+q)).
-        # At q=3.5, h=4.0694e-5, b=3.4999952, x*=3.4873817:
-        # rho=0.9928154, or 0.2+0.8*rho=0.9942524 with relaxation.
-        # From the 1024-step residual, ceil(ln(1e-7/1.3455e-7)/
-        # ln(0.9942524))=52 more steps reach the unchanged 1e-7 criterion.
-        # Keep a bounded budget with margin.
-        max_iterations = 2048
-        for iteration in range(max_iterations):
+        def evaluate(
+            values: list[float],
+        ) -> tuple[list[float], dict[str, dict[str, float]]]:
+            stage_capture: dict[str, dict[int, float]] = {}
+            wall_capture: dict[str, dict[str, float]] = {}
+            for (species, kind, location), value in zip(coordinates, values):
+                capture = stage_capture if kind == 'stage' else wall_capture
+                capture.setdefault(species, {})[location] = (
+                    value * inlet_rates[species]
+                )
             species_rates_by_segment = segment_rates_from_capture(
-                stage_capture,
-                wall_capture,
+                stage_capture, wall_capture,
             )
             self.wall_species_partial_pressures_pa_by_segment = (
                 _segment_species_partial_pressures_pa(
@@ -4211,46 +4142,153 @@ class CondensationModel:
                 )
             )
             self.last_wall_deposition_rate_shadow_candidate = {}
-            candidates_by_species = wall_candidates(
-                species_rates_by_segment,
-                record_telemetry=False,
+            candidates = wall_candidates(
+                species_rates_by_segment, record_telemetry=False,
             )
-            next_stage_capture, next_wall_capture = resolved_capture(
-                candidates_by_species
+            stages, walls = resolved_capture(candidates)
+            self.last_wall_capture_fixed_point_iterations += 1
+            return [
+                (stages if kind == 'stage' else walls)
+                .get(species, {}).get(location, 0.0)
+                / inlet_rates[species]
+                for species, kind, location in coordinates
+            ], candidates
+
+        def dot(left: list[float], right: list[float]) -> float:
+            return math.fsum(a * b for a, b in zip(left, right))
+
+        import numpy as np
+        from scipy.optimize import brentq
+
+        def feasible_step(values: list[float], direction: list[float]) -> float:
+            # Nonnegative capture and sum(capture)<=q bound extrapolation.
+            upper = min(
+                (
+                    value / -step
+                    for value, step in zip(values, direction) if step < 0.0
+                ),
+                default=math.inf,
             )
-            delta = capture_delta(
-                stage_capture,
-                wall_capture,
-                next_stage_capture,
-                next_wall_capture,
-            )
+            for indices in species_indices.values():
+                growth = math.fsum(direction[i] for i in indices)
+                # A fixed capture budget makes this sum exactly zero after
+                # the first map step. Allow accumulation roundoff (eight
+                # ulps per normalized coordinate), or a full-budget state
+                # would spuriously permit no extrapolation at all.
+                roundoff = 8.0 * len(indices) * math.ulp(1.0)
+                if growth > roundoff:
+                    available = max(
+                        0.0, 1.0 - math.fsum(values[i] for i in indices),
+                    )
+                    upper = min(upper, available / growth)
+            return upper
+
+        values = [0.0] * len(coordinates)
+        residual_history: list[list[float]] = []
+        mapped_history: list[list[float]] = []
+        # The guard detects non-contraction/stagnation of the accelerated
+        # vector solve; geometric convergence of a slow scalar mode is handled
+        # by a bracketed residual solve, not by increasing this budget.
+        for _ in range(2048):
+            mapped, candidates_by_species = evaluate(values)
+            residual = [new - old for old, new in zip(values, mapped)]
+            delta = max(map(abs, residual), default=0.0)
             if delta <= 1.0e-7:
-                stage_capture = next_stage_capture
-                wall_capture = next_wall_capture
-                self.last_wall_capture_fixed_point_iterations = iteration + 1
-                converged = True
                 break
-            if (
-                previous_delta is not None
-                and delta >= 0.95 * previous_delta
-            ):
-                relaxation = 0.8
-            stage_capture = relax_capture(
-                stage_capture,
-                next_stage_capture,
-                relaxation,
+            residual_history.append(residual)
+            mapped_history.append(mapped)
+            # n+1 samples span at most n independent capture modes. No history
+            # beyond that can add an independent secant to the local solve.
+            residual_history = residual_history[-len(coordinates)-1:]
+            mapped_history = mapped_history[-len(coordinates)-1:]
+            trial_steps = [0.8]
+            proposals = []
+            if len(residual_history) > 1:
+                # Anderson: minimize ||r-DeltaR*gamma||, then extrapolate
+                # F(x)-DeltaF*gamma. For one mode this is Aitken's delta²
+                # step, with gain 1/(1-rho); multiple modes get independent
+                # secants instead of sharing one relaxation factor.
+                changes = np.diff(np.asarray(residual_history), axis=0).T
+                gamma = np.linalg.lstsq(changes, residual, rcond=None)[0]
+                mapped_changes = np.diff(np.asarray(mapped_history), axis=0).T
+                accelerated = np.asarray(mapped) - mapped_changes @ gamma
+                direction = [
+                    float(new) - old for old, new in zip(values, accelerated)
+                ]
+                step = min(1.0, feasible_step(values, direction))
+                if step > 0.0:
+                    proposals.append([
+                        max(0.0, value + step * r)
+                        for value, r in zip(values, direction)
+                    ])
+
+                # Bracket the projected residual along the feasible line.
+                # For a vector its zero is only a trial: check ALL residuals.
+                # Pure Cr/two supply-limited walls illustrate the bracket:
+                # q=inlet, h=stage candidate, b=capture budget (all kg).
+                # Raw candidates q and q-x normalize to total q, giving
+                # F(x)=b*q²/[(h+q)*(2q-x)]. Thus g_x(0)>=0 and
+                # g_x(q)=b*q/(h+q)-q<=0, since 0<=b<=q and h>=0.
+                # The feasible wall total is W=b*q/(h+q)<=q; even the
+                # tighter endpoint brackets: g_x(W)=W*(W-q)/(2q-W)<=0.
+                # Solving x*(2q-x)=b*q²/(h+q) gives the physical root
+                # x*=q-sqrt(q²-b*q²/(h+q)); the other root is >=q.
+                # Units: F is kg, F'=x*/(2q-x*) is dimensionless.
+                # h->0 gives x*=q-sqrt(q*(q-b)); b->0 gives x*=0.
+                # At h=0,b=q the endpoint x=q is the root (rho=1).
+                # Brent's bracket removes dependence on rho for this mode.
+                upper = feasible_step(values, residual)
+                if math.isfinite(upper) and upper > 1.0:
+                    def line_residual(step: float) -> float:
+                        trial = [
+                            max(0.0, value + step * r)
+                            for value, r in zip(values, residual)
+                        ]
+                        trial_mapped, _ = evaluate(trial)
+                        return dot([
+                            new - old for old, new in zip(trial, trial_mapped)
+                        ], residual)
+
+                    endpoint_residual = line_residual(upper)
+                    # An affine step can leave an ulp unallocated at a simplex
+                    # vertex. Accept that endpoint rather than searching a
+                    # flat double root with a rounded-to-zero residual.
+                    roundoff = (
+                        8.0 * math.ulp(1.0) * math.sqrt(dot(residual, residual))
+                    )
+                    if abs(endpoint_residual) <= roundoff:
+                        trial_steps.append(upper)
+                    elif endpoint_residual < 0.0:
+                        try:
+                            root = brentq(
+                                line_residual, 0.0, upper, xtol=1.0e-14,
+                            )
+                        except RuntimeError as exc:
+                            raise _WallCaptureNonContraction(
+                                'wall/stage capture projected residual '
+                                'non-contraction or numerical stagnation '
+                                'during bracketed solve'
+                            ) from exc
+                        trial_steps.append(root)
+            proposals.extend(
+                [max(0.0, value + step * r) for value, r in zip(values, residual)]
+                for step in trial_steps
             )
-            wall_capture = relax_capture(
-                wall_capture,
-                next_wall_capture,
-                relaxation,
-            )
-            previous_delta = delta
-        if not converged:
-            self.last_wall_capture_fixed_point_iterations = max_iterations
-            raise RuntimeError(
-                f'wall/stage capture fixed-point did not converge in {max_iterations} '
-                f'iterations (relative delta={delta:.12g})'
+            # Safeguard the coupled solve by choosing the smallest FULL
+            # residual, including the original feasible damped-map step.
+            best_delta = math.inf
+            for trial in proposals:
+                trial_mapped, _ = evaluate(trial)
+                trial_delta = max((
+                    abs(new - old) for old, new in zip(trial, trial_mapped)
+                ), default=0.0)
+                if trial_delta < best_delta:
+                    best_delta, best_values = trial_delta, trial
+            values = best_values
+        else:
+            raise _WallCaptureNonContraction(
+                'wall/stage capture fixed-point non-contraction or numerical '
+                f'stagnation after acceleration (relative residual={delta:.12g})'
             )
         if (
             antoine_extrapolations is not None
@@ -6422,6 +6460,10 @@ def _segment_species_partial_pressures_pa(
             },
         )
     return by_segment
+
+
+class _WallCaptureNonContraction(RuntimeError):
+    """The accelerated wall/stage capture map has no converged residual."""
 
 
 class MolarMassUnavailable(ValueError):
