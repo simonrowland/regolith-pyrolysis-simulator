@@ -312,6 +312,24 @@ def test_silicate_melt_alpha_remains_comparable() -> None:
     assert any(record.status in SCORING_STATUSES for record in evaluation.records)
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason="b-420: an untyped system class can still ground an alpha residual pin",
+)
+def test_untyped_system_class_is_not_alpha_pin_bearing() -> None:
+    obs = _alpha_fixture(
+        species_id="Fe",
+        observation_id="fixture_untyped_fe_alpha",
+        phase=None,
+        values={"alpha": 0.02, "material": "unclassified_sample"},
+        condensed_form={"state": "liquid_melt", "metastable": False},
+    )
+    pin_ok, pin_skip, axes = rail_alpha_comparability(obs)
+    assert pin_ok is False
+    assert pin_skip == "missing_system_class"
+    assert axes["rail_system_class_verdict"] == "undeterminable"
+
+
 @pytest.mark.parametrize("markers", [
     {"evidence_kind": "model"},
     {"measurement_status": "model_output_not_measurement"},
