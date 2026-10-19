@@ -124,6 +124,7 @@ LOCATOR_KEYS = frozenset(
         "page",
         "published_page",
         "pdf_page_index",
+        "page_verification",
         "table",
         "figure",
         "paragraph",

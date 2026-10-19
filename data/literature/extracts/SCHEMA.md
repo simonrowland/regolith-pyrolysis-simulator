@@ -399,7 +399,7 @@ observation.
 
 A locator is a mapping with at least one non-empty location key among:
 
-- `page`, `published_page`, `pdf_page_index`
+- `page`, `published_page`, `pdf_page_index`, `page_verification`
 - `table`, `figure`, `paragraph`, `section`, `equation`
 - `line_range` (e.g. thermo.inp line range)
 - `note` (prose locator when the above do not apply — allowed, but prefer structured keys)
@@ -410,6 +410,11 @@ zero-based PDF page index (the first PDF page is 0). `published_page` is the
 folio printed on the page; it may be absent, Roman-numeral, or non-numeric.
 Example: a figure on the 12th PDF page with printed folio 7 has `page: 12`,
 `pdf_page_index: 11`, and `published_page: 7`.
+
+When the source PDF is absent from the corpus, a locator whose physical page
+could not be verified may carry `page_verification: unverified_pdf_absent`.
+This typed reason is reported as a notice and exempts that locator from the
+`page == pdf_page_index + 1` check until the PDF is available.
 
 Every **observation** requires a `locator`.  
 Every **equipment-metadata field** that is present requires its **own** `locator`

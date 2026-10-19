@@ -151,7 +151,7 @@ def test_locator_page_index_is_checked_against_corpus_pdf(tmp_path: Path, monkey
     )
 
 
-def test_locator_page_mismatch_is_soft_when_published_page_is_missing(tmp_path: Path):
+def test_locator_page_mismatch_is_hard_even_with_published_page(tmp_path: Path):
     doc = _document()
     locator = doc["species"]["Fe"]["observations"][0]["locator"]
     locator["page"] = 3711
@@ -160,11 +160,27 @@ def test_locator_page_mismatch_is_soft_when_published_page_is_missing(tmp_path: 
 
     assert "locator" not in _checks(report)
     assert "locator-page-offset" in _checks(report)
-    assert next(item for item in report.findings if item.check == "locator-page-offset").severity == "SOFT"
+    assert next(item for item in report.findings if item.check == "locator-page-offset").severity == "HARD"
 
     locator["published_page"] = 3711
     report = _run_gate(tmp_path, doc)
+    assert "locator-page-offset" in _checks(report)
+    assert next(item for item in report.findings if item.check == "locator-page-offset").severity == "HARD"
+
+
+def test_typed_missing_pdf_reason_skips_page_rule_with_counted_notice(tmp_path: Path):
+    doc = _document()
+    locator = doc["species"]["Fe"]["observations"][0]["locator"]
+    locator.update(page=3711, pdf_page_index=2, page_verification="unverified_pdf_absent")
+    report = _run_gate(tmp_path, doc)
+
     assert "locator-page-offset" not in _checks(report)
+    notice = next(item for item in report.findings if item.check == "locator-verification")
+    assert notice.severity == "SOFT"
+    assert "1 issue(s)" in notice.detail
+    locator["page_verification"] = "unverified"
+    report = _run_gate(tmp_path, doc)
+    assert next(item for item in report.findings if item.check == "locator").severity == "HARD"
 
 
 def test_absent_corpus_pdf_only_warns_about_page_count(tmp_path: Path):
