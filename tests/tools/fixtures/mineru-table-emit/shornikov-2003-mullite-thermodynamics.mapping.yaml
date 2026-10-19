@@ -1,0 +1,83 @@
+source_id: shornikov-2003-mullite-thermodynamics
+source:
+  citation: >-
+    Shornikov, S. I., Archakov, I. Yu., and Shul’ts, M. M. (2003). A Mass
+    Spectrometric Study of the Thermodynamic Properties of Mullite. Russian
+    Journal of Physical Chemistry, 77(7), 1044–1050.
+  year: 2003
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-18'
+  worker: trial-lxh-1018
+review_status: draft
+fidelity_samples:
+  - path: species.Al6Si2O13.observations[shornikov_2003_mullite_thermodynamics_p002_t01_r02_c04].values.value_as_printed
+    value: '– 8.0'
+    locator:
+      page: 2
+      published_page: 1045
+      pdf_page_index: 1
+      table: '1'
+      row: 1
+      column: 4
+      note: Table 1 first data row; checked against the 600 dpi page render.
+  - path: species.Al6Si2O13.observations[shornikov_2003_mullite_thermodynamics_p002_t01_r31_c04].values.value_as_printed
+    value: '11.05 ± 0.08'
+    locator:
+      page: 2
+      published_page: 1045
+      pdf_page_index: 1
+      table: '1'
+      row: 30
+      column: 4
+      note: Table 1 reference [33]; checked against the 600 dpi page render.
+  - path: species.Al6Si2O13.observations[shornikov_2003_mullite_thermodynamics_p002_t01_r32_c04].values.value_as_printed
+    value: '12.9 ± 0.8'
+    locator:
+      page: 2
+      published_page: 1045
+      pdf_page_index: 1
+      table: '1'
+      row: 31
+      column: 4
+      note: Table 1 final data row; checked against the 600 dpi page render.
+tables:
+  - page: 2
+    table_index: 1
+    type: gibbs_table
+    quantity: delta_fH
+    evidence_class: quoted_attributed
+    unit: kJ/mol
+    phase: cr
+    per: mol_species
+    experiment: shornikov_2003_mullite_table1
+    attribution: >-
+      Table 1; the row-specific printed reference is recorded in its locator.
+    published_page: 1045
+    rows: all
+    temperature:
+      column: 2
+      unit: K
+    values:
+      - column: 4
+        species: Al6Si2O13
+        quantity: delta_fH
+        unit: kJ/mol
+  - page: 4
+    table_index: 2
+    type: gibbs_table
+    quantity: delta_fH
+    evidence_class: quoted_attributed
+    unit: kJ/mol
+    phase: cr
+    per: mol_species
+    experiment: shornikov_2003_mullite_table2
+    attribution: >-
+      Table 2, this work; fitted thermodynamic values reported by the authors.
+    published_page: 1047
+    rows: all
+    values:
+      - column: 3
+        species: Al6Si2O13
+        quantity: delta_fH
+        unit: kJ/mol
