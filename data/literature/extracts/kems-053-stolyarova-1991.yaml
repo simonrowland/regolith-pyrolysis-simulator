@@ -49,17 +49,17 @@ fidelity_samples:
 - path: species.SiO2.observations[stolyarova_1991_gibbs_integral_energy_fig3].values.points[0].delta_G_kcal_per_mole_as_digitized
   value: -5.3
   locator:
-    page: 5
+    page: 4
     published_page: 3713
-    pdf_page_index: 4
+    pdf_page_index: 3
     figure: '3'
     note: First filled-circle source experimental result; digitized value
 - path: species.O2.observations[stolyarova_1991_o2_pressure_fig4].values.points[0].lg_P_O2_atm_as_digitized
   value: -7.747
   locator:
-    page: 5
+    page: 4
     published_page: 3713
-    pdf_page_index: 4
+    pdf_page_index: 3
     figure: '4'
     note: First sampled point on curve 1, CaO-SiO2 system; digitized log pressure
 benches:
@@ -2425,9 +2425,9 @@ species:
     - observation_id: stolyarova_1991_experimental_method_and_apparatus
       type: method
       locator:
-        page: 2
+        page: 1
         published_page: 3710
-        pdf_page_index: 1
+        pdf_page_index: 0
         section: Experimental
       units: as printed
       values:
@@ -2958,9 +2958,9 @@ species:
     - observation_id: stolyarova_1991_gibbs_integral_energy_fig3
       type: gibbs_table
       locator:
-        page: 5
+        page: 4
         published_page: 3713
-        pdf_page_index: 4
+        pdf_page_index: 3
         figure: '3'
       T_range_K:
       - 1933.0
@@ -3013,9 +3013,9 @@ species:
     - observation_id: stolyarova_1991_gas_speciation_table3
       type: gas_speciation
       locator:
-        page: 5
+        page: 4
         published_page: 3713
-        pdf_page_index: 4
+        pdf_page_index: 3
         table: III
       T_range_K:
       - 1823.0
@@ -3041,9 +3041,9 @@ species:
     - observation_id: stolyarova_1991_o2_pressure_fig4
       type: partial_pressure
       locator:
-        page: 5
+        page: 4
         published_page: 3713
-        pdf_page_index: 4
+        pdf_page_index: 3
         figure: '4'
         equation: '[15]'
       T_range_K:
