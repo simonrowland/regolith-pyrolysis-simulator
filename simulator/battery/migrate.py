@@ -3765,10 +3765,14 @@ def wt_pct_to_mole_fraction_derivation(
 def _composition_located_from_values(
     values: object,
     locator: Locator | None,
+    role_refusal: list[str] | None = None,
 ) -> Located[Composition] | None:
     """Convert typed initial/datum maps or structurally signaled FeOT maps."""
 
     source_note = values.get("composition_derivation") if isinstance(values, Mapping) else None
+    role, _refusal = _declared_composition_role(values)
+    if _refusal is not None and role_refusal is not None:
+        role_refusal.append(_refusal)
     wt = _initial_oxide_map_from_values(
         values,
         declared_map=_declared_wt_composition_point_map(values, None),
@@ -3776,7 +3780,6 @@ def _composition_located_from_values(
     if not wt:
         return None
     has_feot = any(str(oxide).strip() == "FeOT" for oxide in wt)
-    role, _refusal = _declared_composition_role(values)
     if not has_feot and role not in _COMPOSITION_ROLE_TOKENS:
         return None
     derivation = wt_pct_to_mole_fraction_derivation(
@@ -13840,7 +13843,19 @@ class Migrator:
         total_iron_notice = _total_iron_reported_as_feo_notice(
             initial_oxide_map, q_token, obs_id
         )
-        composition_located = _composition_located_from_values(values, locator)
+        composition_role_refusal: list[str] = []
+        composition_located = _composition_located_from_values(
+            values, locator, role_refusal=composition_role_refusal
+        )
+        if composition_role_refusal:
+            self.result.add_queue(
+                work.work_id,
+                locator,
+                ["composition"],
+                composition_role_refusal[0],
+                source=source_key,
+                observation_id=obs_id,
+            )
         catalogue_composition = _catalogue_composition_located_from_values(values, locator)
         malformed_composition_amount: str | None = None
         try:
