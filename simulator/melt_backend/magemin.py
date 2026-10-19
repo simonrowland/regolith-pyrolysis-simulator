@@ -171,7 +171,10 @@ from simulator.feedstock_composition import iron_oxide_values, total_fe
 # while staying well inside the 60.0 s finder aggregate budget below.
 MAGEMIN_WARM_CALL_TIMEOUT_S = 15.0
 _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_CHARS = 8192
-_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_MOL_ENTRIES = 32
+_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES = 16
+_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_NAME_CHARS = 48
+_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_VALUE_CHARS = 64
+_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ARG_CHARS = 128
 # 2026-07-23 B1 gate-2 (same drift class as the call wall above): the warm
 # liquidus-finder aggregate budget raised 15.0 -> 60.0 s. Measured full
 # freeze-gate curve scans under the same 6-way + full-gate load: p50 =
@@ -2118,151 +2121,184 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 fO2_log=fO2_log,
             )
         )
-        mol_entries = []
-        mol_truncated = False
-        if composition_mol is not None:
-            items = sorted(
-                composition_mol.items(),
-                key=lambda item: str(item[0]),
-            )
-            mol_truncated = (
-                len(items) > _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_MOL_ENTRIES
-            )
-            for name, raw_value in items[
-                :_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_MOL_ENTRIES
-            ]:
-                name_text = str(name)
-                if len(name_text) > 80:
-                    name_text = name_text[:80]
-                    mol_truncated = True
-                try:
-                    value = float(raw_value)
-                except (TypeError, ValueError):
-                    value = str(raw_value)[:80]
-                if isinstance(value, float) and not math.isfinite(value):
-                    value = str(raw_value)[:80]
-                mol_entries.append([name_text, value])
-
         payload = {
-            'composition_mol': mol_entries,
-            'composition_mol_truncated': mol_truncated,
-            'composition_wt_pct': {
-                str(name): float(value)
-                for name, value in sorted(
-                    bulk_projection.composition_wt_pct.items()
-                )
-            },
-            'projected_bulk_vector_wt_pct': [
-                float(value) for value in bulk_projection.vector
-            ],
-            'oxide_names': list(bulk_projection.order),
-            'temperature_C': float(temperature_C),
-            'pressure_bar': float(pressure_bar),
-            'pressure_kbar': float(pressure_kbar),
-            'fO2_log': float(fO2_log),
+            'composition_mol': composition_mol or {},
+            'composition_wt_pct': bulk_projection.composition_wt_pct,
+            'projected_bulk_vector_wt_pct': bulk_projection.vector,
+            'oxide_names': bulk_projection.order,
+            'temperature_C': temperature_C,
+            'pressure_bar': pressure_bar,
+            'pressure_kbar': pressure_kbar,
+            'fO2_log': fO2_log,
             'buffer': buffer_name,
-            'buffer_n': float(buffer_n),
+            'buffer_n': buffer_n,
             'database': self._database,
             'argv': args,
         }
         return self._encode_magemin_timeout_diagnostic(payload)
 
+    def _magemin_timeout_diagnostic_detail_safely(
+        self,
+        *,
+        bulk_projection: _MAGEMinBulkProjection,
+        composition_mol: Optional[Mapping[str, float]],
+        temperature_C: float,
+        pressure_bar: float,
+        pressure_kbar: float,
+        fO2_log: float,
+    ) -> str:
+        try:
+            return self._magemin_timeout_diagnostic_detail(
+                bulk_projection=bulk_projection,
+                composition_mol=composition_mol,
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                pressure_kbar=pressure_kbar,
+                fO2_log=fO2_log,
+            )
+        except Exception as exc:
+            try:
+                return self._encode_magemin_timeout_diagnostic({
+                    'diagnostic_capture_error': type(exc).__name__,
+                    'composition_mol': composition_mol or {},
+                    'composition_wt_pct': bulk_projection.composition_wt_pct,
+                    'projected_bulk_vector_wt_pct': bulk_projection.vector,
+                    'oxide_names': bulk_projection.order,
+                    'temperature_C': temperature_C,
+                    'pressure_bar': pressure_bar,
+                    'pressure_kbar': pressure_kbar,
+                    'fO2_log': fO2_log,
+                    'buffer': None,
+                    'buffer_n': None,
+                    'database': self._database,
+                    'argv': [],
+                    'argv_truncated': True,
+                })
+            except Exception:
+                return '{"diagnostic_capture_error":"capture_failed"}'
+
     @staticmethod
     def _encode_magemin_timeout_diagnostic(
         payload: Dict[str, Any],
     ) -> str:
-        """Serialize a request record without exceeding the log-line cap."""
+        """Encode one fixed-shape request record under the log-line cap."""
 
-        def encode() -> str:
-            return json.dumps(
-                payload,
-                ensure_ascii=True,
-                allow_nan=False,
-                separators=(',', ':'),
-                sort_keys=True,
-            )
+        def text(value: Any, limit: int) -> tuple[str, bool]:
+            rendered = str(value)
+            if len(rendered) <= limit:
+                return rendered, False
+            return rendered[:limit - 14] + '...[truncated]', True
 
-        detail = encode()
-        if len(detail) <= _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_CHARS:
-            return detail
-        if 'composition_mol' in payload:
-            payload['composition_mol'] = payload['composition_mol'][:8]
-            payload['composition_mol_truncated'] = True
-        detail = encode()
-        if len(detail) <= _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_CHARS:
-            return detail
-        if 'composition_mol' in payload:
-            payload['composition_mol'] = []
-            payload['composition_mol_truncated'] = True
-        if 'composition_wt_pct' in payload:
-            payload['composition_wt_pct'] = {}
-            payload['composition_wt_pct_truncated'] = True
+        def value(raw: Any) -> tuple[Any, bool]:
+            if raw is None:
+                return None, False
+            try:
+                number = float(raw)
+            except (TypeError, ValueError):
+                return text(raw, _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_VALUE_CHARS)
+            return (number, False) if math.isfinite(number) else (str(number), False)
 
-        def shorten(value: str, limit: int) -> str:
-            if len(value) <= limit:
-                return value
-            return value[:limit] + '...[truncated]'
+        def entries(raw: Any) -> tuple[list[list[Any]], bool]:
+            if not isinstance(raw, Mapping):
+                return [], bool(raw)
+            ordered = sorted(raw.items(), key=lambda pair: str(pair[0]))
+            truncated = len(ordered) > _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES
+            bounded = []
+            for name, raw_value in ordered[
+                :_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES
+            ]:
+                safe_name, name_cut = text(
+                    name,
+                    _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_NAME_CHARS,
+                )
+                safe_value, value_cut = value(raw_value)
+                bounded.append([safe_name, safe_value])
+                truncated = truncated or name_cut or value_cut
+            return bounded, truncated
 
-        database = payload.get('database')
-        if isinstance(database, str):
-            bounded_database = shorten(database, 256)
-            if bounded_database != database:
-                payload['database'] = bounded_database
-                payload['database_truncated'] = True
-        argv = payload.get('argv')
-        if isinstance(argv, list):
-            bounded_argv = [
-                shorten(str(argument), 256) for argument in argv
-            ]
-            if bounded_argv != argv:
-                payload['argv'] = bounded_argv
-                payload['argv_truncated'] = True
-        detail = encode()
-        if len(detail) <= _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_CHARS:
-            return detail
+        mol, mol_truncated = entries(payload.get('composition_mol') or {})
+        wt_pct, wt_pct_truncated = entries(
+            payload.get('composition_wt_pct') or {}
+        )
+        vectors = payload.get('projected_bulk_vector_wt_pct', ())
+        vectors = vectors if isinstance(vectors, (list, tuple)) else ()
+        vector_truncated = len(vectors) > _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES
+        vector = [
+            value(item)[0]
+            for item in vectors[:_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES]
+        ]
+        names = payload.get('oxide_names', ())
+        names = names if isinstance(names, (list, tuple)) else ()
+        argv = payload.get('argv', ())
+        argv = argv if isinstance(argv, (list, tuple)) else ()
+        oxide_names = [
+            text(item, _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_NAME_CHARS)[0]
+            for item in names[:_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES]
+        ]
+        argv_out = [
+            text(item, _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ARG_CHARS)[0]
+            for item in argv[:_MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES]
+        ]
+        database, database_cut = text(
+            payload.get('database', ''),
+            _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ARG_CHARS,
+        )
+        buffer = payload.get('buffer')
+        if buffer is not None:
+            buffer = text(buffer, 48)[0]
 
-        argv = payload.get('argv', [])
-        minimal = {
-            'diagnostic_capture_error': payload.get(
-                'diagnostic_capture_error'
+        # The fixed entry and string caps keep this record below 8 KiB even
+        # when a configured path, database name, or input mapping is huge.
+        record = {
+            'composition_mol': mol,
+            'composition_mol_truncated': mol_truncated,
+            'composition_wt_pct': dict(wt_pct),
+            'composition_wt_pct_truncated': wt_pct_truncated,
+            'projected_bulk_vector_wt_pct': vector,
+            'projected_bulk_vector_truncated': vector_truncated,
+            'oxide_names': oxide_names,
+            'temperature_C': value(payload.get('temperature_C'))[0],
+            'pressure_bar': value(payload.get('pressure_bar'))[0],
+            'pressure_kbar': value(payload.get('pressure_kbar'))[0],
+            'fO2_log': value(payload.get('fO2_log'))[0],
+            'buffer': buffer,
+            'buffer_n': value(payload.get('buffer_n'))[0],
+            'database': database,
+            'database_truncated': database_cut,
+            'argv': argv_out,
+            'argv_truncated': (
+                len(argv) > _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ENTRIES
+                or bool(payload.get('argv_truncated'))
+                or database_cut
+                or any(
+                    len(str(item)) > _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_ARG_CHARS
+                    for item in argv
+                )
             ),
-            'diagnostic_truncated': True,
-            'composition_mol': [],
-            'composition_mol_truncated': True,
-            'composition_wt_pct': {},
-            'composition_wt_pct_truncated': True,
-            'projected_bulk_vector_wt_pct': payload.get(
-                'projected_bulk_vector_wt_pct', []
-            )[:32],
-            'oxide_names': [
-                shorten(str(name), 40)
-                for name in payload.get('oxide_names', [])[:24]
-            ],
-            'temperature_C': payload.get('temperature_C'),
-            'pressure_bar': payload.get('pressure_bar'),
-            'pressure_kbar': payload.get('pressure_kbar'),
-            'fO2_log': payload.get('fO2_log'),
-            'buffer': shorten(str(payload.get('buffer', '')), 40),
-            'buffer_n': payload.get('buffer_n'),
-            'database': shorten(str(payload.get('database', '')), 128),
-            'database_truncated': True,
-            'argv': [
-                shorten(str(argument), 96) for argument in argv[:16]
-            ],
-            'argv_truncated': True,
         }
+        if payload.get('diagnostic_capture_error'):
+            record['diagnostic_capture_error'] = str(
+                payload['diagnostic_capture_error']
+            )[:64]
         detail = json.dumps(
-            minimal,
+            record,
             ensure_ascii=True,
             allow_nan=False,
             separators=(',', ':'),
             sort_keys=True,
         )
         if len(detail) > _MAGEMIN_TIMEOUT_DIAGNOSTIC_MAX_CHARS:
-            # The fixed-size bulk vector and capped argv make this unreachable
-            # for MAGEMin requests; keep the final guard valid JSON regardless.
-            detail = '{"diagnostic_truncated":true}'
+            raise ValueError('bounded MAGEMin timeout record exceeded its cap')
         return detail
+
+    @staticmethod
+    def _attach_magemin_timeout_diagnostic(
+        timeout: EngineWorkerTimeout,
+        detail: str,
+    ) -> EngineWorkerTimeout:
+        timeout.diagnostic_detail = detail
+        timeout.args = (f'{timeout}; MAGEMin request: {detail}',)
+        return timeout
 
     def _call_magemin(
         self,
@@ -2443,44 +2479,38 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     }, timeout_s=timeout_s)
                     try:
                         return future.result(timeout=future_timeout_s)
-                    except EngineWorkerTimeout:
+                    except EngineWorkerTimeout as timeout:
+                        diagnostic_detail = (
+                            self._magemin_timeout_diagnostic_detail_safely(
+                                bulk_projection=bulk_projection,
+                                composition_mol=composition_mol,
+                                temperature_C=temperature_C,
+                                pressure_bar=pressure_bar,
+                                pressure_kbar=pressure_kbar,
+                                fO2_log=fO2_log,
+                            )
+                        )
+                        self._subprocess_pool._abort_request(
+                            future,
+                            diagnostic_detail=diagnostic_detail,
+                        )
+                        self._attach_magemin_timeout_diagnostic(
+                            timeout,
+                            diagnostic_detail,
+                        )
                         raise
                     except FutureTimeoutError as exc:
                         future.cancel()
-                        try:
-                            diagnostic_detail = (
-                                self._magemin_timeout_diagnostic_detail(
-                                    bulk_projection=bulk_projection,
-                                    composition_mol=composition_mol,
-                                    temperature_C=temperature_C,
-                                    pressure_bar=pressure_bar,
-                                    pressure_kbar=pressure_kbar,
-                                    fO2_log=fO2_log,
-                                )
+                        diagnostic_detail = (
+                            self._magemin_timeout_diagnostic_detail_safely(
+                                bulk_projection=bulk_projection,
+                                composition_mol=composition_mol,
+                                temperature_C=temperature_C,
+                                pressure_bar=pressure_bar,
+                                pressure_kbar=pressure_kbar,
+                                fO2_log=fO2_log,
                             )
-                        except Exception as diagnostic_error:
-                            diagnostic_detail = (
-                                self._encode_magemin_timeout_diagnostic(
-                                    {
-                                        'diagnostic_capture_error': type(
-                                            diagnostic_error
-                                        ).__name__,
-                                        'database': self._database,
-                                        'temperature_C': temperature_C,
-                                        'pressure_bar': pressure_bar,
-                                        'pressure_kbar': pressure_kbar,
-                                        'fO2_log': fO2_log,
-                                        'oxide_names': list(
-                                            bulk_projection.order
-                                        ),
-                                        'projected_bulk_vector_wt_pct': list(
-                                            bulk_projection.vector
-                                        ),
-                                        'argv': [],
-                                        'argv_truncated': True,
-                                    }
-                                )
-                            )
+                        )
                         self._subprocess_pool._abort_request(
                             future,
                             diagnostic_detail=diagnostic_detail,
@@ -2490,8 +2520,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                             future_timeout_s,
                             phase='job',
                         )
-                        timeout.args = (
-                            f'{timeout}; MAGEMin request: {diagnostic_detail}',
+                        self._attach_magemin_timeout_diagnostic(
+                            timeout,
+                            diagnostic_detail,
                         )
                         raise timeout from exc
                 except EngineWorkerTimeout:
