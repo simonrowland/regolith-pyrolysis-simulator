@@ -329,10 +329,6 @@ def test_step_hour_zero_current_and_voltage_remain_idle():
     assert zero_v["energy_kWh"] == 0.0
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="b-434: legacy MRE path caps an infinite Faraday extent as FeO depletion",
-)
 def test_step_hour_refuses_nonfinite_faraday_extent():
     result = _legacy_model().step_hour(
         MeltState(composition_kg={"FeO": 1.0}),

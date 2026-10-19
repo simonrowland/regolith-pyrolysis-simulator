@@ -287,6 +287,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
         from simulator.accounting.formulas import resolve_species_formula
         from simulator.electrolysis import (
             ELECTRONS_PER_OXIDE,
+            _faraday_reduced_extent,
             FERRIC_TO_FERROUS_ELECTRONS,
             FERRIC_TO_FERROUS_FEO_PER_FE2O3,
             FERRIC_TO_FERROUS_O2_PER_FE2O3,
@@ -802,13 +803,15 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
             )
             M_oxide_gmol = MOLAR_MASS.get(oxide, 100.0)
 
-            uncapped_moles_reduced = (
-                I_species * eta_CE * t_s
-            ) / (n_e * FARADAY)
-            kg_oxide_reduced = uncapped_moles_reduced * M_oxide_gmol / 1000.0
-            if not math.isfinite(uncapped_moles_reduced) or not math.isfinite(
-                kg_oxide_reduced
-            ):
+            extent = _faraday_reduced_extent(
+                I_species,
+                eta_CE,
+                t_s,
+                n_e,
+                M_oxide_gmol,
+                faraday=FARADAY,
+            )
+            if extent is None:
                 return self._invalid_result(
                     request,
                     reason=MRE_CONTROL_OUT_OF_DOMAIN_REFUSAL,
@@ -818,6 +821,7 @@ class BuiltinElectrolysisStepProvider(ChemistryProvider):
                     },
                     energy_kWh=0.0,
                 )
+            uncapped_moles_reduced, kg_oxide_reduced = extent
 
             # Cap at melt availability. Re-derive mol from the capped
             # kg to keep mol-native bookkeeping consistent with the
