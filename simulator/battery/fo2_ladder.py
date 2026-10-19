@@ -28,6 +28,7 @@ from decimal import Decimal
 
 from simulator.battery.enums import (
     AmountBasis,
+    Authority,
     MethodToken,
     Phase,
     ReferenceStateConvention,
@@ -94,10 +95,16 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
     if resolved.borrowed:
         reason += "; borrowed"
     return Notice(
-        kind=NoticeKind.SOURCE_DISAGREEMENT,
+        kind=(
+            NoticeKind.OUT_OF_CERTIFIED_BAND
+            if resolved.borrowed
+            else NoticeKind.SOURCE_DISAGREEMENT
+        ),
         affected_quantities=(quantity,),
         reason=reason,
         origin="fo2_ladder",
+        band=f"borrowed fO2: {resolved.route}" if resolved.borrowed else None,
+        authority=Authority.BRIDGE if resolved.borrowed else None,
     )
 
 

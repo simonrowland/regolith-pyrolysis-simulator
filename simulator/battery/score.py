@@ -5806,9 +5806,6 @@ def _oxygen_input_request(
     return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
 
 
-_BORROWED_EFFUSION_PHRASE = "effusion closure borrowed from internal-analytical"
-
-
 def _borrow_internal_analytical_effusion(
     *,
     engine: Engine,
@@ -5834,6 +5831,7 @@ def _borrow_internal_analytical_effusion(
         PO2_COMMANDED,
         Po2Request,
     )
+    from simulator.battery.fo2_ladder import ResolvedFo2, fo2_tier_notice
 
     prediction = predict_with_engine(
         Engine.INTERNAL_ANALYTICAL,
@@ -5859,14 +5857,15 @@ def _borrow_internal_analytical_effusion(
             notices=tuple(notices),
         )
     notices.append(
-        Notice(
-            kind=NoticeKind.SOURCE_DISAGREEMENT,
-            affected_quantities=(quantity,),
-            reason=(
-                "fo2_tier=3; route=effusion_oxygen_balance; "
-                + _BORROWED_EFFUSION_PHRASE
+        fo2_tier_notice(
+            quantity,
+            ResolvedFo2(
+                math.log10(bar),
+                3,
+                "effusion_oxygen_balance; effusion closure borrowed from internal-analytical",
+                True,
+                po2_bar=bar,
             ),
-            origin="fo2_ladder",
         )
     )
     return Po2Request(mode=PO2_COMMANDED, po2_bar=bar)

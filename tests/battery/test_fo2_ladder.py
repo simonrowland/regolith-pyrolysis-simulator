@@ -15,20 +15,28 @@ from decimal import Decimal
 import pytest
 
 from simulator.battery.enums import (
+    Authority,
     CellMaterial,
     Engine,
     FO2Channel,
     MethodToken,
+    NoticeKind,
     Quantity,
     ValueKind,
 )
-from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
+from simulator.battery.fo2_ladder import (
+    ResolvedFo2,
+    fo2_tier_notice,
+    resolve_row_fo2,
+)
 from simulator.battery.records import FO2Control, State, Value
 from simulator.battery.score import (
+    FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND,
     ScoreContext,
     _cell_oxygen_class,
     composition_wt_pct,
     compile_residual,
+    flagged_strata,
     predict_with_engine,
 )
 from simulator.battery.waypoints import ReadinessStatus, oxygen_condition
@@ -200,6 +208,8 @@ def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> 
     assert resolved.log10_fO2_bar == pytest.approx(-9.68612316558128, abs=1e-12)
     notice = fo2_tier_notice(Quantity.ACTIVITY, resolved)
     assert "fo2 from printed a_FeO (circular for a_FeO rows)" in notice.reason
+    assert notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+    assert flagged_strata((notice,)) == ()
 
     requests = melt_activity_requests(
         collect_consumer_inputs(experiment, bench, observation),
@@ -248,6 +258,28 @@ def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> 
     assert any(
         "fo2 from printed a_FeO (circular for a_FeO rows)" in notice.reason
         for notice in residual.notices
+    )
+    assert FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND not in flagged_strata(
+        residual.notices
+    )
+
+    borrowed_notice = fo2_tier_notice(
+        Quantity.ACTIVITY,
+        ResolvedFo2(-9.0, 4, "intrinsic_melt_fO2", True),
+    )
+    assert borrowed_notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert borrowed_notice.authority is Authority.BRIDGE
+    borrowed_residual, _candidate = compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=replace(
+            prediction,
+            notices=(*prediction.notices, borrowed_notice),
+        ),
+    )
+    assert FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND in flagged_strata(
+        borrowed_residual.notices
     )
 
 
@@ -553,10 +585,17 @@ def test_magemin_and_thermoengine_borrow_one_internal_closure(monkeypatch) -> No
     assert seen["thermoengine"] == 3.5e-9
     assert seen["magemin"] == 3.5e-9
     for prediction in predictions:
-        assert any(
-            "effusion closure borrowed from internal-analytical" in notice.reason
-            and notice.reason.startswith("fo2_tier=3; route=effusion_oxygen_balance;")
-            for notice in prediction.notices
+        borrowed_notice = next(
+            notice for notice in prediction.notices
+            if "effusion closure borrowed from internal-analytical" in notice.reason
+        )
+        assert borrowed_notice.reason.startswith(
+            "fo2_tier=3; route=effusion_oxygen_balance;"
+        )
+        assert borrowed_notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        assert borrowed_notice.authority is Authority.BRIDGE
+        assert FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND in flagged_strata(
+            (borrowed_notice,)
         )
 
 
