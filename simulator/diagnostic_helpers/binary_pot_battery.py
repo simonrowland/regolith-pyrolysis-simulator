@@ -2234,6 +2234,24 @@ def _solve_vapor_engine_cell_oxygen_balance(
 # ---------------------------------------------------------------------------
 
 
+def _carried_ferric_fold_notice(notice: Mapping[str, Any]) -> dict[str, Any]:
+    """Give the fold owner's dict the kind and reason cell_notices reads.
+
+    The owner keeps code, wt%, factor, basis, and the pinned d-072 message.
+    kind ``openimcc_notice`` becomes ENGINE_MODEL_CAVEAT. authority stays
+    unset so the fold is not treated as an out-of-band flag.
+    """
+
+    row = dict(notice)
+    row["kind"] = "openimcc_notice"
+    row["authority"] = None
+    if notice.get("code") == "openimcc_fe2o3_fold":
+        row["reason"] = "ferric folded to FeOt"
+    else:
+        row["reason"] = str(notice.get("message") or notice.get("code") or "")
+    return row
+
+
 class _OpenImccBatteryBackend:
     """Battery-only producer for the optional openimcc package.
 
@@ -2314,10 +2332,29 @@ class _OpenImccBatteryBackend:
             "allow_extrapolation": True,
             "allow_out_of_envelope": True,
         }
+        # OpenIMCC refuses raw Fe2O3. d-180: fold ferric onto FeOt and
+        # carry the owner's notices. Do not copy the fold.
+        fold_notices: tuple[Mapping[str, Any], ...] = ()
         if composition_mol:
-            bridge_kwargs["composition_mol"] = composition_mol
+            folded_mol, fold_notices = self._bridge.fold_ferric_to_feot(
+                composition_mol
+            )
+            bridge_kwargs["composition_mol"] = folded_mol
         elif composition_kg is not None:
-            bridge_kwargs["composition_kg"] = composition_kg
+            if self._bridge.positive_fe2o3(composition_kg):
+                # kg is a 1 kg batch (wt%/100). The fold is a mole identity.
+                batch_mol = composition_kg_and_mol(
+                    {
+                        str(name): float(amount) * 100.0
+                        for name, amount in composition_kg.items()
+                    }
+                )[1]
+                folded_mol, fold_notices = self._bridge.fold_ferric_to_feot(
+                    batch_mol
+                )
+                bridge_kwargs["composition_mol"] = folded_mol
+            else:
+                bridge_kwargs["composition_kg"] = composition_kg
         else:
             bridge_kwargs["composition_mol"] = composition_mol
         result = self._bridge.evaluate(**bridge_kwargs)
@@ -2327,7 +2364,9 @@ class _OpenImccBatteryBackend:
         self._identity["pack_version"] = result.pack_version
         self._identity["pack_digest"] = result.pack_digest
 
-        notices: list[dict[str, Any]] = []
+        notices: list[dict[str, Any]] = [
+            _carried_ferric_fold_notice(row) for row in fold_notices
+        ]
         authority: str | None = None
         outside_domain = bool(
             result.extrapolated or result.envelope_status != "inside"
