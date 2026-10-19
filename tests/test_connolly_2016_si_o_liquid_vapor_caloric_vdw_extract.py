@@ -20,6 +20,19 @@ def _document() -> dict:
 
 def test_kraus_quoted_properties_and_shock_estimates_match_rendered_cells() -> None:
     document = _document()
+    assert document["source"]["corpus_sha256"] == (
+        "deb42a5ea0ad3665eeb6e13af61d4fa1399bb470b8025b78cbeebdc370b56260"
+    )
+    fidelity_sample = document["fidelity_samples"][2]
+    assert fidelity_sample["path"] == (
+        "species.SiO2.observations[connolly_2016_kraus_a2_entropy].values.uncertainty"
+    )
+    assert fidelity_sample["value"] == 3.9
+    assert fidelity_sample["locator"] == {
+        "table": "A2",
+        "row": "Kraus et al. [2012]",
+        "pdf_page_index": 23,
+    }
     observations = document["species"]["SiO2"]["observations"]
     assert len(observations) == 2
 
@@ -55,7 +68,16 @@ def test_kraus_quoted_properties_and_shock_estimates_match_rendered_cells() -> N
         "Tc": "<4,961 ± 559 K",
         "s_c": "<5,798 ± 277 J/K-kg",
     }
+    assert shock["units"] == "per-column as printed"
     assert shock["locator"]["pdf_page_index"] == 12
+
+    parked = document["extraction"]["method"]
+    for printed_value in (
+        "174.02/79.01", "173.11/85.77", "173.28/82.50", "184.15/82.6",
+        "1,687 K", "68,583", "91.92", "10.92 ± 0.34", "27.20",
+        "±0.1 K/MPa", "7,477 ± 12 J/K-kg",
+    ):
+        assert printed_value in parked
 
 
 def test_all_seven_figures_are_deferred_context_records_without_points() -> None:
@@ -66,6 +88,7 @@ def test_all_seven_figures_are_deferred_context_records_without_points() -> None
     assert len(figures) == 7
     assert {row["locator"]["figure"] for row in figures} == set("1234567")
     assert all(row["values"]["method_class"] == "model_derived" for row in figures)
+    assert all(row["units"] == "as printed" for row in figures)
     assert all(row["digitisation"] == "deferred to a figure pass" for row in figures)
     assert all("points" not in row and "numeric_points" not in row for row in figures)
     assert {

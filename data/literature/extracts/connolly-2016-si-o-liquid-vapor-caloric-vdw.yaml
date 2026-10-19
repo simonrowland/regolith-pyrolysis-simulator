@@ -9,7 +9,7 @@ source:
   doi: 10.1002/2016JE005059
   url: https://doi.org/10.1002/2016JE005059
   corpus_asset: raw/connolly-2016-si-o-liquid-vapor-caloric-vdw/connolly-2016-si-o-liquid-vapor-caloric-vdw.pdf
-  corpus_sha256: bd7115d7f1efb93568cda868672b5716b7b40c10e2f2cb63b8a707e78d972256
+  corpus_sha256: deb42a5ea0ad3665eeb6e13af61d4fa1399bb470b8025b78cbeebdc370b56260
 extraction:
   method: >-
     Minimal extract from the born-digital pdftotext-layout.txt. The paper reports
@@ -21,6 +21,11 @@ extraction:
     MinerU HTML, which is absent for this born-digital source; the cited cells
     were transcribed from the text and checked against 600 dpi renders of PDF
     pages 13 and 24.
+    The following quoted values remain explicitly parked, not scored: Table A2
+    Schnurre 174.02/79.01, Hudon 173.11/85.77, Holland and Powell 173.28/82.50,
+    and Ghiorso 184.15/82.6; the Si(l) block at Tm 1,687 K (gm -68,583,
+    sm 91.92, vm 10.92 ± 0.34, cm 27.20); the Jackson (1976) Clapeyron slope
+    ±0.1 K/MPa; and Table 3 footnote d corrected vapor entropy 7,477 ± 12 J/K-kg.
   date: '2026-10-18'
   worker: fam2-1018
   provenance_path: text/connolly-2016-si-o-liquid-vapor-caloric-vdw/pdftotext-layout.txt
@@ -34,11 +39,10 @@ fidelity_samples:
     value: 83.25
     note: Kraus et al. (2012) quoted heat capacity at the printed 1999 K reference point.
     locator: {table: 'A2', row: 'Kraus et al. [2012]', pdf_page_index: 23}
-  - species: SiO2
-    observation_id: connolly_2016_kraus_table3_constraint
-    field: values.values_as_printed.Tb
-    value: '3,177 ± 115 K'
-    locator: {table: '3', row: 'Kraus', pdf_page_index: 12}
+  - path: species.SiO2.observations[connolly_2016_kraus_a2_entropy].values.uncertainty
+    value: 3.9
+    note: Kraus et al. (2012) quoted entropy uncertainty at the printed 1999 K reference point.
+    locator: {table: 'A2', row: 'Kraus et al. [2012]', pdf_page_index: 23}
 species:
   SiO2:
     observations:
@@ -92,6 +96,7 @@ species:
       - observation_id: connolly_2016_kraus_table3_constraint
         type: quoted_shock_estimate_set
         locator: {page: 1653, published_page: 1653, pdf_page_index: 12, table: '3', row: 'Kraus'}
+        units: per-column as printed
         species_as_printed: SiO2-rich fluid
         phase_as_printed: boiling and critical point estimates
         system_as_printed: Si-O
@@ -122,6 +127,7 @@ species:
       - type: figure_record
         observation_id: connolly_2016_fig1_figure_only
         locator: {page: 1650, published_page: 1650, pdf_page_index: 9, figure: '1'}
+        units: as printed
         species_as_printed: [Hg, Rb, hypothetical SiO2, hypothetical Si]
         system_as_printed: Hg, Rb, hypothetical monospecies SiO2 and Si fluids
         phase_as_printed: liquid-vapor boiling curves
@@ -162,6 +168,7 @@ species:
       - type: figure_record
         observation_id: connolly_2016_fig2_figure_only
         locator: {page: 1652, published_page: 1652, pdf_page_index: 11, figure: '2'}
+        units: as printed
         species_as_printed: Si-O system
         system_as_printed: Si-O
         phase_as_printed: modeled phase fields
@@ -189,6 +196,7 @@ species:
       - type: figure_record
         observation_id: connolly_2016_fig3_figure_only
         locator: {page: 1654, published_page: 1654, pdf_page_index: 13, figure: '3'}
+        units: as printed
         species_as_printed: Si-O system
         system_as_printed: Si-O
         phase_as_printed: modeled phase fields
@@ -230,6 +238,7 @@ species:
       - type: figure_record
         observation_id: connolly_2016_fig4_figure_only
         locator: {page: 1655, published_page: 1655, pdf_page_index: 14, figure: '4'}
+        units: as printed
         species_as_printed: SiO2-rich fluid
         system_as_printed: Si-O
         phase_as_printed: azeotropic liquid-vapor boiling envelopes
@@ -280,6 +289,7 @@ species:
       - type: figure_record
         observation_id: connolly_2016_fig5_figure_only
         locator: {page: 1656, published_page: 1656, pdf_page_index: 15, figure: '5'}
+        units: as printed
         species_as_printed: SiO2-rich fluid
         system_as_printed: Si-O
         phase_as_printed: azeotropic liquid-vapor boiling curves and species
@@ -326,6 +336,7 @@ species:
       - type: figure_record
         observation_id: connolly_2016_fig6_figure_only
         locator: {page: 1657, published_page: 1657, pdf_page_index: 16, figure: '6'}
+        units: as printed
         species_as_printed: SiO2-rich fluid
         system_as_printed: Si-O
         phase_as_printed: liquid and vapor
@@ -367,6 +378,7 @@ species:
       - type: figure_record
         observation_id: connolly_2016_fig7_figure_only
         locator: {page: 1659, published_page: 1659, pdf_page_index: 18, figure: '7'}
+        units: as printed
         species_as_printed: silica composition
         system_as_printed: Si-O
         phase_as_printed: liquid-vapor phase field, isochores, and isentropes
