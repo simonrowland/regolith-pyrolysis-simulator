@@ -144,6 +144,7 @@ from simulator.battery.validity import (
     comparison_method_cell_constant_cancels,
     run_validity_gates,
 )
+from simulator.diagnostic_helpers.species_rail import parse_formula_elements
 from simulator.reference_data.janaf import formula_composition
 
 # Explicit closed set. openimcc is the only IMCC producer. Do not build this from
@@ -9252,7 +9253,7 @@ def _battery_hero_element_series_records(
 
     bins: dict[tuple[str, str, str, str, int], _BatteryHeroBinAccumulator] = {}
     for (engine, formula, _rail), points in series.items():
-        elements = {element for element, _count in formula_composition(formula) or ()}
+        elements = set(parse_formula_elements(formula) or ())
         for element in elements:
             for point in points:
                 bin_index = int(point["bin_index"])
