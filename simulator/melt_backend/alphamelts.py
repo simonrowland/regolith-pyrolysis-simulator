@@ -3487,14 +3487,10 @@ class _MELTSBackendSupport(MeltBackend):
         *,
         redox_mode: Optional[str] = None,
     ) -> tuple[str | None, float | None]:
+        # equilibrate owns mode and fO2 validation for every transport; this
+        # helper only translates the accepted request into MELTS-file fields.
         if redox_mode == REDOX_MODE_NOT_AN_INPUT:
-            if fO2_log is not None:
-                raise ValueError('not_an_input redox_mode requires fO2_log=None')
             return None, None
-        if redox_mode is not None:
-            raise ValueError(f'unsupported redox_mode={redox_mode!r}')
-        if fO2_log is None:
-            raise ValueError('fO2_log=None requires an explicit redox_mode')
         if self._redox_buffer is not None:
             path = 'FMQ' if self._redox_buffer == 'QFM' else self._redox_buffer
             return path, float(self._fo2_offset or 0.0)
