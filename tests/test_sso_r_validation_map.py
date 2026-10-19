@@ -10,7 +10,10 @@ import pytest
 from simulator.chemistry.kernel import ProviderUnavailableError
 from simulator.core import FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS
 from simulator.optimize import sso_r_owner_surface
-from simulator.reduced_real_determinism import GateCurveProviderOutcome
+from simulator.reduced_real_determinism import (
+    GateCurveProviderOutcome,
+    _gate_curve_provider_role,
+)
 from scripts import sso_r_validation_map as validation_map
 
 
@@ -34,8 +37,8 @@ CONFIGURED_OWNER_PN2_ANCHORS = {
     "SiO_provider_pO2_bar": 1e-09,
     "SiO_flux_kg_hr": 0.0279267607515389,
 }
-# Configless fallback, not canonical. Used only when the freeze-gate liquidus
-# provider did not produce a live curve in the validation-map run.
+# Configless fallback, not canonical. Used when the consumed curve did not
+# come from the gate liquid-fraction path.
 CONFIGLESS_FALLBACK_NOT_CANONICAL = {
     "native_fe_pool_mol": 1576.0114767733974,
     "stage_3_Fe_wt_pct": 0.0121860033141556,
@@ -44,14 +47,13 @@ CONFIGLESS_FALLBACK_NOT_CANONICAL = {
 _SMOKE_FREEZE_GATE_CURVE_RECORDS = []
 
 
-def _freeze_gate_liquidus_provider_live(record):
+def _curve_record_uses_gate_liquid_fraction_source(record):
     if not isinstance(record, Mapping):
         return False
     curve = record.get("curve")
     return (
-        record.get("provider_outcome") == GateCurveProviderOutcome.PRODUCED
-        and isinstance(curve, Mapping)
-        and str(curve.get("source", "")).startswith("gate_liquid_fraction")
+        isinstance(curve, Mapping)
+        and _gate_curve_provider_role(curve) is not None
     )
 
 
@@ -91,26 +93,40 @@ def smoke_payload():
         _SMOKE_FREEZE_GATE_CURVE_RECORDS[:] = records
 
 
-def test_freeze_gate_liquidus_provider_selector_uses_returned_curve_record():
+def test_freeze_gate_liquidus_path_selector_uses_consumed_curve_source():
     configured_record = {
-        "provider_outcome": GateCurveProviderOutcome.PRODUCED,
-        "curve": {"source": "gate_liquid_fraction"},
+        "provider_outcome": GateCurveProviderOutcome.STABLE_REFUSAL,
+        "curve": {
+            "source": (
+                "gate_liquid_fraction:fallback:magemin-shadow:"
+                "composition_projected"
+            ),
+            "composition_projected_notice": {
+                "kind": "composition_projected",
+            },
+        },
     }
+    # _build_sim uses backend=None; a configless run with no usable gate bounds
+    # reaches the Kress calibration floor.
     configless_record = {
-        "provider_outcome": GateCurveProviderOutcome.PRODUCED,
-        "curve": {"source": "liquidus_solidus:backend"},
+        "provider_outcome": GateCurveProviderOutcome.NO_PROVIDER,
+        "curve": {"source": "kress91_liquid_calibration_floor"},
     }
 
-    assert _freeze_gate_liquidus_provider_live(configured_record) is True
-    assert _freeze_gate_liquidus_provider_live(configless_record) is False
+    assert _curve_record_uses_gate_liquid_fraction_source(
+        configured_record
+    ) is True
+    assert _curve_record_uses_gate_liquid_fraction_source(
+        configless_record
+    ) is False
 
 
 @pytest.fixture(scope="module")
-def freeze_gate_liquidus_provider_live(smoke_payload):
+def configured_freeze_gate_liquidus_path_consumed(smoke_payload):
     # Observe the resolved curve records consumed by the redox path; they also
     # cover curves returned through either cache.
     return any(
-        _freeze_gate_liquidus_provider_live(record)
+        _curve_record_uses_gate_liquid_fraction_source(record)
         for record in _SMOKE_FREEZE_GATE_CURVE_RECORDS
     )
 
@@ -569,7 +585,7 @@ def test_run_row_establishes_one_production_authority_pin(monkeypatch):
 
 def test_owner_pn2_anchor_reports_current_certification_state(
     smoke_payload,
-    freeze_gate_liquidus_provider_live,
+    configured_freeze_gate_liquidus_path_consumed,
 ):
     owner = [
         row for row in smoke_payload["rows"]
@@ -579,7 +595,7 @@ def test_owner_pn2_anchor_reports_current_certification_state(
         and row["dose_fraction_of_full_FeO_equiv"] == pytest.approx(1.0)
     ][0]
     assertions = {a["name"]: a for a in smoke_payload["assertions"]}
-    if freeze_gate_liquidus_provider_live:
+    if configured_freeze_gate_liquidus_path_consumed:
         expected_owner = CONFIGURED_OWNER_PN2_ANCHORS
         expected_native_fe_pool_mol = expected_owner["native_fe_pool_mol"]
         expected_stage_3_Fe_wt_pct = expected_owner["stage_3_Fe_wt_pct"]
@@ -595,7 +611,7 @@ def test_owner_pn2_anchor_reports_current_certification_state(
         )
     expected_sio_provider_pO2_bar = (
         expected_owner["SiO_provider_pO2_bar"]
-        if freeze_gate_liquidus_provider_live
+        if configured_freeze_gate_liquidus_path_consumed
         else 1.0e-9
     )
 
@@ -826,11 +842,11 @@ def test_map_live_semantics_parity_tolerances_bind(smoke_payload, monkeypatch):
 
 def test_distilled_golden_fixture_matches_current_anchors(
     smoke_payload,
-    freeze_gate_liquidus_provider_live,
+    configured_freeze_gate_liquidus_path_consumed,
 ):
     golden_path = (
         CONFIGURED_GOLDEN_PATH
-        if freeze_gate_liquidus_provider_live
+        if configured_freeze_gate_liquidus_path_consumed
         else CONFIGLESS_GOLDEN_PATH
     )
     golden = json.loads(golden_path.read_text(encoding="utf-8"))
@@ -844,7 +860,7 @@ def test_distilled_golden_fixture_matches_current_anchors(
     assert current["owner_pn2_row"]["classification"] == (
         golden["owner_pn2_row"]["classification"]
     )
-    if freeze_gate_liquidus_provider_live:
+    if configured_freeze_gate_liquidus_path_consumed:
         assert golden["owner_pn2_row"]["native_fe_pool_mol"] == pytest.approx(
             CONFIGURED_OWNER_PN2_ANCHORS["native_fe_pool_mol"],
             rel=0.0,
