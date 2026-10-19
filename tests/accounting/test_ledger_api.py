@@ -6,6 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from simulator.accounting.queries import AccountingQueries
 from simulator.accounting.ledger import AccountPolicy, KNOWN_LEDGER_ACCOUNTS, AtomLedger
 from simulator.accounting.ledger_api import LEDGER_SCHEMA_VERSION, LedgerAPI
 
@@ -63,6 +64,26 @@ def test_account_units_match_ledger_ground_truth_and_are_basis_aware():
     metal_wt = api.account("process.metal_phase_float_layer", units="wt_pct")
     assert metal_wt["basis"] == "elemental"
     assert metal_wt["species"] == {"Al": pytest.approx(100.0)}
+
+
+@pytest.mark.xfail(strict=True, reason="b-895: refractory oxides are omitted")
+def test_terminal_rump_classifies_minor_refractory_oxides():
+    ledger = AtomLedger()
+    refractory_species = ("Y2O3", "Sc2O3", "ZrO2", "HfO2", "ThO2", "UO2")
+    ledger.load_external_mol(
+        "process.cleaned_melt",
+        {species: 1.0 for species in refractory_species},
+        material_origin="feedstock",
+    )
+    queries = AccountingQueries(SimpleNamespace(atom_ledger=ledger))
+
+    projected_kg = ledger.project_account_kg("process.cleaned_melt")
+    classes = queries.terminal_rump_by_class()
+
+    assert classes["refractory_oxides"] == pytest.approx(
+        sum(projected_kg[species] for species in refractory_species)
+    )
+    assert classes["other"] == pytest.approx(0.0)
 
 
 def test_signed_accounts_omit_wt_pct_instead_of_renormalizing_mass():
