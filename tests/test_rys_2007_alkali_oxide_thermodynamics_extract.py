@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from pathlib import Path
 from collections import Counter
 
@@ -34,7 +35,8 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
 
     table7_first = _point_by_observation_id(document, "rys_2007_table7_liquidus", 0)
     assert table7_first["T_C"] == 1080
-    assert table7_first["composition_mole_fraction"] == {"Na2O": "95.98", "SiO2": "4.01"}
+    assert table7_first["composition_mol"] == {"Na2O": "0.9598", "SiO2": "0.0401"}
+    assert table7_first["composition_mol_basis"] == "printed_mole_fraction"
 
     table9_first = _point_by_observation_id(document, "rys_2007_table9_liquidus", 0)
     assert table9_first["T_C"] == 1089
@@ -146,3 +148,18 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
         for condition in point_conditions.values():
             assert condition.locator is not None, observation.observation_id
             assert condition.state is not None, observation.observation_id
+
+    table7_row = next(
+        row
+        for row in result.observations.values()
+        if "rys_2007_table7_liquidus" in row.observation_id
+        and row.locator is not None
+        and row.locator.table == "7"
+        and row.value.point == Decimal("1353.15")
+    )
+    composition = dict(table7_row.identity.composition.value.components)
+    assert composition == {
+        "Na2O": Decimal("0.9598"),
+        "SiO2": Decimal("0.0401"),
+    }
+    assert sum(composition.values()) == Decimal("0.9999")
