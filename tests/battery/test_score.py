@@ -4942,7 +4942,22 @@ def test_battery_hero_deck_scores_polymerisation_and_delta_iw() -> None:
         fO2_pa="100000",
     )
 
-    result = score_mod._battery_hero_deck_records([row])
+    stored = F.observation(
+        "measured-row",
+        "deck-test-experiment",
+        Identity(
+            quantity=Quantity.P_PARTIAL,
+            species=Species("Fe", Phase.G),
+            temperature_K=State.of(Decimal("1200")),
+            fO2_Pa=State.of(Decimal("100000")),
+        ),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="deck-test",
+    )
+    result = score_mod._battery_hero_deck_records(
+        [row], observations={stored.observation_id: stored}
+    )
     polymerisation = next(
         point for point in result["points"]
         if point["chart"] == "polymerisation"
@@ -4986,6 +5001,35 @@ def test_battery_hero_deck_scores_pO2_decade_and_measured_redox() -> None:
         candidate_value="1.5",
         fO2_pa="100000",
     )
+    sio_observations = {
+        "sio-pO2-reference": F.observation(
+            "sio-pO2-reference",
+            "deck-sio-experiment",
+            Identity(
+                quantity=Quantity.P_PARTIAL,
+                species=Species("SiO", Phase.G),
+                temperature_K=State.of(Decimal("1200")),
+                fO2_Pa=State.of(Decimal("1000")),
+            ),
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="deck-test",
+        ),
+        "sio-redox-high-fo2": F.observation(
+            "sio-redox-high-fo2",
+            "deck-sio-experiment",
+            Identity(
+                quantity=Quantity.P_PARTIAL,
+                species=Species("SiO", Phase.G),
+                temperature_K=State.of(Decimal("1200")),
+                fO2_Pa=State.of(Decimal("100000")),
+            ),
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="deck-test",
+        ),
+    }
+    pO2_row["reference"] = "sio-pO2-reference"
     sio_redox_row["reference"] = "sio-redox-high-fo2"
     dex = compute_metric(
         MetricOperation.DEX, Decimal("2.5"), Decimal("1.25")
@@ -5002,7 +5046,8 @@ def test_battery_hero_deck_scores_pO2_decade_and_measured_redox() -> None:
     )
 
     result = score_mod._battery_hero_deck_records(
-        [pO2_row, sio_redox_row, redox_row]
+        [pO2_row, sio_redox_row, redox_row],
+        observations=sio_observations,
     )
     sio = next(
         point for point in result["points"]
@@ -5069,7 +5114,7 @@ def test_battery_hero_deck_uses_store_oxygen_request_for_axis() -> None:
     expected = score_mod._battery_hero_delta_iw(Decimal("1200"), Decimal("10"))
     assert expected is not None
     assert float(point["x_value"]).hex() == float(expected).hex()
-    assert point["fO2_Pa"] == "10"
+    assert Decimal(str(point["fO2_Pa"])) == Decimal("10")
 
 
 def test_battery_hero_residue_requires_typed_mass_loss_at_same_time() -> None:
