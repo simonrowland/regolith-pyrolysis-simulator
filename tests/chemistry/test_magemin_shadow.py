@@ -418,18 +418,6 @@ def _run_provider_after_fork_probe():
     assert 'Exception ignored in thread' not in stderr
 
 
-class _RaisingMAGEMinBackend(_FakeMAGEMinBackend):
-    def __init__(self):
-        super().__init__(
-            equilibrium=_FakeEquilibriumResult(),
-            engine_version='fake-magemin-raising',
-        )
-
-    def equilibrate(self, **kwargs):
-        self.calls.append(kwargs)
-        raise RuntimeError('synthetic MAGEMin adapter failure')
-
-
 class _FakeEquilibriumResult:
     """Duck-typed substitute for ``simulator.melt_backend.base.EquilibriumResult``."""
 
@@ -888,8 +876,17 @@ def test_shadow_backend_initialization_pins_subprocess_bridge():
     ]
 
 
-def test_shadow_backend_exception_surfaces_warning():
-    fake_backend = _RaisingMAGEMinBackend()
+def test_shadow_backend_typed_engine_failure_surfaces_diagnostics():
+    message = 'synthetic MAGEMin adapter failure'
+    failure = _FakeEquilibriumResult(
+        status='not_converged',
+        warnings=(f'MAGEMin equilibrate failed: RuntimeError: {message}',),
+    )
+    failure.diagnostics = {
+        'backend_failure_exception': 'RuntimeError',
+        'backend_failure_message': message,
+    }
+    fake_backend = _FakeMAGEMinBackend(equilibrium=failure)
     shadow = MAGEMinShadowProvider(backend=fake_backend)
 
     result = shadow.dispatch(
@@ -899,18 +896,18 @@ def test_shadow_backend_exception_surfaces_warning():
     assert fake_backend.calls
     assert result.status == 'not_converged'
     assert result.diagnostic['backend_status'] == 'not_converged'
+    assert result.diagnostic['backend_diagnostics'] == {
+        'backend_failure_exception': 'RuntimeError',
+        'backend_failure_message': message,
+    }
     assert result.diagnostic['backend_warnings'] == (
-        'MAGEMin equilibrate raised: synthetic MAGEMin adapter failure',
+        f'MAGEMin equilibrate failed: RuntimeError: {message}',
     )
     assert result.warnings == (
-        'MAGEMin equilibrate raised: synthetic MAGEMin adapter failure',
+        f'MAGEMin equilibrate failed: RuntimeError: {message}',
     )
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason='b-769: provider must propagate its own backend programming errors',
-)
 def test_shadow_backend_keyerror_propagates():
     class _BrokenBackend(_FakeMAGEMinBackend):
         def equilibrate(self, **kwargs):

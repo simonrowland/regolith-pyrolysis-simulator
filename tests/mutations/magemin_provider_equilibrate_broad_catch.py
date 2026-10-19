@@ -1,0 +1,93 @@
+"""Prove the MAGEMin provider regression catches a restored broad handler."""
+
+from __future__ import annotations
+
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+
+ROOT = Path(__file__).resolve().parents[2]
+SOURCE = ROOT / 'engines/magemin/provider.py'
+TEST = ROOT / 'tests/chemistry/test_magemin_shadow.py'
+CALL = '''        return backend.equilibrate(
+            temperature_C=float(request.temperature_C),
+            pressure_bar=float(request.pressure_bar),
+            fO2_log=(
+                float(request.fO2_log)
+                if request.fO2_log is not None
+                else -9.0
+            ),
+            composition_mol_by_account=composition_mol_by_account,
+            species_formula_registry=species_registry,
+        )
+'''
+BROAD = '''        try:
+            return backend.equilibrate(
+                temperature_C=float(request.temperature_C),
+                pressure_bar=float(request.pressure_bar),
+                fO2_log=(
+                    float(request.fO2_log)
+                    if request.fO2_log is not None
+                    else -9.0
+                ),
+                composition_mol_by_account=composition_mol_by_account,
+                species_formula_registry=species_registry,
+            )
+        except Exception as exc:  # noqa: BLE001 - mutation restores old handler
+            from simulator.melt_backend.base import EquilibriumResult
+
+            return EquilibriumResult(
+                status='not_converged',
+                warnings=(f'MAGEMin equilibrate raised: {exc}',),
+            )
+'''
+
+
+def main() -> int:
+    source = SOURCE.read_text()
+    if source.count(CALL) != 1:
+        raise SystemExit('expected one direct MAGEMin equilibrate call')
+
+    try:
+        SOURCE.write_text(source.replace(CALL, BROAD, 1))
+        env = os.environ.copy()
+        env['PYTHONPATH'] = str(ROOT)
+        result = subprocess.run(
+            [
+                sys.executable,
+                '-m',
+                'pytest',
+                '-q',
+                '-n',
+                '0',
+                '-p',
+                'no:cacheprovider',
+                '--basetemp=/private/tmp/claude-501/bugs1019-w2-00-pyt',
+                str(TEST),
+                '-k',
+                'test_shadow_backend_keyerror_propagates',
+            ],
+            cwd=ROOT,
+            env=env,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    finally:
+        SOURCE.write_text(source)
+
+    output = result.stdout + result.stderr
+    if result.returncode == 0:
+        raise SystemExit(
+            'mutation survived; expected the focused regression test to fail'
+        )
+    if 'test_shadow_backend_keyerror_propagates' not in output:
+        raise SystemExit('pytest failed for an unrelated reason')
+    print('PASS: restored broad catch makes the focused regression test red')
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

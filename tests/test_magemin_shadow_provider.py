@@ -391,10 +391,6 @@ def test_liquidus_finder_forwards_normalized_redox_state():
     )
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason='b-769: provider must propagate its own liquidus programming errors',
-)
 def test_liquidus_finder_keyerror_propagates():
     request = IntentRequest(
         intent=ChemistryIntent.SILICATE_LIQUIDUS,
