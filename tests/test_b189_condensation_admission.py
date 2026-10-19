@@ -548,12 +548,12 @@ def test_legacy_antoine_rows_still_consult_applicability(payload) -> None:
     assert measured == REORDERED_ROWS
 
 
-def test_stage0_only_refusal_is_phase_dependent(payload) -> None:
+def test_phosphate_source_pressure_does_not_authorize_condensation(payload) -> None:
     catalog = compiled_catalog_for(payload, emit_u0_request_rules=False)
     for species_id in P_CARRIERS:
         assert _condensation_admission_refusal(
             species_id, vapor_pressure_data=payload
-        ) == REFUSAL_INAPPLICABLE_PREDICATE
+        ) == CONDENSATION_ADMISSION_REFUSAL_NO_DATA
 
         assert catalog.evaluator_for_hot_train(
             species_id,

@@ -1038,7 +1038,7 @@ def test_phosphorus_hot_train_scope_survives_compatibility_projection(
 ):
     oxide_vapors = vapor_pressure_data["oxide_vapors"]
     for carrier in ("PO", "PO2", "P2", "P4", "P4O6", "P4O10"):
-        assert oxide_vapors[carrier]["hot_train_applicability"] == "source_inventory_present"
+        assert oxide_vapors[carrier]["hot_train_applicability"] == "applicable"
 
     # 2026-08-05 b-133 adjudication: the P2O5_gas tombstone is RESTORED
     # (the MC-4 wave-1B reactivation was wrong); the exact-key tombstone
@@ -1065,7 +1065,7 @@ def test_present_phosphate_is_priced_in_c2a(
     sim.start_campaign(CampaignPhase.C2A)
     sim.melt.temperature_C = 1700.0
     sim.melt.melt_fO2_log = -11.0
-    equilibrium = sim._internal_analytical_equilibrium()
+    equilibrium = sim._get_equilibrium()
     assert equilibrium.vapor_pressures_Pa[carrier] > 0.0
     flux = sim._calculate_evaporation(equilibrium)
     assert flux.species_kg_hr[carrier] > 0.0

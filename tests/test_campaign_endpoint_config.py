@@ -65,12 +65,19 @@ def _flux(total_kg_hr: float = 0.0, **species_kg_hr: float) -> EvaporationFlux:
     )
 
 
-def test_c0b_counts_configured_hold_only_at_target_temperature():
+@pytest.mark.parametrize("override_hold_hr", [None, 4])
+def test_c0b_counts_configured_hold_only_at_target_temperature(override_hold_hr):
     setpoints = _setpoints()
     manager = CampaignManager(setpoints)
-    melt = _melt(CampaignPhase.C0B, 10, temperature_C=1040.0)
+    melt = _melt(
+        CampaignPhase.C0B, 10, temperature_C=1040.0,
+        composition_kg={"SiO2": 99.0, "P2O5": 1.0},
+    )
     target_C, _ = manager.get_temp_target(CampaignPhase.C0B, 10, melt)
     hold_hr = int(setpoints["campaigns"]["C0b_p_cleanup"]["max_hold_hr"])
+    if override_hold_hr is not None:
+        manager.overrides[CampaignPhase.C0B.name] = {"max_hours": override_hold_hr}
+        hold_hr = override_hold_hr
     record = BatchRecord(snapshots=[
         HourSnapshot(campaign=CampaignPhase.C0B, temperature_C=1040.0),
     ])
@@ -83,6 +90,9 @@ def test_c0b_counts_configured_hold_only_at_target_temperature():
         record.snapshots.append(HourSnapshot(
             campaign=CampaignPhase.C0B, temperature_C=target_C,
         ))
+    assert manager.last_c0b_termination["status"] == "residual_phosphorus"
+    assert manager.last_c0b_termination["residual_p2o5_kg"] == 1.0
+    assert "P cleanup incomplete" in manager.get_decision(CampaignPhase.C0B, record).context
 
 
 def test_t155_delta_materializes_once_at_phase_entry_and_defaults_stay_equal():

@@ -736,12 +736,12 @@ def test_production_vapor_pressures_has_only_reviewed_active_thermo_carriers() -
         ("CrO", "nasa_cea_9", "applicable"),
         ("CrO2", "nasa_cea_9", "applicable"),
         ("CrO3", "nasa_cea_9", "applicable"),
-        ("PO", "nasa_cea_9", "stage0_only"),
-        ("PO2", "nasa_cea_9", "stage0_only"),
-        ("P4O6", "nasa_cea_9", "stage0_only"),
-        ("P4O10", "nasa_cea_9", "stage0_only"),
-        ("P2", "nasa_cea_9", "stage0_only"),
-        ("P4", "nasa_cea_9", "stage0_only"),
+        ("PO", "nasa_cea_9", "applicable"),
+        ("PO2", "nasa_cea_9", "applicable"),
+        ("P4O6", "nasa_cea_9", "applicable"),
+        ("P4O10", "nasa_cea_9", "applicable"),
+        ("P2", "nasa_cea_9", "applicable"),
+        ("P4", "nasa_cea_9", "applicable"),
         ("K2", "nasa_cea_9", "applicable"),
         ("K2O_gas", "nasa_cea_9", "applicable"),
         ("Mg2", "nasa_cea_9", "applicable"),
@@ -844,7 +844,7 @@ def test_production_phosphorus_carriers_use_cea_reaction_thermo() -> None:
         assert evaluator.pO2_exponent == pytest.approx(pO2_exponent)
         assert evaluator.activity_exponent == pytest.approx(activity_exponent)
         assert species.code_metadata.request_rule == "source_inventory_present"
-        assert species.code_metadata.hot_train_applicability == "source_inventory_present"
+        assert species.code_metadata.hot_train_applicability == "applicable"
         assert species.validation_status.value == "pending_validation"
 
         at_reference = evaluator.evaluate(
