@@ -21,7 +21,7 @@ import threading
 import time
 import types
 import warnings
-from concurrent.futures import Future
+from concurrent.futures import Future, TimeoutError as FutureTimeoutError
 from dataclasses import replace
 from pathlib import Path
 
@@ -821,8 +821,117 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch, request
         MAGEMIN_WARM_CALL_TIMEOUT_S + 0.5
     )
     assert submitted['result_timeout_s'] == pytest.approx(
-        MAGEMIN_WARM_CALL_TIMEOUT_S + 30.0
+        47.4
     )
+    assert backend._call_magemin(
+        projection,
+        1200.0,
+        1.0,
+        -8.0,
+        call_timeout_s=20.0,
+    )
+    assert submitted['result_timeout_s'] == pytest.approx(20.0)
+
+
+@pytest.mark.parametrize(
+    ('completion_s', 'should_timeout'),
+    [
+        pytest.param(45.97, False, id='legal-spawn-startup-solve'),
+        pytest.param(47.45, True, id='one-poll-tick-past-envelope'),
+    ],
+)
+def test_magemin_cold_start_envelope_covers_spawn_startup_and_solve(
+    completion_s,
+    should_timeout,
+):
+    class ScheduledFuture:
+        def __init__(self):
+            self.timeout_s = None
+            self.cancelled = False
+
+        def result(self, timeout=None):
+            self.timeout_s = timeout
+            if completion_s > timeout:
+                raise FutureTimeoutError()
+            return {'phases': {'liq': {'mass_kg': 1.0}}}
+
+        def cancel(self):
+            self.cancelled = True
+            return False
+
+    class ScheduledPool:
+        def __init__(self):
+            self.future = ScheduledFuture()
+            self.abort_detail = None
+
+        def submit(self, *_args, **_kwargs):
+            return self.future
+
+        def _abort_request(self, _future, *, diagnostic_detail=None):
+            self.abort_detail = diagnostic_detail
+            return False
+
+    pool = ScheduledPool()
+    backend = _make_pooled_subprocess_backend(None)
+    backend._subprocess_pool = pool
+    backend._config = {
+        'warm_call_timeout_s': 15.0,
+        'worker_startup_timeout_s': 30.0,
+    }
+    projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
+
+    if should_timeout:
+        with pytest.raises(EngineWorkerTimeout) as caught:
+            backend._call_magemin(
+                projection,
+                temperature_C=1200.0,
+                pressure_bar=1.0,
+                fO2_log=-8.0,
+            )
+        assert caught.value.timeout_s == pytest.approx(47.4)
+        assert pool.future.cancelled
+        assert pool.abort_detail is not None
+    else:
+        assert backend._call_magemin(
+            projection,
+            temperature_C=1200.0,
+            pressure_bar=1.0,
+            fO2_log=-8.0,
+        ) == {'phases': {'liq': {'mass_kg': 1.0}}}
+        assert completion_s == pytest.approx(0.99 + 29.99 + 14.99)
+
+    assert pool.future.timeout_s == pytest.approx(47.4)
+
+
+@pytest.mark.parametrize(
+    'startup_timeout_s',
+    [
+        pytest.param(0.0, id='zero'),
+        pytest.param(-0.01, id='negative'),
+        pytest.param(float('nan'), id='nan'),
+        pytest.param(float('inf'), id='infinity'),
+    ],
+)
+def test_magemin_initialize_rejects_invalid_worker_startup_timeout(
+    monkeypatch,
+    startup_timeout_s,
+):
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        '_locate_binary',
+        staticmethod(lambda _explicit: Path('/fake/MAGEMin')),
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        '_import_magemin_bridge',
+        lambda self, *, requested: ('subprocess', None),
+    )
+    backend = MAGEMinBackend()
+
+    with pytest.raises(ValueError):
+        backend.initialize({
+            'worker_startup_timeout_s': startup_timeout_s,
+        })
 
 
 def test_magemin_equilibrate_surfaces_typed_hang_without_disabling_backend():
