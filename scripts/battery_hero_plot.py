@@ -62,7 +62,6 @@ from matplotlib.patches import Rectangle
 from matplotlib.ticker import FuncFormatter, FormatStrFormatter
 
 from simulator.battery.enums import (  # noqa: E402
-    Authority,
     NoticeKind,
     Rail,
     ResidualStatus,
@@ -110,10 +109,6 @@ TIER_STYLES: dict[str, dict[str, Any]] = {
     TIER_MAJOR: {"color": "#111111", "linewidth": 2.0, "markersize": 3.5},
     TIER_MINOR: {"color": "#777777", "linewidth": 1.2, "markersize": 3.0},
     TIER_TRACE: {"color": "#b9b9b9", "linewidth": 0.5, "markersize": 2.5},
-}
-_OUT_OF_BAND_NOTICE_KINDS = {
-    NoticeKind.OUT_OF_CERTIFIED_BAND.value,
-    NoticeKind.OUT_OF_GAMMA_DOMAIN.value,
 }
 
 
@@ -399,16 +394,6 @@ def _version_text(raw: object) -> str | None:
     return None
 
 
-def _has_out_of_band_flag(row: Mapping[str, Any], observation: Mapping[str, Any]) -> bool:
-    for source in (row.get("notices"), observation.get("notices")):
-        if not isinstance(source, Sequence) or isinstance(source, (str, bytes)):
-            continue
-        for notice in source:
-            if isinstance(notice, Mapping) and notice.get("kind") in _OUT_OF_BAND_NOTICE_KINDS:
-                return True
-    return False
-
-
 def _requested_rails(values: Sequence[str] | None) -> tuple[str, ...]:
     if not values:
         return DEFAULT_RAILS
@@ -625,8 +610,7 @@ def read_scores(
                 experiment TEXT NOT NULL,
                 temperature_key TEXT NOT NULL,
                 temperature_K REAL NOT NULL,
-                authority TEXT NOT NULL,
-                out_of_band INTEGER NOT NULL,
+                flagged INTEGER NOT NULL,
                 residual_dex REAL NOT NULL,
                 composition_key TEXT NOT NULL,
                 composition_label TEXT NOT NULL,
@@ -635,7 +619,7 @@ def read_scores(
         )
 
         pending: list[
-            tuple[str, str, str, str, str, float, str, int, float, str, str, str]
+            tuple[str, str, str, str, str, float, int, float, str, str, str]
         ] = []
         with _open_residual_jsonl(path) as source:
             for line_number, line in enumerate(source, start=1):
@@ -761,8 +745,7 @@ def read_scores(
                 if not experiment:
                     experiment = row.get("reference") or row.get("key") or f"line:{line_number}"
 
-                authority = str(candidate_observation.get("authority") or "unknown")
-                out_of_band = _has_out_of_band_flag(row, candidate_observation)
+                flagged = bool(_flagged_payload_strata(row))
                 source_relation = str(row.get("source_relation") or "unknown")
                 if rail in selected:
                     summary.source_relations[source_relation] += 1
@@ -802,8 +785,7 @@ def read_scores(
                         str(experiment),
                         temperature_key,
                         temperature,
-                        authority,
-                        int(out_of_band),
+                        int(flagged),
                         residual,
                         composition_key,
                         composition_label,
@@ -812,14 +794,14 @@ def read_scores(
                 )
                 if len(pending) >= 5000:
                     database.executemany(
-                        "INSERT INTO scored VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        "INSERT INTO scored VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         pending,
                     )
                     pending.clear()
 
         if pending:
             database.executemany(
-                "INSERT INTO scored VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO scored VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 pending,
             )
         database.commit()
@@ -835,14 +817,13 @@ def read_scores(
         for row in database.execute(
             """SELECT engine, species, rail, composition_key, composition_label,
                       observable, MIN(temperature_K),
-                      MAX(CASE WHEN authority != ? OR out_of_band = 1 THEN 1 ELSE 0 END),
+                      MAX(flagged),
                       AVG(residual_dex)
                  FROM scored
                 GROUP BY engine, species, rail, composition_key, composition_label,
                          observable, experiment, temperature_key
                 ORDER BY engine, species, rail, composition_key, observable,
                          MIN(temperature_K)""",
-            (Authority.CERTIFIED.value,),
         ):
             (
                 engine,

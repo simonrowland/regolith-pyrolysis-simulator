@@ -83,6 +83,21 @@ def _record(
 
 
 def _score_file(path: Path) -> None:
+    flagged_activity = _record(
+        engine="openimcc",
+        experiment="ea6",
+        formula="SiO2",
+        temperature_K=1200,
+        residual=0.2,
+        rail="melt_activity",
+        authority="extrapolated",
+    )
+    flagged_activity["notices"] = [
+        {
+            "kind": NoticeKind.OUT_OF_CERTIFIED_BAND.value,
+            "reason": "extrapolated beyond certified band",
+        }
+    ]
     rows: list[dict[str, object]] = [
         {"kind": "battery_store_stamp", "revision": "test-store"},
         _record(engine="openimcc", experiment="e1", formula="SiO2", temperature_K=1001, residual=0.1),
@@ -100,15 +115,7 @@ def _score_file(path: Path) -> None:
         _record(engine="openimcc", experiment="ea6", formula="SiO2", temperature_K=1200, residual=0.6, rail="melt_activity"),
         _record(engine="openimcc", experiment="ea7", formula="SiO2", temperature_K=1220, residual=0.8, rail="melt_activity"),
         _record(engine="openimcc", experiment="ea8", formula="SiO2", temperature_K=1240, residual=1.0, rail="melt_activity"),
-        _record(
-            engine="openimcc",
-            experiment="ea6",
-            formula="SiO2",
-            temperature_K=1200,
-            residual=0.2,
-            rail="melt_activity",
-            authority="extrapolated",
-        ),
+        flagged_activity,
         _record(engine="openimcc", experiment="ea9", formula="SiO2", temperature_K=1260, residual=1.2, rail="melt_activity"),
         _record(
             engine="openimcc",
@@ -308,16 +315,22 @@ def test_clipped_flagged_points_keep_a_hollow_marker(tmp_path: Path, view: str) 
             ("extrapolated", -4.5),
         )
     ):
-        rows.append(
-            _record(
-                engine="openimcc",
-                experiment=f"clipped-{index}",
-                formula="SiO2",
-                temperature_K=1000 + index * 100,
-                residual=residual,
-                authority=authority,
-            )
+        row = _record(
+            engine="openimcc",
+            experiment=f"clipped-{index}",
+            formula="SiO2",
+            temperature_K=1000 + index * 100,
+            residual=residual,
+            authority=authority,
         )
+        if authority == "extrapolated":
+            row["notices"] = [
+                {
+                    "kind": NoticeKind.OUT_OF_CERTIFIED_BAND.value,
+                    "reason": "extrapolated beyond certified band",
+                }
+            ]
+        rows.append(row)
     residuals.write_text(
         "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
     )
@@ -338,6 +351,71 @@ def test_clipped_flagged_points_keep_a_hollow_marker(tmp_path: Path, view: str) 
         assert len(clipped_arrows) == (4 if view == "species" else 8)
         assert len(flagged_markers) == (2 if view == "species" else 4)
         assert all(len(marker.get_facecolors()) == 0 for marker in flagged_markers)
+    finally:
+        plt.close(figure)
+
+
+def test_hero_hollow_encoding_uses_only_scorer_flags(tmp_path: Path) -> None:
+    residuals = tmp_path / "flag-sources.jsonl"
+    ordinary = _record(
+        engine="openimcc",
+        experiment="authority-only",
+        formula="SiO",
+        temperature_K=1200,
+        residual=0.2,
+        authority="extrapolated",
+    )
+    flagged = _record(
+        engine="openimcc",
+        experiment="scorer-flag",
+        formula="CaO",
+        temperature_K=1200,
+        residual=0.3,
+    )
+    flagged["notices"] = [
+        {
+            "kind": NoticeKind.UNVERIFIED_APPARATUS.value,
+            "reason": "apparatus_unverified:test",
+        }
+    ]
+    rows = [
+        {"kind": "battery_store_stamp", "revision": "flag-sources"},
+        ordinary,
+        flagged,
+    ]
+    residuals.write_text(
+        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
+    )
+    data = read_scores(residuals, rails=HERO_RAILS)
+
+    ordinary_point = data.hero_series[("vapour", "SiO", "openimcc", "unknown")][0]
+    flagged_point = data.hero_series[("vapour", "CaO", "openimcc", "unknown")][0]
+    assert not ordinary_point.flagged
+    assert flagged_point.flagged
+
+    figure, axis = plt.subplots()
+    try:
+        _draw_hero_current(
+            axis,
+            data,
+            "vapour",
+            "SiO",
+            engine_colors={"openimcc": "#123456"},
+        )
+        ordinary_artist = axis.collections[0]
+        assert ordinary_artist.get_gid().endswith(":ordinary")
+        assert ordinary_artist.get_facecolors()[0] == pytest.approx(to_rgba("#123456"))
+        _draw_hero_current(
+            axis,
+            data,
+            "vapour",
+            "CaO",
+            engine_colors={"openimcc": "#123456"},
+        )
+        flagged_artist = axis.collections[1]
+        assert flagged_artist.get_gid().endswith(":flagged")
+        assert flagged_artist.get_facecolors()[0] == pytest.approx(to_rgba("#ffffff"))
+        assert flagged_artist.get_edgecolors()[0] == pytest.approx(to_rgba("#123456"))
     finally:
         plt.close(figure)
 
