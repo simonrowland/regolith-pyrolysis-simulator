@@ -21348,6 +21348,10 @@ species:
         line_range: '1112-1118'
         note: >-
           Table 4 γ_i (this work) for LiO0.5; authors set α_e=1 and compute γ from K*/K
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 1673.15}
+          locator: {page: 57, pdf_page_index: 56, table: '4'}
       T_range_K:
       - 1673.15
       - 1673.15
@@ -21981,6 +21985,10 @@ species:
         line_range: '1112-1118'
         note: >-
           Table 4 γ_i (this work) for AgO0.5; authors set α_e=1 and compute γ from K*/K
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 1673.15}
+          locator: {page: 57, pdf_page_index: 56, table: '4'}
       T_range_K:
       - 1673.15
       - 1673.15
@@ -22610,6 +22618,10 @@ species:
         line_range: '1112-1118'
         note: >-
           Table 4 γ_i (this work) for CdO; authors set α_e=1 and compute γ from K*/K
+      point_conditions:
+        temperature_K:
+          state: {tag: value, value: 1673.15}
+          locator: {page: 57, pdf_page_index: 56, table: '4'}
       T_range_K:
       - 1673.15
       - 1673.15
@@ -23189,7 +23201,7 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
-- species: Li
+- species: LiO0.5
   observable: activity_coefficient
   observation_id: sossi_2019_li_table4_gamma_this_work
   field: gamma
@@ -23216,7 +23228,7 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
-- species: Rb
+- species: RbO0.5
   observable: activity_coefficient
   observation_id: sossi_2019_rb_table4_gamma_this_work
   field: gamma
@@ -23243,7 +23255,7 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
-- species: Cu
+- species: CuO0.5
   observable: activity_coefficient
   observation_id: sossi_2019_cu_table4_gamma_this_work
   field: gamma
@@ -23270,7 +23282,7 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
-- species: Ag
+- species: AgO0.5
   observable: activity_coefficient
   observation_id: sossi_2019_ag_table4_gamma_this_work
   field: gamma
@@ -23288,7 +23300,7 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
-- species: Zn
+- species: ZnO
   observable: activity_coefficient
   observation_id: sossi_2019_zn_table4_gamma_this_work
   field: gamma
@@ -23315,7 +23327,7 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
-- species: Ge
+- species: GeO2
   observable: activity_coefficient
   observation_id: sossi_2019_ge_table4_gamma_this_work
   field: gamma
@@ -23342,7 +23354,7 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
-- species: Cd
+- species: CdO
   observable: activity_coefficient
   observation_id: sossi_2019_cd_table4_gamma_this_work
   field: gamma
@@ -23396,7 +23408,7 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
     table: '3'
     line_range: '1108-1112'
-- species: Pb
+- species: PbO
   observable: activity_coefficient
   observation_id: sossi_2019_pb_table4_gamma_this_work
   field: gamma
