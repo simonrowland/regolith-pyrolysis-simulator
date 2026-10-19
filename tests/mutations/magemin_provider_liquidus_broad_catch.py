@@ -7,10 +7,13 @@ from pathlib import Path
 import subprocess
 import sys
 
+from _pytest_assertion_outcome import pytest_assertion_failed
+
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / 'engines/magemin/provider.py'
 TEST = ROOT / 'tests/test_magemin_shadow_provider.py'
+TEST_NODE = f'{TEST.relative_to(ROOT)}::test_liquidus_finder_keyerror_propagates'
 CALL = '''        return finder(
             pressure_bar=float(request.pressure_bar),
             fO2_log=(float(fO2_log) if fO2_log is not None else -9.0),
@@ -57,8 +60,7 @@ def main() -> int:
                 '-p',
                 'no:cacheprovider',
                 '--basetemp=/private/tmp/claude-501/bugs1019-w2-00-pyt',
-                str(TEST),
-                '::test_liquidus_finder_keyerror_propagates',
+                TEST_NODE,
             ],
             cwd=ROOT,
             env=env,
@@ -70,12 +72,15 @@ def main() -> int:
         SOURCE.write_text(source)
 
     output = result.stdout + result.stderr
-    if result.returncode == 0:
+    if not pytest_assertion_failed(
+        returncode=result.returncode,
+        output=output,
+        node_id=TEST_NODE,
+        expected_reason="DID NOT RAISE <class 'KeyError'>",
+    ):
         raise SystemExit(
-            'mutation survived; expected the focused regression test to fail'
+            'mutation was not killed by the focused assertion failure'
         )
-    if 'test_liquidus_finder_keyerror_propagates' not in output:
-        raise SystemExit('pytest failed for an unrelated reason')
     print('PASS: restored broad catch makes the focused regression test red')
     return 0
 
