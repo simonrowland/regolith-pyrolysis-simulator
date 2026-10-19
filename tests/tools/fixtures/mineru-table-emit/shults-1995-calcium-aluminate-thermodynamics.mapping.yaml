@@ -1,0 +1,13 @@
+# The extract admits no numeric Table 2 cells. MinerU flattened the apparent
+# H/S/G rows into header cells (body_rows=0), so emit cannot select the values.
+source_id: shults-1995-calcium-aluminate-thermodynamics
+source:
+  citation: >-
+    Shul'ts and Shornikov (1995), Mass Spectrometric Study of the
+    Thermodynamic Properties of Calcium Aluminate Melts, Doklady Physical Chemistry 340.
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-18'
+  worker: emitbt-1018
+review_status: draft
+tables: []

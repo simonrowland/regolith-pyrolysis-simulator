@@ -1,0 +1,96 @@
+# Table 2's elemental abundances and the 14163 K/Na time series are mappable;
+# the column-specific sample and heating histories cannot be attached as point
+# conditions. Ratio rows are omitted because the mapping cannot encode their
+# numerator/denominator identity.
+source_id: kems-024-gibson-hubbard-1972
+source:
+  citation: >-
+    Gibson and Hubbard (1972), Thermal volatilization studies on lunar samples,
+    Proceedings of the Third Lunar Science Conference, Supplement 3, Volume 2.
+extraction:
+  method: mineru_table_draft emit
+  date: '2026-10-18'
+  worker: emitbt-1018
+review_status: draft
+tables:
+  - page: 3
+    table_index: 2
+    type: rate_series
+    quantity: elemental_abundance
+    evidence_class: measured_direct
+    unit: ppm
+    published_page: 2005
+    rows: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    value_pairs:
+      - species_column: 1
+        value_column: 2
+      - species_column: 1
+        value_column: 3
+      - species_column: 1
+        value_column: 4
+      - species_column: 1
+        value_column: 5
+      - species_column: 1
+        value_column: 6
+      - species_column: 1
+        value_column: 7
+      - species_column: 1
+        value_column: 8
+      - species_column: 1
+        value_column: 9
+      - species_column: 1
+        value_column: 10
+      - species_column: 1
+        value_column: 11
+        evidence_class: quoted_attributed
+  - page: 3
+    table_index: 2
+    type: rate_series
+    quantity: residue_composition_vs_time
+    evidence_class: measured_direct
+    unit: ppm
+    published_page: 2005
+    rows: [3]
+    value_pairs:
+      - species_column: 1
+        value_column: 12
+      - species_column: 1
+        value_column: 13
+      - species_column: 1
+        value_column: 14
+      - species_column: 1
+        value_column: 15
+  - page: 3
+    table_index: 2
+    type: rate_series
+    quantity: elemental_abundance
+    evidence_class: measured_direct
+    unit: ppm
+    published_page: 2005
+    rows: [4, 6]
+    value_pairs:
+      - species_column: 1
+        value_column: 12
+      - species_column: 1
+        value_column: 13
+      - species_column: 1
+        value_column: 14
+      - species_column: 1
+        value_column: 15
+  - page: 3
+    table_index: 2
+    type: rate_series
+    quantity: residue_composition_vs_time
+    evidence_class: measured_direct
+    unit: ppm
+    published_page: 2005
+    rows: [5]
+    value_pairs:
+      - species_column: 1
+        value_column: 12
+      - species_column: 1
+        value_column: 13
+      - species_column: 1
+        value_column: 14
+      - species_column: 1
+        value_column: 15
