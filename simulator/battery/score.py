@@ -9793,6 +9793,22 @@ def _engine_from_payload(row: Mapping[str, object]) -> str:
 def _residual_engine_observable(row: Mapping[str, object]) -> bool:
     """Whether a refused row is an observable that this engine can report."""
 
+    execution = row.get("execution")
+    if isinstance(execution, Mapping):
+        if execution.get("call_evidence"):
+            return True
+        execution_state = str(execution.get("state") or "")
+        if execution_state in {
+            ExecutionState.NOT_PROBED.value,
+            ExecutionState.UNSUPPORTED.value,
+        }:
+            return False
+        if execution_state in {
+            ExecutionState.PRODUCED.value,
+            ExecutionState.ATTEMPTED_UNAVAILABLE.value,
+        }:
+            return True
+
     rail = str(row.get("rail") or "")
     engine = _engine_from_payload(row)
     if rail == Rail.VAPOUR.value and engine == Engine.MAGEMIN.value:

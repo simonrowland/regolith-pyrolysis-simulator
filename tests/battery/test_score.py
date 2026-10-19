@@ -4832,6 +4832,34 @@ def test_residual_engine_observability_uses_scorer_domain_decisions() -> None:
             "refusal": {"reason": RefusalReason.UNSUPPORTED.value},
         }
     )
+    # Line 3,981,466 in the pinned battery archive: this is one of the 92
+    # MAGEMin vapour refusals after equilibrate_cell ran.
+    attempted_magemin_vapour = {
+        "rail": Rail.VAPOUR.value,
+        "candidate_request": {
+            "engine": Engine.MAGEMIN.value,
+            "channel": Engine.MAGEMIN.value,
+            "quantity": Quantity.P_SAT.value,
+        },
+        "execution": {
+            "state": "unsupported",
+            "call_evidence": "equilibrate_cell:magemin:host=Mac-Studio-256-2:exit=None",
+        },
+        "refusal": {
+            "reason": RefusalReason.UNSUPPORTED.value,
+            "detail": {
+                "engine_reason": "forbidden_species",
+                "refusal_reason": "out_of_basis",
+            },
+        },
+    }
+    assert _residual_engine_observable(attempted_magemin_vapour)
+    assert not _residual_engine_observable(
+        {
+            **attempted_magemin_vapour,
+            "execution": {"state": "not_probed"},
+        }
+    )
 
 
 def test_battery_hero_sweet_spot_scores_shared_mole_fraction_bins() -> None:
