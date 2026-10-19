@@ -21,7 +21,7 @@ extraction:
     and both values are retained with their own locators. Estimated activities
     in Tables 2-4 are retained as model-derived context. Figures 1-8 are
     recorded without numeric points, as deferred figure records.
-    Prose-derived model quantities are explicitly parked rather than scored: L_MgO(CaO) ≈ 47,900 J/mol at 1873 K and ≈ 49,500 J/mol at 1773 K; L_CaO(MgO) ≈ 77,800 J/mol; f_AlO1.5 = 0.0402; ΔG6 = −20,790 − 15.7T [9].
+    Prose-derived model quantities are explicitly parked rather than scored: L_MgO(CaO) ≈ 47,900 J/mol at 1873 K and ≈ 49,500 J/mol at 1773 K; L_CaO(MgO) ≈ 77,800 J/mol; a_Al2O3 = 0.0402 and a_AlO1.5 ≈ 0.201 at 1873 K; f_AlO1.5 ≈ 86 at 1873 K and ≈ 188 at 1773 K; ΔG6 = −20,790 − 15.7T [9].
   date: '2026-10-18'
   worker: fam2-1018
   provenance_path: text/gran-sichen-2012-molten12-ladle-slag-liquidus/pdftotext-layout.txt
@@ -588,6 +588,32 @@ species:
         standard_state: 'pure solid oxides at 1873 K'
         units: dimensionless
         values: {quantity: activity, method_class: model_derived, values_as_printed: {CaO: '0.956', Al2O3_alternative_estimates: [{value_as_printed: '0.00011(2)', data_source_as_printed: '[9]'}, {value_as_printed: '0.00021(3)', data_source_as_printed: '[10]'}], MgO: '0.992'}}
+      - type: activity_estimate
+        observation_id: gran_2012_prose_a_Al2O3_1873
+        locator: {page: 9, published_page: 9, pdf_page_index: 8}
+        units: dimensionless
+        temperature_K: 1873
+        standard_state: 'pure solid Al2O3 at 1873 K'
+        values: {quantity: activity, quantity_as_published: a_Al2O3, method_class: model_derived, admission_status: parked, value_as_printed: '0.0402'}
+      - type: activity_estimate
+        observation_id: gran_2012_prose_a_AlO1_5_1873
+        locator: {page: 9, published_page: 9, pdf_page_index: 8}
+        units: dimensionless
+        temperature_K: 1873
+        standard_state: 'AlO1.5 activity related to Al2O3 activity at 1873 K'
+        values: {quantity: activity, quantity_as_published: a_AlO1.5, method_class: model_derived, admission_status: parked, value_as_printed: '0.201', approximate: true}
+      - type: activity_estimate
+        observation_id: gran_2012_prose_f_AlO1_5_1873
+        locator: {page: 9, published_page: 9, pdf_page_index: 8}
+        units: dimensionless
+        temperature_K: 1873
+        values: {quantity: activity_coefficient, quantity_as_published: f_AlO1.5, method_class: model_derived, admission_status: parked, value_as_printed: '86', approximate: true}
+      - type: activity_estimate
+        observation_id: gran_2012_prose_f_AlO1_5_1773
+        locator: {page: 9, published_page: 9, pdf_page_index: 8}
+        units: dimensionless
+        temperature_K: 1773
+        values: {quantity: activity_coefficient, quantity_as_published: f_AlO1.5, method_class: model_derived, admission_status: parked, value_as_printed: '188', approximate: true}
       - type: figure_record
         observation_id: gran_2012_fig1_figure_only
         locator: {pdf_page_index: 2, figure: '1'}

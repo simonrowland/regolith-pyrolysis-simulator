@@ -94,7 +94,7 @@ def test_phase_rows_use_the_ruled_species_containers_and_figures_stay_deferred()
     ]
     activities = [context for context in contexts if context.get("type") == "activity_estimate"]
     figures = [context for context in contexts if context.get("type") == "figure_record"]
-    assert len(activities) == 56
+    assert len(activities) == 60
     assert all(context["values"]["method_class"] == "model_derived" for context in activities)
     assert len(figures) == 8
     assert all(context["units"] == "as printed" for context in figures)
@@ -162,6 +162,34 @@ def test_model_derived_prose_values_are_explicitly_parked() -> None:
     )
     assert method_context["units"] == "as printed"
     assert "About 0.5 g oxide charges" in method_context["values"]["statement_as_printed"]
+
+    prose_activities = {
+        context["observation_id"]: context
+        for context in document["species"]["SiO2"]["context"]
+        if context.get("observation_id", "").startswith("gran_2012_prose_")
+    }
+    expected = {
+        "gran_2012_prose_a_Al2O3_1873": ("a_Al2O3", 1873, "0.0402", False),
+        "gran_2012_prose_a_AlO1_5_1873": ("a_AlO1.5", 1873, "0.201", True),
+        "gran_2012_prose_f_AlO1_5_1873": ("f_AlO1.5", 1873, "86", True),
+        "gran_2012_prose_f_AlO1_5_1773": ("f_AlO1.5", 1773, "188", True),
+    }
+    assert set(prose_activities) == set(expected)
+    for observation_id, (quantity, temperature, value, approximate) in expected.items():
+        context = prose_activities[observation_id]
+        assert context["type"] == "activity_estimate"
+        assert context["units"] == "dimensionless"
+        assert context["temperature_K"] == temperature
+        assert context["locator"] == {
+            "page": 9,
+            "published_page": 9,
+            "pdf_page_index": 8,
+        }
+        assert context["values"]["method_class"] == "model_derived"
+        assert context["values"]["admission_status"] == "parked"
+        assert context["values"]["quantity_as_published"] == quantity
+        assert context["values"]["value_as_printed"] == value
+        assert context["values"].get("approximate", False) is approximate
 
 
 def test_isolated_migration_has_no_hard_issues_and_preserves_every_temperature() -> None:
