@@ -5071,6 +5071,12 @@ def test_lookup_misses_feasible_legacy_row_without_extraction_binding(
     assert math.isfinite(bound.observed)
     assert not bound.feasible
 
+    stored = store.lookup(spec)
+    assert stored is not None
+    assert (
+        stored.feasibility_margins["extraction_completeness"].observed
+        == scored.feasibility_margins["extraction_completeness"].observed
+    )
     replayed = study._lookup_cached(
         Candidate("legacy-completeness-probe", patch),
         profile,
@@ -5080,12 +5086,7 @@ def test_lookup_misses_feasible_legacy_row_without_extraction_binding(
         store,
         constraints,
     )
-    assert replayed is not None
-    assert replayed.feasible is True
-    assert (
-        replayed.feasibility_margins["extraction_completeness"].observed
-        == 0.03668332604274586
-    )
+    assert replayed is None
 
 
 def test_feasible_analytical_cache_hit_skips_evaluation_and_splits_keys(
