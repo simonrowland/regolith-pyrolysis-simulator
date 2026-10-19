@@ -188,6 +188,7 @@ def test_composition_rejects_unsupported_basis_and_percent_scale(tmp_path: Path)
     }
     report = _run_gate(tmp_path, doc)
     assert "composition" in _checks(report)
+    assert next(item for item in report.findings if item.check == "composition").severity == "HARD"
     detail = next(
         item.detail for item in report.findings if item.check == "composition"
     )
@@ -200,6 +201,7 @@ def test_composition_rejects_unsupported_basis_and_percent_scale(tmp_path: Path)
         "CaO": "50",
     }
     report = _run_gate(tmp_path, doc)
+    assert next(item for item in report.findings if item.check == "composition").severity == "HARD"
     assert "percent-as-fraction" in next(
         item.detail for item in report.findings if item.check == "composition"
     )
@@ -467,6 +469,8 @@ def test_schema_fidelity_and_flow_guard_use_shared_validators(tmp_path: Path):
 
     assert "schema/fidelity" in _checks(report)
     assert "yaml-source" in _checks(report)
+    assert next(item for item in report.findings if item.check == "schema/fidelity").severity == "HARD"
+    assert next(item for item in report.findings if item.check == "yaml-source").severity == "HARD"
 
 
 def test_cli_audits_one_extract_by_source_id(tmp_path: Path, monkeypatch, capsys):
