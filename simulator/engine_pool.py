@@ -681,7 +681,26 @@ class WarmEngineWorker:
                         'call',
                         f'{self.name} worker exited without a result',
                     )
-                connection.send(request)
+                # Passing this locked check admits this request to the send.
+                # Keep transport I/O outside the lock so disable and abort can
+                # still kill the child if send blocks.
+            connection.send(request)
+            with self._state_lock:
+                if abort_event is not None and abort_event.is_set():
+                    raise EngineWorkerTimeout(
+                        self.name,
+                        timeout,
+                        phase='job',
+                    )
+                if (
+                    self.disabled
+                    or self.process is not process
+                    or self.connection is not connection
+                ):
+                    raise EngineWorkerDied(
+                        'call',
+                        f'{self.name} worker exited without a result',
+                    )
             deadline = time.monotonic() + remaining
             while True:
                 with self._state_lock:
