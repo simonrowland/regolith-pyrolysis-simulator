@@ -22,7 +22,7 @@ def test_borisov_2004_tables_and_isolated_migration() -> None:
     ]
     assert len(gamma_rows) == 10
     assert gamma_rows[0]["values"]["gamma"] == 6.63
-    assert gamma_rows[-1]["values"]["TiO2_wt_pct"] == 43.05
+    assert gamma_rows[-1]["point_conditions"]["TiO2_wt_pct"]["state"]["value"] == 43.05
     assert all(row["values"]["method_class"] == "measured_reduced" for row in gamma_rows)
     assert all(row["derivation"]["inputs"] == row["derived_from"] for row in gamma_rows)
     table_3 = by_id["borisov_2004_table_3_reduced_redox_values"]
@@ -43,9 +43,14 @@ def test_borisov_2004_tables_and_isolated_migration() -> None:
     migrator.finalize()
     assert not migrator.result.validation.hard_issues
     migrated = tuple(migrator.result.observations.values())
-    assert len(migrated) == 20
+    assert len(migrated) == 11
     gamma = [row for row in migrated if row.identity.quantity.value.value == "activity_coefficient"]
     assert len(gamma) == 10
     first = next(row for row in gamma if "dat32n_activity_coefficient" in row.observation_id)
     assert str(first.value.point) == "6.63"
+    assert str(first.point_conditions["XTiO2"].state.value) == "0.1508"
+    assert str(first.point_conditions["TiO2_wt_pct"].state.value) == "19.09"
+    assert str(first.point_conditions["temperature_K"].state.value) == "1495"
+    assert first.identity.composition.reason == "no composition mapped from source"
+    assert sum(row.identity.quantity.value.value == "activity" for row in migrated) == 1
     assert not migrator.result.validation.hard_issues
