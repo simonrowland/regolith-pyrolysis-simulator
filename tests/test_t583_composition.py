@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import math
 import re
 from collections import Counter
@@ -102,6 +104,34 @@ def test_typed_refusal_ignores_edits_to_missing_prose() -> None:
         original_refusal.missing_melt_owners
         == edited_refusal.missing_melt_owners
         == ("halide_reservoir_owner_missing",)
+    )
+
+
+def test_coverage_composition_verdicts_match_green_snapshot() -> None:
+    """Pin all existing ledger verdicts from the green production resolver."""
+
+    entries = _payload("vapour_rail_coverage_gaps.yaml")["entries"]
+    records = []
+    refusal_count = 0
+    for row in entries:
+        refusal = typed_refusal(row)
+        if refusal is None:
+            verdict = None
+        else:
+            refusal_count += 1
+            verdict = {
+                "disposition": refusal.disposition,
+                "missing_channels": refusal.missing_channels,
+                "missing_melt_owners": refusal.missing_melt_owners,
+                "pathway": refusal.pathway,
+            }
+        records.append((row["element"], row["carrier"], verdict))
+
+    encoded = json.dumps(records, sort_keys=True, separators=(",", ":")).encode()
+    assert len(entries) == 1592
+    assert refusal_count == 878
+    assert hashlib.sha256(encoded).hexdigest() == (
+        "53b7f0ba141bfd4b840f3a6df25b23a1b4635b352303f48211115bcb43b2439b"
     )
 
 
