@@ -1,0 +1,1021 @@
+schema_version: literature_extract.v1
+source_id: shyrokykh-2021-vanadium-vaporization
+source:
+  citation: Shyrokykh, T., Wei, X., Seetharaman, S., and Volkova, O. (2021). Vaporization of Vanadium
+    Pentoxide from CaO-SiO2-VOx Slags During Alumina Dissolution. Metallurgical and Materials Transactions
+    B 52, 1472–1483.
+  year: 2021
+  doi: 10.1007/s11663-021-02114-9
+  url: https://doi.org/10.1007/s11663-021-02114-9
+  corpus_asset: raw/shyrokykh-2021-vanadium-vaporization/shyrokykh-2021-vanadium-vaporization.pdf
+  sha256: 68171c0ed210ab8d20ac9702236aacf0dd92e42df41278eb6af005d076564799
+extraction:
+  method: Born-digital pdftotext-layout transcription. The table draft tool was attempted but no MinerU
+    content-list JSON exists for this source; Tables I–III were transcribed by hand and every cell checked
+    against 600 dpi physical-page renders. Figures 1–16 are recorded without digitized points.
+  date: '2026-10-19'
+  worker: fam17-1019
+  table_disposition:
+    Table I: CSV1/CSV2 starting compositions are bound to the corresponding text-reported yield bounds
+      by sample ID; CSV3 remains context because its outcomes are figure-only. The legacy migrator currently
+      emits the two bounded yields as unavailable.
+    Table II: Treatment matrix retained in context; it contains conditions but no measured outcome column.
+    Table III: All 25 selected-element EDX atomic-percent cells retained in context because no token fits
+      this partial elemental composition table.
+review_status: draft
+fidelity_samples:
+- path: species.V2O5.observations[shyrokykh_2021_csv1_text_extraction_bound].values.mass_loss_pct
+  value:
+    kind: bound
+    bound_operator: '>'
+    bound_value: '77'
+  note: Textual lower bound, physical PDF page 3; Figure 5 is separately deferred.
+- path: species.V2O5.observations[shyrokykh_2021_csv2_text_extraction_bound].values.mass_loss_pct
+  value:
+    kind: bound
+    bound_operator: '>'
+    bound_value: '45'
+  note: Textual lower bound, physical PDF page 3; the same series appears in Figure 7, which is separately
+    deferred.
+species:
+  V2O5:
+    observations:
+    - observation_id: shyrokykh_2021_csv1_text_extraction_bound
+      type: mass_loss
+      locator: &id003
+        page: 3
+        pdf_page_index: 2
+        published_page: 1474
+        section: IV.A CaO-SiO2-VOx Slag System
+        note: Text reports more than 77 mass pct V2O5 extracted at 60 minutes for CSV1.
+      phase: l
+      method_as_printed: V2O5 extraction fraction reported from the treatment; post-treatment slag chemical
+        composition was analyzed by XRF.
+      units: mass pct V2O5 extracted, as printed
+      composition_locator: &id001
+        page: 3
+        pdf_page_index: 2
+        published_page: 1474
+        table: I
+        row: CSV1
+        note: Reported initial slag composition used for this sample; post-treatment values are not row-specific
+          here.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1476
+            table: II
+            row: table header
+            column: temperature
+        composition:
+          state:
+            tag: unknown
+            reason: This is the initial slag composition; the post-treatment liquid composition changed
+              during alumina dissolution and V2O5 extraction and is not reported per text-bound yield
+              point.
+          locator: *id001
+        initial_composition:
+          state:
+            tag: value
+            value:
+              CaO_wt_pct: '44.61'
+              SiO2_wt_pct: '47.29'
+              V2O5_wt_pct: '8.10'
+          locator: *id001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '85000'
+          locator: &id002
+            page: 5
+            pdf_page_index: 4
+            published_page: 1476
+            table: II
+            row: '1'
+          value_as_printed: 85 kPa
+        atmosphere:
+          state:
+            tag: value
+            value: argon during heating and melting; oxygen top-blowing during treatment
+          locator: *id002
+        oxygen_top_blowing_flow_cm3_min:
+          state:
+            tag: value
+            value: '250'
+          locator: *id002
+        oxygen_partial_pressure:
+          state:
+            tag: unknown
+            reason: The paper prints oxygen flow rate and total chamber pressure, but no oxygen partial
+              pressure; p(O2) is not calculated.
+          locator: *id002
+        holding_time_min:
+          state:
+            tag: value
+            value: '60'
+          locator: *id003
+      quench_statement:
+        text: The experimental procedure reports post-treatment XRF analysis but does not report a quench
+          or cooling procedure.
+        preservation: not_stated
+        quench_direction: not_stated
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1474
+          section: Experimental Procedure
+          note: No quench/cooling procedure is stated in the reported procedure.
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        admission_status: admitted
+        loss_basis_as_printed: fraction of V2O5 extracted from the starting slag; the paper reports the
+          extraction percentage, without numeric XRF inputs in this text passage
+        sample_id: CSV1
+        sample_as_published: CSV1
+        initial_composition_as_printed:
+          CaO_wt_pct: '44.61'
+          SiO2_wt_pct: '47.29'
+          V2O5_wt_pct: '8.10'
+        T_K: '1873'
+        mass_loss_pct:
+          kind: bound
+          bound_operator: '>'
+          bound_value: '77'
+        value_as_printed: more than 77 mass pct V2O5 extracted
+    - observation_id: shyrokykh_2021_csv2_text_extraction_bound
+      type: mass_loss
+      locator: &id006
+        page: 3
+        pdf_page_index: 2
+        published_page: 1474
+        section: IV.A CaO-SiO2-VOx Slag System
+        note: Text reports more than 45 mass pct V2O5 extracted at 60 minutes for CSV2.
+      phase: l
+      method_as_printed: V2O5 extraction fraction reported from the treatment; post-treatment slag chemical
+        composition was analyzed by XRF.
+      units: mass pct V2O5 extracted, as printed
+      composition_locator: &id004
+        page: 3
+        pdf_page_index: 2
+        published_page: 1474
+        table: I
+        row: CSV2
+        note: Reported initial slag composition used for this sample; post-treatment values are not row-specific
+          here.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1873'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1476
+            table: II
+            row: table header
+            column: temperature
+        composition:
+          state:
+            tag: unknown
+            reason: This is the initial slag composition; the post-treatment liquid composition changed
+              during alumina dissolution and V2O5 extraction and is not reported per text-bound yield
+              point.
+          locator: *id004
+        initial_composition:
+          state:
+            tag: value
+            value:
+              CaO_wt_pct: '44.37'
+              SiO2_wt_pct: '49.53'
+              V2O5_wt_pct: '6.09'
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '85000'
+          locator: &id005
+            page: 5
+            pdf_page_index: 4
+            published_page: 1476
+            table: II
+            row: '3'
+          value_as_printed: 850 mbar
+        atmosphere:
+          state:
+            tag: value
+            value: argon during heating and melting; oxygen top-blowing during treatment
+          locator: *id005
+        oxygen_top_blowing_flow_cm3_min:
+          state:
+            tag: value
+            value: '500'
+          locator: *id005
+        oxygen_partial_pressure:
+          state:
+            tag: unknown
+            reason: The paper prints oxygen flow rate and total chamber pressure, but no oxygen partial
+              pressure; p(O2) is not calculated.
+          locator: *id005
+        holding_time_min:
+          state:
+            tag: value
+            value: '60'
+          locator: *id006
+      quench_statement:
+        text: The experimental procedure reports post-treatment XRF analysis but does not report a quench
+          or cooling procedure.
+        preservation: not_stated
+        quench_direction: not_stated
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1474
+          section: Experimental Procedure
+          note: No quench/cooling procedure is stated in the reported procedure.
+      values:
+        quantity: mass_loss_fraction
+        method_class: measured_direct
+        admission_status: admitted
+        loss_basis_as_printed: fraction of V2O5 extracted from the starting slag; the paper reports the
+          extraction percentage, without numeric XRF inputs in this text passage
+        sample_id: CSV2
+        sample_as_published: CSV2
+        initial_composition_as_printed:
+          CaO_wt_pct: '44.37'
+          SiO2_wt_pct: '49.53'
+          V2O5_wt_pct: '6.09'
+        T_K: '1873'
+        mass_loss_pct:
+          kind: bound
+          bound_operator: '>'
+          bound_value: '45'
+        value_as_printed: more than 45 mass pct V2O5 extracted
+    context:
+    - observation_id: shyrokykh_2021_table1_csv3_starting_composition_context
+      type: measured_table_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1474
+        table: I
+        row: CSV3
+      units: wt pct as printed
+      attribution: Shyrokykh et al. (2021), present study
+      values:
+        quantity: unavailable
+        quantity_as_printed: initial chemical composition of prepared CaO-SiO2-V2O5 slag
+        candidate_tokens_considered:
+        - equilibrium_phase_composition
+        - residue_component_composition
+        schema_gap: The printed starting-mixture composition is not an equilibrium phase analysis or residue
+          composition. CSV1 and CSV2 compositions are attached to their typed yield observations by sample
+          ID; CSV3 is figure-only and retained here.
+        method_class: reported_setup
+        admission_status: typed_unavailable
+        rows:
+        - sample_id: CSV3
+          CaO_wt_pct: '44.35'
+          SiO2_wt_pct: '49.52'
+          V2O5_wt_pct: '6.12'
+    - observation_id: shyrokykh_2021_table2_treatment_matrix_context
+      type: experimental_design_context
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1476
+        table: II
+      units: total pressure in kPa; argon during heating/melting; oxygen top-blowing cm3 min−1; temperature
+        1873 K
+      attribution: Shyrokykh et al. (2021), present study
+      values:
+        quantity: unavailable
+        quantity_as_printed: treatment sequences used for experiments
+        candidate_tokens_considered:
+        - total_pressure_Pa
+        - p_partial
+        - mass_loss_fraction
+        - yield_fraction
+        schema_gap: Table II is a treatment matrix without a measured outcome column; its cells are run
+          conditions, attached to the two typed text bounds where applicable.
+        method_class: method_only
+        rows:
+        - table_row: '1'
+          sample_id: CSV1
+          total_pressure_as_printed: 85 kPa
+          total_pressure_kPa: '85'
+          heating_atmosphere: argon
+          oxygen_top_blowing_cm3_min: '250'
+        - table_row: '2'
+          sample_id: CSV2
+          total_pressure_as_printed: 85 kPa
+          total_pressure_kPa: '85'
+          heating_atmosphere: argon
+          oxygen_top_blowing_cm3_min: not marked
+        - table_row: '3'
+          sample_id: CSV2
+          total_pressure_as_printed: 85 kPa
+          total_pressure_kPa: '85'
+          heating_atmosphere: argon
+          oxygen_top_blowing_cm3_min: '500'
+        - table_row: '4'
+          sample_id: CSV2
+          total_pressure_as_printed: 100 kPa
+          total_pressure_kPa: '100'
+          heating_atmosphere: argon
+          oxygen_top_blowing_cm3_min: '500'
+        - table_row: '5'
+          sample_id: CSV3
+          total_pressure_as_printed: 50 kPa
+          total_pressure_kPa: '50'
+          heating_atmosphere: argon
+          oxygen_top_blowing_cm3_min: '250'
+        - table_row: '6'
+          sample_id: CSV3
+          total_pressure_as_printed: 85 kPa
+          total_pressure_kPa: '85'
+          heating_atmosphere: argon
+          oxygen_top_blowing_cm3_min: '500'
+        - table_row: '7'
+          sample_id: CSV3
+          total_pressure_as_printed: 85 kPa
+          total_pressure_kPa: '85'
+          heating_atmosphere: argon
+          oxygen_top_blowing_cm3_min: not marked
+        argon_feed_purity_as_printed: 99,999 pct; typical O2 impurity 2 to 3 ppm
+        note: An unmarked oxygen-flow cell is preserved as not marked, not as zero. No p(O2) is calculated
+          from flow or chamber pressure.
+    - observation_id: shyrokykh_2021_table3_sem_edx_partial_elemental_composition_context
+      type: measured_table_context
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 1478
+        table: III
+      units: atomic pct as printed
+      attribution: Shyrokykh et al. (2021), present study
+      values:
+        quantity: unavailable
+        quantity_as_printed: SEM/EDX analysis of CSV1 sample, three spots and two areas
+        candidate_tokens_considered:
+        - equilibrium_phase_composition
+        - residue_component_composition
+        schema_gap: Table III reports selected element atomic percentages rather than an oxide composition
+          or complete phase composition; omitted elements are not reconstructed.
+        method_class: measured_tabulated
+        rows:
+        - element: O K
+          spot_1_atomic_pct: '51.86'
+          spot_2_atomic_pct: '35.33'
+          spot_3_atomic_pct: '45.30'
+          area_1_atomic_pct: '43.60'
+          area_2_atomic_pct: '45.04'
+        - element: Al K
+          spot_1_atomic_pct: '2.81'
+          spot_2_atomic_pct: '1.16'
+          spot_3_atomic_pct: '0.31'
+          area_1_atomic_pct: '0.51'
+          area_2_atomic_pct: '0.76'
+        - element: Si K
+          spot_1_atomic_pct: '21.54'
+          spot_2_atomic_pct: '15.07'
+          spot_3_atomic_pct: '25.87'
+          area_1_atomic_pct: '23.13'
+          area_2_atomic_pct: '26.52'
+        - element: Ca K
+          spot_1_atomic_pct: '8.80'
+          spot_2_atomic_pct: '17.16'
+          spot_3_atomic_pct: '21.92'
+          area_1_atomic_pct: '21.35'
+          area_2_atomic_pct: '20.17'
+        - element: V K
+          spot_1_atomic_pct: '5.16'
+          spot_2_atomic_pct: '13.19'
+          spot_3_atomic_pct: '0.36'
+          area_1_atomic_pct: '2.14'
+          area_2_atomic_pct: '1.72'
+    - observation_id: shyrokykh_2021_fig4_textual_alumina_bound_context
+      type: measured_text_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1474
+        section: IV.A CaO-SiO2-VOx Slag System
+        note: Text reports a maximum alumina pickup in one experiment.
+      units: mass pct Al2O3 as printed
+      values:
+        quantity: unavailable
+        quantity_as_printed: single-component Al2O3 content in treated slag
+        candidate_tokens_considered:
+        - equilibrium_phase_composition
+        - residue_component_composition
+        schema_gap: No sample ID or complete post-treatment composition is supplied for the 23.3 pct maximum;
+          no row-specific point is inferred.
+        method_class: measured_reduced
+        value_as_printed: maximum 23.3 pct Al2O3 at 60 minutes in one experiment
+        phase: liquid slag during treatment; analyzed post-treatment
+    - observation_id: shyrokykh_2021_textual_relative_extraction_comparisons_context
+      type: measured_text_context
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1475
+        section: Experimental Results
+        note: Comparison of inert-gas and chamber-pressure trials.
+      units: relative V2O5 extraction change as printed
+      values:
+        quantity: unavailable
+        quantity_as_printed: relative extraction change between treatment conditions
+        candidate_tokens_considered:
+        - mass_loss_fraction
+        - yield_fraction
+        schema_gap: The text says extraction decreased by half but gives no absolute value or complete
+          point-to-condition mapping; this relative comparison is not a standalone yield fraction.
+        method_class: measured_reduced
+        rows:
+        - comparison_as_printed: 20 and 60 minute inert-argon treatments had half the V2O5 extraction
+            of the corresponding oxygen-blowing treatments; no absolute value printed.
+        - comparison_as_printed: Raising chamber total pressure to 1 atm halved V2O5 extraction; no absolute
+            value printed.
+    - observation_id: shyrokykh_2021_vo15_activity_composition_fit_context
+      type: model_fit_context
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 1473
+        equation: '2'
+        section: Thermodynamic Considerations
+      units: dimensionless activity as printed
+      attribution: Activity-composition relation derived by Shyrokykh et al. from Dong et al. [19], Figure
+        5.
+      values:
+        quantity: activity
+        method_class: model_derived
+        species: VO1.5
+        phase: slag
+        equation_as_printed: aVO1.5 = 88.3736 X^2 + 0.02513 X + 0.00005
+        composition_variable_as_printed: X is the mole fraction of VO1.5 in the slag
+        reference_state_as_printed: pure solid VO1.5
+        note: The equation is derived from Dong et al. [19] Figure 5 and is not a measured point series
+          from this study.
+    - observation_id: shyrokykh_2021_v2o3_oxidation_reaction_delta_g_context
+      type: calculated_reaction_thermodynamics_context
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 1473
+        equation: '1'
+        section: Thermodynamic Considerations
+      units: kJ as printed
+      values:
+        quantity: unavailable
+        quantity_as_printed: standard Gibbs energy for V2O3 + O2 = V2O5
+        candidate_tokens_considered:
+        - delta_fG
+        schema_gap: This is a reaction Gibbs energy, not standard Gibbs energy of formation from elements
+          represented by delta_fG.
+        method_class: model_derived
+        reaction_as_printed: V2O3 + O2 = V2O5
+        value_as_printed: −77,038 kJ
+        temperature_K_as_printed: '1873'
+        oxide_reference_state_as_printed: pure state
+        oxygen_pressure_as_printed: 101.3 kPa
+        software_as_printed: HSC Chemistry 9.0
+    - observation_id: shyrokykh_2021_quoted_surface_tension_values_without_store_token_context
+      type: quoted_attributed_context
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1479
+        section: Discussion
+        note: Surface-tension comparisons cited in the discussion.
+      units: mN m−1 and pct as printed
+      values:
+        quantity: unavailable
+        quantity_as_printed: surface tension
+        candidate_tokens_considered:
+        - viscosity
+        - density
+        schema_gap: No existing store quantity token represents surface tension.
+        method_class: quoted_attributed
+        rows:
+        - attribution_as_printed: Badger et al. [27]
+          composition_as_printed: 17.4 pct Na2O-10.1 pct CaO-SiO2, rest unspecified
+          V2O5_addition_as_printed: small addition
+          temperature_K_as_printed:
+          - '1473'
+          - '1623'
+          value_as_printed: surface tension decreased by 23 pct
+        - attribution_as_printed: Mills [28]
+          temperature_as_printed: steelmaking temperatures, not numerically specified
+          V2O5_content_as_printed: amounts as in the present study
+          value_as_printed: about 40 mN m−1
+          approximate: true
+    - observation_id: shyrokykh_2021_figure_1_deferred
+      type: figure_record
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 1473
+        figure: '1'
+      panel: whole_figure
+      attribution: O. Kubaschewski and C.B. Alcock [15], as cited in Shyrokykh et al. (2021)
+      units: as printed in axes or caption
+      values:
+        method_class: quoted_attributed
+        quantity: p_sat
+        species:
+        - V2O5
+        phase: l
+        temperature_as_printed: Temperature axis 1200–1900 K
+        axes_as_printed:
+          x: Temperature, K
+          y: Vapor pressure, Pa
+        caption: Vapor pressure of V2O5 in equilibrium with liquid V2O5 as a function of temperature.
+        series:
+        - name: V2O5 over liquid V2O5
+          marker: continuous curve
+          marker_count: 0
+        points: []
+        digitisation: deferred to a figure pass
+        reference_state_as_printed: pure liquid V2O5, as printed
+    - observation_id: shyrokykh_2021_figure_2_deferred
+      type: figure_record
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1475
+        figure: '2'
+      panel:
+      - a
+      - b
+      attribution: Shyrokykh et al. (2021), present study
+      units: as printed in axes or caption
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        species:
+        - V2O5
+        phase: not_applicable
+        temperature_as_printed: not shown
+        axes_as_printed:
+          axes: none
+        caption: 'Experimental setup: (a) redesigned Cold Crucible Induction Melter; (b) inner view of
+          setup.'
+        series:
+        - name: photographic panels a and b
+          marker: photograph
+          marker_count: 0
+        points: []
+        digitisation: deferred to a figure pass
+        schema_gap: Equipment photograph, no measured quantity.
+    - observation_id: shyrokykh_2021_figure_3_deferred
+      type: figure_record
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1475
+        figure: '3'
+      panel: whole_figure
+      attribution: Shyrokykh et al. (2021), present study
+      units: as printed in axes or caption
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        species:
+        - V2O5
+        phase: l
+        temperature_as_printed: not shown
+        axes_as_printed:
+          axes: none
+        caption: Schematic illustration of cross-sectional view of a method for recovering V2O5 from a
+          slag.
+        series:
+        - name: recovery-method schematic
+          marker: schematic
+          marker_count: 0
+        points: []
+        digitisation: deferred to a figure pass
+        schema_gap: Process schematic, no measured quantity.
+    - observation_id: shyrokykh_2021_figure_4_deferred
+      type: figure_record
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1476
+        figure: '4'
+      panel: whole_figure
+      attribution: Shyrokykh et al. (2021), present study
+      units: as printed in axes or caption
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        species:
+        - V2O5
+        phase: l
+        temperature_as_printed: 1873 K
+        axes_as_printed:
+          x: Oxygen treatment time, min
+          y: Al2O3, %
+        caption: 'Evolution of alumina content in the sample with the treatment time (Temperature: 1873
+          K).'
+        series:
+        - name: CSV1
+          marker: square
+          marker_count: 5
+        - name: CSV2
+          marker: circle
+          marker_count: 5
+        - name: CSV3
+          marker: triangle
+          marker_count: 5
+        points: []
+        digitisation: deferred to a figure pass
+        schema_gap: The figure is a single-component Al2O3 wt-percent trend; no existing token fits this
+          partial post-treatment composition series.
+    - observation_id: shyrokykh_2021_figure_5_deferred
+      type: figure_record
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1476
+        figure: '5'
+      panel: whole_figure
+      attribution: Shyrokykh et al. (2021), present study
+      units: as printed in axes or caption
+      values:
+        method_class: figure_only
+        quantity: mass_loss_fraction
+        species:
+        - V2O5
+        phase: l
+        temperature_as_printed: 1873 K
+        axes_as_printed:
+          x: Oxygen treatment time, min
+          y: V2O5 extraction rate, %
+        caption: Vanadium pentoxide extraction rate as a function of oxygen treatment time (O2 flow rate
+          = 250 cm3 min−1, total pressure in a chamber = 850 mbar, T = 1873 K).
+        series:
+        - name: CSV1; Q(O2)=250 cm3 min−1; P(Ar)=850 mbar
+          marker: filled circle
+          marker_count: 5
+        - name: polynomial fit for CSV1
+          marker: dotted line
+          marker_count: 0
+        points: []
+        digitisation: deferred to a figure pass
+    - observation_id: shyrokykh_2021_figure_6_deferred
+      type: figure_record
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 1477
+        figure: '6'
+      panel:
+      - a
+      - b
+      attribution: Shyrokykh et al. (2021), present study
+      units: as printed in axes or caption
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        species:
+        - V2O5
+        phase: l
+        temperature_as_printed: 1873 K treatment; figure caption does not state a temperature
+        axes_as_printed:
+          axes: none
+        caption: CSV1 sample after (a) 5 min of oxygen treatment; (b) after 20 min of oxygen treatment.
+        series:
+        - name: cross-section images before/after treatment, panels a and b
+          marker: photograph
+          marker_count: 0
+        points: []
+        digitisation: deferred to a figure pass
+        schema_gap: Cross-section photographs, no measured quantity.
+    - observation_id: shyrokykh_2021_figure_7_deferred
+      type: figure_record
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 1478
+        figure: '7'
+      panel: whole_figure
+      attribution: Shyrokykh et al. (2021), present study
+      units: as printed in axes or caption
+      values:
+        method_class: figure_only
+        quantity: mass_loss_fraction
+        species:
+        - V2O5
+        phase: l
+        temperature_as_printed: 1873 K
+        axes_as_printed:
+          x: Treatment time, min
+          y: V2O5 extraction rate, %
+        caption: 'Comparison of the results of CSV2 and CSV3 slag systems (Temperature: 1873 K).'
+        series:
+        - name: CSV2; P(Ar)=850 mbar; Q(O2)=500 cm3 min−1
+          marker: open circle
+          marker_count: 5
+        - name: CSV3; P(Ar)=850 mbar; Q(O2)=500 cm3 min−1
+          marker: open triangle
+          marker_count: 5
+        - name: linear fit, CSV2
+          marker: dashed line
+          marker_count: 0
+        - name: linear fit, CSV3
+          marker: dotted line
+          marker_count: 0
+        points: []
+        digitisation: deferred to a figure pass
+    - observation_id: shyrokykh_2021_figure_8_deferred
+      type: figure_record
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 1478
+        figure: '8'
+      panel: whole_figure
+      attribution: Shyrokykh et al. (2021), present study
+      units: as printed in axes or caption
+      values:
+        method_class: figure_only
+        quantity: mass_loss_fraction
+        species:
+        - V2O5
+        phase: l
+        temperature_as_printed: 1873 K
+        axes_as_printed:
+          x: Treatment time, min
+          y: V2O5 extraction rate, %
+        caption: 'Additional experiments with different pressures in CCIM chamber (Temperature: 1873 K)
+          compared with the aggregated trend line for all data points of CSV2 and CSV3 shown in Fig. 7.'
+        series:
+        - name: CSV3; P(Ar)=850 mbar
+          marker: filled square
+          marker_count: 2
+        - name: CSV3; P(Ar)=500 mbar; Q(O2)=500 cm3 min−1
+          marker: open square
+          marker_count: 1
+        - name: CSV3; P(Ar)=1000 mbar; Q(O2)=500 cm3 min−1
+          marker: triangle
+          marker_count: 1
+        - name: CSV3; P(Ar)=850 mbar; Q(O2)=500 cm3 min−1
+          marker: open square
+          marker_count: 1
+        - name: aggregate trend line for CSV2 and CSV3
+          marker: dotted line
+          marker_count: 0
+        points: []
+        digitisation: deferred to a figure pass
+    - observation_id: shyrokykh_2021_figure_9_deferred
+      type: figure_record
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 1478
+        figure: '9'
+      panel: whole_figure
+      attribution: Shyrokykh et al. (2021), present study
+      units: as printed in axes or caption
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        species:
+        - V2O5
+        phase: not_applicable
+        temperature_as_printed: not shown
+        axes_as_printed:
+          axes: none
+        caption: Top view on the crucible with additional cover.
+        series:
+        - name: photograph of crucible cover
+          marker: photograph
+          marker_count: 0
+        points: []
+        digitisation: deferred to a figure pass
+        schema_gap: Equipment photograph, no measured quantity.
+    - observation_id: shyrokykh_2021_figure_10_deferred
+      type: figure_record
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 1478
+        figure: '10'
+      panel: whole_figure
+      attribution: Shyrokykh et al. (2021), present study
+      units: as printed in axes or caption
+      values:
+        method_class: figure_only
+        quantity: mass_loss_fraction
+        species:
+        - V2O5
+        phase: l
+        temperature_as_printed: 1873 K
+        axes_as_printed:
+          x: Oxygen treatment time, min
+          y: V2O5 extraction rate, %
+        caption: Experiments with additional cover on top of the crucible (O2 flow rate = 250 cm3/min,
+          total pressure in a chamber = 850 mbar, T = 1873 K).
+        series:
+        - name: additional cover; Q(O2)=250 cm3/min; P=850 mbar
+          marker: open circle
+          marker_count: 2
+        - name: linear fit
+          marker: dotted line
+          marker_count: 0
+        points: []
+        digitisation: deferred to a figure pass
+    - observation_id: shyrokykh_2021_figure_11_deferred
+      type: figure_record
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1479
+        figure: '11'
+      panel: whole_figure
+      attribution: Shyrokykh et al. (2021), FactSage 7.2 model calculation
+      units: as printed in axes or caption
+      values:
+        method_class: model_derived
+        quantity: viscosity
+        species:
+        - V2O5
+        phase: l
+        temperature_as_printed: 1873 K treatment series
+        axes_as_printed:
+          x: Treatment time, min
+          y: Viscosity, Pa s
+        caption: Viscosity of the slag as a function of treatment time and chemical composition of the
+          samples including the dissolved alumina calculated in FactSage 7.2.
+        series:
+        - name: CSV1
+          marker: circle
+          marker_count: 5
+        - name: CSV2
+          marker: square
+          marker_count: 5
+        - name: CSV3
+          marker: triangle
+          marker_count: 5
+        points: []
+        digitisation: deferred to a figure pass
+        model_range_as_printed: 220–420 mPa s in discussion; series assignment not printed.
+        model_range_locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 1476
+          section: Discussion
+          note: Viscosity range is printed in the discussion on physical page 5; no series assignment
+            is given.
+    - observation_id: shyrokykh_2021_figure_12_deferred
+      type: figure_record
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1479
+        figure: '12'
+      panel: whole_figure
+      attribution: Shyrokykh et al. (2021), present study
+      units: as printed in axes or caption
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        species:
+        - V2O5
+        phase: l
+        temperature_as_printed: not shown
+        axes_as_printed:
+          axes: none
+        caption: Thermocapillary effect.
+        series:
+        - name: photograph with thermocapillary-effect annotation
+          marker: photograph
+          marker_count: 0
+        points: []
+        digitisation: deferred to a figure pass
+        schema_gap: Photograph, no typed surface-tension token or numeric data.
+    - observation_id: shyrokykh_2021_figure_13_deferred
+      type: figure_record
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 1479
+        figure: '13'
+      panel: whole_figure
+      attribution: Shyrokykh et al. (2021), model calculations using Mills tables [26]
+      units: as printed in axes or caption
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        species:
+        - V2O5
+        phase: l
+        temperature_as_printed: 1873 K treatment series
+        axes_as_printed:
+          x: Treatment time, min
+          y: Surface tension, mN/m
+        caption: Surface tension of CSV1 slag as a function of time.
+        series:
+        - name: Method 1
+          marker: open circle
+          marker_count: 5
+        - name: Method 1b
+          marker: open triangle
+          marker_count: 5
+        - name: Method 2a
+          marker: open square
+          marker_count: 5
+        - name: Method 2b
+          marker: cross
+          marker_count: 5
+        points: []
+        digitisation: deferred to a figure pass
+        schema_gap: Surface tension has no store quantity token.
+    - observation_id: shyrokykh_2021_figure_14_deferred
+      type: figure_record
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: 1481
+        figure: '14'
+      panel: whole_figure
+      attribution: Shyrokykh et al. (2021), present study
+      units: as printed in axes or caption
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        species:
+        - V2O5
+        phase: l
+        temperature_as_printed: not shown
+        axes_as_printed:
+          axes: none
+        caption: Schematic convection illustration for the inside liquid.
+        series:
+        - name: convection schematic
+          marker: schematic arrows
+          marker_count: 0
+        points: []
+        digitisation: deferred to a figure pass
+        schema_gap: Process schematic, no measured quantity.
+    - observation_id: shyrokykh_2021_figure_15_deferred
+      type: figure_record
+      locator:
+        page: 10
+        pdf_page_index: 9
+        published_page: 1481
+        figure: '15'
+      panel: whole_figure
+      attribution: Shyrokykh et al. (2021), present study
+      units: as printed in axes or caption
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        species:
+        - V2O5
+        phase: l
+        temperature_as_printed: not shown
+        axes_as_printed:
+          axes: none
+        caption: Schematic illustration of liquid slag surface system surface of liquid slag system.
+        series:
+        - name: liquid surface schematic
+          marker: schematic arrows
+          marker_count: 0
+        points: []
+        digitisation: deferred to a figure pass
+        schema_gap: Process schematic, no measured quantity.
+    - observation_id: shyrokykh_2021_figure_16_deferred
+      type: figure_record
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 1482
+        figure: '16'
+      panel: whole_figure
+      attribution: Shyrokykh et al. (2021), present study
+      units: as printed in axes or caption
+      values:
+        method_class: figure_only
+        quantity: unavailable
+        species:
+        - V2O5
+        phase: l
+        temperature_as_printed: not shown
+        axes_as_printed:
+          axes: none
+        caption: Schematic illustration of liquid slag surface.
+        series:
+        - name: liquid slag surface schematic
+          marker: schematic
+          marker_count: 0
+        points: []
+        digitisation: deferred to a figure pass
+        schema_gap: Process schematic, no measured quantity.
