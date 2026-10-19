@@ -783,9 +783,10 @@ def test_c4_to_c2a_retained_gas_balance_matches_committed_bleed(monkeypatch) -> 
     )
     simulator = run._start_session().simulator
     simulator.melt.temperature_C = 1670.0
-    solves, bleeds = [], []
+    solves, bleeds, captures = [], [], []
     original_solve = coupling.solve_capacity_shadow
     original_bleed = simulator._dispatch_overhead_bleed
+    original_capture = simulator._dispatch_condensation_route
 
     def solve(**kwargs):
         result = original_solve(**kwargs)
@@ -798,26 +799,44 @@ def test_c4_to_c2a_retained_gas_balance_matches_committed_bleed(monkeypatch) -> 
         bleeds.append((before, simulator._overhead_holdup_mol(), result))
         return result
 
+    def capture(*args, **kwargs):
+        before = simulator._overhead_holdup_mol()
+        result = original_capture(*args, **kwargs)
+        after = simulator._overhead_holdup_mol()
+        captures.append({s: before.get(s, 0.0) - after.get(s, 0.0)
+                         for s in set(before) | set(after)})
+        return result
+
     monkeypatch.setattr(coupling, "solve_capacity_shadow", solve)
     monkeypatch.setattr(simulator, "_dispatch_overhead_bleed", bleed)
+    monkeypatch.setattr(simulator, "_dispatch_condensation_route", capture)
     for campaign in (CampaignPhase.C4, CampaignPhase.C2A):
         if simulator.melt.campaign != campaign:
             simulator.start_campaign(campaign)
+        captures.clear()
         simulator.step()
         args, result = solves[-1]
         parts = dict(result.partial_pressures_Pa)
+        retained_bar = simulator.overhead_model._compute_partial_pressures(
+            simulator._overhead_holdup_mol(), simulator._headspace_volume_m3(),
+            simulator._headspace_temperature_K(),
+        )
         print(json.dumps({"campaign": campaign.name, "total_Pa": sum(parts.values()),
-                          "partials_Pa": parts, "volume_m3": args["volume_m3"]}))
+                          "partials_Pa": parts, "volume_m3": args["volume_m3"],
+                          "retained_partials_Pa": {s: p * 1e5 for s, p in retained_bar.items()}}))
 
     args, result = solves[-1]
     before, after, bleed_result = bleeds[-1]
     bled = dict(bleed_result.diagnostic["bled_species_mol"])
-    assert bled == pytest.approx(dict(result.bled_species_mol), rel=1e-8, abs=1e-12)
     assert args["volume_m3"] == pytest.approx(simulator._headspace_volume_m3())
     source = args["overhead_source_mol_hr_at_partials"](result.partial_pressures_Pa)
     for species in set(before) | set(after) | set(args["pre_holdup_mol"]) | set(source):
         supplied = args["pre_holdup_mol"].get(species, 0.0) + source.get(species, 0.0)
-        assert after.get(species, 0.0) + bled.get(species, 0.0) == pytest.approx(
+        condensed = sum(c.get(species, 0.0) for c in captures)
+        assert bled.get(species, 0.0) + condensed == pytest.approx(
+            result.bled_species_mol.get(species, 0.0), rel=1e-8, abs=1e-10,
+        ), species
+        assert after.get(species, 0.0) + bled.get(species, 0.0) + condensed == pytest.approx(
             supplied, rel=1e-8, abs=1e-10,
         ), species
         assert before.get(species, 0.0) - bled.get(species, 0.0) == pytest.approx(
@@ -831,7 +850,7 @@ def test_c4_to_c2a_retained_gas_balance_matches_committed_bleed(monkeypatch) -> 
         sum(result.partial_pressures_Pa.values()), rel=1e-9,
     )
     assert result.source_duct_residual_rel < 1e-9
-    assert abs(simulator.mass_balance().closure_error_pct) < 1e-8
+    assert abs(simulator._make_snapshot().mass_balance_error_pct) < 1e-8
 
 
 def test_c2a_1600c_six_hour_source_duct_closure_is_same_tick() -> None:

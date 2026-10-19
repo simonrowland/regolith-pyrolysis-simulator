@@ -1530,21 +1530,25 @@ def test_source_duct_closure_matches_linear_hk_and_pipe1_quadratic():
     assert q_source == pytest.approx(q_duct, rel=1.0e-8)
 
 
-def _retained_gas_shadow(species, pre_mol, *, flux=None, equilibrium=None, G=2.35e-6):
+def _retained_gas_shadow(
+    species, pre_mol, *, flux=None, equilibrium=None, G=2.35e-6,
+    source=None, volume_m3=0.085383807627,
+):
     return solve_capacity_shadow(
         pre_holdup_mol={species: pre_mol},
         molar_mass_kg_mol={"Fe": 0.055845, "O2": M_O2},
         flux_kg_hr_at_partials=flux or (lambda _parts: {}),
         capacity=NoColdTrain(),
         head_bled_species_mol={}, external_o2_holdup_mol=0.0,
-        temperature_K=1950.65, volume_m3=0.085383807627, dt_hr=1.0,
+        temperature_K=1950.65, volume_m3=volume_m3, dt_hr=1.0,
         bleed_conductance_kg_s=1.0, downstream_pressure_Pa=0.0,
         k_relief_kg_hr_Pa=0.0, p_open_Pa=1.0,
         equilibrium_pressures_Pa=equilibrium or {},
         pipe_molar_G_mol_s_Pa2=G,
         carrier_partials_Pa={"N2": 1000.0},
+        overhead_source_mol_hr_at_partials=source,
         incoming_partials_Pa={
-            species: pre_mol * GAS_CONSTANT * 1950.65 / 0.085383807627,
+            species: pre_mol * GAS_CONSTANT * 1950.65 / volume_m3,
         },
     )
 
@@ -1588,6 +1592,60 @@ def test_retained_supersaturated_vapour_does_not_stay_fixed_after_bleed():
         "Fe", remaining, flux=source, equilibrium={"Fe": 10.0},
     )
     assert second.partial_pressures_Pa["Fe"] < first.partial_pressures_Pa["Fe"]
+
+
+def test_retained_stock_is_held_when_duct_conductance_is_zero():
+    result = _retained_gas_shadow("O2", 2.0, G=0.0)
+    assert result.bled_species_mol.get("O2", 0.0) == pytest.approx(0.0, abs=1e-12)
+    assert result.partial_pressures_Pa["O2"] == pytest.approx(
+        2.0 * GAS_CONSTANT * 1950.65 / 0.085383807627,
+    )
+    assert result.source_duct_residual_rel < 1e-9
+
+
+def test_coproduct_source_and_vanishing_volume_share_inventory_balance():
+    result = _retained_gas_shadow(
+        "O2", 1.0, source=lambda _parts: {"O2": 2.0}, volume_m3=1e-10,
+    )
+    assert result.bled_species_mol["O2"] == pytest.approx(3.0, rel=1e-9)
+    assert result.source_duct_residual_rel < 1e-9
+
+
+def test_source_duct_bleed_preserves_reserved_inventory_after_capture():
+    controls = {"source_duct_remaining_mol": {"O2": "0.25", "Fe": 0.1}}
+    bled = BuiltinOverheadBleedProvider._bled_species_mol(
+        {"O2": 1.0, "Fe": 0.4}, total_mol=1.4, total_kg=0.054338,
+        controls=controls,
+    )
+    assert bled == pytest.approx({"O2": 0.75, "Fe": 0.3})
+    assert BuiltinOverheadBleedProvider._invalid_destructive_control(controls) is None
+    invalid = {"source_duct_remaining_mol": {"O2": float("nan")}}
+    assert BuiltinOverheadBleedProvider._invalid_destructive_control(invalid)
+
+
+def test_source_duct_reserve_bounds_both_vapour_and_tar_capture(monkeypatch):
+    sim = _real_capacity_sim()
+    masses = {s: resolve_species_formula(s, sim.species_formula_registry).molar_mass_kg_per_mol()
+              for s in ("Fe", "organic_tar")}
+    monkeypatch.setattr(sim.atom_ledger, "mol_by_account", lambda _account: {s: 1.0 for s in masses})
+    monkeypatch.setattr(sim.atom_ledger, "kg_by_account", lambda _account: dict(masses))
+    seen = []
+
+    def dispatch(_intent, **kwargs):
+        seen.append(kwargs["control_inputs"])
+        return SimpleNamespace(transition=None)
+
+    monkeypatch.setattr(sim, "_dispatch_and_commit", dispatch)
+    route = SimpleNamespace(wall_deposit_fraction_by_species={},
+                            wall_deposit_account_fractions_by_species={})
+    sim._dispatch_condensation_route("Fe", masses["Fe"], {}, route, reserved_holdup_mol=0.75)
+    sim.condensation_model.wall_temperature_C = 20.0
+    sim._apply_organic_tar_wall_deposit(reserved_holdup_mol=0.75)
+    assert [c["species"] for c in seen] == ["Fe", "organic_tar"]
+    for controls in seen:
+        # A quarter mol may enter capture; the reserved three quarters must
+        # remain upstream regardless of wall temperature or capture demand.
+        assert controls["condensed_kg"] == pytest.approx(0.25 * masses[controls["species"]])
 
 
 def test_evaporation_flux_refuses_missing_overhead_pressure_without_command_fallback():

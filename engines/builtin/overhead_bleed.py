@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping
 from dataclasses import dataclass
 
 from engines.builtin._common import (
@@ -499,6 +500,12 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
             return {}
         if controls.get("force_drain_all", False):
             return dict(holdup_mol)
+        if "source_duct_remaining_mol" in controls:
+            return {
+                species: max(0.0, mol - float(controls["source_duct_remaining_mol"].get(species, 0.0)))
+                for species, mol in holdup_mol.items()
+                if mol > float(controls["source_duct_remaining_mol"].get(species, 0.0))
+            }
 
         conductance_raw = controls.get("bleed_conductance_kg_s")
         if conductance_raw is None:
@@ -534,6 +541,14 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
 
     @staticmethod
     def _invalid_destructive_control(controls: dict) -> str | None:
+        if "source_duct_remaining_mol" in controls:
+            planned = controls["source_duct_remaining_mol"]
+            if not isinstance(planned, Mapping) or any(
+                not is_declared_real_scalar(mol, allow_numeric_str=True)
+                or not math.isfinite(float(mol)) or float(mol) < 0.0
+                for mol in planned.values()
+            ):
+                return "source_duct_remaining_mol must contain finite nonnegative mol"
         for legacy_name in ("o2_vented_kg", "max_o2_flow_kg_hr"):
             if legacy_name in controls:
                 return f"{legacy_name} is retired; OVERHEAD_BLEED owns partitioning"

@@ -3689,7 +3689,8 @@ class EvaporationMixin:
         return effective_rates
 
     def _route_to_condensation(
-        self, evap_flux: EvaporationFlux
+        self, evap_flux: EvaporationFlux, *,
+        source_duct_remaining_mol: Mapping[str, float] | None = None,
     ) -> EvaporationFlux:
         """
         Route evaporated species through the condensation train.
@@ -3854,6 +3855,10 @@ class EvaporationMixin:
                 route_result,
                 species,
                 rate_kg_hr,
+                reserved_holdup_mol=(
+                    source_duct_remaining_mol.get(species, 0.0)
+                    if source_duct_remaining_mol is not None else 0.0
+                ),
             )
             if route_outcome.get('evaporation_transition') is not None:
                 committed_species_kg_hr[species] = rate_kg_hr
@@ -3874,7 +3879,9 @@ class EvaporationMixin:
                 0.0, overhead_after_kg - overhead_before_kg,
             )
 
-        self._apply_organic_tar_wall_deposit()
+        self._apply_organic_tar_wall_deposit(
+            reserved_holdup_mol=(source_duct_remaining_mol or {}).get('organic_tar', 0.0)
+        )
         self._sync_oxygen_kg_counters()
 
         committed_flux = EvaporationFlux(
@@ -3919,6 +3926,7 @@ class EvaporationMixin:
         rate_kg_hr: float,
         *,
         apply_evaporative_redox_source_terms: bool = True,
+        reserved_holdup_mol: float = 0.0,
     ) -> dict[str, Any]:
         authority = dict(
             getattr(route_result, 'condensation_authority_by_species', {}).get(
@@ -3993,6 +4001,7 @@ class EvaporationMixin:
         )
         credited_condensed_kg = self._dispatch_condensation_route(
             species, condensed_kg, sp_data, route_result,
+            reserved_holdup_mol=reserved_holdup_mol,
         )
 
         product_projection = self._condensed_products_kg(
@@ -4153,6 +4162,7 @@ class EvaporationMixin:
         condensed_kg: float,
         sp_data: dict,
         route_result,
+        *, reserved_holdup_mol: float = 0.0,
     ) -> float:
         """Dispatch CONDENSATION_ROUTE through the kernel + commit.
 
@@ -4168,6 +4178,15 @@ class EvaporationMixin:
         actually deposited onto ``process.condensation_train``, used by
         the caller to drive ``_project_condensed_stage_collection``.
         """
+        if reserved_holdup_mol > 0.0:
+            formula = resolve_species_formula(species, self.species_formula_registry)
+            available_mol = self.atom_ledger.mol_by_account(
+                'process.overhead_gas'
+            ).get(species, 0.0)
+            # Capture is a leg of duct outflow, so it cannot consume the
+            # upstream inventory reserved by the same mixture solve.
+            condensed_kg = min(condensed_kg, max(0.0, available_mol - reserved_holdup_mol)
+                               * formula.molar_mass_kg_per_mol())
         wall_deposit_fraction = float(
             route_result.wall_deposit_fraction_by_species.get(species, 0.0)
         )
@@ -4223,7 +4242,7 @@ class EvaporationMixin:
         self._record_wall_alkali_binding_diagnostic_state(diagnostic)
         return float(diagnostic.get('credited_condensed_kg', 0.0))
 
-    def _apply_organic_tar_wall_deposit(self) -> None:
+    def _apply_organic_tar_wall_deposit(self, *, reserved_holdup_mol: float = 0.0) -> None:
         """Move cold-wall tar from overhead_gas onto process.wall_deposit.
 
         Uses the existing CONDENSATION_ROUTE wall split. Hot walls
@@ -4269,6 +4288,7 @@ class EvaporationMixin:
             coat_kg,
             {},
             _TarRoute(),
+            reserved_holdup_mol=reserved_holdup_mol,
         )
 
     def _record_wall_deposit_delta(

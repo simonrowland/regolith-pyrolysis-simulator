@@ -7030,13 +7030,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             controls['effective_transport_capacity'] = (
                 effective_transport_capacity
             )
-        from simulator.thermal_train import FiniteCapacity
+        from simulator.thermal_train import FiniteCapacity, NoColdTrain
 
         capacity, cold_train = self._cold_train_capacity_policy()
         # Snapshot for _project_overhead_bleed_partition: the policy re-reads
         # config on every call, so the projection must reuse the exact
         # capacity this dispatch partitioned with, never a fresh read.
         self._last_bleed_cold_train_capacity = capacity
+        if capacity_result is not None and isinstance(
+            capacity_result.capacity, NoColdTrain
+        ):
+            from simulator.capacity_coupling import source_duct_remaining_mol
+
+            # The mixture/inventory solve owns the physical outflow. The
+            # bleed provider only disposes that answer through the ledger.
+            controls['source_duct_remaining_mol'] = source_duct_remaining_mol(
+                capacity_result.partial_pressures_Pa,
+                self._source_duct_carrier_partials_Pa(),
+                volume_m3=self._headspace_volume_m3(),
+                temperature_K=self._headspace_temperature_K(),
+            )
         if isinstance(capacity, FiniteCapacity):
             assert cold_train is not None
             accumulator_enabled = bool(
@@ -7241,13 +7254,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ).molar_mass_kg_per_mol(),
         )
 
-        provider = BuiltinEvaporationFluxProvider()
-        profile = provider.capability_profile()
-        account_view = build_provider_account_view(
-            self.atom_ledger,
-            profile.declared_accounts,
-            self.species_formula_registry,
-        )
+        if finite_capacity:
+            provider = BuiltinEvaporationFluxProvider()
+            profile = provider.capability_profile()
+            account_view = build_provider_account_view(
+                self.atom_ledger,
+                profile.declared_accounts,
+                self.species_formula_registry,
+            )
         liquid_fraction_factor = (
             self._freeze_gate_liquid_fraction_factor()
             if self._freeze_gate_enabled()
@@ -7286,16 +7300,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     max(0.0, float(pressure))
                     for pressure in partials_Pa.values()
                 )
-            request = IntentRequest(
-                intent=ChemistryIntent.EVAPORATION_FLUX,
-                account_view=account_view,
-                temperature_C=float(self.melt.temperature_C),
-                pressure_bar=(
-                    float(iteration_controls['overhead_pressure_pa']) / 1.0e5
-                ),
-                control_inputs=iteration_controls,
-            )
-            result = provider.dispatch(request)
+            if finite_capacity:
+                request = IntentRequest(
+                    intent=ChemistryIntent.EVAPORATION_FLUX,
+                    account_view=account_view,
+                    temperature_C=float(self.melt.temperature_C),
+                    pressure_bar=(
+                        float(iteration_controls['overhead_pressure_pa']) / 1.0e5
+                    ),
+                    control_inputs=iteration_controls,
+                )
+                result = provider.dispatch(request)
+            else:
+                # The solved rates are committed, so source evaluation must
+                # use the same dispatcher as the live evaporation owner.
+                # FiniteCapacity retains its existing frozen account view.
+                result = self._dispatch_only(
+                    ChemistryIntent.EVAPORATION_FLUX,
+                    control_inputs=iteration_controls,
+                    include_diagnostic_shadows=False,
+                )
             if str(result.status) != 'ok':
                 diagnostic = dict(result.diagnostic or {})
                 raise EvaporationFluxRefusal(
@@ -7376,8 +7400,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if not finite_capacity:
                 if not batch_flux_pressures:
                     return None
-                from simulator.physical_constants import GAS_CONSTANT as _R
-
                 reference_mass = resolve_species_formula(
                     'N2',
                     self.species_formula_registry,
@@ -7394,16 +7416,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     p_downstream_Pa=0.0,
                     species_kg_for_M_avg={'N2': 1.0},
                 )
-                incoming = {}
-                if volume_m3 > 0.0:
-                    temperature_K = self._headspace_temperature_K()
-                    for species, mol in pre_holdup.items():
-                        incoming[str(species)] = (
-                            max(0.0, float(mol))
-                            * _R
-                            * temperature_K
-                            / volume_m3
-                        )
                 source_duct_kwargs = {
                     'equilibrium_pressures_Pa': dict(batch_flux_pressures),
                     'pipe_molar_G_mol_s_Pa2': (
@@ -7413,7 +7425,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         if reference_mass > 0.0 and reference_Pa > 0.0
                         else 0.0
                     ),
-                    'incoming_partials_Pa': incoming,
                     'carrier_partials_Pa': (
                         self._source_duct_carrier_partials_Pa()
                     ),
@@ -7449,7 +7460,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     ) or 0.0
                 ),
                 temperature_K=self._headspace_temperature_K(),
-                volume_m3=(volume_m3 if finite_capacity else max(volume_m3, 1.0)),
+                volume_m3=volume_m3,
                 dt_hr=1.0,
                 bleed_conductance_kg_s=self._headspace_bleed_conductance_kg_s(
                     species_kg_for_M_avg=self._overhead_holdup_species_kg(
@@ -14268,11 +14279,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                             ),
                             doctrine_category=CATEGORY_MARK,
                         )
-                committed_rates = (
-                    live_rates
-                    if isinstance(capacity_result.capacity, _NoColdTrain)
-                    else solved_rates
-                )
+                committed_rates = solved_rates
                 evap_flux.species_kg_hr = {
                     species: float(rate)
                     for species, rate in (
@@ -14315,7 +14322,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ):
             self._configure_condensation_operating_conditions(evap_flux)
             self._apply_lab_surface_temperatures(sample_time_h=float(self.melt.hour) + 1.0)
-            overhead_flux = self._route_to_condensation(evap_flux)
+            route_kwargs = {}
+            if capacity_result is not None and isinstance(
+                capacity_result.capacity, _NoColdTrain
+            ) and self._overhead_headspace_enabled():
+                from simulator.capacity_coupling import source_duct_remaining_mol
+
+                route_kwargs['source_duct_remaining_mol'] = source_duct_remaining_mol(
+                    capacity_result.partial_pressures_Pa,
+                    self._source_duct_carrier_partials_Pa(),
+                    volume_m3=self._headspace_volume_m3(),
+                    temperature_K=self._headspace_temperature_K(),
+                )
+            overhead_flux = self._route_to_condensation(evap_flux, **route_kwargs)
             evap_flux = self._ledger_committed_evap_flux_this_tick
             effective_transport_capacity = (
                 self._controlled_o2_transport_capacity(evap_flux)
