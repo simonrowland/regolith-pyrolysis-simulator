@@ -1026,14 +1026,9 @@ def _initial_oxide_wt_percent(sample: object) -> dict[str, float]:
         raise ResidueInventoryRefusal("initial_composition_invalid") from exc
     if any(not math.isfinite(x) or x < 0.0 for x in amounts.values()):
         raise ResidueInventoryRefusal("initial_composition_invalid")
-    masses = {
-        oxide: amount * _formula_terms(oxide)[1]
-        for oxide, amount in amounts.items()
-    }
-    total = math.fsum(masses.values())
-    if total <= 0.0:
+    if not any(amount > 0.0 for amount in amounts.values()):
         raise ResidueInventoryRefusal("initial_composition_invalid")
-    return {oxide: mass / total * 100.0 for oxide, mass in masses.items()}
+    return _hashimoto_project_oxide_wt_pct(amounts)
 
 
 def predict_mass_loss_fraction(
