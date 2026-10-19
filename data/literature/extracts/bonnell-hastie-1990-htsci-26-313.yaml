@@ -1,0 +1,478 @@
+schema_version: literature_extract.v1
+source_id: bonnell-hastie-1990-htsci-26-313
+source:
+  citation: >-
+    Bonnell, D. W. and Hastie, J. W. (1990). A Predictive Thermodynamic Model
+    for Complex High Temperature Solution Phases XI. High Temperature Science,
+    26, 313-334.
+  year: 1990
+  corpus_asset: raw/bonnell-hastie-1990-htsci-26-313/bonnell-hastie-1990-htsci-26-313.pdf
+  corpus_sha256: 40b156a7c4e3e4b83cbde7efe317f092edcf5f1d3a5f2d116eac6ceb10813f29
+extraction:
+  method: >-
+    Minimal extract from the born-digital pdftotext-layout.txt. This paper
+    presents the Ideal Mixing of Complex Components model and calculated
+    outputs; it reports no numeric measured values in tables. Experimental and
+    literature comparisons appear as plotted markers or curves in Figures
+    1-4 and 6-10 and are recorded without numeric points. Table 3's calculated
+    equilibrium output was transcribed from the 600 dpi PDF render. The table
+    tool accepts MinerU HTML and does not parse this born-digital table layout.
+  date: '2026-10-18'
+  worker: fam2-1018
+  provenance_path: text/bonnell-hastie-1990-htsci-26-313/pdftotext-layout.txt
+review_status: draft
+evidence_policy:
+  classification: model
+  measurement_claim: >-
+    The paper presents the Ideal Mixing of Complex Components model and its
+    calculations. It reports no new numeric measurements; validation data
+    appear as plotted markers or curves and remain deferred figure records.
+  model_generators:
+    - Ideal Mixing of Complex Components (IMCC) model
+    - SOLGASMIX equilibrium calculation
+species:
+  SiO2:
+    observations: []
+    context:
+      - observation_id: bonnell_hastie_1990_table3_model_output
+        type: model_output_table
+        locator: {page: 319, published_page: 319, pdf_page_index: 6, table: '3'}
+        units: per-column as printed
+        system_as_printed: Na2O-K2O-SiO2
+        phase_as_printed: gas, liquid, and pure condensed phases
+        temperature_K: 1430.00
+        pressure_atm_as_printed: '1.000'
+        nominal_composition_as_printed: 'Na2O (0.116 mol%)–K2O (0.223 mol%)–SiO2 (0.661)'
+        units_as_printed:
+          nominal_mol: mol
+          amount_mol: mol
+          pressure_atm: atm
+          activity: dimensionless
+          delta_fG_T: kcal/mol
+          log_Kp: dimensionless
+        quantity_labels_as_printed: [Nominal, Amount, Pressure, Activity, 'ΔfG(T)', 'Log Kp']
+        footnotes_as_printed:
+          a: 'Nominal composition is the input overall composition without the complex phases.'
+          b: 'Composition is stated in terms of reference elements.'
+          c: 'The printed computer exponent E-01 denotes 10^-1.'
+          d: 'Activities below unity indicate relative stability of pure phases; those phases are absent until unit activity.'
+        values:
+          method_class: model_derived
+          rows_as_printed:
+            - species: 'Ar(g)'
+              nominal_mol: '5.00000E+00'
+              amount_mol: '5.00000E+00'
+              pressure_atm: '9.99996E-01^c'
+              activity: '9.99996E-01'
+              delta_fG_T_kcal_mol: '0.000'
+              log_Kp: '0.000'
+            - species: 'K(g)'
+              nominal_mol: '4.46000E-01^c'
+              amount_mol: '1.34077E-05'
+              pressure_atm: '2.68153E-06'
+              activity: '2.68153E-06'
+              delta_fG_T_kcal_mol: '0.000'
+              log_Kp: '0.000'
+            - species: 'Na(g)'
+              nominal_mol: '2.32000E-01'
+              amount_mol: '4.20078E-06'
+              pressure_atm: '8.40152E-07'
+              activity: '8.40152E-07'
+              delta_fG_T_kcal_mol: '0.000'
+              log_Kp: '0.000'
+            - species: 'O2(g)'
+              nominal_mol: '8.30500E-01'
+              amount_mol: '4.40212E-06'
+              pressure_atm: '8.80420E-07'
+              activity: '8.80420E-07'
+              delta_fG_T_kcal_mol: '0.000'
+              log_Kp: '0.000'
+            - species: 'Si(g)'
+              nominal_mol: '0.00000E+00'
+              amount_mol: '2.13753E-27'
+              pressure_atm: '4.27504E-28'
+              activity: '4.27504E-28'
+              delta_fG_T_kcal_mol: '56.933'
+              log_Kp: '-8.701'
+            - species: 'SiO(g)'
+              nominal_mol: '0.00000E+00'
+              amount_mol: '1.38673E-13'
+              pressure_atm: '2.77345E-14'
+              activity: '2.77345E-14'
+              delta_fG_T_kcal_mol: '-53.251'
+              log_Kp: '8.139'
+            - species: 'SiO2(g)'
+              nominal_mol: '0.00000E+00'
+              amount_mol: '1.88651E-13'
+              pressure_atm: '3.77299E-14'
+              activity: '3.77299E-14'
+              delta_fG_T_kcal_mol: '-73.936'
+              log_Kp: '11.300'
+            - species: 'Si2(g)'
+              nominal_mol: '0.00000E+00'
+              amount_mol: '3.77649E-49'
+              pressure_atm: '7.55295E-50'
+              activity: '7.55295E-50'
+              delta_fG_T_kcal_mol: '77.119'
+              log_Kp: '-11.786'
+            - species: 'Si3(g)'
+              nominal_mol: '0.00000E+00'
+              amount_mol: '1.36904E-68'
+              pressure_atm: '2.73807E-69'
+              activity: '2.73807E-69'
+              delta_fG_T_kcal_mol: '82.175'
+              log_Kp: '-12.559'
+            - species: 'K2O(l)'
+              nominal_mol: '0.00000E+00'
+              amount_mol: '1.87683E-10'
+              pressure_atm: ''
+              activity: '4.63581E-10'
+              delta_fG_T_kcal_mol: '-31.649'
+              log_Kp: '4.837'
+            - species: 'K2SiO3(l)'
+              nominal_mol: '0.00000E+00'
+              amount_mol: '5.44861E-02'
+              pressure_atm: ''
+              activity: '1.34582E-01'
+              delta_fG_T_kcal_mol: '-248.790'
+              log_Kp: '38.023'
+            - species: 'K2Si2O5(l)'
+              nominal_mol: '0.00000E+00'
+              amount_mol: '1.56750E-01'
+              pressure_atm: ''
+              activity: '3.87176E-01'
+              delta_fG_T_kcal_mol: '-413.559'
+              log_Kp: '63.205'
+            - species: 'K2Si4O9(l)'
+              nominal_mol: '0.00000E+00'
+              amount_mol: '1.17573E-02'
+              pressure_atm: ''
+              activity: '2.90409E-02'
+              delta_fG_T_kcal_mol: '-729.733'
+              log_Kp: '111.527'
+            - species: 'Na2O(l)'
+              nominal_mol: '0.00000E+00'
+              amount_mol: '1.64884E-09'
+              pressure_atm: ''
+              activity: '4.07267E-09'
+              delta_fG_T_kcal_mol: '-44.420'
+              log_Kp: '6.789'
+            - species: 'Na2SiO3(l)'
+              nominal_mol: '0.00000E+00'
+              amount_mol: '5.18742E-02'
+              pressure_atm: ''
+              activity: '1.28130E-01'
+              delta_fG_T_kcal_mol: '-255.246'
+              log_Kp: '39.010'
+            - species: 'Na2Si2O5(l)'
+              nominal_mol: '0.00000E+00'
+              amount_mol: '6.41237E-02'
+              pressure_atm: ''
+              activity: '1.58387E-01'
+              delta_fG_T_kcal_mol: '-417.615'
+              log_Kp: '63.825'
+            - species: 'SiO2(l)'
+              nominal_mol: '0.00000E+00'
+              amount_mol: '6.58632E-02'
+              pressure_atm: ''
+              activity: '1.62684E-01'
+              delta_fG_T_kcal_mol: '-156.607'
+              log_Kp: '23.934'
+            - species: 'Na2Si2O5(s)'
+              nominal_mol: '0.00000E+00'
+              amount_mol: '0.00000E+00'
+              pressure_atm: ''
+              activity: '8.47202E-02^d'
+              delta_fG_T_kcal_mol: '-415.837'
+              log_Kp: '63.553'
+            - species: 'SiO2(s)'
+              nominal_mol: '0.00000E+00'
+              amount_mol: '0.00000E+00'
+              pressure_atm: ''
+              activity: '1.88786E-01^d'
+              delta_fG_T_kcal_mol: '-157.029'
+              log_Kp: '23.999'
+            - species: 'Si(s or l)'
+              nominal_mol: '6.61000E-01'
+              amount_mol: '0.00000E+00'
+              pressure_atm: ''
+              activity: '2.14860E-19^d'
+              delta_fG_T_kcal_mol: '0.000'
+              log_Kp: '0.000'
+        note: >-
+          Model calculation at 1430.00 K and 1.000 atm. Empty pressure cells
+          are blank in the printed liquid and pure-phase rows. The printed Log
+          Kp column has no matching store quantity and is retained here with its
+          printed dimensionless values.
+      - type: figure_record
+        observation_id: bonnell_hastie_1990_fig1_figure_only
+        locator: {page: 322, published_page: 322, pdf_page_index: 9, figure: '1'}
+        units: as printed
+        species_as_printed: Na2O-SiO2 mixture
+        system_as_printed: Na2O-SiO2
+        phase_as_printed: gas-liquid equilibrium
+        panel: single panel
+        temperature_K: 1473
+        axes_as_printed: 'x: total Na2O content (mole fraction); y: Na partial pressure (atm)'
+        series:
+          - {name: Na model curve, marker_count: 0, attribution: present work}
+          - {name: 'literature curves labeled A, B, C, D, E, F, G, H, K, P, S', marker_count: 0, attribution: 'citations listed in ref. [10]'}
+          - {name: literature measurements shown by point symbols, marker_count: 3, attribution: 'citations listed in ref. [10]'}
+        values:
+          quantity: p_partial
+          method_class: model_derived
+          admission_status: figure_only
+          caption: >-
+            Fig. 1. Comparison of model and literature data for Na partial
+            pressure vs total Na2O content in Na2O-SiO2 mixtures at 1473 K. See
+            ref. 10 for citations of experimental data.
+        digitisation: deferred to a figure pass
+      - type: figure_record
+        observation_id: bonnell_hastie_1990_fig2_figure_only
+        locator: {page: 323, published_page: 323, pdf_page_index: 10, figure: '2'}
+        units: as printed
+        species_as_printed: Na2O-SiO2
+        system_as_printed: Na2O-SiO2
+        phase_as_printed: liquid activity comparison
+        panel: single panel
+        temperature_K: 1430
+        axes_as_printed: 'x: Na2O content (mole %); y: activity Na2O (dimensionless)'
+        series:
+          - {name: model calculation, marker_count: 0, attribution: present work}
+          - {name: experimental activity data shown as open circles, marker_count: 7, attribution: 'Rudnyi et al. [16]'}
+        values:
+          quantity: activity
+          method_class: model_derived
+          admission_status: figure_only
+          caption: >-
+            Fig. 2. Comparison of model calculations in the Na2O-SiO2 system
+            with recent experimental data obtained using a novel negative
+            ion-forming additive technique.
+        digitisation: deferred to a figure pass
+      - type: figure_record
+        observation_id: bonnell_hastie_1990_fig3_figure_only
+        locator: {page: 324, published_page: 324, pdf_page_index: 11, figure: '3'}
+        units: as printed
+        species_as_printed: K2O and Na2O
+        system_as_printed: K2O-Na2O-SiO2
+        phase_as_printed: liquid activities
+        panel: single panel
+        temperature_as_printed: 'varies along the 10^4/T axis; top scale 1050-1150 °C'
+        composition_as_printed: '0.116 Na2O + 0.223 K2O + 0.661 SiO2'
+        axes_as_printed: 'x: 10^4/T (K); y: alkali activity (dimensionless)'
+        series:
+          - {name: model K2O activity, marker_count: 0, attribution: present work}
+          - {name: model Na2O activity, marker_count: 0, attribution: present work}
+          - {name: K2O experimental data shown as open squares, marker_count: 6, attribution: 'Rudnyi et al. [16]'}
+          - {name: Na2O experimental data shown as an open circle, marker_count: 1, attribution: 'Rudnyi et al. [16]'}
+        values:
+          quantity: activity
+          method_class: model_derived
+          admission_status: figure_only
+          caption: >-
+            Fig. 3. Comparison of model and experimental activities with recent
+            experimental data for a K2O (0.223 mol%)-Na2O (0.116)-SiO2 melt.
+        digitisation: deferred to a figure pass
+      - type: figure_record
+        observation_id: bonnell_hastie_1990_fig4_figure_only
+        locator: {page: 325, published_page: 325, pdf_page_index: 12, figure: '4'}
+        units: as printed
+        species_as_printed: FeO-Al2O3 system
+        system_as_printed: FeO-Al2O3
+        phase_as_printed: phase diagram
+        panel: single panel
+        temperature_as_printed: '1100-2100 °C on the plotted ordinate'
+        axes_as_printed: 'x: Al2O3 content (wt%); y: temperature (°C)'
+        series:
+          - {name: literature phase boundary, marker_count: 0, attribution: 'reference [20]'}
+          - {name: calculated phase boundary, marker_count: 0, attribution: present work}
+        values:
+          quantity: transition_temperature
+          method_class: model_derived
+          admission_status: figure_only
+          caption: >-
+            Fig. 4. Comparison of literature (solid curve) and calculated
+            (dash curve) phase diagram of the “FeO”-Al2O3 system. Ordinate is
+            degrees Celsius.
+        digitisation: deferred to a figure pass
+      - type: figure_record
+        observation_id: bonnell_hastie_1990_fig5_figure_only
+        locator: {page: 326, published_page: 326, pdf_page_index: 13, figure: '5'}
+        units: as printed
+        species_as_printed: K2O-CaO-Al2O3-SiO2 liquid components
+        system_as_printed: K2O-CaO-Al2O3-SiO2
+        phase_as_printed: liquid component mole fractions (activities)
+        panel: single panel
+        temperature_K: 1800
+        composition_as_printed: 'CaO 37.3 mol%; Al2O3 20.5 mol%; K2O varies along the composition line'
+        axes_as_printed: 'x: mole % K2O; y: liquid component mole fraction (activity)'
+        series:
+          - {name: Ca2Al2SiO7, marker_count: 0, attribution: present work}
+          - {name: CaAl2Si4O12, marker_count: 0, attribution: present work}
+          - {name: CaSiO3, marker_count: 0, attribution: present work}
+          - {name: KCaAlSi2O7, marker_count: 0, attribution: present work}
+          - {name: CaAl2O4, marker_count: 0, attribution: present work}
+          - {name: CaAl2Si2O8, marker_count: 0, attribution: present work}
+          - {name: SiO2, marker_count: 0, attribution: present work}
+          - {name: CaO, marker_count: 0, attribution: present work}
+          - {name: K2O multiplied by 10^5, marker_count: 0, attribution: present work}
+          - {name: KAlO2, marker_count: 0, attribution: present work}
+          - {name: Ca2SiO4, marker_count: 0, attribution: present work}
+          - {name: Ca12Al14O33, marker_count: 0, attribution: present work}
+          - {name: K2SiO3, marker_count: 0, attribution: present work}
+          - {name: Al2O3, marker_count: 0, attribution: present work}
+          - {name: KAlSiO4, marker_count: 0, attribution: present work}
+        values:
+          quantity: activity
+          method_class: model_derived
+          admission_status: figure_only
+          caption: >-
+            Fig. 5. Example of model calculation of liquid component mole
+            fractions (activities) for K2O-CaO (37.3 mol%)-Al2O3 (20.5
+            mol%)-SiO2 mixtures at 1800 K. Solid curves are labeled on the RHS.
+        digitisation: deferred to a figure pass
+      - type: figure_record
+        observation_id: bonnell_hastie_1990_fig6_figure_only
+        locator: {page: 327, published_page: 327, pdf_page_index: 14, figure: '6'}
+        units: as printed
+        species_as_printed: K, O2, and Na vapor
+        system_as_printed: seven-component SRM-621 glass
+        phase_as_printed: vapor above glass
+        axes_as_printed: 'x: 10^4/T (K); y: partial pressure (atm)'
+        composition_as_printed: 'Na2O (12.54 mol%//12.75 wt%), K2O (1.3//2.02), CaO (11.68//10.75), MgO (0.41//0.27), Al2O3 (1.66//2.78), SiO2 (72.4//71.39), Fe2O3 (0.02//0.04)'
+        series:
+          - {name: model K partial pressure, marker_count: 0, attribution: present work}
+          - {name: model O2 partial pressure, marker_count: 0, attribution: present work}
+          - {name: model Na partial pressure, marker_count: 0, attribution: present work}
+          - {name: K experimental points shown as squares, marker_count: 8, attribution: KMS}
+          - {name: O2 experimental points shown as triangles, marker_count: 7, attribution: KMS}
+          - {name: Na experimental points shown as open circles, marker_count: 10, attribution: KMS}
+        values:
+          quantity: p_partial
+          method_class: model_derived
+          admission_status: figure_only
+          caption: >-
+            Fig. 6. Comparison of model (solid curves) and experimental partial
+            pressure vs temperature data for the seven component SRM-621 glass.
+            The nominal composition is given in the caption; squares are K,
+            triangles are O2, and open circles are Na. The comparison was
+            originally presented in ref. 10.
+        digitisation: deferred to a figure pass
+      - type: figure_record
+        observation_id: bonnell_hastie_1990_fig7a_figure_only
+        locator: {page: 327, published_page: 327, pdf_page_index: 15, figure: '7a'}
+        units: as printed
+        species_as_printed: K and Na vapor
+        system_as_printed: NIST SRM 88a dolomitic limestone
+        phase_as_printed: vapor above sample
+        axes_as_printed: 'x: 10^4/temperature (K); y: partial pressure (atm)'
+        composition_as_printed: 'Al2O3 (0.19 wt%//0.17 mol%), CaO (30.10//49.23), Fe2O3 (0.28//0.16), K2O (0.12//0.12), MgO (21.30//48.47), Na2O (0.01//0.015), SiO2 (1.20//1.83)'
+        series:
+          - {name: model K partial pressure, marker_count: 0, attribution: present work}
+          - {name: model Na partial pressure, marker_count: 0, attribution: present work}
+          - {name: KMS experimental open-circle points, marker_count: 11, attribution: KMS}
+          - {name: TMS experimental open-triangle points, marker_count: 13, attribution: TMS}
+          - {name: experimental Na points shown as filled circles, marker_count: 8, attribution: experimental data; technique not distinguished in figure}
+        values:
+          quantity: p_partial
+          method_class: model_derived
+          admission_status: figure_only
+          caption: >-
+            Fig. 7a. Calculated alkali partial pressure data for NIST SRM 88a
+            dolomitic limestone as a function of temperature (solid curves).
+            Points are experimental data. The certified composition is given
+            in the caption.
+        digitisation: deferred to a figure pass
+      - type: figure_record
+        observation_id: bonnell_hastie_1990_fig7b_figure_only
+        locator: {page: 328, published_page: 328, pdf_page_index: 15, figure: '7b'}
+        units: as printed
+        species_as_printed: K and Na vapor
+        system_as_printed: SRM 88a and Tymochtee dolomites
+        phase_as_printed: vapor above sample
+        axes_as_printed: 'x: 10^4/temperature (K); y: partial pressure (atm)'
+        composition_as_printed: >-
+          Tymochtee dolomite: Al2O3 (4.57 wt%//8.91 mol%), CaO (43.58//46.73),
+          Fe2O3 (0//0), K2O (0.16//0.0.29), MgO (40.5//31.2), Na2O
+          (0.004//0.005), SiO2 (11.15//12.81). SRM 88a composition is given
+          with Fig. 7a.
+        series:
+          - {name: model alkali pressure for SRM 88a, marker_count: 0, attribution: present work}
+          - {name: model alkali pressure for Tymochtee dolomite, marker_count: 0, attribution: present work}
+        values:
+          quantity: p_partial
+          method_class: model_derived
+          admission_status: figure_only
+          caption: >-
+            Fig. 7b. Comparison of calculated alkali partial pressures for
+            SRM 88a and Tymochtee dolomites, showing the effect of composition
+            variations.
+        digitisation: deferred to a figure pass
+      - type: figure_record
+        observation_id: bonnell_hastie_1990_fig8_figure_only
+        locator: {page: 330, published_page: 330, pdf_page_index: 17, figure: '8'}
+        units: as printed
+        species_as_printed: K and O2 vapor
+        system_as_printed: illite mineral
+        phase_as_printed: vapor above mineral
+        axes_as_printed: 'x: 10^4/T (K); y: partial pressure (atm)'
+        composition_as_printed: 'Al2O3 26.0 wt%, FeOx 4.4 wt%, K2O 7.4 wt%, Na2O 0.2 wt%, MgO 2.1 wt%, SiO2 60.2 wt%, S 0.1 wt% (not modeled)'
+        series:
+          - {name: experimental K and O2 pressure curves, marker_count: 0, attribution: experimental data}
+          - {name: model K pressure with O2 fixed by measured value, marker_count: 0, attribution: present work}
+          - {name: model K pressure for small condensed-phase FeOx O/Fe variations, marker_count: 0, attribution: present work}
+        values:
+          quantity: p_partial
+          method_class: model_derived
+          admission_status: figure_only
+          caption: >-
+            Fig. 8. Experimental and model partial pressure data for K and O2
+            over illite. The nominal mineral composition and curve styles are
+            given in the caption; the experimental data are solid curves and
+            model variants are dot-dash or dashed curves.
+        digitisation: deferred to a figure pass
+      - type: figure_record
+        observation_id: bonnell_hastie_1990_fig9_figure_only
+        locator: {page: 331, published_page: 331, pdf_page_index: 18, figure: '9'}
+        units: as printed
+        species_as_printed: K vapor
+        system_as_printed: potassium-enriched MHD slag
+        phase_as_printed: vapor above slag
+        axes_as_printed: 'x: 10^4/T (K); y: K partial pressure (atm)'
+        composition_as_printed: 'Al2O3 (12.1 wt%), CaO (3.8), Fe2O3 (14.3), K2O (19.5), MgO (1.0), Na2O (0.5), SiO2 (46.8)'
+        series:
+          - {name: model K pressure with experimental O2, marker_count: 0, attribution: present work}
+          - {name: model K pressure with O2 fixed by Fe3O4, marker_count: 0, attribution: present work}
+          - {name: experimental K pressure points shown as open circles, marker_count: 6, attribution: this lab}
+        values:
+          quantity: p_partial
+          method_class: model_derived
+          admission_status: figure_only
+          caption: >-
+            Fig. 9. Experimental data (this lab) for an MHD slag of the
+            composition given in the caption; model calculations show the
+            Fe2O3 composition uncertainty effects.
+        digitisation: deferred to a figure pass
+      - type: figure_record
+        observation_id: bonnell_hastie_1990_fig10_figure_only
+        locator: {page: 332, published_page: 332, pdf_page_index: 19, figure: '10'}
+        units: as printed
+        species_as_printed: LiBO2 and NaBO2 vapor
+        system_as_printed: simulated nuclear-waste borosilicate glass
+        phase_as_printed: vapor above glass
+        axes_as_printed: 'x: 10^4/temperature (K); y: partial pressure (atm)'
+        composition_as_printed: 'SiO2 59.4 mol%, Na2O 9.20 mol%, Li2O 8.80 mol%, B2O3 6.19 mol%, Al2O3 3.09 mol%, MnO2 2.72 mol%, ZrO2 2.04 mol%, NiO 1.60 mol%, CaO 1.19 mol%, MgO 0.88 mol%, RuO2 0.05 mol%, SrO 0.03 mol%, Cs2O 0.02 mol%, Re2O7 0.01 mol%'
+        series:
+          - {name: model LiBO2 partial pressure multiplied by 10, marker_count: 0, attribution: present work}
+          - {name: model NaBO2 partial pressure, marker_count: 0, attribution: present work}
+          - {name: KMS experimental symbols, marker_count: 18, attribution: KMS}
+          - {name: TMS experimental symbols, marker_count: 24, attribution: TMS}
+        values:
+          quantity: p_partial
+          method_class: model_derived
+          admission_status: figure_only
+          caption: >-
+            Fig. 10. Comparison of model prediction with TMS and KMS
+            experimental data for a simulated nuclear-waste borosilicate
+            glass with the nominal composition given in the caption.
+        digitisation: deferred to a figure pass
