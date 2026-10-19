@@ -183,17 +183,17 @@ def _is_absolute_path(value: Any) -> bool:
     return isinstance(value, str) and bool(_ABS_PATH_RE.match(value))
 
 
-def _walk_absolute_path_values(
+def _walk_path_values(
     node: Any, *, path: str = ""
 ) -> list[tuple[str, str, str]]:
-    """Return (key, dotted-path, value) for absolute PATH_VALUE_KEYS hits.
+    """Return (key, dotted-path, value) for PATH_VALUE_KEYS strings.
 
     Walks the *parsed* document, so a quoted scalar and a YAML alias
     (``source_path: *scan``) count exactly like an unquoted scalar, and an
     anchor reused N times yields N hits (one per place a consumer reads it).
-    A path key's value may be a string (checked), a list (each string element
-    checked, e.g. ``corpus_tables: [tables/x/t1.csv, ...]``; other elements
-    walked), or a mapping (walked, e.g. the ``transcription`` page/table dict).
+    A path key's value may be a string, a list (each string element checked,
+    e.g. ``corpus_tables: [tables/x/t1.csv, ...]``), or a mapping (walked,
+    e.g. the ``transcription`` page/table dict).
     """
     hits: list[tuple[str, str, str]] = []
     if isinstance(node, Mapping):
@@ -201,18 +201,24 @@ def _walk_absolute_path_values(
             key_s = str(key)
             child = f"{path}.{key_s}" if path else key_s
             if key_s in PATH_VALUE_KEYS:
-                if _is_absolute_path(value):
+                if isinstance(value, str):
                     hits.append((key_s, child, value))
-                    continue
-                if isinstance(value, (list, tuple)):
+                elif isinstance(value, (list, tuple)):
                     for i, item in enumerate(value):
-                        if _is_absolute_path(item):
+                        if isinstance(item, str):
                             hits.append((key_s, f"{child}[{i}]", item))
-            hits.extend(_walk_absolute_path_values(value, path=child))
+            hits.extend(_walk_path_values(value, path=child))
     elif isinstance(node, (list, tuple)):
         for i, item in enumerate(node):
-            hits.extend(_walk_absolute_path_values(item, path=f"{path}[{i}]"))
+            hits.extend(_walk_path_values(item, path=f"{path}[{i}]"))
     return hits
+
+
+def _walk_absolute_path_values(
+    node: Any, *, path: str = ""
+) -> list[tuple[str, str, str]]:
+    """Return absolute strings found under the owning PATH_VALUE_KEYS set."""
+    return [hit for hit in _walk_path_values(node, path=path) if _is_absolute_path(hit[2])]
 
 
 def _absolute_path_value_errors(doc: Any, label: str) -> list[str]:
@@ -235,30 +241,19 @@ def _absolute_path_value_errors(doc: Any, label: str) -> list[str]:
     return errors
 
 
-def _private_source_path_errors(doc: Any, label: str) -> list[str]:
-    """Refuse repository-private workspace paths in any nested source_path."""
+def _private_path_value_errors(doc: Any, label: str) -> list[str]:
+    """Refuse repository-private paths under every path-valued extract key."""
+    hits = [hit for hit in _walk_path_values(doc) if hit[2].startswith("docs-private/")]
+    by_value: dict[tuple[str, str], list[str]] = {}
+    for key, dotted, value in hits:
+        by_value.setdefault((key, value), []).append(dotted)
     errors: list[str] = []
-
-    def walk(node: Any, path: str = "") -> None:
-        if isinstance(node, Mapping):
-            for key, value in node.items():
-                key_s = str(key)
-                child = f"{path}.{key_s}" if path else key_s
-                if (
-                    key_s == "source_path"
-                    and isinstance(value, str)
-                    and value.startswith("docs-private/")
-                ):
-                    errors.append(
-                        f"{label}: {child} must be repository-portable "
-                        f"(docs-private source path refused): {value!r}"
-                    )
-                walk(value, child)
-        elif isinstance(node, (list, tuple)):
-            for i, item in enumerate(node):
-                walk(item, f"{path}[{i}]")
-
-    walk(doc)
+    for (key, value), where in by_value.items():
+        more = f" (+{len(where) - 1} more via YAML aliases/repeats)" if len(where) > 1 else ""
+        errors.append(
+            f"{label}: {where[0]} must be repository-portable "
+            f"(docs-private path refused for {key}): {value!r}{more}"
+        )
     return errors
 
 
@@ -1683,7 +1678,7 @@ def validate_extract_document(
     # extraction.provenance_path. b-713 replaced a line-regex count ceiling
     # that missed quoted scalars and YAML aliases.
     errors.extend(_absolute_path_value_errors(doc, label))
-    errors.extend(_private_source_path_errors(doc, label))
+    errors.extend(_private_path_value_errors(doc, label))
 
     review = doc.get("review_status")
     if review not in REVIEW_STATUSES:
