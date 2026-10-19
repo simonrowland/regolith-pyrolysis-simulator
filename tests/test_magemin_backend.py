@@ -280,11 +280,16 @@ def _make_pooled_subprocess_backend(exception):
 
 
 @pytest.mark.parametrize(
-    'database',
-    ['ig', 'ig' + (' ' * 9000)],
-    ids=['normal-database', 'oversized-database'],
+    ('database', 'capture_error'),
+    [
+        pytest.param('ig', False, id='normal-database'),
+        pytest.param('ig' + (' ' * 9000), False, id='oversized-database'),
+        pytest.param('ig' + (' ' * 9000), True, id='capture-error'),
+    ],
 )
-def test_magemin_unfinished_pool_future_is_timed_out_and_aborted(database):
+def test_magemin_unfinished_pool_future_is_timed_out_and_aborted(
+    monkeypatch, database, capture_error,
+):
     class RunningFuture(Future):
         cancel_attempted = False
 
@@ -314,6 +319,15 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted(database):
     backend = _make_pooled_subprocess_backend(None)
     backend._subprocess_pool = pool
     backend._database = database
+    if capture_error:
+        def fail_diagnostic_capture(**_kwargs):
+            raise RuntimeError('diagnostic capture failed')
+
+        monkeypatch.setattr(
+            backend,
+            '_magemin_timeout_diagnostic_detail',
+            fail_diagnostic_capture,
+        )
     backend._config = {
         'warm_call_timeout_s': 0.05,
         'worker_startup_timeout_s': 0.05,
@@ -355,27 +369,33 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted(database):
         assert pool.diagnostic_detail is not None
         assert len(pool.diagnostic_detail) <= 8192
         diagnostic = json.loads(pool.diagnostic_detail)
-        assert diagnostic['argv'][0] == '/fake/MAGEMin'
-        if len(database) > 8192:
-            assert diagnostic['argv_truncated'] is True
+        if capture_error:
+            assert diagnostic['diagnostic_capture_error'] == 'RuntimeError'
             assert diagnostic['database_truncated'] is True
         else:
+            assert diagnostic['argv'][0] == '/fake/MAGEMin'
+        if not capture_error and len(database) > 8192:
+            assert diagnostic['argv_truncated'] is True
+            assert diagnostic['database_truncated'] is True
+        elif not capture_error:
             assert diagnostic['database'] == database
             assert diagnostic['argv'][2] == '--db=ig'
-        assert 'composition_mol_truncated":true' in pool.diagnostic_detail
-        assert 'composition_mol' in pool.diagnostic_detail
+        if not capture_error:
+            assert 'composition_mol_truncated":true' in pool.diagnostic_detail
+            assert 'composition_mol' in pool.diagnostic_detail
         assert 'projected_bulk' in pool.diagnostic_detail
         assert 'oxide_names' in pool.diagnostic_detail
         assert 'temperature_C' in pool.diagnostic_detail
         assert 'pressure_bar' in pool.diagnostic_detail
         assert 'fO2_log' in pool.diagnostic_detail
-        assert 'buffer' in pool.diagnostic_detail
-        assert 'buffer_n' in pool.diagnostic_detail
         assert 'database' in pool.diagnostic_detail
         assert 'argv' in pool.diagnostic_detail
-        assert '--Temp=1200.000000' in pool.diagnostic_detail
-        assert '--Pres=0.001000' in pool.diagnostic_detail
-        assert '--db=ig' in pool.diagnostic_detail
+        if not capture_error:
+            assert 'buffer' in pool.diagnostic_detail
+            assert 'buffer_n' in pool.diagnostic_detail
+            assert '--Temp=1200.000000' in pool.diagnostic_detail
+            assert '--Pres=0.001000' in pool.diagnostic_detail
+            assert '--db=ig' in pool.diagnostic_detail
         assert time.monotonic() - started_at < 0.25
     finally:
         if waiter.is_alive():
