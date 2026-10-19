@@ -13,7 +13,7 @@ EXTRACT = ROOT / "data/literature/extracts/shornikov-2002-mullite-thermodynamics
 def test_shornikov_mullite_tables_migrate_and_preserve_temperature_and_context():
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     rows = document["species"]["Al2O3"]["observations"]
-    assert len(rows) == 27
+    assert len(rows) == 29
     table_1 = next(
         row for row in document["species"]["Al2O3"]["context"]
         if row["observation_id"] == "shornikov_2002_table1_oxide_formation_inventory"
@@ -33,7 +33,7 @@ def test_shornikov_mullite_tables_migrate_and_preserve_temperature_and_context()
     assert migrator.result.validation.ok
     assert migrator.result.validation.hard_issues == ()
     observations = tuple(migrator.result.observations.values())
-    assert len(observations) == 27
+    assert len(observations) == 29
     rows_by_id = {row["observation_id"]: row for row in rows}
     for observation in observations:
         source_id = observation.observation_id.rsplit("::", 1)[-1]
@@ -61,3 +61,12 @@ def test_shornikov_mullite_tables_migrate_and_preserve_temperature_and_context()
         if "shornikov_2002_t1_hf_neumann" in row.observation_id
     )
     assert formation_enthalpy.value.point == Decimal("-7547.9")
+    for observation_id, value, attribution in (
+        ("shornikov_2002_t1_hf_barin", "-6820.5", "Barin et al. [52] (1993)"),
+        ("shornikov_2002_t1_hf_kirshen", "-6823.5", "Kirshen et al. [55] (1999)"),
+    ):
+        enthalpy = next(row for row in observations if observation_id in row.observation_id)
+        assert enthalpy.value.point == Decimal(value)
+        source = rows_by_id[observation_id]
+        assert source["values"]["attribution"] == attribution
+        assert source["T_range_K"] == [298, 298]
