@@ -1616,11 +1616,14 @@ def test_lunar_mare_low_ti_full_run_ledger_pin(
         allow_nan=False,
     ).encode()
     digest = hashlib.sha256(ledger_bytes).hexdigest()
+    # Whole-stack golden: measured on green a822c275f (openimcc e1423d8,
+    # MAGEMin 1.9.6 ig) on the laptop and confirmed on studio-3. It moves
+    # with any engine or OpenIMCC pin; the pin offer's owner regenerates it.
     assert session.is_complete()
-    assert len(hourly_ledgers) == 212
-    assert len(ledger_bytes) == 775401
+    assert len(hourly_ledgers) == 195
+    assert len(ledger_bytes) == 706058
     assert digest == (
-        "88b2f7df0273052111b2688283d9aed852fea13aa4f6c31996a51a21f9b252d8"
+        "5ae80eb5c19c6550c0c0f0e96ae991d520bd3c2b105f6463e4fed28b037282ec"
     )
 
 
