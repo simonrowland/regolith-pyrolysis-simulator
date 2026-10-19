@@ -5,6 +5,7 @@ import os
 import re
 import subprocess
 import csv
+import json
 import unicodedata
 from functools import lru_cache
 from decimal import Decimal, InvalidOperation
@@ -24,6 +25,7 @@ CORPUS_ROOTS = tuple(
     )
     if corpus_root
 )
+MINERU_TEXT_ROOT = Path.home() / "Repos/.regolith-main-review/corpus-main/text"
 TOUCHED_EXTRACTS = (
     "data/literature/extracts/adamkovicova-1980-casio3-heat-of-fusion.yaml",
     "data/literature/extracts/basu-2008-feo-steelmaking.yaml",
@@ -172,6 +174,37 @@ def _page_text(pdf, page_number):
         check=True, capture_output=True, text=True, timeout=30,
     )
     return result.stdout
+
+
+@lru_cache(maxsize=None)
+def _mineru_page_text(source_id, corpus_source_id, page_index):
+    for sid in dict.fromkeys((source_id, corpus_source_id)):
+        if not sid:
+            continue
+        candidates = (
+            MINERU_TEXT_ROOT / sid / "mineru" / f"{sid}_content_list.json",
+            MINERU_TEXT_ROOT / sid / "mineru/source/vlm/source_content_list.json",
+            *(root / sid / "ocr-mineru" / name for root in CORPUS_ROOTS
+              for name in (f"{sid}_content_list.json", "source_content_list.json")),
+        )
+        for path in candidates:
+            if not path.is_file():
+                continue
+            content = json.loads(path.read_text())
+            chunks = [chunk for chunk in content if chunk.get("page_idx") == page_index]
+            parts = []
+            for chunk in chunks:
+                for key in (
+                    "text", "content", "chart_caption", "chart_footnote",
+                    "table_caption", "table_footnote", "table_body",
+                ):
+                    value = chunk.get(key)
+                    if isinstance(value, list):
+                        parts.extend(str(item) for item in value)
+                    elif isinstance(value, str):
+                        parts.append(value)
+            return "\n".join(parts)
+    return ""
 
 
 def _has_page_text(text):
@@ -365,6 +398,7 @@ def _assert_label_and_data(locator, locator_path, page_text, caption_page_text=N
 
 def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
     checked = skipped = justified = 0
+    pdftotext_matched = mineru_matched = 0
     failures = []
     justifications = _justifications()
     used_justifications = set()
@@ -397,8 +431,8 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
                 continue
             caption_page = locator.get("table_caption_page")
             caption_text = _page_text(str(pdf), caption_page) if caption_page is not None else None
+            printed_values = tuple(_observation_values(current, locator_path))
             try:
-                printed_values = tuple(_observation_values(current, locator_path))
                 _assert_label_and_data(
                     locator,
                     locator_path,
@@ -408,6 +442,19 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
                 )
             except AssertionError as exc:
                 if str(exc) == "no printed observation value is present on cited page":
+                    mineru_text = _normalize_label_text(_mineru_page_text(
+                        current.get("source_id"),
+                        current.get("source", {}).get("corpus_source_id"),
+                        page_number - 1,
+                    ))
+                    try:
+                        _assert_observation_value(mineru_text, printed_values)
+                    except AssertionError:
+                        pass
+                    else:
+                        checked += 1
+                        mineru_matched += 1
+                        continue
                     value_class = _skip_class(current, locator_path, locator)
                     kind, value_label = next((key, locator[key]) for key in ("table", "figure") if key in locator)
                     value_skips.append({
@@ -440,12 +487,26 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
                 failures.append(f"{relative} {locator_path}: {label} on PDF page {page_number}: {exc}")
                 continue
             checked += 1
+            if printed_values:
+                pdftotext_matched += 1
             if not printed_values:
                 generic_values = _generic_observation_values(current, locator_path)
                 if generic_values and any(
                     pattern is not None and pattern.search(_normalize_label_text(text))
                     for pattern in (_number_pattern(value) for value in generic_values)
                 ):
+                    pdftotext_matched += 1
+                    continue
+                mineru_text = _normalize_label_text(_mineru_page_text(
+                    current.get("source_id"),
+                    current.get("source", {}).get("corpus_source_id"),
+                    page_number - 1,
+                ))
+                if generic_values and any(
+                    pattern is not None and pattern.search(mineru_text)
+                    for pattern in (_number_pattern(value) for value in generic_values)
+                ):
+                    mineru_matched += 1
                     continue
                 kind, label = next((key, locator[key]) for key in ("table", "figure") if key in locator)
                 value_skips.append({
@@ -460,6 +521,7 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
         f"t1353 PDF locator labels: {checked} passed, {skipped} skipped "
         f"({justified} justified by 600-dpi render), {len(failures)} failed"
     )
+    print(f"printed values: {pdftotext_matched} pdftotext-matched, {mineru_matched} MinerU-matched")
     assert checked > 0, "no locator labels were checked"
     assert failures == [], "PDF locator label failures:\n" + "\n".join(failures)
     assert used_justifications == set(justifications), "stale or unmatched rendered locator justification"
