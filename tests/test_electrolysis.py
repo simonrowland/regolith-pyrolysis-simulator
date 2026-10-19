@@ -105,7 +105,21 @@ def test_mre_baseline_multi_oxide_partition_is_typed_refusal_not_poisoned_hour(
 
 
 @pytest.mark.parametrize(
-    "refusal_reason", [MRE_RAW_MARGIN_REFUSAL, "invalid_electrolysis_control"]
+    "refusal_reason",
+    [
+        MRE_RAW_MARGIN_REFUSAL,
+        "invalid_electrolysis_control",
+        pytest.param(
+            "electrolysis_control_out_of_domain",
+            marks=pytest.mark.xfail(
+                strict=True,
+                reason=(
+                    "b-434: control-domain refusal is not registered for "
+                    "terminal whole-hour rollback"
+                ),
+            ),
+        ),
+    ],
 )
 def test_sc109_mre_non_partition_refusal_propagates_typed_through_executor(
     monkeypatch: pytest.MonkeyPatch,
