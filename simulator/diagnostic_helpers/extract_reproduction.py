@@ -2384,9 +2384,7 @@ def rail_system_class_comparability(
 
     system_class = observation_system_class(obs)
     if system_class is None:
-        # Untyped and uninferable: leave scorable. Silent exclusion of
-        # unknown rows would hide coverage drift; typed class is preferred.
-        return True, None, None
+        return False, None, "missing_system_class"
     if system_class in RAIL_COMPARABLE_SYSTEM_CLASSES:
         return True, system_class, None
     if system_class in RAIL_INCOMPARABLE_SYSTEM_CLASSES:
@@ -2406,18 +2404,14 @@ def rail_system_class_comparability(
 def rail_system_class_verdict(obs: AdoptedObservation) -> str:
     """Three-value class-comparability verdict (b-190). DIAGNOSTIC ONLY.
 
-    ``rail_system_class_comparability`` must keep returning ``True`` for an
-    untyped observation -- silently excluding unknown rows would hide coverage
-    drift, which is worse than scoring them. But ``True`` there means "not
-    excluded", NOT "verified comparable", and nothing downstream could tell the
-    two apart. This function draws that distinction without moving the boolean:
+    This preserves whether the class is known even though the α gate refuses
+    untyped observations as pin-bearing. The verdict distinguishes:
 
         typed and rail-comparable    -> match
         typed and not rail-comparable -> mismatch
         untyped / uninferable         -> undeterminable
 
-    Nothing refuses on this verdict; it is recorded so the untyped population is
-    countable. Owner ruling 2026-08-18: third state, no gate.
+    The verdict remains recorded so unknown-class refusals stay countable.
     """
 
     return verdict_from_membership(
@@ -2934,8 +2928,7 @@ def rail_alpha_comparability(
     runtime: dict[str, Any] = {
         "system_class": system_class,
         "rail_system_class_comparable": class_ok,
-        # b-190: `class_ok` is True both for a verified-comparable class and for
-        # an untyped one. The verdict separates them without changing the gate.
+        # Keep the evidence state visible alongside the fail-closed class gate.
         "rail_system_class_verdict": rail_system_class_verdict(obs),
         "condensed_form_state": form_state,
         "rail_condensed_form_comparable": form_ok,

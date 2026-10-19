@@ -312,10 +312,6 @@ def test_silicate_melt_alpha_remains_comparable() -> None:
     assert any(record.status in SCORING_STATUSES for record in evaluation.records)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="b-420: an untyped system class can still ground an alpha residual pin",
-)
 def test_untyped_system_class_is_not_alpha_pin_bearing() -> None:
     obs = _alpha_fixture(
         species_id="Fe",
