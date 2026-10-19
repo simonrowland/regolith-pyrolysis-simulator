@@ -686,7 +686,8 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
         ).run()
         if name == 'ci_carbonaceous_chondrite_C2B_12h':
             assert rebuild_counts[name] == 1
-            assert equilibrium_count[0] - equilibrations_before == 8
+            # b-899 one redox state, d-166 regen; was 8 on green 62d9d561a.
+            assert equilibrium_count[0] - equilibrations_before == 38
 
     assert observed == expected
 
