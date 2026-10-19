@@ -73,6 +73,12 @@ def _assert_table1_grid(document: dict, expected: list[dict[str, str]]) -> None:
         assert values["Total_wt_pct_as_published"] == expected_row["Total"]
         assert values["value"] == expected_row["Fe3+/Fe2+"]
         fO2_condition = observation["point_conditions"]["fO2_log"]
+        assert fO2_condition["reference_pressure"] == {
+            "value": 1,
+            "units": "bar",
+            "basis": "convention",
+            "printed": False,
+        }
         assert fO2_condition["state"]["tag"] == "value"
         canonical_log_fO2 = -Decimal(
             values["minus_log_fO2_as_published"]
@@ -85,6 +91,22 @@ def _assert_table1_grid(document: dict, expected: list[dict[str, str]]) -> None:
         assert observation["locator"]["page"] == (4 if int(row_number) <= 48 else 5)
         assert observation["locator"]["pdf_page_index"] == observation["locator"]["page"] - 1
         assert observation["locator"]["row"] == row_number
+
+
+def _first_row_fO2_pa(document: dict, tmp_path: Path) -> Decimal:
+    path = tmp_path / "borisov-2015-reference-mutation.yaml"
+    path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(path)
+    migrator.finalize()
+    record = next(
+        record
+        for record in migrator.result.observations.values()
+        if "table1_fe3_fe2_row_01" in record.observation_id
+    )
+    assert record.identity.fO2_Pa is not None
+    assert record.identity.fO2_Pa.is_value
+    return record.identity.fO2_Pa.value
 
 
 def test_render_grid_binds_all_table1_cells_and_catches_both_mutations(
@@ -182,6 +204,27 @@ def test_migration_types_all_rows_and_binds_conditions_quench_and_species(
     assert quoted.evidence.class_.value.value == "quoted_attributed"
     assert quoted.uncertainty.kind is UncertaintyKind.PRINTED
     assert "1σ" in quoted.uncertainty.verbatim["verbatim"]
+
+
+def test_bar_reference_maps_to_pinned_pascal_magnitude_and_mutation_fails(
+    document: dict, tmp_path: Path
+) -> None:
+    expected = Decimal("20892.96130854039483122233736")
+    assert _first_row_fO2_pa(document, tmp_path) == expected
+
+    mutated = deepcopy(document)
+    first_row = next(
+        item for item in mutated["species"]["Fe"]["observations"]
+        if item["observation_id"].endswith("_row_01_daf_52")
+    )
+    first_row["point_conditions"]["fO2_log"]["reference_pressure"] = {
+        "value": "101325",
+        "units": "Pa",
+        "basis": "convention",
+        "printed": False,
+    }
+    with pytest.raises(AssertionError):
+        assert _first_row_fO2_pa(mutated, tmp_path) == expected
 
 
 def test_published_tables_figures_and_quench_context_are_disposed_by_type(

@@ -11516,6 +11516,26 @@ def _log_fO2_to_pa(
     return reference_pressure_pa * (Decimal(10) ** log10_fO2)
 
 
+def _fO2_conventional_reference_pressure_pa(condition: object) -> Decimal | None:
+    """Read an explicit non-printed reference pressure from an fO2 condition."""
+
+    if not isinstance(condition, Mapping):
+        return None
+    reference = condition.get("reference_pressure")
+    if not isinstance(reference, Mapping):
+        return None
+    if reference.get("basis") != "convention" or reference.get("printed") is not False:
+        return None
+    amount = _printed_decimal(reference.get("value"))
+    units = str(reference.get("units") or "").strip()
+    if amount is None or not units:
+        return None
+    pressure_pa, _ = convert_pressure_to_pa(amount, units)
+    if pressure_pa is None or pressure_pa <= 0:
+        return None
+    return pressure_pa
+
+
 def _normalize_printed_token(raw: object) -> str:
     return str(raw).strip().replace("−", "-").replace("–", "-").replace(" ", "")
 
@@ -11723,6 +11743,16 @@ def _walk_printed_oxygen(
                 ):
                     rejected_logs.append(True)
                 else:
+                    reference_pressure_pa = (
+                        _fO2_conventional_reference_pressure_pa(condition)
+                    )
+                    if (
+                        isinstance(condition, Mapping)
+                        and "reference_pressure" in condition
+                        and reference_pressure_pa is None
+                    ):
+                        rejected_logs.append(True)
+                        continue
                     logs.append((
                         condition_value,
                         Located(
@@ -11730,7 +11760,7 @@ def _walk_printed_oxygen(
                             locator=located_condition.locator or local,
                             inference=located_condition.inference,
                         ),
-                        _BAR_PA,
+                        reference_pressure_pa or _BAR_PA,
                     ))
         if name in _PRINTED_LOG_FO2_KEYS or name in _PRINTED_PO2_KEYS:
             if name in _PRINTED_LOG_FO2_KEYS and buffer_relative:
@@ -15160,6 +15190,8 @@ class Migrator:
             oxygen_roots.append(values)
         if isinstance(obs.get("equipment"), Mapping):
             oxygen_roots.append(obs["equipment"])
+        if isinstance(raw_point_conditions, Mapping):
+            oxygen_roots.append({"point_conditions": raw_point_conditions})
         point_conditions = self._merge_printed_oxygen(
             experiment_id,
             point_conditions,
@@ -15268,16 +15300,17 @@ class Migrator:
         )
         if q_token in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
             fO2_condition = (point_conditions or {}).get("fO2_log")
-            fO2_note = (
-                fO2_condition.locator.note.casefold()
-                if isinstance(fO2_condition, Located)
-                and fO2_condition.locator is not None
-                and fO2_condition.locator.note is not None
-                else ""
+            raw_fO2_condition = (
+                raw_point_conditions.get("fO2_log")
+                if isinstance(raw_point_conditions, Mapping)
+                else None
+            )
+            fO2_reference_pa = (
+                _fO2_conventional_reference_pressure_pa(raw_fO2_condition)
             )
             existing_fO2 = ident_kwargs.get("fO2_Pa")
             if (
-                "stored on the bar convention" in fO2_note
+                fO2_reference_pa is not None
                 and isinstance(fO2_condition, Located)
                 and fO2_condition.state.is_value
                 and isinstance(fO2_condition.state.value, Decimal)
@@ -15287,7 +15320,7 @@ class Migrator:
                 )
             ):
                 ident_kwargs["fO2_Pa"] = State.of(
-                    _log_fO2_to_pa(fO2_condition.state.value, _BAR_PA)
+                    _log_fO2_to_pa(fO2_condition.state.value, fO2_reference_pa)
                 )
         identity = fill_identity(quantity, species, **ident_kwargs)
         partial_total_condition = _partial_pressure_point_condition(
