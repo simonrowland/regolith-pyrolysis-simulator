@@ -151,10 +151,12 @@
                 <select id="furnace-material"
                         class="recipe-defining-control"
                         aria-label="Furnace material"
+                        aria-describedby="furnace-material-error"
                         data-catalog-url="{{ url_for('web.furnace_material_catalog') }}">
-                    <option value="" selected>Default (1800 C ceiling)</option>
+                    <option value="" selected>Default</option>
                 </select>
             </label>
+            <div id="furnace-material-error" class="config-warning" hidden role="status" aria-live="polite"></div>
             <div class="chip-row" aria-label="Wall temperature offset display">
                 <button type="button" class="chip" disabled title="No live wall-temperature offset path exists yet">-50</button>
                 <button type="button" class="chip" disabled title="No live wall-temperature offset path exists yet">nominal</button>
