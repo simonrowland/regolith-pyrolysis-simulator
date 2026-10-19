@@ -907,6 +907,24 @@ def test_shadow_backend_exception_surfaces_warning():
     )
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason='b-769: provider must propagate its own backend programming errors',
+)
+def test_shadow_backend_keyerror_propagates():
+    class _BrokenBackend(_FakeMAGEMinBackend):
+        def equilibrate(self, **kwargs):
+            self.calls.append(kwargs)
+            raise KeyError('synthetic provider programming error')
+
+    shadow = MAGEMinShadowProvider(
+        backend=_BrokenBackend(equilibrium=_FakeEquilibriumResult()),
+    )
+
+    with pytest.raises(KeyError, match='synthetic provider programming error'):
+        shadow.dispatch(_make_request(ChemistryIntent.SILICATE_EQUILIBRIUM))
+
+
 def test_projected_field_repair_warning_reaches_shadow_caller():
     fake_backend = _FakeMAGEMinBackend(
         equilibrium=_FakeEquilibriumResult(
