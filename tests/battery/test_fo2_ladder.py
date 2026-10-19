@@ -19,9 +19,10 @@ from simulator.battery.enums import (
     Engine,
     FO2Channel,
     MethodToken,
+    Quantity,
     ValueKind,
 )
-from simulator.battery.fo2_ladder import resolve_row_fo2
+from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
 from simulator.battery.records import FO2Control, State, Value
 from simulator.battery.score import (
     ScoreContext,
@@ -175,6 +176,79 @@ def test_tier3_buffer_matches_the_oxygen_condition_point() -> None:
     assert payload["fO2_route"] == "buffer_relation"
     assert payload["fO2_borrowed"] is False
     assert payload["fO2_log"] == float(selected.value.point)
+
+
+def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> None:
+    from simulator.battery.consumer_inputs import collect_consumer_inputs
+    from simulator.battery.generators.bench import melt_activity_requests
+    from simulator.battery.migrate import load_migrated_benches, load_migrated_store
+
+    _works, experiments, observations = load_migrated_store(
+        sources=("basu-2008-feo-steelmaking",)
+    )
+    observation = observations[
+        "basu-2008-feo-steelmaking::basu_2008_tii_s01_a_feo_1873k"
+    ]
+    experiment = experiments[observation.experiment_id]
+    bench = load_migrated_benches()[experiment.bench_id]
+    resolved = resolve_row_fo2(experiment, bench, observation)
+    assert resolved is not None
+    assert resolved.tier == 3
+    assert resolved.route == (
+        "metal_saturation; fo2 from printed a_FeO (circular for a_FeO rows)"
+    )
+    assert resolved.log10_fO2_bar == pytest.approx(-9.68612316558128, abs=1e-12)
+    notice = fo2_tier_notice(Quantity.ACTIVITY, resolved)
+    assert "fo2 from printed a_FeO (circular for a_FeO rows)" in notice.reason
+
+    requests = melt_activity_requests(
+        collect_consumer_inputs(experiment, bench, observation),
+        experiment=experiment,
+        bench=bench,
+        observation=observation,
+    )
+    comparable = [
+        item for item in requests
+        if item.readiness.engine in _COMPARABLE and item.payload is not None
+    ]
+    assert comparable
+    assert {item.payload["fO2_log"] for item in comparable} == {
+        resolved.log10_fO2_bar
+    }
+    assert {item.payload["fO2_tier"] for item in comparable} == {3}
+    assert {item.payload["fO2_route"] for item in comparable} == {resolved.route}
+
+    unavailable = replace(
+        observation,
+        value=Value(ValueKind.UNAVAILABLE, unavailable_reason="test row without a_FeO"),
+    )
+    assert resolve_row_fo2(experiment, bench, unavailable) is None
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        isolated=False,
+    )
+    context = ScoreContext(
+        works=_works,
+        experiments=experiments,
+        observations=observations,
+        extract_review={observation.source_id: "reviewed"},
+        hostname="test",
+        benches={bench.id: bench},
+    )
+    residual, _candidate = compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=prediction,
+    )
+    assert any(
+        "fo2 from printed a_FeO (circular for a_FeO rows)" in notice.reason
+        for notice in residual.notices
+    )
 
 
 def test_tier4_borrowed_intrinsic_is_the_same_on_every_engine() -> None:

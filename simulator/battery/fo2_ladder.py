@@ -5,7 +5,7 @@ The ladder is the seeding order from d-160/d-163:
 1. printed fO2;
 2. printed Fe3+/ΣFe through the Kress91 inverse;
 3. the experiment's controlled atmosphere or buffer, including the
-   effusion oxygen-mass-balance closure;
+   effusion oxygen-mass-balance closure and metal/slag saturation;
 4. the melt's intrinsic fO2, flagged borrowed.
 
 Tiers 1, 2 and 4 share one numeric fO2. For tier 3 effusion the shared
@@ -29,12 +29,14 @@ from decimal import Decimal
 from simulator.battery.enums import (
     AmountBasis,
     MethodToken,
+    Phase,
+    ReferenceStateConvention,
     NoticeKind,
     Quantity,
     ValueKind,
 )
 from simulator.battery.composition import composition_wt_pct
-from simulator.battery.identity import Identity
+from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.migrate import (
     FE3_FE2_RATIO_PRINTED_FIELDS,
     FERRIC_FRACTION_FIELDS,
@@ -189,6 +191,8 @@ def resolve_row_fo2(
     )
     if closure is not None:
         return closure
+    if _metal_saturation_declared(experiment):
+        return _metal_saturation_fo2(observation, temperature, quantity)
     for route in routes:
         if route.route == _VACUUM_ROUTE:
             log = _log_point(route.value)
@@ -197,6 +201,90 @@ def resolve_row_fo2(
     if _knudsen_blocks_intrinsic(experiment, observation, quantity):
         return None
     return _tier4(weights, temperature)
+
+
+def _metal_saturation_declared(experiment: Experiment | None) -> bool:
+    if experiment is None or experiment.sample.form is None:
+        return False
+    form = experiment.sample.form.state
+    if not form.is_value or not isinstance(form.value, str):
+        return False
+    folded = form.value.casefold()
+    return any(
+        marker in folded
+        for marker in ("liquid iron", "solid iron", "liquid fe", "solid fe")
+    )
+
+
+def _metal_saturation_fo2(
+    observation: Observation | None,
+    temperature_K: float | None,
+    quantity: Quantity | None,
+) -> ResolvedFo2 | None:
+    identity = _identity(observation)
+    resolved_quantity = quantity or (
+        None if identity is None else quantity_token(identity)
+    )
+    if (
+        observation is None
+        or identity is None
+        or temperature_K is None
+        or resolved_quantity is not Quantity.ACTIVITY
+        or identity.species.formula.strip().casefold() != "feo"
+        or identity.species.phase is None
+        or not identity.species.phase.is_value
+        or identity.species.phase.value is not Phase.L
+    ):
+        return None
+    reference_state = identity.reference_state
+    if (
+        reference_state is None
+        or not reference_state.is_value
+        or reference_state.value.convention
+        is not ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        or reference_state.value.endmember.formula.strip().casefold() != "feo"
+        or reference_state.value.endmember.phase is None
+        or not reference_state.value.endmember.phase.is_value
+        or reference_state.value.endmember.phase.value is not Phase.L
+    ):
+        return None
+    value = observation.value
+    if value.kind is not ValueKind.POINT or value.point is None:
+        return None
+    try:
+        activity_feo = float(value.point)
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not math.isfinite(activity_feo) or activity_feo <= 0.0:
+        return None
+
+    # Premise: coexisting pure Fe fixes a_Fe=1 in 2 Fe + O2 = 2 FeO.
+    # Algebra: 0=ΔG°+RT ln(a_FeO²/(a_Fe² fO2)), hence
+    #          log10(fO2)=2 log10(a_FeO)+ΔG°/(RT ln 10).
+    # Unit check: JANAF ΔG° is kJ/mol-O2; (R/1000)·T is kJ/mol-O2.
+    # Sanity: at 1873 K with printed a_FeO=0.306, the owner gives -9.6861.
+    from simulator.chemistry.ellingham_thermo import (
+        ellingham_delta_g_kj_per_mol_o2,
+    )
+    from simulator.physical_constants import GAS_CONSTANT
+
+    try:
+        delta_g_kj_per_mol_o2 = ellingham_delta_g_kj_per_mol_o2(
+            "Fe", temperature_K
+        )
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    log10_fo2 = (
+        2.0 * math.log10(activity_feo)
+        + delta_g_kj_per_mol_o2
+        / ((GAS_CONSTANT / 1000.0) * temperature_K * math.log(10.0))
+    )
+    if not math.isfinite(log10_fo2):
+        return None
+    route = "metal_saturation"
+    if resolved_quantity is Quantity.ACTIVITY:
+        route += "; fo2 from printed a_FeO (circular for a_FeO rows)"
+    return ResolvedFo2(log10_fo2, 3, route, False)
 
 
 def _identity(observation: Observation | None) -> Identity | None:
