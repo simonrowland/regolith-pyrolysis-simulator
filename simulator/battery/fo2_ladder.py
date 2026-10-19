@@ -29,6 +29,7 @@ from decimal import Decimal
 from simulator.battery.enums import (
     AmountBasis,
     Authority,
+    Fo2Mode,
     MethodToken,
     Phase,
     ReferenceStateConvention,
@@ -105,6 +106,19 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
         origin="fo2_ladder",
         band=f"borrowed fO2: {resolved.route}" if resolved.borrowed else None,
         authority=Authority.BRIDGE if resolved.borrowed else None,
+        fo2_mode=Fo2Mode.SHARED_LADDER,
+    )
+
+
+def engine_intrinsic_fo2_notice(quantity: Quantity) -> Notice:
+    """Record an engine's own redox calculation with no supplied fO2."""
+
+    return Notice(
+        kind=NoticeKind.INPUT_OMITTED,
+        affected_quantities=(quantity,),
+        reason="engine intrinsic redox; no fO2 supplied",
+        origin="fo2_ladder",
+        fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
     )
 
 

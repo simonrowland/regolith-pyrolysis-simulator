@@ -38,6 +38,11 @@ class Engine(StrEnum):
     OPENIMCC = "openimcc"
 
 
+class Fo2Mode(StrEnum):
+    ENGINE_INTRINSIC = "engine_intrinsic"
+    SHARED_LADDER = "shared_ladder"
+
+
 class PolymorphRejectionKind(StrEnum):
     OMITTED = "omitted"
     UNRECOGNISED = "unrecognised"

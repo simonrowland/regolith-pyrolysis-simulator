@@ -1,10 +1,4 @@
-"""One fO2 per row, shared by every engine (d-180, t-1352).
-
-The equality assertion is the mutation target: restoring the
-internal-analytical exemption (drop its oxygen gap, and skip attaching a
-ladder fO2 when the printed oxygen waypoint is empty) makes that engine's
-fO2 differ from the others.
-"""
+"""Shared-ladder and intrinsic redox modes (d-180/d-182, t-1352)."""
 
 from __future__ import annotations
 
@@ -22,9 +16,11 @@ from simulator.battery.enums import (
     CellMaterial,
     Engine,
     FO2Channel,
+    Fo2Mode,
     MethodToken,
     NoticeKind,
     Quantity,
+    Rail,
     ValueKind,
 )
 from simulator.battery.fo2_ladder import (
@@ -42,6 +38,8 @@ from simulator.battery.score import (
     flagged_strata,
     load_score_context,
     predict_with_engine,
+    residual_to_plain,
+    score_store,
 )
 from simulator.battery.waypoints import ReadinessStatus, oxygen_condition
 from simulator.fe_redox import (
@@ -295,6 +293,64 @@ def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> 
     assert FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND not in flagged_strata(
         residual.notices
     )
+
+    intrinsic, _candidate = compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
+    )
+    assert intrinsic.numeric is not None, intrinsic.refusal
+    assert intrinsic.fo2_mode is Fo2Mode.ENGINE_INTRINSIC
+    # Green 6f90106c6 internal-analytical result before the shared ladder.
+    assert float(intrinsic.numeric.value).hex() == "-0x1.380f012af8f98p-2"
+    assert intrinsic.fo2_mode is not residual.fo2_mode
+    assert not any(
+        "fo2 from printed a_FeO (circular for a_FeO rows)" in notice.reason
+        for notice in intrinsic.notices
+    )
+    assert any(
+        notice.fo2_mode is Fo2Mode.ENGINE_INTRINSIC
+        for notice in intrinsic.notices
+    )
+    assert any(
+        notice.fo2_mode is Fo2Mode.SHARED_LADDER for notice in residual.notices
+    )
+    assert residual.fo2_mode is Fo2Mode.SHARED_LADDER
+    assert residual.numeric is not None
+    assert float(residual.numeric.value).hex() == float(intrinsic.numeric.value).hex()
+    assert residual.key != intrinsic.key
+    assert residual_to_plain(intrinsic)["fo2_mode"] == "engine_intrinsic"
+    assert any(
+        notice.get("fo2_mode") == "engine_intrinsic"
+        for notice in residual_to_plain(intrinsic)["notices"]
+    )
+    assert any(
+        notice.get("fo2_mode") == "shared_ladder"
+        for notice in residual_to_plain(residual)["notices"]
+    )
+
+    from simulator.battery.generators.bench import activity_request_for_engine
+
+    intrinsic_request = activity_request_for_engine(
+        experiment,
+        observation,
+        Engine.INTERNAL_ANALYTICAL.value,
+        fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
+    )
+    assert intrinsic_request is not None and intrinsic_request.payload is not None
+    assert "fO2_log" not in intrinsic_request.payload
+
+    scored, _candidates = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.MELT_ACTIVITY,
+    )
+    paired = [item for item in scored if item.reference == observation.observation_id]
+    assert {item.fo2_mode for item in paired} == {
+        Fo2Mode.ENGINE_INTRINSIC,
+        Fo2Mode.SHARED_LADDER,
+    }
 
     borrowed_notice = fo2_tier_notice(
         Quantity.ACTIVITY,

@@ -40,6 +40,7 @@ from simulator.battery.enums import (
     Engine,
     EvidenceClass,
     ExecutionState,
+    Fo2Mode,
     FORMATION_QUANTITIES,
     FUSION_QUANTITIES,
     KINETIC_YIELD_QUANTITIES,
@@ -677,6 +678,17 @@ def residual_key(
     t = "" if temperature_K is None else f":T={_dec_token(temperature_K)}"
     rail_token = "none" if rail is None else rail.value
     return f"{reference_id}{t}::{q}::{rail_token}::{engine.value}"
+
+
+def _key_for_fo2_mode(key: str, mode: Fo2Mode | None) -> str:
+    return key if mode is None else f"{key}::fo2_mode={mode.value}"
+
+
+def _fo2_mode_from_notices(notices: Sequence[Notice]) -> Fo2Mode | None:
+    return next(
+        (notice.fo2_mode for notice in notices if notice.fo2_mode is not None),
+        None,
+    )
 
 
 def _dec_token(value: Decimal) -> str:
@@ -4597,6 +4609,24 @@ def oxygen_is_scorer_input(
     return False, f"{qname} does not take oxygen as an input; oxygen was omitted", redox
 
 
+def _has_intrinsic_redox_activity(engine: Engine, point: Observation) -> bool:
+    if engine is not Engine.INTERNAL_ANALYTICAL:
+        return False
+    identity = point.identity
+    if (
+        not isinstance(identity, Identity)
+        or quantity_token(identity) is not Quantity.ACTIVITY
+    ):
+        return False
+    state = identity.composition
+    composition = (
+        state.value
+        if state is not None and state.is_value and state.value is not None
+        else None
+    )
+    return bool(oxygen_is_scorer_input(identity, composition)[2])
+
+
 def _unfilled_inputs(identity: Identity) -> dict[str, str]:
     """Which of the scorer's former fills this identity does not carry."""
 
@@ -5019,7 +5049,8 @@ def _comparison_identity(
         prediction.engine, prediction.notices
     )
     shared_oxygen_condition = any(
-        notice.origin == "fo2_ladder" for notice in prediction.notices
+        notice.fo2_mode is Fo2Mode.SHARED_LADDER
+        for notice in prediction.notices
     )
     melt_identity = _melt_identity_for_valence(identity)
     redox = quantity_token(identity) in {
@@ -5920,6 +5951,7 @@ def predict_with_engine(
     isolated: bool | None = None,
     experiment: Experiment | None = None,
     bench: Bench | None = None,
+    fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
 ) -> EnginePrediction:
     """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
 
@@ -6260,7 +6292,12 @@ def predict_with_engine(
                 },
                 identity=identity,
             )
-        generated = activity_request_for_engine(experiment, observation, engine.value)
+        generated = activity_request_for_engine(
+            experiment,
+            observation,
+            engine.value,
+            fo2_mode=fo2_mode,
+        )
         if generated is None or generated.payload is None:
             return _activity_contract_refusal(
                 engine,
@@ -8013,6 +8050,7 @@ def compile_residual(
     derived_band_reason: str | None = None,
     ratchet_missing: bool = False,
     point_observations: Sequence[Observation] | None = None,
+    fo2_mode: Fo2Mode | None = None,
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
     source_reference = reference
@@ -8074,6 +8112,13 @@ def compile_residual(
         evidence_class_notices,
         _quench_notices(reference),
     )
+    if fo2_mode is Fo2Mode.ENGINE_INTRINSIC and quantity is not None:
+        from simulator.battery.fo2_ladder import engine_intrinsic_fo2_notice
+
+        notices = union_notices(
+            notices,
+            (engine_intrinsic_fo2_notice(quantity),),
+        )
     comparison_ids = comparison_ids or {reference.observation_id}
 
     def _refused(
@@ -8087,6 +8132,7 @@ def compile_residual(
         exclusions: tuple[str, ...] = (),
     ) -> tuple[Residual, Observation | None]:
         all_notices = union_notices(notices, extra_notices)
+        result_mode = fo2_mode or _fo2_mode_from_notices(all_notices)
         excl = exclusions or ("status_match_or_mismatch",)
         if (
             not _reference_has_measured_evidence(reference)
@@ -8095,7 +8141,7 @@ def compile_residual(
             excl = (*excl, "reference_measured_evidence")
         return (
             Residual(
-                key=key,
+                key=_key_for_fo2_mode(key, result_mode),
                 reference=reference.observation_id,
                 execution=execution,
                 rail=rail,
@@ -8116,6 +8162,7 @@ def compile_residual(
                 numeric=None,
                 refusal=ResidualRefusal(reason, dict(detail), check_refs=_check_refs(gates, reason)),
                 quench_state=_residual_quench_state(reference),
+                fo2_mode=result_mode,
             ),
             candidate,
         )
@@ -8196,6 +8243,7 @@ def compile_residual(
                 engine,
                 context=context,
                 prediction=prediction,
+                fo2_mode=fo2_mode,
                 comparison_ids=comparison_ids,
                 predict=predict,
                 handles=handles,
@@ -8351,6 +8399,8 @@ def compile_residual(
             recorded = _bench_for_score(experiment, context.benches)
             if recorded is not None:
                 predictor_kwargs["bench"] = recorded
+        if predictor is predict_with_engine and fo2_mode is not None:
+            predictor_kwargs["fo2_mode"] = fo2_mode
         prediction = predictor(
             engine,
             _melt_prediction_reference(implied_alpha_reference or reference),
@@ -8358,6 +8408,7 @@ def compile_residual(
         )
 
     notices = union_notices(notices, prediction.notices)
+    result_mode = fo2_mode or _fo2_mode_from_notices(notices)
     expanded_sources = expand_coefficient_sources(prediction.coefficient_sources)
     lineage_complete = lineage_complete_for(
         prediction.coefficient_sources,
@@ -8543,7 +8594,13 @@ def compile_residual(
             source_identity.reference_state.value.endmember.polymorph
         )
     )
-    if quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
+    if fo2_mode is Fo2Mode.ENGINE_INTRINSIC and quantity in MELT_ACTIVITY_QUANTITIES:
+        equal = _identity_equal(
+            compared_reference,
+            compared_candidate,
+            ignore_fO2=True,
+        )
+    elif quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
         equal = _same_row_redox_identity_equal(
             compared_reference, compared_candidate
         )
@@ -8907,7 +8964,7 @@ def compile_residual(
     eligible = conjuncts.eligible()
     return (
         Residual(
-            key=key,
+            key=_key_for_fo2_mode(key, result_mode),
             reference=reference.observation_id,
             execution=prediction.execution,
             rail=rail,
@@ -8928,6 +8985,7 @@ def compile_residual(
                 )
             ),
             quench_state=_residual_quench_state(reference),
+            fo2_mode=result_mode,
         ),
         candidate,
     )
@@ -9327,6 +9385,9 @@ def _score_store_with_decisions(
                                 engine,
                                 residue_prediction_cache,
                             )
+                        intrinsic_redox_activity = _has_intrinsic_redox_activity(
+                            engine, point
+                        )
                         residual, candidate = compile_residual(
                             point,
                             engine,
@@ -9347,12 +9408,56 @@ def _score_store_with_decisions(
                             point_observations=point_observations_by_experiment.get(
                                 point.experiment_id, ()
                             ),
+                            fo2_mode=(
+                                Fo2Mode.SHARED_LADDER
+                                if intrinsic_redox_activity
+                                else None
+                            ),
                         )
                         if _stream is None:
                             assert residuals is not None
                             residuals.append(residual)
                         else:
                             _stream.append(residual, candidate)
+                        if (
+                            residual.fo2_mode is Fo2Mode.SHARED_LADDER
+                            and intrinsic_redox_activity
+                            and prediction is None
+                            and predict is None
+                        ):
+                            total += 1
+                            intrinsic_residual, intrinsic_candidate = compile_residual(
+                                point,
+                                engine,
+                                context=live_context,
+                                comparison_ids=comparison_ids,
+                                handles=resolved_handles,
+                                lineage_observation_id=(
+                                    obs.observation_id
+                                    if point.observation_id != obs.observation_id
+                                    else None
+                                ),
+                                table_index=table_index,
+                                derived_band=derived_band,
+                                derived_band_reason=derived_band_reason,
+                                ratchet_missing=ratchet_missing,
+                                point_observations=point_observations_by_experiment.get(
+                                    point.experiment_id, ()
+                                ),
+                                fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
+                            )
+                            if _stream is None:
+                                assert residuals is not None
+                                residuals.append(intrinsic_residual)
+                            else:
+                                _stream.append(
+                                    intrinsic_residual,
+                                    intrinsic_candidate,
+                                )
+                            if intrinsic_candidate is not None and _stream is None:
+                                candidates[intrinsic_candidate.observation_id] = (
+                                    intrinsic_candidate
+                                )
                         if candidate is not None and _stream is None:
                             candidates[candidate.observation_id] = candidate
                         done += 1

@@ -5,7 +5,7 @@ from decimal import Decimal
 from collections.abc import Mapping
 
 from simulator.battery.consumer_inputs import ConsumerInputs, REQUIREMENTS
-from simulator.battery.enums import Phase, ReferenceStateConvention, ValueKind
+from simulator.battery.enums import Fo2Mode, Phase, ReferenceStateConvention, ValueKind
 from simulator.battery.records import (
     StandardState,
     Value,
@@ -490,6 +490,7 @@ def engine_point_requests(inputs: ConsumerInputs) -> tuple[GeneratedInput, ...]:
 
 def melt_activity_requests(
     inputs: ConsumerInputs, *, experiment=None, bench=None, observation=None,
+    fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
 ) -> tuple[GeneratedInput, ...]:
     """Activity and activity-coefficient requests for engines that report activities.
 
@@ -499,8 +500,10 @@ def melt_activity_requests(
     engine receives the same fO2 from the row ladder, or the same oxygen gap
     when no tier resolves. A printed fO2 is attached for every engine even
     when oxygen is not otherwise an input. Pressure and the gas boundary are
-    not inputs. A missing required input is a typed gap, and a missing oxygen
-    point is never filled from the engine default.
+    not inputs. ``engine_intrinsic`` omits fO2 only for internal-analytical;
+    all other engines retain the shared-ladder requirement. A missing required
+    input is a typed gap, and a missing oxygen point is never filled from the
+    engine default.
     """
     provenance = _provenance(inputs)
     if inputs.pure_substance_reference:
@@ -555,16 +558,18 @@ def melt_activity_requests(
     moles = None
     if composition.selected is not None and isinstance(composition.selected.value, Mapping):
         moles = composition.selected.value
-    from simulator.battery.fo2_ladder import resolve_row_fo2
+    resolved = None
+    if fo2_mode is Fo2Mode.SHARED_LADDER:
+        from simulator.battery.fo2_ladder import resolve_row_fo2
 
-    resolved = resolve_row_fo2(
-        experiment,
-        bench,
-        observation,
-        composition_moles=moles,
-        temperature_K=temperature_K,
-        oxygen=inputs.waypoints["oxygen_condition"],
-    )
+        resolved = resolve_row_fo2(
+            experiment,
+            bench,
+            observation,
+            composition_moles=moles,
+            temperature_K=temperature_K,
+            oxygen=inputs.waypoints["oxygen_condition"],
+        )
     # Tier 1 is the printed fO2 and is shared even when oxygen is not
     # otherwise an input. Tiers 2-4 fill only a multivalent row.
     # A vapour effusion closure is not an activity fO2.
@@ -588,7 +593,15 @@ def melt_activity_requests(
         if engine == "internal-analytical" and inputs.activity_quantity != "activity":
             results.append(_not_applicable(provenance, engine))
             continue
-        engine_gaps = gap_tuple
+        engine_gaps = tuple(
+            gap
+            for gap in gap_tuple
+            if not (
+                fo2_mode is Fo2Mode.ENGINE_INTRINSIC
+                and engine == "internal-analytical"
+                and gap.waypoint == "oxygen_condition"
+            )
+        )
         engine_status = (
             ReadinessStatus.GAP if engine_gaps else ReadinessStatus.READY
         )
@@ -691,11 +704,18 @@ def melt_activity_requests(
     return tuple(results)
 
 
-def activity_request_for_engine(experiment, observation, engine: str) -> GeneratedInput | None:
+def activity_request_for_engine(
+    experiment,
+    observation,
+    engine: str,
+    *,
+    fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
+) -> GeneratedInput | None:
     """One engine's melt-activity contract for this observation.
 
     The scorer calls this before it would fill a missing fO2. A gap here is
-    a typed refusal. PO2_ENGINE_DEFAULT is not an oxygen input.
+    a typed refusal. ``engine_intrinsic`` is limited to the internal
+    analytical activity calculation. PO2_ENGINE_DEFAULT is not an oxygen input.
     """
 
     from simulator.battery.consumer_inputs import collect_consumer_inputs
@@ -712,6 +732,7 @@ def activity_request_for_engine(experiment, observation, engine: str) -> Generat
         experiment=experiment,
         bench=bench,
         observation=observation,
+        fo2_mode=fo2_mode,
     ):
         if item.readiness.engine == engine:
             return item

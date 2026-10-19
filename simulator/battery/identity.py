@@ -1667,8 +1667,9 @@ def _identity_equal(
     *,
     allow_unknown_species_phase: bool = False,
     allow_unknown_species_polymorph: bool = False,
+    ignore_fO2: bool = False,
 ) -> IdentityEqualOutcome:
-    """Compare identities, optionally allowing an unknown phase or polymorph."""
+    """Compare identities with the narrow caller-selected axis allowances."""
 
     left_q_state = _quantity_state(left)
     right_q_state = _quantity_state(right)
@@ -1710,6 +1711,10 @@ def _identity_equal(
     unknown: list[str] = []
     invalid: list[str] = []
     for name in _AXIS_NAMES:
+        # The caller uses this only for an explicit intrinsic-mode residual,
+        # whose engine received no fO2 input.
+        if ignore_fO2 and name == "fO2_Pa":
+            continue
         required = name in profile.required
         permitted_na = name in profile.permitted_not_applicable
         if not required and not permitted_na:
