@@ -1,0 +1,545 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2025-ca-al-inclusion-thermodynamics
+source:
+  citation: "Shornikov, S. I. (2025). Thermodynamic Properties of Oxide Compounds Occurring in Ca–Al-Rich Inclusions. Geochemistry International, 63(9), 810–836."
+  doi: 10.1134/S0016702925600324
+  year: 2025
+  corpus_asset: raw/shornikov-2025-ca-al-inclusion-thermodynamics/shornikov-2025-ca-al-inclusion-thermodynamics.pdf
+  corpus_sha256: 871fba603fa3486d8a834fe3e2cc5c48b564f8027413256f33dd2b5a1530639e
+extraction:
+  method: Manual transcription from pdftotext-layout.txt; Table 2 rendered at 600 dpi for cell verification.
+  date: "2026-10-18"
+  worker: fam10-1019
+review_status: draft
+fidelity_samples:
+  - species: CaAl2O4
+    observable: transition_point
+    observation_id: shornikov_2025_table2_zherbetsov_melting
+    field: delta_H_m_kJ_per_mol
+    value: 35.00
+    locator:
+      page: 5
+      published_page: 814
+      pdf_page_index: 4
+      table: "2"
+species:
+  CaAl2O4:
+    observations:
+      - observation_id: shornikov_2025_table2_allibert_melting
+        type: transition_point
+        locator: {page: 5, published_page: 814, pdf_page_index: 4, table: "2"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Allibert et al., 1981
+          research_method_as_printed: KEMS
+          T_m_as_printed: 1875 ± 6
+          T_m_K: 1875
+          T_m_uncertainty_K: 6
+          delta_H_m_as_printed: 45.00 ± 6.00
+          delta_H_m_kJ_per_mol: 45.00
+          delta_H_m_uncertainty_kJ_per_mol: 6.00
+          delta_S_m_as_printed: 24.00 ± 4.00
+          delta_S_m_J_per_mol_K: 24.00
+          delta_S_m_uncertainty_J_per_mol_K: 4.00
+      - observation_id: shornikov_2025_table2_shornikov_melting
+        type: transition_point
+        locator: {page: 5, published_page: 814, pdf_page_index: 4, table: "2"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Shornikov et al., 1997
+          research_method_as_printed: KEMS
+          T_m_as_printed: 1877 K
+          T_m_K: 1877
+          delta_H_m_as_printed: 31.90 ± 3.00
+          delta_H_m_kJ_per_mol: 31.90
+          delta_H_m_uncertainty_kJ_per_mol: 3.00
+          delta_S_m_as_printed: 17.00 ± 1.60
+          delta_S_m_J_per_mol_K: 17.00
+          delta_S_m_uncertainty_J_per_mol_K: 1.60
+      - observation_id: shornikov_2025_table2_zherbetsov_melting
+        type: transition_point
+        locator: {page: 5, published_page: 814, pdf_page_index: 4, table: "2"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Zherebtsov et al., 1999
+          research_method_as_printed: DTA
+          T_m_as_printed: 1877 K
+          T_m_K: 1877
+          delta_H_m_as_printed: 35.00 ± 5.00
+          delta_H_m_kJ_per_mol: 35.00
+          delta_H_m_uncertainty_kJ_per_mol: 5.00
+          delta_S_m_as_printed: 18.65 ± 2.66
+          delta_S_m_J_per_mol_K: 18.65
+          delta_S_m_uncertainty_J_per_mol_K: 2.66
+    context:
+      - observation_id: shornikov_2025_table2_formation_from_oxides
+        type: thermodynamic_context
+        locator: {page: 5, published_page: 814, pdf_page_index: 4, table: "2"}
+        units: as printed
+        values:
+          quantity: enthalpy_and_entropy_of_CaAl2O4_formation_from_oxides
+          method_class: quoted_attributed
+          reaction_as_printed: not explicitly printed for this table; formation from oxides stated in the article text
+          phase: cr
+          rows_as_printed: "T=1773 K: ΔHT −9.56 ± 0.50 kJ/mol; ΔST 8.58 ± 0.90 J/(mol K), Kalyanram and Bell (1961). T=1260–1400 K: −9.00 ± 0.50; 9.40 ± 0.40, Popov et al. (1979). T=923–1223 K: −9.06 ± 0.90; 9.31 ± 0.74, Allibert et al. (1981). T=1200–1400 K: −9.50 ± 2.30; 11.70 ± 1.90, Skolis et al. (1983). T=1050–1500 K: −7.56 ± 0.42; 9.10 ± 0.28, Kumar and Kay (1985). T=1373–1873 K: −8.96 ± 0.20; 8.69 ± 0.20, Nagata et al. (1989). T=1600–1773 K: −10.86 ± 0.22; 8.19 ± 0.13, Zaitsev et al. (1990). T=1000–1200 K: −6.99 ± 0.08; 9.50 ± 0.15, Rog et al. (1993). T=1173 K: −4.00 ± 0.50; entropy not printed, Ayed et al. (1994). T=1877–2033 K: 22.99 ± 0.50; 28.10 ± 0.25, Shults and Shornikov (1995). T=1833–1877 K: −8.91 ± 1.52; 11.10 ± 0.81, Shornikov et al. (1997)."
+  CaAl4O7:
+    observations:
+      - observation_id: shornikov_2025_table3_shornikov_melting
+        type: transition_point
+        locator: {page: 6, published_page: 815, pdf_page_index: 5, table: "3"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Shornikov et al., 1997
+          T_m_as_printed: 2035 K
+          T_m_K: 2035
+          delta_H_m_as_printed: 27.00 ± 2.50
+          delta_H_m_kJ_per_mol: 27.00
+          delta_H_m_uncertainty_kJ_per_mol: 2.50
+          delta_S_m_as_printed: 13.27 ± 1.20
+          delta_S_m_J_per_mol_K: 13.27
+          delta_S_m_uncertainty_J_per_mol_K: 1.20
+      - observation_id: shornikov_2025_table3_zherbetsov_melting
+        type: transition_point
+        locator: {page: 6, published_page: 815, pdf_page_index: 5, table: "3"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Zherebtsov et al., 1999
+          T_m_as_printed: 2035 K
+          T_m_K: 2035
+          delta_H_m_as_printed: 43.33 ± 3.33
+          delta_H_m_kJ_per_mol: 43.33
+          delta_H_m_uncertainty_kJ_per_mol: 3.33
+          delta_S_m_as_printed: 21.29 ± 1.64
+          delta_S_m_J_per_mol_K: 21.29
+          delta_S_m_uncertainty_J_per_mol_K: 1.64
+          note: "Table footnote: calculated accounting for ΔHm(Al2O3) = 118.407 kJ/mol (Bale et al., 2016)."
+    context:
+      - observation_id: shornikov_2025_table3_formation_from_oxides
+        type: thermodynamic_context
+        locator: {page: 6, published_page: 815, pdf_page_index: 5, table: "3"}
+        units: as printed
+        values:
+          quantity: enthalpy_and_entropy_of_CaAl4O7_formation_from_oxides
+          method_class: quoted_attributed
+          reaction_as_printed: not explicitly printed for this table; formation from oxides stated in the article text
+          phase: cr
+          rows_as_printed: "T=1700–1900 K: ΔHT −5.58 ± 2.80 kJ/mol; ΔST 6.38 ± 1.50 J/(mol K), Rein and Chipman (1965). T=1260–1400 K: −0.30 ± 0.50; 9.30 ± 0.40, Popov et al. (1979). T=923–1223 K: −5.36 ± 0.27; 8.57 ± 0.22, Allibert et al. (1981). T=1200–1400 K: −10.50 ± 0.30; 7.90 ± 0.30, Skolis et al. (1983). T=1100–1500 K: −4.31 ± 0.42; 8.91 ± 0.28, Kumar and Kay (1985). T=1063 K: −8.53 ± 1.57; 4.83 ± 0.97, Geiger et al. (1988). T=1373–1873 K: −5.22 ± 0.18; 8.61 ± 0.18, Nagata et al. (1989). T=1562–1773 K: −6.14 ± 0.29; 8.15 ± 0.18, Zaitsev et al. (1990). T=1000–1200 K: −3.96 ± 0.03; 9.17 ± 0.13, Rog et al. (1993). T=1173 K: −4.67 ± 0.33; entropy not printed, Ayed et al. (1994). T=1833–2035 K: −6.34 ± 0.25; 9.94 ± 0.30, Shults and Shornikov (1995). T=2035–2100 K: 20.66 ± 1.26; 23.21 ± 0.62, Shornikov et al. (1997)."
+  CaAl12O19:
+    observations:
+      - observation_id: shornikov_2025_table4_shornikov_melting
+        type: transition_point
+        locator: {page: 7, published_page: 816, pdf_page_index: 6, table: "4"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Shornikov et al., 1997
+          T_m_as_printed: 2148 K
+          T_m_K: 2148
+          delta_H_m_as_printed: 16.80 ± 1.90
+          delta_H_m_kJ_per_mol: 16.80
+          delta_H_m_uncertainty_kJ_per_mol: 1.90
+          delta_S_m_as_printed: 7.82 ± 0.90
+          delta_S_m_J_per_mol_K: 7.82
+          delta_S_m_uncertainty_J_per_mol_K: 0.90
+      - observation_id: shornikov_2025_table4_zherbetsov_melting
+        type: transition_point
+        locator: {page: 7, published_page: 816, pdf_page_index: 6, table: "4"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Zherebtsov et al., 1999
+          T_m_as_printed: 2125 K
+          T_m_K: 2125
+          delta_H_m_as_printed: 17.28 ± 4.77
+          delta_H_m_kJ_per_mol: 17.28
+          delta_H_m_uncertainty_kJ_per_mol: 4.77
+          delta_S_m_as_printed: 8.13 ± 2.24
+          delta_S_m_J_per_mol_K: 8.13
+          delta_S_m_uncertainty_J_per_mol_K: 2.24
+          note: "Table footnote: calculated accounting for ΔHm(Al2O3) = 118.407 kJ/mol (Bale et al., 2016)."
+  CaTiO3:
+    observations:
+      - observation_id: shornikov_2025_table5_klimm_melting
+        type: transition_point
+        locator: {page: 8, published_page: 817, pdf_page_index: 7, table: "5"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Klimm et al., 2018
+          research_method_as_printed: DTA
+          T_m_as_printed: 2220 K
+          T_m_K: 2220
+          delta_H_m_as_printed: 56.65 ± 11.33
+          delta_H_m_kJ_per_mol: 56.65
+          delta_H_m_uncertainty_kJ_per_mol: 11.33
+          delta_S_m_as_printed: 25.52 ± 5.10
+          delta_S_m_J_per_mol_K: 25.52
+          delta_S_m_uncertainty_J_per_mol_K: 5.10
+      - observation_id: shornikov_2025_table5_shornikov_melting
+        type: transition_point
+        locator: {page: 8, published_page: 817, pdf_page_index: 7, table: "5"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Shornikov, 2019
+          research_method_as_printed: KEMS
+          T_m_as_printed: 2241 K
+          T_m_K: 2241
+          delta_H_m_as_printed: 47.61 ± 1.84
+          delta_H_m_kJ_per_mol: 47.61
+          delta_H_m_uncertainty_kJ_per_mol: 1.84
+          delta_S_m_as_printed: 21.24 ± 0.81
+          delta_S_m_J_per_mol_K: 21.24
+          delta_S_m_uncertainty_J_per_mol_K: 0.81
+  MgSiO3:
+    observations:
+      - observation_id: shornikov_2025_table7_stebbins_melting
+        type: transition_point
+        locator: {page: 11, published_page: 820, pdf_page_index: 10, table: "7"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Stebbins et al., 1984
+          T_m_as_printed: 1840 K
+          T_m_K: 1840
+          delta_H_m_as_printed: 38.70 ± 2.10
+          delta_H_m_kJ_per_mol: 38.70
+          delta_H_m_uncertainty_kJ_per_mol: 2.10
+          delta_S_m_as_printed: 21.03 ± 1.14
+          delta_S_m_J_per_mol_K: 21.03
+          delta_S_m_uncertainty_J_per_mol_K: 1.14
+      - observation_id: shornikov_2025_table7_richet_melting
+        type: transition_point
+        locator: {page: 11, published_page: 820, pdf_page_index: 10, table: "7"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Richet and Bottinga, 1986
+          T_m_as_printed: 1834 K
+          T_m_K: 1834
+          delta_H_m_as_printed: 36.60 ± 3.00
+          delta_H_m_kJ_per_mol: 36.60
+          delta_H_m_uncertainty_kJ_per_mol: 3.00
+          delta_S_m_as_printed: 19.96 ± 1.64
+          delta_S_m_J_per_mol_K: 19.96
+          delta_S_m_uncertainty_J_per_mol_K: 1.64
+      - observation_id: shornikov_2025_table7_sugawara_melting
+        type: transition_point
+        locator: {page: 11, published_page: 820, pdf_page_index: 10, table: "7"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Sugawara, 2005
+          T_m_as_printed: 1834 K
+          T_m_K: 1834
+          delta_H_m_as_printed: 34.75 ± 1.45
+          delta_H_m_kJ_per_mol: 34.75
+          delta_H_m_uncertainty_kJ_per_mol: 1.45
+          delta_S_m_as_printed: 18.95 ± 0.79
+          delta_S_m_J_per_mol_K: 18.95
+          delta_S_m_uncertainty_J_per_mol_K: 0.79
+  Mg2SiO4:
+    observations:
+      - observation_id: shornikov_2025_table8_navrotsky_melting
+        type: transition_point
+        locator: {page: 13, published_page: 822, pdf_page_index: 12, table: "8"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Navrotsky et al., 1989
+          research_method_as_printed: Drop HTSC
+          T_m_as_printed: 2163 K
+          T_m_K: 2163
+          delta_H_m_as_printed: 38.00 ± 6.67
+          delta_H_m_kJ_per_mol: 38.00
+          delta_H_m_uncertainty_kJ_per_mol: 6.67
+          delta_S_m_as_printed: 17.57 ± 3.08
+          delta_S_m_J_per_mol_K: 17.57
+          delta_S_m_uncertainty_J_per_mol_K: 3.08
+      - observation_id: shornikov_2025_table8_richet_melting
+        type: transition_point
+        locator: {page: 13, published_page: 822, pdf_page_index: 12, table: "8"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Richet et al., 1993
+          research_method_as_printed: DTA
+          T_m_as_printed: 2174 K
+          T_m_K: 2174
+          delta_H_m_as_printed: 47.33 ± 4.67
+          delta_H_m_kJ_per_mol: 47.33
+          delta_H_m_uncertainty_kJ_per_mol: 4.67
+          delta_S_m_as_printed: 21.77 ± 2.14
+          delta_S_m_J_per_mol_K: 21.77
+          delta_S_m_uncertainty_J_per_mol_K: 2.14
+      - observation_id: shornikov_2025_table8_sugawara_melting
+        type: transition_point
+        locator: {page: 13, published_page: 822, pdf_page_index: 12, table: "8"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Sugawara, 2005
+          research_method_as_printed: DSC
+          T_m_as_printed: 2174 K
+          T_m_K: 2174
+          delta_H_m_as_printed: 46.30 ± 0.87
+          delta_H_m_kJ_per_mol: 46.30
+          delta_H_m_uncertainty_kJ_per_mol: 0.87
+          delta_S_m_as_printed: 21.30 ± 0.40
+          delta_S_m_J_per_mol_K: 21.30
+          delta_S_m_uncertainty_J_per_mol_K: 0.40
+  Ca2MgSi2O7:
+    observations:
+      - observation_id: shornikov_2025_table10_proks_melting
+        type: transition_point
+        locator: {page: 15, published_page: 824, pdf_page_index: 14, table: "10"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Proks et al., 1977
+          research_method_as_printed: HF drop HTSC
+          T_m_as_printed: 1727 K
+          T_m_K: 1727
+          delta_H_m_as_printed: 24.78 ± 0.64
+          delta_H_m_kJ_per_mol: 24.78
+          delta_H_m_uncertainty_kJ_per_mol: 0.64
+          delta_S_m_as_printed: 14.35 ± 0.37
+          delta_S_m_J_per_mol_K: 14.35
+          delta_S_m_uncertainty_J_per_mol_K: 0.37
+      - observation_id: shornikov_2025_table10_richet_melting
+        type: transition_point
+        locator: {page: 15, published_page: 824, pdf_page_index: 14, table: "10"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Richet et al., 1994
+          research_method_as_printed: Ice calorimetry
+          T_m_as_printed: 1727 K
+          T_m_K: 1727
+          delta_H_m_as_printed: 24.92 ± 1.50
+          delta_H_m_kJ_per_mol: 24.92
+          delta_H_m_uncertainty_kJ_per_mol: 1.50
+          delta_S_m_as_printed: 14.43 ± 0.87
+          delta_S_m_J_per_mol_K: 14.43
+          delta_S_m_uncertainty_J_per_mol_K: 0.87
+      - observation_id: shornikov_2025_table10_sugawara_melting
+        type: transition_point
+        locator: {page: 15, published_page: 824, pdf_page_index: 14, table: "10"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Sugawara and Akaogi, 2003
+          research_method_as_printed: DSC
+          T_m_as_printed: 1731 K
+          T_m_K: 1731
+          delta_H_m_as_printed: 26.62 ± 0.48
+          delta_H_m_kJ_per_mol: 26.62
+          delta_H_m_uncertainty_kJ_per_mol: 0.48
+          delta_S_m_as_printed: 15.41 ± 0.28
+          delta_S_m_J_per_mol_K: 15.41
+          delta_S_m_uncertainty_J_per_mol_K: 0.28
+  CaAl2Si2O8:
+    observations:
+      - observation_id: shornikov_2025_table12_kracek_melting
+        type: transition_point
+        locator: {page: 17, published_page: 826, pdf_page_index: 16, table: "12"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Kracek and Neuvonen, 1951
+          research_method_as_printed: HF HTSC
+          T_m_as_printed: 1828 K
+          T_m_K: 1828
+          delta_H_m_as_printed: 18.80 ± 5.00
+          delta_H_m_kJ_per_mol: 18.80
+          delta_H_m_uncertainty_kJ_per_mol: 5.00
+          delta_S_m_as_printed: 10.28 ± 2.74
+          delta_S_m_J_per_mol_K: 10.28
+          delta_S_m_uncertainty_J_per_mol_K: 2.74
+      - observation_id: shornikov_2025_table12_ferrier_melting
+        type: transition_point
+        locator: {page: 17, published_page: 826, pdf_page_index: 16, table: "12"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Ferrier, 1971
+          research_method_as_printed: HF HTSC
+          T_m_as_printed: 1826 K
+          T_m_K: 1826
+          delta_H_m_as_printed: 41.74 ± 2.00
+          delta_H_m_kJ_per_mol: 41.74
+          delta_H_m_uncertainty_kJ_per_mol: 2.00
+          delta_S_m_as_printed: 22.86 ± 1.10
+          delta_S_m_J_per_mol_K: 22.86
+          delta_S_m_uncertainty_J_per_mol_K: 1.10
+      - observation_id: shornikov_2025_table12_robie_melting
+        type: transition_point
+        locator: {page: 17, published_page: 826, pdf_page_index: 16, table: "12"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Robie et al., 1978
+          research_method_as_printed: Adiabatic calorimetry
+          T_m_as_printed: 1830 K
+          T_m_K: 1830
+          delta_H_m_as_printed: 24.50 ± 4.50
+          delta_H_m_kJ_per_mol: 24.50
+          delta_H_m_uncertainty_kJ_per_mol: 4.50
+          delta_S_m_as_printed: 13.39 ± 2.46
+          delta_S_m_J_per_mol_K: 13.39
+          delta_S_m_uncertainty_J_per_mol_K: 2.46
+      - observation_id: shornikov_2025_table12_charlu_melting
+        type: transition_point
+        locator: {page: 17, published_page: 826, pdf_page_index: 16, table: "12"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Charlu et al., 1978
+          research_method_as_printed: Pb2B2O5 HTSC
+          T_m_as_printed: 1830 K
+          T_m_K: 1830
+          delta_H_m_as_printed: 33.20 ± 0.30
+          delta_H_m_kJ_per_mol: 33.20
+          delta_H_m_uncertainty_kJ_per_mol: 0.30
+          delta_S_m_as_printed: 18.14 ± 0.16
+          delta_S_m_J_per_mol_K: 18.14
+          delta_S_m_uncertainty_J_per_mol_K: 0.16
+      - observation_id: shornikov_2025_table12_navrotsky_melting
+        type: transition_point
+        locator: {page: 17, published_page: 826, pdf_page_index: 16, table: "12"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Navrotsky et al., 1980
+          research_method_as_printed: Pb2B2O5 HTSC
+          T_m_as_printed: 1830 K
+          T_m_K: 1830
+          delta_H_m_as_printed: 33.30 ± 0.30
+          delta_H_m_kJ_per_mol: 33.30
+          delta_H_m_uncertainty_kJ_per_mol: 0.30
+          delta_S_m_as_printed: 18.20 ± 0.16
+          delta_S_m_J_per_mol_K: 18.20
+          delta_S_m_uncertainty_J_per_mol_K: 0.16
+      - observation_id: shornikov_2025_table12_weill_melting
+        type: transition_point
+        locator: {page: 17, published_page: 826, pdf_page_index: 16, table: "12"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Weill et al., 1980a
+          research_method_as_printed: Drop calorimetry
+          T_m_as_printed: 1830 K
+          T_m_K: 1830
+          delta_H_m_as_printed: 33.89 ± 2.20
+          delta_H_m_kJ_per_mol: 33.89
+          delta_H_m_uncertainty_kJ_per_mol: 2.20
+          delta_S_m_as_printed: 18.52 ± 1.20
+          delta_S_m_J_per_mol_K: 18.52
+          delta_S_m_uncertainty_J_per_mol_K: 1.20
+      - observation_id: shornikov_2025_table12_richet_b_bottinga_melting
+        type: transition_point
+        locator: {page: 17, published_page: 826, pdf_page_index: 16, table: "12"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Richet and Bottinga, 1984
+          research_method_as_printed: Drop calorimetry
+          T_m_as_printed: 1830 K
+          T_m_K: 1830
+          delta_H_m_as_printed: 33.30 ± 1.00
+          delta_H_m_kJ_per_mol: 33.30
+          delta_H_m_uncertainty_kJ_per_mol: 1.00
+          delta_S_m_as_printed: 18.20 ± 0.55
+          delta_S_m_J_per_mol_K: 18.20
+          delta_S_m_uncertainty_J_per_mol_K: 0.55
+      - observation_id: shornikov_2025_table12_richet_melting
+        type: transition_point
+        locator: {page: 17, published_page: 826, pdf_page_index: 16, table: "12"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Richet et al., 1994
+          research_method_as_printed: Ice calorimetry
+          T_m_as_printed: 1830 K
+          T_m_K: 1830
+          delta_H_m_as_printed: 33.25 ± 0.16
+          delta_H_m_kJ_per_mol: 33.25
+          delta_H_m_uncertainty_kJ_per_mol: 0.16
+          delta_S_m_as_printed: 18.17 ± 0.16
+          delta_S_m_J_per_mol_K: 18.17
+          delta_S_m_uncertainty_J_per_mol_K: 0.16
+      - observation_id: shornikov_2025_table12_sugawara_melting
+        type: transition_point
+        locator: {page: 17, published_page: 826, pdf_page_index: 16, table: "12"}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Sugawara, 2005
+          research_method_as_printed: DSC
+          T_m_as_printed: 1830 K
+          T_m_K: 1830
+          delta_H_m_as_printed: 36.65 ± 0.80
+          delta_H_m_kJ_per_mol: 36.65
+          delta_H_m_uncertainty_kJ_per_mol: 0.80
+          delta_S_m_as_printed: 20.03 ± 0.44
+          delta_S_m_J_per_mol_K: 20.03
+          delta_S_m_uncertainty_J_per_mol_K: 0.44
