@@ -3745,6 +3745,15 @@ def _furnace_amortization_summary(
             "furnace_amortization_status": "batch_cost_unavailable",
             "furnace_amortization_batch_cost_equivalents": 0.0,
         })
+    if (
+        isinstance(campaigns_to_resinter, str)
+        and campaigns_to_resinter.startswith("resinter_threshold_kg / ")
+    ):
+        return MappingProxyType({
+            "furnace_amortization_status": "resinter_threshold_ungrounded",
+            "furnace_amortization_batch_cost_equivalents": 0.0,
+            "campaigns_to_resinter": campaigns_to_resinter,
+        })
     amortization = furnace_amortization_cost_per_run(
         batch_cost,
         campaigns_to_resinter,
