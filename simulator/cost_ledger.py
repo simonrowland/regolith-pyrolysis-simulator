@@ -69,8 +69,9 @@ def _quantity_floor_skips(quantities: Iterable[float]) -> tuple[int, float]:
 
 
 def _quantity_floor_warning(side: str, skipped_keys: int, total_kg: float) -> str:
-    # VECTOR_TOLERANCE (1e-12 kg) × the maximum shipped unit charge
-    # ($10,000/kg) is $1e-8, below the cost report's $0.01 resolution.
+    # Per key, VECTOR_TOLERANCE (1e-12 kg) × the maximum shipped unit charge
+    # ($10,000/kg) is $1e-8, below cent resolution. The run-level total_kg
+    # reports the combined skipped quantity.
     return (
         f"cost_{side}_below_quantity_floor: "
         f"skipped_keys={skipped_keys} total_kg={total_kg:.12g} "
@@ -370,6 +371,10 @@ class CostLedger:
         self._product_lots: list[CostLot] = []
         self._transitions: list[CostTransition] = []
         self._warnings: list[str] = []
+        self._quantity_floor_totals: dict[str, tuple[int, float]] = {
+            "debit": (0, 0.0),
+            "credit": (0, 0.0),
+        }
         self._sequence = 0
 
     @property
@@ -378,7 +383,30 @@ class CostLedger:
 
     @property
     def warnings(self) -> tuple[str, ...]:
-        return tuple(self._warnings)
+        return tuple(self._all_warnings())
+
+    def _record_quantity_floor_skips(
+        self,
+        side: str,
+        skipped_keys: int,
+        total_kg: float,
+    ) -> None:
+        if not skipped_keys:
+            return
+        previous_keys, previous_kg = self._quantity_floor_totals[side]
+        self._quantity_floor_totals[side] = (
+            previous_keys + skipped_keys,
+            previous_kg + total_kg,
+        )
+
+    def _all_warnings(self) -> list[str]:
+        warnings = list(self._warnings)
+        for side, (skipped_keys, total_kg) in self._quantity_floor_totals.items():
+            if skipped_keys:
+                warnings.append(
+                    _quantity_floor_warning(side, skipped_keys, total_kg)
+                )
+        return warnings
 
     @_best_effort_cost_entrypoint("cost_seed_error")
     def seed_external_material(
@@ -586,18 +614,16 @@ class CostLedger:
                 input_lots.extend(
                     self._debit_lots(lot.account, species, kg, strict=strict)
                 )
-        if skipped_floor_keys:
-            self._warnings.append(_quantity_floor_warning(
-                "debit", skipped_floor_keys, skipped_floor_kg
-            ))
+        self._record_quantity_floor_skips(
+            "debit", skipped_floor_keys, skipped_floor_kg
+        )
 
         outputs, skipped_credit_keys, skipped_credit_kg = _outputs_from_lots(
             transition.credits
         )
-        if skipped_credit_keys:
-            self._warnings.append(_quantity_floor_warning(
-                "credit", skipped_credit_keys, skipped_credit_kg
-            ))
+        self._record_quantity_floor_skips(
+            "credit", skipped_credit_keys, skipped_credit_kg
+        )
         if not outputs:
             if input_lots or not processing_cost.is_zero():
                 if strict:
@@ -676,31 +702,47 @@ class CostLedger:
                 key: inventory_totals[key].to_json()
                 for key in sorted(inventory_totals)
             },
-            "warnings": list(self._warnings),
+            "warnings": self._all_warnings(),
             "owner_ratify_placeholders": placeholders,
             "owner_ratify_placeholder_count": len(placeholders),
         }
 
     def _state_snapshot(
         self,
-    ) -> tuple[list[CostLot], list[CostLot], list[CostTransition], list[str], int]:
+    ) -> tuple[
+        list[CostLot],
+        list[CostLot],
+        list[CostTransition],
+        list[str],
+        dict[str, tuple[int, float]],
+        int,
+    ]:
         return (
             list(self._active_lots),
             list(self._product_lots),
             list(self._transitions),
             list(self._warnings),
+            dict(self._quantity_floor_totals),
             int(self._sequence),
         )
 
     def _restore_state_snapshot(
         self,
-        snapshot: tuple[list[CostLot], list[CostLot], list[CostTransition], list[str], int],
+        snapshot: tuple[
+            list[CostLot],
+            list[CostLot],
+            list[CostTransition],
+            list[str],
+            dict[str, tuple[int, float]],
+            int,
+        ],
     ) -> None:
         (
             self._active_lots,
             self._product_lots,
             self._transitions,
             self._warnings,
+            self._quantity_floor_totals,
             self._sequence,
         ) = snapshot
 
@@ -729,7 +771,7 @@ class CostLedger:
                 "all_options_visible": True,
             }
         try:
-            warnings = list(self._warnings)
+            warnings = self._all_warnings()
         except Exception:
             warnings = []
         try:

@@ -170,6 +170,43 @@ def test_sub_tolerance_beneficiary_credits_are_counted_and_warned():
     )
 
 
+def test_quantity_floor_warnings_aggregate_across_transitions():
+    debit_quantities = (1.25e-13, 2.5e-13)
+    credit_quantities = (3.0e-13, 1.5e-13)
+    ledger = CostLedger()
+
+    for index, (debit_kg, credit_kg) in enumerate(
+        zip(debit_quantities, credit_quantities, strict=True)
+    ):
+        ledger.observe_transition(
+            intent=ChemistryIntent.CA_ALUMINOTHERMIC_STEP,
+            transition=LedgerTransition(
+                f"tiny_floor_{index}",
+                debits=(MaterialLot(
+                    "process.reagent_inventory", {f"debit_{index}": debit_kg}
+                ),),
+                credits=(MaterialLot(
+                    "terminal.product", {f"credit_{index}": credit_kg}
+                ),),
+            ),
+        )
+
+    summary = ledger.summary()
+    warnings = summary["warnings"]
+    assert len(warnings) == 2
+    debit_warning, credit_warning = warnings
+    assert debit_warning.startswith("cost_debit_below_quantity_floor:")
+    assert "skipped_keys=2" in debit_warning
+    assert f"total_kg={sum(debit_quantities):.12g}" in debit_warning
+    assert f"floor_kg={VECTOR_TOLERANCE:.1e}" in debit_warning
+    assert credit_warning.startswith("cost_credit_below_quantity_floor:")
+    assert "skipped_keys=2" in credit_warning
+    assert f"total_kg={sum(credit_quantities):.12g}" in credit_warning
+    assert f"floor_kg={VECTOR_TOLERANCE:.1e}" in credit_warning
+    assert ledger.warnings == tuple(warnings)
+    assert summary["product_costs"] == {}
+
+
 def test_cost_ledger_mass_allocates_normal_coproducts_by_product_mass():
     ledger = CostLedger()
 
