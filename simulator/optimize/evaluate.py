@@ -1069,14 +1069,6 @@ def evaluate(
         key=key,
     )
 
-    _abort_on_mass_balance_breach(
-        run_execution,
-        patch=validated_patch,
-        candidate_id=candidate_id,
-        eval_spec=spec,
-        key=key,
-    )
-
     if status == "refused":
         return _physics_refused_result(
             candidate_id,
@@ -1087,6 +1079,14 @@ def evaluate(
             run_execution=run_execution,
             profile=profile,
         )
+
+    _abort_on_mass_balance_breach(
+        run_execution,
+        patch=validated_patch,
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        key=key,
+    )
 
     try:
         feasibility = _evaluate_physics_constraints(
