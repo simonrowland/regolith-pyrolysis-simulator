@@ -555,15 +555,24 @@ def test_sossi_table4_successors_supersede_predecessors_in_full_extract(
         assert rows[0].admission.status is AdmissionStatus.SUPERSEDED
 
     successors = {
-        formula: f"{predecessor_id}_quoted_20260906"
+        formula: [f"{predecessor_id}_quoted_20260906"]
         for formula, predecessor_id in predecessors.items()
     }
+    successors["PbO"].append(
+        "sossi_2019_pb_table4_gamma_this_work_quoted_20260906_pbo_hash"
+    )
+    successor_ids = {
+        successor_id
+        for local_ids in successors.values()
+        for successor_id in local_ids
+    }
+    target_ids = set(predecessors.values()) | successor_ids
     oxide_points = [
         observation
         for observation in all_observations
         if any(
             observation.observation_id.startswith(f"{source_id}::{successor_id}::")
-            for successor_id in successors.values()
+            for successor_id in successor_ids
         )
         and observation.value.kind is ValueKind.POINT
     ]
@@ -633,7 +642,6 @@ def test_sossi_table4_successors_supersede_predecessors_in_full_extract(
     assert actual == expected
 
     element_species = {"Li", "Rb", "Cu", "Ag", "Zn", "Ge", "Cd", "Pb"}
-    target_ids = set(predecessors.values()) | set(successors.values())
     element_keyed_gamma = [
         observation
         for observation in all_observations
@@ -659,6 +667,73 @@ def test_sossi_table4_successors_supersede_predecessors_in_full_extract(
         assert rows[0].identity.temperature_K.value == Decimal("1673.15")
         assert rows[0].value.point == Decimal(value)
         assert rows[0].admission.status is AdmissionStatus.ADMITTED
+
+    source_path = REPO_ROOT / "data" / "literature" / "extracts" / name
+    source_doc = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    isolated_species = {}
+    for formula, species_doc in source_doc["species"].items():
+        selected = [
+            deepcopy(row)
+            for row in species_doc.get("observations", [])
+            if row.get("observation_id") in target_ids
+        ]
+        if selected:
+            isolated_species[formula] = {"observations": selected}
+    source_doc["species"] = isolated_species
+    source_doc["fidelity_samples"] = []
+    isolated_result = _migrate_real_extract(
+        tmp_path / "isolated",
+        name,
+        extract_doc=source_doc,
+        use_repository_index_row=True,
+    )
+    assert isolated_result.validation is not None
+    assert not isolated_result.validation.hard_issues
+    isolated_observations = list(isolated_result.observations.values())
+    assert len(isolated_observations) == 31
+    for formula, predecessor_id in predecessors.items():
+        rows = [
+            observation
+            for observation in isolated_observations
+            if observation.observation_id == f"{source_id}::{predecessor_id}"
+        ]
+        assert len(rows) == 1
+        assert rows[0].identity.species.formula == formula
+        assert rows[0].admission.status is AdmissionStatus.SUPERSEDED
+    isolated_successor_points = [
+        observation
+        for observation in isolated_observations
+        if any(
+            observation.observation_id.startswith(f"{source_id}::{successor_id}::")
+            for successor_id in successor_ids
+        )
+    ]
+    assert len(isolated_successor_points) == 23
+    isolated_actual = set()
+    for observation in isolated_observations:
+        assert observation.value.kind is ValueKind.POINT
+        temperature = observation.identity.temperature_K
+        assert temperature is not None and temperature.is_value
+        conditions = observation.point_conditions
+        assert conditions is not None
+        assert conditions["temperature_K"].state.value == temperature.value
+        assert conditions["temperature_K"].locator.page == 57
+        assert conditions["temperature_K"].locator.pdf_page_index == 56
+        if observation in isolated_successor_points:
+            assert observation.admission.status is AdmissionStatus.ADMITTED
+            isolated_actual.add(
+                (
+                    observation.identity.species.formula,
+                    str(temperature.value),
+                    str(observation.value.point),
+                )
+            )
+        else:
+            assert observation.admission.status is AdmissionStatus.SUPERSEDED
+    assert isolated_actual == {
+        (formula, temperature, value)
+        for formula, temperature, value, _channel in expected
+    }
 
 
 def test_holzheid_1997_typed_wustite_reference_and_table2_compositions(

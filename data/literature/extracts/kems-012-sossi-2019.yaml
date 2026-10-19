@@ -21344,14 +21344,13 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
         table: '4'
+        page: 57
+        pdf_page_index: 56
         section: '4.6 Evaporation coefficients / Table 4'
         line_range: '1112-1118'
         note: >-
           Table 4 γ_i (this work) for LiO0.5; authors set α_e=1 and compute γ from K*/K
-      point_conditions:
-        temperature_K:
-          state: {tag: value, value: 1673.15}
-          locator: {page: 57, pdf_page_index: 56, table: '4'}
+      T_K: 1673.15
       T_range_K:
       - 1673.15
       - 1673.15
@@ -21500,13 +21499,10 @@ species:
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
         page: 57
+        pdf_page_index: 56
         note: >-
           Table 4 γ_i (this work) for RbO0.5; authors set α_e=1 and compute γ from K*/K
       T_K: 1673.15
-      point_conditions:
-        temperature_K:
-          state: {tag: value, value: 1673.15}
-          locator: {page: 57, pdf_page_index: 56, table: '4'}
       T_range_K:
       - 1673.15
       - 1823.15
@@ -21713,13 +21709,10 @@ species:
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
         page: 57
+        pdf_page_index: 56
         note: >-
           Table 4 γ_i (this work) for CuO0.5; authors set α_e=1 and compute γ from K*/K
       T_K: 1673.15
-      point_conditions:
-        temperature_K:
-          state: {tag: value, value: 1673.15}
-          locator: {page: 57, pdf_page_index: 56, table: '4'}
       T_range_K:
       - 1573.15
       - 1923.15
@@ -21981,14 +21974,13 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
         table: '4'
+        page: 57
+        pdf_page_index: 56
         section: '4.6 Evaporation coefficients / Table 4'
         line_range: '1112-1118'
         note: >-
           Table 4 γ_i (this work) for AgO0.5; authors set α_e=1 and compute γ from K*/K
-      point_conditions:
-        temperature_K:
-          state: {tag: value, value: 1673.15}
-          locator: {page: 57, pdf_page_index: 56, table: '4'}
+      T_K: 1673.15
       T_range_K:
       - 1673.15
       - 1673.15
@@ -22129,13 +22121,10 @@ species:
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
         page: 57
+        pdf_page_index: 56
         note: >-
           Table 4 γ_i (this work) for ZnO; authors set α_e=1 and compute γ from K*/K
       T_K: 1673.15
-      point_conditions:
-        temperature_K:
-          state: {tag: value, value: 1673.15}
-          locator: {page: 57, pdf_page_index: 56, table: '4'}
       T_range_K:
       - 1573.15
       - 1823.15
@@ -22373,13 +22362,10 @@ species:
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
         page: 57
+        pdf_page_index: 56
         note: >-
           Table 4 γ_i (this work) for GeO2; authors set α_e=1 and compute γ from K*/K
       T_K: 1673.15
-      point_conditions:
-        temperature_K:
-          state: {tag: value, value: 1673.15}
-          locator: {page: 57, pdf_page_index: 56, table: '4'}
       T_range_K:
       - 1573.15
       - 1823.15
@@ -22614,14 +22600,13 @@ species:
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-012-sossi-2019/spool/out/kems-012-sossi-2019/vlm/kems-012-sossi-2019.md
         table: '4'
+        page: 57
+        pdf_page_index: 56
         section: '4.6 Evaporation coefficients / Table 4'
         line_range: '1112-1118'
         note: >-
           Table 4 γ_i (this work) for CdO; authors set α_e=1 and compute γ from K*/K
-      point_conditions:
-        temperature_K:
-          state: {tag: value, value: 1673.15}
-          locator: {page: 57, pdf_page_index: 56, table: '4'}
+      T_K: 1673.15
       T_range_K:
       - 1673.15
       - 1673.15
@@ -22761,13 +22746,10 @@ species:
         table: '4'
         section: '4.6 Evaporation coefficients / Table 4'
         page: 57
+        pdf_page_index: 56
         note: >-
           Table 4 γ_i (this work) for PbO; authors set α_e=1 and compute γ from K*/K
       T_K: 1673.15
-      point_conditions:
-        temperature_K:
-          state: {tag: value, value: 1673.15}
-          locator: {page: 57, pdf_page_index: 56, table: '4'}
       T_range_K:
       - 1573.15
       - 1673.15
@@ -22894,16 +22876,6 @@ species:
               quote: 'PbO^; 1573.15 K: 0.06±0.02'
               note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
               pdf_page_index: 56
-          PbO#:
-          - T_K: 1573.15
-            gamma_uncertainty: 0.09
-            locator:
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
-              page: 57
-              table: '4'
-              quote: 'PbO#; 1573.15 K: 0.21±0.09'
-              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
-              pdf_page_index: 56
       values:
         admission_status: admitted
         quantity: activity_coefficient_this_work
@@ -22948,6 +22920,55 @@ species:
                 pdf_page_index: 56
                 table: '4'
           channel_as_published: PbO^
+        derivation_note: gamma derives from measured K* using the authors' adopted alpha_e=1.
+        derived_from:
+        - tables:kems-012-sossi-2019
+        derivation:
+          relation: K_star_over_alpha_e_and_pure_system_equilibrium_constant
+          inputs:
+          - tables:kems-012-sossi-2019
+          output_unit: dimensionless
+    - observation_id: sossi_2019_pb_table4_gamma_this_work_quoted_20260906_pbo_hash
+      type: activity_coefficient
+      class: model
+      phase: silicate_melt_ferrobasalt_FCMAS
+      standard_state: raoultian_pure_endmember; pure liquid oxide at the temperature and pressure of interest;
+        endmember=PbO; γ_i^∞ is the Henry/infinite-dilution limit (PDF p. 9, eq. 6)
+      regime: open_furnace_apparent
+      units: dimensionless γ as published
+      locator:
+        page: 57
+        table: '4'
+        quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+          \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+          \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+          \                             Temperature (K)\n                                       1573.15  \
+          \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+          \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nPbO^ | γi (this work) | 0.06±0.02\
+          \ | 0.17 |  |  | \nPbO# | γi (this work) | 0.21±0.09 | 0.38 |  |  | \n^ = calculated from the reaction\
+          \ PbO(l) = PbO(g)\n# = calculated from the reaction PbO(l) = Pb(g) + ½O2"
+        note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+        pdf_page_index: 56
+      uncertainty:
+        note: Printed ± terms are fit precision only, excluding adopted alpha uncertainty (PDF p20, lines
+          561–562).
+        by_channel:
+          PbO#:
+          - T_K: 1573.15
+            gamma_uncertainty: 0.09
+            locator:
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+              page: 57
+              table: '4'
+              quote: 'PbO#; 1573.15 K: 0.21±0.09'
+              note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+              pdf_page_index: 56
+      values:
+        admission_status: admitted
+        quantity: activity_coefficient_this_work
+        evidence_class: model
+        method_class: model_derived
+        points:
         - gamma: 0.21
           T_K: 1573.15
           locator:
@@ -24605,6 +24626,26 @@ fidelity_samples:
           pdf_page_index: 56
           table: '4'
     channel_as_published: PbO^
+  locator:
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf
+    page: 57
+    table: '4'
+    quote: "Table 4. Evaporation- (αe) and activity coefficients (γi) of melt oxide species. Evaporation\
+      \ coefficients calculated with eq. 6\nusing activity coefficients shown in the references, activity\
+      \ coefficients calculated with αe = 1 from eq. 6.\nSpecies                                     \
+      \                             Temperature (K)\n                                       1573.15  \
+      \               1673.15                 1773.15            1823.15        1923.15\nSpecies | Quantity\
+      \ | 1573.15 K | 1673.15 K | 1773.15 K | 1823.15 K | 1923.15 K\nPbO^ | γi (this work) | 0.06±0.02\
+      \ | 0.17 |  |  | \nPbO# | γi (this work) | 0.21±0.09 | 0.38 |  |  | \n^ = calculated from the reaction\
+      \ PbO(l) = PbO(g)\n# = calculated from the reaction PbO(l) = Pb(g) + ½O2"
+    note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t4.provenance.yaml
+    pdf_page_index: 56
+
+- species: PbO
+  observable: activity_coefficient
+  observation_id: sossi_2019_pb_table4_gamma_this_work_quoted_20260906_pbo_hash
+  field: points
+  value:
   - gamma: 0.21
     T_K: 1573.15
     locator:
