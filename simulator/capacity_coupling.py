@@ -322,6 +322,17 @@ def _knudsen_number_at_total_Pa(
     return mean_free_path_m / diameter_m
 
 
+def _mixture_duct_coefficients(total_Pa, G, P_down, molecular_C, knudsen_at_total):
+    factor = _pipe1_mixture_factor(total_Pa, G, P_down)
+    w_v = (1.0 if knudsen_at_total is None else
+           _duct_viscous_weight(float(knudsen_at_total(total_Pa))))
+    w_m = 1.0 - w_v
+    return {
+        species: w_v * factor + w_m * C
+        for species, C in molecular_C.items()
+    }, w_v * factor, w_m
+
+
 def _molecular_pipe_conductance_mol_s_Pa(
     *,
     diameter_m: float,
@@ -521,14 +532,9 @@ def mixture_surface_partials_Pa(
 
     def partials_at(P_vapour: float) -> dict[str, float]:
         total = max(0.0, P_vapour) + P_extra
-        factor = _pipe1_mixture_factor(
-            total, G_mol_s_Pa2, P_down
+        drains, viscous, w_m = _mixture_duct_coefficients(
+            total, G_mol_s_Pa2, P_down, C_map, knudsen_at_total_Pa,
         )
-        if knudsen_at_total_Pa is None:
-            w_v = 1.0
-        else:
-            w_v = _duct_viscous_weight(float(knudsen_at_total_Pa(total)))
-        w_m = 1.0 - w_v
         out = dict(extra)
         for species in species_order:
             if species in extra and storage_mol_s_Pa <= 0.0:
@@ -541,7 +547,7 @@ def mixture_surface_partials_Pa(
                 out[species] = companion_pressure(str(species))
                 continue
             C = float(C_map.get(species, 0.0))
-            drain = w_v * factor + w_m * C
+            drain = drains.get(species, viscous)
             supply = max(0.0, stock.get(species, 0.0) + coproduct.get(species, 0.0))
             downstream = 0.0 if storage_mol_s_Pa > 0.0 else P_down
             denom = conductance + storage_mol_s_Pa + drain
@@ -621,13 +627,10 @@ def _source_duct_residual_rel(
         sum(max(0.0, float(pressure)) for pressure in partials_Pa.values())
         + max(0.0, float(P_carrier_Pa))
     )
-    factor = _pipe1_mixture_factor(total_P, G_mol_s_Pa2, P_downstream_Pa)
-    if knudsen_at_total_Pa is None:
-        w_v = 1.0
-    else:
-        w_v = _duct_viscous_weight(float(knudsen_at_total_Pa(total_P)))
-    w_m = 1.0 - w_v
     C_map = dict(molecular_C_mol_s_Pa or {})
+    drains, viscous, w_m = _mixture_duct_coefficients(
+        total_P, G_mol_s_Pa2, P_downstream_Pa, C_map, knudsen_at_total_Pa,
+    )
     P_down = max(0.0, float(P_downstream_Pa))
     max_scale = 0.0
     max_delta = 0.0
@@ -644,7 +647,7 @@ def _source_duct_residual_rel(
                   - float((carrier_partials_Pa or {}).get(name, 0.0)))
         C = max(0.0, float(C_map.get(name, 0.0)))
         downstream = 0.0 if storage_mol_s_Pa > 0.0 else P_down
-        q_duct = w_v * p_i * factor + w_m * C * (p_i - downstream)
+        q_duct = p_i * drains.get(name, viscous) - w_m * C * downstream
         supplied = max(0.0, stock.get(name, 0.0) + q_source)
         disposed = q_duct + storage_mol_s_Pa * p_i
         max_delta = max(max_delta, abs(supplied - disposed))
