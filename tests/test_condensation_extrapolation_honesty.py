@@ -187,7 +187,7 @@ def test_predict_flag_wall_certified_value_retains_bits():
     assert notices == {}
 
 
-def test_ca_crown_pressure_is_within_one_decade_of_janaf():
+def test_ca_crown_pressure_is_within_factor_two_of_janaf():
     from simulator.reference_data.janaf import TABLES_DIR, load_table_document
     from simulator.state import GAS_CONSTANT
 
@@ -202,7 +202,30 @@ def test_ca_crown_pressure_is_within_one_decade_of_janaf():
     gibbs_670 = gibbs_600 + (gibbs_700 - gibbs_600) * (670.0 - 600.0) / (700.0 - 600.0)
     janaf_pa = 1.0e5 * math.exp(-1000.0 * gibbs_670 / (GAS_CONSTANT * 670.0))
     pressure = condensation._antoine_psat_pa("Ca", 670.0)
-    assert 0.1 <= pressure / janaf_pa <= 10.0
+    assert 0.5 <= pressure / janaf_pa <= 2.0
+
+
+@pytest.mark.parametrize("species", ["Na", "K", "Mg", "Fe", "Ca", "Al", "Si", "Ti", "Cr", "Mn"])
+def test_janaf_wall_extension_is_monotone_and_join_is_flagged(species):
+    from engines.builtin.vapor_pressure import wall_condensation_antoine_coefficients, vapor_pressure_valid_range_K
+    from tests.chemistry.conftest import _load_yaml
+
+    data = _load_yaml("vapor_pressures.yaml")
+    row = data["metals"][species]
+    _, block = wall_condensation_antoine_coefficients(row, 1.0)
+    low = float(vapor_pressure_valid_range_K(row, block, 1.0)[0])
+    notices = {}
+    pressures = [condensation._antoine_psat_pa(
+        species, low * fraction, vapor_pressure_data=data,
+        antoine_extrapolations=notices,
+    ) for fraction in (1e-6, .01, .1, .25, .5, .75, .99)]
+    assert all(math.isfinite(p) and p >= 0.0 for p in pressures)
+    assert pressures == sorted(pressures)
+    notice = next(record for record in notices.values() if record.get("method") == "janaf")
+    assert notice["anchor_temperature_K"] == low
+    assert notice["below_band_janaf_join"]["janaf_to_antoine_ratio"] > 0.0
+    assert notice["source_id"] == "nist-janaf-4th"
+    assert notice["authority_level"] == "extrapolated"
 
 
 def test_every_antoine_below_band_extension_is_monotone_and_pole_free():
