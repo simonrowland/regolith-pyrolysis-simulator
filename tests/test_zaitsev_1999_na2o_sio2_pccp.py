@@ -44,6 +44,9 @@ def test_zaitsev_1999_scored_rows_migrate_with_temperature_and_composition():
         if "::zaitsev_1999_table4_" in observation.observation_id
     ]
     assert len(table4) == 44
+    assert {observation.identity.species.formula for observation in table4} == {
+        "Na2O"
+    }
     assert all(
         observation.provenance["printed_form"] == "neg_log10"
         and observation.locator.page == 6
@@ -68,6 +71,28 @@ def test_zaitsev_1999_scored_rows_migrate_with_temperature_and_composition():
 def test_zaitsev_1999_render_pins_and_table1_row_count():
     document, _ = _migrate()
     species = document["species"]
+    table4 = {
+        observation["observation_id"]: observation["values"]["points"]
+        for observation in species["Na2O"]["observations"]
+        if observation["observation_id"].startswith("zaitsev_1999_table4_")
+    }
+    # These Table 4 cells were confirmed against the 600 dpi p. 1904 render.
+    table4_pins = {
+        ("zaitsev_1999_table4_present_na2o_activity", "0.103", "1430"): "9.394",
+        ("zaitsev_1999_table4_ref16_na2o_activity", "0.103", "1430"): "9.823",
+        ("zaitsev_1999_table4_present_na2o_activity", "0.254", "1557"): "8.346",
+        ("zaitsev_1999_table4_ref16_na2o_activity", "0.254", "1557"): "8.79",
+        ("zaitsev_1999_table4_present_na2o_activity", "0.303", "1344"): "9.261",
+    }
+    for (observation_id, x_na2o, temperature), expected in table4_pins.items():
+        point = next(
+            point
+            for point in table4[observation_id]
+            if point["x_Na2O_as_printed"] == x_na2o
+            and point["T_K"] == temperature
+        )
+        assert point["activity"] == expected
+
     na2o = next(
         item["values"]["points"]
         for item in species["Na2O"]["observations"]
