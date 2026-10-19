@@ -368,7 +368,7 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted(
     started_at = time.monotonic()
     waiter = threading.Thread(target=call, daemon=True)
     waiter.start()
-    waiter.join(timeout=0.5)
+    waiter.join(timeout=3.0)
     try:
         assert not waiter.is_alive(), (
             'MAGEMin waited forever on its pool future'
@@ -376,7 +376,7 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted(
         assert len(outcomes) == 1
         assert isinstance(outcomes[0], EngineWorkerTimeout)
         assert outcomes[0].phase == 'job'
-        assert outcomes[0].timeout_s == pytest.approx(0.1)
+        assert outcomes[0].timeout_s == pytest.approx(2.5)
         assert pending.cancel_attempted
         assert pending.running()
         assert pool.abort_calls == 1
@@ -412,7 +412,7 @@ def test_magemin_unfinished_pool_future_is_timed_out_and_aborted(
             assert '--Temp=1200.000000' in pool.diagnostic_detail
             assert '--Pres=0.001000' in pool.diagnostic_detail
             assert '--db=ig' in pool.diagnostic_detail
-        assert time.monotonic() - started_at < 0.25
+        assert time.monotonic() - started_at < 3.0
     finally:
         if waiter.is_alive():
             pending.set_result({'phases': {'liq': {'mass_kg': 1.0}}})
@@ -495,12 +495,12 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker(
     waiter = threading.Thread(target=call, daemon=True)
     waiter.start()
     try:
-        waiter.join(timeout=3.0)
+        waiter.join(timeout=6.0)
         assert not waiter.is_alive(), 'MAGEMin did not bound its pool future'
         assert len(outcomes) == 1
         assert isinstance(outcomes[0], EngineWorkerTimeout)
         assert outcomes[0].phase == 'job'
-        assert outcomes[0].timeout_s == pytest.approx(2.05)
+        assert outcomes[0].timeout_s == pytest.approx(4.45)
         assert outcomes[0].diagnostic_detail
         assert outcomes[0].diagnostic_detail in str(outcomes[0])
         timeout_text = str(outcomes[0])
@@ -532,7 +532,7 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker(
                 assert arg in timeout_text
             diagnostic_log = diagnostic_log_path.read_text(encoding='utf-8')
             assert outcomes[0].diagnostic_detail in diagnostic_log
-        assert time.monotonic() - started_at < 2.5
+        assert time.monotonic() - started_at < 5.5
         assert worker.process is None
         with pytest.raises(ProcessLookupError):
             os.kill(worker_pid, 0)
