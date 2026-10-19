@@ -1726,6 +1726,33 @@ def test_qualification_temperature_below_and_above_published_band() -> None:
     assert low["temperature_in_band"] is True
 
 
+@pytest.mark.parametrize("sio2_wt_pct", (32.0, 34.0))
+def test_qualification_gate_pins_observed_crash_floor_assessment(
+    sio2_wt_pct: float,
+) -> None:
+    from engines.engine_commissioning import assess_engine_commissioning
+
+    composition = scale_feo_mgo_for_sio2(
+        sio2_wt_pct,
+        {"FeO": 30.0, "MgO": 20.0, "SiO2": 50.0},
+    )
+    expected = assess_engine_commissioning(
+        "alphamelts",
+        sio2_wt_pct=sio2_wt_pct,
+        temperature_K=1700.0,
+    )
+
+    gate = assess_qualification_gate(composition, 1700.0)
+
+    assert gate["below_crash_floor"] is expected.below_crash_floor
+    assert gate["certified_band"]["sio2_crash_floor_wt_pct"] == (
+        expected.spec.sio2_wt_pct.observed_crash_floor_wt_pct
+    )
+    assert any("crash floor" in warning for warning in gate["warnings"]) is (
+        expected.below_crash_floor
+    )
+
+
 def test_qualification_sio2_sweep_pots_sum_to_100() -> None:
     pots = qualification_sio2_sweep_pots(
         BinaryPot(
