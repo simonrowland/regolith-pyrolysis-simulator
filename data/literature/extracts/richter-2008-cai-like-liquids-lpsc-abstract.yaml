@@ -40,7 +40,7 @@ species:
         type: figure_record
         locator: {page: 2, published_page: '1385.pdf', pdf_page_index: 1, figure: '2'}
         panel: whole_figure
-        attribution: Present-work high-precision measurements and earlier measurements by [2], as stated in the caption.
+        attribution: Figure 2 shows present-work and earlier experimental symbols; its red relation is not assigned to one source subset, and its blue line is the ideal inverse-square-root mass comparison.
         units: dimensionless axes as printed
         values:
           quantity: unavailable
@@ -56,8 +56,8 @@ species:
           series:
             - {name: present-work high-precision data, marker: small solid symbol, marker_count: 6, evidence_class: measured_direct}
             - {name: 'earlier measurements [2]', marker: open symbol, marker_count: 5, evidence_class: quoted_attributed}
-            - {name: present-work Rayleigh fit, marker_count: 0, evidence_class: model_derived}
-            - {name: 'Richter et al. [2] Rayleigh fit', marker_count: 0, evidence_class: quoted_attributed}
+            - {name: 'ideal inverse-square-root mass comparison (blue line; annotated 0.97980)', marker_count: 0, evidence_class: model_derived}
+            - {name: 'experimental-symbol relation (red line; annotated 0.98797 ± 0.00022; source subset not distinguished)', marker_count: 0, evidence_class: quoted_attributed}
           digitisation: deferred to a figure pass
       - observation_id: richter_2008_figure3_magnesium_fractionation_factor
         type: figure_record
@@ -86,7 +86,7 @@ species:
         type: figure_fit_record
         locator: {page: 2, published_page: '1385.pdf', pdf_page_index: 1, figure: '2'}
         units: dimensionless
-        attribution: Present-work fit and Richter et al. [2] fit, as labeled in Figure 2.
+        attribution: Figure 2 shows an ideal inverse-square-root mass comparison (blue line, annotated 0.97980) and a red relation (annotated 0.98797 ± 0.00022) that follows the experimental symbols; the red relation is not assigned to one source subset.
         values:
           quantity_as_printed: kinetic magnesium isotope fractionation factor α from Rayleigh fits
           quantity_token: unavailable

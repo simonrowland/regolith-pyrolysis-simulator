@@ -69,15 +69,26 @@ def test_context_only_extract_preserves_printed_fits_conditions_and_figures() ->
         assert [series["marker_count"] for series in values["series"]] == expected_figure[
             "marker_counts"
         ]
+    figure2 = next(row for row in figures if row["locator"]["figure"] == "2")
+    assert "not assigned to one source subset" in figure2["attribution"]
+    assert "ideal inverse-square-root mass comparison" in figure2["attribution"]
+    figure2_fit_series = figure2["values"]["series"][2:]
+    assert "ideal inverse-square-root mass comparison (blue line" in figure2_fit_series[0]["name"]
+    assert "experimental-symbol relation (red line" in figure2_fit_series[1]["name"]
+    assert figure2_fit_series[0]["evidence_class"] == "model_derived"
+    assert figure2_fit_series[1]["evidence_class"] == "quoted_attributed"
     assert "about two orders of magnitude larger that the vacuum rate" in figures[0][
         "values"
     ]["caption"]
 
-    fits = next(
-        row["values"]
+    fit_record = next(
+        row
         for row in context
         if row["observation_id"] == "richter_2008_figure2_printed_alpha_fits"
     )
+    assert "not assigned to one source subset" in fit_record["attribution"]
+    assert "ideal inverse-square-root mass comparison" in fit_record["attribution"]
+    fits = fit_record["values"]
     assert fits["quantity_token"] == "unavailable"
     assert [fit["value_as_printed"] for fit in fits["fits"]] == [
         "0.97980",
