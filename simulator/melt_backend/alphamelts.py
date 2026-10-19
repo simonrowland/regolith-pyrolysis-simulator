@@ -2714,6 +2714,19 @@ class _MELTSBackendSupport(MeltBackend):
             # fed the SOLVED equilibrium liquid composition (not the
             # pre-equilibrium input); explicit Antoine fallback otherwise.
             vaporock_envelope_diagnostics: dict[str, Any] = {}
+            if redox_mode == REDOX_MODE_NOT_AN_INPUT:
+                # The melt activity solve answered the requested fixed
+                # composition, but the oxygen-dependent vapor facet has no
+                # fO2 input and cannot be evaluated independently.
+                eq.vapor_pressures_Pa = {}
+                eq.vapor_pressures_source = {}
+                eq.diagnostics = {
+                    **eq.diagnostics,
+                    'vapor_pressure_backend_status': 'not_attempted',
+                    'vapor_pressure_backend_status_reason': 'fO2_not_an_input',
+                    'authoritative_for_requested_vapor_pressure': False,
+                }
+                return self._fail_closed_on_clamped_operating_point(eq)
             if self._vaporock_available:
                 eq.vapor_pressures_Pa, source = (
                     self._vapor_pressures_via_vaporock_or_antoine(
