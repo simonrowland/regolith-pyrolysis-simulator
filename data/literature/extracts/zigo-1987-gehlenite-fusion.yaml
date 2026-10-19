@@ -14,37 +14,37 @@ review_status: draft
 fidelity_samples:
   - path: species.gehlenite.observations[zigo_1987_t1_crystal_cooling_measured].values.points[0].minus_delta_H_cool_kJ_mol-1
     value: 335.9
-    locator: {page: 5, pdf_page_index: 4, table: '1'}
+    locator: {page: 4, published_page: 174, pdf_page_index: 3, table: '1'}
   - path: species.gehlenite.observations[zigo_1987_t3_crystal_relative_enthalpy_measured_derived].values.points[5].H_rel_kJ_mol-1
     value: 1282.4
     locator: {page: 6, pdf_page_index: 5, table: '3'}
   - path: species.gehlenite.observations[zigo_1987_t4_melt_enthalpy_calorimetry].values.points[4].H_rel_kJ_mol-1
     value: 1519.0
-    locator: {page: 8, pdf_page_index: 7, table: '4'}
+    locator: {page: 7, published_page: 177, pdf_page_index: 6, table: '4'}
   - species: gehlenite
     observable: transition_point
     observation_id: zigo_1987_fusion_temperature_selected
     field: T_fus_K
     value: 1863
-    locator: {page: 3, pdf_page_index: 2, paragraph: 'fusion temperature'}
+    locator: {page: 2, published_page: 172, pdf_page_index: 1, paragraph: 'fusion temperature'}
   - species: gehlenite
     observable: heat_capacity_and_heat_content_series
     observation_id: zigo_1987_fusion_enthalpy_at_1863K
     field: delta_H_fus_kJ_mol-1
     value: 172.1
-    locator: {page: 10, pdf_page_index: 9, equation: '7'}
+    locator: {page: 9, published_page: 179, pdf_page_index: 8, equation: '7'}
   - species: gehlenite
     observable: heat_capacity_and_heat_content_series
     observation_id: zigo_1987_fusion_entropy_at_1863K
     field: delta_S_fus_J_mol-1_K-1
     value: 92.4
-    locator: {page: 10, pdf_page_index: 9, equation: '8'}
+    locator: {page: 9, published_page: 179, pdf_page_index: 8, equation: '8'}
 species:
   gehlenite:
     observations:
       - observation_id: zigo_1987_t1_crystal_cooling_measured
         type: heat_capacity_and_heat_content_series
-        locator: {page: 5, pdf_page_index: 4, table: '1'}
+        locator: {page: 4, published_page: 174, pdf_page_index: 3, table: '1'}
         phase: crystalline_gehlenite_C2AS
         regime: cooling_to_298_K_in_drop_calorimeter
         units: 'K; kJ mol−1'
@@ -64,7 +64,7 @@ species:
 
       - observation_id: zigo_1987_t1_crystal_cooling_fit
         type: heat_capacity_and_heat_content_series
-        locator: {page: 5, pdf_page_index: 4, table: '1', equation: '2'}
+        locator: {page: 4, published_page: 174, pdf_page_index: 3, table: '1', equation: '2'}
         phase: crystalline_gehlenite_C2AS
         regime: least_squares_fit_to_drop_calorimetry
         units: 'T in K; −ΔHcool in kJ mol−1'
@@ -88,7 +88,7 @@ species:
 
       - observation_id: zigo_1987_t2_crystal_solution_calorimetry
         type: heat_capacity_and_heat_content_series
-        locator: {page: 6, pdf_page_index: 5, table: '2'}
+        locator: {page: 5, published_page: 175, pdf_page_index: 4, table: '2'}
         phase: gehlenite_sample_with_unreacted_admixtures
         regime: solution_calorimetry_at_298_K
         units: kJ mol−1
@@ -164,7 +164,7 @@ species:
 
       - observation_id: zigo_1987_t4_melt_enthalpy_calorimetry
         type: heat_capacity_and_heat_content_series
-        locator: {page: 8, pdf_page_index: 7, table: '4'}
+        locator: {page: 7, published_page: 177, pdf_page_index: 6, table: '4'}
         phase: C2AS_melt_composition_corresponding_to_gehlenite
         regime: drop_and_solution_calorimetry; cooling_to_298_K
         units: 'K; kJ mol−1'
@@ -183,7 +183,7 @@ species:
 
       - observation_id: zigo_1987_t4_melt_relative_enthalpy_fit
         type: heat_capacity_and_heat_content_series
-        locator: {page: 8, pdf_page_index: 7, table: '4', equation: '6'}
+        locator: {page: 7, published_page: 177, pdf_page_index: 6, table: '4', equation: '6'}
         phase: C2AS_melt_composition_corresponding_to_gehlenite
         units: 'T in K; Hrel in kJ mol−1'
         values:
@@ -205,7 +205,7 @@ species:
 
       - observation_id: zigo_1987_fusion_temperature_selected
         type: transition_point
-        locator: {page: 3, pdf_page_index: 2, paragraph: 'introduction'}
+        locator: {page: 2, published_page: 172, pdf_page_index: 1, paragraph: 'introduction'}
         phase: gehlenite_C2AS_crystal_and_composition_matched_melt
         units: 'K; °C'
         values:
@@ -220,7 +220,7 @@ species:
 
       - observation_id: zigo_1987_fusion_enthalpy_at_1863K
         type: heat_capacity_and_heat_content_series
-        locator: {page: 10, pdf_page_index: 9, equation: '7'}
+        locator: {page: 9, published_page: 179, pdf_page_index: 8, equation: '7'}
         phase: gehlenite_C2AS_crystal_to_composition_matched_melt
         units: 'kJ mol−1; K'
         values:
@@ -238,7 +238,7 @@ species:
 
       - observation_id: zigo_1987_fusion_entropy_at_1863K
         type: heat_capacity_and_heat_content_series
-        locator: {page: 10, pdf_page_index: 9, equation: '8'}
+        locator: {page: 9, published_page: 179, pdf_page_index: 8, equation: '8'}
         phase: gehlenite_C2AS_crystal_to_composition_matched_melt
         units: 'J mol−1 K−1; kJ mol−1; K'
         values:
@@ -254,7 +254,7 @@ species:
 
       - observation_id: zigo_1987_fusion_temperature_sensitivity
         type: heat_capacity_and_heat_content_series
-        locator: {page: 11, pdf_page_index: 10, paragraph: 'fusion temperature uncertainty'}
+        locator: {page: 10, published_page: 180, pdf_page_index: 9, paragraph: 'fusion temperature uncertainty'}
         phase: gehlenite_C2AS_crystal_to_composition_matched_melt
         units: 'K; kJ mol−1'
         values:
@@ -269,7 +269,7 @@ species:
     context:
       - observation_id: zigo_1987_method_and_heat_capacity_scope
         type: method
-        locator: {page: 2, published_page: 171, pdf_page_index: 1, paragraph: 'abstract'}
+        locator: {page: 1, published_page: 171, pdf_page_index: 0, paragraph: 'abstract'}
         units: as printed
         values:
           quantity: experiment_method_and_heat_capacity_coverage
@@ -279,7 +279,7 @@ species:
           calorimetry: 'Drop calorimeter cooling measurements combined with heats of solution at 298 K.'
       - observation_id: zigo_1987_heat_capacity_fit_scope
         type: method
-        locator: {page: 11, pdf_page_index: 10, paragraph: 'results and discussion'}
+        locator: {page: 10, published_page: 180, pdf_page_index: 9, paragraph: 'results and discussion'}
         units: as printed
         values:
           quantity: heat_capacity_fit_coverage

@@ -5,6 +5,7 @@ import os
 import re
 import subprocess
 from functools import lru_cache
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 import yaml
@@ -180,7 +181,90 @@ def _has_page_text(text):
     return bool(substantive)
 
 
-def _assert_label_and_data(locator, locator_path, page_text, caption_page_text=None):
+def _numeric_values(value, parent_key="", published_only=False):
+    if isinstance(value, dict):
+        for key, child in value.items():
+            key_text = str(key)
+            if re.search(r"(^t(?:_|$)|temperature|composition|mole_fraction|^x_)", key_text, re.I):
+                continue
+            yield from _numeric_values(child, key_text, published_only)
+    elif isinstance(value, list):
+        for child in value:
+            yield from _numeric_values(child, parent_key, published_only)
+    elif isinstance(value, (int, float)) and not isinstance(value, bool):
+        if not published_only or re.search(r"as_(?:published|printed)$", parent_key):
+            yield str(value)
+    elif isinstance(value, str) and re.search(r"as_(?:published|printed)$", parent_key):
+        if re.fullmatch(r"[\s\d.,±+−–—﹣－*/()^%eE-]+", value):
+            yield from re.findall(r"[−–—﹣－-]?\s*(?:\d+(?:\.\d*)?|\.\d+)", value)
+
+
+def _digitized(value):
+    if isinstance(value, dict):
+        return any(
+            _digitized(child) if key != "method_class" else bool(re.search(r"digitiz", str(child), re.I))
+            for key, child in value.items()
+        )
+    if isinstance(value, list):
+        return any(_digitized(child) for child in value)
+    return False
+
+
+def _observation_values(document, locator_path):
+    if locator_path[:1] == ("fidelity_samples",):
+        bound = document
+        for part in locator_path[:-1]:
+            bound = bound[int(part)] if isinstance(bound, list) else bound[part]
+        if isinstance(bound, dict) and "value" in bound:
+            if not re.search(r"digitiz", str(bound.get("note", "")), re.I):
+                yield from _numeric_values(bound["value"])
+        return
+    for index, part in enumerate(locator_path[:-1]):
+        if part not in {"observations", "context"} or index + 1 >= len(locator_path) - 1:
+            continue
+        observation_path = locator_path[:index + 2]
+        observation = document
+        for component in observation_path:
+            observation = observation[int(component)] if isinstance(observation, list) else observation[component]
+        if isinstance(observation, dict) and "values" in observation:
+            values = observation["values"]
+            if _digitized(values):
+                return
+            printed_values = tuple(_numeric_values(values, published_only=True))
+            yield from (printed_values or tuple(_numeric_values(values)))
+        return
+
+
+def _number_pattern(value):
+    try:
+        number = Decimal(str(value))
+    except InvalidOperation:
+        return None
+    if not number.is_finite():
+        return None
+    original = str(value)
+    text = format(number, "f")
+    if "." in text and "." not in original:
+        text = text.rstrip("0").rstrip(".")
+    elif "." in text:
+        text = text.rstrip("0").rstrip(".")
+    sign = r"(?:[−–—﹣－-]\s*)?" if original.strip().startswith("-") else ""
+    digits = text.lstrip("-")
+    body = r"\s*".join(re.escape(char) for char in digits)
+    trailing_zeros = r"(?:\.0+)?" if "." in original else ""
+    return re.compile(rf"(?<![\d.]){sign}{body}{trailing_zeros}(?![\d.])")
+
+
+def _assert_observation_value(page_text, observation_values):
+    observation_values = tuple(observation_values)
+    if observation_values and not any(
+        pattern is not None and pattern.search(page_text)
+        for pattern in (_number_pattern(value) for value in observation_values)
+    ):
+        raise AssertionError("no printed observation value is present on cited page")
+
+
+def _assert_label_and_data(locator, locator_path, page_text, caption_page_text=None, observation_values=()):
     label_pattern = _label_pattern(locator)
     caption_page = locator.get("table_caption_page")
     if caption_page is not None:
@@ -208,9 +292,11 @@ def _assert_label_and_data(locator, locator_path, page_text, caption_page_text=N
             raise AssertionError("continued table data-cell record is absent from cited page")
         if caption_page_text is None or not label_pattern.search(caption_page_text):
             raise AssertionError("table caption label is absent from caption page")
+        _assert_observation_value(page_text, observation_values)
         return
     if not label_pattern.search(page_text):
         raise AssertionError("table/figure label is absent from cited page")
+    _assert_observation_value(page_text, observation_values)
 
 
 def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
@@ -252,6 +338,7 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
                     locator_path,
                     _normalize_label_text(text),
                     _normalize_label_text(caption_text) if caption_text is not None else None,
+                    _observation_values(current, locator_path),
                 )
             except AssertionError as exc:
                 key = (relative, locator_path, page_number, label)
@@ -299,6 +386,31 @@ def test_continued_table_checks_caption_page_and_data_page():
         "T (K)  F°(T)\n3300.000 64.806 346.974",
         "Class accuracy\nTable 877",
     )
+
+
+def test_zigo_table_1_prose_mention_does_not_satisfy_data_locator():
+    relative = "data/literature/extracts/zigo-1987-gehlenite-fusion.yaml"
+    document = _yaml((ROOT / relative).read_text())
+    observation = document["species"]["gehlenite"]["observations"][0]
+    locator = observation["locator"]
+    assert locator["page"] == 4
+    assert locator["pdf_page_index"] == 3
+    assert locator["published_page"] == 174
+    pdf = _pdf_path(document.get("source_id"), document.get("source", {}).get("corpus_source_id"))
+    assert pdf is not None
+    page_five = _normalize_label_text(_page_text(str(pdf), 5))
+    assert _label_pattern(locator).search(page_five), "mutation fixture must include the prose label mention"
+    try:
+        _assert_label_and_data(
+            {**locator, "page": 5, "pdf_page_index": 4},
+            ("species", "gehlenite", "observations", "0", "locator"),
+            page_five,
+            observation_values=_numeric_values(observation["values"]),
+        )
+    except AssertionError as exc:
+        assert str(exc) == "no printed observation value is present on cited page"
+    else:
+        raise AssertionError("Table 1 page-5 prose mention incorrectly satisfied the data locator")
 
 
 def test_figure_caption_regex_handles_spacing_and_japanese_suffix():
