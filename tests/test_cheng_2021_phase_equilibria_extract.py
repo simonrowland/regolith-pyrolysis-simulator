@@ -174,6 +174,43 @@ def test_cheng_isolated_migration_carries_temperature_and_conditions(tmp_path: P
     assert feo_pin is not None
     assert feo_pin.as_map()["FeO1.5"] == Decimal("0.875")
 
+    liquidus_rows = [
+        row
+        for block in document["species"].values()
+        for row in block["observations"]
+        if row.get("type") == "transition_point"
+        and isinstance(row.get("values", {}).get("composition_mol"), dict)
+    ]
+    assert len(liquidus_rows) == 63
+    for row in liquidus_rows:
+        composition = row["values"]["composition_mol"]
+        assert composition["basis"] == "printed_mole_fraction"
+        amounts = [
+            Decimal(str(amount))
+            for key, amount in composition.items()
+            if key != "basis"
+        ]
+        assert amounts
+        assert all(Decimal("0") <= amount <= Decimal("1.003") for amount in amounts)
+    assert (
+        _observation(document, "cheng21_t5_e001_liquidus")["values"]["composition_mol"]
+        == composition_rows["cheng21_t5_e001_liq_feo1p5"]["values"]["composition_mol"]
+    )
+    liquidus_migrated = [
+        observation
+        for observation in result.observations.values()
+        if "cheng21_t5_e001_liquidus" in observation.observation_id
+    ]
+    assert len(liquidus_migrated) == 1
+    identity = liquidus_migrated[0].identity.composition
+    assert identity.is_value
+    assert identity.value.amount_basis.value == "mole_fraction"
+    assert identity.value.as_map() == {
+        "CaO": Decimal("0"),
+        "FeO1.5": Decimal("0.875"),
+        "SiO2": Decimal("0.125"),
+    }
+
     for observation in result.observations.values():
         conditions = observation.point_conditions
         assert conditions is not None
