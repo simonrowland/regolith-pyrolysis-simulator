@@ -11,6 +11,7 @@ from functools import lru_cache
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
+import pytest
 import yaml
 
 BASE = "28af098ed04b8ca99f569381a2f38330cb66d7cd"
@@ -221,7 +222,10 @@ def _numeric_values(value, parent_key="", published_only=False):
     if isinstance(value, dict):
         for key, child in value.items():
             key_text = str(key)
-            if not published_only and re.search(r"(^t(?:_|$)|temperature|composition|mole_fraction|^x_)", key_text, re.I):
+            if key_text == "experimental_T_window_K_as_published" or (
+                not published_only
+                and re.search(r"(^t(?:_|$)|temperature|composition|mole_fraction|^x_)", key_text, re.I)
+            ):
                 continue
             yield from _numeric_values(child, key_text, published_only)
     elif isinstance(value, list):
@@ -234,7 +238,7 @@ def _numeric_values(value, parent_key="", published_only=False):
         measured_text = re.split(r"±|\+/-", value, maxsplit=1)[0]
         match = re.match(r"\s*\(?\s*([−–—﹣－-]?\s*(?:\d+(?:\.\d*)?|\.\d+))", measured_text)
         if match:
-            yield re.sub(r"\s+", "", match.group(1))
+            yield value.strip() if re.search(r"±|\+/-", value) else re.sub(r"\s+", "", match.group(1))
 
 
 def _digitized(value):
@@ -252,8 +256,24 @@ def _has_measured_values(values):
     return values.get("quantity") != "apparatus_and_pressure_regime"
 
 
+def _is_non_measured_locator(locator_path):
+    return any(part in {"point_conditions", "standard_state", "composition_role", "uncertainty"} for part in locator_path)
+
+
+def _nested_value_record(document, locator_path):
+    if "values" not in locator_path or locator_path.index("values") + 2 != len(locator_path) - 1:
+        return None
+    record = document
+    for part in locator_path[:-1]:
+        record = record[int(part)] if isinstance(record, list) else record[part]
+    return record if isinstance(record, dict) else None
+
+
 def _observation_values(document, locator_path):
-    if any(part in {"point_conditions", "standard_state", "composition_role", "uncertainty"} for part in locator_path):
+    if _is_non_measured_locator(locator_path):
+        return
+    record = _nested_value_record(document, locator_path)
+    if record and re.search(r"model_derived|calculated", str(record.get("method_class", "")), re.I):
         return
     if locator_path[:1] == ("fidelity_samples",):
         bound = document
@@ -262,10 +282,24 @@ def _observation_values(document, locator_path):
         if isinstance(bound, dict) and "value" in bound:
             value_path = str(bound.get("path", bound.get("field", "")))
             note = str(bound.get("note", ""))
-            if (re.search(r"as_(?:published|printed)$|value_as_published$", value_path)
+            locator = bound.get("locator", {})
+            table = str(locator.get("table", ""))
+            field = str(bound.get("field", value_path.rsplit(".", 1)[-1]))
+            if (table == "IV" and field == "delta_f_H_kJ_mol"
+                    and isinstance(bound["value"], (int, float)) and bound["value"] < 0):
+                # The table's ΔfH convention and page render show a leading minus;
+                # pdftotext corrupts that sign glyph in the MgO/CaO values.
+                yield f"sign-omitted:{abs(bound['value'])}"
+            elif (table in {"VI", "VII"} and field == "printed_total_delta_r_H_kJ_mol"
+                    and isinstance(bound["value"], (int, float)) and bound["value"] < 0):
+                # These reaction-enthalpy columns also print a minus that this
+                # PDF's text layer corrupts; the rendered table shows the sign.
+                yield f"sign-omitted:{abs(bound['value'])}"
+            elif (re.search(r"as_(?:published|printed)$|value_as_published$", value_path)
                     or re.search(r"\bprinted\b", note, re.I)) and not re.search(r"digitiz", note, re.I):
+                value = bound["value"]
                 field_context = value_path if re.search(r"as_(?:published|printed)$|value_as_published$", value_path) else "value_as_published"
-                yield from _numeric_values(bound["value"], parent_key=field_context)
+                yield from _numeric_values(value, parent_key=field_context)
         return
     for index, part in enumerate(locator_path[:-1]):
         if part not in {"observations", "context"} or index + 1 >= len(locator_path) - 1:
@@ -279,10 +313,25 @@ def _observation_values(document, locator_path):
             if not _has_measured_values(values) or _digitized(values):
                 return
             yield from _numeric_values(values, published_only=True)
+            if observation.get("locator", {}).get("table") in {"IV", "Table IV"}:
+                value = values.get("delta_f_H_kJ_mol")
+                if isinstance(value, (int, float)) and value < 0:
+                    yield f"sign-omitted:{abs(value)}"
+            # Some tables store the measured cell as a numeric field without an
+            # as-published alias (Plante's f(FeO)); prose ranges above are excluded.
+            for key, value in values.items():
+                if re.fullmatch(r"f_at_x_[\w.]+", str(key)) and isinstance(value, (int, float)):
+                    yield str(value)
         return
 
 
 def _generic_observation_values(document, locator_path):
+    if "composition_role" in locator_path:
+        return ()
+    record = _nested_value_record(document, locator_path)
+    if record and re.search(r"model_derived|calculated", str(record.get("method_class", "")), re.I):
+        value = record.get("value")
+        return (str(value),) if _number_pattern(value) is not None else ()
     if locator_path[:1] == ("fidelity_samples",):
         bound = document
         for part in locator_path[:-1]:
@@ -314,6 +363,9 @@ def _generic_observation_values(document, locator_path):
 
 
 def _skip_class(document, locator_path, locator):
+    record = _nested_value_record(document, locator_path)
+    if record and re.search(r"model_derived|calculated", str(record.get("method_class", "")), re.I):
+        return "derived"
     if any(part in {"point_conditions", "standard_state", "composition_role", "uncertainty", "composition"} for part in locator_path):
         return "categorical" if "composition_role" in locator_path or "composition" in locator_path else "derived"
     if "figure" in locator:
@@ -346,6 +398,33 @@ def _skip_class(document, locator_path, locator):
 
 
 def _number_pattern(value):
+    original_value = str(value)
+    if "±" in original_value or "+/-" in original_value:
+        central, uncertainty = re.split(r"±|\+/-", original_value, maxsplit=1)
+        central_match = re.search(r"([−–—﹣－-]?\s*(?:\d+(?:\.\d*)?|\.\d+))", central)
+        uncertainty_match = re.search(r"(?:[−–—﹣－-]?\s*)?(\d+(?:\.\d*)?|\.\d+)", uncertainty)
+        if central_match and uncertainty_match:
+            central_pattern = _number_pattern(central_match.group(1))
+            uncertainty_pattern = _number_pattern(uncertainty_match.group(1))
+            if central_pattern is not None and uncertainty_pattern is not None:
+                # Some text layers discard ± and glue the uncertainty to the
+                # central token (for example, 4.4720.25).
+                def component(pattern):
+                    value_pattern = re.sub(r"^\(\?<!.*?\)", "", pattern.pattern)
+                    value_pattern = value_pattern.split("(?!", 1)[0]
+                    return value_pattern.removesuffix("0*")
+
+                central_component = component(central_pattern)
+                uncertainty_component = re.sub(
+                    r"\(\?!.*$", "",
+                    re.sub(r"^\(\?<!.*?\)", "", uncertainty_pattern.pattern),
+                )
+                glued_pattern = re.compile(
+                    rf"(?<![\d.−–—﹣－-]){central_component}"
+                    rf"(?:\s*±\s*|[25]?\s*){uncertainty_component}(?![\d.])",
+                    re.I,
+                )
+                return re.compile(rf"(?:{central_pattern.pattern}|{glued_pattern.pattern})", re.I)
     original = unicodedata.normalize("NFKC", str(value)).translate(
         str.maketrans({"−": "-", "–": "-", "—": "-", "﹣": "-", "－": "-"})
     )
@@ -379,11 +458,35 @@ def _number_pattern(value):
 
 def _assert_observation_value(page_text, observation_values):
     observation_values = tuple(observation_values)
-    if observation_values and not any(
-        pattern is not None and pattern.search(page_text)
-        for pattern in (_number_pattern(value) for value in observation_values)
-    ):
-        raise AssertionError("no printed observation value is present on cited page")
+    for value in observation_values:
+        if value.startswith("sign-omitted:"):
+            pattern = _number_pattern(value.removeprefix("sign-omitted:"))
+        else:
+            pattern = _number_pattern(value)
+        if pattern is not None and pattern.search(page_text):
+            return
+    if observation_values:
+        raise AssertionError(f"measured central value {observation_values!r} is absent from cited page")
+
+
+def _required_measured_value_checks(document):
+    source_id = document.get("source_id")
+    if source_id == "ts1985":
+        observation = document["species"]["Na2O"]["observations"][0]
+        value = observation["values"]["rows"][0]["A_as_printed"]
+        yield ("species", "Na2O", "observations", "0", "locator"), observation["locator"], (value,)
+    elif source_id == "kems-021-plante-1992-feo":
+        sample = next(item for item in document["fidelity_samples"] if item.get("field") == "f_at_x_0_1")
+        path = ("fidelity_samples", str(document["fidelity_samples"].index(sample)), "locator")
+        yield path, sample["locator"], tuple(_observation_values(document, path))
+    elif source_id == "kems-031-halwax-2024":
+        sample = next(item for item in document["fidelity_samples"] if item.get("observation_id") == "halwax_2024_table_iv_mgo_mean")
+        path = ("fidelity_samples", str(document["fidelity_samples"].index(sample)), "locator")
+        yield path, sample["locator"], tuple(_observation_values(document, path))
+    elif source_id == "shornikov-1994-mullite-kems":
+        sample = next(item for item in document["fidelity_samples"] if "p_Al2O_times_10^-8_atm_as_printed" in item.get("path", ""))
+        path = ("fidelity_samples", str(document["fidelity_samples"].index(sample)), "locator")
+        yield path, sample["locator"], tuple(_observation_values(document, path))
 
 
 def _assert_label_and_data(locator, locator_path, page_text, caption_page_text=None, observation_values=()):
@@ -432,9 +535,17 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
     justifications = _justifications()
     used_justifications = set()
     value_skips = []
+    checked_documents = {}
+    csv_path = Path(__file__).with_name("t1353_locator_pdf_value_skips.csv")
+    with csv_path.open(newline="") as stream:
+        recorded_skips = list(csv.DictReader(stream))
+    recorded_by_locator = {
+        (row["extract"], row["locator"]): row for row in recorded_skips
+    }
     for relative in _changed_extract_paths():
         current_path = ROOT / relative
         current = _yaml(current_path.read_text())
+        checked_documents[relative] = current
         old = subprocess.run(
             ["git", "show", f"{BASE}:{relative}"], cwd=ROOT,
             check=True, capture_output=True, text=True,
@@ -474,7 +585,7 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
                     printed_values,
                 )
             except AssertionError as exc:
-                if str(exc) == "no printed observation value is present on cited page":
+                if str(exc).startswith("measured central value "):
                     mineru_text = _normalize_label_text(_mineru_page_text(
                         current.get("source_id"),
                         current.get("source", {}).get("corpus_source_id"),
@@ -488,16 +599,29 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
                         checked += 1
                         mineru_matched += 1
                         continue
-                    value_class = _skip_class(current, locator_path, locator)
-                    kind, value_label = next((key, locator[key]) for key in ("table", "figure") if key in locator)
-                    value_skips.append({
-                        "extract": relative,
-                        "locator": ".".join(locator_path) + f" [{kind} {value_label}, page {page_number}]",
-                        "printed_string": "; ".join(printed_values),
-                        "class": value_class,
-                        "verdict": "label-present; value is not literal page text for this typed locator",
-                    })
-                    skipped += 1
+                    skip_locator = ".".join(locator_path) + f" [{next(k for k in ('table', 'figure') if k in locator)} {locator[next(k for k in ('table', 'figure') if k in locator)]}, page {page_number}]"
+                    recorded = recorded_by_locator.get((relative, skip_locator))
+                    if recorded is not None and recorded["printed_string"] == "; ".join(printed_values):
+                        value_skips.append({
+                            "extract": relative,
+                            "locator": skip_locator,
+                            "printed_string": "; ".join(printed_values),
+                            "class": recorded["class"],
+                            "verdict": recorded["verdict"],
+                        })
+                        skipped += 1
+                        continue
+                    if "figure" in locator and _skip_class(current, locator_path, locator) == "digitized":
+                        value_skips.append({
+                            "extract": relative,
+                            "locator": skip_locator,
+                            "printed_string": "; ".join(printed_values),
+                            "class": "digitized",
+                            "verdict": "label-present; value is not literal page text for this typed locator",
+                        })
+                        skipped += 1
+                        continue
+                    failures.append(f"{relative} {locator_path}: {label} on PDF page {page_number}: {exc}")
                     continue
                 key = (relative, locator_path, page_number, label)
                 justification = justifications.get(key)
@@ -545,11 +669,57 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
                 value_skips.append({
                     "extract": relative,
                     "locator": ".".join(locator_path) + f" [{kind} {label}, page {page_number}]",
-                    "printed_string": "",
+                        "printed_string": "; ".join(generic_values),
                     "class": _skip_class(current, locator_path, locator),
-                    "verdict": "label-present; no literal printed numeric value to assert",
+                        "verdict": (
+                            "label-present; stored value is not literal page text for this typed locator"
+                            if generic_values else "label-present; no literal printed numeric value to assert"
+                        ),
                 })
                 skipped += 1
+    for relative, document in checked_documents.items():
+        if document.get("source_id") not in {
+            "ts1985", "kems-021-plante-1992-feo", "kems-031-halwax-2024",
+            "shornikov-1994-mullite-kems",
+        }:
+            continue
+        pdf = _pdf_path(document.get("source_id"), document.get("source", {}).get("corpus_source_id"))
+        for locator_path, locator, measured_values in _required_measured_value_checks(document):
+            if pdf is None or not ("page" in locator and "pdf_page_index" in locator):
+                failures.append(f"{relative} {locator_path}: required measured-value page locator is unavailable")
+                continue
+            page_number = int(locator["pdf_page_index"]) + 1
+            text = _normalize_label_text(_page_text(str(pdf), page_number))
+            try:
+                _assert_label_and_data(locator, locator_path, text, observation_values=measured_values)
+            except AssertionError as exc:
+                try:
+                    mineru_text = _normalize_label_text(_mineru_page_text(
+                        document.get("source_id"),
+                        document.get("source", {}).get("corpus_source_id"),
+                        page_number - 1,
+                    ))
+                    _assert_observation_value(mineru_text, measured_values)
+                except AssertionError:
+                    failures.append(f"{relative} {locator_path}: required measured value on PDF page {page_number}: {exc}")
+                else:
+                    checked += 1
+                    mineru_matched += 1
+            else:
+                if document.get("source_id") == "kems-031-halwax-2024":
+                    magnitude = measured_values[0].removeprefix("sign-omitted:")
+                    magnitude_pattern = _number_pattern(magnitude)
+                    mean_cell = re.compile(r"±\s*10\s+mean\b", re.I)
+                    if magnitude_pattern is None or not any(
+                        magnitude_pattern.search(line) and mean_cell.search(line)
+                        for line in text.splitlines()
+                    ):
+                        failures.append(
+                            f"{relative} {locator_path}: Table IV MgO mean magnitude {magnitude} and uncertainty are absent"
+                        )
+                        continue
+                checked += 1
+                pdftotext_matched += 1
     print(
         f"t1353 PDF locator labels: {checked} passed, {skipped} skipped "
         f"({justified} justified by 600-dpi render), {len(failures)} failed"
@@ -558,13 +728,17 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
     assert checked > 0, "no locator labels were checked"
     assert failures == [], "PDF locator label failures:\n" + "\n".join(failures)
     assert used_justifications == set(justifications), "stale or unmatched rendered locator justification"
-    csv_path = Path(__file__).with_name("t1353_locator_pdf_value_skips.csv")
-    with csv_path.open(newline="") as stream:
-        recorded_skips = list(csv.DictReader(stream))
-    assert len(value_skips) == len(recorded_skips), "typed locator value skip count differs from committed CSV"
+    assert len(value_skips) == len(recorded_skips), (
+        f"typed locator value skip count differs from committed CSV: {len(value_skips)} != "
+        f"{len(recorded_skips)}; current-only: "
+        f"{[(row['extract'], row['locator'], row['printed_string']) for row in value_skips if (row['extract'], row['locator']) not in recorded_by_locator][:30]}; "
+        f"recorded-only: {[(row['extract'], row['locator'], row['printed_string']) for row in recorded_skips if (row['extract'], row['locator']) not in {(item['extract'], item['locator']) for item in value_skips}][:30]}"
+    )
     value_render_justified = 0
     recorded_fields = ("extract", "locator", "printed_string", "class", "verdict")
-    for expected, recorded in zip(value_skips, recorded_skips):
+    value_skip_mismatches = []
+    for expected in value_skips:
+        recorded = recorded_by_locator[(expected["extract"], expected["locator"])]
         if recorded["class"] == "render-confirmed":
             crop_path = Path(recorded["crop_path"])
             assert not crop_path.is_absolute(), "render-confirmed crop path must be repository-relative"
@@ -572,9 +746,15 @@ def test_changed_table_and_figure_locators_name_their_physical_pdf_page(capsys):
             expected["class"] = "render-confirmed"
             expected["verdict"] = "render-confirmed; no text layer"
             value_render_justified += 1
-        assert {field: expected[field] for field in recorded_fields} == {
+        if {field: expected[field] for field in recorded_fields} != {
             field: recorded[field] for field in recorded_fields
-        }, "typed locator value skip differs from committed CSV"
+        }:
+            value_skip_mismatches.append((expected["locator"], {
+                field: (expected[field], recorded[field])
+                for field in recorded_fields
+                if expected[field] != recorded[field]
+            }))
+    assert value_skip_mismatches == [], f"typed locator value skips differ from committed CSV: {value_skip_mismatches}"
     assert all(
         not Path(row["crop_path"]).is_absolute()
         and (ROOT / row["crop_path"]).is_file()
@@ -597,8 +777,6 @@ def test_reiss_apparatus_values_are_not_measured_observation_values():
 
 
 def test_printed_string_checks_central_measured_value_with_field_context():
-    import pytest
-
     document = {
         "fidelity_samples": [
             {
@@ -611,14 +789,21 @@ def test_printed_string_checks_central_measured_value_with_field_context():
     locator_path = ("fidelity_samples", "0", "locator")
     measured_value = tuple(_observation_values(document, locator_path))
 
-    assert measured_value == ("2.2",)
+    assert measured_value == ("2.2 ± 0.2",)
     assert tuple(_numeric_values("NaCl(l) + K2O(slag)", parent_key="reaction_as_printed", published_only=True)) == ()
     assert tuple(_numeric_values("P_KCl / P_K(no NaCl) ~ 10^4", parent_key="expression_as_printed", published_only=True)) == ()
     _assert_observation_value("P_Ca 2.2 ± 0.2", measured_value)
-    with pytest.raises(AssertionError, match="no printed observation value"):
+    with pytest.raises(AssertionError, match="measured central value"):
         _assert_observation_value("P_Ca 0.2", measured_value)
-    with pytest.raises(AssertionError, match="no printed observation value"):
+    with pytest.raises(AssertionError, match="measured central value"):
         _assert_observation_value("P_Ca -2.2", measured_value)
+
+
+def test_printed_central_values_match_exponents_and_glued_uncertainties():
+    _assert_observation_value("A=(-1.46 ± 0.02) × 10^4", ("(-1.46 ± 0.02) × 10^4",))
+    _assert_observation_value("p_Al2O 4.4720.25", ("4.47 ± 0.25",))
+    with pytest.raises(AssertionError, match="4.47 ± 0.25"):
+        _assert_observation_value("p_Al2O 9.4720.25", ("4.47 ± 0.25",))
 
 
 def test_tsuzuki_printed_coefficient_is_checked_as_its_measured_field():
@@ -628,12 +813,62 @@ def test_tsuzuki_printed_coefficient_is_checked_as_its_measured_field():
     measured_value = tuple(
         _numeric_values(row["A_as_printed"], parent_key="A_as_printed", published_only=True)
     )
-    assert measured_value == ("-1.46",)
+    assert measured_value == ("(-1.46 ± 0.02) × 10^4",)
     pdf = _pdf_path(document.get("source_id"), document.get("source", {}).get("corpus_source_id"))
     assert pdf is not None
     assert _label_pattern(observation["locator"]).search(
         _normalize_label_text(_page_text(str(pdf), 7))
     )
+
+
+@pytest.mark.parametrize(
+    ("relative", "wrong_value"),
+    (
+        ("data/literature/extracts/ts1985.yaml", "-9.99"),
+        ("data/literature/extracts/kems-021-plante-1992-feo.yaml", "9.99"),
+        ("data/literature/extracts/kems-031-halwax-2024.yaml", "111.0"),
+        ("data/literature/extracts/shornikov-1994-mullite-kems.yaml", "9.47"),
+    ),
+)
+def test_measured_value_mutations_fail_the_full_locator_sweep(monkeypatch, relative, wrong_value):
+    original_yaml = _yaml
+    calls_for_target = 0
+
+    def mutate(value):
+        if isinstance(value, dict):
+            for key, child in tuple(value.items()):
+                if relative.endswith("ts1985.yaml") and child == "(-1.46 ± 0.02) × 10^4":
+                    value[key] = "(-9.99 ± 0.02) × 10^4"
+                elif relative.endswith("kems-021-plante-1992-feo.yaml") and isinstance(child, (int, float)) and child == 4.04:
+                    value[key] = 9.99
+                elif relative.endswith("kems-031-halwax-2024.yaml") and isinstance(child, (int, float)) and child == -598.0:
+                    value[key] = -111.0
+                elif relative.endswith("shornikov-1994-mullite-kems.yaml") and child == "4.47 ± 0.25":
+                    value[key] = "9.47 ± 0.25"
+                else:
+                    mutate(child)
+        elif isinstance(value, list):
+            for child in value:
+                mutate(child)
+
+    def changed_yaml(text):
+        nonlocal calls_for_target
+        document = original_yaml(text)
+        if document.get("source_id") == Path(relative).stem:
+            calls_for_target += 1
+            if calls_for_target == 1:
+                mutate(document)
+        return document
+
+    class EmptyCapture:
+        @staticmethod
+        def readouterr():
+            return type("Captured", (), {"out": ""})()
+
+    monkeypatch.setattr(__import__(__name__, fromlist=["_yaml"]), "_yaml", changed_yaml)
+    with pytest.raises(AssertionError, match="PDF locator label failures") as failure:
+        test_changed_table_and_figure_locators_name_their_physical_pdf_page(EmptyCapture())
+    assert wrong_value in str(failure.value)
 
 
 def test_continued_table_checks_caption_page_and_data_page():
@@ -653,8 +888,6 @@ def test_continued_table_checks_caption_page_and_data_page():
 
 
 def test_continued_table_requires_label_on_preceding_physical_page():
-    import pytest
-
     locator = {
         "table": "877",
         "page": 4,
@@ -690,7 +923,7 @@ def test_zigo_table_1_prose_mention_does_not_satisfy_data_locator():
             observation_values=_numeric_values(observation["values"]),
         )
     except AssertionError as exc:
-        assert str(exc) == "no printed observation value is present on cited page"
+        assert str(exc).startswith("measured central value ")
     else:
         raise AssertionError("Table 1 page-5 prose mention incorrectly satisfied the data locator")
 
