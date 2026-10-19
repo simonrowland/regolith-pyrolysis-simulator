@@ -748,8 +748,10 @@ def test_magemin_blocked_send_timeout_reaps_and_restarts_worker_slot():
         assert len(caller_outcomes) == 1
         assert isinstance(caller_outcomes[0], EngineWorkerTimeout)
         assert caller_outcomes[0].timeout_s == pytest.approx(4.45)
+        # The consumer publishes the send failure after the caller's abort
+        # returns; this is a hang guard, not a latency assertion.
         with pytest.raises(EngineWorkerDied) as send_failure:
-            submitted[0].result(timeout=1.0)
+            submitted[0].result(timeout=_RENDEZVOUS_TIMEOUT_S)
         assert send_failure.value.phase == 'call'
         assert send_unblocked.is_set()
         assert worker.process is None
