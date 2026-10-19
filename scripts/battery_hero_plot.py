@@ -3096,6 +3096,7 @@ def render_hero_deck_charts(
             history,
             engine_colors=engine_colors,
         )
+        history_axis.set_xlabel("")
 
         sweet_spot_axes: list[Axes] = []
         for pair_index, pair in enumerate(sweet_spot_pairs):
