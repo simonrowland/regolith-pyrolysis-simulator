@@ -5,7 +5,7 @@ from pathlib import Path
 
 import yaml
 
-from tests.test_cheng_2021_phase_equilibria_extract import _locators
+from tests.literature_extract_test_helpers import iter_locators
 
 
 EXTRACT = (
@@ -19,7 +19,7 @@ EXTRACT = (
 
 def test_all_locators_map_printed_pdf_page_to_zero_based_index() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
-    locators = [locator for locator in _locators(document) if "page" in locator]
+    locators = [locator for locator in iter_locators(document) if "page" in locator]
     assert len(locators) == 93
     assert all(locator["page"] == 2 for locator in locators)
     assert all(locator["pdf_page_index"] == 1 for locator in locators)

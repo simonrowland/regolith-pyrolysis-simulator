@@ -9,6 +9,7 @@ import yaml
 
 from simulator.battery.migrate import _mole_fraction_composition_from_values
 from tests.battery.test_migrate import _migrate_real_extract
+from tests.literature_extract_test_helpers import iter_locators
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -51,17 +52,6 @@ def _assert_render_pins(document: dict) -> None:
         assert observation["locator"]["page"] == pdf_page
         assert observation["locator"]["published_page"] == pdf_page
         assert observation["locator"]["pdf_page_index"] == pdf_page - 1
-
-
-def _locators(value: object):
-    if isinstance(value, dict):
-        for key, child in value.items():
-            if key == "locator" and isinstance(child, dict):
-                yield child
-            yield from _locators(child)
-    elif isinstance(value, list):
-        for child in value:
-            yield from _locators(child)
 
 
 def test_cheng_table_rows_and_600_dpi_render_pins() -> None:
@@ -114,7 +104,7 @@ def test_cheng_render_pin_rejects_a_changed_cell() -> None:
 
 def test_cheng_all_locators_use_printed_pages_and_zero_based_pdf_indices() -> None:
     document = _document()
-    locators = list(_locators(document))
+    locators = list(iter_locators(document))
     assert len(locators) == 9172
     assert all(
         locator["published_page"] == locator["page"]
