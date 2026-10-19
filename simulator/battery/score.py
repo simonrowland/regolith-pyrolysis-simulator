@@ -9001,12 +9001,16 @@ def measured_engine_rail_records(
 def _paired_engine_rail_benchmarks(
     residuals: Iterable[Mapping[str, object]],
     *,
-    primary_engine: str,
+    primary_engines: Sequence[str],
+    comparison_engines: Sequence[str],
+    rails: Sequence[str],
 ) -> list[dict[str, object]]:
-    """Choose the lowest-RMS comparison on references shared with primary.
+    """Choose each primary's lowest-RMS comparison on pairwise shared rows.
 
     Only one numeric dex row per engine/reference/rail is unambiguous enough
     to pair. Missing rows and duplicates are excluded from that comparison.
+    A result is returned for every requested rail and primary, including an
+    explicit unavailable record when no comparison engine shares rows.
     """
 
     values: dict[tuple[str, str], dict[str, list[Decimal]]] = defaultdict(
@@ -9035,43 +9039,59 @@ def _paired_engine_rail_benchmarks(
             continue
         values[(rail, reference)][engine].append(value)
 
-    paired: dict[str, dict[str, list[tuple[Decimal, Decimal]]]] = defaultdict(
-        lambda: defaultdict(list)
-    )
-    for (rail, _reference), by_engine in values.items():
-        primary_values = by_engine.get(primary_engine, ())
-        if len(primary_values) != 1:
-            continue
-        primary_value = primary_values[0]
-        for engine, engine_values in by_engine.items():
-            if engine != primary_engine and len(engine_values) == 1:
-                paired[rail][engine].append((primary_value, engine_values[0]))
-
     records: list[dict[str, object]] = []
-    for rail, comparisons in sorted(paired.items()):
-        candidates: list[tuple[Decimal, str, Decimal, int]] = []
-        for engine, pairs in comparisons.items():
-            benchmark_rms = _rms([comparison for _primary, comparison in pairs])
-            primary_rms = _rms([primary for primary, _comparison in pairs])
-            if benchmark_rms is not None and primary_rms is not None:
-                candidates.append(
-                    (benchmark_rms, engine, primary_rms, len(pairs))
+    comparison_names = set(comparison_engines) - set(primary_engines)
+    for rail in sorted(set(rails)):
+        for primary_engine in primary_engines:
+            pairs_by_engine: dict[str, list[tuple[Decimal, Decimal]]] = defaultdict(list)
+            for (row_rail, _reference), by_engine in values.items():
+                if row_rail != rail:
+                    continue
+                primary_values = by_engine.get(primary_engine, ())
+                if len(primary_values) != 1:
+                    continue
+                primary_value = primary_values[0]
+                for engine in comparison_names:
+                    comparison_values = by_engine.get(engine, ())
+                    if len(comparison_values) == 1:
+                        pairs_by_engine[engine].append(
+                            (primary_value, comparison_values[0])
+                        )
+
+            candidates: list[tuple[Decimal, str, Decimal, int]] = []
+            for engine, pairs in pairs_by_engine.items():
+                benchmark_rms = _rms([comparison for _primary, comparison in pairs])
+                primary_rms = _rms([primary for primary, _comparison in pairs])
+                if benchmark_rms is not None and primary_rms is not None:
+                    candidates.append(
+                        (benchmark_rms, engine, primary_rms, len(pairs))
+                    )
+            if not candidates:
+                records.append(
+                    {
+                        "rail": rail,
+                        "primary_engine": primary_engine,
+                        "benchmark_engine": None,
+                        "n": 0,
+                        "primary_rms_dex": None,
+                        "benchmark_rms_dex": None,
+                    }
                 )
-        if not candidates:
-            continue
-        benchmark_rms, engine, primary_rms, count = min(
-            candidates, key=lambda candidate: (candidate[0], candidate[1])
-        )
-        records.append(
-            {
-                "rail": rail,
-                "primary_engine": primary_engine,
-                "benchmark_engine": engine,
-                "n": count,
-                "primary_rms_dex": str(primary_rms),
-                "benchmark_rms_dex": str(benchmark_rms),
-            }
-        )
+                continue
+
+            benchmark_rms, engine, primary_rms, count = min(
+                candidates, key=lambda candidate: (candidate[0], candidate[1])
+            )
+            records.append(
+                {
+                    "rail": rail,
+                    "primary_engine": primary_engine,
+                    "benchmark_engine": engine,
+                    "n": count,
+                    "primary_rms_dex": str(primary_rms),
+                    "benchmark_rms_dex": str(benchmark_rms),
+                }
+            )
     return records
 
 

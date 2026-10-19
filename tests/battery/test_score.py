@@ -4673,7 +4673,7 @@ def test_measured_engine_rail_records_group_source_relation() -> None:
     ]
 
 
-def test_paired_engine_rail_benchmark_uses_only_shared_references() -> None:
+def test_paired_engine_rail_benchmarks_choose_best_comparison_per_primary() -> None:
     rows = [
         {
             "rail": Rail.VAPOUR.value,
@@ -4683,7 +4683,7 @@ def test_paired_engine_rail_benchmark_uses_only_shared_references() -> None:
         },
         {
             "rail": Rail.VAPOUR.value,
-            "reference": "primary-only",
+            "reference": "internal-vaporock",
             "candidate_request": {"engine": "internal-analytical"},
             "numeric": {"operation": "dex", "value": "4"},
         },
@@ -4696,7 +4696,7 @@ def test_paired_engine_rail_benchmark_uses_only_shared_references() -> None:
         {
             "rail": Rail.VAPOUR.value,
             "reference": "comparison-only",
-            "candidate_request": {"engine": "openimcc"},
+            "candidate_request": {"engine": "vaporock"},
             "numeric": {"operation": "dex", "value": "100"},
         },
         {
@@ -4705,20 +4705,67 @@ def test_paired_engine_rail_benchmark_uses_only_shared_references() -> None:
             "candidate_request": {"engine": "thermoengine"},
             "numeric": {"operation": "dex", "value": "2"},
         },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "shared",
+            "candidate_request": {"engine": "vaporock"},
+            "numeric": {"operation": "dex", "value": "0.5"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "internal-vaporock",
+            "candidate_request": {"engine": "vaporock"},
+            "numeric": {"operation": "dex", "value": "4"},
+        },
+        {
+            "rail": Rail.REDOX.value,
+            "reference": "redox-primary",
+            "candidate_request": {"engine": "internal-analytical"},
+            "numeric": {"operation": "dex", "value": "0.3"},
+        },
+        {
+            "rail": Rail.REDOX.value,
+            "reference": "redox-primary",
+            "candidate_request": {"engine": "openimcc"},
+            "numeric": {"operation": "dex", "value": "0.2"},
+        },
     ]
 
-    record = _paired_engine_rail_benchmarks(
-        rows, primary_engine="internal-analytical"
-    )[0]
+    records = _paired_engine_rail_benchmarks(
+        rows,
+        primary_engines=("openimcc", "internal-analytical"),
+        comparison_engines=("vaporock", "thermoengine", "alphamelts", "magemin"),
+        rails=(Rail.VAPOUR.value, Rail.REDOX.value),
+    )
+    by_key = {
+        (record["rail"], record["primary_engine"]): record for record in records
+    }
 
-    assert record == {
+    assert by_key[(Rail.VAPOUR.value, "openimcc")] == {
+        "rail": Rail.VAPOUR.value,
+        "primary_engine": "openimcc",
+        "benchmark_engine": "vaporock",
+        "n": 1,
+        "primary_rms_dex": "1",
+        "benchmark_rms_dex": "0.5",
+    }
+    assert by_key[(Rail.VAPOUR.value, "internal-analytical")] == {
         "rail": Rail.VAPOUR.value,
         "primary_engine": "internal-analytical",
-        "benchmark_engine": "openimcc",
+        "benchmark_engine": "thermoengine",
         "n": 1,
         "primary_rms_dex": "3",
-        "benchmark_rms_dex": "1",
+        "benchmark_rms_dex": "2",
     }
+    for primary in ("openimcc", "internal-analytical"):
+        assert by_key[(Rail.REDOX.value, primary)] == {
+            "rail": Rail.REDOX.value,
+            "primary_engine": primary,
+            "benchmark_engine": None,
+            "n": 0,
+            "primary_rms_dex": None,
+            "benchmark_rms_dex": None,
+        }
 
 
 def test_measured_headline_mode_serializes_typed_residuals_end_to_end(
