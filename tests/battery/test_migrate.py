@@ -6550,6 +6550,8 @@ def _series_census(
     extracts: Path, extracts_v2: Path
 ) -> tuple[dict[str, int], list[str], int, int, dict[str, dict[str, int]]]:
     from decimal import Decimal, InvalidOperation
+    from simulator.battery.migrate import _residue_component_field_sets
+    from simulator.yaml_cache import YAML12SafeLoader
 
     census: dict[str, int] = {}
     per_source: dict[str, dict[str, int]] = {}
@@ -6557,13 +6559,17 @@ def _series_census(
     n_numeric = 0
     n_unavailable = 0
     for src_path in sorted(extracts.glob("*.yaml")):
-        source = yaml.safe_load(src_path.read_text(encoding="utf-8"))
+        source = yaml.load(
+            src_path.read_text(encoding="utf-8"), Loader=YAML12SafeLoader
+        )
         if not isinstance(source, dict):
             continue
         store_path = extracts_v2 / src_path.name
         if not store_path.is_file():
             continue
-        stored = yaml.safe_load(store_path.read_text(encoding="utf-8"))
+        stored = yaml.load(
+            store_path.read_text(encoding="utf-8"), Loader=YAML12SafeLoader
+        )
         stored_observations = [
             o
             for o in (stored.get("observations") or [])
@@ -6594,11 +6600,7 @@ def _series_census(
                     if q_token == "residue_component_composition":
                         residue_fields = (
                             "residue_ppm",
-                            "SiO2_wt_pct",
-                            "Al2O3_wt_pct",
-                            "FeO_wt_pct",
-                            "MgO_wt_pct",
-                            "CaO_wt_pct",
+                            *_residue_component_field_sets(item)[0],
                         )
                         for field in residue_fields:
                             if field not in item:
@@ -14095,6 +14097,263 @@ def test_residue_component_quantity_aliases_keep_printed_values_and_missing_cell
         missing = select_declared_source(quantity.value, units, {field: None})
         assert not missing.available
         assert "null" in (missing.reason or "")
+
+
+def test_residue_series_scores_every_parseable_printed_oxide(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.migrate import _mass_loss_oxide_map_from_mapping
+
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/kems-026-markova-1984.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    row = next(
+        observation
+        for observation in source["species"]["SiO2"]["observations"]
+        if observation.get("observation_id")
+        == "markova_1984_table2_residual_melt_VI_lherzolite"
+    )
+    row["values"]["series"] = [
+        {
+            "T_C": 1475,
+            "mass_loss_pct": "1.46",
+            "SiO2_wt_pct": "44.4",
+            "TiO2_wt_pct": "1.23",
+            "Na2O_wt_pct": "0.44",
+        }
+    ]
+    assert _mass_loss_oxide_map_from_mapping(row["values"]["series"][0]) == {
+        "SiO2": Decimal("44.4"),
+        "TiO2": Decimal("1.23"),
+        "Na2O": Decimal("0.44"),
+    }
+    migrated = _migrate_real_extract(
+        tmp_path, "kems-026-markova-1984.yaml", extract_doc=source
+    )
+    cells = {
+        observation.identity.species.formula: observation.value.point
+        for observation in migrated.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and observation.observation_id.startswith(
+            "kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite::"
+        )
+        and observation.identity.species.formula in {"SiO2", "TiO2", "Na2O"}
+        and observation.value.kind is ValueKind.POINT
+    }
+    assert cells == {
+        "SiO2": Decimal("44.4"),
+        "TiO2": Decimal("1.23"),
+        "Na2O": Decimal("0.44"),
+    }
+
+
+def test_unparseable_residue_oxide_field_is_a_typed_refusal(
+    tmp_path: Path,
+) -> None:
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/kems-026-markova-1984.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    row = next(
+        observation
+        for observation in source["species"]["SiO2"]["observations"]
+        if observation.get("observation_id")
+        == "markova_1984_table2_residual_melt_VI_lherzolite"
+    )
+    row["values"]["series"] = [
+        {"T_C": 1475, "SiO2_wt_pct": "44.4", "UnobtainiumO2_wt_pct": "0.2"}
+    ]
+    migrated = _migrate_real_extract(
+        tmp_path, "kems-026-markova-1984.yaml", extract_doc=source
+    )
+    issues = [
+        issue
+        for issue in migrated.validation.issues
+        if "UnobtainiumO2_wt_pct" in issue.path
+    ]
+    assert len(issues) == 1
+    assert issues[0].reason is RefusalReason.INVALID_SOURCE
+    assert "parseable oxide formula" in issues[0].detail
+
+
+def test_ivanova_residue_ordinal_ids_keep_their_printed_components(
+    tmp_path: Path,
+) -> None:
+    source_id = "ivanova-2018-spinel-rich-cai-evaporation"
+    migrated = _migrate_real_extract(tmp_path, f"{source_id}.yaml")
+    stored_payload = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts-v2" / f"{source_id}.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    stored = [
+        observation_from_plain(row)
+        for row in stored_payload["observations"]
+        if row["identity"]["quantity"].get("value")
+        == "residue_component_composition"
+    ]
+    actual = [
+        observation
+        for observation in migrated.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+
+    def by_id(observations):
+        return {
+            observation.observation_id: (
+                observation.identity.species.formula,
+                observation.value.point,
+            )
+            for observation in observations
+        }
+
+    expected_by_id = by_id(stored)
+    assert len(expected_by_id) == 32
+    assert by_id(actual) == expected_by_id
+
+
+def test_appended_residue_oxide_does_not_move_ordinal_component_ids(
+    tmp_path: Path,
+) -> None:
+    source_id = "ivanova-2018-spinel-rich-cai-evaporation"
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts" / f"{source_id}.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    row = next(
+        observation
+        for observation in source["species"]["CaO"]["observations"]
+        if observation.get("observation_id")
+        == "ivanova_2018_table1_residue_composition"
+    )
+    for point in row["values"]["series"]:
+        point["TiO2_wt_pct"] = "1.11"
+    migrated = _migrate_real_extract(
+        tmp_path, f"{source_id}.yaml", extract_doc=source
+    )
+    stored_payload = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts-v2" / f"{source_id}.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    stored_silica = {
+        row["observation_id"]: (
+            row["identity"]["species"]["formula"],
+            Decimal(row["value"]["point"]),
+        )
+        for row in stored_payload["observations"]
+        if row["identity"]["quantity"].get("value")
+        == "residue_component_composition"
+        and row["identity"]["species"]["formula"] == "SiO2"
+    }
+    migrated_silica = {
+        observation.observation_id: (
+            observation.identity.species.formula,
+            observation.value.point,
+        )
+        for observation in migrated.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and observation.identity.species.formula == "SiO2"
+    }
+    migrated_titania = [
+        observation
+        for observation in migrated.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and observation.identity.species.formula == "TiO2"
+    ]
+    assert len(stored_silica) == 8
+    assert migrated_silica == stored_silica
+    assert len(migrated_titania) == 8
+    assert all(obs.value.point == Decimal("1.11") for obs in migrated_titania)
+    assert len({obs.observation_id for obs in migrated_titania}) == 8
+    assert all(
+        "::field:TiO2:row:" in obs.observation_id for obs in migrated_titania
+    )
+    assert not (set(stored_silica) & {obs.observation_id for obs in migrated_titania})
+
+
+def test_quantity_absent_activity_row_is_not_misclassified_as_residue(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import AdmissionStatus
+
+    source_id = "kang-2007-sio2-activity-cas-low-silica"
+    migrated = _migrate_real_extract(tmp_path, f"{source_id}.yaml")
+    activity = [
+        observation
+        for observation in migrated.observations.values()
+        if observation.observation_id.endswith(
+            "::kang_2007_t2_sample_301_sio2_activity"
+        )
+    ]
+    assert len(activity) == 1
+    assert activity[0].identity.quantity.is_value
+    assert activity[0].identity.quantity.value is Quantity.ACTIVITY
+    assert activity[0].value.point == Decimal("0.00102")
+    assert activity[0].admission.status is AdmissionStatus.ADMITTED
+
+
+def test_markova_residue_default_admission_survives_printed_composition_maps(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import AdmissionStatus
+
+    source_id = "kems-026-markova-1984"
+    migrated = _migrate_real_extract(tmp_path, f"{source_id}.yaml")
+    residue = [
+        observation
+        for observation in migrated.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+    assert len(residue) == 110
+    assert all(obs.admission.status is AdmissionStatus.ADMITTED for obs in residue)
+    assert all(
+        obs.admission.reason
+        and obs.admission.reason.startswith("admission_defaulted:")
+        and "d-056" in obs.admission.reason
+        for obs in residue
+    )
+    stored_payload = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts-v2" / f"{source_id}.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    stored_mass_loss = [
+        observation_from_plain(row)
+        for row in stored_payload["observations"]
+        if row["identity"]["quantity"].get("value") == "mass_loss_fraction"
+    ]
+    migrated_mass_loss = [
+        observation
+        for observation in migrated.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+    ]
+    def by_id(observations):
+        return {
+            observation.observation_id: (
+                observation.value.point,
+                observation.admission.status,
+                observation.admission.reason,
+            )
+            for observation in observations
+        }
+    assert len(stored_mass_loss) == 24
+    assert by_id(migrated_mass_loss) == by_id(stored_mass_loss)
 
 
 def test_hashimoto_row_left_live_diagnostics_are_final(
