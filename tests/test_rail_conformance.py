@@ -1169,6 +1169,7 @@ def test_demand_manifest_ratchet_rejects_source_census_shrinkage() -> None:
 
 
 def test_gap_ledger_schema_and_reason_types() -> None:
+    assert GAPS["schema_version"] == 2
     assert set(GAPS["reason_types"]) == REASON_TYPES
     entries = GAPS["entries"]
     keys = [_pair_key(row) for row in entries]
@@ -1176,6 +1177,10 @@ def test_gap_ledger_schema_and_reason_types() -> None:
     for row in entries:
         assert row["reason"] in REASON_TYPES
         assert isinstance(row.get("missing"), str) and row["missing"].strip()
+        if row.get("verdict") == "NEEDS-CHANNEL":
+            assert isinstance(row.get("pathway"), str)
+            assert isinstance(row.get("required_channels"), list)
+            assert isinstance(row.get("refusal_code"), str)
         if row["carrier"] == UNRESOLVED_CARRIER:
             assert row["contract"] == "carrier-discovery"
             assert row["reason"] == "acquisition-pending"

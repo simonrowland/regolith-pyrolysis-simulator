@@ -22,9 +22,9 @@ from simulator.vapour_rail.channels import (
     CHANNEL_I2,
     ChannelCompositionRefusal,
     REFUSAL_CARBON_SIDE_OWNER_MISSING,
-    attempt_channel_composition,
+    REFUSAL_HALIDE_RESERVOIR_OWNER_MISSING,
 )
-from tools.compose_vapour_rail_carriers import typed_refusal
+from tools import compose_vapour_rail_carriers as composer
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -59,14 +59,10 @@ def _strip_phase(formula: str) -> str:
 
 def test_all_878_needs_channel_rows_execute_typed_refusal() -> None:
     entries = _payload("vapour_rail_coverage_gaps.yaml")["entries"]
-    needs = [row for row in entries if str(row.get("missing", "")).startswith("NEEDS-CHANNEL")]
+    needs = [row for row in entries if row.get("verdict") == "NEEDS-CHANNEL"]
     assert len(needs) == 878
     for row in needs:
-        refusal = attempt_channel_composition(
-            carrier=str(row["carrier"]),
-            element=str(row["element"]),
-            missing_text=str(row["missing"]),
-        )
+        refusal = composer.typed_refusal(row)
         assert isinstance(refusal, ChannelCompositionRefusal), row
         assert refusal.ledger_missing == row["missing"]
         if refusal.disposition != REFUSAL_CARBON_SIDE_OWNER_MISSING:
@@ -82,6 +78,7 @@ def test_typed_refusal_ignores_edits_to_missing_prose() -> None:
         "verdict": "NEEDS-CHANNEL",
         "pathway": "parent_oxide_x_halogen_exchange",
         "required_channels": [CHANNEL_F2],
+        "refusal_code": REFUSAL_HALIDE_RESERVOIR_OWNER_MISSING,
         "missing": (
             "NEEDS-CHANNEL: ligand fugacity channel for ['F']; "
             "pathway=parent_oxide_x_halogen_exchange"
@@ -92,8 +89,8 @@ def test_typed_refusal_ignores_edits_to_missing_prose() -> None:
         "missing": row["missing"].replace("['F']", "['S']"),
     }
 
-    original_refusal = typed_refusal(row)
-    edited_refusal = typed_refusal(edited_row)
+    original_refusal = composer.typed_refusal(row)
+    edited_refusal = composer.typed_refusal(edited_row)
 
     assert isinstance(original_refusal, ChannelCompositionRefusal)
     assert isinstance(edited_refusal, ChannelCompositionRefusal)
@@ -114,7 +111,7 @@ def test_coverage_composition_verdicts_match_green_snapshot() -> None:
     records = []
     refusal_count = 0
     for row in entries:
-        refusal = typed_refusal(row)
+        refusal = composer.typed_refusal(row)
         if refusal is None:
             verdict = None
         else:
@@ -133,6 +130,35 @@ def test_coverage_composition_verdicts_match_green_snapshot() -> None:
     assert hashlib.sha256(encoded).hexdigest() == (
         "53b7f0ba141bfd4b840f3a6df25b23a1b4635b352303f48211115bcb43b2439b"
     )
+
+
+def test_candidate_composition_inputs_come_from_typed_fields(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    row = {
+        "element": "Ba",
+        "carrier": "BaF",
+        "verdict": STRICT,
+        "pathway": "catalog_self_executable",
+        "anchor_key": None,
+        "overlap_fraction": 1.0,
+        "missing": (
+            "COMPOSABLE-NOW-CLIPPED: pathway=wrong_pathway; "
+            "anchor WRONG_ANCHOR partial; overlap_fraction=0.25"
+        ),
+    }
+    gaps_path = tmp_path / "coverage.yaml"
+    gaps_path.write_text(yaml.safe_dump({"entries": [row]}), encoding="utf-8")
+    monkeypatch.setattr(composer, "GAPS_PATH", gaps_path)
+
+    candidates = composer.load_candidates()
+
+    assert len(candidates) == 1
+    candidate = candidates[0]
+    assert candidate.tier == STRICT
+    assert candidate.pathway == "catalog_self_executable"
+    assert candidate.anchor_key is None
+    assert candidate.overlap_fraction == 1.0
 
 
 def test_ba_pilot_three_way_split_and_owner_specific_refusals() -> None:
@@ -155,7 +181,7 @@ def test_ba_pilot_three_way_split_and_owner_specific_refusals() -> None:
         str(row["carrier"]): row
         for row in entries
         if row.get("element") == "Ba"
-        and str(row.get("missing", "")).startswith("NEEDS-CHANNEL")
+        and row.get("verdict") == "NEEDS-CHANNEL"
     }
     expected = {
         "BaBr": (CHANNEL_Br2, "halide_reservoir_owner_missing"),
@@ -171,11 +197,7 @@ def test_ba_pilot_three_way_split_and_owner_specific_refusals() -> None:
     assert set(ba_needs) == set(expected)
     for carrier, (channel, owner) in expected.items():
         row = ba_needs[carrier]
-        refusal = attempt_channel_composition(
-            carrier=carrier,
-            element="Ba",
-            missing_text=str(row["missing"]),
-        )
+        refusal = composer.typed_refusal(row)
         assert isinstance(refusal, ChannelCompositionRefusal)
         assert refusal.missing_channels == (channel,)
         assert owner in refusal.missing_melt_owners

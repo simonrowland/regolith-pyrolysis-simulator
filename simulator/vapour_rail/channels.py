@@ -55,7 +55,7 @@ Ownership invariants (design §3) — hard boundaries:
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import Enum
 from pathlib import Path
 from types import MappingProxyType
@@ -1518,7 +1518,6 @@ def _empty_channel_composition_refusal(
             "(not a gas channel in t-571)"
         )
     else:
-        disposition = REFUSAL_MISSING_CHANNEL_INPUT
         detail = (
             f"carrier {carrier}: NEEDS-CHANNEL but no channel requirement "
             "could be inferred; balanced reaction still required"
@@ -1539,13 +1538,9 @@ def _empty_channel_composition_refusal(
 # Coverage-ledger consumption of typed NEEDS-CHANNEL reasons
 # ---------------------------------------------------------------------------
 
-_PATHWAY_RE = re.compile(r"pathway=([a-z0-9_]+)")
-_NEEDS_CHANNEL_PREFIX = re.compile(r"^NEEDS-CHANNEL\b")
-
-
 @dataclass(frozen=True)
 class TypedGapReason:
-    """Coverage-ledger row projected onto the t-571 channel vocabulary."""
+    """Typed coverage verdict projected onto the t-571 channel vocabulary."""
 
     element: str
     carrier: str
@@ -1557,39 +1552,33 @@ class TypedGapReason:
 
 
 def parse_needs_channel_entry(entry: Mapping[str, Any]) -> TypedGapReason | None:
-    """Project one coverage-gap entry into a typed channel reason, or None."""
+    """Read one typed NEEDS-CHANNEL verdict; prose is retained for display."""
 
     missing = str(entry.get("missing") or "")
-    if not _NEEDS_CHANNEL_PREFIX.search(missing):
+    if entry.get("verdict") != "NEEDS-CHANNEL":
         return None
     element = str(entry.get("element") or "")
     carrier = str(entry.get("carrier") or "")
-    pathway_match = _PATHWAY_RE.search(missing)
-    pathway = pathway_match.group(1) if pathway_match else None
-    required = infer_required_channels_from_carrier(
-        carrier, pathway=pathway, missing_text=missing
-    )
+    raw_pathway = entry.get("pathway")
+    if raw_pathway is not None and not isinstance(raw_pathway, str):
+        raise TypeError("coverage verdict pathway must be a string or null")
+    pathway = raw_pathway
+    raw_required = entry.get("required_channels")
+    if not isinstance(raw_required, (list, tuple)) or any(
+        not isinstance(channel_id, str) for channel_id in raw_required
+    ):
+        raise TypeError("NEEDS-CHANNEL required_channels must be a string list")
+    required = tuple(raw_required)
+    if len(required) != len(set(required)):
+        raise ValueError("NEEDS-CHANNEL required_channels must be unique")
+    disposition = entry.get("refusal_code")
+    if not isinstance(disposition, str) or not disposition:
+        raise TypeError("NEEDS-CHANNEL refusal_code must be a non-empty string")
     melt_owners: list[str] = []
     for channel_id in required:
         entry_reg = CHANNEL_REGISTRY.get(channel_id)
         if entry_reg and entry_reg.missing_melt_owner_code:
             melt_owners.append(entry_reg.missing_melt_owner_code)
-    if any(
-        CHANNEL_REGISTRY[c].missing_melt_owner_code == "halide_reservoir_owner_missing"
-        for c in required
-        if c in CHANNEL_REGISTRY
-    ):
-        disposition = REFUSAL_HALIDE_RESERVOIR_OWNER_MISSING
-    elif any(
-        CHANNEL_REGISTRY[c].missing_melt_owner_code == "sulfur_reservoir_owner_missing"
-        for c in required
-        if c in CHANNEL_REGISTRY
-    ):
-        disposition = REFUSAL_SULFUR_RESERVOIR_OWNER_MISSING
-    elif required:
-        disposition = REFUSAL_CHANNEL_RUNTIME_OWNER_MISSING
-    else:
-        disposition = REFUSAL_MISSING_CHANNEL_INPUT
     return TypedGapReason(
         element=element,
         carrier=carrier,
@@ -1599,6 +1588,40 @@ def parse_needs_channel_entry(entry: Mapping[str, Any]) -> TypedGapReason | None
         disposition=disposition,
         raw_missing=missing,
     )
+
+
+def _compose_typed_gap_entry(
+    entry: Mapping[str, Any],
+) -> ChannelCompositionRefusal | Mapping[str, GasChannelPotential] | None:
+    """Resolve typed coverage inputs and carry ``missing`` as display text."""
+
+    typed = parse_needs_channel_entry(entry)
+    if typed is None:
+        return None
+    if not typed.required_channels:
+        result = _empty_channel_composition_refusal(
+            carrier=typed.carrier,
+            element=typed.element,
+            disposition=typed.disposition,
+            ledger_missing=typed.raw_missing,
+            pathway=typed.pathway,
+        )
+        return result
+
+    result = attempt_channel_composition(
+        carrier=typed.carrier,
+        element=typed.element,
+        pathway=typed.pathway,
+        required_channels=typed.required_channels,
+    )
+    if isinstance(result, ChannelCompositionRefusal):
+        if result.disposition != typed.disposition:
+            raise ValueError(
+                f"{typed.carrier}: typed disposition {typed.disposition!r} "
+                f"does not match channel resolution {result.disposition!r}"
+            )
+        return replace(result, ledger_missing=typed.raw_missing)
+    return result
 
 
 def load_typed_needs_channel_reasons(
@@ -1640,7 +1663,7 @@ def reconstruct_878_pathway_cohort(
     *,
     gaps_path: str | Path | None = None,
 ) -> Mapping[str, Any]:
-    """Reproduce the design §2.2 878-row pathway cohort from the free-text ledger.
+    """Reproduce the design §2.2 878-row cohort from typed ledger verdicts.
 
     Returns counts by pathway label plus the total.  The 878 figure is the
     sum of these disjoint pathway labels (not a per-channel count).
@@ -1673,42 +1696,23 @@ def reconstruct_878_pathway_cohort(
         "related_binary_condensed",
     )
     counts: dict[str, int] = {label: 0 for label in pathway_labels}
-    # halide_condensed_family rows in the 878 use the ratio-mismatch prose,
-    # not every halide_condensed_family COMPOSABLE-NOW row.
+    # Only the typed NEEDS-CHANNEL verdict contributes the halide ratio subset;
+    # COMPOSABLE-NOW rows in that pathway do not.
     halide_ratio_mismatch = 0
     for entry in entries:
-        missing = str(entry.get("missing") or "")
-        if not _NEEDS_CHANNEL_PREFIX.search(missing):
-            # No-op.  Absence of a leading NEEDS-CHANNEL prefix does not
-            # skip the row and does not, by itself, admit it.  Counting
-            # below still requires a pathway= token, then the per-label
-            # filters in this loop.
-            pass
-        pathway_match = _PATHWAY_RE.search(missing)
-        if pathway_match is None:
+        pathway = entry.get("pathway")
+        if not isinstance(pathway, str):
             continue
-        pathway = pathway_match.group(1)
+        verdict = entry.get("verdict")
         if pathway == "halide_condensed_family":
-            # Design §2.2: the "changed total-halogen ratio only" subset
-            # (107).  Counted when the free-text contains "NEEDS-CHANNEL"
-            # or "ratio mismatch" (the prefix itself is not required).
-            if "NEEDS-CHANNEL" in missing or "ratio mismatch" in missing:
+            if verdict == "NEEDS-CHANNEL":
                 counts["halide_condensed_family"] += 1
                 halide_ratio_mismatch += 1
             continue
-        if pathway in counts:
-            if "NEEDS-CHANNEL" in missing or pathway in {
-                "parent_oxide_x_halogen_exchange",
-                "element_condensed_x_halogen_exchange",
-                "catalog_base_x_halogen_exchange",
-                "base_x_hydrogen_exchange",
-                "related_binary_condensed",
-            }:
-                # related_binary_condensed: counted whenever the pathway
-                # token is present.  The other four labels in this set:
-                # counted only when "NEEDS-CHANNEL" is in the free-text.
-                if "NEEDS-CHANNEL" in missing or pathway == "related_binary_condensed":
-                    counts[pathway] += 1
+        if pathway in counts and (
+            verdict == "NEEDS-CHANNEL" or pathway == "related_binary_condensed"
+        ):
+            counts[pathway] += 1
 
     total = sum(counts.values())
     return MappingProxyType(
