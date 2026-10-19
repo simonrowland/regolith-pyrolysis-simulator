@@ -235,6 +235,33 @@ def _absolute_path_value_errors(doc: Any, label: str) -> list[str]:
     return errors
 
 
+def _private_source_path_errors(doc: Any, label: str) -> list[str]:
+    """Refuse repository-private workspace paths in any nested source_path."""
+    errors: list[str] = []
+
+    def walk(node: Any, path: str = "") -> None:
+        if isinstance(node, Mapping):
+            for key, value in node.items():
+                key_s = str(key)
+                child = f"{path}.{key_s}" if path else key_s
+                if (
+                    key_s == "source_path"
+                    and isinstance(value, str)
+                    and value.startswith("docs-private/")
+                ):
+                    errors.append(
+                        f"{label}: {child} must be repository-portable "
+                        f"(docs-private source path refused): {value!r}"
+                    )
+                walk(value, child)
+        elif isinstance(node, (list, tuple)):
+            for i, item in enumerate(node):
+                walk(item, f"{path}[{i}]")
+
+    walk(doc)
+    return errors
+
+
 class ExtractValidationError(Exception):
     """One or more extract validation failures."""
 
@@ -1656,6 +1683,7 @@ def validate_extract_document(
     # extraction.provenance_path. b-713 replaced a line-regex count ceiling
     # that missed quoted scalars and YAML aliases.
     errors.extend(_absolute_path_value_errors(doc, label))
+    errors.extend(_private_source_path_errors(doc, label))
 
     review = doc.get("review_status")
     if review not in REVIEW_STATUSES:

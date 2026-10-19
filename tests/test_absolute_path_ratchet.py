@@ -97,6 +97,19 @@ def test_relative_spelling_validates_clean(form: str) -> None:
     assert vle.validate_extract_document(doc, expected_source_id="probe") == []
 
 
+def test_relative_docs_private_source_path_is_refused() -> None:
+    doc = yaml.safe_load(_text("quoted", "docs-private/research/ocr-repair/table.md"))
+    errors = vle.validate_extract_document(doc, expected_source_id="probe")
+    assert len(errors) == 1
+    assert "source_path" in errors[0]
+    assert "docs-private source path refused" in errors[0]
+
+
+def test_corpus_text_source_path_validates_clean() -> None:
+    doc = yaml.safe_load(_text("quoted", "text/probe/ocr-repair/table.md"))
+    assert vle.validate_extract_document(doc, expected_source_id="probe") == []
+
+
 @pytest.mark.parametrize("form", ["quoted", "gibson_anchor_alias"])
 def test_validate_all_refuses_one_extract(tmp_path: Path, form: str) -> None:
     probe = tmp_path / "probe.yaml"
