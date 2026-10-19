@@ -1761,6 +1761,7 @@ def validate_extract_file(
     if isinstance(doc, Mapping) and doc.get("schema_version") == TABLE_SCHEMA_VERSION:
         errors: list[str] = []
         errors.extend(_absolute_path_value_errors(doc, str(path)))
+        errors.extend(_private_path_value_errors(doc, str(path)))
         source_id = doc.get("source_id")
         if not isinstance(source_id, str) or not source_id:
             return [f"{path}: companion table source_id is required"]

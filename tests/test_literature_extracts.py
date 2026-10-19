@@ -1528,6 +1528,42 @@ def test_refuses_absolute_locator_path_on_companion(tmp_path: Path, monkeypatch)
     )
 
 
+@pytest.mark.parametrize(
+    "companion_yaml",
+    [
+        """schema_version: literature_extract_table.v1
+source_id: fixture-source
+rows:
+- locator:
+    source_path: docs-private/research/repair.md
+""",
+        """schema_version: literature_extract_table.v1
+source_id: fixture-source
+rows:
+- locator:
+    source_path: [docs-private/research/repair.md]
+""",
+        """schema_version: literature_extract_table.v1
+source_id: fixture-source
+rows:
+- locator:
+    source_path: &private_path docs-private/research/repair.md
+- provenance:
+    source_path: *private_path
+""",
+    ],
+    ids=("nested", "list", "alias"),
+)
+def test_refuses_private_path_on_companion(tmp_path: Path, monkeypatch, companion_yaml):
+    monkeypatch.setattr(vle, "ROOT", tmp_path)
+    path = _write_companion_table(tmp_path)
+    path.write_text(companion_yaml, encoding="utf-8")
+
+    errors = vle.validate_extract_file(path)
+
+    assert any("docs-private path refused" in error for error in errors)
+
+
 def test_refuses_companion_table_with_unprefixed_filename(
     tmp_path: Path, monkeypatch
 ):
