@@ -4,10 +4,10 @@ source:
   citation: Smales, A. A. et al. (1971), "Elemental composition of lunar surface material (part 2)", Proceedings of the Second Lunar Science Conference 2, 1253–1258.
   year: 1971
 extraction:
-  method: 2026-08-27 repaired-table transcription from 150 dpi source-page vision; no figure digitization
+  method: 2026-08-27 repaired-table transcription from 150 dpi source-page vision; no figure digitization; validated in an internal review, 2026-08-27, ocr-repair; values OCR-repaired in a private pass, 2026-08-27; verified against the PDF page
   date: '2026-08-27'
   worker: extract-ingest
-  provenance_path: docs-private/research/2026-08-27-ocr-repair/smales-1971-lpsc-12022/tables.md
+  provenance_path: raw/smales-1971-lpsc-12022/smales-1971-lpsc-12022.pdf
 review_status: draft
 species:
   SiO2:
@@ -15,7 +15,7 @@ species:
     - observation_id: smales_1971_apollo_12022_bulk_composition_tables1_2_3
       type: gibbs_table
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/smales-1971-lpsc-12022/tables.md
+        source_path: raw/smales-1971-lpsc-12022/smales-1971-lpsc-12022.pdf
         tables:
         - '1'
         - '2'
@@ -106,7 +106,7 @@ species:
     - observation_id: smales_1971_apollo_12065_bulk_composition_tables1_2_3
       type: gibbs_table
       locator:
-        source_path: docs-private/research/2026-08-27-ocr-repair/smales-1971-lpsc-12022/tables.md
+        source_path: raw/smales-1971-lpsc-12022/smales-1971-lpsc-12022.pdf
         tables:
         - '1'
         - '2'
@@ -180,12 +180,12 @@ fidelity_samples:
 - path: species.SiO2.observations[smales_1971_apollo_12022_bulk_composition_tables1_2_3].values.major_oxide_measurements_wt_pct.SiO2[0].value
   value: 42.3
   locator:
-    source_path: docs-private/research/2026-08-27-ocr-repair/smales-1971-lpsc-12022/tables.md
+    source_path: raw/smales-1971-lpsc-12022/smales-1971-lpsc-12022.pdf
     table: '2'
     page: 1254
 - path: species.SiO2.observations[smales_1971_apollo_12065_bulk_composition_tables1_2_3].values.major_oxide_measurements_wt_pct.SiO2[0].value
   value: 47.1
   locator:
-    source_path: docs-private/research/2026-08-27-ocr-repair/smales-1971-lpsc-12022/tables.md
+    source_path: raw/smales-1971-lpsc-12022/smales-1971-lpsc-12022.pdf
     table: '2'
     page: 1254
