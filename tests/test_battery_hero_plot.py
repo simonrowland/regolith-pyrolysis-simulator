@@ -392,9 +392,41 @@ def test_deck_renderer_emits_all_panels_and_missing_axis_labels(
     )
     sio_svg = Path(files["deck:sio-evolution:svg"]).read_text(encoding="utf-8")
     assert "engine-computed fO2 not yet available" in cross_svg
-    assert "fraction evaporated is not recorded" in residue_svg
+    assert "No typed mass-loss fraction matches these residue rows" in residue_svg
     assert "no history rows" in sio_svg
     assert "1970-01-01" not in sio_svg
+
+
+def test_deck_refusal_strip_includes_missing_scorer_axis(tmp_path: Path) -> None:
+    residuals = tmp_path / "residuals.jsonl"
+    row = _record(
+        engine="openimcc",
+        experiment="missing-oxygen-condition",
+        formula="Fe",
+        temperature_K=1200,
+        residual=0.25,
+    )
+    row["reference"] = "missing-deck-source::missing-oxygen-condition"
+    residuals.write_text(
+        "".join(
+            json.dumps(item) + "\n"
+            for item in (
+                {"kind": "battery_store_stamp", "revision": "test-store"},
+                row,
+            )
+        ),
+        encoding="utf-8",
+    )
+
+    data = read_scores(residuals)
+    assert data.hero_deck_axis_refusals[
+        ("redox_sensitivity", "openimcc", "no fO2 for this row")
+    ] == 1
+    files = hero_plot.render_hero_deck_charts(data, tmp_path / "deck")
+    redox_svg = Path(files["deck:redox-sensitivity:svg"]).read_text(
+        encoding="utf-8"
+    )
+    assert "no fO2 for this row" in redox_svg
 
 
 @pytest.mark.parametrize("view", ("species", "element"))
