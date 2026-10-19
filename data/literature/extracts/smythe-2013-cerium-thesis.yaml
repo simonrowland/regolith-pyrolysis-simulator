@@ -1,0 +1,1856 @@
+schema_version: literature_extract.v1
+source_id: smythe-2013-cerium-thesis
+source:
+  citation: Smythe, D. J. (2013). Cerium Oxidation State in Silicate Melts and the Application to Ce-in-Zircon Oxygen
+    Barometry. PhD thesis, University of Toronto.
+  year: 2013
+extraction:
+  method: Manual transcription from pdftotext-layout; all Table 2.3 cells checked against 600 dpi PDF render.
+  date: '2026-10-19'
+  worker: fam13-1019
+  provenance_path: text/smythe-2013-cerium-thesis/pdftotext-layout.txt
+review_status: draft
+fidelity_samples:
+- path: species.Ce.observations[smythe_2013_table23_xanes_log_ratio].values.series[0].value
+  value: '-0.254'
+  locator:
+    table: '2.3'
+    page: 57
+    pdf_page_index: 56
+    row: DS09-C3-10
+- path: species.Ce.observations[smythe_2013_table23_chemical_fraction].values.series[3].value
+  value: '0.281'
+  locator:
+    table: '2.3'
+    page: 57
+    pdf_page_index: 56
+    row: DS09-C2-13
+- path: species.Ce.observations[smythe_2013_table23_xanes_fraction].values.series[11].value
+  value: '0.168'
+  locator:
+    table: '2.3'
+    page: 57
+    pdf_page_index: 56
+    row: DS09-C2-12
+species:
+  Ce:
+    observations:
+    - observation_id: smythe_2013_table23_chemical_fraction
+      type: concentration_series
+      locator:
+        table: '2.3'
+        page: 57
+        pdf_page_index: 56
+      phase: glass
+      standard_state: Chemical Ce4+/ΣCe
+      units: fraction
+      uncertainty:
+        note: Parenthetical widths as printed; confidence level is not stated.
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 4
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_direct
+        series:
+        - sample: DS09-C3-10
+          T_C: 1298
+          fO2_log: '-2.73'
+          sample_composition_as_published: RH08
+          value: '0.095'
+          sigma: '0.005'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-10
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1571.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-10
+            fO2_log:
+              state:
+                tag: value
+                value: '-2.73'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-10
+            total_pressure_Pa: &id001
+              state:
+                tag: unknown
+                reason: Total pressure is not printed in Table 2.3.
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+            composition: &id002
+              state:
+                tag: unknown
+                reason: Table 2.3 identifies only a starting-material code; full per-sample melt composition is
+                  not printed in this table.
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+            quench_status: &id003
+              state:
+                tag: value
+                value: not_stated
+              locator:
+                page: 43
+                pdf_page_index: 42
+                published_page: 29
+                section: 2.2.1 Experimental procedure
+                note: Samples were quenched in cold water; the source does not state whether Ce valence is preserved
+                  through quenching.
+        - sample: DS11-C36
+          T_C: 1500
+          fO2_log: '0.00'
+          sample_composition_as_published: RH08
+          value: '0.133'
+          sigma: '0.007'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS11-C36
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1773.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C36
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C36
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C3-19
+          T_C: 1399
+          fO2_log: '-0.02'
+          sample_composition_as_published: RH08
+          value: '0.200'
+          sigma: '0.010'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-19
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1672.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-19
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.02'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-19
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C2-13
+          T_C: 1299
+          fO2_log: '0.00'
+          sample_composition_as_published: RH08
+          value: '0.281'
+          sigma: '0.005'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C2-13
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1572.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C2-13
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C2-13
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS11-C35
+          T_C: 1500
+          fO2_log: '0.00'
+          sample_composition_as_published: DA09
+          value: '0.111'
+          sigma: '0.006'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS11-C35
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1773.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C35
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C35
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C3-25
+          T_C: 1399
+          fO2_log: '-0.02'
+          sample_composition_as_published: DA09
+          value: '0.051'
+          sigma: '0.006'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-25
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1672.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-25
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.02'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-25
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS11-C34
+          T_C: 1500
+          fO2_log: '0.00'
+          sample_composition_as_published: AA08
+          value: '0.086'
+          sigma: '0.013'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS11-C34
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1773.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C34
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C34
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C3-18
+          T_C: 1399
+          fO2_log: '-0.02'
+          sample_composition_as_published: AA08
+          value: '0.118'
+          sigma: '0.006'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-18
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1672.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-18
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.02'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-18
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS11-C21
+          T_C: 1799
+          fO2_log: '-2.40'
+          sample_composition_as_published: BH09
+          value: '0.011'
+          sigma: '0.006'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS11-C21
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 2072.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C21
+            fO2_log:
+              state:
+                tag: value
+                value: '-2.40'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C21
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C3-07
+          T_C: 1299
+          fO2_log: '-2.73'
+          sample_composition_as_published: BH09
+          value: '0.034'
+          sigma: '0.005'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-07
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1572.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-07
+            fO2_log:
+              state:
+                tag: value
+                value: '-2.73'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-07
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C2-12
+          T_C: 1299
+          fO2_log: '0.00'
+          sample_composition_as_published: BH09
+          value: '0.075'
+          sigma: '0.009'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C2-12
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1572.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C2-12
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C2-12
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+    - observation_id: smythe_2013_table23_chemical_log_ratio
+      type: concentration_series
+      locator:
+        table: '2.3'
+        page: 57
+        pdf_page_index: 56
+      phase: glass
+      standard_state: Chemical log Ce4+/Ce3+
+      units: log10 ratio
+      uncertainty:
+        note: Parenthetical widths as printed; confidence level is not stated.
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 4
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: log10_ratio
+        method_class: measured_direct
+        series:
+        - sample: DS09-C3-10
+          T_C: 1298
+          fO2_log: '-2.73'
+          sample_composition_as_published: RH08
+          value: '-0.979'
+          sigma: '0.030'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-10
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1571.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-10
+            fO2_log:
+              state:
+                tag: value
+                value: '-2.73'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-10
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS11-C36
+          T_C: 1500
+          fO2_log: '0.00'
+          sample_composition_as_published: RH08
+          value: '-0.814'
+          sigma: '0.032'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS11-C36
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1773.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C36
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C36
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C3-19
+          T_C: 1399
+          fO2_log: '-0.02'
+          sample_composition_as_published: RH08
+          value: '-0.602'
+          sigma: '0.029'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-19
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1672.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-19
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.02'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-19
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C2-13
+          T_C: 1299
+          fO2_log: '0.00'
+          sample_composition_as_published: RH08
+          value: '-0.408'
+          sigma: '0.011'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C2-13
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1572.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C2-13
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C2-13
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS11-C35
+          T_C: 1500
+          fO2_log: '0.00'
+          sample_composition_as_published: DA09
+          value: '-0.904'
+          sigma: '0.033'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS11-C35
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1773.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C35
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C35
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C3-25
+          T_C: 1399
+          fO2_log: '-0.02'
+          sample_composition_as_published: DA09
+          value: '-1.270'
+          sigma: '0.072'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-25
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1672.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-25
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.02'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-25
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS11-C34
+          T_C: 1500
+          fO2_log: '0.00'
+          sample_composition_as_published: AA08
+          value: '-1.026'
+          sigma: '0.095'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS11-C34
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1773.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C34
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C34
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C3-18
+          T_C: 1399
+          fO2_log: '-0.02'
+          sample_composition_as_published: AA08
+          value: '-0.874'
+          sigma: '0.030'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-18
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1672.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-18
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.02'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-18
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS11-C21
+          T_C: 1799
+          fO2_log: '-2.40'
+          sample_composition_as_published: BH09
+          value: '-1.954'
+          sigma: '0.319'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS11-C21
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 2072.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C21
+            fO2_log:
+              state:
+                tag: value
+                value: '-2.40'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C21
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C3-07
+          T_C: 1299
+          fO2_log: '-2.73'
+          sample_composition_as_published: BH09
+          value: '-1.453'
+          sigma: '0.094'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-07
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1572.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-07
+            fO2_log:
+              state:
+                tag: value
+                value: '-2.73'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-07
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C2-12
+          T_C: 1299
+          fO2_log: '0.00'
+          sample_composition_as_published: BH09
+          value: '-1.091'
+          sigma: '0.074'
+          instrument: potentiometric analysis
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C2-12
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1572.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C2-12
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C2-12
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+    - observation_id: smythe_2013_table23_xanes_fraction
+      type: concentration_series
+      locator:
+        table: '2.3'
+        page: 57
+        pdf_page_index: 56
+      phase: glass
+      standard_state: XANES Ce4+/ΣCe
+      units: fraction
+      uncertainty:
+        note: Parenthetical widths as printed; confidence level is not stated.
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 4
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        series:
+        - sample: DS09-C3-10
+          T_C: 1298
+          fO2_log: '-2.73'
+          sample_composition_as_published: RH08
+          value: '0.358'
+          sigma: '0.018'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-10
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1571.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-10
+            fO2_log:
+              state:
+                tag: value
+                value: '-2.73'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-10
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS11-C36
+          T_C: 1500
+          fO2_log: '0.00'
+          sample_composition_as_published: RH08
+          value: '0.333'
+          sigma: '0.017'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS11-C36
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1773.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C36
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C36
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C3-19
+          T_C: 1399
+          fO2_log: '-0.02'
+          sample_composition_as_published: RH08
+          value: '0.386'
+          sigma: '0.019'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-19
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1672.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-19
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.02'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-19
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C2-13
+          T_C: 1299
+          fO2_log: '0.00'
+          sample_composition_as_published: RH08
+          value: '0.397'
+          sigma: '0.020'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C2-13
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1572.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C2-13
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C2-13
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS08-C1-20
+          T_C: 1100
+          fO2_log: '-0.56'
+          sample_composition_as_published: RH08
+          value: '0.215'
+          sigma: '0.021'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS08-C1-20
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1373.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS08-C1-20
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.56'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS08-C1-20
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS11-C35
+          T_C: 1500
+          fO2_log: '0.00'
+          sample_composition_as_published: DA09
+          value: '0.231'
+          sigma: '0.012'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS11-C35
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1773.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C35
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C35
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C3-25
+          T_C: 1399
+          fO2_log: '-0.02'
+          sample_composition_as_published: DA09
+          value: '0.228'
+          sigma: '0.011'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-25
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1672.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-25
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.02'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-25
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS11-C34
+          T_C: 1500
+          fO2_log: '0.00'
+          sample_composition_as_published: AA08
+          value: '0.173'
+          sigma: '0.009'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS11-C34
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1773.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C34
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C34
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C3-18
+          T_C: 1399
+          fO2_log: '-0.02'
+          sample_composition_as_published: AA08
+          value: '0.179'
+          sigma: '0.009'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-18
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1672.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-18
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.02'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-18
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS11-C21
+          T_C: 1799
+          fO2_log: '-2.40'
+          sample_composition_as_published: BH09
+          value: '0.116'
+          sigma: '0.006'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS11-C21
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 2072.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C21
+            fO2_log:
+              state:
+                tag: value
+                value: '-2.40'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C21
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C3-07
+          T_C: 1299
+          fO2_log: '-2.73'
+          sample_composition_as_published: BH09
+          value: '0.143'
+          sigma: '0.007'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-07
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1572.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-07
+            fO2_log:
+              state:
+                tag: value
+                value: '-2.73'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-07
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C2-12
+          T_C: 1299
+          fO2_log: '0.00'
+          sample_composition_as_published: BH09
+          value: '0.168'
+          sigma: '0.008'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C2-12
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1572.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C2-12
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C2-12
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+      derivation:
+        relation: Table 2.3 reports Ce valence reduced from the XANES XANES area ratio.
+        locator:
+          table: '2.3'
+          page: 57
+          pdf_page_index: 56
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            note: Row-specific spectra are not tabulated.
+    - observation_id: smythe_2013_table23_xanes_log_ratio
+      type: concentration_series
+      locator:
+        table: '2.3'
+        page: 57
+        pdf_page_index: 56
+      phase: glass
+      standard_state: XANES log Ce4+/Ce3+
+      units: log10 ratio
+      uncertainty:
+        note: Parenthetical widths as printed; confidence level is not stated.
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 4
+          denominator_kind: oxidation_state
+          denominator_oxidation_state: 3
+          value_form: log10_ratio
+        method_class: measured_reduced
+        series:
+        - sample: DS09-C3-10
+          T_C: 1298
+          fO2_log: '-2.73'
+          sample_composition_as_published: RH08
+          value: '-0.254'
+          sigma: '0.034'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-10
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1571.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-10
+            fO2_log:
+              state:
+                tag: value
+                value: '-2.73'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-10
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS11-C36
+          T_C: 1500
+          fO2_log: '0.00'
+          sample_composition_as_published: RH08
+          value: '-0.301'
+          sigma: '0.033'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS11-C36
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1773.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C36
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C36
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C3-19
+          T_C: 1399
+          fO2_log: '-0.02'
+          sample_composition_as_published: RH08
+          value: '-0.202'
+          sigma: '0.035'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-19
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1672.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-19
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.02'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-19
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C2-13
+          T_C: 1299
+          fO2_log: '0.00'
+          sample_composition_as_published: RH08
+          value: '-0.181'
+          sigma: '0.036'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C2-13
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1572.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C2-13
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C2-13
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS08-C1-20
+          T_C: 1100
+          fO2_log: '-0.56'
+          sample_composition_as_published: RH08
+          value: '-0.563'
+          sigma: '0.056'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS08-C1-20
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1373.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS08-C1-20
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.56'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS08-C1-20
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS11-C35
+          T_C: 1500
+          fO2_log: '0.00'
+          sample_composition_as_published: DA09
+          value: '-0.523'
+          sigma: '0.028'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS11-C35
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1773.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C35
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C35
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C3-25
+          T_C: 1399
+          fO2_log: '-0.02'
+          sample_composition_as_published: DA09
+          value: '-0.531'
+          sigma: '0.028'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-25
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1672.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-25
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.02'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-25
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS11-C34
+          T_C: 1500
+          fO2_log: '0.00'
+          sample_composition_as_published: AA08
+          value: '-0.679'
+          sigma: '0.026'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS11-C34
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1773.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C34
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C34
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C3-18
+          T_C: 1399
+          fO2_log: '-0.02'
+          sample_composition_as_published: AA08
+          value: '-0.662'
+          sigma: '0.026'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-18
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1672.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-18
+            fO2_log:
+              state:
+                tag: value
+                value: '-0.02'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-18
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS11-C21
+          T_C: 1799
+          fO2_log: '-2.40'
+          sample_composition_as_published: BH09
+          value: '-0.882'
+          sigma: '0.025'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS11-C21
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 2072.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C21
+            fO2_log:
+              state:
+                tag: value
+                value: '-2.40'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS11-C21
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C3-07
+          T_C: 1299
+          fO2_log: '-2.73'
+          sample_composition_as_published: BH09
+          value: '-0.779'
+          sigma: '0.025'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C3-07
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1572.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-07
+            fO2_log:
+              state:
+                tag: value
+                value: '-2.73'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C3-07
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+        - sample: DS09-C2-12
+          T_C: 1299
+          fO2_log: '0.00'
+          sample_composition_as_published: BH09
+          value: '-0.694'
+          sigma: '0.026'
+          instrument: XANES area ratio
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            row: DS09-C2-12
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1572.15
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C2-12
+            fO2_log:
+              state:
+                tag: value
+                value: '0.00'
+              locator:
+                table: '2.3'
+                page: 57
+                pdf_page_index: 56
+                row: DS09-C2-12
+            total_pressure_Pa: *id001
+            composition: *id002
+            quench_status: *id003
+      derivation:
+        relation: Table 2.3 reports Ce valence reduced from the XANES XANES area ratio.
+        locator:
+          table: '2.3'
+          page: 57
+          pdf_page_index: 56
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            table: '2.3'
+            page: 57
+            pdf_page_index: 56
+            note: Row-specific spectra are not tabulated.
+    context:
+    - observation_id: smythe_2013_table21_starting_composition
+      type: context
+      locator:
+        table: '2.1'
+        page: 55
+        pdf_page_index: 54
+      units: wt% as printed
+      values:
+        caption: Table 2.1. Bulk composition of starting materials in weight percent (excluding Ce).
+        reason: 'Supporting batch compositions are incomplete: blank oxide cells and a 1.0–1.2 wt% CeO2 range prevent
+          a complete melt composition; no composition was reconstructed.'
+    - observation_id: smythe_2013_table22_fit_parameters
+      type: model_derived
+      locator:
+        table: '2.2'
+        page: 56
+        pdf_page_index: 55
+      units: mixed as printed (eV, relative width, and ratio)
+      values:
+        caption: Table 2.2. Curve parameters used to fit Ce M4,5-edge.
+        reason: Fitted spectral curve parameters, not measured melt redox outcomes; raw spectrum inputs are not
+          included in the table.
+    - observation_id: smythe_2013_table23_A
+      type: model_derived
+      locator:
+        table: '2.3'
+        page: 57
+        pdf_page_index: 56
+      units: dimensionless
+      values:
+        caption: Table 2.3 column A, values calculated by Equation 2.11.
+        reason: Calculated equation parameter, not measured redox data.
+    - observation_id: smythe_2013_table31_starting_compositions
+      type: context
+      locator:
+        table: '3.1'
+        page: 73
+        pdf_page_index: 72
+      units: wt% oxide as printed
+      values:
+        caption: Table 3.1. Bulk composition of starting materials in weight percent oxide.
+        reason: Supporting run compositions left for a later pass; the table has omitted oxide values and cannot
+          define complete compositions.
+    - observation_id: smythe_2013_table32_run_conditions
+      type: context
+      locator:
+        table: '3.2'
+        page: 74
+        pdf_page_index: 73
+      units: K, log fO2, GPa, and wt% H2O as printed
+      values:
+        caption: Table 3.2. Experiment run conditions.
+        reason: Supporting conditions for Table 3.3 rows are left for a later pass under the thesis effort cap.
+    - observation_id: smythe_2013_table33_glass_products
+      type: context
+      locator:
+        table: '3.3'
+        page: 76
+        pdf_page_index: 75
+      units: wt% as printed
+      values:
+        caption: Table 3.3. Electron microprobe analyses of glass run products.
+        reason: Measured run-product compositions and Ce redox values feed the requested rails; left for a later
+          pass under the thesis effort cap.
+    - observation_id: smythe_2013_table_a21_glass_products
+      type: context
+      locator:
+        table: A2.1
+        page: 117
+        pdf_page_index: 116
+      units: wt% as printed
+      values:
+        caption: Table A2.1. Electron microprobe analyses of all glass run products.
+        reason: Measured run-product compositions are in scope but left for a later pass under the thesis effort
+          cap.
+    - observation_id: smythe_2013_table_a31_fit_parameters
+      type: model_derived
+      locator:
+        table: A3.1
+        page: 125
+        pdf_page_index: 124
+      units: mixed as printed
+      values:
+        caption: Table A3.1. Curve parameters used to fit Ce M4,5-edge.
+        reason: Fitted spectral curve parameters, not measured melt redox outcomes.
+    - observation_id: smythe_2013_table_a41_bishop_tuff_zircon
+      type: context
+      locator:
+        table: A4.1
+        page: 138
+        pdf_page_index: 137
+      units: as printed
+      values:
+        caption: Table A4.1. Major and trace element data for Bishop tuff zircon.
+        reason: Zircon analyses are outside the melt redox/activity/run-composition rails.
+    - observation_id: smythe_2013_table_a42_toba_tuff_zircon
+      type: context
+      locator:
+        table: A4.2
+        page: 142
+        pdf_page_index: 141
+      units: as printed
+      values:
+        caption: Table A4.2. Major and trace element data for Toba tuff zircon.
+        reason: Zircon analyses are outside the melt redox/activity/run-composition rails.
+    - observation_id: smythe_2013_table_a43_umiakovik_zircon
+      type: context
+      locator:
+        table: A4.3
+        page: 147
+        pdf_page_index: 146
+      units: as printed
+      values:
+        caption: Table A4.3. Major and trace element data for Umiakovik pluton zircon.
+        reason: Zircon analyses are outside the melt redox/activity/run-composition rails.
