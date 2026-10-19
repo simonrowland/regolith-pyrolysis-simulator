@@ -430,22 +430,9 @@ def test_no_recipe_run_matches_committed_golden_text(
         },
     )
 
-    actual_payload = run.run()
-    expected_text = (
+    actual = json.dumps(run.run(), indent=2, sort_keys=False)
+    expected = (
         ROOT / "tests" / "fixtures" / "runner" / "lunar_mare_low_ti_C0_24h.json"
     ).read_text(encoding="utf-8")
-    expected_payload = json.loads(expected_text)
-    expected_warnings = expected_payload["run_metadata"]["cost_rollup_diagnostic"][
-        "warnings"
-    ]
-    actual_cost_diagnostic = actual_payload["run_metadata"]["cost_rollup_diagnostic"]
-    actual_warnings = actual_cost_diagnostic["warnings"]
-    assert [
-        warning
-        for warning in actual_warnings
-        if not warning.startswith("cost_credit_below_quantity_floor: ")
-    ] == expected_warnings
-    actual_cost_diagnostic["warnings"] = expected_warnings
-    actual = json.dumps(actual_payload, indent=2, sort_keys=False)
-    assert expected_text.endswith("\n")
-    assert actual == expected_text.removesuffix("\n")
+    assert expected.endswith("\n")
+    assert actual == expected.removesuffix("\n")
