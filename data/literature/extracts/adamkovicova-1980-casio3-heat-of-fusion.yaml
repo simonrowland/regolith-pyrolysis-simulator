@@ -215,7 +215,7 @@ species:
       - observation_id: adamkovicova_1980_table1_solid_cooling_measured
         experiment: adamkovicova-pseudowollastonite-drop-series
         type: heat_capacity_and_heat_content_series
-        locator: {page: 195, pdf_page_index: 3, table: I}
+        locator: {page: 3, published_page: 195, pdf_page_index: 2, table: I}
         T_range_K: [1506, 1780]
         phase: crystalline_pseudowollastonite_alpha_wollastonite
         condensed_form: {polymorph: alpha}
@@ -239,7 +239,7 @@ species:
       - observation_id: adamkovicova_1980_table2_solid_solution_heats_measured
         experiment: adamkovicova-pseudowollastonite-solution-series
         type: heat_capacity_and_heat_content_series
-        locator: {page: 196, pdf_page_index: 4, table: II}
+        locator: {page: 4, published_page: 196, pdf_page_index: 3, table: II}
         T_range_K: [298, 298]
         phase: crystalline_pseudowollastonite_alpha_wollastonite
         condensed_form: {polymorph: alpha}
@@ -266,7 +266,7 @@ species:
 
       - observation_id: adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
         type: heat_capacity_and_heat_content_series
-        locator: {page: 195, pdf_page_index: 3, table: I}
+        locator: {page: 3, published_page: 195, pdf_page_index: 2, table: I}
         T_range_K: [1506, 1780]
         phase: crystalline_pseudowollastonite_alpha_wollastonite
         condensed_form: {polymorph: alpha}
@@ -292,7 +292,7 @@ species:
 
       - observation_id: adamkovicova_1980_solid_cooling_fit_eq3
         type: heat_capacity_and_heat_content_series
-        locator: {page: 195, pdf_page_index: 3, equation: '3', table: I}
+        locator: {page: 3, published_page: 195, pdf_page_index: 2, equation: '3', table: I}
         T_range_K: [1506, 1780]
         phase: crystalline_pseudowollastonite_alpha_wollastonite
         condensed_form: {polymorph: alpha}
@@ -318,7 +318,7 @@ species:
 
       - observation_id: adamkovicova_1980_solid_relative_enthalpy_fit_eq6
         type: heat_capacity_and_heat_content_series
-        locator: {page: 196, pdf_page_index: 4, equation: '6', table: I}
+        locator: {page: 4, published_page: 196, pdf_page_index: 3, equation: '6', table: I}
         T_range_K: [1506, 1780]
         phase: crystalline_pseudowollastonite_alpha_wollastonite
         condensed_form: {polymorph: alpha}
@@ -344,7 +344,7 @@ species:
 
       - observation_id: adamkovicova_1980_solid_heat_capacity_eq4
         type: heat_capacity_and_heat_content_series
-        locator: {page: 196, pdf_page_index: 4, equation: '4'}
+        locator: {page: 4, published_page: 196, pdf_page_index: 3, equation: '4'}
         T_range_K: [1506, 1780]
         phase: crystalline_pseudowollastonite_alpha_wollastonite
         condensed_form: {polymorph: alpha}
@@ -362,7 +362,7 @@ species:
       - observation_id: adamkovicova_1980_table3_melt_cooling_measured
         experiment: adamkovicova-melt-drop-series
         type: heat_capacity_and_heat_content_series
-        locator: {page: 196, pdf_page_index: 4, table: III}
+        locator: {page: 4, published_page: 196, pdf_page_index: 3, table: III}
         T_range_K: [1829, 1961]
         phase: CaSiO3_melt
         polymorph_notes: 'The authors formed the melt by fusing pseudowollastonite; the liquid has no condensed polymorph.'
@@ -384,7 +384,7 @@ species:
       - observation_id: adamkovicova_1980_table3_melt_solution_means_measured
         experiment: adamkovicova-melt-solution-series
         type: heat_capacity_and_heat_content_series
-        locator: {page: 196, pdf_page_index: 4, table: III}
+        locator: {page: 4, published_page: 196, pdf_page_index: 3, table: III}
         T_range_K: [1829, 1961]
         phase: CaSiO3_melt_sample_solution_heat
         standard_state: 'Heat of solution in concentrated HF:HNO3 (2:1) at 298 K; per mole of CaSiO3.'
@@ -405,7 +405,7 @@ species:
 
       - observation_id: adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced
         type: heat_capacity_and_heat_content_series
-        locator: {page: 196, pdf_page_index: 4, table: III}
+        locator: {page: 4, published_page: 196, pdf_page_index: 3, table: III}
         T_range_K: [1829, 1961]
         phase: CaSiO3_melt
         standard_state: 'Relative enthalpy Hrel defined by Eq. (1), from T to the 298 K reference.'
@@ -428,7 +428,7 @@ species:
 
       - observation_id: adamkovicova_1980_melt_relative_enthalpy_fit_eq7
         type: heat_capacity_and_heat_content_series
-        locator: {page: 197, pdf_page_index: 5, equation: '7', table: III}
+        locator: {page: 5, published_page: 197, pdf_page_index: 4, equation: '7', table: III}
         T_range_K: [1829, 1961]
         phase: CaSiO3_melt
         standard_state: 'Relative enthalpy Hrel defined at 298 K by Eq. (1).'
@@ -452,7 +452,7 @@ species:
 
       - observation_id: adamkovicova_1980_melt_heat_capacity_stated
         type: heat_capacity_and_heat_content_series
-        locator: {page: 198, pdf_page_index: 6, section: Discussion, equation: '7'}
+        locator: {page: 6, published_page: 198, pdf_page_index: 5, section: Discussion, equation: '7'}
         T_range_K: [1829, 1961]
         phase: CaSiO3_melt
         units: 'kJ mol−1 K−1 CaSiO3'
@@ -469,7 +469,7 @@ species:
 
       - observation_id: adamkovicova_1980_heat_of_fusion_at_1817K
         type: heat_capacity_and_heat_content_series
-        locator: {page: 197, pdf_page_index: 5, equation: '8', figure: '1'}
+        locator: {page: 5, published_page: 197, pdf_page_index: 4, equation: '8', figure: '1'}
         T_range_K: [1817, 1817]
         phase: pseudowollastonite_to_CaSiO3_melt
         polymorph_notes: 'The authors state congruent melting of CaSiO3 at 1817 K and identify the crystalline phase as pseudowollastonite (α-wollastonite).'
@@ -494,7 +494,7 @@ species:
 
       - observation_id: adamkovicova_1980_prior_heat_fusion_56_1_quote
         type: heat_capacity_and_heat_content_series
-        locator: {page: 199, pdf_page_index: 7, section: Discussion}
+        locator: {page: 7, published_page: 199, pdf_page_index: 6, section: Discussion}
         phase: CaSiO3_heat_of_fusion_prior_value
         units: kJ mol−1 CaSiO3
         values:
@@ -507,7 +507,7 @@ species:
 
       - observation_id: adamkovicova_1980_prior_heat_fusion_50_1_quote
         type: heat_capacity_and_heat_content_series
-        locator: {page: 199, pdf_page_index: 7, section: Discussion}
+        locator: {page: 7, published_page: 199, pdf_page_index: 6, section: Discussion}
         phase: CaSiO3_heat_of_fusion_prior_value
         units: kJ mol−1 CaSiO3
         values:
@@ -520,7 +520,7 @@ species:
 
       - observation_id: adamkovicova_1980_prior_heat_fusion_59_0_quote
         type: heat_capacity_and_heat_content_series
-        locator: {page: 199, pdf_page_index: 7, section: Discussion}
+        locator: {page: 7, published_page: 199, pdf_page_index: 6, section: Discussion}
         phase: CaSiO3_heat_of_fusion_prior_value
         units: kJ mol−1 CaSiO3
         values:
@@ -533,7 +533,7 @@ species:
 
       - observation_id: adamkovicova_1980_prior_heat_fusion_68_2_quote
         type: heat_capacity_and_heat_content_series
-        locator: {page: 199, pdf_page_index: 7, section: Discussion}
+        locator: {page: 7, published_page: 199, pdf_page_index: 6, section: Discussion}
         phase: CaSiO3_heat_of_fusion_prior_value
         units: kJ mol−1 CaSiO3
         values:
@@ -546,7 +546,7 @@ species:
 
       - observation_id: adamkovicova_1980_prior_heat_fusion_27_6_quote
         type: heat_capacity_and_heat_content_series
-        locator: {page: 199, pdf_page_index: 7, section: Discussion}
+        locator: {page: 7, published_page: 199, pdf_page_index: 6, section: Discussion}
         phase: CaSiO3_heat_of_fusion_prior_value
         units: kJ mol−1 CaSiO3
         values:
@@ -559,7 +559,7 @@ species:
 
       - observation_id: adamkovicova_1980_prior_heat_fusion_82_9_quote
         type: heat_capacity_and_heat_content_series
-        locator: {page: 199, pdf_page_index: 7, section: Discussion}
+        locator: {page: 7, published_page: 199, pdf_page_index: 6, section: Discussion}
         phase: CaSiO3_heat_of_fusion_prior_value
         units: kJ mol−1 CaSiO3
         values:
@@ -572,7 +572,7 @@ species:
 
       - observation_id: adamkovicova_1980_prior_melt_heat_capacity_0_15073_quote
         type: heat_capacity_and_heat_content_series
-        locator: {page: 198, pdf_page_index: 6, section: Discussion}
+        locator: {page: 6, published_page: 198, pdf_page_index: 5, section: Discussion}
         phase: CaSiO3_melt
         units: kJ mol−1 K−1 CaSiO3
         values:
@@ -585,7 +585,7 @@ species:
 
       - observation_id: adamkovicova_1980_prior_melt_heat_capacity_0_14654_quote
         type: heat_capacity_and_heat_content_series
-        locator: {page: 198, pdf_page_index: 6, section: Discussion}
+        locator: {page: 6, published_page: 198, pdf_page_index: 5, section: Discussion}
         phase: CaSiO3_melt
         units: kJ mol−1 K−1 CaSiO3
         values:
