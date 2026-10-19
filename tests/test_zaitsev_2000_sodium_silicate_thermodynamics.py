@@ -26,7 +26,7 @@ def test_zaitsev_2000_tables_4_and_6_migrate_with_binary_conditions_and_signs():
     assert migrator.result.validation is not None
     assert migrator.result.validation.ok
     assert migrator.result.validation.hard_issues == ()
-    assert len(migrator.result.observations) == 66
+    assert len(migrator.result.observations) == 110
     assert all(
         all(
             key in (observation.point_conditions or {})
@@ -35,6 +35,17 @@ def test_zaitsev_2000_tables_4_and_6_migrate_with_binary_conditions_and_signs():
             for key in ("temperature_K", "composition")
         )
         for observation in migrator.result.observations.values()
+    )
+    table5 = [
+        observation
+        for observation in migrator.result.observations.values()
+        if "::zaitsev_2000_table5_" in observation.observation_id
+    ]
+    assert len(table5) == 44
+    assert all(
+        observation.provenance["printed_form"] == "neg_log10"
+        and observation.locator.page == 9
+        for observation in table5
     )
     reduced_silica_rows = [
         observation
