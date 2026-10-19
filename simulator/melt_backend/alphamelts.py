@@ -3219,13 +3219,43 @@ class _MELTSBackendSupport(MeltBackend):
             for oxide, wt_pct in comp_wt.items()
             if float(wt_pct) > ALPHAMELTS_MIN_EMITTED_COMPONENT_WT_PCT
         )
+        alkali_silica_binaries = (
+            frozenset({'SiO2', 'Na2O'}),
+            frozenset({'SiO2', 'K2O'}),
+        )
+        if (
+            redox_mode == REDOX_MODE_NOT_AN_INPUT
+            and active_components in alkali_silica_binaries
+        ):
+            crash_floor = engine_commissioning(
+                self.backend_name
+            ).sio2_wt_pct.observed_crash_floor_wt_pct
+            sio2_wt_pct = self._canonical_sio2_wt_pct(comp_wt)
+            if (
+                crash_floor is not None
+                and sio2_wt_pct < float(crash_floor)
+            ):
+                return self._domain_gate_result(
+                    requested_temperature_C,
+                    requested_pressure_bar,
+                    fO2_log,
+                    [
+                        'redox-free Na2O/K2O-SiO2 composition has '
+                        f'SiO2 {sio2_wt_pct:.3f} wt% below the observed '
+                        f'alphaMELTS crash floor of {float(crash_floor):g} wt%'
+                    ],
+                    diagnostics={
+                        **dict(diagnostics or {}),
+                        'redox_mode': redox_mode,
+                        'sio2_crash_floor_wt_pct': float(crash_floor),
+                        'sio2_wt_pct': sio2_wt_pct,
+                    },
+                    reason=OutOfDomainReason.SILICATE_WINDOW,
+                )
         if (
             redox_mode != REDOX_MODE_NOT_AN_INPUT
             and fO2_log is not None
-            and active_components in (
-                frozenset({'SiO2', 'Na2O'}),
-                frozenset({'SiO2', 'K2O'}),
-            )
+            and active_components in alkali_silica_binaries
         ):
             return self._fe_free_absolute_fo2_crash_result(
                 requested_temperature_C,
