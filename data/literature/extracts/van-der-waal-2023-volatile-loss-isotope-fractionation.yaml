@@ -50,7 +50,7 @@ species:
         - {element: Li, gamma_as_printed: '1.8 ± 0.2 – 15.4 ± 3.1', sources: '5'}
         - {element: V, gamma_as_printed: '4.8 ± 0.32', sources: '4'}
         - {element: Cu, gamma_as_printed: '3.5 – 11.8 ± 1.7', sources: '2, 3, 4, 5'}
-        - {element: Zn, gamma_as_printed: '1.9·10^-2 ± 1·10^-2 – 0.51 ± 0.13', sources: '1, 3, 4, 5'}
+        - {element: Zn, gamma_as_printed: '1.9·10^-2 ± 1·10^-2 – 0.51 ± 0.13', sources: '1, 4, 5'}
         - {element: Ga, gamma_as_printed: '1.82 ± 0.53', sources: '4'}
         - {element: Ge, gamma_as_printed: '3.7·10^-3 ± 1·10^-3 – 0.11 ± 0.01', sources: '4, 5'}
         - {element: As, gamma_as_printed: '—', sources: '—'}
@@ -74,11 +74,20 @@ species:
     - observation_id: van_der_waal_2023_table_2_1_experimental_redox_conditions
       type: experiment_series
       locator: {page: 58, pdf_page_index: 57, published_page: 19, table: '2.1'}
-      units: gas flow rates as printed; ΔIW and ΔFMQ
+      units: °C, log(fO2), ml min−1, ΔIW, and ΔFMQ as printed
       values:
         method_class: measured_direct
         caption: 'The temperature and oxygen fugacity conditions used in experiments.'
-        reason: 'Conditions table not converted to observation rows in this bounded pass.'
+        columns: [temperature_C, log_fO2, air_ml_min, CO_ml_min, CO2_ml_min, delta_IW, delta_FMQ]
+        rows:
+        - {temperature_C: 1300, log_fO2: -0.68, air_ml_min: 200, CO_ml_min: 0, CO2_ml_min: 0, delta_IW: 10.08, delta_FMQ: 6.89}
+        - {temperature_C: 1300, log_fO2: -7, air_ml_min: 0, CO_ml_min: 10, CO2_ml_min: 190, delta_IW: 3.76, delta_FMQ: 0.57}
+        - {temperature_C: 1300, log_fO2: -9, air_ml_min: 0, CO_ml_min: 68, CO2_ml_min: 132, delta_IW: 1.76, delta_FMQ: -1.43}
+        - {temperature_C: 1300, log_fO2: -11, air_ml_min: 0, CO_ml_min: 163, CO2_ml_min: 37, delta_IW: -0.24, delta_FMQ: -3.43}
+        - {temperature_C: 1400, log_fO2: -0.68, air_ml_min: 200, CO_ml_min: 0, CO2_ml_min: 0, delta_IW: 9.03, delta_FMQ: 5.86}
+        - {temperature_C: 1400, log_fO2: -3.05, air_ml_min: 0, CO_ml_min: 0, CO2_ml_min: 200, delta_IW: 6.66, delta_FMQ: 3.49}
+        - {temperature_C: 1400, log_fO2: -6, air_ml_min: 0, CO_ml_min: 10, CO2_ml_min: 190, delta_IW: 3.71, delta_FMQ: 0.54}
+        - {temperature_C: 1400, log_fO2: -8, air_ml_min: 0, CO_ml_min: 67, CO2_ml_min: 133, delta_IW: 1.71, delta_FMQ: -1.46}
     - observation_id: van_der_waal_2023_table_2_3_initial_compositions
       type: experiment_series
       locator: {page: 65, pdf_page_index: 64, published_page: 26, table: '2.3'}
@@ -170,3 +179,283 @@ species:
       locator: {page: 294, pdf_page_index: 293, table: 'A4.1, A4.3, A4.5'}
       units: ppm or dimensionless standard deviations
       values: {caption: 'Standard deviations for trace element abundances and volatility factors in Tables 4.3, A4.2, and A4.4.', reason: 'Uncertainty tables remain paired with their corresponding untranscribed measurements.'}
+    - observation_id: van_der_waal_2023_figure_1_1_deferred
+      type: deferred_figure
+      locator: {page: 34, pdf_page_index: 33, figure: '1.1'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 1.1; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_1_2_deferred
+      type: deferred_figure
+      locator: {page: 46, pdf_page_index: 45, figure: '1.2'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 1.2; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_2_1_deferred
+      type: deferred_figure
+      locator: {page: 60, pdf_page_index: 59, figure: '2.1'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 2.1; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_2_2_deferred
+      type: deferred_figure
+      locator: {page: 64, pdf_page_index: 63, figure: '2.2'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 2.2; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_3_1_deferred
+      type: deferred_figure
+      locator: {page: 86, pdf_page_index: 85, figure: '3.1'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 3.1; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_3_2_deferred
+      type: deferred_figure
+      locator: {page: 88, pdf_page_index: 87, figure: '3.2'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 3.2; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_3_3_deferred
+      type: deferred_figure
+      locator: {page: 98, pdf_page_index: 97, figure: '3.3'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 3.3; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_3_4_deferred
+      type: deferred_figure
+      locator: {page: 99, pdf_page_index: 98, figure: '3.4'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 3.4; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_3_5_deferred
+      type: deferred_figure
+      locator: {page: 100, pdf_page_index: 99, figure: '3.5'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 3.5; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_3_6_deferred
+      type: deferred_figure
+      locator: {page: 101, pdf_page_index: 100, figure: '3.6'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 3.6; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_3_7_deferred
+      type: deferred_figure
+      locator: {page: 106, pdf_page_index: 105, figure: '3.7'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 3.7; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_3_8_deferred
+      type: deferred_figure
+      locator: {page: 107, pdf_page_index: 106, figure: '3.8'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 3.8; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_3_9_deferred
+      type: deferred_figure
+      locator: {page: 109, pdf_page_index: 108, figure: '3.9'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 3.9; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_3_10_deferred
+      type: deferred_figure
+      locator: {page: 111, pdf_page_index: 110, figure: '3.10'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 3.10; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_3_11_deferred
+      type: deferred_figure
+      locator: {page: 114, pdf_page_index: 113, figure: '3.11'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 3.11; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_3_12_deferred
+      type: deferred_figure
+      locator: {page: 115, pdf_page_index: 114, figure: '3.12'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 3.12; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_3_13_deferred
+      type: deferred_figure
+      locator: {page: 117, pdf_page_index: 116, figure: '3.13'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 3.13; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_3_14_deferred
+      type: deferred_figure
+      locator: {page: 119, pdf_page_index: 118, figure: '3.14'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 3.14; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_3_15_deferred
+      type: deferred_figure
+      locator: {page: 122, pdf_page_index: 121, figure: '3.15'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 3.15; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_3_16_deferred
+      type: deferred_figure
+      locator: {page: 123, pdf_page_index: 122, figure: '3.16'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 3.16; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_4_1_deferred
+      type: deferred_figure
+      locator: {page: 128, pdf_page_index: 127, figure: '4.1'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 4.1; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_4_2_deferred
+      type: deferred_figure
+      locator: {page: 136, pdf_page_index: 135, figure: '4.2'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 4.2; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_4_3_deferred
+      type: deferred_figure
+      locator: {page: 138, pdf_page_index: 137, figure: '4.3'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 4.3; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_4_4_deferred
+      type: deferred_figure
+      locator: {page: 142, pdf_page_index: 141, figure: '4.4'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 4.4; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_4_5_deferred
+      type: deferred_figure
+      locator: {page: 144, pdf_page_index: 143, figure: '4.5'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 4.5; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_4_6_deferred
+      type: deferred_figure
+      locator: {page: 146, pdf_page_index: 145, figure: '4.6'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 4.6; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_4_7_deferred
+      type: deferred_figure
+      locator: {page: 148, pdf_page_index: 147, figure: '4.7'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 4.7; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_4_8_deferred
+      type: deferred_figure
+      locator: {page: 160, pdf_page_index: 159, figure: '4.8'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 4.8; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_4_9_deferred
+      type: deferred_figure
+      locator: {page: 162, pdf_page_index: 161, figure: '4.9'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 4.9; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_4_10_deferred
+      type: deferred_figure
+      locator: {page: 164, pdf_page_index: 163, figure: '4.10'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 4.10; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_4_11_deferred
+      type: deferred_figure
+      locator: {page: 167, pdf_page_index: 166, figure: '4.11'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 4.11; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_4_12_deferred
+      type: deferred_figure
+      locator: {page: 168, pdf_page_index: 167, figure: '4.12'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 4.12; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_4_13_deferred
+      type: deferred_figure
+      locator: {page: 169, pdf_page_index: 168, figure: '4.13'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 4.13; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_4_14_deferred
+      type: deferred_figure
+      locator: {page: 170, pdf_page_index: 169, figure: '4.14'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 4.14; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_4_15_deferred
+      type: deferred_figure
+      locator: {page: 172, pdf_page_index: 171, figure: '4.15'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 4.15; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_4_16_deferred
+      type: deferred_figure
+      locator: {page: 174, pdf_page_index: 173, figure: '4.16'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 4.16; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_4_17_deferred
+      type: deferred_figure
+      locator: {page: 178, pdf_page_index: 177, figure: '4.17'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 4.17; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_4_18_deferred
+      type: deferred_figure
+      locator: {page: 179, pdf_page_index: 178, figure: '4.18'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 4.18; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_5_1_deferred
+      type: deferred_figure
+      locator: {page: 182, pdf_page_index: 181, figure: '5.1'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 5.1; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_5_2_deferred
+      type: deferred_figure
+      locator: {page: 184, pdf_page_index: 183, figure: '5.2'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 5.2; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_5_3_deferred
+      type: deferred_figure
+      locator: {page: 185, pdf_page_index: 184, figure: '5.3'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 5.3; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_5_4_deferred
+      type: deferred_figure
+      locator: {page: 186, pdf_page_index: 185, figure: '5.4'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 5.4; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_5_5_deferred
+      type: deferred_figure
+      locator: {page: 187, pdf_page_index: 186, figure: '5.5'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 5.5; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_5_6_deferred
+      type: deferred_figure
+      locator: {page: 190, pdf_page_index: 189, figure: '5.6'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 5.6; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_5_7_deferred
+      type: deferred_figure
+      locator: {page: 192, pdf_page_index: 191, figure: '5.7'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 5.7; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_5_8_deferred
+      type: deferred_figure
+      locator: {page: 193, pdf_page_index: 192, figure: '5.8'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 5.8; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_5_9_deferred
+      type: deferred_figure
+      locator: {page: 197, pdf_page_index: 196, figure: '5.9'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 5.9; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_5_10_deferred
+      type: deferred_figure
+      locator: {page: 198, pdf_page_index: 197, figure: '5.10'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 5.10; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_5_11_deferred
+      type: deferred_figure
+      locator: {page: 199, pdf_page_index: 198, figure: '5.11'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 5.11; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_5_12_deferred
+      type: deferred_figure
+      locator: {page: 204, pdf_page_index: 203, figure: '5.12'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 5.12; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_5_13_deferred
+      type: deferred_figure
+      locator: {page: 208, pdf_page_index: 207, figure: '5.13'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 5.13; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_5_14_deferred
+      type: deferred_figure
+      locator: {page: 211, pdf_page_index: 210, figure: '5.14'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 5.14; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_5_15_deferred
+      type: deferred_figure
+      locator: {page: 213, pdf_page_index: 212, figure: '5.15'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 5.15; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_5_16_deferred
+      type: deferred_figure
+      locator: {page: 215, pdf_page_index: 214, figure: '5.16'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 5.16; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_5_17_deferred
+      type: deferred_figure
+      locator: {page: 218, pdf_page_index: 217, figure: '5.17'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 5.17; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
+    - observation_id: van_der_waal_2023_figure_5_18_deferred
+      type: deferred_figure
+      locator: {page: 219, pdf_page_index: 218, figure: '5.18'}
+      units: as plotted
+      values: {quantity: unclassified_figure_data, method_class: figure_only, caption: 'Figure 5.18; no numeric points transcribed.', panels: not inventoried, axes_as_printed: {x: not inventoried, y: not inventoried}, series: not inventoried, marker_counts: not counted, digitisation: deferred}
