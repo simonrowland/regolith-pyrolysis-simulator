@@ -151,7 +151,10 @@ def _install_green_migrate(path: str) -> None:
             loader = SourceFileLoader(fullname, path)
             return spec_from_loader(fullname, loader)
 
-    sys.meta_path.insert(0, Finder)
+    # The finder object must be an instance. Inserting the class makes
+    # find_spec bind the module name to self, return None, and both sides
+    # of the diff run the worktree migrator.
+    sys.meta_path.insert(0, Finder())
 
 
 def _rebind_green_paths() -> None:
@@ -175,6 +178,17 @@ def _without_text(row: dict[str, object]) -> dict[str, object]:
     return {key: value for key, value in row.items() if key != "value_text"}
 
 
+def _brief(row: dict[str, object]) -> str:
+    value = row["value"]
+    point = value.get("point") if isinstance(value, dict) else None
+    kind = value.get("kind") if isinstance(value, dict) else None
+    return (
+        f"quantity={row['quantity']} species={row['species']} "
+        f"kind={kind} point={point} admission={row['admission']} "
+        f"reason={row['admission_reason']}"
+    )
+
+
 def diff_payloads(
     tip: dict[str, list[dict[str, object]]],
     green: dict[str, list[dict[str, object]]],
@@ -182,6 +196,7 @@ def diff_payloads(
     report: dict[str, object] = {}
     real_total = 0
     text_total = 0
+    first: str | None = None
     for source_id in SOURCES:
         tip_rows = {str(row["id"]): row for row in tip[source_id]}
         green_rows = {str(row["id"]): row for row in green[source_id]}
@@ -194,10 +209,22 @@ def diff_payloads(
             right = green_rows[obs_id]
             if _without_text(left) != _without_text(right):
                 real.append(obs_id)
+                if first is None:
+                    first = (
+                        f"{source_id} {obs_id}\n"
+                        f"tip   {_brief(left)}\n"
+                        f"green {_brief(right)}"
+                    )
             elif left["value_text"] != right["value_text"]:
                 text_only.append(obs_id)
         real_total += len(real) + len(only_tip) + len(only_green)
         text_total += len(text_only)
+        if first is None and only_tip:
+            missing = tip_rows[only_tip[0]]
+            first = f"{source_id} only tip {only_tip[0]}\n{_brief(missing)}"
+        elif first is None and only_green:
+            missing = green_rows[only_green[0]]
+            first = f"{source_id} only green {only_green[0]}\n{_brief(missing)}"
         report[source_id] = {
             "tip": len(tip_rows),
             "green": len(green_rows),
@@ -208,6 +235,7 @@ def diff_payloads(
         }
     report["real_total"] = real_total
     report["decimal_text_only_total"] = text_total
+    report["first"] = first
     return report
 
 
@@ -233,13 +261,25 @@ def test_printed_residue_migrations_match_green_a822c275f(tmp_path: Path) -> Non
         env=env,
         check=True,
     )
-    report = diff_payloads(tip, json.loads(green_out.read_text(encoding="utf-8")))
-    assert report["real_total"] == 0, report
+    green_payload = json.loads(green_out.read_text(encoding="utf-8"))
+    loaded = Path(str(green_payload["loaded_migrate"])).resolve()
+    assert loaded == green_src.resolve(), loaded
+    report = diff_payloads(tip, green_payload["sources"])
+    assert report["real_total"] == 0, report.get("first") or report
     assert report["decimal_text_only_total"] == 0, report
 
 
 if __name__ == "__main__":
-    _install_green_migrate(os.environ["PARITY_GREEN_SRC"])
+    green_src = Path(os.environ["PARITY_GREEN_SRC"]).resolve()
+    _install_green_migrate(str(green_src))
     _rebind_green_paths()
-    payload = migrate_sources(Path(os.environ["PARITY_ROOT"]))
+    import simulator.battery.migrate as migrate
+
+    loaded = Path(migrate.__file__).resolve()
+    if loaded != green_src:
+        raise SystemExit(f"green migrate was not loaded: {loaded}")
+    payload = {
+        "loaded_migrate": str(loaded),
+        "sources": migrate_sources(Path(os.environ["PARITY_ROOT"])),
+    }
     Path(os.environ["PARITY_OUT"]).write_text(json.dumps(payload), encoding="utf-8")
