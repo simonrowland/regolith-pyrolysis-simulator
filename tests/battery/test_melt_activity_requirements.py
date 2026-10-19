@@ -1,10 +1,11 @@
 """Melt-activity observations are not held to the engine_point contract.
 
-An activity or activity coefficient needs a normalized composition, a
-point temperature, and a reference state that matches the engine. Oxygen
-is required when the composition or the measured species holds a
-multivalent element. Pressure is not an input, and a missing required
-input is refused rather than defaulted.
+A melt activity or activity coefficient needs a normalized composition, a
+point temperature, and a reference state that matches the engine. For melt
+activity, oxygen is required when the composition or measured species holds
+a multivalent element. Other quantities follow their identity input profile.
+Pressure is not an input, and a missing required input is refused rather than
+defaulted.
 """
 
 from dataclasses import replace
@@ -622,9 +623,9 @@ def test_redox_free_activity_is_scored_without_an_oxygen_input(monkeypatch):
     assert prediction.value == Decimal('0.4')
 
 
-def test_multivalent_psat_without_oxygen_is_a_typed_scorer_refusal(monkeypatch):
+def test_multivalent_psat_without_oxygen_keeps_green_scorer_decision(monkeypatch):
     seen = _install_scoring_cell(monkeypatch, gas_pressures={"FeO": 3.0})
-    from simulator.battery.enums import Engine, RefusalReason
+    from simulator.battery.enums import Engine
     from simulator.battery.score import predict_with_engine
 
     experiment = f.tabulation_experiment()
@@ -641,12 +642,9 @@ def test_multivalent_psat_without_oxygen_is_a_typed_scorer_refusal(monkeypatch):
         isolated=False,
     )
 
-    assert prediction.value is None
-    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert prediction.refusal_detail["reason"] == "missing_fO2"
-    assert prediction.refusal_detail["quantity"] == Quantity.P_SAT.value
-    assert prediction.refusal_detail["multivalent"] == ["FeO"]
-    assert seen["cell_calls"] == []
+    assert prediction.value == Decimal("3.0")
+    assert prediction.refusal_reason is None
+    assert seen["cell_calls"] == [{"mode": "not_an_input", "po2_bar": None}]
 
 
 def test_fe_free_psat_numeric_residual_keeps_omitted_oxygen_mode(monkeypatch):

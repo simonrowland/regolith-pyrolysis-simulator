@@ -611,9 +611,9 @@ def test_extract_preserves_valid_partial_pressures_and_reports_invalid_names() -
 def test_alphamelts_cell_passes_isothermal_subprocess_run_mode() -> None:
     pot = BinaryPot(
         pot_id="fixture_pot",
-        kato_1993_table4_system="Al2O3-SiO2",
+        kato_1993_table4_system="CaO-Al2O3-SiO2",
         why="fixture",
-        composition_wt_pct={"SiO2": 50.0, "Al2O3": 50.0},
+        composition_wt_pct={"SiO2": 50.0, "CaO": 25.0, "Al2O3": 25.0},
     )
     po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
     captured: dict[str, object] = {}
@@ -654,6 +654,108 @@ def test_alphamelts_cell_passes_isothermal_subprocess_run_mode() -> None:
     assert handle.available is True
 
 
+def test_psat_without_fo2_on_fe_melt_keeps_green_scorer_request() -> None:
+    from decimal import Decimal
+
+    from simulator.battery.enums import AmountBasis, Engine, Quantity
+    from simulator.battery.records import Composition
+    from simulator.battery.score import _oxygen_input_request
+    from tests.battery.factories import psat_identity
+
+    composition = Composition(
+        "review pin",
+        (("FeO", Decimal("0.2")), ("SiO2", Decimal("0.8"))),
+        AmountBasis.MOLE_FRACTION,
+    )
+    notices = []
+    request = _oxygen_input_request(
+        engine=Engine.THERMOENGINE,
+        channel="review pin",
+        sources=(),
+        identity=psat_identity("Na"),
+        requested=None,
+        quantity=Quantity.P_SAT,
+        composition_value=composition,
+        input_notices=notices,
+    )
+
+    assert isinstance(request, Po2Request)
+    assert request.mode == PO2_NOT_AN_INPUT
+    assert request.po2_bar is None
+
+
+def test_multivalent_not_an_input_keeps_alphamelts_intrinsic_refusal() -> None:
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+    omitted = object()
+    received: list[tuple[float | None, object]] = []
+
+    class _RecordingAlphaMELTSBackend(AlphaMELTSBackend):
+        def equilibrate(
+            self,
+            temperature_C,
+            composition_kg=None,
+            fO2_log=None,
+            pressure_bar=1.0e-6,
+            *,
+            composition_mol=None,
+            composition_mol_by_account=None,
+            species_formula_registry=None,
+            redox_mode=omitted,
+            subprocess_run_mode=None,
+            **kwargs,
+        ):
+            received.append((fO2_log, redox_mode))
+            forwarded = dict(kwargs)
+            if redox_mode is not omitted:
+                forwarded["redox_mode"] = redox_mode
+            return super().equilibrate(
+                temperature_C=temperature_C,
+                composition_kg=composition_kg,
+                composition_mol=composition_mol,
+                composition_mol_by_account=composition_mol_by_account,
+                species_formula_registry=species_formula_registry,
+                fO2_log=fO2_log,
+                pressure_bar=pressure_bar,
+                subprocess_run_mode=subprocess_run_mode,
+                **forwarded,
+            )
+
+    pot = BinaryPot(
+        pot_id="feo_psat",
+        kato_1993_table4_system="FeO-SiO2",
+        why="Fe-bearing p_sat with no printed oxygen potential",
+        composition_wt_pct={"FeO": 20.0, "SiO2": 80.0},
+    )
+    backend = _RecordingAlphaMELTSBackend()
+    handle = EngineHandle(
+        name="alphamelts",
+        backend=backend,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1673.15,
+        po2=Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None),
+        isolated=False,
+        timeout_s=2.0,
+    )
+
+    assert received == [(None, omitted)], {
+        "received": received,
+        "status": cell.status,
+        "refusal_reason": cell.refusal_reason,
+        "engine_reason": cell.engine_reason,
+    }
+    assert cell.status == "refusal"
+    assert "intrinsic closed-system fO2" in (cell.engine_reason or "")
+
+
 @pytest.mark.parametrize(
     "oxide",
     ("FeO", "Fe2O3", "TiO2", "Cr2O3", "MnO", "FeOT"),
@@ -679,7 +781,7 @@ def test_backend_owned_multivalent_rule_keeps_pinned_results(oxide: str) -> None
     "redox_oxide",
     ("FeO", "Fe2O3", "TiO2", "Cr2O3", "MnO"),
 )
-def test_not_an_input_rejects_multivalent_composition_at_backend_and_cell(
+def test_not_an_input_refusal_stays_at_backend_boundary_for_multivalent_cell(
     monkeypatch,
     redox_oxide: str,
 ) -> None:
@@ -740,8 +842,8 @@ def test_not_an_input_rejects_multivalent_composition_at_backend_and_cell(
         OutOfDomainReason.INVALID_INPUT.value
     )
     assert cell.status == "refusal"
-    assert cell.engine_status == "out_of_domain"
-    assert cell.engine_reason == OutOfDomainReason.INVALID_INPUT.value
+    assert cell.engine_status == "ValueError"
+    assert "intrinsic closed-system fO2" in (cell.engine_reason or "")
     assert transport_calls == []
 
 
