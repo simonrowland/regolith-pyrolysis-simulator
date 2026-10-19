@@ -1999,20 +1999,6 @@ def _draw_hero_sweet_spot(
             else "#eeeeee" if sparse else "#ffffff"
         )
         hatch = "///" if sparse else None
-        red, green, blue, _alpha = matplotlib.colors.to_rgba(fill)
-        luminance = sum(
-            weight
-            * (
-                channel / 12.92
-                if channel <= 0.04045
-                else ((channel + 0.055) / 1.055) ** 2.4
-            )
-            for channel, weight in (
-                (red, 0.2126),
-                (green, 0.7152),
-                (blue, 0.0722),
-            )
-        )
         axis.add_patch(
             Rectangle(
                 (x_low, y_low),
@@ -2024,7 +2010,9 @@ def _draw_hero_sweet_spot(
                 hatch=hatch,
             )
         )
-        label_color = "#222222" if luminance >= 0.5 else "#f7f7f7"
+        dark_contrast = _wcag_contrast_ratio(fill, "#222222")
+        light_contrast = _wcag_contrast_ratio(fill, "#f7f7f7")
+        label_color = "#222222" if dark_contrast >= light_contrast else "#f7f7f7"
         axis.text(
             (x_low + x_high) / 2,
             (y_low + y_high) / 2,
@@ -2053,6 +2041,28 @@ def _draw_hero_sweet_spot(
         fontsize=6.5,
     )
     return True
+
+
+def _wcag_contrast_ratio(foreground: object, background: object) -> float:
+    """Return the WCAG contrast ratio for two opaque sRGB colors."""
+
+    def relative_luminance(color: object) -> float:
+        red, green, blue, _alpha = matplotlib.colors.to_rgba(color)
+        linear = tuple(
+            channel / 12.92
+            if channel <= 0.04045
+            else ((channel + 0.055) / 1.055) ** 2.4
+            for channel in (red, green, blue)
+        )
+        return sum(
+            channel * weight
+            for channel, weight in zip(linear, (0.2126, 0.7152, 0.0722), strict=True)
+        )
+
+    first = relative_luminance(foreground)
+    second = relative_luminance(background)
+    lighter, darker = sorted((first, second), reverse=True)
+    return (lighter + 0.05) / (darker + 0.05)
 
 
 def _draw_hero_history(
