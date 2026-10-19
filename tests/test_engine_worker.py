@@ -74,6 +74,18 @@ def _handle_recording_request(resource, request, _errlog):
     return request_id
 
 
+def _bootstrap_timeout_log_worker(handler_started):
+    return handler_started, 'timeout-log-worker-ready'
+
+
+def _handle_timeout_log_request(handler_started, request, _errlog):
+    if request.get('block_forever'):
+        handler_started.set()
+        while True:
+            time.sleep(0.05)
+    return request.get('request_id')
+
+
 def _recording_worker(
     results,
     *,
@@ -487,15 +499,16 @@ def test_pool_timeout_log_only_records_assigned_request_outside_pool_lock(
     tmp_path,
 ):
     context = multiprocessing.get_context('spawn')
-    results = context.Queue()
     handler_started = context.Event()
-    release_handler = context.Event()
     diagnostic_path = tmp_path / 'worker-diagnostics.log'
     pool = EngineWorkerPool(
-        lambda _index: _recording_worker(
-            results,
-            started=handler_started,
-            release=release_handler,
+        lambda index: WarmEngineWorker(
+            name=f'timeout log worker {index}',
+            bootstrap=_bootstrap_timeout_log_worker,
+            bootstrap_args=(handler_started,),
+            handler=_handle_timeout_log_request,
+            startup_timeout_s=_RENDEZVOUS_TIMEOUT_S,
+            call_timeout_s=30.0,
             diagnostic_log_path=diagnostic_path,
         ),
         size=1,
@@ -513,7 +526,7 @@ def test_pool_timeout_log_only_records_assigned_request_outside_pool_lock(
     monkeypatch.setattr(Path, 'open', gated_open)
     try:
         active = pool.submit(
-            {'request_id': 'active', 'block': True},
+            {'request_id': 'active', 'block_forever': True},
             timeout_s=30.0,
         )
         assert handler_started.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
@@ -547,11 +560,8 @@ def test_pool_timeout_log_only_records_assigned_request_outside_pool_lock(
             {'request_id': 'active'},
         ]
     finally:
-        release_handler.set()
         release_writer.set()
         pool.close(cancel_pending=True)
-        results.close()
-        results.join_thread()
 
 
 def test_nested_typed_timeout_crosses_worker_boundary_and_respawns():
