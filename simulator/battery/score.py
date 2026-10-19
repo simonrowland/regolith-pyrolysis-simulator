@@ -144,6 +144,7 @@ from simulator.battery.validity import (
     comparison_method_cell_constant_cancels,
     run_validity_gates,
 )
+from simulator.diagnostic_helpers.species_rail import parse_formula_elements
 from simulator.reference_data.janaf import formula_composition
 
 # Explicit closed set. openimcc is the only IMCC producer. Do not build this from
@@ -8998,6 +8999,460 @@ def measured_engine_rail_records(
     return records
 
 
+def _paired_engine_rail_benchmarks(
+    residuals: Iterable[Mapping[str, object]],
+    *,
+    primary_engines: Sequence[str],
+    comparison_engines: Sequence[str],
+    rails: Sequence[str],
+) -> list[dict[str, object]]:
+    """Choose each primary's lowest-RMS comparison on pairwise shared rows.
+
+    Only one numeric dex row per engine/reference/rail is unambiguous enough
+    to pair. Missing rows and duplicates are excluded from that comparison.
+    A result is returned for every requested rail and primary, including an
+    explicit unavailable record when no comparison engine shares rows.
+    """
+
+    values: dict[tuple[str, str], dict[str, list[Decimal]]] = defaultdict(
+        lambda: defaultdict(list)
+    )
+    for row in residuals:
+        rail = str(row.get("rail") or "")
+        reference = str(row.get("reference") or "")
+        numeric = row.get("numeric")
+        if (
+            not rail
+            or not reference
+            or not isinstance(numeric, Mapping)
+            or numeric.get("operation") != MetricOperation.DEX.value
+            or numeric.get("value") is None
+        ):
+            continue
+        engine = _engine_from_payload(row)
+        if engine == "unknown":
+            continue
+        try:
+            value = as_decimal(numeric["value"])
+        except (KeyError, TypeError, ValueError, ArithmeticError):
+            continue
+        if not value.is_finite():
+            continue
+        values[(rail, reference)][engine].append(value)
+
+    records: list[dict[str, object]] = []
+    comparison_names = set(comparison_engines) - set(primary_engines)
+    for rail in sorted(set(rails)):
+        for primary_engine in primary_engines:
+            pairs_by_engine: dict[str, list[tuple[Decimal, Decimal]]] = defaultdict(list)
+            for (row_rail, _reference), by_engine in values.items():
+                if row_rail != rail:
+                    continue
+                primary_values = by_engine.get(primary_engine, ())
+                if len(primary_values) != 1:
+                    continue
+                primary_value = primary_values[0]
+                for engine in comparison_names:
+                    comparison_values = by_engine.get(engine, ())
+                    if len(comparison_values) == 1:
+                        pairs_by_engine[engine].append(
+                            (primary_value, comparison_values[0])
+                        )
+
+            candidates: list[tuple[Decimal, str, Decimal, int]] = []
+            for engine, pairs in pairs_by_engine.items():
+                benchmark_rms = _rms([comparison for _primary, comparison in pairs])
+                primary_rms = _rms([primary for primary, _comparison in pairs])
+                if benchmark_rms is not None and primary_rms is not None:
+                    candidates.append(
+                        (benchmark_rms, engine, primary_rms, len(pairs))
+                    )
+            if not candidates:
+                records.append(
+                    {
+                        "rail": rail,
+                        "primary_engine": primary_engine,
+                        "benchmark_engine": None,
+                        "n": 0,
+                        "primary_rms_dex": None,
+                        "benchmark_rms_dex": None,
+                    }
+                )
+                continue
+
+            benchmark_rms, engine, primary_rms, count = min(
+                candidates, key=lambda candidate: (candidate[0], candidate[1])
+            )
+            records.append(
+                {
+                    "rail": rail,
+                    "primary_engine": primary_engine,
+                    "benchmark_engine": engine,
+                    "n": count,
+                    "primary_rms_dex": str(primary_rms),
+                    "benchmark_rms_dex": str(benchmark_rms),
+                }
+            )
+    return records
+
+
+def _battery_hero_sio2_mole_fraction(composition_raw: object) -> Decimal | None:
+    """Return the scorer-declared SiO2 mole fraction, or None when unavailable."""
+
+    if not isinstance(composition_raw, Mapping):
+        return None
+    if composition_raw.get("amount_basis") != AmountBasis.MOLE_FRACTION.value:
+        return None
+    components = composition_raw.get("components")
+    if (
+        not isinstance(components, Sequence)
+        or isinstance(components, (str, bytes))
+        or not components
+    ):
+        return None
+    sio2_fraction = Decimal(0)
+    try:
+        for component in components:
+            if (
+                isinstance(component, Sequence)
+                and not isinstance(component, (str, bytes))
+                and len(component) == 2
+                and component[0] == "SiO2"
+            ):
+                sio2_fraction = as_decimal(component[1])
+                break
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not sio2_fraction.is_finite() or sio2_fraction < 0 or sio2_fraction > 1:
+        return None
+    return sio2_fraction
+
+
+def _battery_hero_sweet_spot_records(
+    samples: Iterable[tuple[str, str, object, object, object]],
+) -> list[dict[str, object]]:
+    """Score median |dex| cells over declared SiO2 mole fraction and T.
+
+    Each sample is ``(rail, engine, temperature_K, composition, signed_dex)``;
+    the caller unwraps serialized State fields, while this owner assigns bins
+    and computes the median. All engines on a rail receive the same complete
+    grid. Composition components are a complete map, so an omitted SiO2
+    component is zero when the declared amount basis is mole fraction.
+    """
+
+    sio2_width = Decimal("0.05")
+    temperature_width = Decimal("100")
+    values_by_cell: dict[tuple[str, str, int, int], list[Decimal]] = defaultdict(
+        list
+    )
+    temperature_bins_by_rail: dict[str, set[int]] = defaultdict(set)
+    engines_by_rail: dict[str, set[str]] = defaultdict(set)
+
+    for rail, engine, temperature_raw, composition_raw, dex_raw in samples:
+        if not rail or not engine:
+            continue
+        sio2_fraction = _battery_hero_sio2_mole_fraction(composition_raw)
+        if sio2_fraction is None:
+            continue
+        try:
+            temperature = as_decimal(temperature_raw)
+            dex = as_decimal(dex_raw)
+        except (TypeError, ValueError, ArithmeticError):
+            continue
+        if not temperature.is_finite() or not dex.is_finite():
+            continue
+
+        temperature_bin = math.floor(temperature / temperature_width)
+        sio2_bin = (
+            19
+            if sio2_fraction == 1
+            else math.floor(sio2_fraction / sio2_width)
+        )
+        key = (str(rail), str(engine), temperature_bin, sio2_bin)
+        values_by_cell[key].append(dex)
+        temperature_bins_by_rail[str(rail)].add(temperature_bin)
+        engines_by_rail[str(rail)].add(str(engine))
+
+    records: list[dict[str, object]] = []
+    for rail in sorted(temperature_bins_by_rail):
+        temperature_bins = temperature_bins_by_rail[rail]
+        for engine in sorted(engines_by_rail[rail]):
+            for temperature_bin in range(
+                min(temperature_bins), max(temperature_bins) + 1
+            ):
+                temperature_lower = Decimal(temperature_bin) * temperature_width
+                for sio2_bin in range(20):
+                    cell_values = values_by_cell.get(
+                        (rail, engine, temperature_bin, sio2_bin), []
+                    )
+                    records.append(
+                        {
+                            "rail": rail,
+                            "engine": engine,
+                            "temperature_lower_K": str(temperature_lower),
+                            "temperature_upper_K": str(
+                                temperature_lower + temperature_width
+                            ),
+                            "sio2_lower": str(Decimal(sio2_bin) * sio2_width),
+                            "sio2_upper": str(Decimal(sio2_bin + 1) * sio2_width),
+                            "n": len(cell_values),
+                            "color_eligible": len(cell_values) >= 3,
+                            "median_abs_dex": (
+                                None
+                                if not cell_values
+                                else str(_median_abs(cell_values))
+                            ),
+                        }
+                    )
+    return records
+
+
+@dataclass
+class _BatteryHeroBinAccumulator:
+    residual_sum: float = 0.0
+    temperature_sum: float = 0.0
+    n: int = 0
+    flagged: bool = False
+
+
+def _battery_hero_facet(rail: str, formula: str, observable: str) -> str:
+    if rail == Rail.REDOX.value:
+        return observable if observable != "unknown" else "unknown observable"
+    return formula if formula else "unknown species"
+
+
+def _battery_hero_minor_foulant_facets(formula: str) -> tuple[str, ...]:
+    composition = dict(formula_composition(formula) or ())
+    elements = set(composition)
+    facets = [
+        f"minor:{element}"
+        for element in ("P", "S", "Cl", "C")
+        if element in elements
+    ]
+    alkali = elements.intersection({"Na", "K"})
+    halide = bool(elements.intersection({"Cl", "F"})) and not elements.intersection(
+        {"O", "S", "C"}
+    )
+    sulfate = composition.get("S", 0.0) > 0 and composition.get("O", 0.0) == (
+        4 * composition["S"]
+    )
+    carbonate = composition.get("C", 0.0) > 0 and composition.get("O", 0.0) == (
+        3 * composition["C"]
+    )
+    if alkali and (halide or sulfate or carbonate):
+        facets.append("minor:alkali_salts")
+    return tuple(facets)
+
+
+def _battery_hero_element_series_records(
+    series: Mapping[
+        tuple[str, str, str], Sequence[Mapping[str, object]]
+    ],
+) -> dict[tuple[str, str], list[dict[str, object]]]:
+    """Pool binned residual points by each formula element."""
+
+    bins: dict[tuple[str, str, str, str, int], _BatteryHeroBinAccumulator] = {}
+    for (engine, formula, _rail), points in series.items():
+        elements = set(parse_formula_elements(formula) or ())
+        for element in elements:
+            for point in points:
+                bin_index = int(point["bin_index"])
+                composition_key = str(point["composition_key"])
+                composition_label = str(point["composition_label"])
+                accumulator = bins.setdefault(
+                    (
+                        engine,
+                        element,
+                        composition_key,
+                        composition_label,
+                        bin_index,
+                    ),
+                    _BatteryHeroBinAccumulator(),
+                )
+                count = int(point["n"])
+                accumulator.residual_sum += float(point["residual_dex"]) * count
+                accumulator.temperature_sum += float(point["temperature_K"]) * count
+                accumulator.n += count
+                accumulator.flagged = accumulator.flagged or bool(point["flagged"])
+
+    grouped: dict[tuple[str, str], list[dict[str, object]]] = defaultdict(list)
+    for (
+        engine,
+        element,
+        composition_key,
+        composition_label,
+        bin_index,
+    ), accumulator in sorted(bins.items()):
+        grouped[(engine, element)].append(
+            {
+                "bin_index": bin_index,
+                "temperature_K": accumulator.temperature_sum / accumulator.n,
+                "residual_dex": accumulator.residual_sum / accumulator.n,
+                "n": accumulator.n,
+                "flagged": accumulator.flagged,
+                "composition_key": composition_key,
+                "composition_label": composition_label,
+                "observable": "pooled",
+            }
+        )
+    return {
+        key: sorted(points, key=lambda point: int(point["bin_index"]))
+        for key, points in grouped.items()
+    }
+
+
+def _battery_hero_binned_score_records(
+    database: sqlite3.Connection,
+    *,
+    selected_rails: Sequence[str],
+    hero_rails: Sequence[str],
+    bin_width_K: float,
+    composition_sio2_by_key: Mapping[str, float],
+) -> dict[str, object]:
+    """Deduplicate and bin battery hero residuals from the streamed score table.
+
+    The caller stages raw numeric score rows in ``scored``. This owner performs
+    the SQL duplicate average, RMS accumulation, temperature binning, and
+    element pooling, returning finished records for presentation.
+    """
+
+    selected = set(selected_rails)
+    hero = set(hero_rails)
+    bins: dict[
+        tuple[str, str, str, str, str, str, int], _BatteryHeroBinAccumulator
+    ] = {}
+    hero_bins: dict[
+        tuple[str, str, str, str, str, str, int], _BatteryHeroBinAccumulator
+    ] = {}
+    unique_points: dict[str, int] = defaultdict(int)
+    residual_square_sums: dict[str, float] = defaultdict(float)
+    for row in database.execute(
+        """SELECT engine, species, rail, composition_key, composition_label,
+                  observable, MIN(temperature_K), MAX(flagged), AVG(residual_dex)
+             FROM scored
+            GROUP BY engine, species, rail, composition_key, composition_label,
+                     observable, experiment, temperature_key
+            ORDER BY engine, species, rail, composition_key, observable,
+                     MIN(temperature_K)"""
+    ):
+        (
+            engine,
+            formula,
+            rail,
+            composition_key,
+            composition_label,
+            observable,
+            temperature,
+            flagged,
+            residual,
+        ) = row
+        if rail in selected:
+            unique_points[engine] += 1
+            residual_square_sums[engine] += float(residual) ** 2
+        bin_index = math.floor(float(temperature) / bin_width_K)
+        if rail in selected:
+            key = (
+                engine,
+                formula,
+                rail,
+                composition_key,
+                composition_label,
+                observable,
+                bin_index,
+            )
+            accumulator = bins.setdefault(key, _BatteryHeroBinAccumulator())
+            accumulator.residual_sum += float(residual)
+            accumulator.temperature_sum += float(temperature)
+            accumulator.n += 1
+            accumulator.flagged = accumulator.flagged or bool(flagged)
+        if rail in hero:
+            facets = [_battery_hero_facet(rail, formula, observable)]
+            if rail == Rail.VAPOUR.value:
+                facets.extend(_battery_hero_minor_foulant_facets(formula))
+            for facet in facets:
+                key = (
+                    rail,
+                    facet,
+                    engine,
+                    composition_key,
+                    composition_label,
+                    observable,
+                    bin_index,
+                )
+                accumulator = hero_bins.setdefault(
+                    key, _BatteryHeroBinAccumulator()
+                )
+                accumulator.residual_sum += float(residual)
+                accumulator.temperature_sum += float(temperature)
+                accumulator.n += 1
+                accumulator.flagged = accumulator.flagged or bool(flagged)
+
+    series: dict[tuple[str, str, str], list[dict[str, object]]] = defaultdict(list)
+    for key, accumulator in sorted(bins.items()):
+        (
+            engine,
+            formula,
+            rail,
+            composition_key,
+            composition_label,
+            observable,
+            bin_index,
+        ) = key
+        series[(engine, formula, rail)].append(
+            {
+                "bin_index": bin_index,
+                "temperature_K": accumulator.temperature_sum / accumulator.n,
+                "residual_dex": accumulator.residual_sum / accumulator.n,
+                "n": accumulator.n,
+                "flagged": accumulator.flagged,
+                "composition_key": composition_key,
+                "composition_label": composition_label,
+                "observable": observable,
+            }
+        )
+
+    hero_series: dict[tuple[str, str, str, str], list[dict[str, object]]] = defaultdict(list)
+    for key, accumulator in sorted(hero_bins.items()):
+        rail, facet, engine, composition_key, composition_label, observable, bin_index = key
+        hero_series[(rail, facet, engine, composition_key)].append(
+            {
+                "bin_index": bin_index,
+                "temperature_K": accumulator.temperature_sum / accumulator.n,
+                "residual_dex": accumulator.residual_sum / accumulator.n,
+                "n": accumulator.n,
+                "flagged": accumulator.flagged,
+                "composition_key": composition_key,
+                "composition_label": composition_label,
+                "observable": observable,
+                "composition_sio2_mole_fraction": composition_sio2_by_key.get(
+                    composition_key
+                ),
+            }
+        )
+
+    summary_records = {
+        engine: {
+            "unique_points": count,
+            "rms_dex": math.sqrt(residual_square_sums[engine] / count),
+        }
+        for engine, count in sorted(unique_points.items())
+    }
+    series_records = {
+        key: sorted(points, key=lambda point: int(point["bin_index"]))
+        for key, points in series.items()
+    }
+    hero_records = {
+        key: sorted(points, key=lambda point: int(point["bin_index"]))
+        for key, points in hero_series.items()
+    }
+    return {
+        "summaries": summary_records,
+        "series": series_records,
+        "hero_series": hero_records,
+        "element_series": _battery_hero_element_series_records(series_records),
+    }
+
+
 def _optional_decimal(value: Decimal | None) -> str | None:
     return None if value is None else str(value)
 
@@ -9323,6 +9778,87 @@ def _payload_measured_reference(
     return member
 
 
+class _AllNumericPayloadAccumulator:
+    """Stream payload rows into the scorer-owned all-numeric headline."""
+
+    def __init__(
+        self,
+        *,
+        engines: Sequence[Engine],
+        observations: Mapping[str, Observation] | None = None,
+        origins: Mapping[str, str] | None = None,
+        retain_report_facts: bool = True,
+    ) -> None:
+        from simulator.battery.compilation_tier import reference_observation
+
+        self._engines = tuple(engines)
+        self._observations = observations
+        self._reference_observation = reference_observation
+        self._measured_reference = _payload_measured_reference(observations, origins)
+        self._headline = _AllNumericHeadline() if retain_report_facts else None
+        self._rms_squares: dict[tuple[str, str], Decimal] = defaultdict(Decimal)
+        self._rms_counts: dict[tuple[str, str], int] = defaultdict(int)
+
+    def add(self, row: Mapping[str, object]) -> None:
+        reference = str(row.get("reference") or "")
+        engine = _ScorePayloadAccumulator._engine(row)
+        fact = _all_numeric_fact(
+            row,
+            engine=engine,
+            observation=(
+                None
+                if self._observations is None
+                else self._reference_observation(self._observations, reference)
+            ),
+            certified=(
+                self._measured_reference(row)
+                and _headline_payload_admits(row, tier="measured")
+                if self._headline is not None
+                else False
+            ),
+        )
+        if fact is None:
+            return
+        if fact.operation == MetricOperation.DEX.value:
+            key = (fact.rail, fact.engine)
+            self._rms_squares[key] += fact.value * fact.value
+            self._rms_counts[key] += 1
+        if self._headline is not None:
+            self._headline.add(fact)
+
+    def records(self) -> list[dict[str, object]]:
+        if self._headline is None:
+            raise RuntimeError("report facts were not retained")
+        return self._headline.records(engine.value for engine in self._engines)
+
+    def rms_records(self) -> list[dict[str, object]]:
+        engines = {engine.value for engine in self._engines}
+        engines.update(engine for _rail, engine in self._rms_counts)
+        records: list[dict[str, object]] = []
+        for rail in Rail:
+            for engine in sorted(engines):
+                count = self._rms_counts[(rail.value, engine)]
+                rms = (
+                    None
+                    if count == 0
+                    else str(
+                        (
+                            self._rms_squares[(rail.value, engine)]
+                            / Decimal(count)
+                        ).sqrt()
+                    )
+                )
+                records.append(
+                    {
+                        "rail": rail.value,
+                        "engine": engine,
+                        "n_dex": count,
+                        "rms_dex": rms,
+                    }
+                )
+        return records
+
+
 def all_numeric_payload_records(
     rows: Iterable[Mapping[str, object]],
     *,
@@ -9336,26 +9872,14 @@ def all_numeric_payload_records(
     membership plus the measured headline row filter.
     """
 
-    from simulator.battery.compilation_tier import reference_observation
-
-    measured_reference = _payload_measured_reference(observations, origins)
-    owner = _AllNumericHeadline()
+    owner = _AllNumericPayloadAccumulator(
+        engines=engines,
+        observations=observations,
+        origins=origins,
+    )
     for row in rows:
-        reference = str(row.get("reference") or "")
-        owner.add(
-            _all_numeric_fact(
-                row,
-                engine=_ScorePayloadAccumulator._engine(row),
-                observation=(
-                    None
-                    if observations is None
-                    else reference_observation(observations, reference)
-                ),
-                certified=measured_reference(row)
-                and _headline_payload_admits(row, tier="measured"),
-            )
-        )
-    return owner.records(engine.value for engine in engines)
+        owner.add(row)
+    return owner.records()
 
 
 def _all_numeric_markdown_lines(
@@ -9580,6 +10104,52 @@ def _engine_from_payload(row: Mapping[str, object]) -> str:
     if row.get("key"):
         return str(row["key"]).rsplit("::", 1)[-1]
     return "unknown"
+
+
+def _residual_engine_observable(row: Mapping[str, object]) -> bool:
+    """Whether this engine can report the refused quantity on its rail."""
+
+    execution = row.get("execution")
+    if isinstance(execution, Mapping) and execution.get("call_evidence"):
+        return True
+
+    rail = str(row.get("rail") or "")
+    engine = _engine_from_payload(row)
+    if rail == Rail.VAPOUR.value and engine == Engine.MAGEMIN.value:
+        return False
+    if rail == Rail.MELT_ACTIVITY.value:
+        from simulator.battery.waypoints import MELT_ACTIVITY_ENGINES
+
+        if engine not in MELT_ACTIVITY_ENGINES:
+            return False
+
+    refusal = row.get("refusal")
+    if not isinstance(refusal, Mapping):
+        return True
+    reason = str(refusal.get("reason") or "")
+    detail = refusal.get("detail")
+    detail_reason = str(detail.get("reason") or "") if isinstance(detail, Mapping) else ""
+    if rail == Rail.REDOX.value and reason == RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX.value:
+        return False
+    if (
+        rail == Rail.THERMOCHEMISTRY.value
+        and reason == RefusalReason.UNSUPPORTED.value
+        and detail_reason == "quantity_not_predicted"
+    ):
+        request = row.get("candidate_request")
+        raw_quantity = request.get("quantity") if isinstance(request, Mapping) else None
+        try:
+            quantity = Quantity(str(raw_quantity))
+            engine_value = Engine(engine)
+        except ValueError:
+            return True
+        from simulator.battery.compilation_tier import _engine_thermo_quantities
+
+        return (
+            quantity in _engine_thermo_quantities(engine_value)
+            or quantity in FUSION_QUANTITIES
+        )
+    return True
 
 
 def candidate_rail_census(

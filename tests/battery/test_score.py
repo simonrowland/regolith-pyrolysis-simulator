@@ -88,6 +88,11 @@ from simulator.battery.score import (
     ScoreContext,
     SINGLE_CATION_COEFFICIENT_BASIS,
     SINGLE_LIQUID_ENGINES,
+    _battery_hero_minor_foulant_facets,
+    _battery_hero_sio2_mole_fraction,
+    _battery_hero_sweet_spot_records,
+    _paired_engine_rail_benchmarks,
+    _residual_engine_observable,
     compile_residual,
     compute_metric,
     dumps_residual_line,
@@ -4670,6 +4675,369 @@ def test_measured_engine_rail_records_group_source_relation() -> None:
         (SourceRelation.INDEPENDENT.value, 1),
         (SourceRelation.TRAINING.value, 1),
     ]
+
+
+def test_paired_engine_rail_benchmarks_choose_best_comparison_per_primary() -> None:
+    rows = [
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "shared",
+            "candidate_request": {"engine": "internal-analytical"},
+            "numeric": {"operation": "dex", "value": "3"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "internal-vaporock",
+            "candidate_request": {"engine": "internal-analytical"},
+            "numeric": {"operation": "dex", "value": "4"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "shared",
+            "candidate_request": {"engine": "openimcc"},
+            "numeric": {"operation": "dex", "value": "1"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "comparison-only",
+            "candidate_request": {"engine": "vaporock"},
+            "numeric": {"operation": "dex", "value": "100"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "shared",
+            "candidate_request": {"engine": "thermoengine"},
+            "numeric": {"operation": "dex", "value": "2"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "shared",
+            "candidate_request": {"engine": "vaporock"},
+            "numeric": {"operation": "dex", "value": "0.5"},
+        },
+        {
+            "rail": Rail.VAPOUR.value,
+            "reference": "internal-vaporock",
+            "candidate_request": {"engine": "vaporock"},
+            "numeric": {"operation": "dex", "value": "4"},
+        },
+        {
+            "rail": Rail.REDOX.value,
+            "reference": "redox-primary",
+            "candidate_request": {"engine": "internal-analytical"},
+            "numeric": {"operation": "dex", "value": "0.3"},
+        },
+        {
+            "rail": Rail.REDOX.value,
+            "reference": "redox-primary",
+            "candidate_request": {"engine": "openimcc"},
+            "numeric": {"operation": "dex", "value": "0.2"},
+        },
+    ]
+
+    records = _paired_engine_rail_benchmarks(
+        rows,
+        primary_engines=("openimcc", "internal-analytical"),
+        comparison_engines=("vaporock", "thermoengine", "alphamelts", "magemin"),
+        rails=(Rail.VAPOUR.value, Rail.REDOX.value),
+    )
+    by_key = {
+        (record["rail"], record["primary_engine"]): record for record in records
+    }
+
+    assert by_key[(Rail.VAPOUR.value, "openimcc")] == {
+        "rail": Rail.VAPOUR.value,
+        "primary_engine": "openimcc",
+        "benchmark_engine": "vaporock",
+        "n": 1,
+        "primary_rms_dex": "1",
+        "benchmark_rms_dex": "0.5",
+    }
+    assert by_key[(Rail.VAPOUR.value, "internal-analytical")] == {
+        "rail": Rail.VAPOUR.value,
+        "primary_engine": "internal-analytical",
+        "benchmark_engine": "thermoengine",
+        "n": 1,
+        "primary_rms_dex": "3",
+        "benchmark_rms_dex": "2",
+    }
+    for primary in ("openimcc", "internal-analytical"):
+        assert by_key[(Rail.REDOX.value, primary)] == {
+            "rail": Rail.REDOX.value,
+            "primary_engine": primary,
+            "benchmark_engine": None,
+            "n": 0,
+            "primary_rms_dex": None,
+            "benchmark_rms_dex": None,
+        }
+
+
+def test_residual_engine_observability_uses_scorer_domain_decisions() -> None:
+    from simulator.battery.compilation_tier import _engine_thermo_quantities
+
+    unsupported_thermo = {
+        "rail": Rail.THERMOCHEMISTRY.value,
+        "candidate_request": {
+            "engine": Engine.ALPHAMELTS.value,
+            "quantity": Quantity.H_MINUS_H298.value,
+        },
+        "refusal": {
+            "reason": RefusalReason.UNSUPPORTED.value,
+            "detail": {"reason": "quantity_not_predicted"},
+        },
+        "execution": {"state": ExecutionState.UNSUPPORTED.value},
+    }
+    assert Quantity.H_MINUS_H298 not in _engine_thermo_quantities(Engine.ALPHAMELTS)
+    assert not _residual_engine_observable(unsupported_thermo)
+
+    supported_thermo = {
+        "rail": Rail.THERMOCHEMISTRY.value,
+        "candidate_request": {
+            "engine": Engine.THERMOENGINE.value,
+            "quantity": Quantity.CP.value,
+        },
+        "refusal": {
+            "reason": RefusalReason.UNSUPPORTED.value,
+            "detail": {"reason": "quantity_not_predicted"},
+        },
+        "execution": {"state": ExecutionState.UNSUPPORTED.value},
+    }
+    assert Quantity.CP in _engine_thermo_quantities(Engine.THERMOENGINE)
+    assert _residual_engine_observable(supported_thermo)
+
+    for reason in (
+        RefusalReason.IDENTITY_INCOMPLETE,
+        RefusalReason.METRIC_DOMAIN,
+    ):
+        assert _residual_engine_observable(
+            {
+                "rail": Rail.REDOX.value,
+                "candidate_request": {
+                    "engine": Engine.INTERNAL_ANALYTICAL.value,
+                    "quantity": Quantity.FE3_FE2_RATIO.value,
+                },
+                "execution": {"state": ExecutionState.NOT_PROBED.value},
+                "refusal": {"reason": reason.value},
+            }
+        )
+
+    assert not _residual_engine_observable(
+        {
+            "rail": Rail.VAPOUR.value,
+            "candidate_request": {"engine": Engine.MAGEMIN.value},
+            "refusal": {"reason": RefusalReason.UNSUPPORTED.value},
+        }
+    )
+    assert not _residual_engine_observable(
+        {
+            "rail": Rail.MELT_ACTIVITY.value,
+            "candidate_request": {"engine": Engine.MAGEMIN.value},
+            "refusal": {"reason": RefusalReason.UNSUPPORTED.value},
+        }
+    )
+    assert not _residual_engine_observable(
+        {
+            "rail": Rail.REDOX.value,
+            "candidate_request": {"engine": Engine.ALPHAMELTS.value},
+            "refusal": {
+                "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX.value
+            },
+        }
+    )
+    assert _residual_engine_observable(
+        {
+            "rail": Rail.VAPOUR.value,
+            "candidate_request": {"engine": Engine.VAPOROCK.value},
+            "refusal": {"reason": RefusalReason.UNSUPPORTED.value},
+        }
+    )
+    # Line 3,981,466 in the pinned battery archive: this is one of the 92
+    # MAGEMin vapour refusals after equilibrate_cell ran.
+    attempted_magemin_vapour = {
+        "rail": Rail.VAPOUR.value,
+        "candidate_request": {
+            "engine": Engine.MAGEMIN.value,
+            "channel": Engine.MAGEMIN.value,
+            "quantity": Quantity.P_SAT.value,
+        },
+        "execution": {
+            "state": "unsupported",
+            "call_evidence": "equilibrate_cell:magemin:host=Mac-Studio-256-2:exit=None",
+        },
+        "refusal": {
+            "reason": RefusalReason.UNSUPPORTED.value,
+            "detail": {
+                "engine_reason": "forbidden_species",
+                "refusal_reason": "out_of_basis",
+            },
+        },
+    }
+    assert _residual_engine_observable(attempted_magemin_vapour)
+    assert not _residual_engine_observable(
+        {
+            **attempted_magemin_vapour,
+            "execution": {"state": "not_probed"},
+        }
+    )
+
+
+def test_battery_hero_sweet_spot_scores_shared_mole_fraction_bins() -> None:
+    mole_composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": [["SiO2", "0.02"]],
+    }
+    assert _battery_hero_sio2_mole_fraction(mole_composition) == Decimal("0.02")
+    assert _battery_hero_sio2_mole_fraction(
+        {
+            "amount_basis": AmountBasis.MASS_PERCENT.value,
+            "components": [["SiO2", "2"]],
+        }
+    ) is None
+    assert _battery_hero_sio2_mole_fraction(
+        {
+            "amount_basis": AmountBasis.MOLE_FRACTION.value,
+            "components": [["SiO2", "1.01"]],
+        }
+    ) is None
+    samples = [
+        (Rail.VAPOUR.value, "openimcc", "100", mole_composition, "-1"),
+        (Rail.VAPOUR.value, "openimcc", "199.9", mole_composition, "3"),
+        (
+            Rail.VAPOUR.value,
+            "openimcc",
+            "200",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["SiO2", "0.05"]],
+            },
+            "6",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "openimcc",
+            "199",
+            {
+                "amount_basis": AmountBasis.MASS_PERCENT.value,
+                "components": [["SiO2", "0.02"]],
+            },
+            "100",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "vaporock",
+            "500",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["FeO", "1"]],
+            },
+            "-7",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "vaporock",
+            "500",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["FeO", "1"]],
+            },
+            "-1",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "vaporock",
+            "500",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["FeO", "1"]],
+            },
+            "-3",
+        ),
+        (
+            Rail.VAPOUR.value,
+            "vaporock",
+            "600",
+            {
+                "amount_basis": AmountBasis.MOLE_FRACTION.value,
+                "components": [["SiO2", "1"]],
+            },
+            "-8",
+        ),
+    ]
+
+    records = _battery_hero_sweet_spot_records(samples)
+    openimcc_cell = next(
+        row
+        for row in records
+        if row["engine"] == "openimcc"
+        and row["temperature_lower_K"] == "100"
+        and row["sio2_lower"] == "0.00"
+    )
+    assert openimcc_cell["n"] == 2
+    assert Decimal(str(openimcc_cell["median_abs_dex"])) == Decimal("2")
+    assert openimcc_cell["color_eligible"] is False
+
+    boundary_cell = next(
+        row
+        for row in records
+        if row["engine"] == "openimcc"
+        and row["temperature_lower_K"] == "200"
+        and row["sio2_lower"] == "0.05"
+    )
+    assert boundary_cell["n"] == 1
+    assert Decimal(str(boundary_cell["median_abs_dex"])) == Decimal("6")
+
+    shared_empty_cell = next(
+        row
+        for row in records
+        if row["engine"] == "openimcc"
+        and row["temperature_lower_K"] == "500"
+        and row["sio2_lower"] == "0.95"
+    )
+    assert shared_empty_cell["n"] == 0
+    assert shared_empty_cell["median_abs_dex"] is None
+    zero_sio2_cell = next(
+        row
+        for row in records
+        if row["engine"] == "vaporock"
+        and row["temperature_lower_K"] == "500"
+        and row["sio2_lower"] == "0.00"
+    )
+    assert zero_sio2_cell["n"] == 3
+    assert Decimal(str(zero_sio2_cell["median_abs_dex"])) == Decimal("3")
+    assert zero_sio2_cell["color_eligible"] is True
+    upper_boundary_cell = next(
+        row
+        for row in records
+        if row["engine"] == "vaporock"
+        and row["temperature_lower_K"] == "600"
+        and row["sio2_lower"] == "0.95"
+    )
+    assert upper_boundary_cell["n"] == 1
+    assert Decimal(str(upper_boundary_cell["median_abs_dex"])) == Decimal("8")
+    assert upper_boundary_cell["color_eligible"] is False
+    openimcc_temperature_bins = {
+        (row["temperature_lower_K"], row["temperature_upper_K"])
+        for row in records
+        if row["engine"] == "openimcc"
+    }
+    vaporock_temperature_bins = {
+        (row["temperature_lower_K"], row["temperature_upper_K"])
+        for row in records
+        if row["engine"] == "vaporock"
+    }
+    assert openimcc_temperature_bins == vaporock_temperature_bins
+
+
+@pytest.mark.parametrize(
+    ("formula", "is_alkali_salt"),
+    [("Na", False), ("Na2O", False), ("NaCl", True), ("K2SO4", True)],
+)
+def test_battery_hero_alkali_salt_facets_require_a_salt_anion(
+    formula: str, is_alkali_salt: bool
+) -> None:
+    assert (
+        "minor:alkali_salts" in _battery_hero_minor_foulant_facets(formula)
+    ) is is_alkali_salt
 
 
 def test_measured_headline_mode_serializes_typed_residuals_end_to_end(
