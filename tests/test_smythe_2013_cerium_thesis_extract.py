@@ -5,6 +5,7 @@ from pathlib import Path
 
 import yaml
 
+from literature_extract_assertions import assert_all_physical_locators
 from simulator.battery.enums import Phase, Quantity, ValenceValueForm, ValueKind
 from simulator.battery.migrate import Migrator
 
@@ -53,4 +54,84 @@ def test_table23_values_match_render_and_migrate_with_conditions():
         migrated_row = next(row for row in migrated if f"row={sample.casefold()}" in row.observation_id and observation_id in row.observation_id)
         assert migrated_row.identity.valence_basis.value.value_form is (
             ValenceValueForm.LOG10_RATIO if "log_ratio" in observation_id else ValenceValueForm.FRACTION
+        )
+
+
+def test_all_table_and_figure_locators_use_physical_pages():
+    extract = yaml.safe_load(EXTRACT.read_text())
+    assert_all_physical_locators(extract)
+
+    locators = []
+
+    def collect(value):
+        if isinstance(value, dict):
+            locator = value.get("locator")
+            if isinstance(locator, dict):
+                locators.append(locator)
+            for child in value.values():
+                collect(child)
+        elif isinstance(value, list):
+            for child in value:
+                collect(child)
+
+    collect(extract)
+    assert len(locators) == 327
+    for locator in locators:
+        assert locator["published_page"] == locator["page"] - 14
+
+    context = extract["species"]["Ce"]["context"]
+    tables = {row["locator"].get("table"): row for row in context if row["type"] != "figure_context"}
+    assert tables["3.3"]["locator"] == {
+        "table": "3.3",
+        "page": 90,
+        "published_page": 76,
+        "pdf_page_index": 89,
+    }
+    assert tables["A2.1"]["locator"] == {
+        "table": "A2.1",
+        "page": 131,
+        "published_page": 117,
+        "pdf_page_index": 130,
+    }
+
+    figures = {
+        row["locator"]["figure"]: row
+        for row in context
+        if row["type"] == "figure_context"
+    }
+    assert set(figures) == {
+        f"{chapter}.{number}"
+        for chapter, last in ((1, 3), (2, 6), (3, 9), (4, 6))
+        for number in range(1, last + 1)
+    } | {"A1.1", "A1.2", "A4.1", "A4.2", "A4.3"}
+    appendix_locator_pins = {
+        "A1.1": (129, 128, 115),
+        "A1.2": (130, 129, 116),
+        "A4.1": (167, 166, 153),
+        "A4.2": (168, 167, 154),
+        "A4.3": (169, 168, 155),
+    }
+    for figure, (page, pdf_page_index, published_page) in appendix_locator_pins.items():
+        assert figures[figure]["locator"] == {
+            "figure": figure,
+            "page": page,
+            "pdf_page_index": pdf_page_index,
+            "published_page": published_page,
+        }
+    for figure in figures.values():
+        values = figure["values"]
+        assert values["quantity"]
+        assert values["identity"]
+        assert values["panel"]
+        assert values["axes"]
+        assert values["series"]
+        assert values["attribution"]
+        assert values["digitisation"] == "marker inventory checked at 600 dpi; numeric digitisation deferred"
+        assert all(
+            series["panel"]
+            and series["name"]
+            and series["marker"]
+            and isinstance(series["marker_count"], int)
+            and series["attribution"]
+            for series in values["series"]
         )
