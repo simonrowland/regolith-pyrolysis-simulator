@@ -14,6 +14,7 @@ from scripts.battery_hero_plot import (
     HERO_MINOR_FACETS,
     HERO_RAILS,
     _draw_hero_current,
+    _draw_hero_sweet_spot,
     _history_record,
     _hero_facets,
     _hero_refusal_entries,
@@ -35,6 +36,7 @@ from scripts.battery_hero_plot import (
     TIER_MINOR,
     TIER_TRACE,
 )
+from matplotlib.colors import Normalize
 import matplotlib.pyplot as plt
 
 
@@ -649,6 +651,73 @@ def test_non_observable_rows_are_separate_from_refusals_and_history(
     assert "magemin 1" in svg
 
 
+def test_sweet_spot_panels_show_shared_cell_counts_and_hatch_sparse_cells(
+    tmp_path: Path,
+) -> None:
+    rows: list[dict[str, object]] = [
+        {"kind": "battery_store_stamp", "revision": "sweet-spot-test"}
+    ]
+    for engine, experiment, residual in (
+        ("internal-analytical", "ia-1", 0.2),
+        ("internal-analytical", "ia-2", -0.8),
+        ("internal-analytical", "ia-3", 1.0),
+        ("openimcc", "open-1", 0.4),
+    ):
+        row = _record(
+            engine=engine,
+            experiment=experiment,
+            formula="SiO",
+            temperature_K=1200,
+            residual=residual,
+            rail="vapour",
+        )
+        row["candidate_observation"]["identity"]["composition"] = {
+            "tag": "value",
+            "value": {
+                "amount_basis": "mole_fraction",
+                "components": [["SiO2", "0.25"], ["FeO", "0.75"]],
+            },
+        }
+        rows.append(row)
+
+    residuals = tmp_path / "sweet-spot.jsonl"
+    residuals.write_text(
+        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"
+    )
+    data = read_scores(residuals, rails=HERO_RAILS)
+    internal_cells = data.hero_sweet_spot_cells[("vapour", "internal-analytical")]
+    openimcc_cells = data.hero_sweet_spot_cells[("vapour", "openimcc")]
+    internal_cell = next(cell for cell in internal_cells if cell["n"] == 3)
+    openimcc_cell = next(cell for cell in openimcc_cells if cell["n"] == 1)
+    assert internal_cell["median_abs_dex"] == "0.8"
+    assert internal_cell["sio2_lower"] == openimcc_cell["sio2_lower"] == "0.25"
+    assert (
+        internal_cell["temperature_lower_K"]
+        == openimcc_cell["temperature_lower_K"]
+    )
+
+    fig, axis = plt.subplots()
+    _draw_hero_sweet_spot(
+        axis,
+        "openimcc",
+        openimcc_cells,
+        colormap=plt.get_cmap("viridis"),
+        normalization=Normalize(vmin=0, vmax=1),
+    )
+    assert any(patch.get_hatch() == "///" for patch in axis.patches)
+    assert "1" in {text.get_text() for text in axis.texts}
+    assert "0" in {text.get_text() for text in axis.texts}
+    plt.close(fig)
+
+    files = render_hero_charts(data, tmp_path / "sweet-spot-render")
+    svg = files["hero:vapour:svg"].read_text(encoding="utf-8").casefold()
+    assert "cell label=n" in svg
+    assert "sweet-spot fill is median" in svg
+    melt_svg = files["hero:melt_activity:svg"].read_text(encoding="utf-8").casefold()
+    assert "140/147 rows" in melt_svg
+    assert "main's fix is pending" in melt_svg
+
+
 def test_hero_flagged_points_are_hollow_and_benchmark_uses_shared_rows(
     tmp_path: Path,
 ) -> None:
@@ -984,16 +1053,24 @@ def test_read_scores_streams_residuals_from_archive_member(tmp_path: Path) -> No
 
 def test_hero_svg_is_byte_identical_for_the_same_input(tmp_path: Path) -> None:
     residuals = tmp_path / "residuals.jsonl"
+    row = _record(
+        engine="internal-analytical",
+        experiment="hero-1",
+        formula="SiO",
+        temperature_K=1200,
+        residual=0.2,
+        rail="vapour",
+    )
+    row["candidate_observation"]["identity"]["composition"] = {
+        "tag": "value",
+        "value": {
+            "amount_basis": "mole_fraction",
+            "components": [["SiO2", "0.25"], ["FeO", "0.75"]],
+        },
+    }
     rows: list[dict[str, object]] = [
         {"kind": "battery_store_stamp", "revision": "hero-test"},
-        _record(
-            engine="internal-analytical",
-            experiment="hero-1",
-            formula="SiO",
-            temperature_K=1200,
-            residual=0.2,
-            rail="vapour",
-        ),
+        row,
     ]
     residuals.write_text(
         "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8"

@@ -56,7 +56,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.axes import Axes
+from matplotlib.colors import Normalize
 from matplotlib.lines import Line2D
+from matplotlib.patches import Rectangle
 
 from simulator.battery.enums import (  # noqa: E402
     Authority,
@@ -73,6 +75,7 @@ from simulator.diagnostic_helpers.species_rail import (  # noqa: E402
 from simulator.feedstock_composition import resolve_feedstock_composition  # noqa: E402
 from simulator.battery.score import (  # noqa: E402
     _flagged_payload_strata,
+    _battery_hero_sweet_spot_records,
     _paired_engine_rail_benchmarks,
     _residual_engine_observable,
 )
@@ -175,6 +178,9 @@ class ScorePlotData:
     hero_refusal_totals: Mapping[tuple[str, str, str], int]
     hero_diagnostics: Mapping[tuple[str, str], Mapping[str, object]]
     hero_benchmarks: Mapping[tuple[str, str], Mapping[str, object]]
+    hero_sweet_spot_cells: Mapping[
+        tuple[str, str], tuple[Mapping[str, object], ...]
+    ]
     x_limits: tuple[float, float]
     bin_width_K: float
 
@@ -589,6 +595,7 @@ def read_scores(
     summaries: dict[str, EngineSummary] = defaultdict(EngineSummary)
     rails_seen: set[str] = set()
     benchmark_payloads: list[Mapping[str, object]] = []
+    sweet_spot_samples: list[tuple[str, str, object, object, object]] = []
     hero_refusals: Counter[tuple[str, str, str, str, str]] = Counter()
     hero_refusal_totals: Counter[tuple[str, str, str]] = Counter()
     hero_diagnostics: dict[tuple[str, str], dict[str, object]] = {}
@@ -768,6 +775,16 @@ def read_scores(
                         else max(summary.max_temperature_K, temperature)
                     )
                 composition_key, composition_label = _composition_fields(identity)
+                if rail in HERO_RAILS:
+                    sweet_spot_samples.append(
+                        (
+                            rail,
+                            engine,
+                            temperature_raw,
+                            _state_value(identity.get("composition")),
+                            numeric.get("value"),
+                        )
+                    )
                 observable = _row_observable(row)
                 pending.append(
                     (
@@ -939,6 +956,13 @@ def read_scores(
             rails=HERO_RAILS,
         )
     }
+    hero_sweet_spot_groups: dict[
+        tuple[str, str], list[Mapping[str, object]]
+    ] = defaultdict(list)
+    for cell in _battery_hero_sweet_spot_records(sweet_spot_samples):
+        hero_sweet_spot_groups[(str(cell["rail"]), str(cell["engine"]))].append(
+            cell
+        )
 
     return ScorePlotData(
         stamp=stamp,
@@ -952,6 +976,10 @@ def read_scores(
         hero_refusal_totals=dict(hero_refusal_totals),
         hero_diagnostics=_normalized_hero_diagnostics(hero_diagnostics),
         hero_benchmarks=hero_benchmarks,
+        hero_sweet_spot_cells={
+            key: tuple(cells)
+            for key, cells in sorted(hero_sweet_spot_groups.items())
+        },
         x_limits=x_limits,
         bin_width_K=bin_width_K,
     )
@@ -1949,6 +1977,85 @@ def _history_date(entry: Mapping[str, Any]) -> float | None:
     return mdates.date2num(parsed)
 
 
+def _draw_hero_sweet_spot(
+    axis: Axes,
+    engine: str,
+    cells: Sequence[Mapping[str, object]],
+    *,
+    colormap: Any,
+    normalization: Normalize,
+) -> bool:
+    """Draw scorer-owned cell medians and sample counts for one engine."""
+
+    temperatures: list[float] = []
+    for cell in cells:
+        x_low = _finite_float(cell.get("sio2_lower"))
+        x_high = _finite_float(cell.get("sio2_upper"))
+        y_low = _finite_float(cell.get("temperature_lower_K"))
+        y_high = _finite_float(cell.get("temperature_upper_K"))
+        if None in (x_low, x_high, y_low, y_high):
+            continue
+        assert x_low is not None and x_high is not None
+        assert y_low is not None and y_high is not None
+        temperatures.extend((y_low, y_high))
+        count = int(cell.get("n") or 0)
+        value = _finite_float(cell.get("median_abs_dex"))
+        color_eligible = bool(cell.get("color_eligible")) and value is not None
+        fill = colormap(normalization(value)) if color_eligible else "#eeeeee"
+        hatch = None if color_eligible else "///"
+        axis.add_patch(
+            Rectangle(
+                (x_low, y_low),
+                x_high - x_low,
+                y_high - y_low,
+                facecolor=fill,
+                edgecolor="#aaaaaa",
+                linewidth=0.25,
+                hatch=hatch,
+            )
+        )
+        label_color = (
+            "#f7f7f7"
+            if color_eligible and normalization(value) >= 0.55
+            else "#222222"
+        )
+        axis.text(
+            (x_low + x_high) / 2,
+            (y_low + y_high) / 2,
+            str(count),
+            ha="center",
+            va="center",
+            color=label_color,
+            fontsize=4.5,
+        )
+
+    if not temperatures:
+        axis.set_axis_off()
+        return False
+    axis.set_xlim(0.0, 1.0)
+    axis.set_ylim(min(temperatures), max(temperatures))
+    axis.set_xticks([index / 10 for index in range(11)])
+    axis.set_xticklabels([f"{index / 10:.1f}" for index in range(11)], fontsize=5)
+    cell_lowers = sorted(
+        {
+            _finite_float(cell.get("temperature_lower_K"))
+            for cell in cells
+            if _finite_float(cell.get("temperature_lower_K")) is not None
+        }
+    )
+    tick_stride = max(1, math.ceil(len(cell_lowers) / 8))
+    axis.set_yticks(cell_lowers[::tick_stride])
+    axis.tick_params(axis="y", labelsize=5)
+    axis.set_xlabel("SiO₂ mole fraction", fontsize=6)
+    axis.set_ylabel("T (K)", fontsize=6)
+    axis.set_title(
+        f"{engine} · fill=median |dex| (n≥3); hatched= n<3; cell label=n",
+        loc="left",
+        fontsize=7,
+    )
+    return True
+
+
 def _draw_hero_history(axis: Axes, rail: str, history: Sequence[Mapping[str, Any]]) -> None:
     metrics_by_engine: dict[str, dict[str, list[tuple[float, float]]]] = defaultdict(
         lambda: {"rms_dex": [], "median_abs_dex": []}
@@ -2184,9 +2291,31 @@ def render_hero_charts(
         for facet in facets:
             ratios.extend((2.0, max(0.45, len(refusal_entries[facet]) * 0.18)))
         ratios.append(2.4)
-        figure = plt.figure(figsize=(14.0, max(5.0, len(facets) * 2.8 + 2.4)))
+        sweet_spot_engines = tuple(
+            engine
+            for (sweet_spot_rail, engine) in sorted(data.hero_sweet_spot_cells)
+            if sweet_spot_rail == rail
+        )
+        sweet_spot_cells = {
+            engine: data.hero_sweet_spot_cells[(rail, engine)]
+            for engine in sweet_spot_engines
+        }
+        sweet_spot_values = [
+            value
+            for cells in sweet_spot_cells.values()
+            for cell in cells
+            if cell.get("color_eligible")
+            if (value := _finite_float(cell.get("median_abs_dex"))) is not None
+        ]
+        color_max = max(sweet_spot_values, default=1.0) or 1.0
+        normalization = Normalize(vmin=0.0, vmax=color_max)
+        sweet_spot_colormap = plt.get_cmap("viridis")
+        ratios.extend(4.0 for _ in sweet_spot_engines)
+        figure = plt.figure(
+            figsize=(14.0, max(5.0, len(facets) * 2.8 + 2.4 + 4.0 * len(sweet_spot_engines)))
+        )
         grid = figure.add_gridspec(
-            nrows=2 * len(facets) + 1,
+            nrows=2 * len(facets) + 1 + len(sweet_spot_engines),
             ncols=1,
             height_ratios=ratios,
             hspace=0.18,
@@ -2203,8 +2332,29 @@ def render_hero_charts(
             )
             current_axis.set_title(facet, loc="left", fontsize=8)
             _draw_hero_refusals(refusal_axis, refusal_entries[facet])
-        history_axis = figure.add_subplot(grid[-1])
+        history_index = 2 * len(facets)
+        history_axis = figure.add_subplot(grid[history_index])
         _draw_hero_history(history_axis, rail, history)
+        sweet_spot_axes: list[Axes] = []
+        for index, engine in enumerate(sweet_spot_engines):
+            axis = figure.add_subplot(grid[history_index + 1 + index])
+            if _draw_hero_sweet_spot(
+                axis,
+                engine,
+                sweet_spot_cells[engine],
+                colormap=sweet_spot_colormap,
+                normalization=normalization,
+            ):
+                sweet_spot_axes.append(axis)
+        if sweet_spot_axes and sweet_spot_values:
+            scalar = matplotlib.cm.ScalarMappable(
+                norm=normalization,
+                cmap=sweet_spot_colormap,
+            )
+            scalar.set_array([])
+            colorbar = figure.colorbar(scalar, ax=sweet_spot_axes, pad=0.015)
+            colorbar.set_label("median |dex| (n≥3)", fontsize=6)
+            colorbar.ax.tick_params(labelsize=5)
 
         status_lines: list[str] = []
         for engine in HERO_PRIMARY_ENGINES:
@@ -2241,10 +2391,19 @@ def render_hero_charts(
             fontsize=8.2,
             y=0.997,
         )
+        caption = (
+            "Lines separate engine and composition; hollow markers are flagged/extrapolated. "
+            "Sweet-spot fill is median |dex|; each cell shows n; n<3 is hatched."
+        )
+        if rail == Rail.MELT_ACTIVITY.value:
+            caption += (
+                " ThermoEngine comparison caveat: 140/147 rows pair pure-solid "
+                "data with its pure-liquid model reference; main's fix is pending."
+            )
         figure.text(
             0.5,
             0.002,
-            "Lines separate engine and composition; hollow markers are flagged or extrapolated predictions.",
+            caption,
             ha="center",
             va="bottom",
             fontsize=6,
