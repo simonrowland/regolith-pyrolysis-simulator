@@ -322,8 +322,8 @@ def read_ledger_api(
         return response()
 
 
-def read_ledger_api_for_client(client_id: str, resource: str, **params):
-    """Resolve an active run owned by one signed Flask browser session."""
+def _active_simulation_sid_for_client(client_id: str) -> str:
+    """Resolve the unique active run owned by a signed browser session."""
     with _run_command_lock:
         with _simulations_guard:
             matches = [
@@ -332,7 +332,14 @@ def read_ledger_api_for_client(client_id: str, resource: str, **params):
             ]
         if len(matches) != 1:
             raise LookupError("no unique active simulation for this browser session")
-        return read_ledger_api(matches[0], resource, **params)
+        return matches[0]
+
+
+def read_ledger_api_for_client(client_id: str, resource: str, **params):
+    """Resolve an active run owned by one signed Flask browser session."""
+    return read_ledger_api(
+        _active_simulation_sid_for_client(client_id), resource, **params
+    )
 
 
 def read_advisory_panel_detail(
@@ -368,15 +375,11 @@ def read_advisory_panel_detail(
 
 def read_advisory_panel_detail_for_client(client_id: str, panel: str):
     """Resolve the live VR panel detail for one signed Flask browser session."""
-    with _run_command_lock:
-        with _simulations_guard:
-            matches = [
-                sid for sid, state in _simulations.items()
-                if state.get('ledger_client_id') == client_id
-            ]
-        if len(matches) != 1:
-            raise LookupError("no unique active simulation for this browser session")
-        return read_advisory_panel_detail(matches[0], panel, include_run_id=True)
+    return read_advisory_panel_detail(
+        _active_simulation_sid_for_client(client_id),
+        panel,
+        include_run_id=True,
+    )
 
 
 # A LAWFUL PHYSICS REFUSAL IS A RESULT, NOT A CRASH -- SAY SO IN WORDS.
