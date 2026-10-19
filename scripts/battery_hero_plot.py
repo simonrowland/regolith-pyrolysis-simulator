@@ -80,8 +80,11 @@ from simulator.diagnostic_helpers.species_rail import (  # noqa: E402
 from simulator.feedstock_composition import resolve_feedstock_composition  # noqa: E402
 from simulator.battery.score import (  # noqa: E402
     SCORE_ENGINE_SET,
+    _BATTERY_HERO_DECK_SOURCE_RAILS,
     _AllNumericPayloadAccumulator,
     _battery_hero_binned_score_records,
+    _battery_hero_deck_payload,
+    _battery_hero_deck_records,
     _battery_hero_facet,
     _battery_hero_minor_foulant_facets,
     _flagged_payload_strata,
@@ -187,6 +190,16 @@ class ScorePlotData:
     element_series: Mapping[tuple[str, str], tuple[BinPoint, ...]]
     x_limits: tuple[float, float]
     bin_width_K: float
+    hero_deck_points: tuple[Mapping[str, object], ...] = ()
+    hero_deck_metrics: Mapping[tuple[str, str], Mapping[str, object]] = field(
+        default_factory=dict
+    )
+    hero_deck_benchmarks: Mapping[tuple[str, str], Mapping[str, object]] = field(
+        default_factory=dict
+    )
+    hero_deck_unavailable_axis_counts: Mapping[tuple[str, str], int] = field(
+        default_factory=dict
+    )
 
 
 def _d139_exclusion_counts(
@@ -604,10 +617,11 @@ def read_scores(
         raise ValueError("bin width must be a finite positive number of kelvin")
     selected_rails = _requested_rails(rails)
     selected = set(selected_rails)
-    retained_rails = selected | set(HERO_RAILS)
+    retained_rails = selected | set(HERO_RAILS) | set(_BATTERY_HERO_DECK_SOURCE_RAILS)
     summaries: dict[str, EngineSummary] = defaultdict(EngineSummary)
     rails_seen: set[str] = set()
     benchmark_payloads: list[Mapping[str, object]] = []
+    deck_score_rows: list[Mapping[str, object]] = []
     sweet_spot_samples: list[tuple[str, str, object, object, object]] = []
     hero_composition_sio2: dict[str, float] = {}
     hero_refusals: Counter[tuple[str, str, str, str, str]] = Counter()
@@ -689,7 +703,7 @@ def read_scores(
                     status is not ResidualStatus.REFUSED
                     or _residual_engine_observable(row)
                 )
-                if rail in HERO_RAILS:
+                if rail in _BATTERY_HERO_DECK_SOURCE_RAILS:
                     _record_hero_diagnostic(
                         hero_diagnostics,
                         row,
@@ -705,7 +719,7 @@ def read_scores(
                         summary.refused_by_rail[rail] += 1
                     else:
                         summary.not_observable_by_rail[rail] += 1
-                    if rail in HERO_RAILS and engine_observable:
+                    if rail in _BATTERY_HERO_DECK_SOURCE_RAILS and engine_observable:
                         formula = _row_formula(row)
                         identity = _row_identity(row)
                         composition_key, _composition_label = _composition_fields(identity)
@@ -731,6 +745,8 @@ def read_scores(
                     continue
                 if rail in HERO_RAILS:
                     benchmark_payloads.append(row)
+                if rail in _BATTERY_HERO_DECK_SOURCE_RAILS:
+                    deck_score_rows.append(_battery_hero_deck_payload(row))
 
                 identity = _row_identity(row)
                 if not identity:
@@ -793,7 +809,7 @@ def read_scores(
                         else max(summary.max_temperature_K, temperature)
                     )
                 composition_key, composition_label = _composition_fields(identity)
-                if rail in HERO_RAILS:
+                if rail in HERO_RAILS or rail in _BATTERY_HERO_DECK_SOURCE_RAILS:
                     composition_raw = _state_value(identity.get("composition"))
                     sio2_fraction = _battery_hero_sio2_mole_fraction(composition_raw)
                     if sio2_fraction is not None:
@@ -888,6 +904,11 @@ def read_scores(
             rails=HERO_RAILS,
         )
     }
+    deck_records = _battery_hero_deck_records(
+        deck_score_rows,
+        primary_engines=HERO_PRIMARY_ENGINES,
+        comparison_engines=HERO_COMPARISON_ENGINES,
+    )
     hero_sweet_spot_groups: dict[
         tuple[str, str], list[Mapping[str, object]]
     ] = defaultdict(list)
@@ -916,6 +937,12 @@ def read_scores(
         element_series=element_series,
         x_limits=x_limits,
         bin_width_K=bin_width_K,
+        hero_deck_points=tuple(deck_records["points"]),
+        hero_deck_metrics=deck_records["metrics"],
+        hero_deck_benchmarks=deck_records["benchmarks"],
+        hero_deck_unavailable_axis_counts=deck_records[
+            "unavailable_axis_counts"
+        ],
     )
 
 
@@ -1877,6 +1904,46 @@ def _hero_legend_handles(
     return handles
 
 
+def _draw_hero_deck_scatter(
+    axis: Axes,
+    points: Sequence[Mapping[str, object]],
+    *,
+    engine_colors: Mapping[str, Any],
+) -> None:
+    """Draw scorer-produced deck points, with hollow faces only for scorer flags."""
+
+    grouped: dict[tuple[str, bool, str], list[tuple[float, float]]] = defaultdict(list)
+    for point in points:
+        x_value = _finite_float(point.get("x_value"))
+        y_value = _finite_float(point.get("y_value"))
+        engine = str(point.get("engine") or "unknown")
+        if x_value is None or y_value is None:
+            continue
+        marker = str(point.get("marker") or "o")
+        grouped[(engine, bool(point.get("flagged")), marker)].append(
+            (x_value, y_value)
+        )
+
+    for (engine, flagged, marker), values in sorted(grouped.items()):
+        color = engine_colors.get(engine, "#555555")
+        artist = axis.scatter(
+            [value[0] for value in values],
+            [value[1] for value in values],
+            marker=marker,
+            s=24,
+            facecolors="#ffffff" if flagged else color,
+            edgecolors=color,
+            linewidths=1.0,
+            zorder=3,
+        )
+        artist.set_gid(
+            f"hero-deck-marker:{engine}:{'flagged' if flagged else 'ordinary'}:{marker}"
+        )
+    axis.tick_params(labelsize=6)
+    axis.grid(True, color="#999999", alpha=0.18, linewidth=0.5)
+    axis.yaxis.set_major_formatter(FormatStrFormatter("%.2f"))
+
+
 def _draw_hero_current(
     axis: Axes,
     data: ScorePlotData,
@@ -2131,6 +2198,20 @@ def _draw_hero_history(
                     continue
                 paired_primary_points[primary].append((date, primary_value))
                 benchmark_points[primary].append((date, value))
+
+    if not metrics_by_engine and not paired_primary_points and not benchmark_points:
+        axis.set_axis_off()
+        axis.text(
+            0.5,
+            0.5,
+            "no history rows",
+            transform=axis.transAxes,
+            ha="center",
+            va="center",
+            fontsize=7,
+        )
+        axis.set_title("History by green landing", loc="left", fontsize=8)
+        return
 
     engine_names = sorted(metrics_by_engine)
     for engine in engine_names:
@@ -2629,6 +2710,504 @@ def render_hero_charts(
     return files
 
 
+def _hero_deck_legend_handles(
+    points: Sequence[Mapping[str, object]],
+    engine_colors: Mapping[str, Any],
+    *,
+    group_labels: Sequence[tuple[str, str]] = (),
+) -> list[Line2D]:
+    engines = sorted({str(point.get("engine") or "unknown") for point in points})
+    handles = [
+        Line2D(
+            [0],
+            [0],
+            color=engine_colors.get(engine, "#555555"),
+            linestyle="None",
+            marker="o",
+            markerfacecolor=engine_colors.get(engine, "#555555"),
+            markeredgecolor=engine_colors.get(engine, "#555555"),
+            markersize=4,
+            label=engine,
+        )
+        for engine in engines
+    ]
+    if any(bool(point.get("flagged")) for point in points):
+        handles.append(
+            Line2D(
+                [0],
+                [0],
+                color="#444444",
+                linestyle="None",
+                marker="o",
+                markerfacecolor="#ffffff",
+                markeredgecolor="#444444",
+                markersize=4,
+                label=FLAGGED_MARKER_LABEL,
+            )
+        )
+    handles.extend(
+        Line2D(
+            [0],
+            [0],
+            color="#555555",
+            linestyle="None",
+            marker=marker,
+            markerfacecolor="#ffffff",
+            markeredgecolor="#555555",
+            markersize=4,
+            label=label,
+        )
+        for marker, label in group_labels
+    )
+    return handles
+
+
+def _hero_deck_benchmark_caption(
+    data: ScorePlotData, chart: str
+) -> str:
+    entries: list[str] = []
+    for primary in HERO_PRIMARY_ENGINES:
+        metric = data.hero_deck_metrics.get((chart, primary), {})
+        benchmark = data.hero_deck_benchmarks.get((chart, primary), {})
+        count = int(metric.get("n") or 0)
+        benchmark_engine = benchmark.get("benchmark_engine")
+        benchmark_count = int(benchmark.get("n") or 0)
+        if benchmark_engine is None or benchmark_count == 0:
+            entries.append(f"{primary}: best comparison unavailable (n=0)")
+            continue
+        entries.append(
+            f"{primary} {_format_dex(benchmark.get('primary_rms_dex'))} vs "
+            f"{benchmark_engine} {_format_dex(benchmark.get('benchmark_rms_dex'))} "
+            f"dex (n={_compact_count(benchmark_count)}; scored n={_compact_count(count)})"
+        )
+    return "Best comparison on chart rows: " + "; ".join(entries)
+
+
+def _hero_deck_refusal_entries(
+    data: ScorePlotData, rail: str
+) -> tuple[tuple[str, str, int], ...]:
+    return tuple(
+        (engine, reason, count)
+        for (source_rail, engine, reason), count in sorted(
+            data.hero_refusal_totals.items()
+        )
+        if source_rail == rail and count
+    )
+
+
+def render_hero_deck_charts(
+    data: ScorePlotData,
+    output_dir: Path,
+    *,
+    history_path: Path | None = None,
+) -> dict[str, Path]:
+    """Render the scorer-owned hero deck axes and explicit missing-data panels."""
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    history = read_history(history_path)
+    engine_colors = _hero_engine_colors(data.engines)
+    chart_configs = (
+        (
+            "polymerisation",
+            "Polymerisation test",
+            Rail.VAPOUR.value,
+            "NBO/T",
+            "signed dex",
+        ),
+        (
+            "redox_sensitivity",
+            "Redox sensitivity",
+            Rail.VAPOUR.value,
+            "ΔIW = log₁₀(fO₂) − IW",
+            "signed dex",
+        ),
+        (
+            "sio_evolution",
+            "SiO evolution by pO₂ bin",
+            Rail.SIO_EVOLUTION.value,
+            "Temperature (K)",
+            "signed dex",
+        ),
+        (
+            "residue_composition",
+            "Residue composition",
+            Rail.RESIDUE_COMPOSITION.value,
+            "Fraction evaporated",
+            "signed dex",
+        ),
+        (
+            "fo2_cross_comparison",
+            "fO₂ cross-comparison",
+            Rail.REDOX.value,
+            "Measured Fe³⁺/Fe²⁺ ratio",
+            "Predicted Fe³⁺/Fe²⁺ ratio",
+        ),
+    )
+    file_slugs = {
+        "polymerisation": "polymerisation",
+        "redox_sensitivity": "redox-sensitivity",
+        "sio_evolution": "sio-evolution",
+        "residue_composition": "residue-composition",
+        "fo2_cross_comparison": "fo2-cross-comparison",
+    }
+    files: dict[str, Path] = {}
+
+    for chart, title, source_rail, x_label, y_label in chart_configs:
+        points = [
+            point for point in data.hero_deck_points if point.get("chart") == chart
+        ]
+        current_groups: list[tuple[str, tuple[Mapping[str, object], ...]]] = []
+        if chart == "redox_sensitivity":
+            for species in ("Fe", "SiO", "Na"):
+                current_groups.append(
+                    (
+                        species,
+                        tuple(point for point in points if point.get("facet") == species),
+                    )
+                )
+        else:
+            current_groups.append(("", tuple(points)))
+
+        sweet_spot_engines = tuple(
+            engine
+            for (rail, engine), cells in sorted(data.hero_sweet_spot_cells.items())
+            if rail == source_rail and any(int(cell.get("n") or 0) for cell in cells)
+        )
+        sweet_spot_pairs = [
+            tuple(sweet_spot_engines[index : index + 2])
+            for index in range(0, len(sweet_spot_engines), 2)
+        ]
+        row_heights = [1.65, 0.55, 1.55]
+        row_heights.extend(2.4 for _ in sweet_spot_pairs)
+        figure = plt.figure(figsize=(14.0, max(7.0, sum(row_heights) / 0.78)))
+        grid = figure.add_gridspec(
+            nrows=len(row_heights),
+            ncols=6,
+            height_ratios=row_heights,
+            left=0.055,
+            right=0.92,
+            top=0.86,
+            bottom=0.075,
+            hspace=0.38,
+            wspace=0.34,
+        )
+        figure.suptitle(title, fontsize=10, y=0.985)
+        figure.text(
+            0.5,
+            0.935,
+            _hero_deck_benchmark_caption(data, chart),
+            ha="center",
+            va="center",
+            fontsize=6,
+        )
+
+        if chart == "redox_sensitivity":
+            for column, (species, species_points) in enumerate(current_groups):
+                axis = figure.add_subplot(grid[0, column * 2 : (column + 1) * 2])
+                if species_points:
+                    _draw_hero_deck_scatter(
+                        axis, species_points, engine_colors=engine_colors
+                    )
+                else:
+                    axis.set_axis_off()
+                    axis.text(
+                        0.5,
+                        0.5,
+                        f"No scored {species} rows with measured fO₂",
+                        transform=axis.transAxes,
+                        ha="center",
+                        va="center",
+                        fontsize=7,
+                    )
+                axis.set_title(species, loc="left", fontsize=7)
+                axis.set_xlabel(x_label, fontsize=6)
+                axis.set_ylabel(y_label, fontsize=6)
+        elif chart == "fo2_cross_comparison":
+            unavailable_axis = figure.add_subplot(grid[0, 0:2])
+            unavailable_axis.set_axis_off()
+            unavailable_axis.text(
+                0.5,
+                0.5,
+                "engine-computed fO2 not yet available",
+                transform=unavailable_axis.transAxes,
+                ha="center",
+                va="center",
+                fontsize=8,
+                wrap=True,
+            )
+            unavailable_axis.set_title("Panel 1 · engine fO₂", loc="left", fontsize=7)
+            axis = figure.add_subplot(grid[0, 2:6])
+            if points:
+                _draw_hero_deck_scatter(axis, points, engine_colors=engine_colors)
+                values = [
+                    value
+                    for point in points
+                    for value in (
+                        _finite_float(point.get("x_value")),
+                        _finite_float(point.get("y_value")),
+                    )
+                    if value is not None
+                ]
+                if values:
+                    low, high = min(values), max(values)
+                    padding = max((high - low) * 0.04, abs(high) * 0.02, 1e-6)
+                    axis.plot(
+                        [low - padding, high + padding],
+                        [low - padding, high + padding],
+                        color="#555555",
+                        linestyle="--",
+                        linewidth=0.8,
+                        zorder=1,
+                    )
+            else:
+                _draw_hero_deck_unavailable(
+                    axis,
+                    "No Fe³⁺/Fe²⁺ redox scores have both a measured composition and measured fO₂.",
+                )
+            axis.set_title("Panel 2 · Fe³⁺/Fe²⁺", loc="left", fontsize=7)
+            axis.set_xlabel(x_label, fontsize=6)
+            axis.set_ylabel(y_label, fontsize=6)
+        else:
+            axis = figure.add_subplot(grid[0, :])
+            if chart == "residue_composition":
+                missing = sum(
+                    count
+                    for (missing_chart, _engine), count
+                    in data.hero_deck_unavailable_axis_counts.items()
+                    if missing_chart == chart
+                )
+                message = "fraction evaporated is not recorded in scored rows"
+                if missing:
+                    message += (
+                        f"  Scored residue rows without this axis: "
+                        f"{_compact_count(missing)}."
+                    )
+                _draw_hero_deck_unavailable(
+                    axis,
+                    message,
+                )
+            elif points:
+                if chart == "sio_evolution":
+                    group_indices = sorted(
+                        {
+                            int(point["group_index"])
+                            for point in points
+                            if point.get("group_index") is not None
+                        }
+                    )
+                    markers = {
+                        group: _HERO_MARKERS[index % len(_HERO_MARKERS)]
+                        for index, group in enumerate(group_indices)
+                    }
+                    points = [
+                        {**point, "marker": markers[int(point["group_index"])]}
+                        for point in points
+                    ]
+                    group_labels = [
+                        (
+                            markers[group],
+                            next(
+                                str(point["group_label"])
+                                for point in points
+                                if int(point["group_index"]) == group
+                            ),
+                        )
+                        for group in group_indices
+                    ]
+                else:
+                    group_labels = []
+                _draw_hero_deck_scatter(axis, points, engine_colors=engine_colors)
+                if chart == "sio_evolution":
+                    axis.legend(
+                        handles=_hero_deck_legend_handles(
+                            points, engine_colors, group_labels=group_labels
+                        ),
+                        loc="upper left",
+                        bbox_to_anchor=(1.005, 1.0),
+                        frameon=False,
+                        fontsize=5,
+                    )
+            else:
+                missing = sum(
+                    count
+                    for (missing_chart, _engine), count
+                    in data.hero_deck_unavailable_axis_counts.items()
+                    if missing_chart == chart
+                )
+                if chart == "redox_sensitivity":
+                    message = (
+                        "No Fe, SiO, or Na scored vapour rows carry a finite fO₂_Pa; "
+                        "ΔIW cannot be computed."
+                    )
+                elif chart == "sio_evolution":
+                    message = (
+                        "No scored SiO rows carry both temperature and pO₂; "
+                        "pO₂ binning cannot be computed."
+                    )
+                else:
+                    message = "No scorer-computed NBO/T rows have signed dex values."
+                if missing:
+                    message += f"  Rows without the required axis: {_compact_count(missing)}."
+                _draw_hero_deck_unavailable(axis, message)
+            axis.set_xlabel(x_label, fontsize=6)
+            axis.set_ylabel(y_label, fontsize=6)
+
+        refusal_axis = figure.add_subplot(grid[1, :])
+        refusal_rails = (
+            (source_rail, Rail.SIO_EVOLUTION.value)
+            if chart == "redox_sensitivity"
+            else (source_rail,)
+        )
+        _draw_hero_refusals(
+            refusal_axis,
+            tuple(
+                entry
+                for rail in refusal_rails
+                for entry in _hero_deck_refusal_entries(data, rail)
+            ),
+            engine_colors=engine_colors,
+        )
+        if refusal_axis.axison:
+            refusal_axis.set_title("Refused scorer rows (not-observable rows separate)", loc="left", fontsize=6)
+
+        history_axis = figure.add_subplot(grid[2, :])
+        _draw_hero_history(
+            history_axis,
+            source_rail,
+            history,
+            engine_colors=engine_colors,
+        )
+
+        sweet_spot_axes: list[Axes] = []
+        for pair_index, pair in enumerate(sweet_spot_pairs):
+            row_index = 3 + pair_index
+            for column, engine in enumerate(pair):
+                axis = figure.add_subplot(
+                    grid[row_index, column * 3 : (column + 1) * 3]
+                )
+                cells = data.hero_sweet_spot_cells[(source_rail, engine)]
+                numeric_values = [
+                    value
+                    for cell in cells
+                    if cell.get("color_eligible")
+                    if (value := _finite_float(cell.get("median_abs_dex"))) is not None
+                ]
+                color_max = max(numeric_values, default=1.0) or 1.0
+                if _draw_hero_sweet_spot(
+                    axis,
+                    engine,
+                    cells,
+                    colormap=plt.get_cmap("viridis"),
+                    normalization=Normalize(vmin=0.0, vmax=color_max),
+                    x_limits=(0.0, 1.0),
+                    temperature_limits=data.x_limits,
+                ):
+                    sweet_spot_axes.append(axis)
+            if len(pair) == 1:
+                blank = figure.add_subplot(grid[row_index, 3:6])
+                blank.set_axis_off()
+
+        if points:
+            group_labels: list[tuple[str, str]] = []
+            if chart == "sio_evolution":
+                seen_groups: dict[int, str] = {}
+                for point in points:
+                    if point.get("group_index") is not None:
+                        seen_groups[int(point["group_index"])] = str(point["group_label"])
+                group_labels = [
+                    (_HERO_MARKERS[index % len(_HERO_MARKERS)], label)
+                    for index, (_group, label) in enumerate(sorted(seen_groups.items()))
+                ]
+            handles = _hero_deck_legend_handles(
+                points, engine_colors, group_labels=group_labels
+            )
+            figure.legend(
+                handles=handles,
+                loc="upper center",
+                bbox_to_anchor=(0.5, 0.902),
+                ncol=min(max(1, len(handles)), 8),
+                frameon=False,
+                fontsize=5.5,
+            )
+
+        if sweet_spot_axes:
+            values = [
+                _finite_float(cell.get("median_abs_dex"))
+                for (rail, _engine), cells in data.hero_sweet_spot_cells.items()
+                if rail == source_rail
+                for cell in cells
+                if cell.get("color_eligible")
+            ]
+            numeric_values = [value for value in values if value is not None]
+            if numeric_values:
+                scalar = matplotlib.cm.ScalarMappable(
+                    norm=Normalize(vmin=0.0, vmax=max(numeric_values) or 1.0),
+                    cmap=plt.get_cmap("viridis"),
+                )
+                scalar.set_array([])
+                colorbar = figure.colorbar(
+                    scalar,
+                    ax=sweet_spot_axes,
+                    fraction=0.018,
+                    pad=0.012,
+                )
+                colorbar.set_label("median |dex| (n≥3)", fontsize=5.5)
+                colorbar.ax.tick_params(labelsize=5)
+
+        figure.text(
+            0.5,
+            0.025,
+            "Scored rows only; hollow markers are scorer-flagged. History is per source rail.",
+            ha="center",
+            va="bottom",
+            fontsize=5.4,
+        )
+        path = output_dir / f"battery-hero-{file_slugs[chart]}.svg"
+        png_path = output_dir / f"battery-hero-{file_slugs[chart]}.png"
+        with matplotlib.rc_context({"svg.hashsalt": "battery-hero-deck"}):
+            figure.savefig(
+                path,
+                format="svg",
+                bbox_inches="tight",
+                metadata={"Date": None, "Creator": "battery_hero_plot"},
+            )
+        figure.savefig(
+            png_path,
+            format="png",
+            dpi=150,
+            bbox_inches="tight",
+            metadata={"Software": "battery_hero_plot"},
+        )
+        plt.close(figure)
+        files[f"deck:{file_slugs[chart]}:svg"] = path
+        files[f"deck:{file_slugs[chart]}:png"] = png_path
+    return files
+
+
+def _draw_hero_deck_unavailable(axis: Axes, message: str) -> None:
+    axis.set_axis_off()
+    axis.text(
+        0.5,
+        0.55,
+        "axis unavailable",
+        transform=axis.transAxes,
+        ha="center",
+        va="center",
+        fontsize=8,
+        fontweight="bold",
+    )
+    axis.text(
+        0.5,
+        0.38,
+        message,
+        transform=axis.transAxes,
+        ha="center",
+        va="center",
+        fontsize=6,
+        wrap=True,
+    )
+
+
 def render_plots(
     data: ScorePlotData,
     output_dir: Path,
@@ -2764,6 +3343,9 @@ def render_plots(
             files[f"{view}:engine:{engine}"] = engine_png
     if history_path is not None:
         files.update(render_hero_charts(data, output_dir, history_path=history_path))
+        files.update(
+            render_hero_deck_charts(data, output_dir, history_path=history_path)
+        )
     return files
 
 

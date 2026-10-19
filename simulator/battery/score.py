@@ -22,7 +22,7 @@ import time
 import warnings
 from collections import defaultdict
 from dataclasses import dataclass, field, replace
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, InvalidOperation, ROUND_FLOOR
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping, Sequence
@@ -144,6 +144,7 @@ from simulator.battery.validity import (
     comparison_method_cell_constant_cancels,
     run_validity_gates,
 )
+from simulator.fe_redox import feo_iw_log10_fO2_bar
 from simulator.diagnostic_helpers.species_rail import parse_formula_elements
 from simulator.reference_data.janaf import formula_composition
 
@@ -9094,6 +9095,386 @@ def _paired_engine_rail_benchmarks(
                 }
             )
     return records
+
+
+_BATTERY_HERO_DECK_SOURCE_RAILS = (
+    Rail.VAPOUR.value,
+    Rail.REDOX.value,
+    Rail.SIO_EVOLUTION.value,
+    Rail.RESIDUE_COMPOSITION.value,
+)
+_BATTERY_HERO_DECK_CHART_IDS = (
+    "polymerisation",
+    "redox_sensitivity",
+    "sio_evolution",
+    "residue_composition",
+    "fo2_cross_comparison",
+)
+
+
+def _battery_hero_state_value(value: object) -> object | None:
+    if isinstance(value, Mapping):
+        return value.get("value") if value.get("tag") == "value" else None
+    return value
+
+
+def _battery_hero_nbo_t(composition_raw: object) -> Decimal | None:
+    """Calculate oxide-basis NBO/T from the composition used by the scorer.
+
+    Network formers T are Si, Al, and P: each is represented by tetrahedral
+    oxide units in the declared mole composition. Fe and other variable-valence
+    or coordination cations are not counted as T because this composition does
+    not resolve their coordination state. With this convention, oxygen atoms
+    supply two bridging-bond ends and each T tetrahedron uses four; therefore
+    NBO/T = (2*O - 4*T)/T. Non-mole compositions and negative results are
+    unavailable rather than converted or clipped.
+    """
+
+    if not isinstance(composition_raw, Mapping):
+        return None
+    if composition_raw.get("amount_basis") != AmountBasis.MOLE_FRACTION.value:
+        return None
+    components = composition_raw.get("components")
+    if (
+        not isinstance(components, Sequence)
+        or isinstance(components, (str, bytes))
+        or not components
+    ):
+        return None
+
+    oxygen = Decimal(0)
+    tetrahedral_formers = Decimal(0)
+    try:
+        for component in components:
+            if (
+                not isinstance(component, Sequence)
+                or isinstance(component, (str, bytes))
+                or len(component) != 2
+            ):
+                return None
+            formula, raw_amount = component
+            amount = as_decimal(raw_amount)
+            parsed = formula_composition(str(formula))
+            if (
+                parsed is None
+                or not amount.is_finite()
+                or amount < 0
+            ):
+                return None
+            atom_counts = {element: Decimal(str(count)) for element, count in parsed}
+            if "B" in atom_counts:
+                return None
+            oxygen += amount * atom_counts.get("O", Decimal(0))
+            tetrahedral_formers += amount * sum(
+                (atom_counts.get(element, Decimal(0)) for element in ("Si", "Al", "P")),
+                Decimal(0),
+            )
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if not oxygen.is_finite() or tetrahedral_formers <= 0:
+        return None
+    nbo_t = (Decimal(2) * oxygen - Decimal(4) * tetrahedral_formers) / tetrahedral_formers
+    return nbo_t if nbo_t.is_finite() and nbo_t >= 0 else None
+
+
+def _battery_hero_delta_iw(
+    temperature_raw: object, fO2_pa_raw: object
+) -> Decimal | None:
+    try:
+        temperature = as_decimal(temperature_raw)
+        fO2_pa = as_decimal(fO2_pa_raw)
+        if (
+            not temperature.is_finite()
+            or temperature <= 0
+            or not fO2_pa.is_finite()
+            or fO2_pa <= 0
+        ):
+            return None
+        fO2_bar = fO2_pa / PA_PER_BAR_DEC
+        # The production FeO-IW buffer owns the fit; do not duplicate it here.
+        iw_log10_fO2_bar = Decimal(
+            str(feo_iw_log10_fO2_bar(float(temperature), a_feo=1.0))
+        )
+        delta_iw = fO2_bar.log10() - iw_log10_fO2_bar
+        return delta_iw if delta_iw.is_finite() else None
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+
+
+def _battery_hero_pO2_bin(fO2_pa_raw: object) -> tuple[int, str] | None:
+    try:
+        fO2_pa = as_decimal(fO2_pa_raw)
+        if not fO2_pa.is_finite() or fO2_pa <= 0:
+            return None
+        # Scored fO2_Pa is converted to pO2_bar under the scorer's stated
+        # ideal-gas assumption; use the same exact Pa/bar conversion here.
+        pO2_bar = fO2_pa / PA_PER_BAR_DEC
+        lower_decade = int(pO2_bar.log10().to_integral_value(rounding=ROUND_FLOOR))
+        return (
+            lower_decade,
+            f"10^{lower_decade}–10^{lower_decade + 1} bar",
+        )
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+
+
+def _battery_hero_deck_payload(row: Mapping[str, object]) -> dict[str, object]:
+    """Retain only deck inputs while the plotter streams the full archive."""
+
+    candidate = row.get("candidate_observation")
+    candidate = candidate if isinstance(candidate, Mapping) else {}
+    identity = candidate.get("identity")
+    identity = identity if isinstance(identity, Mapping) else {}
+    value = candidate.get("value")
+    value = value if isinstance(value, Mapping) else {}
+    numeric = row.get("numeric")
+    numeric = numeric if isinstance(numeric, Mapping) else {}
+    return {
+        "candidate_request": {"engine": _engine_from_payload(row)},
+        "candidate_observation": {
+            "identity": {
+                key: identity[key]
+                for key in (
+                    "composition",
+                    "fO2_Pa",
+                    "quantity",
+                    "species",
+                    "temperature_K",
+                )
+                if key in identity
+            },
+            "value": {
+                key: value[key]
+                for key in ("kind", "point")
+                if key in value
+            },
+        },
+        "notices": tuple(row.get("notices") or ()),
+        "numeric": {
+            "operation": numeric.get("operation"),
+            "value": numeric.get("value"),
+        },
+        "rail": row.get("rail"),
+        "reference": row.get("reference"),
+    }
+
+
+def _battery_hero_deck_records(
+    rows: Iterable[Mapping[str, object]],
+    *,
+    primary_engines: Sequence[str] = (),
+    comparison_engines: Sequence[str] = (),
+) -> dict[str, object]:
+    """Score plotted deck axes and chart-specific same-row summaries."""
+
+    points: list[dict[str, object]] = []
+    benchmark_rows: dict[str, list[Mapping[str, object]]] = defaultdict(list)
+    metric_values: dict[tuple[str, str], list[Decimal]] = defaultdict(list)
+    unavailable: dict[tuple[str, str], int] = defaultdict(int)
+    engines: set[str] = set()
+
+    def add_point(
+        chart: str,
+        row: Mapping[str, object],
+        *,
+        facet: str,
+        x_value: Decimal,
+        y_value: Decimal,
+        residual_dex: Decimal,
+        **fields: object,
+    ) -> None:
+        engine = _engine_from_payload(row)
+        engines.add(engine)
+        point: dict[str, object] = {
+            "chart": chart,
+            "engine": engine,
+            "facet": facet,
+            "x_value": str(x_value),
+            "y_value": str(y_value),
+            "residual_dex": str(residual_dex),
+            "flagged": bool(_flagged_payload_strata(row)),
+            "reference": str(row.get("reference") or ""),
+            **fields,
+        }
+        points.append(point)
+        benchmark_rows[chart].append({**row, "rail": chart})
+
+    for row in rows:
+        rail = str(row.get("rail") or "")
+        if rail not in _BATTERY_HERO_DECK_SOURCE_RAILS:
+            continue
+        engine = _engine_from_payload(row)
+        if engine != "unknown":
+            engines.add(engine)
+        numeric = row.get("numeric")
+        candidate = row.get("candidate_observation")
+        identity = candidate.get("identity") if isinstance(candidate, Mapping) else None
+        identity = identity if isinstance(identity, Mapping) else {}
+        if (
+            not isinstance(numeric, Mapping)
+            or numeric.get("operation") != MetricOperation.DEX.value
+            or numeric.get("value") is None
+        ):
+            continue
+        try:
+            residual_dex = as_decimal(numeric["value"])
+        except (TypeError, ValueError, ArithmeticError):
+            continue
+        if not residual_dex.is_finite():
+            continue
+
+        species = identity.get("species")
+        formula = str(species.get("formula") or "") if isinstance(species, Mapping) else ""
+        composition = _battery_hero_state_value(identity.get("composition"))
+        temperature = _battery_hero_state_value(identity.get("temperature_K"))
+        fO2_pa = _battery_hero_state_value(identity.get("fO2_Pa"))
+        quantity = str(_battery_hero_state_value(identity.get("quantity")) or "")
+
+        is_redox_species = (
+            rail == Rail.VAPOUR.value and formula in {"Fe", "SiO", "Na"}
+        ) or (rail == Rail.SIO_EVOLUTION.value and formula == "SiO")
+        if is_redox_species:
+            delta_iw = _battery_hero_delta_iw(temperature, fO2_pa)
+            if delta_iw is None:
+                unavailable[("redox_sensitivity", engine)] += 1
+            else:
+                add_point(
+                    "redox_sensitivity",
+                    row,
+                    facet=formula,
+                    x_value=delta_iw,
+                    y_value=residual_dex,
+                    residual_dex=residual_dex,
+                )
+
+        if rail == Rail.VAPOUR.value:
+            nbo_t = _battery_hero_nbo_t(composition)
+            if nbo_t is None:
+                unavailable[("polymerisation", engine)] += 1
+            else:
+                add_point(
+                    "polymerisation",
+                    row,
+                    facet=formula,
+                    x_value=nbo_t,
+                    y_value=residual_dex,
+                    residual_dex=residual_dex,
+                )
+
+        elif rail == Rail.SIO_EVOLUTION.value and formula == "SiO":
+            pO2_bin = _battery_hero_pO2_bin(fO2_pa)
+            try:
+                temperature_value = as_decimal(temperature)
+            except (TypeError, ValueError, ArithmeticError):
+                temperature_value = Decimal("NaN")
+            if (
+                pO2_bin is None
+                or not temperature_value.is_finite()
+                or temperature_value <= 0
+            ):
+                unavailable[("sio_evolution", engine)] += 1
+            else:
+                decade, group_label = pO2_bin
+                add_point(
+                    "sio_evolution",
+                    row,
+                    facet=group_label,
+                    x_value=temperature_value,
+                    y_value=residual_dex,
+                    residual_dex=residual_dex,
+                    group_index=decade,
+                    group_label=group_label,
+                )
+
+        elif rail == Rail.REDOX.value and quantity == "fe3_fe2_ratio":
+            components = composition.get("components") if isinstance(composition, Mapping) else None
+            has_measured_composition = (
+                isinstance(components, Sequence)
+                and not isinstance(components, (str, bytes))
+                and bool(components)
+                and not composition.get("proxy_flag")
+            )
+            value_payload = candidate.get("value") if isinstance(candidate, Mapping) else None
+            raw_prediction = (
+                value_payload.get("point")
+                if isinstance(value_payload, Mapping)
+                and value_payload.get("kind") == "point"
+                else None
+            )
+            try:
+                prediction = as_decimal(raw_prediction)
+                fO2_value = as_decimal(fO2_pa)
+                if (
+                    not has_measured_composition
+                    or not prediction.is_finite()
+                    or prediction <= 0
+                    or not fO2_value.is_finite()
+                    or fO2_value <= 0
+                ):
+                    raise ValueError("redox cross-comparison lacks measured inputs")
+                # residual_dex = log10(predicted / measured), the score.py
+                # metric contract. Recover the measured scalar at that recorded
+                # precision because the score row serializes the prediction and
+                # residual, but not a second copy of the reference value.
+                measured = prediction / (Decimal(10) ** residual_dex)
+                if not measured.is_finite() or measured <= 0:
+                    raise ValueError("redox reference recovery left the metric domain")
+            except (TypeError, ValueError, ArithmeticError):
+                unavailable[("fo2_cross_comparison", engine)] += 1
+                continue
+            add_point(
+                "fo2_cross_comparison",
+                row,
+                facet="Fe3+/Fe2+ ratio",
+                x_value=measured,
+                y_value=prediction,
+                residual_dex=residual_dex,
+                fO2_Pa=str(fO2_value),
+                quantity=quantity,
+            )
+
+        elif rail == Rail.RESIDUE_COMPOSITION.value:
+            unavailable[("residue_composition", engine)] += 1
+            metric_values[("residue_composition", engine)].append(residual_dex)
+            benchmark_rows["residue_composition"].append(
+                {**row, "rail": "residue_composition"}
+            )
+
+    values_by_chart_engine: dict[tuple[str, str], list[Decimal]] = defaultdict(list)
+    for point in points:
+        values_by_chart_engine[(str(point["chart"]), str(point["engine"]))].append(
+            as_decimal(point["residual_dex"])
+        )
+    metrics: dict[tuple[str, str], dict[str, object]] = {}
+    for chart in _BATTERY_HERO_DECK_CHART_IDS:
+        for engine in sorted(engines):
+            values = metric_values.get((chart, engine))
+            if values is None:
+                values = values_by_chart_engine.get((chart, engine), [])
+            metrics[(chart, engine)] = {
+                "rail": chart,
+                "engine": engine,
+                "n": len(values),
+                "rms_dex": None if not values else str(_rms(values)),
+                "median_abs_dex": (
+                    None if not values else str(_median_abs(values))
+                ),
+            }
+    benchmarks = {
+        (str(record["rail"]), str(record["primary_engine"])): record
+        for record in _paired_engine_rail_benchmarks(
+            (row for chart_rows in benchmark_rows.values() for row in chart_rows),
+            primary_engines=primary_engines,
+            comparison_engines=comparison_engines,
+            rails=_BATTERY_HERO_DECK_CHART_IDS,
+        )
+    } if primary_engines else {}
+    return {
+        "points": tuple(points),
+        "metrics": metrics,
+        "benchmarks": benchmarks,
+        "unavailable_axis_counts": dict(unavailable),
+    }
 
 
 def _battery_hero_sio2_mole_fraction(composition_raw: object) -> Decimal | None:
