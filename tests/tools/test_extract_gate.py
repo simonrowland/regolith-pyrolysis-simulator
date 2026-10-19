@@ -79,13 +79,16 @@ def _checks(report) -> set[str]:
     return {finding.check for finding in report.findings}
 
 
-def test_isolated_migration_reports_kinds_and_refusals(tmp_path: Path):
+def test_isolated_migration_reports_kinds_and_refusals(tmp_path: Path, monkeypatch):
     report = _run_gate(tmp_path, _document())
 
     assert report.migration_error is None
     assert report.migration_hard_issues == 0
     assert report.value_kinds
     assert "isolated-migration" not in _checks(report)
+    monkeypatch.setattr(gate, "_migrate_one", lambda *_args: ["forced refusal"])
+    report = _run_gate(tmp_path, _document())
+    assert next(item for item in report.findings if item.check == "isolated-migration").severity == "HARD"
 
 
 def test_locator_requires_zero_based_pdf_page_index(tmp_path: Path):
@@ -95,7 +98,18 @@ def test_locator_requires_zero_based_pdf_page_index(tmp_path: Path):
     report = _run_gate(tmp_path, doc)
 
     assert "locator" in _checks(report)
+    assert next(item for item in report.findings if item.check == "locator").severity == "HARD"
     assert any("pdf_page_index" in finding.detail for finding in report.findings)
+
+
+def test_datetime_extraction_date_does_not_raise(tmp_path: Path):
+    from datetime import datetime
+
+    doc = _document()
+    doc["extraction"]["date"] = datetime(2026, 10, 18)
+    doc["species"]["Fe"]["observations"][0]["locator"].pop("pdf_page_index")
+    report = _run_gate(tmp_path, doc)
+    assert "locator" in _checks(report)
 
 
 def test_missing_legacy_locator_index_is_soft(tmp_path: Path):
@@ -146,7 +160,7 @@ def test_locator_page_mismatch_is_soft_when_published_page_is_missing(tmp_path: 
 
     assert "locator" not in _checks(report)
     assert "locator-page-offset" in _checks(report)
-    assert any(item.severity == "SOFT" for item in report.findings)
+    assert next(item for item in report.findings if item.check == "locator-page-offset").severity == "SOFT"
 
     locator["published_page"] = 3711
     report = _run_gate(tmp_path, doc)
@@ -208,44 +222,23 @@ def test_explicit_inventory_basis_allows_descriptive_composition_label():
     assert gate._composition_basis_issues(doc) == []
 
 
-def test_supported_composition_bases_match_green_extract_census():
-    # Census of Composition maps and composition_mol basis fields in the 347
-    # extracts committed at 6edf21cb0, filtered to basis strings migrate.py
-    # preserves when reading Composition values.
-    assert gate._SUPPORTED_COMPOSITION_BASES == frozenset(
-        {
-            "Fe pure standard",
-            "Fe-Mo binary alloy",
-            "Fe-Mo_alloy",
-            "Fe-Sn_alloy",
-            "Pd pure standard",
-            "Saratov chondrule oxide composition as printed",
-            "derived_from_formula",
-            "elemental",
-            "formula-derived composition from printed mullite stoichiometry",
-            "formula-unit mole fraction calculated from printed mullite formula",
-            "measured 5aN-3 composition used as the starting composition",
-            "measured_as_printed",
-            "normalized_mole_fraction_from_published_Fo93Fa7",
-            "normalized_mole_fraction_from_published_xA_over_xC_and_xS",
-            "printed Saratov chondrule oxide composition",
-            "printed_formula_stoichiometry",
-            "printed_initial_mole_fractions",
-            "printed_metals",
-            "printed_mole_fraction",
-            "printed_oxides",
-            "printed_quasi_binary",
-            "printed_species",
-            "printed_x_Mo_axis",
-            "printed_x_e_Al2O3_mol_percent_axis",
-            "simple_oxide_mole_fraction",
-            "sossi_2020_measured_oxide_mole_fraction",
-            "stoichiometric MgAl2O4 on the MgO–Al2O3 oxide-component basis",
-            "stoichiometric_Ca3SiO5_oxide_mole_fractions",
-            "total iron on a single-cation oxide basis: x(FeO) + x(FeO1.5), mole fraction, as compiled",
+def test_fraction_sum_uses_numeric_siblings_and_rounding_band():
+    doc = {
+        "composition_mole_fraction": {
+            "basis": "printed_mole_fraction",
+            "SiO2": "60",
+            "Al2O3": "38.6",
+            "note": "oxides as printed",
         }
-    )
-    assert "printed_mole_percent" not in gate._SUPPORTED_COMPOSITION_BASES
+    }
+    issues = gate._composition_basis_issues(doc)
+    assert any("sum to 98.6" in issue for issue in issues)
+
+    doc["composition_mole_fraction"].update(SiO2="50", Al2O3="50")
+    assert any("sum to 100" in issue for issue in gate._composition_basis_issues(doc))
+
+    doc["composition_mole_fraction"].update(SiO2="0.6", Al2O3="0.4")
+    assert not any("percent-as-fraction" in issue for issue in gate._composition_basis_issues(doc))
 
 
 def test_transition_composition_flags_nonliquidus_but_allows_liquidus(
@@ -286,6 +279,11 @@ def test_transition_composition_flags_nonliquidus_but_allows_liquidus(
     report = _run_gate(tmp_path, doc)
 
     assert "transition-composition" in _checks(report)
+    assert next(item for item in report.findings if item.check == "transition-composition").severity == "HARD"
+
+    doc["experiments"][0]["sample"]["printed_composition"]["state"]["value"]["components"][0][1] = "0"
+    assert "transition-composition" not in _checks(_run_gate(tmp_path, doc))
+    doc["experiments"][0]["sample"]["printed_composition"]["state"]["value"]["components"][0][1] = "0.7"
 
     row["values"]["property_kind"] = "liquidus"
     report = _run_gate(tmp_path, doc)
@@ -293,7 +291,14 @@ def test_transition_composition_flags_nonliquidus_but_allows_liquidus(
     assert "transition-composition" not in _checks(report)
 
 
-def test_evidence_rejects_unattributed_quotes_and_scored_models(tmp_path: Path):
+def test_zero_components_in_shornikov_rows_do_not_make_transition_mixtures():
+    path = Path(__file__).resolve().parents[2] / "data/literature/extracts/shornikov-2000-aluminosilicate-vaporization.yaml"
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    issues = gate._transition_composition_issues(doc)
+    assert not any(f"shornikov_2000_table1_row_{row:02d}" in issue for issue in issues for row in range(1, 6))
+
+
+def test_evidence_classification_is_owned_by_migration_and_validation(tmp_path: Path):
     doc = _document()
     doc["species"]["Fe"]["observations"][0]["values"].update(
         {
@@ -303,13 +308,14 @@ def test_evidence_rejects_unattributed_quotes_and_scored_models(tmp_path: Path):
     )
     report = _run_gate(tmp_path, doc)
 
-    assert "evidence" in _checks(report)
-    assert "attribution" in next(
-        item.detail for item in report.findings if item.check == "evidence"
+    assert "evidence" not in _checks(report)
+    assert report.migration_hard_issues > 0
+
+    evidence, queue_reason = gate.migrate.evidence_for(
+        "model_derived", model="FactSage 8.2"
     )
-    assert "model_derived" in next(
-        item.detail for item in report.findings if item.check == "evidence"
-    )
+    assert evidence.class_.value.value == "model_derived"
+    assert queue_reason is None
 
 
 def test_zero_uncertainty_and_zero_band_width_are_hard(tmp_path: Path):
@@ -322,6 +328,33 @@ def test_zero_uncertainty_and_zero_band_width_are_hard(tmp_path: Path):
     report = _run_gate(tmp_path, doc)
 
     assert "zero-uncertainty" in _checks(report)
+    assert next(item for item in report.findings if item.check == "zero-uncertainty").severity == "HARD"
+
+
+def test_asymmetric_uncertainty_zero_arm_is_not_zero_uncertainty(tmp_path: Path):
+    doc = _document()
+    doc["species"]["Fe"]["observations"][0]["values"]["uncertainty"] = {
+        "delta_Hstar_sigma_plus_kJ_mol": 357,
+        "delta_Hstar_sigma_minus_kJ_mol": 0,
+        "delta_Sstar_sigma_plus_J_mol_K": 230,
+        "delta_Sstar_sigma_minus_J_mol_K": 0,
+    }
+    assert "zero-uncertainty" not in _checks(_run_gate(tmp_path, doc))
+    doc["species"]["Fe"]["observations"][0]["values"]["uncertainty"] = {
+        "sigma_plus": 0,
+        "sigma_minus": 0,
+    }
+    report = _run_gate(tmp_path, doc)
+    assert "zero-uncertainty" in _checks(report)
+    assert next(item for item in report.findings if item.check == "zero-uncertainty").severity == "HARD"
+
+
+def test_heck_asymmetric_uncertainty_rows_keep_zero_lower_arm():
+    path = Path(__file__).resolve().parents[2] / "data/literature/extracts/kems-140-heck-2025.yaml"
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    issues = gate._uncertainty_issues(doc)
+    assert not any("sigma_minus" in issue and "delta_Hstar" in issue for issue in issues)
+    assert not any("sigma_minus" in issue and "delta_Sstar" in issue for issue in issues)
 
 
 def test_table_coverage_compares_mineru_cells_to_extract_values(tmp_path: Path):
@@ -449,6 +482,22 @@ def test_cli_audits_one_extract_by_source_id(tmp_path: Path, monkeypatch, capsys
     output = capsys.readouterr().out
     assert status == 0
     assert "MIGRATION observations by ValueKind:" in output
+
+    doc = _document()
+    doc["extraction"]["date"] = "2026-10-18"
+    doc["species"]["Fe"]["observations"][0]["locator"].pop("pdf_page_index")
+    path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
+    status = extract_gate.main(["--ids", "fixture-source", "--corpus", str(tmp_path)])
+    assert status == 1
+
+
+def test_cli_requires_corpus_or_environment_and_explains_option(capsys):
+    import pytest
+
+    with pytest.raises(SystemExit) as error:
+        extract_gate.main([])
+    assert error.value.code == 2
+    assert "--corpus or REGOLITH_CORPUS is required" in capsys.readouterr().err
 
 
 def test_cli_audits_changed_extracts(tmp_path: Path, monkeypatch, capsys):

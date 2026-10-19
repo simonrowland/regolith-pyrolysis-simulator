@@ -9,7 +9,7 @@ import unicodedata
 import yaml
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 from html.parser import HTMLParser
 from pathlib import Path
@@ -189,6 +189,8 @@ def _legacy_missing_locator_index(doc: object) -> bool:
     if not isinstance(extraction, Mapping):
         return False
     extracted_on = extraction.get("date")
+    if isinstance(extracted_on, datetime):
+        return extracted_on.date() < _LEGACY_LOCATOR_INDEX_CUTOFF
     if isinstance(extracted_on, date):
         return extracted_on < _LEGACY_LOCATOR_INDEX_CUTOFF
     if isinstance(extracted_on, str):
@@ -290,16 +292,21 @@ def _formula_count(names: object) -> int:
     if isinstance(names, Mapping):
         if "components" in names:
             return _formula_count(names["components"])
-        candidates = names.keys()
+        candidates = names.items()
     elif isinstance(names, (list, tuple)):
         candidates = [
-            item[0]
+            (item[0], item[1])
             for item in names
             if isinstance(item, (list, tuple)) and len(item) == 2
         ]
     else:
         return 0
-    return sum(1 for name in candidates if parse_species_formula(str(name)) is not None)
+    return sum(
+        1
+        for name, amount in candidates
+        if parse_species_formula(str(name)) is not None
+        and (_as_decimal(amount) is None or _as_decimal(amount) > 0)
+    )
 
 
 def _composition_basis_issues(doc: object) -> list[str]:
@@ -321,11 +328,12 @@ def _composition_basis_issues(doc: object) -> list[str]:
 
     def check_amounts(amounts: list[tuple[str, object]], path: str) -> None:
         numeric = [_as_decimal(value) for _, value in amounts]
-        if not numeric or any(value is None for value in numeric):
+        numeric_values = [value for value in numeric if value is not None]
+        if not numeric_values:
             return
-        total = sum((value for value in numeric if value is not None), Decimal(0))
+        total = sum(numeric_values, Decimal(0))
         if (
-            abs(total - Decimal(100)) <= Decimal(1)
+            abs(total - Decimal(100)) <= Decimal(2)
             and abs(total - Decimal(1)) > Decimal("0.01")
         ):
             key = (path, str(total))
@@ -469,41 +477,6 @@ def _transition_composition_issues(doc: object) -> list[str]:
     return issues
 
 
-def _evidence_issues(doc: object) -> list[str]:
-    issues: list[str] = []
-    if not isinstance(doc, Mapping):
-        return issues
-    species_blocks = doc.get("species")
-    if not isinstance(species_blocks, Mapping):
-        return issues
-    for species, block in species_blocks.items():
-        if not isinstance(block, Mapping):
-            continue
-        observations = block.get("observations")
-        if not isinstance(observations, list):
-            continue
-        for observation in observations:
-            if not isinstance(observation, Mapping):
-                continue
-            oid = str(observation.get("observation_id") or "?")
-            for row, path in _mappings(observation.get("values")):
-                classes = {
-                    str(row.get("method_class") or "").lower(),
-                    str(row.get("evidence_class") or "").lower(),
-                }
-                if "quoted_attributed" in classes and not row.get("attribution"):
-                    issues.append(
-                        f"species.{species}.{oid}.{path}: quoted_attributed "
-                        "value has no attribution"
-                    )
-                if "model_derived" in classes:
-                    issues.append(
-                        f"species.{species}.{oid}.{path}: model_derived value "
-                        "belongs in context[]"
-                    )
-    return issues
-
-
 def _uncertainty_zero_paths(node: object, path: str) -> list[str]:
     issues: list[str] = []
 
@@ -515,6 +488,20 @@ def _uncertainty_zero_paths(node: object, path: str) -> list[str]:
 
     def visit(value: object, current: str, band_context: bool = False) -> None:
         if isinstance(value, Mapping):
+            sigma_arms: dict[tuple[str, str], dict[str, tuple[str, Decimal | None]]] = defaultdict(dict)
+            for key, child in value.items():
+                match = re.fullmatch(r"(.*)sigma_(plus|minus)(.*)", str(key).lower())
+                if match:
+                    group = (match.group(1), match.group(3))
+                    sigma_arms[group][match.group(2)] = (str(key), _as_decimal(child))
+            paired_sigma_keys: set[str] = set()
+            for arms in sigma_arms.values():
+                if "plus" not in arms or "minus" not in arms:
+                    continue
+                paired_sigma_keys.update((arms["plus"][0], arms["minus"][0]))
+                plus, minus = arms["plus"][1], arms["minus"][1]
+                if plus is not None and minus is not None and plus == minus == 0:
+                    issues.append(current)
             endpoints: dict[str, Decimal | None] = {}
             for key in ("low", "lower", "min", "high", "upper", "max"):
                 if key in value:
@@ -532,6 +519,8 @@ def _uncertainty_zero_paths(node: object, path: str) -> list[str]:
             for key, child in value.items():
                 key_text = str(key).lower()
                 child_path = f"{current}.{key}"
+                if str(key) in paired_sigma_keys:
+                    continue
                 if key_text in {"low", "lower", "min", "high", "upper", "max"}:
                     continue
                 if "band_width" in key_text or (
@@ -1038,7 +1027,6 @@ def evaluate_extract(
     _add(report, "locator-legacy", "SOFT", locator_legacy_soft)
     _add(report, "composition", "HARD", _composition_basis_issues(doc))
     _add(report, "transition-composition", "HARD", _transition_composition_issues(doc))
-    _add(report, "evidence", "HARD", _evidence_issues(doc))
     _add(report, "zero-uncertainty", "HARD", _uncertainty_issues(doc))
 
     report.tables = _capture_report(doc, corpus)

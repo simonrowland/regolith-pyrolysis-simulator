@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 from collections.abc import Mapping
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -87,10 +88,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--corpus",
         type=Path,
-        default=Path.home() / "Repos" / "regolith-corpus",
-        help="corpus root containing raw/<source_id>/ocr-mineru (default: %(default)s)",
+        default=Path(os.environ["REGOLITH_CORPUS"])
+        if os.environ.get("REGOLITH_CORPUS")
+        else None,
+        help="corpus root containing raw/<source_id>/ocr-mineru (or set REGOLITH_CORPUS)",
     )
     args = parser.parse_args(argv)
+    if args.corpus is None:
+        parser.error("--corpus or REGOLITH_CORPUS is required")
 
     if args.extract and (args.ids or args.changed_since):
         parser.error("provide either an extract or one audit mode, not both")
