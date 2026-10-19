@@ -92,8 +92,9 @@ experiments:
           Fe2O3: 12.20
           P2O5: 0.61
       locator:
-        page: 39
-        pdf_page_index: 54
+        page: 54
+        published_page: 39
+        pdf_page_index: 53
         table: '4.1'
         note: 'EAC-1 column; oxide wt% as printed; label EAC-1 (caption: EAC-1A numbers from [25]; column header EAC-1); experimental charge is EAC-1A; Total row 100.00 omitted; 0.00 cells retained as printed'
     initial_composition:
@@ -115,7 +116,7 @@ experiments:
           - [K2O, '0.009122504868']
           - [Fe2O3, '0.049734878127']
           - [P2O5, '0.002797615986']
-      locator: {page: 39, pdf_page_index: 54, table: '4.1', note: 'EAC-1 column as printed; normalized mole fractions derived from the complete oxide wt% map; printed zero components retained'}
+      locator: {page: 54, published_page: 39, pdf_page_index: 53, table: '4.1', note: 'EAC-1 column as printed; normalized mole fractions derived from the complete oxide wt% map; printed zero components retained'}
       method_class: calculated
       inference:
         relation: wt_pct_to_mole_fraction

@@ -82,7 +82,9 @@ def test_quoted_fits_experiment_carries_transpiration_from_printed_p22(hastie) -
     assert experiment.method.is_value
     assert experiment.method.value is MethodToken.TRANSPIRATION
     assert experiment.locator is not None
-    assert experiment.locator.page == 22
+    assert experiment.locator.page == 28
+    assert experiment.locator.published_page == 22
+    assert experiment.locator.pdf_page_index == 27
     assert experiment.locator.pdf_page_index == 27
     assert "TMS technique" in (experiment.locator.paragraph or "")
 
