@@ -554,6 +554,88 @@ def test_scorer_refuses_a_multivalent_gap_before_the_engine_default(monkeypatch)
     assert prediction.refusal_detail["reason"] != "engine_default"
 
 
+def test_redox_free_activity_is_scored_without_an_oxygen_input(monkeypatch):
+    seen = {}
+
+    def _open(name):
+        return type("Handle", (), {
+            "name": name,
+            "available": True,
+            "unavailable_reason": None,
+            "supports_intrinsic_fO2": False,
+        })()
+
+    def _cell(_handle, _pot, *, po2, **_kwargs):
+        seen['mode'] = po2.mode
+        seen['po2_bar'] = po2.po2_bar
+        return type("Cell", (), {
+            "status": "ok",
+            "refusal_reason": None,
+            "melt_activities": {"SiO2": 0.4},
+            "melt_activity_coefficients": {},
+            "gas_partial_pressures_Pa": {},
+            "hostname": "test",
+            "exit_code": 0,
+            "exit_signal": None,
+            "notices": [],
+            "authority": None,
+            "certified_band": None,
+        })()
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import predict_with_engine
+
+    experiment, _bench, observation = _case(
+        composition=_composition(
+            ("SiO2", "0.5"), ("CaO", "0.3"), ("Al2O3", "0.2"),
+        ),
+        formula="SiO2",
+    )
+    prediction = predict_with_engine(
+        Engine.ALPHAMELTS, observation, experiment=experiment, isolated=False,
+    )
+
+    assert seen == {'mode': 'not_an_input', 'po2_bar': None}
+    assert prediction.value == Decimal('0.4')
+
+
+def test_redox_active_no_input_refuses_as_typed_scorer_input_error():
+    from simulator.battery.enums import Engine, RefusalReason
+    from simulator.battery.score import _oxygen_input_request
+
+    experiment, _bench, observation = _case(
+        composition=_composition(("FeO", "0.2"), ("SiO2", "0.8")),
+        formula="SiO2",
+    )
+    identity = observation.identity
+    assert identity is not None
+    composition = identity.composition
+    assert composition is not None and composition.is_value
+
+    decision = _oxygen_input_request(
+        engine=Engine.ALPHAMELTS,
+        channel="melt_activity",
+        sources=(),
+        identity=identity,
+        requested=identity.composition,
+        quantity=Quantity.ACTIVITY,
+        composition_value=composition.value,
+        input_notices=[],
+    )
+
+    assert decision.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert decision.refusal_detail['reason'] == 'missing_fO2'
+    assert decision.refusal_detail['multivalent'] == ['FeO']
+
+
 def test_scorer_compares_activity_and_coefficient_to_different_maps(monkeypatch):
     seen = {}
 

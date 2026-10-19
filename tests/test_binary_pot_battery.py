@@ -22,6 +22,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     QUALIFICATION_SIO2_SWEEP_WT_PCT,
     QUANTITY_ACTIVITY,
     QUANTITY_PRESSURE,
+    PO2_NOT_AN_INPUT,
     REFUSAL_COMPOSITION_PROJECTED,
     REFUSAL_ENGINE_CRASH,
     REFUSAL_GATE_REFUSED_IN_ADAPTER,
@@ -614,14 +615,16 @@ def test_alphamelts_cell_passes_isothermal_subprocess_run_mode() -> None:
         why="fixture",
         composition_wt_pct={"SiO2": 50.0, "Al2O3": 50.0},
     )
-    po2 = Po2Request(mode="engine_default", po2_bar=None)
+    po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
     captured: dict[str, object] = {}
 
     class _SubprocessBackend:
         _mode = "subprocess"
 
-        def equilibrate(self, **kwargs):
+        def equilibrate(self, fO2_log=None, redox_mode=None, **kwargs):
             captured.update(kwargs)
+            captured["fO2_log"] = fO2_log
+            captured["redox_mode"] = redox_mode
             return SimpleNamespace(
                 status="ok",
                 diagnostics={},
@@ -643,6 +646,8 @@ def test_alphamelts_cell_passes_isothermal_subprocess_run_mode() -> None:
     cell = equilibrate_cell(handle, pot, temperature_K=1500.0, po2=po2)
     assert cell.status == "ok"
     assert captured["subprocess_run_mode"] == "isothermal"
+    assert captured["fO2_log"] is None
+    assert captured["redox_mode"] == PO2_NOT_AN_INPUT
     assert captured["pressure_bar"] == 1.0
     assert cell.melt_activities == {"SiO2": 0.5}
     assert cell.gas_partial_pressures_Pa == {"Na": 1.0}

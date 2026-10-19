@@ -3466,6 +3466,118 @@ def test_alphamelts_subprocess_serializes_configured_qfm_buffer(tmp_path):
     assert 'Log fO2 Delta:' not in text
 
 
+def test_alphamelts_not_an_input_omits_subprocess_fo2_constraint(
+    monkeypatch,
+    tmp_path,
+):
+    backend = AlphaMELTSBackend()
+    backend._mode = 'subprocess'
+    captured = {}
+
+    def transport(
+        temperature_C,
+        comp_wt,
+        fO2_log,
+        pressure_bar,
+        warnings=None,
+        **kwargs,
+    ):
+        captured.update(
+            temperature_C=temperature_C,
+            composition=comp_wt,
+            fO2_log=fO2_log,
+            pressure_bar=pressure_bar,
+            warnings=warnings,
+            **kwargs,
+        )
+        return EquilibriumResult(
+            status='ok',
+            activity_coefficients={'SiO2': 0.4},
+            liquid_fraction=1.0,
+        )
+
+    monkeypatch.setattr(backend, '_equilibrate_subprocess', transport)
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg={'SiO2': 0.5, 'CaO': 0.25, 'Al2O3': 0.25},
+        fO2_log=None,
+        pressure_bar=1.0,
+        redox_mode='not_an_input',
+        subprocess_run_mode='isothermal',
+    )
+
+    assert result.status == 'ok'
+    assert result.activity_coefficients == {'SiO2': 0.4}
+    assert captured['fO2_log'] is None
+    assert captured['run_mode'] is AlphaMELTSSubprocessRunMode.ISOTHERMAL
+
+    constraint = backend._subprocess_fo2_constraint(
+        None,
+        redox_mode='not_an_input',
+    )
+    path = tmp_path / 'input.melts'
+    backend._write_melts_file(
+        path,
+        {'SiO2': 50.0, 'CaO': 30.0, 'Al2O3': 20.0},
+        1400.0,
+        1.0,
+        fO2_path=constraint[0],
+        fO2_offset=constraint[1],
+    )
+    text = path.read_text()
+    assert 'Log fO2 Path:' not in text
+    assert 'Log fO2 Offset:' not in text
+
+
+def test_alphamelts_python_api_not_an_input_omits_configured_buffer(monkeypatch):
+    backend = AlphaMELTSBackend()
+    _select_python_api_for_test(backend)
+    backend._redox_buffer = 'QFM'
+    backend._fo2_offset = -1.5
+    captured = {}
+
+    monkeypatch.setattr(backend, '_require_petthermotools_runtime', lambda: object())
+    monkeypatch.setattr(backend, '_to_petthermotools_liq_comp', lambda comp: comp)
+    monkeypatch.setattr(backend, '_melts_model_code', lambda: 1)
+
+    def run(operation, *, kwargs):
+        captured['operation'] = operation
+        captured.update(kwargs)
+        return object()
+
+    monkeypatch.setattr(backend, '_run_petthermotools_isolated', run)
+    monkeypatch.setattr(
+        backend,
+        '_parse_petthermotools_result',
+        lambda *_args, **_kwargs: EquilibriumResult(status='out_of_domain'),
+    )
+
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg={'SiO2': 0.5, 'CaO': 0.25, 'Al2O3': 0.25},
+        fO2_log=None,
+        pressure_bar=1.0,
+        redox_mode='not_an_input',
+    )
+
+    assert result.status == 'out_of_domain'
+    assert captured['operation'] == 'equilibrate_MELTS'
+    assert captured['fO2_buffer'] is None
+    assert captured['fO2_offset'] is None
+
+
+def test_alphamelts_intrinsic_none_still_refuses_without_redox_mode():
+    backend = AlphaMELTSBackend()
+
+    with pytest.raises(ValueError, match='intrinsic closed-system fO2'):
+        backend.equilibrate(
+            temperature_C=1400.0,
+            composition_kg={'SiO2': 0.7, 'Al2O3': 0.3},
+            fO2_log=None,
+            pressure_bar=1.0,
+        )
+
+
 def test_alphamelts_python_api_clamped_pressure_reports_solved_condition(
     monkeypatch,
 ):
