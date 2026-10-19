@@ -31,6 +31,7 @@ from scripts.battery_hero_plot import (
     element_view_series,
     history_record_from_archive,
     load_element_abundance,
+    main,
     read_scores,
     render_hero_charts,
     render_plots,
@@ -572,6 +573,7 @@ def test_species_view_labels_major_curves_and_element_view_labels_elements(
 
 def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
     tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     residuals = tmp_path / "residuals.jsonl"
     rows: list[dict[str, object]] = [
@@ -688,6 +690,124 @@ def test_d139_rows_are_excluded_from_panels_and_reported_in_footer(
         "vapour scatter excludes uncalibrated kems p_partial rows under d-139: "
         "openimcc 1, thermoengine 1; scorer all-numeric and same-row rms include them."
     ) in hero_caption
+
+    redox_residuals = tmp_path / "redox-residuals.jsonl"
+    unselected_melt_activity = _record(
+        engine="openimcc",
+        experiment="melt-activity-unselected",
+        formula="SiO2",
+        temperature_K=1200,
+        residual=0.5,
+        rail="melt_activity",
+    )
+    unselected_melt_activity["candidate_observation"]["identity"]["composition"] = {
+        "tag": "value",
+        "value": {
+            "amount_basis": "mole_fraction",
+            "components": [["SiO2", "0.25"], ["FeO", "0.75"]],
+        },
+    }
+    redox_rows = [
+        {"kind": "battery_store_stamp", "revision": "test-store"},
+        _record(
+            engine="openimcc",
+            experiment="redox-1",
+            formula="FeO",
+            temperature_K=1100,
+            residual=0.25,
+            rail="redox",
+        ),
+        uncalibrated,
+        unselected_melt_activity,
+    ]
+    redox_residuals.write_text(
+        "".join(json.dumps(row) + "\n" for row in redox_rows), encoding="utf-8"
+    )
+    redox_data = read_scores(redox_residuals, rails=("redox",))
+    default_redox_data = read_scores(redox_residuals)
+    default_openimcc = default_redox_data.summaries["openimcc"]
+    redox_openimcc = redox_data.summaries["openimcc"]
+    assert default_openimcc.excluded_d139_rows == redox_openimcc.excluded_d139_rows == 1
+    assert (
+        default_openimcc.excluded_d139_by_rail
+        == redox_openimcc.excluded_d139_by_rail
+    )
+    unselected_melt_points = [
+        point
+        for (rail, formula, engine, _composition), points in (
+            redox_data.hero_series.items()
+        )
+        if (rail, formula, engine) == ("melt_activity", "SiO2", "openimcc")
+        for point in points
+    ]
+    assert len(unselected_melt_points) == 1
+    assert unselected_melt_points[0].residual_dex == pytest.approx(0.5)
+    melt_cells = redox_data.hero_sweet_spot_cells[("melt_activity", "openimcc")]
+    assert sum(int(cell["n"]) for cell in melt_cells) == 1
+    assert melt_cells == default_redox_data.hero_sweet_spot_cells[
+        ("melt_activity", "openimcc")
+    ]
+
+    default_hero_files = render_hero_charts(
+        default_redox_data, tmp_path / "default-rail-hero-images"
+    )
+    redox_hero_files = render_hero_charts(
+        redox_data, tmp_path / "redox-rail-hero-images"
+    )
+    caption_marker = (
+        "vapour scatter excludes uncalibrated kems p_partial rows under d-139: "
+    )
+    expected_caption_tail = (
+        "openimcc 1; scorer all-numeric and same-row rms include them"
+    )
+    default_caption_tail = (
+        default_hero_files["hero:vapour:svg"]
+        .read_text(encoding="utf-8")
+        .casefold()
+        .split(caption_marker, 1)[1]
+        .split(".", 1)[0]
+    )
+    redox_caption_tail = (
+        redox_hero_files["hero:vapour:svg"]
+        .read_text(encoding="utf-8")
+        .casefold()
+        .split(caption_marker, 1)[1]
+        .split(".", 1)[0]
+    )
+    assert default_caption_tail == redox_caption_tail == expected_caption_tail
+
+    assert main(
+        [
+            "--input",
+            str(redox_residuals),
+            "--output-dir",
+            str(tmp_path / "redox-images"),
+            "--history-path",
+            str(tmp_path / "history.jsonl"),
+            "--rail",
+            "redox",
+            "--group-by",
+            "species",
+            "--simulator-commit",
+            "sim-test",
+            "--openimcc-commit",
+            "openimcc-test",
+            "--render-date",
+            "2026-10-15",
+        ]
+    ) == 0
+    summary = json.loads(capsys.readouterr().out)
+    redox_svgs = [
+        Path(path)
+        for name, path in summary["files"].items()
+        if name.endswith(":tile_svg")
+    ]
+    assert redox_svgs
+    assert all(
+        "excluded under d-139: openimcc 1 uncalibrated KEMS p_partial"
+        in path.read_text(encoding="utf-8")
+        for path in redox_svgs
+    )
 
 
 def test_lunar_feedstock_abundance_drives_plot_styling() -> None:
