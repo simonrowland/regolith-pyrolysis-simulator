@@ -1609,6 +1609,18 @@ def test_hastie_initial_charges_bind_to_figure_points_as_proxies(
         and notice.authority is not None
         for notice in moved_prediction.notices
     )
+    from simulator.battery.generators.bench import activity_request_for_engine
+
+    moved_request = activity_request_for_engine(
+        moved_experiment, moved_observation, "openimcc"
+    )
+    assert moved_request is not None
+    assert moved_request.payload is not None
+    assert moved_request.payload["fO2_borrowed"] is True
+    assert any(
+        flag["waypoint"] == "fo2_ladder" and flag["authority"] == "assumed"
+        for flag in moved_request.readiness.flags
+    )
 
     na_kms = next(
         row

@@ -679,6 +679,7 @@ def melt_activity_requests(
                     payload["fO2_bar"] = shared.po2_bar
                 routes["fO2_log"] = {
                     "waypoint": "fo2_ladder",
+                    "authority": "assumed" if shared.borrowed else "derived",
                     "tier": shared.tier,
                     "route": shared.route,
                     "borrowed": shared.borrowed,
