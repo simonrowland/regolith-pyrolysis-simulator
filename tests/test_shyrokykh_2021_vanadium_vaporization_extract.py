@@ -158,6 +158,7 @@ def test_text_bounds_keep_sample_and_conditions_but_expose_migration_gap() -> No
             "bound_operator": ">",
             "bound_value": expected_bounds[sample],
         }
+        assert "t-1367" in values["unavailable_reason"]
         composition = values["initial_composition_as_printed"]
         assert (
             sample,
