@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import math
+from collections.abc import Mapping
 from pathlib import Path
 
 import pytest
@@ -43,6 +44,17 @@ CONFIGLESS_FALLBACK_NOT_CANONICAL = {
 _SMOKE_FREEZE_GATE_CURVE_RECORDS = []
 
 
+def _freeze_gate_liquidus_provider_live(record):
+    if not isinstance(record, Mapping):
+        return False
+    curve = record.get("curve")
+    return (
+        record.get("provider_outcome") == GateCurveProviderOutcome.PRODUCED
+        and isinstance(curve, Mapping)
+        and str(curve.get("source", "")).startswith("gate_liquid_fraction")
+    )
+
+
 @pytest.fixture(scope="module", autouse=True)
 def _allow_prototype_crmn_alpha_fallback():
     original_load_data = validation_map._load_data
@@ -64,31 +76,41 @@ def _allow_prototype_crmn_alpha_fallback():
 def smoke_payload():
     records = []
     simulator_type = validation_map.PyrolysisSimulator
-    original_curve_record = simulator_type._freeze_gate_curve_record
+    original_gate_record = simulator_type._melt_redox_liquidus_gate_record
 
-    def capture_curve_record(self, *args, **kwargs):
-        record = original_curve_record(self, *args, **kwargs)
+    def capture_gate_record(self, *args, **kwargs):
+        record = original_gate_record(self, *args, **kwargs)
         records.append(record)
         return record
 
-    simulator_type._freeze_gate_curve_record = capture_curve_record
+    simulator_type._melt_redox_liquidus_gate_record = capture_gate_record
     try:
         return validation_map.run_validation_map(smoke=True)
     finally:
-        simulator_type._freeze_gate_curve_record = original_curve_record
+        simulator_type._melt_redox_liquidus_gate_record = original_gate_record
         _SMOKE_FREEZE_GATE_CURVE_RECORDS[:] = records
+
+
+def test_freeze_gate_liquidus_provider_selector_uses_returned_curve_record():
+    configured_record = {
+        "provider_outcome": GateCurveProviderOutcome.PRODUCED,
+        "curve": {"source": "gate_liquid_fraction"},
+    }
+    configless_record = {
+        "provider_outcome": GateCurveProviderOutcome.PRODUCED,
+        "curve": {"source": "liquidus_solidus:backend"},
+    }
+
+    assert _freeze_gate_liquidus_provider_live(configured_record) is True
+    assert _freeze_gate_liquidus_provider_live(configless_record) is False
 
 
 @pytest.fixture(scope="module")
 def freeze_gate_liquidus_provider_live(smoke_payload):
-    # Observe the production curve record. A kernel liquidus fallback can also
-    # produce a curve, so require the freeze-gate dispatch source itself.
+    # Observe the resolved curve records consumed by the redox path; they also
+    # cover curves returned through either cache.
     return any(
-        record.get("provider_outcome") is GateCurveProviderOutcome.PRODUCED
-        and isinstance(record.get("curve"), dict)
-        and str(record["curve"].get("source", "")).startswith(
-            "gate_liquid_fraction"
-        )
+        _freeze_gate_liquidus_provider_live(record)
         for record in _SMOKE_FREEZE_GATE_CURVE_RECORDS
     )
 
