@@ -3,6 +3,7 @@ import math
 import multiprocessing
 import multiprocessing.process
 import os
+import queue
 import signal
 import subprocess
 import sys
@@ -52,6 +53,35 @@ def _handle_test_request(resource, request, _errlog):
         'fO2_log': request['fO2_log'],
         'composition': resource['scratch'],
     }, sort_keys=True, separators=(',', ':')).encode()
+
+
+def _bootstrap_recording_worker(results, started=None, release=None):
+    return {
+        'results': results,
+        'started': started,
+        'release': release,
+    }, 'recording-worker-ready'
+
+
+def _handle_recording_request(resource, request, _errlog):
+    if request.get('block'):
+        resource['started'].set()
+        if not resource['release'].wait(timeout=10.0):
+            raise TimeoutError('test request release was not signalled')
+    request_id = request['request_id']
+    resource['results'].put(request_id)
+    return request_id
+
+
+def _recording_worker(results, *, started=None, release=None):
+    return WarmEngineWorker(
+        name='recording worker',
+        bootstrap=_bootstrap_recording_worker,
+        bootstrap_args=(results, started, release),
+        handler=_handle_recording_request,
+        startup_timeout_s=_RENDEZVOUS_TIMEOUT_S,
+        call_timeout_s=30.0,
+    )
 
 
 def _test_worker(*, timeout_s=1.0):
@@ -245,6 +275,202 @@ def test_remote_error_discards_tainted_slot_before_next_call():
     assert worker.call(_points()[1], timeout_s=1.0)
     assert worker.start_count == 2
     worker.close()
+
+
+@pytest.mark.timeout(20)
+def test_abort_before_pool_call_entry_prevents_expired_request_start(
+    monkeypatch,
+):
+    context = multiprocessing.get_context('spawn')
+    results = context.Queue()
+    pool = EngineWorkerPool(
+        lambda _index: _recording_worker(results),
+        size=1,
+    )
+    worker = pool.workers[0]
+    original_pid = worker.process.pid
+    entered = threading.Event()
+    release_call = threading.Event()
+    original_call = worker.call
+
+    def call_after_gate(request, *, timeout_s=None):
+        entered.set()
+        assert release_call.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
+        return original_call(request, timeout_s=timeout_s)
+
+    monkeypatch.setattr(worker, 'call', call_after_gate)
+    try:
+        expired = pool.submit({'request_id': 'expired'}, timeout_s=30.0)
+        assert entered.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
+        assert expired.cancel() is False
+        pool._abort_request(expired)
+        release_call.set()
+
+        with pytest.raises(EngineWorkerTimeout):
+            expired.result(timeout=_RENDEZVOUS_TIMEOUT_S)
+        assert worker.process is None
+        with pytest.raises(ProcessLookupError):
+            os.kill(original_pid, 0)
+        with pytest.raises(queue.Empty):
+            results.get(timeout=0.1)
+
+        next_future = pool.submit({'request_id': 'next'}, timeout_s=30.0)
+        assert next_future.result(timeout=_RENDEZVOUS_TIMEOUT_S) == 'next'
+        assert results.get(timeout=_RENDEZVOUS_TIMEOUT_S) == 'next'
+    finally:
+        release_call.set()
+        pool.close(cancel_pending=True)
+        results.close()
+        results.join_thread()
+
+
+@pytest.mark.timeout(20)
+def test_abort_during_cold_restart_before_publication_prevents_request(
+    monkeypatch,
+):
+    context = multiprocessing.get_context('spawn')
+    results = context.Queue()
+    pool = EngineWorkerPool(
+        lambda _index: _recording_worker(results),
+        size=1,
+    )
+    worker = pool.workers[0]
+    original_pid = worker.process.pid
+    worker.close()
+    entered = threading.Event()
+    release_close = threading.Event()
+    original_close = worker.close
+    gate_once = [True]
+
+    def close_after_gate():
+        original_close()
+        if gate_once[0]:
+            gate_once[0] = False
+            entered.set()
+            assert release_close.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
+
+    monkeypatch.setattr(worker, 'close', close_after_gate)
+    try:
+        expired = pool.submit({'request_id': 'expired'}, timeout_s=30.0)
+        assert entered.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
+        assert expired.cancel() is False
+        pool._abort_request(expired)
+        release_close.set()
+
+        with pytest.raises(EngineWorkerTimeout):
+            expired.result(timeout=_RENDEZVOUS_TIMEOUT_S)
+        assert worker.start_count == 1
+        assert worker.process is None
+        with pytest.raises(ProcessLookupError):
+            os.kill(original_pid, 0)
+        with pytest.raises(queue.Empty):
+            results.get(timeout=0.1)
+
+        next_future = pool.submit({'request_id': 'next'}, timeout_s=30.0)
+        assert next_future.result(timeout=_RENDEZVOUS_TIMEOUT_S) == 'next'
+        assert results.get(timeout=_RENDEZVOUS_TIMEOUT_S) == 'next'
+    finally:
+        release_close.set()
+        pool.close(cancel_pending=True)
+        results.close()
+        results.join_thread()
+
+
+@pytest.mark.timeout(20)
+def test_completed_request_abort_does_not_kill_next_assigned_request():
+    context = multiprocessing.get_context('spawn')
+    results = context.Queue()
+    handler_started = context.Event()
+    release_handler = context.Event()
+    pool = EngineWorkerPool(
+        lambda _index: _recording_worker(
+            results,
+            started=handler_started,
+            release=release_handler,
+        ),
+        size=1,
+    )
+    worker = pool.workers[0]
+    abort_entered = threading.Event()
+    release_abort = threading.Event()
+    original_abort = worker._abort_current_call
+    try:
+        first = pool.submit(
+            {'request_id': 'first', 'block': True},
+            timeout_s=30.0,
+        )
+        assert handler_started.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
+        call_finished = pool._active_requests[first][1]
+
+        def abort_after_gate(abort_event=None):
+            if abort_event is not None:
+                abort_event.set()
+            abort_entered.set()
+            assert release_abort.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
+            return original_abort(abort_event)
+
+        worker._abort_current_call = abort_after_gate
+        aborter = threading.Thread(
+            target=lambda: pool._abort_request(first),
+            daemon=True,
+        )
+        aborter.start()
+        assert abort_entered.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
+
+        release_handler.set()
+        assert results.get(timeout=_RENDEZVOUS_TIMEOUT_S) == 'first'
+        assert call_finished.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
+        second = pool.submit({'request_id': 'second'}, timeout_s=30.0)
+        assert not second.done()
+
+        release_abort.set()
+        aborter.join(timeout=_RENDEZVOUS_TIMEOUT_S)
+        assert not aborter.is_alive()
+        assert first.result(timeout=_RENDEZVOUS_TIMEOUT_S) == 'first'
+        assert second.result(timeout=_RENDEZVOUS_TIMEOUT_S) == 'second'
+        assert results.get(timeout=_RENDEZVOUS_TIMEOUT_S) == 'second'
+    finally:
+        release_handler.set()
+        release_abort.set()
+        pool.close(cancel_pending=True)
+        results.close()
+        results.join_thread()
+
+
+@pytest.mark.timeout(20)
+def test_cancelled_pending_future_is_never_executed():
+    context = multiprocessing.get_context('spawn')
+    results = context.Queue()
+    handler_started = context.Event()
+    release_handler = context.Event()
+    pool = EngineWorkerPool(
+        lambda _index: _recording_worker(
+            results,
+            started=handler_started,
+            release=release_handler,
+        ),
+        size=1,
+    )
+    try:
+        first = pool.submit(
+            {'request_id': 'first', 'block': True},
+            timeout_s=30.0,
+        )
+        assert handler_started.wait(timeout=_RENDEZVOUS_TIMEOUT_S)
+        pending = pool.submit({'request_id': 'cancelled'}, timeout_s=30.0)
+        assert pending.cancel() is True
+        release_handler.set()
+        assert first.result(timeout=_RENDEZVOUS_TIMEOUT_S) == 'first'
+        pool._queue.join()
+        assert pending.cancelled()
+        assert results.get(timeout=_RENDEZVOUS_TIMEOUT_S) == 'first'
+        with pytest.raises(queue.Empty):
+            results.get(timeout=0.1)
+    finally:
+        release_handler.set()
+        pool.close(cancel_pending=True)
+        results.close()
+        results.join_thread()
 
 
 def test_nested_typed_timeout_crosses_worker_boundary_and_respawns():
