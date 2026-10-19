@@ -1,0 +1,838 @@
+schema_version: literature_extract.v1
+source_id: van-westrenen-1999-garnet-melt-trace-partitioning
+source:
+  citation: van Westrenen, W., Blundy, J. & Wood, B. (1999). Crystal-chemical controls on trace element partitioning
+    between garnet and anhydrous silicate melt. American Mineralogist, 84, 838–847.
+  year: 1999
+extraction:
+  method: Born-digital pdftotext-layout transcription; Table 2 and the Table 4 Gl row were checked against 600 dpi
+    PDF renders on pages 2, 5, and 6.
+  date: '2026-10-19'
+  worker: fam13-1019
+  provenance_path: text/van-westrenen-1999-garnet-melt-trace-partitioning/pdftotext-layout.txt
+review_status: draft
+experiments:
+- experiment_id: vw99_exp11
+  series: Table 2 experiment 11; same starting mixture as experiment 8
+  method: quench_equilibration
+  locator: &id001
+    table: '2'
+    page: 2
+    published_page: 839
+    pdf_page_index: 1
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: 20 wt% G1, 80 wt% G2 (same as experiment 8)
+      locator: *id001
+    initial_composition:
+      state:
+        tag: unknown
+        reason: The printed G1/G2 mixture is not expanded into a complete run composition; no oxide reconstruction
+          was made.
+      locator: *id001
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1838.15'
+      locator: *id001
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '3000000000'
+      locator: *id001
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '3000000000'
+      locator: *id001
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: No sweep-gas or carrier-gas flow is reported.
+      locator: *id001
+    regime:
+      regime_class:
+        tag: unknown
+        reason: No pressure regime token is printed.
+fidelity_samples:
+- path: species.SiO2.observations[vw99_exp11_gl_cao].values.value
+  value: '15.2'
+  locator: &id002
+    table: '4'
+    page: 5
+    published_page: 842
+    pdf_page_index: 4
+    row: experiment 11, Gl
+- path: species.SiO2.observations[vw99_exp11_gl_mgo].values.value
+  value: '19.9'
+  locator: *id002
+- path: species.SiO2.observations[vw99_exp11_gl_sio2].values.value
+  value: '48.9'
+  locator: *id002
+species:
+  SiO2:
+    observations:
+    - observation_id: vw99_exp11_gl_cao
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: wt%
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1838.15'
+          locator: *id001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '3000000000'
+          locator: *id001
+        starting_material_as_published:
+          state:
+            tag: value
+            value: 'See experiment 8: 20 wt% G1, 80 wt% G2'
+          locator: *id001
+        assemblage_id:
+          state:
+            tag: value
+            value: vw99_exp11
+          locator: *id001
+        full_assemblage:
+          state:
+            tag: value
+            value: Grt + Gl + Q (glass + quench crystals are products of the one garnet-bearing run)
+          locator: *id001
+      uncertainty:
+        value: '0.3'
+        units: wt%
+        verbatim: '0.3'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: CaO wt% in glass (Gl), Table 4
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '15.2'
+        composition_mass_percent:
+          CaO: '15.2'
+          MgO: '19.9'
+          Al2O3: '15.9'
+          SiO2: '48.9'
+          total: '99.8'
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_mgo
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: wt%
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1838.15'
+          locator: *id001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '3000000000'
+          locator: *id001
+        starting_material_as_published:
+          state:
+            tag: value
+            value: 'See experiment 8: 20 wt% G1, 80 wt% G2'
+          locator: *id001
+        assemblage_id:
+          state:
+            tag: value
+            value: vw99_exp11
+          locator: *id001
+        full_assemblage:
+          state:
+            tag: value
+            value: Grt + Gl + Q (glass + quench crystals are products of the one garnet-bearing run)
+          locator: *id001
+      uncertainty:
+        value: '0.3'
+        units: wt%
+        verbatim: '0.3'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: MgO wt% in glass (Gl), Table 4
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '19.9'
+        composition_mass_percent:
+          CaO: '15.2'
+          MgO: '19.9'
+          Al2O3: '15.9'
+          SiO2: '48.9'
+          total: '99.8'
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_al2o3
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: wt%
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1838.15'
+          locator: *id001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '3000000000'
+          locator: *id001
+        starting_material_as_published:
+          state:
+            tag: value
+            value: 'See experiment 8: 20 wt% G1, 80 wt% G2'
+          locator: *id001
+        assemblage_id:
+          state:
+            tag: value
+            value: vw99_exp11
+          locator: *id001
+        full_assemblage:
+          state:
+            tag: value
+            value: Grt + Gl + Q (glass + quench crystals are products of the one garnet-bearing run)
+          locator: *id001
+      uncertainty:
+        value: '0.2'
+        units: wt%
+        verbatim: '0.2'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: Al2O3 wt% in glass (Gl), Table 4
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '15.9'
+        composition_mass_percent:
+          CaO: '15.2'
+          MgO: '19.9'
+          Al2O3: '15.9'
+          SiO2: '48.9'
+          total: '99.8'
+        trace_suite_context: vw99_table4_grt_q_rows
+    - observation_id: vw99_exp11_gl_sio2
+      experiment: vw99_exp11
+      type: equilibrium_phase_composition
+      locator: *id002
+      phase: l
+      units: wt%
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1838.15'
+          locator: *id001
+        total_pressure_Pa:
+          state:
+            tag: value
+            value: '3000000000'
+          locator: *id001
+        starting_material_as_published:
+          state:
+            tag: value
+            value: 'See experiment 8: 20 wt% G1, 80 wt% G2'
+          locator: *id001
+        assemblage_id:
+          state:
+            tag: value
+            value: vw99_exp11
+          locator: *id001
+        full_assemblage:
+          state:
+            tag: value
+            value: Grt + Gl + Q (glass + quench crystals are products of the one garnet-bearing run)
+          locator: *id001
+      uncertainty:
+        value: '0.4'
+        units: wt%
+        verbatim: '0.4'
+        note: Table 4 standard deviation; confidence level not stated.
+      values:
+        quantity: equilibrium_phase_composition
+        method_class: measured_direct
+        basis_as_published: SiO2 wt% in glass (Gl), Table 4
+        printed_phase_label: Gl
+        T_C: '1565'
+        value: '48.9'
+        composition_mass_percent:
+          CaO: '15.2'
+          MgO: '19.9'
+          Al2O3: '15.9'
+          SiO2: '48.9'
+          total: '99.8'
+        trace_suite_context: vw99_table4_grt_q_rows
+    context:
+    - observation_id: vw99_table1_starting_materials
+      type: context
+      locator:
+        table: '1'
+        page: 2
+        published_page: 839
+        pdf_page_index: 1
+      units: major oxides wt%; trace elements ppm
+      values:
+        caption: Table 1. Major and trace element compositions of starting materials.
+        printed_table: "TABLE 1. Major and trace element compositions of starting materials\n                  \
+          \                G1*                          G2†                            G3†                     \
+          \  G4†\nOxides                   Comp.             σ           Comp.           σ              Comp.  \
+          \        σ          Comp.              σ\nCaO                        5.4            0.1          13.7\
+          \           0.1              18.5          0.1        31.6               0.3\nMgO                    \
+          \   25.2            0.4          21.8           0.1              15.0          0.1         4.4       \
+          \        0.1\nAl 2O3                    25.2            0.2          16.7           0.1              23.8\
+          \          0.1        22.8               0.2\nSiO 2                     44.2            0.3          47.7\
+          \           0.4              42.8          0.2        40.8               0.2\n   Total               \
+          \  100.0            0.4         100.0           0.6             100.1          0.3        99.6       \
+          \        0.3\n\nTrace elements\nLi                                                        21.1       \
+          \    0.5          18.4          0.2           21.6           0.4\nB                                  \
+          \                      388             9           345            4\nK                               \
+          \                        2103          122           1590          151            723           106\n\
+          Sc                                                        16.6           1.4          15.0          0.4\
+          \           20.2           0.5\nTi                                                        49.0       \
+          \    5.3          23.5          0.9           24.1           0.6\nSr                                 \
+          \                      134             4           158            3            244             5\nY  \
+          \                                                         8.6          0.5          15.2          0.3\
+          \           16.9           0.3\nZr                                                        18.0       \
+          \    1.0          19.4          1.0           24.3           1.0\nNb                                 \
+          \                       22.6           1.7          31.3          1.5           18.1           0.6\nCd\
+          \                                                       357          145            118           14 \
+          \            18.4           4.7\nIn                                                       414        \
+          \   21            377            9             23.3           3.0\nLa                                \
+          \                        55.2           2.7          36.8          0.6           44.1           0.6\n\
+          Pr                                                        14.7           0.8          10.7          0.3\
+          \           15.1           0.3\nSm                                                        10.2       \
+          \    0.6          11.2          0.6           16.2           0.5\nTb                                 \
+          \                       10.2           0.6          11.1          0.2           12.5           0.3\nEr\
+          \                                                        10.5           0.5          11.1          0.2\
+          \           37.4           0.9\nTm                                                        10.4       \
+          \    0.4\nYb                                                          9.3          0.5          10.4 \
+          \         0.3           13.8           0.4\nLu                                                       \
+          \   4.8          0.5          10.8                        13.9           0.3\nHf                     \
+          \                                     9.8          1.6          11.0          1.2           12.9     \
+          \      0.7\nTa                                                       400           79             31.9\
+          \          3.8           25.1           1.2\nTh                                                      \
+          \ 885           73            736           25             88.9           2.3\nU                     \
+          \                                   152           11            139            4             28.2    \
+          \       1.0\n   Total                                                5104          219           3734\
+          \          154           1442           106\nNote: Oxides in weight percent; trace elements in parts per\
+          \ million.\n* Major element data taken from Walter and Presnall (1994).\n† Approximately 10 mg of starting\
+          \ material was fused for 30 min in a welded platinum capsule at 1520 oC and 1 atm pressure, and subsequently\n\
+          quenched in water."
+        reason: Starting mixtures include quoted G1 major elements and author-prepared G2–G4 with a 26-element trace
+          suite; these are supporting charge compositions, not final product compositions.
+    - observation_id: vw99_table2_experimental_conditions
+      type: context
+      locator: *id001
+      units: P kbar, T °C, t h, products wt%
+      values:
+        caption: Table 2. Experimental conditions and products.
+        printed_table: "TABLE 2. Experimental conditions and products\nDetails               8                 \
+          \               11                   12                      13                   14\nStarting material\
+          \     20 wt%G1, 80 wt%G2               See exp. 8           G3                      G4               \
+          \    G3\nCapsule(s)            Pt                               C + Pt               C + Pt          \
+          \        C + Pt               C + Pt\nP (kbar)              30                               30      \
+          \             30                      30                   30\nT (°C)                1560            \
+          \                 1565                 1545                    1530                 1530\nt (h)      \
+          \           21                               21                   21                      22         \
+          \          21\nProducts (wt%)        gt (35)                          gt (36)              gt (43)   \
+          \              gt (67)              gt (55)\n                      q (65)                           gl+q\
+          \ (64)            q (57)                   q (33)              q (45)\n                      px (trace)\
+          \                       px (trace)"
+        reason: Five run rows; T and P for experiment 11 are also carried on each typed Gl composition observation.
+          No fO2 is printed.
+    - observation_id: vw99_table3_standard_checks
+      type: context
+      locator:
+        table: '3'
+        page: 5
+        published_page: 842
+        pdf_page_index: 4
+      units: observed/published ratio
+      values:
+        caption: Table 3. Comparison of observed and published trace element compositions of SIMS secondary standards.
+        printed_table: "TABLE 3. Comparison of observed and published trace element\n         contents of SIMS secondary\
+          \ standards\n                          Observed / Published ratio\nElement         BCR-1 gl       BIR-1\
+          \ gl       DD1 gt     53388 gt\nSc                1.05(6)      1.08(2)       1.06(2)      1.09(1)\nSr\
+          \                0.78(3)      0.81(2)                    1.03(11)\nY                 0.69(3)      0.82(2)\
+          \                    0.78(2)\nZr                0.95(4)      0.98(4)                    0.95(5)\nLa  \
+          \              0.90(4)      1.00(6)       0.47(19)\nCe                0.86(5)      0.97(10)          \
+          \         0.89(9)\nNd                0.87(5)      1.02(9)                    0.97(7)\nSm             \
+          \   0.89(5)      0.97(9)       0.81(10)     0.88(6)\nEu                0.84(12)     0.91(10)      0.78(2)\
+          \      0.90(6)\nGd                0.89(5)      0.91(14)                   0.90(3)\nTb                0.95(8)\
+          \      1.00(8)       0.86(3)\nDy                0.94(4)      1.03(14)                   0.96(5)\nHo  \
+          \              1.01(15)     1.03(5)       1.04(3)      0.92(6)\nEr                1.02(10)     1.04(5)\
+          \                    1.01(4)\nYb                1.03(3)      1.09(6)       0.91(4)      1.01(6)      \
+          \      FIGURE 4. (a) Spidergram showing garnet/melt partition coefficients\nLu                0.97(7)\
+          \      1.06(15)                   1.05(8)        from this study. Order of elements along x-axis (where\
+          \ possible) from\nHf                             1.29(24)                   1.19(12)\n               \
+          \                                                          Sun and McDonough (1989). In and Li after Withers\
+          \ (1997). Note large\nNote: Observed compositions from analyses by W.v.W. and J.DB. in the\nperiod 1993–1997;\
+          \ published values from Govindaraju (1994; BCR-1),       variation in D-values with garnet composition\
+          \ for some elements (e.g.,\nJochum et al. (1990, BIR-1), Irving and Frey (1978; DD1) and Norman et   LREE,\
+          \ Sr, Li, and HFSE). (b) Variation of DU/DTh and CPP (Critical\nal. (1996; MU53388) Observed/published\
+          \ ratios are given for elements     Partitioning Parameter—Hart and Dunn 1993) along pyrope-grossular\n\
+          measured at least twice by both W.v.W. and J.D.B.                        join. Error bars are ±1σ.\n\f\
+          842                                     VAN WESTRENEN ET AL.: GARNET-MELT PARTITIONING"
+        reason: Standard calibration comparisons are not run-composition observations.
+    - observation_id: vw99_table4_grt_q_rows
+      type: context
+      locator: *id002
+      units: major elements wt%; trace elements ppm
+      values:
+        caption: Table 4. Major and trace element composition of experimental products.
+        printed_phase_labels:
+        - Grt
+        - Q
+        printed_table: "TABLE 4. Major and trace element composition of experimental products\n                \
+          \             8                               11                                      12             \
+          \                             13\n\nElements       Grt      σ         Q      σ     Grt     σ         \
+          \  Gl     σ   Grt             σ           Q            σ          Grt       σ       Q       σ\nCaO   \
+          \         7.5     1.1       14.2   1.4     6.7    0.4        15.2   0.3 14.2             1          21.9\
+          \         0.9        34.7      1.0     26.6    1.2\nMgO           24.6     0.6       22.0   1.4    25.1\
+          \    0.3        19.9   0.3 19.1             0.3        12.5         0.7         2.5      0.6      7.2\
+          \    0.9\nAl 2O3        23.7     1.2       15.2   1.5    25.0    1.2        15.9   0.2 23.9          \
+          \   0.3        21.9         1.1        23.3      0.4     26.1    2.2\nSiO 2         44.1     0.9     \
+          \  48.4   0.9    44.7    1.0        48.9   0.4 44.1             0.4        43.7         0.8        41.0\
+          \      0.3     40.4    1.1\nTotal         99.9     1.0       99.8   1.0   102      0.4        99.8   0.5\
+          \ 101              0.4       100           0.6       101        0.6    100      1.0\nn (majors)    31\
+          \                  9            46                 16           3                         10         \
+          \             19                20\n\nLi             0.7     0.1     39       2        0.05 0.01     \
+          \  10        1       6.5     0.7    14      1        1.2    0.03                        15\nB        \
+          \     11       3      589     45         3.6    0.4     599       27\nK             20      14    3853\
+          \ 646          375     11      1731      178     435       13    1394    120     177       0.3       \
+          \              707\nSc            26       0.6      8.3     0.2     24      2         7.0      0.1 22\
+          \          1       8.4    0.8     27      1                        16\nTi            10       0.5    \
+          \ 46       6       13      0.8      64        7     24        1      23      2       24      1       \
+          \                 29\nSr             2.3     0.7    255     28         0.37 0.05 241            13   \
+          \  62        1     188     17       62      5                       600\nY             11       0.5  \
+          \    4.7     0.1     11      0.7       5.5      0.08 22         2       8.5    0.6     29      5     \
+          \                   11\nZr            45       4      152     10        13      0.7      32.1      0.4\
+          \ 22          0.2     6.2    0.4     27      0.6                      25\nNb                         \
+          \                      0.87 0.06       31        1       4.6     0.07   32      5       11      0.2  \
+          \                    29\nCd            67      29       20       3     107       4       129       10\
+          \    108        5     102      8       15      0.1                      17\nIn                       \
+          \                     246     11        102        2    433       31     205     38       18      0.4\
+          \                      11\nLa             1.1     0.3    106     10         0.38 0.02       94       \
+          \ 3       9.9     0.3    42      5       18      3                        93\nPr             1.0     0.2\
+          \     27       2        0.88 0.03       24.2      0.4     5.8     0.06   12      1       11      1   \
+          \                     25\nSm             3.8     0.1     14       0.8      3.8    0.3      13.7      0.6\
+          \ 10.6        0.01   11      0.6     22      0.5                      17\nTb            10       0.8 \
+          \     8.6     0.3      9.9    0.6       9.0      0.1 15          1       7.6    0.3     19      2    \
+          \                     8.7\nEr            15       1        5.5     0.4     14      1         5.9     \
+          \ 0.2 16          2       6.3    0.5     62     13                        25\nTm            16       2\
+          \        4.5     0.06\nYb            15       2        4.0     0.1     13      1         4.1      0.2\
+          \ 15          2       5.2    0.7     22      5                         7.9\nLu             7       3 \
+          \       1.9     0.1      7.3    0.7       1.3      0.8 16          2       5.0    0.6     23      4  \
+          \                       8.9\nHf             6.4     0.5     13       1        7.8    0.6      12     \
+          \   0.5 12          1       5.1    0.4     16      0.2                      12\nTa            13     \
+          \  5       25       3       18      2       563       16       3.9     0.1    29      5       15     \
+          \ 2                        42\nTh            23       5    1753 188            16      2     1421    \
+          \    39     99        0.3   671     49       49      5                       153\nU              8   \
+          \    2      286     41        12      1       249       10     49        5     136     13       20   \
+          \   0.1                      46\nn (traces)     4                4                6                8 \
+          \               2               5               2                                1\nNote: Major elements\
+          \ in weight percent, trace elements in parts per million. Grt = Garnet, Q = Quench phase, Gl = Glass phase.\n\
+          \n\nThey observed an increase by up to three orders of magnitude             tioning model of Blundy and\
+          \ Wood (1994), as extended by\n      Gt/Cpx                                                Gt/Cpx\nin\
+          \ DLREE with increasing grossular content, while DHREE re-              Wood and Blundy (1997). This model\
+          \ is based on the long-\nmained approximately constant. This is consistent with our               established\
+          \ observation (e.g., Onuma et al. 1968) that mineral-\nexperimental results (Fig. 4a). Several trace elements\
+          \ listed in         melt partition coefficients for series of isovalent cations show\nTable 5 have not\
+          \ been used before in garnet-melt partitioning            a near-parabolic dependence on cation radius.\
+          \ This has been\nstudies. Lithium is consistently more incompatible than the              shown for plagioclase\
+          \ (Blundy and Wood 1991), amphibole\nHREE, confirming the expectations of Ryan and Langmuir          \
+          \         (e.g., Liu et al. 1992; LaTourrette et al. 1995; Brenan et al.\n(1987). Figure 4a also shows\
+          \ that In is compatible in garnet             1995), clinopyroxene (Blundy et al. 1995; Wood and Blundy\n\
+          (DIn ~2), while DCd is about unity for most experiments. Boron           1997), olivine (Beattie 1994),\
+          \ and garnet (Liu et al. 1992; Van\nis highly incompatible, with DB similar to DLa (Table 5). Fi-    \
+          \        Westrenen et al. 1997; Withers 1997). Beattie (1994) and Blundy\nnally, Pr is incompatible with\
+          \ DLa < DPr < DSm.                          and Wood (1994) explained these observations using lattice\n\
+          \    Parameters deemed important for mantle melting also show             strain models, based on the\
+          \ work of Nagasawa (1966) and Brice\nremarkable variation along the pyrope-grossular join. For ex-   \
+          \         (1975), respectively. In the model of Blundy and Wood (1994),\nample, Figure 4b shows the large\
+          \ change in DU/DTh with garnet            trace element partitioning on a given structural site is charac-\n\
+          composition (from 4.1 for Py84 to only 1.3 for Py 9). Values for         terized by the site radius (r0),\
+          \ its Young’s modulus (E), and the\nthe Critical Partitioning Parameter (CPP = [DSm⋅DHf]/[DNd⋅DLu])  \
+          \        (theoretical) strain-free partition coefficient D0 for an element\nfrom Hart and Dunn (1993)\
+          \ are also shown in Figure 4b. Val-              with “ideal” radius r0:\nues of CPP give a measure of\
+          \ the extent of fractionation of the\nSm/Nd and Lu/Hf isotopic systems, and the fact that mantle     \
+          \                                      r0              1          3\n                            \
+          \                                                                −4π ENA  2 (ri − r0 ) + 3 (ri − r0)\
+          \  \n                                                                                             \
+          \                       2\n\n\ngarnets have a low CPP has been used to infer that MORB               \
+          \        Di = D0 ⋅ exp                                                              (1)\n          \
+          \                                                                                                   RT\
+          \                       \nmelting needs to start in the garnet lherzolite stability field (e.g.,    \
+          \                                                          \nSalters and Hart 1989). The CPP values\
+          \ for Py82 and Py 84 are\nvery close to the value of 0.18 used by Salters (1996) in his              \
+          \  NA is Avogadro’s number, R is the gas constant, and T is in\nmodeling of MORB generation. However,\
+          \ other garnets show                 K. Wood and Blundy (1997) used this model to predict REE\nvalues\
+          \ much closer to or even greater than 1, similar to the             D-values for clinopyroxene-melt partitioning,\
+          \ and Van\nvalue calculated for the garnet from the experiment of Hauri et          Westrenen et al. (1997)\
+          \ concluded from a study of available\nal. (1994; CPP = 0.97) and, more significantly, similar to CPP\
+          \           literature data that this model is also applicable to garnet-melt\nvalues for clinopyroxene\
+          \ (Blundy et al. 1998).                           partitioning of trace elements.\n    To interpret the\
+          \ compositional dependence of trace element               We used a Levenberg-Marquardt-type, non-linear\
+          \ least-\npartitioning seen in Figure 4, we used the crystal-melt parti-           squares fitting routine\
+          \ (Press et al. 1992) to derive best-fit val-\n\f                                          VAN WESTRENEN\
+          \ ET AL.: GARNET-MELT PARTITIONING                                                     843\n\n\nTABLE\
+          \ 4.—Extended.                                                            isovalent trace elements in\
+          \ our experiments. Their D-values\n                                    14                            \
+          \            should, therefore, provide the tightest constraints on partition-\nElements           Grt\
+          \              σ             Q               σ           ing behavior. Standard deviations of multiple\
+          \ analyses from\nCaO               15.8              0.4          21.4            0.7          Table 5\
+          \ were used to weight the fits. The following additional\nMgO               17.3              0.4    \
+          \      12.9            0.6\nAl 2O3            23.3              0.5          21.7            0.9     \
+          \     constraints and assumptions were applied.\nSiO 2             43.6              0.3          43.7\
+          \            0.7              •The REE and Y all partition exclusively into the garnet X-\nTotal     \
+          \       100                0.4          99.7            0.4          site. Recent EXAFS studies (Quartieri\
+          \ et al. 1997) and initial\nn (majors)         7                             17\n                    \
+          \                                                          studies of garnet/melt partitioning (Van Westrenen\
+          \ et al. 1997;\nLi                 5.9              0.9          15              0.4          Withers\
+          \ 1997) support this assumption.\nB\nK                269               10         2068          209\n\
+          \                                                                                  •Indium can be univalent\
+          \ or trivalent. Since garnet-melt\nSc                24                2            9.6          0.9 \
+          \            partition coefficients for 1+ cations (K and Li) are about two\nTi                21    \
+          \            0.5         20            1               orders of magnitude smaller than D-values for 3+\
+          \ cations (see\nSr                51                7          227           12\nY                 23\
+          \                1            9.8          0.5             Fig. 4a), small amounts of In1+ should lead\
+          \ to a significant low-\nZr                25                3            8.2          0.7           \
+          \  ering of observed DIn relative to a 3+ ion of the same radius.\nNb                 6.7            \
+          \  0.7         58            5               Fitted values for DIn3+ should therefore generally be higher\
+          \ than\nCd               105                7          105           13\nIn               417        \
+          \       23          166           20               observed DIn.\nLa                 9.9             \
+          \ 1           58            4                   •Sc can enter both the garnet X- and Y-sites (e.g., Geller\n\
+          Pr                 5.6              0.3         14            0.5\nSm                11              \
+          \  0.2         10            0.6\n                                                                   \
+          \           1967). Sc entering the Y-site has been observed by several au-\nTb                14     \
+          \           0.7          8.1          0.4             thors (see Geller 1967) but, because of its ionic\
+          \ radius (0.89 Å\nEr                17                0.6          7.3          0.6             according\
+          \ to Shannon 1976) and in the absence of other (e.g.,\nTm\nYb                17                1     \
+          \       6.5             0.4          EXAFS) data, we expect some of the Sc to enter the X-site.\nLu  \
+          \              18                1            6.2             0.5          With Sc entering both sites,\
+          \ fitted DSc should underestimate the\nHf                16                0.1          7.0          \
+          \   0.8          observed DSc.\nTa                 7.9              0.6         68               4\nTh\
+          \               146               16         1506              92                Table 6 gives our best-fit\
+          \ values for r0, D0, and E. Plots of\nU                 80                5          282             \
+          \ 20            ionic radius vs. D using these parameters (Fig. 5) show good\nn (traces)         3   \
+          \                          4\n                                                                       \
+          \       agreement between observation and model for all experiments,\n                               \
+          \                                               bearing in mind the assumptions listed above. Deviations\
+          \ of\n                                                                              our fitted values\
+          \ from the measured partition coefficients for\nues for r0, D0, and E for partitioning of the large (ri\
+          \ ≥0.89 Å) 3+           La and Pr are probably caused by slight (~0.5%) contamina-\ncations (REE, Y, In,\
+          \ and Sc). Trivalent cations were chosen as                tion of garnet by glass during SIMS analysis.\
+          \ As illustrated in\nthe basis of these fits because these form the largest group of               Figure\
+          \ 6a, fitted values of r0 vary systematically with garnet"
+        reason: Grt and Q product rows retained verbatim in context because the schema has no garnet or quench phase
+          token. The trace-element suite for Gl is also retained here because the typed liquid identity uses the
+          major oxide vector only.
+    - observation_id: vw99_table5_partition_coefficients
+      type: context
+      locator:
+        table: '5'
+        page: 6
+        published_page: 843
+        pdf_page_index: 5
+      units: dimensionless D and σ as printed
+      values:
+        caption: Table 5. Garnet-melt partition coefficients.
+        printed_table: "TABLE 5. Garnet-melt partition coefficients\n                    8 (Py82)              \
+          \      11 (Py84)                     12 (Py65)                 13 (Py9)               14 (Py60)\nElement\
+          \         D            σ              D           σ              D             σ           D         \
+          \        σ        D          σ\nCa             0.53          0.09          0.44         0.03         \
+          \  0.65          0.05        1.3               0.07     0.74      0.03\nMg             1.1           0.1\
+          \           1.3          0.03           1.5           0.08        0.34              0.1      1.3     \
+          \  0.07\nAl             1.6           0.2           1.6          0.08           1.1           0.06   \
+          \     0.89              0.08     1.1       0.05\nSi             0.91          0.02          0.91     \
+          \    0.02           1.0           0.02        1.0               0.03     1.0       0.02\nLi          \
+          \   0.018         0.002         0.0052       0.0007         0.48          0.07        0.083          \
+          \   0.002    0.38      0.06\nB              0.018         0.003         0.0060       0.0006\nK       \
+          \                                   0.22         0.02           0.31          0.03        0.25       \
+          \       0.0004   0.13      0.01\nSc             3.1           0.1           3.4          0.2         \
+          \   2.6           0.3         1.7               0.1      2.4       0.3\nTi             0.2           0.01\
+          \          0.2          0.02           1.1           0.1         0.8               0.04     1.0      \
+          \ 0.06\nSr             0.009         0.002         0.002        0.0002         0.3           0.03    \
+          \    0.1               0.01     0.2       0.03\nY              2.4           0.07          2.0       \
+          \   0.1            2.6           0.3         2.7               0.4      2.3       0.2\nZr            \
+          \ 0.3           0.02          0.4          0.02           3.6           0.2         1.1              \
+          \ 0.02     3.1       0.4\nNb                                         0.03         0.002          0.2 \
+          \          0.02        0.4               0.01     0.1       0.02\nCd                                 \
+          \        0.8          0.07           1.1           0.1         0.9               0.01     1.0       0.1\n\
+          In                                         2.4          0.1            2.1           0.4         1.6 \
+          \              0.04     2.5       0.3\nLa             0.010         0.002         0.0040       0.0002\
+          \         0.24          0.03        0.19              0.03     0.17      0.02\nPr             0.036  \
+          \       0.004         0.036        0.001          0.48          0.05        0.44              0.05   \
+          \  0.40      0.03\nSm             0.27          0.01          0.28         0.02           1.0        \
+          \   0.06        1.3               0.03     1.0       0.1\nTb             1.2           0.05          1.1\
+          \          0.06           1.9           0.2         2.2               0.3      1.8       0.1\nEr     \
+          \        2.8           0.2           2.4          0.2            2.6           0.4         2.5       \
+          \        0.5      2.4       0.2\nTm             3.5           0.2\nYb             3.9           0.2  \
+          \         3.3          0.3            2.9           0.6         2.8               0.7      2.6       0.2\n\
+          Lu             3.7           0.7           5.7          0.5            3.2           0.6         2.7 \
+          \              0.5      2.9       0.3\nHf             0.48          0.03          0.68         0.06  \
+          \         2.4           0.3         1.3               0.02     2.3       0.3\nTa                     \
+          \                    0.032        0.003          0.13          0.02        0.35              0.04    \
+          \ 0.12      0.01\nTh             0.013         0.002         0.011        0.001          0.15        \
+          \  0.01        0.32              0.03     0.10      0.01\nU              0.029         0.004         0.046\
+          \        0.004          0.36          0.05        0.42              0.002    0.28      0.03\nNote: All\
+          \ values calculated using data in Table 4."
+        schema_gap: No partition-coefficient quantity token is available; do not score these values.
+    - observation_id: vw99_table6_lattice_strain_fits
+      type: model_derived
+      locator:
+        table: '6'
+        page: 8
+        published_page: 845
+        pdf_page_index: 7
+      units: r0 Å, D0 dimensionless, E GPa
+      values:
+        caption: Table 6. Results of fitting of partitioning data for Y, REE, In, and Sc to Equation 1.
+        printed_table: "TABLE 6. Results of fitting of partitioning data for Y, REE, In, and        This difference\
+          \ in D0 is a reflection of the importance of con-\n         Sc to Equation 1\n                       \
+          \                                                     figurational entropy effects in both crystal and\
+          \ melt (Blundy et\nExperiment Composition        r0       σ       D0      σ     E     σ        al. 1996).\
+          \ Configurational effects are anticipated in this study,\n     8          Py82 Gr 18   0.940    0.005\
+          \    4.7    0.1   580   40\n    11          Py84 Gr 16   0.935    0.004    4.8    0.1   590   40\n   \
+          \                                                                         because of the very large compositional\
+          \ range of our garnet crys-\n    12          Py65 Gr 35   0.960    0.008    3.2    0.3   269   17    \
+          \    tals and melts. Specifically, the higher D0 values for Py82 and\n    13          Py9 Gr91     0.99\
+          \     0.01     2.8    0.1   347   20        Py84 are a consequence of the fact that the melts in these\
+          \ experi-\n    14          Py60 Gr 40   0.955    0.008    3.1    0.1   257   20\n                    \
+          \                                                        ments are not on the pyrope-grossular join, as\
+          \ opposed to the\nNote: r0 in Å, E in GPa.\n                                                         \
+          \                   melts in the other experiments. Quantification of these effects\ncomposition. Linear\
+          \ regression of r0 against garnet composi-                requires application of activity-composition\
+          \ relations for both\ntion gives                                                                  garnet\
+          \ and melt, which is beyond the scope of this study.\n                                               \
+          \                                 Finally, let us consider our derived values of Young’s modu-\n   r0\
+          \ = 0.993 – 0.0628 XPy Å                                      (2)       lus (E). Blundy and Wood (1994)\
+          \ and Wood and Blundy (1997)\n                                                                       \
+          \     showed that derived E values for plagioclase/melt and"
+        reason: Fitted model parameters, not direct experimental run compositions.
+    - observation_id: vw99_figure1_apparatus
+      type: figure_record
+      locator:
+        figure: '1'
+        page: 3
+        published_page: 840
+        pdf_page_index: 2
+      units: schematic
+      values:
+        quantity: experimental apparatus configuration
+        identity: garnet-melt high-pressure experiment
+        caption: Experimental setup; t/c is a W-3%Re/W-25%Re thermocouple.
+        panel: single
+        axes: none
+        series: []
+        marker_count_per_series: {}
+        attribution: authors’ apparatus
+        digitisation: deferred to a figure pass
+    - observation_id: vw99_figure2_standard_ratios
+      type: figure_record
+      locator:
+        figure: '2'
+        page: 3
+        published_page: 840
+        pdf_page_index: 2
+      units: observed/published ratio
+      values:
+        quantity: SIMS standard observed/published ratios
+        identity: trace elements in glass and garnet standards
+        caption: Comparison of observed and published values for secondary garnet/glass standards.
+        panel: single
+        axes:
+          x: element
+          y: observed/published ratio
+        series:
+        - BCR-1 glass
+        - BIR-1 glass
+        - DD1 garnet
+        - 53388 garnet
+        marker_count_per_series:
+          BCR-1 glass: 17
+          BIR-1 glass: 17
+          DD1 garnet: 9
+          53388 garnet: 17
+        attribution: observed in this study; published values cited in Table 3
+        digitisation: deferred to a figure pass
+    - observation_id: vw99_figure3_backscatter
+      type: figure_record
+      locator:
+        figure: '3'
+        page: 3
+        published_page: 840
+        pdf_page_index: 2
+      units: micrograph
+      values:
+        quantity: experimental product texture
+        identity: experiment 11 garnet, glass, and quench crystals
+        caption: Backscattered electron image of experiment 11 showing garnet (Gt), quench (Q), glass (G), gold
+          coating (Au), and ion microprobe pits (IP).
+        panel: single
+        axes: none; width of view 350 μm
+        series: []
+        marker_count_per_series: {}
+        attribution: authors’ image
+        digitisation: deferred to a figure pass
+    - observation_id: vw99_figure4_partition_coefficients
+      type: figure_record
+      locator:
+        figure: '4'
+        page: 5
+        published_page: 842
+        pdf_page_index: 4
+      units: dimensionless D ratios
+      values:
+        quantity: garnet/melt partition coefficients and D_U/D_Th, CPP
+        identity: experiments 8, 11–14; garnet composition
+        caption: Spidergram of garnet/melt partition coefficients and variation of D_U/D_Th and CPP along the pyrope-grossular
+          join.
+        panel:
+        - a
+        - b
+        axes:
+          a:
+          - element
+          - D (Grt/Melt)
+          b:
+          - '% pyrope'
+          - ratio
+        series:
+          a:
+          - Py82
+          - Py84
+          - Py65
+          - Py9
+          - Py60
+          b:
+          - D_U/D_Th
+          - CPP
+        marker_count_per_series:
+          a:
+            Py82: 19
+            Py84: 22
+            Py65: 22
+            Py9: 22
+            Py60: 22
+          b:
+            D_U/D_Th: 5
+            CPP: 5
+        attribution: partition coefficients measured in this study; CPP from Hart and Dunn (1993)
+        digitisation: deferred to a figure pass
+    - observation_id: vw99_figure5_onuma_diagrams
+      type: figure_record
+      locator:
+        figure: '5'
+        page: 7
+        published_page: 844
+        pdf_page_index: 6
+      units: D (Grt/Melt)
+      values:
+        quantity: garnet-melt partition coefficients for trivalent cations and fitted lattice-strain curves
+        identity: experiments 8, 11–14; garnet X-site
+        caption: Onuma diagrams for experiments 8 and 11–14 showing partition coefficients for trivalent cations
+          entering the garnet X-site, with weighted least-squares fits.
+        panel:
+        - a
+        - b
+        - c
+        - d
+        - e
+        axes:
+          x: ionic radius (Å)
+          y: D (Grt/Melt)
+        series:
+        - Sc
+        - In
+        - Y
+        - La
+        - Pr
+        - Sm
+        - Tb
+        - Er
+        - Tm
+        - Yb
+        - Lu
+        marker_count_per_series:
+          a experiment 8: 10
+          b experiment 11: 10
+          c experiment 12: 10
+          d experiment 13: 10
+          e experiment 14: 10
+        attribution: measured coefficients and fitted curves from this study
+        digitisation: deferred to a figure pass
+    - observation_id: vw99_figure6_fit_trends
+      type: figure_record
+      locator:
+        figure: '6'
+        page: 8
+        published_page: 845
+        pdf_page_index: 7
+      units: Å for r0; dimensionless D0
+      values:
+        quantity: fitted r0 and D0 versus pyrope fraction
+        identity: garnet composition
+        caption: Variation of r0 and D0 along the pyrope-grossular join.
+        panel:
+        - a
+        - b
+        axes:
+          a:
+          - '% pyrope'
+          - fitted r0 (Å)
+          b:
+          - '% pyrope'
+          - fitted D0
+        series:
+          a:
+          - fitted r0
+          - linear fit
+          b:
+          - fitted D0
+        marker_count_per_series:
+          a fitted r0: 5
+          a linear fit: 0
+          b fitted D0: 5
+        attribution: fitted values from this study; expected X-site range referenced to Smyth and Bish (1988)
+        digitisation: deferred to a figure pass
+    - observation_id: vw99_figure7_bulk_modulus
+      type: figure_record
+      locator:
+        figure: '7'
+        page: 9
+        published_page: 846
+        pdf_page_index: 8
+      units: GPa and Å^-3
+      values:
+        quantity: bulk modulus K versus Zc/d^3
+        identity: garnet composition and cation charge
+        caption: Plot of bulk modulus (K) versus Zc/d3.
+        panel: single
+        axes:
+          x: Zc/d^3
+          y: bulk modulus K
+        series:
+        - mineral physics comparison
+        - this study
+        marker_count_per_series: not counted; no numeric points digitised
+        attribution: Anderson and Anderson (1970); Hazen and Finger (1979); authors’ derived values
+        digitisation: deferred to a figure pass
