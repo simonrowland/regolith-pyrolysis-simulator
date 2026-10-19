@@ -1,0 +1,1701 @@
+schema_version: literature_extract.v1
+source_id: majzlan-2021-magnesium-silicate-glass-cp
+source:
+  citation: Majzlan, J., Tangeman, J. A. & Dachs, E. (2021). Heat capacity, entropy, configurational entropy, and viscosity of magnesium silicate glasses and liquids. Physics and Chemistry of Minerals 48:28.
+  doi: 10.1007/s00269-021-01153-7
+  year: 2021
+  corpus_asset: raw/majzlan-2021-magnesium-silicate-glass-cp/majzlan-2021-magnesium-silicate-glass-cp.pdf
+extraction:
+  method: Manual transcription from the authoritative born-digital pdftotext-layout file, checked against 600 dpi page renders.
+  date: '2026-10-19'
+  worker: codex-resume-38721-1792451527
+  provenance_path: text/majzlan-2021-magnesium-silicate-glass-cp/pdftotext-layout.txt
+  source_note: 'No MinerU output or supplementary workbook is present, so the table emitter cannot draft this source and no table mappings apply. Table 1: all five electron-microprobe composition rows are context-no-token (candidates: equilibrium_phase_composition and residue_component_composition; neither represents a prepared-glass assay). Table 2: the seven Cp and S values are typed; its H298.15−H0 heat-content column is context-no-token because the store token H_minus_H298 means H(T)−H(298). Table 3: the nine rows of fitted heat-capacity polynomial coefficients are context-model or quoted-fit because coefficients are not numeric Cp observations. Figures 1–8 are figure records only, with no numeric points. Partial-molar Cp, configurational entropy, and viscosity are context-only for the quantity gaps described in their records. Tables 1–3 comprise 30, 21, and 50 numeric-bearing body cells, respectively; every table cell was checked against its 600 dpi render.'
+review_status: draft
+fidelity_samples:
+- species: MgSiO3
+  observation_id: majzlan_2021_mg50_table2_cp_29815
+  field: cp_298_15_k
+  value: 80.08
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '2'
+    row: MG50
+    column: Cp°298.15
+- species: MgSiO3
+  observation_id: majzlan_2021_mg62_table2_entropy_29815
+  field: entropy
+  value: 91.4
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '2'
+    row: MG62
+    column: S°298.15
+- species: Mg2SiO4
+  observation_id: majzlan_2021_forsterite_table2_cp_29815
+  field: cp_298_15_k
+  value: 118.59
+  locator:
+    page: 4
+    pdf_page_index: 3
+    table: '2'
+    row: forsterite
+    column: Cp°298.15
+- species: MgSiO3
+  observation_id: majzlan_2021_mg50_table1_glass_composition_context
+  field: MgO_wt_pct
+  value:
+    value: 40.6
+    two_standard_deviations: 0.3
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    row: MG50
+species:
+  MgSiO3:
+    observations:
+    - observation_id: majzlan_2021_mg50_table2_cp_29815
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: MG50
+        column: Cp°298.15
+      phase: glass
+      phase_as_printed: glass
+      per: mol_species
+      point_conditions: &id001
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row: MG50
+            column: T = 298.15 K
+      quench_statement: &id002
+        text: The molten, levitating droplets were cooled to glass spheroids by blocking the laser beam.
+        quench_direction: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          section: Methods and materials
+      derivation:
+        relation: The reported Cp at 298.15 K is reduced from measured low-temperature PPMS heat-capacity data using orthogonal-polynomial fits.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Data availability
+            note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs are not printed in the article and the workbook is not present in the local corpus.
+      units: J/mol K
+      values:
+        quantity: cp
+        method_class: measured_reduced
+        sample: MG50
+        formula: Mg0.996SiO2.996
+        T_K: 298.15
+        cp_298_15_k: 80.08
+        basis_as_printed: per mole of formula Mg_xSiO_(2+x)
+        derivation_note: The 298.15 K value is reported from fits to this study’s measured low-temperature heat-capacity data.
+    - observation_id: majzlan_2021_mg50_table2_entropy_29815
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: MG50
+        column: S°298.15
+      phase: glass
+      phase_as_printed: glass
+      per: mol_species
+      point_conditions: *id001
+      quench_statement: *id002
+      derivation:
+        relation: The reported entropy at 298.15 K is calculated by integrating this study’s measured low-temperature heat-capacity data, fitted by orthogonal polynomials and extrapolated to 0 K.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Data availability
+            note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs are not printed in the article and the workbook is not present in the local corpus.
+      units: J/mol K
+      values:
+        quantity: S
+        method_class: measured_reduced
+        sample: MG50
+        formula: Mg0.996SiO2.996
+        T_K: 298.15
+        entropy: 72.9
+        uncertainty: 0.9
+        uncertainty_as_printed: ± 0.9
+        confidence_level: not_stated
+        basis_as_printed: per mole of formula Mg_xSiO_(2+x)
+        derivation_note: The entropy is calculated from this study’s measured low-temperature heat-capacity data.
+    - observation_id: majzlan_2021_mg54_table2_cp_29815
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: MG54
+        column: Cp°298.15
+      phase: glass
+      phase_as_printed: glass
+      per: mol_species
+      point_conditions: &id003
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row: MG54
+            column: T = 298.15 K
+      quench_statement: *id002
+      derivation:
+        relation: The reported Cp at 298.15 K is reduced from measured low-temperature PPMS heat-capacity data using orthogonal-polynomial fits.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Data availability
+            note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs are not printed in the article and the workbook is not present in the local corpus.
+      units: J/mol K
+      values:
+        quantity: cp
+        method_class: measured_reduced
+        sample: MG54
+        formula: Mg1.174SiO3.174
+        T_K: 298.15
+        cp_298_15_k: 87.31
+        basis_as_printed: per mole of formula Mg_xSiO_(2+x)
+        derivation_note: The 298.15 K value is reported from fits to this study’s measured low-temperature heat-capacity data.
+    - observation_id: majzlan_2021_mg54_table2_entropy_29815
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: MG54
+        column: S°298.15
+      phase: glass
+      phase_as_printed: glass
+      per: mol_species
+      point_conditions: *id003
+      quench_statement: *id002
+      derivation:
+        relation: The reported entropy at 298.15 K is calculated by integrating this study’s measured low-temperature heat-capacity data, fitted by orthogonal polynomials and extrapolated to 0 K.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Data availability
+            note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs are not printed in the article and the workbook is not present in the local corpus.
+      units: J/mol K
+      values:
+        quantity: S
+        method_class: measured_reduced
+        sample: MG54
+        formula: Mg1.174SiO3.174
+        T_K: 298.15
+        entropy: 78.5
+        uncertainty: 0.9
+        uncertainty_as_printed: ± 0.9
+        confidence_level: not_stated
+        basis_as_printed: per mole of formula Mg_xSiO_(2+x)
+        derivation_note: The entropy is calculated from this study’s measured low-temperature heat-capacity data.
+    - observation_id: majzlan_2021_mg58_table2_cp_29815
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: MG58
+        column: Cp°298.15
+      phase: glass
+      phase_as_printed: glass
+      per: mol_species
+      point_conditions: &id004
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row: MG58
+            column: T = 298.15 K
+      quench_statement: *id002
+      derivation:
+        relation: The reported Cp at 298.15 K is reduced from measured low-temperature PPMS heat-capacity data using orthogonal-polynomial fits.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Data availability
+            note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs are not printed in the article and the workbook is not present in the local corpus.
+      units: J/mol K
+      values:
+        quantity: cp
+        method_class: measured_reduced
+        sample: MG58
+        formula: Mg1.364SiO3.364
+        T_K: 298.15
+        cp_298_15_k: 94.36
+        basis_as_printed: per mole of formula Mg_xSiO_(2+x)
+        derivation_note: The 298.15 K value is reported from fits to this study’s measured low-temperature heat-capacity data.
+    - observation_id: majzlan_2021_mg58_table2_entropy_29815
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: MG58
+        column: S°298.15
+      phase: glass
+      phase_as_printed: glass
+      per: mol_species
+      point_conditions: *id004
+      quench_statement: *id002
+      derivation:
+        relation: The reported entropy at 298.15 K is calculated by integrating this study’s measured low-temperature heat-capacity data, fitted by orthogonal polynomials and extrapolated to 0 K.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Data availability
+            note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs are not printed in the article and the workbook is not present in the local corpus.
+      units: J/mol K
+      values:
+        quantity: S
+        method_class: measured_reduced
+        sample: MG58
+        formula: Mg1.364SiO3.364
+        T_K: 298.15
+        entropy: 85.1
+        uncertainty: 1.0
+        uncertainty_as_printed: ± 1.0
+        confidence_level: not_stated
+        basis_as_printed: per mole of formula Mg_xSiO_(2+x)
+        derivation_note: The entropy is calculated from this study’s measured low-temperature heat-capacity data.
+    - observation_id: majzlan_2021_mg62_table2_cp_29815
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: MG62
+        column: Cp°298.15
+      phase: glass
+      phase_as_printed: glass
+      per: mol_species
+      point_conditions: &id005
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row: MG62
+            column: T = 298.15 K
+      quench_statement: *id002
+      derivation:
+        relation: The reported Cp at 298.15 K is reduced from measured low-temperature PPMS heat-capacity data using orthogonal-polynomial fits.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Data availability
+            note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs are not printed in the article and the workbook is not present in the local corpus.
+      units: J/mol K
+      values:
+        quantity: cp
+        method_class: measured_reduced
+        sample: MG62
+        formula: Mg1.611SiO3.611
+        T_K: 298.15
+        cp_298_15_k: 101.89
+        basis_as_printed: per mole of formula Mg_xSiO_(2+x)
+        derivation_note: The 298.15 K value is reported from fits to this study’s measured low-temperature heat-capacity data.
+    - observation_id: majzlan_2021_mg62_table2_entropy_29815
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: MG62
+        column: S°298.15
+      phase: glass
+      phase_as_printed: glass
+      per: mol_species
+      point_conditions: *id005
+      quench_statement: *id002
+      derivation:
+        relation: The reported entropy at 298.15 K is calculated by integrating this study’s measured low-temperature heat-capacity data, fitted by orthogonal polynomials and extrapolated to 0 K.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Data availability
+            note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs are not printed in the article and the workbook is not present in the local corpus.
+      units: J/mol K
+      values:
+        quantity: S
+        method_class: measured_reduced
+        sample: MG62
+        formula: Mg1.611SiO3.611
+        T_K: 298.15
+        entropy: 91.4
+        uncertainty: 1.1
+        uncertainty_as_printed: ± 1.1
+        confidence_level: not_stated
+        basis_as_printed: per mole of formula Mg_xSiO_(2+x)
+        derivation_note: The entropy is calculated from this study’s measured low-temperature heat-capacity data.
+    - observation_id: majzlan_2021_mg67_table2_cp_29815
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: MG67
+        column: Cp°298.15
+      phase: glass
+      phase_as_printed: glass
+      per: mol_species
+      point_conditions: &id006
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row: MG67
+            column: T = 298.15 K
+      quench_statement: *id002
+      derivation:
+        relation: The reported Cp at 298.15 K is reduced from measured low-temperature PPMS heat-capacity data using orthogonal-polynomial fits.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Data availability
+            note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs are not printed in the article and the workbook is not present in the local corpus.
+      units: J/mol K
+      values:
+        quantity: cp
+        method_class: measured_reduced
+        sample: MG67
+        formula: Mg1.907SiO3.907
+        T_K: 298.15
+        cp_298_15_k: 115.68
+        basis_as_printed: per mole of formula Mg_xSiO_(2+x)
+        derivation_note: The 298.15 K value is reported from fits to this study’s measured low-temperature heat-capacity data.
+    - observation_id: majzlan_2021_mg67_table2_entropy_29815
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: MG67
+        column: S°298.15
+      phase: glass
+      phase_as_printed: glass
+      per: mol_species
+      point_conditions: *id006
+      quench_statement: *id002
+      derivation:
+        relation: The reported entropy at 298.15 K is calculated by integrating this study’s measured low-temperature heat-capacity data, fitted by orthogonal polynomials and extrapolated to 0 K.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 10
+            pdf_page_index: 9
+            section: Data availability
+            note: The paper states that measured low-temperature Cp data are in supplementary Excel files; raw numerical inputs are not printed in the article and the workbook is not present in the local corpus.
+      units: J/mol K
+      values:
+        quantity: S
+        method_class: measured_reduced
+        sample: MG67
+        formula: Mg1.907SiO3.907
+        T_K: 298.15
+        entropy: 102.8
+        uncertainty: 1.2
+        uncertainty_as_printed: ± 1.2
+        confidence_level: not_stated
+        basis_as_printed: per mole of formula Mg_xSiO_(2+x)
+        derivation_note: The entropy is calculated from this study’s measured low-temperature heat-capacity data.
+    - observation_id: majzlan_2021_enstatite_table2_cp_29815
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: enstatite
+        column: Cp°298.15
+      phase: cr
+      condensed_form: &id007
+        state: crystalline
+        polymorph: enstatite
+        basis: explicit_author
+      per: mol_species
+      point_conditions: &id008
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row: enstatite
+            column: T = 298.15 K
+      units: J/mol K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        sample: enstatite
+        formula: MgSiO3
+        T_K: 298.15
+        cp_298_15_k: 82.05
+        attribution: Krupka et al. (1985b)
+    - observation_id: majzlan_2021_enstatite_table2_entropy_29815
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: enstatite
+        column: S°298.15
+      phase: cr
+      condensed_form: *id007
+      per: mol_species
+      point_conditions: *id008
+      units: J/mol K
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        sample: enstatite
+        formula: MgSiO3
+        T_K: 298.15
+        entropy: 66.3
+        uncertainty: 0.1
+        uncertainty_as_printed: ± 0.1
+        confidence_level: not_stated
+        attribution: Krupka et al. (1985b)
+    - observation_id: majzlan_2021_enstatite_heat_of_fusion_text
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 9
+        pdf_page_index: 8
+        section: Configurational entropy of enstatitic glass
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1834
+          locator:
+            page: 9
+            pdf_page_index: 8
+            section: Configurational entropy of enstatitic glass
+      units: kJ/mol
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        formula: MgSiO3
+        delta_H_fus_kJ_mol-1: 75.3
+        attribution: Stebbins et al. (1984); Richet and Bottinga (1986)
+        T_fus_K:
+          value: 1834
+          units: K
+          locator:
+            page: 9
+            pdf_page_index: 8
+            section: Configurational entropy of enstatitic glass
+      uncertainty:
+        reported_status: printed
+        value: 6.0
+        units: kJ/mol
+        confidence_level: not_stated
+    - observation_id: majzlan_2021_enstatite_entropy_of_fusion_text
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 9
+        pdf_page_index: 8
+        section: Configurational entropy of enstatitic glass
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 1834
+          locator:
+            page: 9
+            pdf_page_index: 8
+            section: Configurational entropy of enstatitic glass
+      units: J/mol K
+      values:
+        quantity: entropy_of_fusion
+        method_class: model_derived
+        formula: MgSiO3
+        delta_S_fus_J_mol-1_K-1: 41.1
+        attribution: calculated in this work from the cited fusion enthalpy
+      derived_from: &id009
+      - majzlan_2021_enstatite_heat_of_fusion_text
+      derivation:
+        relation: Δfusion S = Δfusion H / Tfusion
+        inputs: *id009
+        output_unit: J/mol K
+    - observation_id: majzlan_2021_enstatitic_glass_transition_temperature
+      type: transition_point
+      locator:
+        page: 9
+        pdf_page_index: 8
+        section: Configurational entropy of enstatitic glass
+      phase: glass
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        formula: Mg0.996SiO2.996
+        T_K: 1063
+        transition_as_printed: glass-transition temperature
+        attribution: Briggs (1975)
+        qualification: The paper identifies the value for enstatite glass; MG50 is the near-enstatite composition in this study.
+    context:
+    - observation_id: majzlan_2021_mg50_table1_glass_composition_context
+      type: glass_composition_analysis_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: MG50
+      units: wt.% except molar ratio and formula weight
+      values:
+        method_class: measured_direct
+        attribution: null
+        sample: MG50
+        formula: Mg0.996SiO2.996
+        MgO_wt_pct:
+          value: 40.6
+          two_standard_deviations: 0.3
+        SiO2_wt_pct:
+          value: 60.9
+          two_standard_deviations: 0.9
+        sum_wt_pct:
+          value: 101.5
+          two_standard_deviations: 1.0
+        100Mg_over_Mg_plus_Si_molar_ratio: 49.9
+        formula_weight_g_per_mol: 100.2278
+        candidate_tokens_considered:
+        - equilibrium_phase_composition
+        - residue_component_composition
+        schema_gap: The store has no quantity token for the electron-microprobe composition of a prepared glass sample; it is not an equilibrium phase composition or pyrolysis residue.
+        table_disposition: context-no-token
+    - observation_id: majzlan_2021_mg54_table1_glass_composition_context
+      type: glass_composition_analysis_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: MG54
+      units: wt.% except molar ratio and formula weight
+      values:
+        method_class: measured_direct
+        attribution: null
+        sample: MG54
+        formula: Mg1.174SiO3.174
+        MgO_wt_pct:
+          value: 44.6
+          two_standard_deviations: 0.3
+        SiO2_wt_pct:
+          value: 56.7
+          two_standard_deviations: 0.5
+        sum_wt_pct:
+          value: 101.4
+          two_standard_deviations: 0.4
+        100Mg_over_Mg_plus_Si_molar_ratio: 54.0
+        formula_weight_g_per_mol: 107.3982
+        candidate_tokens_considered:
+        - equilibrium_phase_composition
+        - residue_component_composition
+        schema_gap: The store has no quantity token for the electron-microprobe composition of a prepared glass sample; it is not an equilibrium phase composition or pyrolysis residue.
+        table_disposition: context-no-token
+    - observation_id: majzlan_2021_mg58_table1_glass_composition_context
+      type: glass_composition_analysis_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: MG58
+      units: wt.% except molar ratio and formula weight
+      values:
+        method_class: measured_direct
+        attribution: null
+        sample: MG58
+        formula: Mg1.364SiO3.364
+        MgO_wt_pct:
+          value: 48.6
+          two_standard_deviations: 0.4
+        SiO2_wt_pct:
+          value: 53.1
+          two_standard_deviations: 0.7
+        sum_wt_pct:
+          value: 101.7
+          two_standard_deviations: 0.6
+        100Mg_over_Mg_plus_Si_molar_ratio: 57.7
+        formula_weight_g_per_mol: 115.0622
+        candidate_tokens_considered:
+        - equilibrium_phase_composition
+        - residue_component_composition
+        schema_gap: The store has no quantity token for the electron-microprobe composition of a prepared glass sample; it is not an equilibrium phase composition or pyrolysis residue.
+        table_disposition: context-no-token
+    - observation_id: majzlan_2021_mg62_table1_glass_composition_context
+      type: glass_composition_analysis_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: MG62
+      units: wt.% except molar ratio and formula weight
+      values:
+        method_class: measured_direct
+        attribution: null
+        sample: MG62
+        formula: Mg1.611SiO3.611
+        MgO_wt_pct:
+          value: 52.6
+          two_standard_deviations: 0.3
+        SiO2_wt_pct:
+          value: 48.7
+          two_standard_deviations: 0.8
+        sum_wt_pct:
+          value: 101.3
+          two_standard_deviations: 0.8
+        100Mg_over_Mg_plus_Si_molar_ratio: 61.7
+        formula_weight_g_per_mol: 125.013
+        candidate_tokens_considered:
+        - equilibrium_phase_composition
+        - residue_component_composition
+        schema_gap: The store has no quantity token for the electron-microprobe composition of a prepared glass sample; it is not an equilibrium phase composition or pyrolysis residue.
+        table_disposition: context-no-token
+    - observation_id: majzlan_2021_mg67_table1_glass_composition_context
+      type: glass_composition_analysis_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+        row: MG67
+      units: wt.% except molar ratio and formula weight
+      values:
+        method_class: quoted_attributed
+        attribution: Tangeman et al. (2001)
+        sample: MG67
+        formula: Mg1.907SiO3.907
+        MgO_wt_pct:
+          value: 56.7
+          two_standard_deviations: 1.0
+        SiO2_wt_pct:
+          value: 44.3
+          two_standard_deviations: 0.6
+        sum_wt_pct:
+          value: 101.1
+          two_standard_deviations: 0.5
+        100Mg_over_Mg_plus_Si_molar_ratio: 65.6
+        formula_weight_g_per_mol: 136.944
+        candidate_tokens_considered:
+        - equilibrium_phase_composition
+        - residue_component_composition
+        schema_gap: The store has no quantity token for the electron-microprobe composition of a prepared glass sample; it is not an equilibrium phase composition or pyrolysis residue.
+        table_disposition: context-no-token
+    - observation_id: majzlan_2021_table2_heat_content_H298_minus_H0_context
+      type: thermochemical_values
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: all rows
+        column: H298.15 − H0
+      units: kJ/mol
+      values:
+        quantity_as_printed: H298.15 − H0 (heat content from 0 K)
+        rows:
+        - sample: MG50
+          formula: Mg0.996SiO2.996
+          H298.15_minus_H0_kJ_per_mol_as_printed: 12.43
+          uncertainty_kJ_per_mol: 0.15
+          method_class: measured_reduced
+        - sample: MG54
+          formula: Mg1.174SiO3.174
+          H298.15_minus_H0_kJ_per_mol_as_printed: 13.46
+          uncertainty_kJ_per_mol: 0.16
+          method_class: measured_reduced
+        - sample: MG58
+          formula: Mg1.364SiO3.364
+          H298.15_minus_H0_kJ_per_mol_as_printed: 14.62
+          uncertainty_kJ_per_mol: 0.18
+          method_class: measured_reduced
+        - sample: MG62
+          formula: Mg1.611SiO3.611
+          H298.15_minus_H0_kJ_per_mol_as_printed: 15.76
+          uncertainty_kJ_per_mol: 0.19
+          method_class: measured_reduced
+        - sample: MG67
+          formula: Mg1.907SiO3.907
+          H298.15_minus_H0_kJ_per_mol_as_printed: 17.78
+          uncertainty_kJ_per_mol: 0.21
+          method_class: measured_reduced
+        - sample: enstatite
+          formula: MgSiO3
+          H298.15_minus_H0_kJ_per_mol_as_printed: 11.99
+          uncertainty_kJ_per_mol: 0.02
+          method_class: quoted_attributed
+          attribution: Krupka et al. (1985b)
+        - sample: forsterite
+          formula: Mg2SiO4
+          H298.15_minus_H0_kJ_per_mol_as_printed: 17.22
+          uncertainty_kJ_per_mol: 0.03
+          method_class: quoted_attributed
+          attribution: Robie et al. (1982)
+        candidate_tokens_considered:
+        - H_minus_H298
+        schema_gap: H298.15 − H0 has a 0 K reference and does not fit the store’s H(T) − H(298) quantity.
+        table_disposition: context-no-token for the heat-content column; Table 2 Cp and S columns are typed.
+    - observation_id: majzlan_2021_table3_orthoenstatite_heat_capacity_fit_context
+      type: heat_capacity_model
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: Orthoenstatite
+      units: coefficient-specific factors as printed in Table 3; temperature ranges K
+      values:
+        sample: Orthoenstatite
+        method_class: quoted_attributed
+        formula: MgSiO3
+        quantity_as_printed: heat-capacity polynomial coefficients
+        candidate_tokens_considered:
+        - cp
+        schema_gap: The table gives fitted polynomial coefficients, not numeric heat-capacity observations; the coefficients have no quantity token.
+        Berman_Brown_1985_equation_1:
+          k0: 177.0
+          k1: -1586
+          k2_times_1e_minus_6: 0.2388
+          k3_times_1e_minus_8: -1.574
+          T_range_K:
+          - 298
+          - 1300
+        Richet_Fiquet_1991_equation_2:
+          a: 102.4
+          b: 6.626
+          c_times_1e_minus_4: -2.455
+          d_times_1e_minus_7: 0.3839
+          e_times_1e_minus_9: -0.5085
+          T_range_K:
+          - 298
+          - 1300
+        crystal_data_attribution: Gillet et al. (1991), Krupka et al. (1985a), and Thiéblot et al. (1999)
+        table_disposition: context-quoted-fit
+    - observation_id: majzlan_2021_table3_protoenstatite_heat_capacity_fit_context
+      type: heat_capacity_model
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: Protoenstatite
+      units: coefficient-specific factors as printed in Table 3; temperature ranges K
+      values:
+        sample: Protoenstatite
+        method_class: quoted_attributed
+        formula: MgSiO3
+        quantity_as_printed: heat-capacity polynomial coefficients
+        candidate_tokens_considered:
+        - cp
+        schema_gap: The table gives fitted polynomial coefficients, not numeric heat-capacity observations; the coefficients have no quantity token.
+        Berman_Brown_1985_equation_1: null
+        Richet_Fiquet_1991_equation_2:
+          a: 41.95
+          b: 12.24
+          c_times_1e_minus_4: -0.496
+          d_times_1e_minus_7: 0
+          e_times_1e_minus_9: 0
+          T_range_K:
+          - 1300
+          - 1810
+        crystal_data_attribution: Gillet et al. (1991), Krupka et al. (1985a), and Thiéblot et al. (1999)
+        table_disposition: context-quoted-fit
+    - observation_id: majzlan_2021_table3_mg67_glass_heat_capacity_fit_context
+      type: heat_capacity_model
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: MG67 glass
+      units: coefficient-specific factors as printed in Table 3; temperature ranges K
+      values:
+        sample: MG67 glass
+        method_class: model_derived
+        formula: Mg1.907SiO3.907
+        quantity_as_printed: heat-capacity polynomial coefficients
+        candidate_tokens_considered:
+        - cp
+        schema_gap: The table gives fitted polynomial coefficients, not numeric heat-capacity observations; the coefficients have no quantity token.
+        Berman_Brown_1985_equation_1:
+          k0: 230.7
+          k1: -1637
+          k2_times_1e_minus_6: -4.108
+          k3_times_1e_minus_8: 6.165
+          T_range_K:
+          - 298
+          - 980
+        Richet_Fiquet_1991_equation_2:
+          a: -790.4
+          b: 123.7
+          c_times_1e_minus_4: 15.0
+          d_times_1e_minus_7: -4.136
+          e_times_1e_minus_9: 4.233
+          T_range_K:
+          - 298
+          - 980
+        crystal_data_attribution: null
+        table_disposition: context-model
+    - observation_id: majzlan_2021_table3_mg50_glass_heat_capacity_fit_context
+      type: heat_capacity_model
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: MG50 glass
+      units: coefficient-specific factors as printed in Table 3; temperature ranges K
+      values:
+        sample: MG50 glass
+        method_class: model_derived
+        formula: Mg0.996SiO2.996
+        quantity_as_printed: heat-capacity polynomial coefficients
+        candidate_tokens_considered:
+        - cp
+        schema_gap: The table gives fitted polynomial coefficients, not numeric heat-capacity observations; the coefficients have no quantity token.
+        Berman_Brown_1985_equation_1:
+          k0: 160.7
+          k1: -1011
+          k2_times_1e_minus_6: -4.321
+          k3_times_1e_minus_8: 6.661
+          T_range_K:
+          - 298
+          - 980
+        Richet_Fiquet_1991_equation_2:
+          a: -437.7
+          b: 71.93
+          c_times_1e_minus_4: 9.23
+          d_times_1e_minus_7: -2.922
+          e_times_1e_minus_9: 3.335
+          T_range_K:
+          - 298
+          - 980
+        crystal_data_attribution: null
+        table_disposition: context-model
+    - observation_id: majzlan_2021_configurational_entropy_model_results_context
+      type: thermochemical_model_results
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Configurational entropy of forsteritic glass
+      units: J mol−1 K−1 unless otherwise stated
+      values:
+        method_class: model_derived
+        quantity_as_printed: configurational entropy Sconf
+        candidate_tokens_considered:
+        - S
+        - cp
+        - H_minus_H298
+        schema_gap: The store has no token for configurational entropy, which is not absolute entropy S.
+        results_as_printed:
+        - sample: MG67
+          formula: Mg1.907SiO3.907
+          temperature_K: 1040
+          Sconf: 1.9
+          conservative_uncertainty: 15
+          normalised_value_J_per_gfw_K: 0.7
+        - sample: MG50
+          formula: Mg0.996SiO2.996
+          temperature_K: 1063
+          Sconf: 16.8
+        - sample: MG67
+          formula: Mg1.907SiO3.907
+          temperature_ratio_T_over_Tg: 1.5
+          Sconf: 32
+        - sample: enstatitic glass, Stebbins et al. (1984)
+          temperature_ratio_T_over_Tg: 1.5
+          Sconf_J_per_g_atom_K: 3.4
+          equivalent_Sconf_J_per_mol_K_as_printed: 17
+        basis: Calculated from the paper’s heat-capacity and fusion-entropy inputs and assumed fictive temperatures.
+        table_disposition: context-model
+    - observation_id: majzlan_2021_partial_molar_and_liquid_cp_text_context
+      type: partial_molar_heat_capacity_context
+      locator:
+        page: 9
+        pdf_page_index: 8
+        section: Partial molar heat capacities in magnesium silicate liquids
+      units: J gfw−1 K−1 for partial molar oxide-component values; J mol−1 K−1 for liquid formula values
+      values:
+        method_class: quoted_attributed and model_derived as listed per value
+        quantity_as_printed: partial molar heat capacities and liquid heat capacities
+        candidate_tokens_considered:
+        - cp
+        schema_gap: No token represents partial molar heat capacity of an oxide component; the liquid values are also composition-specific estimates rather than pure-species Cp observations.
+        values_as_printed:
+        - component: SiO2
+          value: 81.37
+          units: J gfw−1 K−1
+          attribution: Courtial and Richet (1993)
+        - component: SiO2
+          value: 80.0
+          uncertainty: 0.9
+          units: J gfw−1 K−1
+          attribution: Stebbins et al. (1984)
+        - component: MgO
+          value: 85.78
+          units: J gfw−1 K−1
+          attribution: Courtial and Richet (1993)
+        - component: MgO
+          value: 99.7
+          units: J gfw−1 K−1
+          attribution: Stebbins et al. (1984)
+        - component: MgO
+          value: 90
+          units: J gfw−1 K−1
+          method_class: model_derived
+          note: Adopted by the authors for their calculations.
+        - liquid_formula: Mg2SiO4
+          value: 253
+          units: J mol−1 K−1
+          attribution: Courtial and Richet (1993)
+        - liquid_formula: Mg2SiO4
+          value: 279.4
+          units: J mol−1 K−1
+          attribution: Stebbins et al. (1984)
+        - liquid_formula: Mg2SiO4
+          value: 260
+          units: J mol−1 K−1
+          method_class: model_derived
+          note: Mean adopted by the authors.
+        - liquid_formula: MgSiO3
+          value: 170
+          units: J mol−1 K−1
+          method_class: model_derived
+          note: Adopted by the authors for enstatitic melts.
+        - liquid_formula: MgSiO3
+          value: 167
+          units: J mol−1 K−1
+          attribution: Courtial and Richet (1993)
+    - observation_id: majzlan_2021_ortho_protoenstatite_transition_context
+      type: solid_state_transition_thermochemistry_context
+      locator:
+        page: 9
+        pdf_page_index: 8
+        section: Partial molar heat capacities in magnesium silicate liquids
+      units: kJ mol−1 for enthalpy; J mol−1 K−1 for entropy
+      values:
+        quantity_as_printed: ortho-to-protoenstatite transformation enthalpy and entropy
+        candidate_tokens_considered:
+        - H_minus_H298
+        - S
+        - entropy_of_fusion
+        schema_gap: The printed values describe a solid-state polymorphic transition, not H(T)−H(298), absolute S, or fusion entropy.
+        values_as_printed:
+        - delta_H_kJ_per_mol: 2
+          attribution: Thiéblot et al. (1999)
+          note: The cited authors were uncertain whether transformation was complete.
+        - delta_H_range_kJ_per_mol:
+          - 9
+          - 11
+          attribution: Gasparik (1990)
+          method_class: model_derived
+        - delta_S_range_J_per_mol_K:
+          - 1.5
+          - 8.5
+          note: Range corresponding to the enthalpy estimates as discussed in the source.
+        - adopted_delta_H_kJ_per_mol: 2
+          adopted_delta_S_J_per_mol_K: 1.5
+          attribution: Thiéblot et al. (1999)
+          method_class: model_derived
+    - observation_id: majzlan_2021_figure_1_deferred
+      type: figure_record
+      locator:
+        page: 3
+        pdf_page_index: 2
+        figure: '1'
+      panel: a,b
+      attribution: MG50–MG67 and MG54–MG62 are this study; enstatite from Krupka et al. (1985b); forsterite from Robie et al. (1982).
+      units: K and J mol−1 K−1
+      values:
+        quantity: cp
+        species:
+        - MG67 glass (Mg1.907SiO3.907)
+        - forsterite (Mg2SiO4)
+        - MG50 glass (Mg0.996SiO2.996)
+        - enstatite (MgSiO3)
+        - MG54 glass (Mg1.174SiO3.174)
+        - MG58 glass (Mg1.364SiO3.364)
+        - MG62 glass (Mg1.611SiO3.611)
+        phase: glass and crystalline comparators
+        temperature_as_printed: approximately 0–300 K
+        axes_as_printed:
+          x: temperature (K)
+          y: heat capacity (J mol−1 K−1)
+        caption: 'Low-temperature Cp data for the glasses from this study: (a) MG67 and MG50 compared to crystalline counterparts; (b) MG54, MG58, and MG62.'
+        series:
+        - name: MG67 glass
+          marker: open square
+          marker_count: 36
+          panel: a
+          evidence_class: measured_direct
+        - name: forsterite
+          marker: open circle
+          marker_count: 40
+          panel: a
+          evidence_class: quoted_attributed
+        - name: MG50 glass
+          marker: filled square
+          marker_count: 14
+          panel: a
+          evidence_class: measured_direct
+        - name: enstatite
+          marker: filled circle
+          marker_count: 39
+          panel: a
+          evidence_class: quoted_attributed
+        - name: MG54 glass
+          marker: green square
+          marker_count: 39
+          panel: b
+          evidence_class: measured_direct
+        - name: MG58 glass
+          marker: yellow square
+          marker_count: 39
+          panel: b
+          evidence_class: measured_direct
+        - name: MG62 glass
+          marker: magenta square
+          marker_count: 39
+          panel: b
+          evidence_class: measured_direct
+        digitisation: deferred to a figure pass
+    - observation_id: majzlan_2021_figure_2_deferred
+      type: figure_record
+      locator:
+        page: 4
+        pdf_page_index: 3
+        figure: '2'
+      panel: whole_figure
+      attribution: Present-study calorimetry and fits.
+      units: K and J mol−1 K−1
+      values:
+        quantity: cp
+        species:
+        - MG50 glass (Mg0.996SiO2.996)
+        - MG67 glass (Mg1.907SiO3.907)
+        phase: glass
+        temperature_as_printed: low-temperature data to 300 K; high-temperature range 300–970 K
+        axes_as_printed:
+          x: temperature (K)
+          y: heat capacity (J mol−1 K−1)
+        caption: Low-temperature (large circles) and high-temperature (small circles, only selected data points shown) Cp data for MG50 and MG67; solid thin lines show Richet–Fiquet fits to high-temperature Cp data.
+        series:
+        - name: MG50 low-temperature data
+          marker: large open circle
+          marker_count: 35
+          evidence_class: measured_direct
+        - name: MG67 low-temperature data
+          marker: large filled circle
+          marker_count: 35
+          evidence_class: measured_direct
+        - name: MG50 selected high-temperature data
+          marker: small open circle
+          marker_count: 15
+          evidence_class: measured_direct
+        - name: MG67 selected high-temperature data
+          marker: small filled circle
+          marker_count: 15
+          evidence_class: measured_direct
+        - name: Richet–Fiquet fit for MG50
+          marker: line
+          marker_count: 0
+          evidence_class: model_derived
+        - name: Richet–Fiquet fit for MG67
+          marker: line
+          marker_count: 0
+          evidence_class: model_derived
+        digitisation: deferred to a figure pass
+    - observation_id: majzlan_2021_figure_3_deferred
+      type: figure_record
+      locator:
+        page: 5
+        pdf_page_index: 4
+        figure: '3'
+      panel: whole_figure
+      attribution: Δvitr H attributed to Nasikas and Navrotsky (2014); −TΔvitr S calculated in this work.
+      units: K; kJ mol−1 and J mol−1 K−1 as plotted
+      values:
+        quantity: unavailable
+        species:
+        - MG50, MG54, MG58, MG62, MG67 glasses
+        phase: glass relative to crystalline mixtures
+        temperature_as_printed: 298.15 K
+        axes_as_printed:
+          x: 100·Mg/(Mg+Si) (molar ratio)
+          y_left: Δvitr H and −TΔvitr S (as plotted)
+        caption: Enthalpies of vitrification (Δvitr H, from Nasikas and Navrotsky 2014) and −TΔvitr S values from this work, both at T = 298.15 K; the cited enthalpies were recalculated to formula MgxSiO2+x.
+        series:
+        - name: Δvitr H
+          marker: open circle
+          marker_count: 5
+          evidence_class: quoted_attributed
+        - name: −TΔvitr S
+          marker: open diamond
+          marker_count: 5
+          evidence_class: measured_reduced
+        digitisation: deferred to a figure pass
+        schema_gap: No token represents enthalpy of vitrification against a mechanical crystal mixture or temperature-scaled vitrification entropy.
+    - observation_id: majzlan_2021_figure_4_deferred
+      type: figure_record
+      locator:
+        page: 5
+        pdf_page_index: 4
+        figure: '4'
+      panel: whole_figure
+      attribution: Present-study entropy values; mechanical mixture calculated from enstatite and forsterite comparator values.
+      units: K and J mol−1 K−1
+      values:
+        quantity: S
+        species:
+        - MG50, MG54, MG58, MG62, MG67 glasses
+        - enstatite–forsterite mechanical mixtures
+        phase: glass and crystalline mixture
+        temperature_as_printed: 298.15 K
+        axes_as_printed:
+          x: 100·Mg/(Mg+Si) (molar ratio)
+          y: entropy at T = 298.15 K (J mol−1 K−1)
+        caption: Entropies of magnesium silicate glasses and corresponding mechanical mixtures of enstatite and forsterite, all at T = 298.15 K; dashed line is a fit through MG50, MG54, MG58 and MG62.
+        series:
+        - name: glass entropy points
+          marker: open circle
+          marker_count: 5
+          evidence_class: measured_reduced
+        - name: fit through MG50–MG62
+          marker: dashed line
+          marker_count: 0
+          evidence_class: model_derived
+        - name: mechanical mixture entropy
+          marker: solid line
+          marker_count: 0
+          evidence_class: model_derived
+        digitisation: deferred to a figure pass
+    - observation_id: majzlan_2021_figure_5_deferred
+      type: figure_record
+      locator:
+        page: 6
+        pdf_page_index: 5
+        figure: '5'
+      panel: whole_figure
+      attribution: Present-study curves; feldspar data redrawn from Robie et al. (1978).
+      units: K and J mol−1 K−1
+      values:
+        quantity: unavailable
+        species:
+        - MG50, MG54, MG58, MG62, MG67 glasses; NaAlSi3O8, KAlSi3O8, CaAl2Si2O8 glasses
+        phase: glass relative to crystalline phases or mixtures
+        temperature_as_printed: approximately 0–300 K
+        axes_as_printed:
+          x: temperature (K)
+          y: ΔCp = Cp,glass − Σmi Cp,i (J mol−1 K−1)
+        caption: 'Differences in heat capacity between glasses and corresponding crystalline phases or mixtures: MG67 thick solid line, other present-study glasses thin solid lines, feldspar-endmember compositions dashed lines.'
+        series:
+        - name: MG67
+          marker: thick solid line
+          marker_count: 0
+          evidence_class: measured_reduced
+        - name: MG50, MG54, MG58, MG62
+          marker: thin solid lines
+          marker_count: 0
+          evidence_class: measured_reduced
+        - name: feldspar-endmember glasses
+          marker: dashed lines
+          marker_count: 0
+          evidence_class: quoted_attributed
+        digitisation: deferred to a figure pass
+        schema_gap: The plotted quantity is a heat-capacity difference, for which the store has no quantity token.
+    - observation_id: majzlan_2021_figure_6_deferred
+      type: figure_record
+      locator:
+        page: 6
+        pdf_page_index: 5
+        figure: '6'
+      panel: a,b
+      attribution: Present-study Mg glasses; MG56 and alkaline-earth silicate comparator series attributed to Richet et al. (2009) and Richet et al. (1991).
+      units: K and 10^5 Cp/T^3 in J g-atom−1 K−4
+      values:
+        quantity: unavailable
+        species:
+        - Mg silicate glasses MG50, MG54, MG56, MG58, MG62, MG67; CaSiO3, BaSiO3, SrSiO3 glasses
+        phase: glass
+        temperature_as_printed: approximately 0–50 K
+        axes_as_printed:
+          x: temperature (K)
+          y: 10^5 Cp/T^3 (J g-atom−1 K−4)
+        caption: 'Boson peaks of silicate glasses with alkaline-earth cations: (a) overview of peak intensity with cation mass; (b) detail showing magnesium silicate glasses.'
+        series:
+        - name: MG50
+          marker: green diamond
+          marker_count: 23
+          panel: a,b
+          evidence_class: measured_direct
+        - name: MG54
+          marker: yellow diamond
+          marker_count: 23
+          panel: a,b
+          evidence_class: measured_direct
+        - name: MG56 (Richet et al. 2009)
+          marker: cyan circle
+          marker_count: 23
+          panel: a,b
+          evidence_class: quoted_attributed
+        - name: MG58
+          marker: pink diamond
+          marker_count: 23
+          panel: a,b
+          evidence_class: measured_direct
+        - name: MG62
+          marker: yellow-green diamond
+          marker_count: 23
+          panel: a,b
+          evidence_class: measured_direct
+        - name: MG67
+          marker: red diamond
+          marker_count: 23
+          panel: a,b
+          evidence_class: measured_direct
+        - name: CaSiO3 (Richet et al. 1991)
+          marker: open square
+          marker_count: 14
+          panel: a
+          evidence_class: quoted_attributed
+        - name: BaSiO3 (Richet et al. 2009)
+          marker: blue circle
+          marker_count: 17
+          panel: a
+          evidence_class: quoted_attributed
+        - name: SrSiO3 (Richet et al. 2009)
+          marker: red circle
+          marker_count: 24
+          panel: a
+          evidence_class: quoted_attributed
+        digitisation: deferred to a figure pass
+        schema_gap: The plotted ordinate is Cp/T^3, not a direct Cp observation; no token fits this normalized boson-peak quantity.
+    - observation_id: majzlan_2021_figure_7_deferred
+      type: figure_record
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: '7'
+      panel: whole_figure
+      attribution: Calculated in this work.
+      units: K and J mol−1 K−1
+      values:
+        quantity: unavailable
+        species:
+        - MG50 enstatitic glass
+        - MG67 forsteritic glass
+        phase: supercooled liquid model for glasses
+        temperature_as_printed: approximately 1000–1900 K
+        axes_as_printed:
+          x: temperature (K)
+          y: configurational entropy Sconf(T) (J mol−1 K−1)
+        caption: Calculated configurational entropy for MG50 and MG67, representing enstatitic and forsteritic supercooled liquids, respectively; Tg is glass-transition temperature.
+        series:
+        - name: MG50 model curve
+          marker: line
+          marker_count: 0
+          evidence_class: model_derived
+        - name: MG67 model curve
+          marker: line
+          marker_count: 0
+          evidence_class: model_derived
+        digitisation: deferred to a figure pass
+        schema_gap: The store has no quantity token for configurational entropy, which differs from absolute entropy S.
+  Mg2SiO4:
+    observations:
+    - observation_id: majzlan_2021_forsterite_table2_cp_29815
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: forsterite
+        column: Cp°298.15
+      phase: cr
+      condensed_form: &id010
+        state: crystalline
+        polymorph: forsterite
+        basis: explicit_author
+      per: mol_species
+      point_conditions: &id011
+        temperature_K:
+          state:
+            tag: value
+            value: 298.15
+          locator:
+            page: 4
+            pdf_page_index: 3
+            table: '2'
+            row: forsterite
+            column: T = 298.15 K
+      units: J/mol K
+      values:
+        quantity: cp
+        method_class: quoted_attributed
+        sample: forsterite
+        formula: Mg2SiO4
+        T_K: 298.15
+        cp_298_15_k: 118.59
+        attribution: Robie et al. (1982)
+    - observation_id: majzlan_2021_forsterite_table2_entropy_29815
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        table: '2'
+        row: forsterite
+        column: S°298.15
+      phase: cr
+      condensed_form: *id010
+      per: mol_species
+      point_conditions: *id011
+      units: J/mol K
+      values:
+        quantity: S
+        method_class: quoted_attributed
+        sample: forsterite
+        formula: Mg2SiO4
+        T_K: 298.15
+        entropy: 94.1
+        uncertainty: 0.1
+        uncertainty_as_printed: ± 0.1
+        confidence_level: not_stated
+        attribution: Robie et al. (1982)
+    - observation_id: majzlan_2021_forsterite_heat_of_fusion_navrotsky_1989
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Configurational entropy of forsteritic glass
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 2163
+          locator:
+            page: 7
+            pdf_page_index: 6
+            section: Configurational entropy of forsteritic glass
+      units: kJ/mol
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        formula: Mg2SiO4
+        delta_H_fus_kJ_mol-1: 114.0
+        attribution: Navrotsky et al. (1989)
+        T_fus_K:
+          value: 2163
+          units: K
+          locator:
+            page: 7
+            pdf_page_index: 6
+            section: Configurational entropy of forsteritic glass
+      uncertainty:
+        reported_status: printed
+        value: 20.0
+        units: kJ/mol
+        confidence_level: not_stated
+    - observation_id: majzlan_2021_forsterite_entropy_of_fusion_navrotsky_1989
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Configurational entropy of forsteritic glass
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 2163
+          locator:
+            page: 7
+            pdf_page_index: 6
+            section: Configurational entropy of forsteritic glass
+      units: J/mol K
+      values:
+        quantity: entropy_of_fusion
+        method_class: model_derived
+        formula: Mg2SiO4
+        delta_S_fus_J_mol-1_K-1: 52.7
+        attribution: calculated in this work from Navrotsky et al. (1989)
+      derived_from: &id012
+      - majzlan_2021_forsterite_heat_of_fusion_navrotsky_1989
+      derivation:
+        relation: Δfusion S = Δfusion H / Tfusion from Navrotsky et al. (1989) Δfusion H = 114.0 ± 20.0 kJ/mol and Tfusion = 2163 K
+        inputs: *id012
+        output_unit: J/mol K
+      uncertainty:
+        reported_status: printed
+        value: 9.2
+        units: J/mol K
+        confidence_level: not_stated
+    - observation_id: majzlan_2021_forsterite_heat_of_fusion_richet_1993
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Configurational entropy of forsteritic glass
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 2174
+          locator:
+            page: 7
+            pdf_page_index: 6
+            section: Configurational entropy of forsteritic glass
+      units: kJ/mol
+      values:
+        quantity: heat_of_fusion
+        method_class: quoted_attributed
+        formula: Mg2SiO4
+        delta_H_fus_kJ_mol-1: 142.0
+        attribution: Richet et al. (1993)
+        T_fus_K:
+          value: 2174
+          units: K
+          locator:
+            page: 7
+            pdf_page_index: 6
+            section: Configurational entropy of forsteritic glass
+      uncertainty:
+        reported_status: printed
+        value: 14.0
+        units: kJ/mol
+        confidence_level: not_stated
+    - observation_id: majzlan_2021_forsterite_entropy_of_fusion_richet_1993
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Configurational entropy of forsteritic glass
+      phase: cr
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: 2174
+          locator:
+            page: 7
+            pdf_page_index: 6
+            section: Configurational entropy of forsteritic glass
+      units: J/mol K
+      values:
+        quantity: entropy_of_fusion
+        method_class: model_derived
+        formula: Mg2SiO4
+        delta_S_fus_J_mol-1_K-1: 65.3
+        attribution: calculated in this work from Richet et al. (1993)
+      derived_from: &id013
+      - majzlan_2021_forsterite_heat_of_fusion_richet_1993
+      derivation:
+        relation: Δfusion S = Δfusion H / Tfusion from Richet et al. (1993) Δfusion H = 142.0 ± 14.0 kJ/mol and Tfusion = 2174 K
+        inputs: *id013
+        output_unit: J/mol K
+      uncertainty:
+        reported_status: printed
+        value: 6.4
+        units: J/mol K
+        confidence_level: not_stated
+    - observation_id: majzlan_2021_forsteritic_glass_transition_temperature_richet_1993
+      type: transition_point
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Configurational entropy of forsteritic glass
+      phase: glass
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        formula: Mg2SiO4
+        T_K: 990
+        transition_as_printed: glass-transition temperature
+        attribution: Richet et al. (1993)
+        qualification: The authors state this is the temperature where configurational entropy would vanish.
+      uncertainty:
+        reported_status: printed
+        value: 10
+        units: K
+        confidence_level: not_stated
+    - observation_id: majzlan_2021_mg67_assumed_glass_transition_temperature_tangeman_2001
+      type: transition_point
+      locator:
+        page: 7
+        pdf_page_index: 6
+        section: Configurational entropy of forsteritic glass
+      phase: glass
+      units: K
+      values:
+        quantity: transition_temperature
+        method_class: quoted_attributed
+        formula: Mg1.907SiO3.907
+        T_K: 1040
+        transition_as_printed: glass-transition temperature
+        attribution: Tangeman et al. (2001)
+        qualification: Tangeman et al. assumed crystallization begins just before glass transition; this is an estimate, not a direct measurement in the present work.
+    context:
+    - observation_id: majzlan_2021_table3_forsterite_heat_capacity_fit_context
+      type: heat_capacity_model
+      locator:
+        page: 5
+        pdf_page_index: 4
+        table: '3'
+        row: Forsterite
+      units: coefficient-specific factors as printed in Table 3; temperature ranges K
+      values:
+        sample: Forsterite
+        method_class: quoted_attributed
+        formula: Mg2SiO4
+        quantity_as_printed: heat-capacity polynomial coefficients
+        candidate_tokens_considered:
+        - cp
+        schema_gap: The table gives fitted polynomial coefficients, not numeric heat-capacity observations; the coefficients have no quantity token.
+        Berman_Brown_1985_equation_1:
+          k0: 271.3
+          k1: -3379
+          k2_times_1e_minus_6: 13.26
+          k3_times_1e_minus_8: -28.72
+          T_range_K:
+          - 298
+          - 1850
+        Richet_Fiquet_1991_equation_2:
+          a: -403.2
+          b: 74.34
+          c_times_1e_minus_4: 8.773
+          d_times_1e_minus_7: -2.597
+          e_times_1e_minus_9: 2.546
+          T_range_K:
+          - 298
+          - 1850
+        crystal_data_attribution: Gillet et al. (1991), Krupka et al. (1985a), and Thiéblot et al. (1999)
+        table_disposition: context-quoted-fit
+    - observation_id: majzlan_2021_forsterite_viscosity_model_context
+      type: viscosity_model_context
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: Viscosity of forsteritic liquids
+      units: A dimensionless in the printed log-viscosity equation; B as printed
+      values:
+        method_class: model_derived
+        quantity_as_printed: viscosity and fitted Adam–Gibbs parameters
+        candidate_tokens_considered:
+        - viscosity
+        schema_gap: The family brief assigns viscosity to context because it has no rail token for this task.
+        equation_as_printed: log η = A + B/[T Sconf(T)]
+        A: -2.34
+        B: 76500
+        Sconf_T_as_printed: 1.90 + (83.7 ln(T/1040))
+        fit_inputs_as_attributed:
+        - Shiraishi et al. (1978)
+        - Spice et al. (2015)
+        - Liebske et al. (2005)
+        - Lacks et al. (2007)
+        - Adjaoud et al. (2008)
+        excluded_from_fit_as_attributed:
+        - Urbain et al. (1982)
+        table_disposition: context-model
+    - observation_id: majzlan_2021_figure_8_deferred
+      type: figure_record
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: '8'
+      panel: whole_figure
+      attribution: Shiraishi et al. (1978), Spice et al. (2015), Liebske et al. (2005), Lacks et al. (2007), Adjaoud et al. (2008); Urbain et al. (1982) comparator.
+      units: K and log viscosity
+      values:
+        quantity: unavailable
+        species:
+        - forsteritic liquid (nominal Mg2SiO4)
+        phase: liquid
+        temperature_as_printed: approximately 1100–2800 K
+        axes_as_printed:
+          x: 10000/T (K−1)
+          top_x: temperature T (K)
+          y: log η
+        caption: 'Calculated viscosity of a forsteritic liquid and experimental data: diamonds were used for fitting; stars are data from Urbain et al. (1982).'
+        series:
+        - name: experimental data used for fit
+          marker: diamond
+          marker_count: 8
+          evidence_class: quoted_attributed
+        - name: Urbain et al. (1982)
+          marker: star
+          marker_count: 9
+          evidence_class: quoted_attributed
+        - name: Adam–Gibbs model
+          marker: line
+          marker_count: 0
+          evidence_class: model_derived
+        digitisation: deferred to a figure pass
+        schema_gap: The family brief assigns viscosity to context because there is no scorable rail token for this curve.
