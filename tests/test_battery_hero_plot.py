@@ -318,6 +318,24 @@ def test_low_count_bins_are_markers_and_flagged_rows_are_hollow(tmp_path: Path) 
     finally:
         plt.close(figure)
 
+    element_figure, element_axis = plt.subplots()
+    try:
+        draw_panel(element_axis, data, "openimcc", abundance, view="element")
+        si_gid = "series:openimcc:Si:pooled:element"
+        si_lines = [line for line in element_axis.lines if line.get_gid() == si_gid]
+        assert len(si_lines) == 1
+        assert si_lines[0].get_linestyle() == "--"
+        flagged_element_markers = [
+            artist
+            for artist in element_axis.collections
+            if artist.get_gid() == f"binned-marker:{si_gid}"
+            and float(artist.get_offsets()[0][0]) > 1200
+        ]
+        assert len(flagged_element_markers) == 1
+        assert len(flagged_element_markers[0].get_facecolors()) == 0
+    finally:
+        plt.close(element_figure)
+
 
 def test_deck_scatter_uses_only_scorer_flag_for_hollow_markers() -> None:
     figure, axis = plt.subplots()
@@ -374,24 +392,6 @@ def test_deck_renderer_emits_all_panels_and_missing_axis_labels(
     )
     assert "engine-computed fO2 not yet available" in cross_svg
     assert "fraction evaporated is not recorded" in residue_svg
-
-    element_figure, element_axis = plt.subplots()
-    try:
-        draw_panel(element_axis, data, "openimcc", abundance, view="element")
-        si_gid = "series:openimcc:Si:pooled:element"
-        si_lines = [line for line in element_axis.lines if line.get_gid() == si_gid]
-        assert len(si_lines) == 1
-        assert si_lines[0].get_linestyle() == "--"
-        flagged_element_markers = [
-            artist
-            for artist in element_axis.collections
-            if artist.get_gid() == f"binned-marker:{si_gid}"
-            and float(artist.get_offsets()[0][0]) > 1200
-        ]
-        assert len(flagged_element_markers) == 1
-        assert len(flagged_element_markers[0].get_facecolors()) == 0
-    finally:
-        plt.close(element_figure)
 
 
 @pytest.mark.parametrize("view", ("species", "element"))
