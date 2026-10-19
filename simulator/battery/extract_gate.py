@@ -27,6 +27,9 @@ _TABLE_NUMBER = re.compile(
 _CHEMICAL_FORMULA = re.compile(
     r"\b(?:[A-Z][a-z]?(?:\d+(?:\.\d+)?)?){1,8}\b"
 )
+_PRINTED_COMPOSITION_COLUMN = re.compile(
+    r"x_(.+)_(?:mol|wt|mass)_percent_as_printed"
+)
 _TABLE_CELL_NUMBER = re.compile(
     r"(?<![A-Za-z])[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?"
 )
@@ -815,42 +818,72 @@ def _source_prints_mixture(values: object, parent_formula: str) -> bool:
     except ValueError:
         composition = None
     if composition is not None and sum(
-        amount > 0 for _formula, amount in composition.components
+        amount != 0 for _formula, amount in composition.components
     ) >= 2:
         return True
 
     for printed in (
         values.get("composition_as_printed"),
         values.get("sample_as_printed"),
+        values.get("composition_mol"),
+        values.get("composition_mole_fraction"),
+        values.get("composition_wt_pct"),
+        values.get("composition"),
     ):
         if isinstance(printed, str):
             if len(set(_CHEMICAL_FORMULA.findall(printed))) >= 2:
                 return True
         elif isinstance(printed, (Mapping, list, tuple)):
-            positive = sum(
-                _as_decimal(raw_amount) is not None
-                and _as_decimal(raw_amount) > 0
-                for _formula, raw_amount in _component_pairs(printed)
+            present = sum(
+                _CHEMICAL_FORMULA.fullmatch(formula) is not None
+                and not _is_explicit_zero(raw_amount)
+                for formula, raw_amount in _component_pairs(printed)
             )
-            if positive >= 2:
+            if present >= 2:
                 return True
 
     printed_oxides: set[str] = set()
     for key, raw_amount in values.items():
-        match = re.fullmatch(
-            r"x_(.+)_mol_percent_as_printed", str(key)
-        )
-        amount = _as_decimal(raw_amount)
-        if match and amount is not None and amount > 0:
+        match = _PRINTED_COMPOSITION_COLUMN.fullmatch(str(key))
+        if match and not _is_explicit_zero(raw_amount):
             oxide = match.group(1)
+            if _CHEMICAL_FORMULA.fullmatch(oxide) is None:
+                continue
             printed_oxides.add(oxide)
             if oxide != parent_formula:
                 return True
     if len(printed_oxides) >= 2:
         return True
+    return False
+
+
+def _is_explicit_zero(value: object) -> bool:
+    if isinstance(value, bool) or not isinstance(value, (str, int, float, Decimal)):
+        return False
+    token = str(value).strip()
+    if not re.fullmatch(r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?", token):
+        return False
+    try:
+        return Decimal(token) == 0
+    except InvalidOperation:
+        return False
+
+
+def _source_has_printed_composition(values: object) -> bool:
+    if not isinstance(values, Mapping):
+        return False
+    composition_fields = {
+        "composition_as_printed",
+        "composition_mol",
+        "composition_mole_fraction",
+        "composition_wt_pct",
+        "composition",
+        "sample_as_printed",
+    }
     return any(
-        _source_prints_mixture(point, parent_formula)
-        for point in migrate._point_rows(values)
+        key in composition_fields
+        or _PRINTED_COMPOSITION_COLUMN.fullmatch(str(key))
+        for key in values
     )
 
 
@@ -863,15 +896,66 @@ def _transition_mixture_identity_issues(
     for parent_formula, raw in migrate.iter_extract_observations(doc):
         raw_id = str(raw.get("observation_id") or "")
         values = raw.get("values")
-        if not raw_id or not _source_prints_mixture(values, parent_formula):
+        if not raw_id or not isinstance(values, Mapping):
             continue
         prefix = f"{source_id}::{raw_id}"
-        migrated = (
-            observation
-            for observation_id, observation in observations.items()
-            if observation_id == prefix or observation_id.startswith(prefix + "::")
+        point_containers = [
+            (name, values[name])
+            for name in ("rows", "series", "points", "tests")
+            if isinstance(values.get(name), list) and values[name]
+        ]
+        inherited_mixture = _source_prints_mixture(
+            migrate._values_without_row_lists(values), parent_formula
         )
-        for observation in migrated:
+        point_mixtures: dict[str, bool] = {}
+        for container, rows in point_containers:
+            for index, point in enumerate(rows):
+                if not isinstance(point, Mapping):
+                    continue
+                point_mixture = (
+                    _source_prints_mixture(point, parent_formula)
+                    if _source_has_printed_composition(point)
+                    else inherited_mixture
+                )
+                point_temperature = migrate.select_declared_source(
+                    migrate.AXIS_TEMPERATURE_K, None, point
+                ).amount
+                point_extra = migrate.series_row_extra(
+                    point, include_locator=container != "series"
+                )
+                point_item = {
+                    "index": index,
+                    "item": point,
+                    "units": values.get("units"),
+                }
+                if container != "series":
+                    point_item["container"] = container
+                point_id = migrate._exploded_point_id(
+                    prefix,
+                    point_item,
+                    point_temperature,
+                    point,
+                    point_extra,
+                )
+                point_mixtures[point_id] = point_mixture
+
+        if point_containers:
+            migrated = (
+                (observation_id, observation)
+                for observation_id, observation in observations.items()
+                if observation_id in point_mixtures
+            )
+        else:
+            parent_mixture = _source_prints_mixture(values, parent_formula)
+            if not parent_mixture:
+                continue
+            migrated = (
+                (observation_id, observation)
+                for observation_id, observation in observations.items()
+                if observation_id == prefix
+                or observation_id.startswith(prefix + "::")
+            )
+        for observation_id, observation in migrated:
             identity = observation.identity
             quantity_state = identity.quantity
             quantity = (
@@ -881,6 +965,8 @@ def _transition_mixture_identity_issues(
                 migrate.Quantity.TRANSITION_TEMPERATURE,
                 migrate.Quantity.ENTHALPY_OF_FUSION,
             }:
+                continue
+            if point_containers and not point_mixtures[observation_id]:
                 continue
             profile = migrate.profile_for(identity)
             composition = identity.composition
