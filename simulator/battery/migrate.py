@@ -3766,7 +3766,7 @@ def _composition_located_from_values(
     values: object,
     locator: Locator | None,
 ) -> Located[Composition] | None:
-    """Convert only typed initial maps or structurally signaled FeOT maps."""
+    """Convert typed initial/datum maps or structurally signaled FeOT maps."""
 
     source_note = values.get("composition_derivation") if isinstance(values, Mapping) else None
     wt = _initial_oxide_map_from_values(
@@ -3777,7 +3777,7 @@ def _composition_located_from_values(
         return None
     has_feot = any(str(oxide).strip() == "FeOT" for oxide in wt)
     role, _refusal = _declared_composition_role(values)
-    if not has_feot and role != INITIAL_CHARGE_ONLY_PROXY_FLAG:
+    if not has_feot and role not in _COMPOSITION_ROLE_TOKENS:
         return None
     derivation = wt_pct_to_mole_fraction_derivation(
         wt,
@@ -3866,16 +3866,19 @@ def _located_printed_and_initial(
     return printed, initial
 
 
-_COMPOSITION_ROLE_TOKENS = frozenset({INITIAL_CHARGE_ONLY_PROXY_FLAG})
+_COMPOSITION_ROLE_TOKENS = frozenset({INITIAL_CHARGE_ONLY_PROXY_FLAG, "datum_state"})
 
 
 def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
     """Return (role, refusal) from the first ``composition_role`` declared.
 
-    The row is read before its parent values block. A role is either the bare
-    token or a mapping whose ``value`` is the token (with its page locator and
-    quote kept beside it in the extract). A token outside the closed set is a
-    refusal, never a guess.
+    The row is read before its parent values block. ``initial_charge_only``
+    marks a printed starting charge that must carry the initial-charge proxy
+    flag. ``datum_state`` marks a row composition that describes the sample at
+    the state this datum was measured; it applies to the observation's point
+    conditions and never marks the experiment's starting charge. Each typed
+    declaration is a bare token or a mapping with its page locator and quote.
+    A token outside the closed set is a refusal, never a guess.
     """
 
     for root in roots:
@@ -14295,7 +14298,7 @@ class Migrator:
                         source=source_key,
                         observation_id=obs_id,
                     )
-                if composition_role is not None:
+                if composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
                     initial_composition = replace(
                         initial_composition, proxy_flag=composition_role
                     )
@@ -16020,7 +16023,7 @@ class Migrator:
                     source=source_key,
                     observation_id=point_id,
                 )
-            if residual is not None and role is not None:
+            if residual is not None and role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
                 residual = replace(
                     residual,
                     state=State.of(replace(residual.state.value, proxy_flag=role)),
