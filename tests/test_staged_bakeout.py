@@ -302,18 +302,44 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # regenerated 2026-08-02 under REPAIRED MAGEMin config per the train13
     # adjudication; prior value was generated against the broken-liquidus job
     # tree (0.10246923985526701). docs-private/research/2026-08-02-train13-adjudication.md
-    assert staged_silica == pytest.approx(0.10262754045813638, rel=1e-9)
+    # d-166, remeasured at 721ce6806 via _run_staged (2026-10-17).
+    assert staged_silica == pytest.approx(0.06931802798909051, rel=1e-9)
     assert continuous_silica == pytest.approx(0.0, abs=1.0e-15)
-    assert set(staged_sio_stage) == {"Si", "SiO2", "Fe"}
+    assert {"Si", "SiO2", "Fe"} <= set(staged_sio_stage)
+    # d-168: CrO on the silica baffles is physical. Pin the round-12b
+    # measured trace composition (kg), including the smaller co-deposits.
+    assert {
+        species: mass
+        for species, mass in staged_sio_stage.items()
+        if species not in {"Si", "SiO2", "Fe"}
+    } == pytest.approx(
+        {
+            "CrO": 0.00013065784295295964,
+            "SiO2_gas": 0.00009975218707577267,
+            "TiO2_gas": 1.2766728789907638e-7,
+            "TiO": 8.748011299881444e-9,
+            "AlO": 1.2282338584032813e-8,
+            "CaO_gas": 3.2195536407146386e-11,
+            "Al": 4.660132095634931e-8,
+            "Al2O": 1.2314197984022692e-10,
+            "Al2O2": 1.4224475695805727e-11,
+            "AlO2": 1.9186393066262434e-12,
+            "CrO3": 1.4575866361827395e-8,
+        },
+        rel=1e-6,
+        abs=0.0,
+    )
     assert staged_sio_stage["Fe"] > 0.0
     assert staged_sio_stage["Si"] + staged_sio_stage["SiO2"] == pytest.approx(
         staged_silica, rel=1e-12
     )
     assert continuous_sio_stage == {}
-    # regenerated 2026-08-02 under REPAIRED MAGEMin config per the train13
-    # adjudication; prior value was generated against the broken-liquidus job
-    # tree (0.01143878479198185). docs-private/research/2026-08-02-train13-adjudication.md
-    assert staged_products["SiO"] == pytest.approx(0.011456288948423666)
+    # d-174 (owner 2026-10-18): the 2026-08-02 pin 0.011456288948423666 was
+    # stale and never re-checked, because the stage-silica assert above failed
+    # first. Green e912e472f measures 0.0076796816652895455 kg; the one-redox-
+    # state melt (b-899) gives 0.007727059368989958 kg (+0.6 %, the same size
+    # as the d-166 stage-silica move).
+    assert staged_products["SiO"] == pytest.approx(0.007727059368989958)
 
 
 def test_c2a_staged_respeciates_evaporative_metal_loss_internal_o():

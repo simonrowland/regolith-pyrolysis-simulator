@@ -134,14 +134,101 @@ def test_explicit_feedstock_body_sets_run_vacuum_floor() -> None:
     assert sim._commanded_pO2_bar() == pytest.approx(MOON_VACUUM_FLOOR_BAR)
 
 
-def test_intrinsic_melt_fo2_clamp_lowers_to_vacuum_body_floor() -> None:
-    sim = _sim()
+@pytest.mark.parametrize(
+    ("temperature_K", "expected_inverse"),
+    [
+        (1000.0, -22.164650192134065),
+        (1673.15, -10.740754356453898),
+        (1873.15, -9.161574733594396),
+    ],
+)
+def test_intrinsic_melt_fo2_inverse_reports_saturation_via_owner(
+    temperature_K: float,
+    expected_inverse: float,
+) -> None:
+    from simulator.fe_redox import (
+        FE_FEO_BUFFER_STANDARD,
+        _native_fe_saturation_comparison,
+        floor_vacuum_pressure_bar,
+    )
+
+    feedstocks = _load_yaml("feedstocks.yaml")
+    # Preserve this fixture's liquid-wustite reference, independent of the
+    # catalog's conventional solid-IW formation seed.
+    feedstocks["lunar_mare_low_ti"]["intrinsic_redox"].update(
+        buffer=FE_FEO_BUFFER_STANDARD,
+        buffer_source={
+            "reference": "Holzheid et al. 1997 Eq.9, wustite-liquid FeO reference",
+            "page": 30,
+        },
+    )
+    sim = _sim(feedstocks)
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
 
-    default_clamped = sim._compute_intrinsic_melt_fO2(temperature_K=1000.0)
-    sim.melt.body = "moon"
-    lunar_clamped = sim._compute_intrinsic_melt_fO2(temperature_K=1000.0)
+    pressure_bar = floor_vacuum_pressure_bar(
+        sim.melt.p_total_mbar / 1000.0,
+        floor_bar=sim._vacuum_floor_bar(),
+    )
+    melt_inventory = sim.atom_ledger.mol_by_account('process.cleaned_melt')
+    ferric = 2. * melt_inventory['Fe2O3']
+    expected = _native_fe_saturation_comparison(
+        sim._melt_oxide_wt_pct(),
+        fO2_log=expected_inverse,
+        T_K=temperature_K,
+        pressure_bar=pressure_bar,
+        fe3_over_sigma_fe=ferric / (melt_inventory['FeO'] + ferric),
+        # F1 / d-166: this imposed-fO2 seed is not a measured iron split.
+        # Its band is [-1, +0.5] dex, formerly the propagated assay band
+        # [-2.6187427296787993, +2.159750321955471] at the liquid points.
+        # At 1000 K the narrower band changes indeterminate -> below.
+        iron_seed=sim._feedstock_iron_initialization,
+    )
 
-    assert default_clamped == pytest.approx(math.log10(DEFAULT_VACUUM_FLOOR_BAR))
-    assert lunar_clamped == pytest.approx(math.log10(MOON_VACUUM_FLOOR_BAR))
-    assert lunar_clamped < default_clamped
+    inventory = sim.atom_ledger.mol_by_account()
+    transition_count = len(sim.atom_ledger.transitions)
+    default_inverse = sim._compute_intrinsic_melt_fO2(temperature_K)
+    sim.melt.body = "moon"
+    lunar_inverse = sim._compute_intrinsic_melt_fO2(temperature_K)
+
+    assert default_inverse == pytest.approx(expected_inverse, abs=1e-12)
+    assert lunar_inverse == pytest.approx(default_inverse, abs=1e-12)
+    assert sim.atom_ledger.mol_by_account() == inventory
+    assert len(sim.atom_ledger.transitions) == transition_count
+
+    notice = next(
+        item
+        for item in sim._redox_source_breakdown_diagnostic()[
+            "redox_bound_notices"
+        ]
+        if item["flag"] == expected['saturation_notice']['flag']
+        and item["melt_potential"] == pytest.approx(default_inverse)
+    )
+    assert notice["melt_potential"] == pytest.approx(default_inverse)
+    assert notice == expected['saturation_notice']
+    assert notice['status'] == expected['saturation_status']
+
+
+def test_intrinsic_melt_fo2_clamp_lowers_to_vacuum_body_floor() -> None:
+    """Old intent: the inverse itself was clamped down to the body vacuum floor.
+
+    d-072 ledger ownership fixes the inverse from the Fe inventory. The body
+    floor bounds gas-side pressure only. A moon body still lowers that floor,
+    and it does not lower the intrinsic melt fO2 or book any oxygen.
+    """
+    sim = _sim()
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    inventory = sim.atom_ledger.mol_by_account()
+    default_inverse = sim._compute_intrinsic_melt_fO2(temperature_K=1000.0)
+    default_floor = sim._vacuum_floor_bar()
+
+    sim.melt.body = "moon"
+    lunar_inverse = sim._compute_intrinsic_melt_fO2(temperature_K=1000.0)
+    lunar_floor = sim._vacuum_floor_bar()
+
+    assert default_floor == pytest.approx(DEFAULT_VACUUM_FLOOR_BAR)
+    assert lunar_floor == pytest.approx(MOON_VACUUM_FLOOR_BAR)
+    assert lunar_floor < default_floor
+    assert lunar_inverse == pytest.approx(default_inverse)
+    assert lunar_inverse != pytest.approx(math.log10(lunar_floor))
+    assert default_inverse != pytest.approx(math.log10(default_floor))
+    assert sim.atom_ledger.mol_by_account() == inventory

@@ -1445,6 +1445,7 @@ class PyrolysisRun:
         _attach_engine_commissioning_notice(run_metadata, sim)
         _attach_engine_binding_admission_notice(run_metadata, sim)
         _attach_diagnostic_gate_authority_notice(run_metadata, sim)
+        _attach_feedstock_iron_notice(run_metadata, sim)
         _attach_sulfur_saturation_notice(run_metadata, sim)
         _attach_rump_expectation_notice(run_metadata, sim)
         _attach_composition_projected_liquidus_notice(run_metadata, sim)
@@ -3483,6 +3484,17 @@ def _attach_diagnostic_gate_authority_notice(
         run_metadata["diagnostic_gate_authority_notice"] = _json_safe(notice)
 
 
+def _attach_feedstock_iron_notice(run_metadata: dict[str, Any], sim: Any) -> None:
+    # Initialization owns the conditions, split and certification gaps. Forward
+    # that computed provenance even when no equilibrium tick has executed.
+    notice = getattr(sim, '_feedstock_iron_initialization', None)
+    if isinstance(notice, Mapping) and notice:
+        run_metadata['feedstock_iron_notice'] = _json_safe(notice)
+        run_metadata['seed_authority'] = _json_safe(notice.get('seed_authority'))
+        run_metadata['iron_comproportionation'] = _json_safe(
+            getattr(sim, '_feedstock_iron_comproportionation', {}))
+
+
 def _sulfur_saturation_notice(sim: Any) -> dict[str, Any] | None:
     reader = getattr(sim, "sulfur_saturation_run_notice", None)
     if not callable(reader):
@@ -5288,6 +5300,7 @@ def _runner_failure_result(
     _attach_engine_commissioning_notice(run_metadata, sim)
     _attach_engine_binding_admission_notice(run_metadata, sim)
     _attach_diagnostic_gate_authority_notice(run_metadata, sim)
+    _attach_feedstock_iron_notice(run_metadata, sim)
     _attach_sulfur_saturation_notice(run_metadata, sim)
     _attach_rump_expectation_notice(run_metadata, sim)
     _attach_composition_projected_liquidus_notice(run_metadata, sim)

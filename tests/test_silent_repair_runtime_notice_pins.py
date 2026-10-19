@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
+import pytest
+
 from simulator.core import PyrolysisSimulator
 from simulator.evaporation import _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
 from simulator.fe_redox import KRESS91_LIQUID_CALIBRATION_MIN_T_C
@@ -122,10 +124,12 @@ def test_sr21_rejected_backend_message_names_producer_without_claiming_fallback(
         )
         sim._chem_registry = SimpleNamespace(authoritative_for=lambda _intent: None)
         sim.species_formula_registry = {}
+        sim.atom_ledger = sim._new_atom_ledger()
         sim._backend_composition_mol_by_account = lambda: {}
         sim._backend_composition_mol = lambda: {}
         sim._validate_backend_account_scope_support = lambda _composition: None
         sim._sync_oxygen_reservoir_mirror = lambda: None
+        sim._current_melt_redox_fO2_log = lambda: -10.0
         sim._backend_accepts_kwarg = lambda _name: False
         sim._disable_backend_after_failure = lambda: None
 
@@ -136,7 +140,27 @@ def test_sr21_rejected_backend_message_names_producer_without_claiming_fallback(
         else:
             raise AssertionError("real backend reject must raise RuntimeError")
         assert producer in message
+        assert "returned post-equilibrium phase material" in message
         assert "using internal-analytical fallback" not in message
+
+
+@pytest.mark.parametrize("backend", [MAGEMinBackend(), AlphaMELTSBackend()])
+def test_sr21_missing_ledger_refuses_before_backend_prediction(backend) -> None:
+    sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim.backend = backend
+    sim._backend_failed = False
+    backend.is_available = lambda: True
+
+    def unexpected_prediction(**_kwargs):
+        raise AssertionError("missing ledger must refuse before prediction")
+
+    backend.equilibrate = unexpected_prediction
+    with pytest.raises(RuntimeError, match="requires an AtomLedger") as exc:
+        sim._get_equilibrium()
+
+    assert sim._last_backend_error == str(exc.value)
+    assert sim._backend_failed is True
+    assert "using internal-analytical fallback" not in str(exc.value)
 
 
 def test_sr22_missing_curve_has_no_floor_repair_notice() -> None:

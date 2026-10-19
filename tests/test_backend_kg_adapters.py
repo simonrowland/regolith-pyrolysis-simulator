@@ -152,6 +152,58 @@ def _sim(backend):
     )
 
 
+def test_equilibrium_reads_current_ledger_redox_after_external_iron_load():
+    backend = RecordingInternalAnalyticalBackend()
+    sim = _sim(backend)
+    sim.load_batch('oxide', mass_kg=1000.)
+    old = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    sim.atom_ledger.load_external_mol(
+        'process.cleaned_melt', {'Fe2O3': 10.},
+        source='external assay material', material_origin='feedstock')
+    expected = sim._current_melt_redox_fO2_log()
+    assert expected != old
+    sim._get_equilibrium()
+    assert backend.calls[-1]['fO2_log'] == expected
+
+
+def test_split_diagnostic_reads_current_ledger_redox_after_external_iron_load():
+    sim = _sim(RecordingInternalAnalyticalBackend())
+    sim.load_batch('oxide', mass_kg=1000.)
+    old = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    sim.atom_ledger.load_external_mol(
+        'process.cleaned_melt', {'Fe2O3': 10.},
+        source='external assay material', material_origin='feedstock')
+    expected = sim._current_melt_redox_fO2_log()
+    assert expected != old
+    assert sim._compute_fe_redox_split_diagnostic()['fO2_log'] == expected
+
+
+def test_analytical_fallback_reads_current_ledger_redox_after_external_iron_load(
+    monkeypatch,
+):
+    import simulator.equilibrium as equilibrium
+
+    sim = _sim(None)
+    sim.load_batch('oxide', mass_kg=1000.)
+    sim.melt.temperature_C = 1400.
+    sim.atom_ledger.load_external_mol(
+        'process.cleaned_melt', {'Fe2O3': 10.},
+        source='external assay material', material_origin='feedstock')
+    expected = sim._current_melt_redox_fO2_log()
+    mirror = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    assert expected != mirror
+    captured = []
+    original = equilibrium.calphad_ferrous_feo_activity_diagnostic
+
+    def record(*args, **kwargs):
+        captured.append(kwargs['fO2_log'])
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(equilibrium, 'calphad_ferrous_feo_activity_diagnostic', record)
+    result = sim._get_equilibrium()
+    assert result.fO2_log == captured[-1] == expected
+
+
 def test_internal_analytical_backend_receives_mol_kernel_payload():
     backend = RecordingInternalAnalyticalBackend()
     sim = _sim(backend)
@@ -166,13 +218,17 @@ def test_internal_analytical_backend_receives_mol_kernel_payload():
     call = backend.calls[0]
     assert call["temperature_C"] == pytest.approx(25.0)
     assert call["composition_mol"]["SiO2"] == pytest.approx(
-        600.0 / (MOLAR_MASS["SiO2"] / 1000.0))
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        9979.380817954894)
     assert call["composition_mol"]["FeO"] == pytest.approx(
-        400.0 / (MOLAR_MASS["FeO"] / 1000.0))
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        5478.639774019004)
     assert call["fO2_log"] == pytest.approx(sim.melt.fO2_log)
     assert call["pressure_bar"] == pytest.approx(0.0)
-    assert sim.melt.composition_kg["SiO2"] == pytest.approx(600.0)
-    assert sim.melt.composition_kg["FeO"] == pytest.approx(400.0)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    assert sim.melt.composition_kg["SiO2"] == pytest.approx(599.5911376851839)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    assert sim.melt.composition_kg["FeO"] == pytest.approx(393.6073959246213)
 
 
 def test_backend_payload_ignores_stale_mutated_meltstate_kg():
@@ -186,9 +242,11 @@ def test_backend_payload_ignores_stale_mutated_meltstate_kg():
 
     call = backend.calls[0]
     assert call["composition_mol"]["SiO2"] == pytest.approx(
-        600.0 / (MOLAR_MASS["SiO2"] / 1000.0))
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        9979.380817954894)
     assert call["composition_mol"]["FeO"] == pytest.approx(
-        400.0 / (MOLAR_MASS["FeO"] / 1000.0))
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        5478.639774019004)
 
 
 def test_backend_result_applies_as_atom_delta():
@@ -201,7 +259,8 @@ def test_backend_result_applies_as_atom_delta():
     sim.step()
 
     sim.atom_ledger.assert_balanced()
-    expected_feo_remaining_kg = 400.0 - MOLAR_MASS["FeO"]
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    expected_feo_remaining_kg = 321.7633959246213
     expected_o2_kg = 0.5 * MOLAR_MASS["O2"]
     assert sim.atom_ledger.kg_by_account("process.cleaned_melt")[
         "FeO"
@@ -214,7 +273,8 @@ def test_backend_result_applies_as_atom_delta():
     assert (
         oxygen_partition["stored"] + oxygen_partition["vented"]
     ) == pytest.approx(expected_o2_kg)
-    assert sim.melt.composition_kg["SiO2"] == pytest.approx(600.0)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    assert sim.melt.composition_kg["SiO2"] == pytest.approx(599.5911376851839)
     assert sim.melt.composition_kg["FeO"] == pytest.approx(
         expected_feo_remaining_kg
     )

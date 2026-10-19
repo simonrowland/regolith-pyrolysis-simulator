@@ -6,8 +6,7 @@ pressure dict consumed by evaporation comes from this builtin provider.
 
 The provider:
 
-- reads ``process.cleaned_melt`` from the account view (the only
-  account it declares),
+- reads the canonical melt-resident accounts from its filtered view,
 - looks up Antoine coefficients from the ``vapor_pressures.yaml``
   payload passed at construction time,
 - combines Ellingham oxide-decomposition equilibrium with phase-correct
@@ -34,7 +33,8 @@ profile says "I CAN be authoritative"; the kernel wiring decides
 whether this build session actually uses this provider as the
 authority or as fallback.
 
-Account declaration: ``process.cleaned_melt`` only.  The provider must
+Account declaration: the canonical melt-resident accounts, including
+provenance-isolated spent oxide in the same physical melt. The provider must
 not see gas / metal / sulfide / salt accounts -- the kernel filter
 enforces this.  Mirrors the same constraint AlphaMELTS has (binding
 spec §7).
@@ -69,7 +69,8 @@ from simulator.vapour_rail.domain_policy import (
     declared_domain_transition,
 )
 from simulator.chemistry.kernel.capabilities import CapabilityProfile, ChemistryIntent
-from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
+from simulator.chemistry.kernel.dto import IntentRequest, IntentResult, ProviderAccountView
+from simulator.account_ids import MELT_RESIDENT_ACCOUNTS
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.chemistry.gas_rail_authority import (
     _gas_rail_block_is_authoritative,
@@ -1917,7 +1918,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             provider_id="builtin-vapor-pressure",
             intents=frozenset({ChemistryIntent.VAPOR_PRESSURE}),
             is_authoritative_for=frozenset({ChemistryIntent.VAPOR_PRESSURE}),
-            declared_accounts=frozenset({self.DECLARED_ACCOUNT}),
+            declared_accounts=frozenset(MELT_RESIDENT_ACCOUNTS),
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
@@ -1975,38 +1976,46 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             melt_dissociation_pO2_bar, melt_dissociation_pO2_clamped = (
                 physical_melt_dissociation_pO2_bar(float(intrinsic_fO2_log))
             )
+        from simulator.accounting.account_views import merge_species_amounts_from_accounts
+
+        melt_account_mol = merge_species_amounts_from_accounts(
+            request.account_view.accounts, MELT_RESIDENT_ACCOUNTS)
+        basis_view = ProviderAccountView(
+            accounts={self.DECLARED_ACCOUNT: melt_account_mol},
+            species_formula_registry=request.account_view.species_formula_registry)
         comp_wt = composition_wt_pct_from_account_view(
-            request.account_view, self.DECLARED_ACCOUNT
-        )
+            basis_view, self.DECLARED_ACCOUNT)
         from simulator.chemistry.structural_activity import (
             structural_activity_diagnostic,
         )
 
         structural_activity_reference = structural_activity_diagnostic(
-            request.account_view.accounts.get(self.DECLARED_ACCOUNT, {}),
+            melt_account_mol,
             temperature_K=T_K,
         )
         warnings: list[str] = []
-        melt_account_mol = dict(
-            request.account_view.accounts.get(self.DECLARED_ACCOUNT, {}) or {}
-        )
         feo_activity_pressure_bar = vacuum_floor_bar
+        feo_activity_diagnostic = None
         if intrinsic_fO2_log is not None:
             from simulator.fe_redox import (
-                kress91_ferrous_feo_activity,
+                calphad_ferrous_feo_activity_diagnostic,
                 kress91_furnace_activity_pressure_bar,
             )
 
             feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
                 floor_bar=vacuum_floor_bar,
             )
-            below_cap_fe_activity = kress91_ferrous_feo_activity(
+            feo_activity_diagnostic = calphad_ferrous_feo_activity_diagnostic(
                 comp_wt=comp_wt,
                 fO2_log=intrinsic_fO2_log,
                 T_K=T_K,
                 pressure_bar=feo_activity_pressure_bar,
                 floor_bar=vacuum_floor_bar,
+                closed_ledger=(controls.get('melt_redox_state', {}).get('origin')
+                               == 'closed_ledger'),
             )
+            below_cap_fe_activity = max(0.0, float(
+                feo_activity_diagnostic.get('a_FeO_authoritative', 0.0) or 0.0))
             below_cap_fe_activity_basis = "kress91_ferrous"
         else:
             below_cap_fe_activity = comp_wt.get("FeO", 0.0) / 100.0
@@ -2030,20 +2039,6 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     f"{notice.get('code', 'high_t_melt_activity_notice')}: "
                     f"{notice.get('message', '')}"
                 )
-        feo_activity_diagnostic = None
-        if intrinsic_fO2_log is not None:
-            from simulator.fe_redox import (
-                calphad_ferrous_feo_activity_diagnostic,
-            )
-
-            feo_activity_diagnostic = calphad_ferrous_feo_activity_diagnostic(
-                comp_wt=comp_wt,
-                fO2_log=intrinsic_fO2_log,
-                T_K=T_K,
-                pressure_bar=feo_activity_pressure_bar,
-                floor_bar=vacuum_floor_bar,
-            )
-
         vapor_pressures: dict[str, float] = {}
         vapor_pressure_sources: dict[str, str] = {}
         vapor_pressure_provenance: dict[str, dict[str, Any]] = {}
@@ -3407,6 +3402,20 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
         if feo_activity_diagnostic is not None:
             diagnostic["a_FeO_calphad"] = feo_activity_diagnostic
+        redox_state = controls.get('melt_redox_state', {})
+        if (redox_state.get('origin') == 'closed_ledger'
+                and 'FE_FEO_SATURATION_BOUND' in redox_state.get('flags', ())):
+            # Reuse the existing run-notice channel after activity selection.
+            # Below the cap this carries only a notice, never a claim that
+            # OpenIMCC ran. The bound is a stability limit, not an imposed x.
+            diagnostic.setdefault('high_t_melt_activity', {}).setdefault(
+                'notices', []).append({
+                    'code': 'FE_FEO_SATURATION_BOUND',
+                    'type': 'typed_notice',
+                    'bound': redox_state['bound'],
+                    'fO2_log': intrinsic_fO2_log,
+                    'message': 'Ferric inventory exhausted; Fe/FeO saturation sets a lower bound on the melt potential.',
+                })
 
         return IntentResult(
             intent=ChemistryIntent.VAPOR_PRESSURE,

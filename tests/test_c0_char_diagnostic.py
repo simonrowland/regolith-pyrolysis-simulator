@@ -27,9 +27,11 @@ def test_ci_c0_reports_refractory_char_and_warns_without_lance() -> None:
     assert diagnostic["partition"]["f_refractory_organic_C"] == pytest.approx(0.5075)
     assert diagnostic["partition"]["fraction_basis"] == "f_char_of_bulk_organic_C"
     live_char = diagnostic["inventory"]["refractory_char_C_mol"]
-    assert live_char == pytest.approx(1305.7985635282805)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    assert live_char == pytest.approx(1303.9765202893107)
     assert diagnostic["inventory"]["formed_refractory_char_C_mol"] == pytest.approx(
-        1305.7985635282805
+        # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+        1303.9765202893107
     )
     assert live_char > 0.0
     assert diagnostic["inventory"]["refractory_char_C_kg"] == pytest.approx(
@@ -66,7 +68,8 @@ def test_ci_c0_reports_refractory_char_and_warns_without_lance() -> None:
         reduction["FeO_reducible_mol"]
     )
     # 1:1 FeO+C->Fe+CO from the committed CI char (char-limited).
-    assert reduction["Fe_equivalent_kg"] == pytest.approx(72.92232078023682)
+    # d-156 (owner 2026-10-16): b-899 one-redox-state rebaseline, measured at 92ee4bb1d
+    assert reduction["Fe_equivalent_kg"] == pytest.approx(72.82056877555655)
 
 
 def test_ci_c0_sufficient_lance_clears_warning_on_both_oxidation_bases() -> None:

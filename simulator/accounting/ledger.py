@@ -11,6 +11,9 @@ from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import Any
 
+from simulator.accounting.account_views import (
+    merge_species_amounts_from_accounts as _merge_species_amounts_from_accounts,
+)
 from simulator.accounting.exceptions import (
     AccountCreditPolicyError,
     AccountingError,
@@ -47,6 +50,8 @@ DEFAULT_BALANCE_TOLERANCE_KG = 1e-12
 DEFAULT_BALANCE_RELATIVE_TOLERANCE = 1e-12
 DEFAULT_BALANCE_ABSOLUTE_FLOOR_KG = 1e-15
 DEFAULT_SCOPE = "batch"
+
+
 POLICY_SCOPES = {"batch", "campaign", "external"}
 TERMINAL_DEBIT_EXCEPTIONS = {
     (
