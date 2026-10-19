@@ -16276,6 +16276,11 @@ class Migrator:
                 model=(row_model if isinstance(row_model, str) else None),
             )
         quantity, species, ident_kwargs = identity_base
+        q_token = (
+            quantity.value
+            if isinstance(quantity, State) and quantity.is_value
+            else (quantity if isinstance(quantity, Quantity) else None)
+        )
         coord = None
         val = None
         trail = "identity"
@@ -16481,9 +16486,6 @@ class Migrator:
                     source=source_key,
                     observation_id=point_id,
                 )
-            q_token = quantity.value if isinstance(quantity, State) and quantity.is_value else (
-                quantity if isinstance(quantity, Quantity) else None
-            )
             selection_payload: Mapping[str, Any] = raw_item
             if (
                 q_token is Quantity.EVOLVED_GAS_YIELD
@@ -16595,11 +16597,7 @@ class Migrator:
             )
             if inherited_n is not None and exp_n is not None and inherited_n != exp_n:
                 ident_kwargs.pop("temperature_K", None)
-        q_token_point = (
-            quantity.value
-            if isinstance(quantity, State) and quantity.is_value
-            else (quantity if isinstance(quantity, Quantity) else None)
-        )
+        q_token_point = q_token
         if (
             q_token_point is Quantity.ACTIVITY_COEFFICIENT
             and isinstance(raw_item, Mapping)
@@ -16789,9 +16787,6 @@ class Migrator:
             )
         else:
             if value_sel is None:
-                q_token = quantity.value if isinstance(quantity, State) and quantity.is_value else (
-                    quantity if isinstance(quantity, Quantity) else None
-                )
                 value_sel = select_declared_source(
                     q_token, units, raw_item if isinstance(raw_item, Mapping) else None
                 )

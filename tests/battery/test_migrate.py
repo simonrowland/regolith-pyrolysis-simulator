@@ -15041,6 +15041,26 @@ def test_duplicate_guard_catches_measured_copy_but_not_ulp_or_different_value() 
     assert _same_work_observation_duplicate_pairs([owner, duplicate]) == []
 
 
+def test_transition_point_non_mapping_row_migrates_without_crashing(
+    tmp_path: Path,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["type"] = "transition_point"
+    row["units"] = "K"
+    row["values"] = {
+        "quantity": "transition_temperature",
+        "points": [1200],
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    assert len(result.observations) == 1
+    observation = next(iter(result.observations.values()))
+    assert quantity_token(observation.identity) is Quantity.TRANSITION_TEMPERATURE
+    assert observation.value.kind is ValueKind.UNAVAILABLE
+
+
 def test_fusion_quantities_migrate_with_phase_transition_identity(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     observations = extract["species"]["Na"]["observations"]
